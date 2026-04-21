@@ -4,9 +4,29 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Target, Zap, Globe, Layout, BarChart3, Search, ArrowRight, Check,
-  Star, Menu, X, Sparkles, Rocket, Shield, Clock, Users, Bot, Code2,
-  TrendingUp, Trophy, Flame, ChevronRight, Play,
+  Target,
+  Zap,
+  Globe,
+  Layout,
+  BarChart3,
+  Search,
+  ArrowRight,
+  Check,
+  Star,
+  Menu,
+  X,
+  Sparkles,
+  Rocket,
+  Shield,
+  Clock,
+  Users,
+  Bot,
+  Code2,
+  TrendingUp,
+  Trophy,
+  Flame,
+  ChevronRight,
+  Play,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
@@ -63,7 +83,7 @@ const WEAPONS = [
   {
     icon: Code2,
     name: "API & Developer Arsenal",
-    description: "REST API generators, Chrome extensions, component libraries, PWAs. Ship developer tools at warp speed.",
+    description: "REST API generators, Globe2 extensions, component libraries, PWAs. Ship developer tools at warp speed.",
     stat: "4 dev tools",
   },
 ];
@@ -154,25 +174,25 @@ export default function Dominat8Page() {
   const [annualBilling, setAnnualBilling] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white relative">
+    <div className="min-h-screen bg-[#060e1f] text-white relative">
       <BackgroundEffects preset="technical" />
       {/* Announcement bar */}
-      <div className="relative z-10 bg-gradient-to-r from-red-600 via-red-500 to-orange-600 text-white text-center py-2.5 text-xs font-medium">
+      <div className="relative z-10 bg-gradient-to-r from-stone-600 via-stone-500 to-stone-600 text-white text-center py-2.5 text-xs font-medium">
         <span className="hidden sm:inline">Join businesses already dominating their market with AI</span>
         <span className="sm:hidden">Dominate your market with AI</span>
-        <span className="mx-2 text-red-200/60">|</span>
-        <Link href="/builder" className="underline font-bold hover:text-red-100 transition-colors">Try free →</Link>
+        <span className="mx-2 text-stone-200/60">|</span>
+        <Link href="/builder" className="underline font-bold hover:text-stone-100 transition-colors">Try free →</Link>
       </div>
 
       {/* Nav */}
-      <nav className="relative sticky top-0 z-50 border-b border-white/[0.10] bg-[#050508]/90 backdrop-blur-xl">
+      <nav className="relative sticky top-0 z-50 border-b border-white/[0.10] bg-[#060e1f]/90 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/dominat8" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 to-red-400 flex items-center justify-center shadow-lg shadow-red-500/25">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-stone-600 to-stone-400 flex items-center justify-center shadow-lg shadow-stone-500/25">
               <Target size={18} className="text-white" />
             </div>
             <span className="text-xl font-black tracking-tight">
-              Dominat<span className="text-red-400">8</span>
+              Dominat<span className="text-stone-400">8</span>
             </span>
           </Link>
 
@@ -189,7 +209,7 @@ export default function Dominat8Page() {
             </Link>
             <Link
               href="/builder"
-              className="px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-400 text-white rounded-lg text-sm font-bold hover:from-red-500 hover:to-orange-500 transition-all shadow-lg shadow-red-500/25"
+              className="px-5 py-2.5 bg-gradient-to-r from-stone-600 to-stone-400 text-white rounded-lg text-sm font-bold hover:from-stone-500 hover:to-stone-500 transition-all shadow-lg shadow-stone-500/25"
             >
               Start Dominating
             </Link>
@@ -207,13 +227,13 @@ export default function Dominat8Page() {
         <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         {/* Dramatic background */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-red-600/[0.10] blur-[150px]" />
-          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-orange-600/[0.08] blur-[130px]" />
-          <div className="absolute top-1/3 right-0 w-[400px] h-[400px] rounded-full bg-red-500/[0.06] blur-[100px]" />
+          <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full bg-stone-600/[0.10] blur-[150px]" />
+          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full bg-stone-600/[0.08] blur-[130px]" />
+          <div className="absolute top-1/3 right-0 w-[400px] h-[400px] rounded-full bg-stone-500/[0.06] blur-[100px]" />
           {/* Grid overlay */}
           <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "linear-gradient(rgba(239,68,68,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(239,68,68,0.3) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
           {/* Spotlight */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[50%] bg-gradient-to-b from-red-500/[0.12] to-transparent blur-[60px]" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[50%] bg-gradient-to-b from-stone-500/[0.12] to-transparent blur-[60px]" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 pt-24 pb-20 text-center relative w-full">
@@ -222,7 +242,7 @@ export default function Dominat8Page() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-bold uppercase tracking-wider mb-10">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-300 text-xs font-bold uppercase tracking-wider mb-10">
               <div className="relative">
                 <Zap size={14} />
                 <div className="absolute inset-0 animate-ping opacity-40"><Zap size={14} /></div>
@@ -238,7 +258,7 @@ export default function Dominat8Page() {
             className="text-[3.5rem] sm:text-[5rem] lg:text-[6.5rem] font-display font-black tracking-[-0.04em] mb-8 leading-[0.85]"
           >
             <span className="block text-white">Your competitors</span>
-            <span className="block mt-3 bg-gradient-to-r from-red-500 via-orange-300 to-red-400 bg-clip-text text-transparent drop-shadow-[0_0_80px_rgba(239,68,68,0.4)]" style={{ backgroundSize: "200% auto", animation: "gradient-shift 4s ease-in-out infinite" }}>
+            <span className="block mt-3 bg-gradient-to-r from-stone-500 via-stone-300 to-stone-400 bg-clip-text text-transparent drop-shadow-[0_0_80px_rgba(239,68,68,0.4)]" style={{ backgroundSize: "200% auto", animation: "gradient-shift 4s ease-in-out infinite" }}>
               are not ready.
             </span>
           </motion.h1>
@@ -253,7 +273,7 @@ export default function Dominat8Page() {
             agency-quality sites, apps, and marketing assets in{" "}
             <span className="text-white font-semibold">under 60 seconds</span>.
             <br className="hidden sm:block" />
-            30+ AI generators. 7-agent pipeline. <span className="text-red-300 font-semibold">Zero mercy.</span>
+            30+ AI generators. 7-agent pipeline. <span className="text-stone-300 font-semibold">Zero mercy.</span>
           </motion.p>
 
           <motion.div
@@ -264,7 +284,7 @@ export default function Dominat8Page() {
           >
             <Link
               href="/builder"
-              className="group inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white rounded-2xl text-lg font-black uppercase tracking-wide hover:from-red-500 hover:via-orange-500 hover:to-yellow-500 transition-all shadow-[0_0_50px_rgba(239,68,68,0.5),0_8px_30px_rgba(239,68,68,0.3)] hover:shadow-[0_0_70px_rgba(239,68,68,0.6),0_12px_40px_rgba(239,68,68,0.4)] hover:-translate-y-1.5 hover:scale-[1.02] duration-300"
+              className="group inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-stone-600 via-stone-500 to-stone-500 text-white rounded-2xl text-lg font-black uppercase tracking-wide hover:from-stone-500 hover:via-stone-500 hover:to-stone-500 transition-all shadow-[0_0_50px_rgba(239,68,68,0.5),0_8px_30px_rgba(239,68,68,0.3)] hover:shadow-[0_0_70px_rgba(239,68,68,0.6),0_12px_40px_rgba(239,68,68,0.4)] hover:-translate-y-1.5 hover:scale-[1.02] duration-300"
             >
               <Sparkles size={20} />
               Start Dominating Free
@@ -288,7 +308,7 @@ export default function Dominat8Page() {
           >
             {STATS.map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-red-500 via-orange-300 to-red-400 bg-clip-text text-transparent">
+                <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-stone-500 via-stone-300 to-stone-400 bg-clip-text text-transparent">
                   {stat.value}
                 </div>
                 <div className="text-xs text-white/60 mt-1.5 font-medium uppercase tracking-wider">{stat.label}</div>
@@ -313,14 +333,14 @@ export default function Dominat8Page() {
             return (
               <div
                 key={weapon.name}
-                className="group rounded-xl border border-white/[0.10] bg-white/[0.05] p-6 hover:border-red-500/30 hover:bg-red-500/[0.02] transition-all duration-300"
+                className="group rounded-xl border border-white/[0.10] bg-white/[0.05] p-6 hover:border-stone-500/30 hover:bg-stone-500/[0.02] transition-all duration-300"
               >
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center mb-4 group-hover:from-red-500/30 group-hover:to-orange-500/30 transition-colors">
-                  <Icon size={22} className="text-red-400" />
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 flex items-center justify-center mb-4 group-hover:from-stone-500/30 group-hover:to-stone-500/30 transition-colors">
+                  <Icon size={22} className="text-stone-400" />
                 </div>
                 <h3 className="text-lg font-bold mb-2">{weapon.name}</h3>
                 <p className="text-sm text-white/60 leading-relaxed mb-4">{weapon.description}</p>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-semibold">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-500/10 text-stone-400 text-xs font-semibold">
                   <Zap size={12} />
                   {weapon.stat}
                 </div>
@@ -334,7 +354,7 @@ export default function Dominat8Page() {
       <section id="compare" className="max-w-5xl mx-auto px-6 py-24">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-display font-black mb-4">
-            Dominat<span className="text-red-400">8</span> vs Traditional Agencies
+            Dominat<span className="text-stone-400">8</span> vs Traditional Agencies
           </h2>
           <p className="text-white/60">Same quality. Fraction of the cost. None of the waiting.</p>
         </div>
@@ -342,7 +362,7 @@ export default function Dominat8Page() {
         <div className="rounded-xl border border-white/[0.10] overflow-hidden">
           <div className="grid grid-cols-3 bg-white/[0.07] border-b border-white/[0.10]">
             <div className="p-4 text-xs font-bold text-white/65 uppercase tracking-wider">Feature</div>
-            <div className="p-4 text-xs font-bold text-red-400 uppercase tracking-wider text-center">Dominat8</div>
+            <div className="p-4 text-xs font-bold text-stone-400 uppercase tracking-wider text-center">Dominat8</div>
             <div className="p-4 text-xs font-bold text-white/60 uppercase tracking-wider text-center">Agency</div>
           </div>
           {COMPARISON.map((row, i) => (
@@ -351,7 +371,7 @@ export default function Dominat8Page() {
               className={`grid grid-cols-3 ${i < COMPARISON.length - 1 ? "border-b border-white/[0.08]" : ""}`}
             >
               <div className="p-4 text-sm text-white/60">{row.feature}</div>
-              <div className="p-4 text-sm text-center font-semibold text-emerald-400">{row.us}</div>
+              <div className="p-4 text-sm text-center font-semibold text-stone-400">{row.us}</div>
               <div className="p-4 text-sm text-center text-white/60">{row.them}</div>
             </div>
           ))}
@@ -373,7 +393,7 @@ export default function Dominat8Page() {
             >
               <div className="flex gap-1 mb-4">
                 {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
+                  <Star key={i} size={14} className="fill-stone-400 text-stone-400" />
                 ))}
               </div>
               <p className="text-sm text-white/60 leading-relaxed mb-6 italic">
@@ -409,7 +429,7 @@ export default function Dominat8Page() {
                 annualBilling ? "bg-white/[0.1] text-white" : "text-white/60"
               }`}
             >
-              Annual <span className="text-emerald-400 font-bold">-20%</span>
+              Annual <span className="text-stone-400 font-bold">-20%</span>
             </button>
           </div>
         </div>
@@ -420,12 +440,12 @@ export default function Dominat8Page() {
               key={plan.name}
               className={`relative rounded-xl border p-8 ${
                 plan.highlighted
-                  ? "border-red-500/30 bg-red-500/[0.03] shadow-xl shadow-red-500/5"
+                  ? "border-stone-500/30 bg-stone-500/[0.03] shadow-xl shadow-stone-500/5"
                   : "border-white/[0.10] bg-white/[0.05]"
               }`}
             >
               {plan.highlighted && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-red-600 to-red-400 text-white text-xs font-bold rounded-full uppercase tracking-wider">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-stone-600 to-stone-400 text-white text-xs font-bold rounded-full uppercase tracking-wider">
                   Most Popular
                 </span>
               )}
@@ -445,13 +465,13 @@ export default function Dominat8Page() {
                   <span className="text-white/60 text-sm">{plan.period}</span>
                 )}
                 {annualBilling && plan.price !== "Free" && plan.price !== "Custom" && (
-                  <div className="text-xs text-emerald-400 mt-1">Save $120/year</div>
+                  <div className="text-xs text-stone-400 mt-1">Save $120/year</div>
                 )}
               </div>
               <ul className="space-y-3 mb-8">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-white/60">
-                    <Check size={14} className="text-emerald-400 mt-0.5 shrink-0" />
+                    <Check size={14} className="text-stone-400 mt-0.5 shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -460,7 +480,7 @@ export default function Dominat8Page() {
                 href={plan.price === "Custom" ? "/support" : "/builder"}
                 className={`block w-full text-center py-3 rounded-lg text-sm font-bold transition-all ${
                   plan.highlighted
-                    ? "bg-gradient-to-r from-red-600 to-red-400 text-white font-black uppercase tracking-wide hover:from-red-500 hover:to-orange-500 shadow-lg shadow-red-500/20"
+                    ? "bg-gradient-to-r from-stone-600 to-stone-400 text-white font-black uppercase tracking-wide hover:from-stone-500 hover:to-stone-500 shadow-lg shadow-stone-500/20"
                     : "bg-white/[0.09] text-white/80 hover:bg-white/[0.1] border border-white/[0.12]"
                 }`}
               >
@@ -473,9 +493,9 @@ export default function Dominat8Page() {
 
       {/* Final CTA */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-red-600/8 to-orange-500/6" />
+        <div className="absolute inset-0 bg-gradient-to-r from-stone-600/8 to-stone-500/6" />
         <div className="max-w-4xl mx-auto px-6 py-24 text-center relative">
-          <Trophy size={48} className="mx-auto text-red-400/60 mb-6" />
+          <Trophy size={48} className="mx-auto text-stone-400/60 mb-6" />
           <h2 className="text-3xl sm:text-4xl font-display font-black mb-4">
             Stop competing. Start dominating.
           </h2>
@@ -485,7 +505,7 @@ export default function Dominat8Page() {
           </p>
           <Link
             href="/builder"
-            className="inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white rounded-xl text-lg font-black uppercase tracking-wide hover:from-red-500 hover:to-orange-500 transition-all shadow-[0_0_40px_rgba(239,68,68,0.4)] hover:shadow-[0_0_60px_rgba(239,68,68,0.5)] hover:-translate-y-1 hover:scale-[1.02] duration-300"
+            className="inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-stone-600 via-stone-500 to-stone-500 text-white rounded-xl text-lg font-black uppercase tracking-wide hover:from-stone-500 hover:to-stone-500 transition-all shadow-[0_0_40px_rgba(239,68,68,0.4)] hover:shadow-[0_0_60px_rgba(239,68,68,0.5)] hover:-translate-y-1 hover:scale-[1.02] duration-300"
           >
             Start Dominating — It&apos;s Free
             <ArrowRight size={20} />
@@ -495,15 +515,15 @@ export default function Dominat8Page() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.06] bg-[#050508]">
+      <footer className="border-t border-white/[0.06] bg-[#060e1f]">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-red-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-600 to-stone-400 flex items-center justify-center">
                 <Target size={16} className="text-white" />
               </div>
               <span className="text-lg font-black">
-                Dominat<span className="text-red-400">8</span>
+                Dominat<span className="text-stone-400">8</span>
               </span>
             </div>
             <div className="flex items-center gap-6 text-xs text-white/60">

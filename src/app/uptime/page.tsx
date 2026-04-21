@@ -3,9 +3,24 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Activity, CheckCircle2, XCircle, AlertTriangle, Clock,
-  Globe, Shield, Bell, Plus, ArrowRight, Settings, Pause,
-  RefreshCw, ExternalLink, Lock, Wifi, Server, Zap
+  Activity,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Clock,
+  Globe,
+  Shield,
+  Bell,
+  Plus,
+  ArrowRight,
+  Settings,
+  Pause,
+  RefreshCw,
+  ExternalLink,
+  Lock,
+  Wifi,
+  Server,
+  Zap,
 } from 'lucide-react';
 
 interface Monitor {
@@ -84,7 +99,7 @@ function UptimeBars({ bars }: { bars: ('up' | 'down' | 'degraded' | 'none')[] })
   return (
     <div className="flex gap-px">
       {bars.map((b, i) => (
-        <div key={i} className={`w-1 h-6 rounded-sm ${b === 'up' ? 'bg-green-500' : b === 'down' ? 'bg-red-500' : b === 'degraded' ? 'bg-yellow-500' : 'bg-white/10'}`}
+        <div key={i} className={`w-1 h-6 rounded-sm ${b === 'up' ? 'bg-stone-500' : b === 'down' ? 'bg-stone-500' : b === 'degraded' ? 'bg-stone-500' : 'bg-white/10'}`}
           title={`Day ${90 - i}: ${b}`} />
       ))}
     </div>
@@ -92,9 +107,9 @@ function UptimeBars({ bars }: { bars: ('up' | 'down' | 'degraded' | 'none')[] })
 }
 
 function StatusIcon({ status }: { status: string }) {
-  if (status === 'up') return <CheckCircle2 className="w-5 h-5 text-green-400" />;
-  if (status === 'down') return <XCircle className="w-5 h-5 text-red-400" />;
-  return <AlertTriangle className="w-5 h-5 text-yellow-400" />;
+  if (status === 'up') return <CheckCircle2 className="w-5 h-5 text-stone-400" />;
+  if (status === 'down') return <XCircle className="w-5 h-5 text-stone-400" />;
+  return <AlertTriangle className="w-5 h-5 text-stone-400" />;
 }
 
 export default function UptimePage() {
@@ -111,16 +126,16 @@ export default function UptimePage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="text-white/70 font-medium">Uptime Monitor</span>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => setShowAlerts(!showAlerts)} className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors relative">
               <Bell className="w-4 h-4" />
-              {degraded && <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-yellow-500" />}
+              {degraded && <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-stone-500" />}
             </button>
-            <button onClick={() => setShowAddMonitor(!showAddMonitor)} className="px-4 py-2 text-sm bg-gradient-to-r from-green-600 to-cyan-600 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center gap-1">
+            <button onClick={() => setShowAddMonitor(!showAddMonitor)} className="px-4 py-2 text-sm bg-gradient-to-r from-stone-600 to-stone-600 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center gap-1">
               <Plus className="w-4 h-4" /> Add Monitor
             </button>
           </div>
@@ -129,9 +144,9 @@ export default function UptimePage() {
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         {/* Status Banner */}
-        <div className={`p-6 rounded-xl border mb-8 ${allUp ? 'border-green-500/30 bg-green-500/10' : degraded ? 'border-yellow-500/30 bg-yellow-500/10' : 'border-red-500/30 bg-red-500/10'}`}>
+        <div className={`p-6 rounded-xl border mb-8 ${allUp ? 'border-stone-500/30 bg-stone-500/10' : degraded ? 'border-stone-500/30 bg-stone-500/10' : 'border-stone-500/30 bg-stone-500/10'}`}>
           <div className="flex items-center gap-3">
-            {allUp ? <CheckCircle2 className="w-8 h-8 text-green-400" /> : degraded ? <AlertTriangle className="w-8 h-8 text-yellow-400" /> : <XCircle className="w-8 h-8 text-red-400" />}
+            {allUp ? <CheckCircle2 className="w-8 h-8 text-stone-400" /> : degraded ? <AlertTriangle className="w-8 h-8 text-stone-400" /> : <XCircle className="w-8 h-8 text-stone-400" />}
             <div>
               <h2 className="text-xl font-bold">{allUp ? 'All Systems Operational' : degraded ? 'Partial System Degradation' : 'System Outage Detected'}</h2>
               <p className="text-sm text-gray-400">Last checked 12 seconds ago &middot; {avgUptime}% average uptime over 90 days</p>
@@ -148,7 +163,7 @@ export default function UptimePage() {
             { label: 'SSL Certs', value: `${MONITORS.filter(m => m.sslDays).length} tracked`, icon: Lock },
           ].map((s, i) => (
             <div key={i} className="p-4 rounded-xl border border-white/10 bg-white/5">
-              <s.icon className="w-5 h-5 text-green-400 mb-2" />
+              <s.icon className="w-5 h-5 text-stone-400 mb-2" />
               <div className="text-2xl font-bold">{s.value}</div>
               <div className="text-xs text-gray-400">{s.label}</div>
             </div>
@@ -157,8 +172,8 @@ export default function UptimePage() {
 
         {/* Add Monitor Form */}
         {showAddMonitor && (
-          <div className="p-6 rounded-xl border border-green-500/20 bg-green-500/5 mb-8 space-y-4">
-            <h3 className="font-semibold flex items-center gap-2"><Plus className="w-5 h-5 text-green-400" /> Add New Monitor</h3>
+          <div className="p-6 rounded-xl border border-stone-500/20 bg-stone-500/5 mb-8 space-y-4">
+            <h3 className="font-semibold flex items-center gap-2"><Plus className="w-5 h-5 text-stone-400" /> Add New Monitor</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <input placeholder="Monitor name" className="bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500" />
               <input placeholder="https://example.com" className="bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500" />
@@ -166,11 +181,11 @@ export default function UptimePage() {
                 <option>Check every 1 minute</option><option>Check every 5 minutes</option><option>Check every 15 minutes</option>
               </select>
               <select className="bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white">
-                <option>Alert via Email</option><option>Alert via Slack</option><option>Alert via SMS</option><option>Alert via Webhook</option>
+                <option>Alert via Email</option><option>Alert via Hash</option><option>Alert via SMS</option><option>Alert via Webhook</option>
               </select>
             </div>
             <div className="flex gap-2">
-              <button className="px-4 py-2 rounded-lg bg-green-600 text-sm font-medium hover:bg-green-500 transition-colors">Create Monitor</button>
+              <button className="px-4 py-2 rounded-lg bg-stone-600 text-sm font-medium hover:bg-stone-500 transition-colors">Create Monitor</button>
               <button onClick={() => setShowAddMonitor(false)} className="px-4 py-2 rounded-lg bg-white/10 text-sm hover:bg-white/20 transition-colors">Cancel</button>
             </div>
           </div>
@@ -178,13 +193,13 @@ export default function UptimePage() {
 
         {/* Alert Config */}
         {showAlerts && (
-          <div className="p-6 rounded-xl border border-yellow-500/20 bg-yellow-500/5 mb-8 space-y-4">
-            <h3 className="font-semibold flex items-center gap-2"><Bell className="w-5 h-5 text-yellow-400" /> Alert Configuration</h3>
+          <div className="p-6 rounded-xl border border-stone-500/20 bg-stone-500/5 mb-8 space-y-4">
+            <h3 className="font-semibold flex items-center gap-2"><Bell className="w-5 h-5 text-stone-400" /> Alert Configuration</h3>
             <div className="space-y-3">
-              {['Email (team@zoobicon.com)', 'Slack (#ops-alerts)', 'PagerDuty (On-call rotation)', 'Webhook (POST to custom URL)'].map((ch, i) => (
+              {['Email (team@zoobicon.com)', 'Hash (#ops-alerts)', 'PagerDuty (On-call rotation)', 'Webhook (POST to custom URL)'].map((ch, i) => (
                 <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
                   <span className="text-sm">{ch}</span>
-                  <div className={`w-10 h-5 rounded-full ${i < 2 ? 'bg-green-500' : 'bg-white/20'}`}>
+                  <div className={`w-10 h-5 rounded-full ${i < 2 ? 'bg-stone-500' : 'bg-white/20'}`}>
                     <div className={`w-4 h-4 rounded-full bg-white transition-transform ${i < 2 ? 'translate-x-5' : 'translate-x-0.5'}`} />
                   </div>
                 </div>
@@ -201,7 +216,7 @@ export default function UptimePage() {
             { id: 'ssl' as const, label: 'SSL Certificates', icon: Lock },
           ].map(t => (
             <button key={t.id} onClick={() => setActiveTab(t.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === t.id ? 'bg-green-500/20 text-green-400' : 'text-gray-400 hover:text-white'}`}>
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === t.id ? 'bg-stone-500/20 text-stone-400' : 'text-gray-400 hover:text-white'}`}>
               <t.icon className="w-4 h-4" /> {t.label}
             </button>
           ))}
@@ -217,7 +232,7 @@ export default function UptimePage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">{m.name}</h3>
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${m.status === 'up' ? 'bg-green-500/20 text-green-400' : m.status === 'degraded' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'}`}>
+                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${m.status === 'up' ? 'bg-stone-500/20 text-stone-400' : m.status === 'degraded' ? 'bg-stone-500/20 text-stone-400' : 'bg-stone-500/20 text-stone-400'}`}>
                         {m.status.toUpperCase()}
                       </span>
                     </div>
@@ -239,9 +254,9 @@ export default function UptimePage() {
               </div>
             ))}
             <div className="flex items-center justify-center gap-6 text-xs text-gray-500 mt-2">
-              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded bg-green-500" /> Operational</span>
-              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded bg-yellow-500" /> Degraded</span>
-              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded bg-red-500" /> Down</span>
+              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded bg-stone-500" /> Operational</span>
+              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded bg-stone-500" /> Degraded</span>
+              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded bg-stone-500" /> Down</span>
               <span>90 days &larr; today</span>
             </div>
           </div>
@@ -253,7 +268,7 @@ export default function UptimePage() {
             {INCIDENT_LOG.map((inc, i) => (
               <div key={i} className="p-4 rounded-xl border border-white/10 bg-white/5">
                 <div className="flex items-center gap-3 mb-2">
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${inc.status === 'resolved' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{inc.status}</span>
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${inc.status === 'resolved' ? 'bg-stone-500/20 text-stone-400' : 'bg-stone-500/20 text-stone-400'}`}>{inc.status}</span>
                   <span className="text-xs text-gray-500">{inc.date}</span>
                   <span className="text-xs text-gray-500">Duration: {inc.duration}</span>
                 </div>
@@ -269,7 +284,7 @@ export default function UptimePage() {
           <div className="space-y-4">
             {MONITORS.filter(m => m.sslExpiry).map(m => (
               <div key={m.id} className="p-4 rounded-xl border border-white/10 bg-white/5 flex items-center gap-4">
-                <Lock className={`w-5 h-5 ${m.sslDays! > 60 ? 'text-green-400' : m.sslDays! > 30 ? 'text-yellow-400' : 'text-red-400'}`} />
+                <Lock className={`w-5 h-5 ${m.sslDays! > 60 ? 'text-stone-400' : m.sslDays! > 30 ? 'text-stone-400' : 'text-stone-400'}`} />
                 <div className="flex-1">
                   <div className="font-medium text-sm">{m.name}</div>
                   <div className="text-xs text-gray-500">{m.url}</div>
@@ -278,7 +293,7 @@ export default function UptimePage() {
                   <div className="text-sm font-medium">{m.sslDays} days</div>
                   <div className="text-xs text-gray-500">Expires {m.sslExpiry}</div>
                 </div>
-                <span className={`px-2 py-0.5 rounded text-xs ${m.sslDays! > 60 ? 'bg-green-500/20 text-green-400' : m.sslDays! > 30 ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'}`}>
+                <span className={`px-2 py-0.5 rounded text-xs ${m.sslDays! > 60 ? 'bg-stone-500/20 text-stone-400' : m.sslDays! > 30 ? 'bg-stone-500/20 text-stone-400' : 'bg-stone-500/20 text-stone-400'}`}>
                   {m.sslDays! > 60 ? 'Valid' : m.sslDays! > 30 ? 'Expiring Soon' : 'Critical'}
                 </span>
               </div>
@@ -287,10 +302,10 @@ export default function UptimePage() {
         )}
 
         {/* CTA */}
-        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-green-600/20 to-cyan-600/20 border border-green-500/20">
+        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-stone-600/20 to-stone-600/20 border border-stone-500/20">
           <h2 className="text-3xl font-bold mb-4">Never Miss Downtime Again</h2>
           <p className="text-gray-400 mb-6 max-w-xl mx-auto">Monitor your sites, APIs, and SSL certificates 24/7. Get instant alerts before your customers notice.</p>
-          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-green-600 to-cyan-600 font-semibold hover:opacity-90 transition-opacity">
+          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold hover:opacity-90 transition-opacity">
             Start Monitoring Free <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

@@ -3,9 +3,24 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Flame, MousePointer2, ArrowDown, Video, AlertTriangle,
-  Code, Eye, Layers, Monitor, Smartphone, Clock, Copy,
-  ArrowRight, Zap, BarChart3, Target, RefreshCw, Check
+  Flame,
+  MousePointer2,
+  ArrowDown,
+  Video,
+  AlertTriangle,
+  Code,
+  Eye,
+  Layers,
+  Monitor,
+  Smartphone,
+  Clock,
+  Copy,
+  ArrowRight,
+  Zap,
+  BarChart3,
+  Target,
+  RefreshCw,
+  Check,
 } from 'lucide-react';
 
 const DEMO_CLICKS = [
@@ -26,11 +41,11 @@ const DEMO_CLICKS = [
 ];
 
 const SCROLL_DEPTH_DATA = [
-  { depth: '0%', visitors: 100, color: 'bg-green-500' },
-  { depth: '25%', visitors: 82, color: 'bg-green-400' },
-  { depth: '50%', visitors: 61, color: 'bg-yellow-400' },
-  { depth: '75%', visitors: 38, color: 'bg-orange-400' },
-  { depth: '100%', visitors: 21, color: 'bg-red-400' },
+  { depth: '0%', visitors: 100, color: 'bg-stone-500' },
+  { depth: '25%', visitors: 82, color: 'bg-stone-400' },
+  { depth: '50%', visitors: 61, color: 'bg-stone-400' },
+  { depth: '75%', visitors: 38, color: 'bg-stone-400' },
+  { depth: '100%', visitors: 21, color: 'bg-stone-400' },
 ];
 
 const RAGE_CLICKS = [
@@ -58,10 +73,10 @@ const TRACKING_SCRIPT = `<script src="https://cdn.zoobicon.com/heatmap.js"
   async></script>`;
 
 function intensityToColor(intensity: number) {
-  if (intensity > 80) return 'bg-red-500';
-  if (intensity > 60) return 'bg-orange-500';
-  if (intensity > 40) return 'bg-yellow-500';
-  return 'bg-green-500';
+  if (intensity > 80) return 'bg-stone-500';
+  if (intensity > 60) return 'bg-stone-500';
+  if (intensity > 40) return 'bg-stone-500';
+  return 'bg-stone-500';
 }
 
 export default function HeatmapsPage() {
@@ -88,13 +103,13 @@ export default function HeatmapsPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="text-white/70 font-medium">Heatmaps & Analytics</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/builder" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Builder</Link>
-            <Link href="/pricing" className="px-4 py-2 text-sm bg-gradient-to-r from-orange-600 to-red-600 rounded-lg font-medium hover:opacity-90 transition-opacity">Get Started</Link>
+            <Link href="/pricing" className="px-4 py-2 text-sm bg-gradient-to-r from-stone-600 to-stone-600 rounded-lg font-medium hover:opacity-90 transition-opacity">Get Started</Link>
           </div>
         </div>
       </header>
@@ -102,11 +117,11 @@ export default function HeatmapsPage() {
       <main className="max-w-7xl mx-auto px-6 py-12">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-sm mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm mb-6">
             <Flame className="w-4 h-4" /> Visual Analytics
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            See Where Users <span className="bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">Actually Click</span>
+            See Where Users <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Actually Click</span>
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             Heatmaps, scroll depth, session recordings, and rage click detection. Understand exactly how visitors interact with your site.
@@ -122,7 +137,7 @@ export default function HeatmapsPage() {
             { label: 'Rage Clicks Found', value: '141', icon: AlertTriangle },
           ].map((s, i) => (
             <div key={i} className="p-4 rounded-xl border border-white/10 bg-white/5">
-              <s.icon className="w-5 h-5 text-orange-400 mb-2" />
+              <s.icon className="w-5 h-5 text-stone-400 mb-2" />
               <div className="text-2xl font-bold">{s.value}</div>
               <div className="text-xs text-gray-400">{s.label}</div>
             </div>
@@ -133,7 +148,7 @@ export default function HeatmapsPage() {
         <div className="flex gap-1 p-1 bg-white/5 rounded-xl border border-white/10 mb-8 overflow-x-auto">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setActiveTab(t.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTab === t.id ? 'bg-orange-500/20 text-orange-400' : 'text-gray-400 hover:text-white'}`}>
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTab === t.id ? 'bg-stone-500/20 text-stone-400' : 'text-gray-400 hover:text-white'}`}>
               <t.icon className="w-4 h-4" /> {t.label}
             </button>
           ))}
@@ -157,10 +172,10 @@ export default function HeatmapsPage() {
                   <div className="h-[8%] border-b border-white/10 bg-white/5 flex items-center px-4">
                     <div className="w-16 h-3 bg-white/20 rounded" /><div className="flex gap-3 ml-auto">{[1,2,3,4].map(i => <div key={i} className="w-10 h-2 bg-white/10 rounded" />)}</div>
                   </div>
-                  <div className="h-[22%] flex items-center px-8"><div className="flex-1"><div className="w-48 h-4 bg-white/15 rounded mb-2" /><div className="w-64 h-3 bg-white/10 rounded mb-4" /><div className="w-24 h-6 bg-blue-500/30 rounded" /></div><div className="w-32 h-24 bg-white/10 rounded-lg" /></div>
+                  <div className="h-[22%] flex items-center px-8"><div className="flex-1"><div className="w-48 h-4 bg-white/15 rounded mb-2" /><div className="w-64 h-3 bg-white/10 rounded mb-4" /><div className="w-24 h-6 bg-stone-500/30 rounded" /></div><div className="w-32 h-24 bg-white/10 rounded-lg" /></div>
                   <div className="h-[20%] bg-white/[0.03] px-8 py-4"><div className="grid grid-cols-3 gap-4 h-full">{[1,2,3].map(i => <div key={i} className="bg-white/5 rounded-lg border border-white/10 p-3"><div className="w-8 h-8 bg-white/10 rounded mb-2" /><div className="w-20 h-2 bg-white/10 rounded" /></div>)}</div></div>
                   <div className="h-[18%] px-8 py-4 flex gap-6"><div className="w-1/2 bg-white/5 rounded-lg" /><div className="flex-1 space-y-2 py-4">{[1,2,3].map(i => <div key={i} className="w-full h-2 bg-white/10 rounded" />)}</div></div>
-                  <div className="h-[15%] bg-white/[0.03] px-8 py-4"><div className="text-center"><div className="w-40 h-3 bg-white/10 rounded mx-auto mb-3" /><div className="w-60 h-2 bg-white/5 rounded mx-auto mb-4" /><div className="w-28 h-6 bg-purple-500/30 rounded mx-auto" /></div></div>
+                  <div className="h-[15%] bg-white/[0.03] px-8 py-4"><div className="text-center"><div className="w-40 h-3 bg-white/10 rounded mx-auto mb-3" /><div className="w-60 h-2 bg-white/5 rounded mx-auto mb-4" /><div className="w-28 h-6 bg-stone-500/30 rounded mx-auto" /></div></div>
                   <div className="h-[17%] bg-white/[0.02] px-8 py-4 border-t border-white/10"><div className="grid grid-cols-4 gap-4">{[1,2,3,4].map(i => <div key={i}><div className="w-16 h-2 bg-white/10 rounded mb-2" />{[1,2,3].map(j => <div key={j} className="w-12 h-1.5 bg-white/5 rounded mb-1" />)}</div>)}</div></div>
                 </div>
                 {/* Heatmap dots */}
@@ -176,10 +191,10 @@ export default function HeatmapsPage() {
               </div>
             </div>
             <div className="flex items-center justify-center gap-6 text-xs text-gray-400">
-              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-green-500" /> Low</div>
-              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-yellow-500" /> Medium</div>
-              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-orange-500" /> High</div>
-              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-red-500" /> Hot</div>
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-stone-500" /> Low</div>
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-stone-500" /> BookOpen</div>
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-stone-500" /> High</div>
+              <div className="flex items-center gap-1"><div className="w-3 h-3 rounded-full bg-stone-500" /> Hot</div>
             </div>
           </div>
         )}
@@ -200,8 +215,8 @@ export default function HeatmapsPage() {
                   </div>
                 </div>
               ))}
-              <div className="mt-6 p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                <p className="text-sm text-yellow-300 flex items-center gap-2"><Target className="w-4 h-4" /> <strong>Insight:</strong> 39% of visitors drop off between 50-75% scroll depth. Consider moving your CTA higher on the page.</p>
+              <div className="mt-6 p-4 rounded-lg bg-stone-500/10 border border-stone-500/20">
+                <p className="text-sm text-stone-300 flex items-center gap-2"><Target className="w-4 h-4" /> <strong>Insight:</strong> 39% of visitors drop off between 50-75% scroll depth. Consider moving your CTA higher on the page.</p>
               </div>
             </div>
           </div>
@@ -217,11 +232,11 @@ export default function HeatmapsPage() {
             <div className="space-y-2">
               {SESSION_RECORDINGS.map(s => (
                 <div key={s.id} className="p-4 rounded-xl border border-white/10 bg-white/5 hover:border-white/20 transition-colors flex items-center gap-4 cursor-pointer">
-                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><Video className="w-4 h-4 text-orange-400" /></div>
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><Video className="w-4 h-4 text-stone-400" /></div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-sm">{s.user}</span>
-                      {s.hasRageClick && <span className="px-2 py-0.5 rounded bg-red-500/20 text-red-400 text-xs">Rage Click</span>}
+                      {s.hasRageClick && <span className="px-2 py-0.5 rounded bg-stone-500/20 text-stone-400 text-xs">Rage Click</span>}
                     </div>
                     <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{s.duration}</span>
@@ -231,7 +246,7 @@ export default function HeatmapsPage() {
                     </div>
                   </div>
                   <span className="text-xs text-gray-500">{s.date}</span>
-                  <button className="px-3 py-1.5 rounded-lg bg-orange-500/20 text-orange-400 text-xs font-medium hover:bg-orange-500/30 transition-colors">Watch</button>
+                  <button onClick={() => {}} className="px-3 py-1.5 rounded-lg bg-stone-500/20 text-stone-400 text-xs font-medium hover:bg-stone-500/30 transition-colors">Watch</button>
                 </div>
               ))}
             </div>
@@ -242,7 +257,7 @@ export default function HeatmapsPage() {
         {activeTab === 'rage' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-red-400" /> Rage Click Detection</h2>
+              <h2 className="text-lg font-semibold flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-stone-400" /> Rage Click Detection</h2>
               <span className="text-sm text-gray-400">5 issues found</span>
             </div>
             <p className="text-sm text-gray-400">Rage clicks indicate user frustration — rapid repeated clicks on the same element.</p>
@@ -250,8 +265,8 @@ export default function HeatmapsPage() {
               {RAGE_CLICKS.map((r, i) => (
                 <div key={i} className="p-4 rounded-xl border border-white/10 bg-white/5">
                   <div className="flex items-center justify-between mb-2">
-                    <code className="text-sm text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded">{r.element}</code>
-                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${r.severity === 'high' ? 'bg-red-500/20 text-red-400' : r.severity === 'medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'}`}>{r.severity}</span>
+                    <code className="text-sm text-stone-400 bg-stone-500/10 px-2 py-0.5 rounded">{r.element}</code>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${r.severity === 'high' ? 'bg-stone-500/20 text-stone-400' : r.severity === 'medium' ? 'bg-stone-500/20 text-stone-400' : 'bg-stone-500/20 text-stone-400'}`}>{r.severity}</span>
                   </div>
                   <p className="text-sm text-gray-300 mb-1">{r.issue}</p>
                   <div className="flex items-center gap-4 text-xs text-gray-500">
@@ -270,15 +285,15 @@ export default function HeatmapsPage() {
             <h2 className="text-lg font-semibold">Setup Instructions</h2>
             <p className="text-gray-400">Add this script to your website to start collecting heatmap data, session recordings, and rage click events.</p>
             <div className="relative">
-              <pre className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm text-green-400 overflow-x-auto">{TRACKING_SCRIPT}</pre>
+              <pre className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm text-stone-400 overflow-x-auto">{TRACKING_SCRIPT}</pre>
               <button onClick={handleCopy} className="absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
-                {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-400" />}
+                {copied ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4 text-gray-400" />}
               </button>
             </div>
             <div className="space-y-3">
               {['Paste the script before the closing </head> tag', 'Replace YOUR_SITE_ID with your site ID from the dashboard', 'Data collection starts automatically within 60 seconds', 'First heatmap available after ~100 visits'].map((step, i) => (
                 <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-white/5">
-                  <div className="w-6 h-6 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</div>
+                  <div className="w-6 h-6 rounded-full bg-stone-500/20 text-stone-400 flex items-center justify-center text-xs font-bold flex-shrink-0">{i + 1}</div>
                   <span className="text-sm text-gray-300">{step}</span>
                 </div>
               ))}
@@ -287,10 +302,10 @@ export default function HeatmapsPage() {
         )}
 
         {/* CTA */}
-        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-orange-600/20 to-red-600/20 border border-orange-500/20">
+        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-stone-600/20 to-stone-600/20 border border-stone-500/20">
           <h2 className="text-3xl font-bold mb-4">Stop Guessing, Start Seeing</h2>
           <p className="text-gray-400 mb-6 max-w-xl mx-auto">Heatmaps and session recordings reveal exactly what your visitors do. Find and fix UX issues before they cost you conversions.</p>
-          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-red-600 font-semibold hover:opacity-90 transition-opacity">
+          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold hover:opacity-90 transition-opacity">
             Start Tracking Free <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

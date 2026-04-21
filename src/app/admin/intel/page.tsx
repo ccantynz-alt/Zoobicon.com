@@ -206,18 +206,18 @@ export default function IntelPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "success": return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
-      case "blocked": return <Shield className="w-4 h-4 text-amber-400" />;
-      case "error": return <XCircle className="w-4 h-4 text-red-400" />;
+      case "success": return <CheckCircle2 className="w-4 h-4 text-stone-400" />;
+      case "blocked": return <Shield className="w-4 h-4 text-stone-400" />;
+      case "error": return <XCircle className="w-4 h-4 text-stone-400" />;
       default: return null;
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case "critical": return "text-red-400 bg-red-500/10 border-red-500/20";
-      case "warning": return "text-amber-400 bg-amber-500/10 border-amber-500/20";
-      default: return "text-blue-400 bg-blue-500/10 border-blue-500/20";
+      case "critical": return "text-stone-400 bg-stone-500/10 border-stone-500/20";
+      case "warning": return "text-stone-400 bg-stone-500/10 border-stone-500/20";
+      default: return "text-stone-400 bg-stone-500/10 border-stone-500/20";
     }
   };
 
@@ -237,19 +237,19 @@ export default function IntelPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#0f2148] text-white">
       <BackgroundEffects preset="admin" />
 
       {/* Header */}
-      <header className="border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl px-6 py-4 sticky top-0 z-20">
+      <header className="border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl px-6 py-4 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/admin" className="text-white/50 hover:text-white/60 transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center">
-                <Radar className="w-5 h-5 text-red-400" />
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 flex items-center justify-center">
+                <Radar className="w-5 h-5 text-stone-400" />
               </div>
               <div>
                 <h1 className="text-lg font-bold">Competitive Intelligence</h1>
@@ -263,7 +263,7 @@ export default function IntelPage() {
             <button
               onClick={triggerFullIntel}
               disabled={isLoading || isCrawling}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-500/20 text-violet-400 hover:bg-violet-500/30 transition-colors disabled:opacity-40 text-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-500/20 text-stone-400 hover:bg-stone-500/30 transition-colors disabled:opacity-40 text-sm"
             >
               {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
               Full Intel Sweep
@@ -271,7 +271,7 @@ export default function IntelPage() {
             <button
               onClick={() => runCrawl()}
               disabled={isCrawling}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-40 text-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-500/20 text-stone-400 hover:bg-stone-500/30 transition-colors disabled:opacity-40 text-sm"
             >
               {isCrawling ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
               {isCrawling ? "Crawling..." : "Crawl All"}
@@ -281,7 +281,7 @@ export default function IntelPage() {
       </header>
 
       {/* Tabs */}
-      <div className="border-b border-white/10 bg-[#131520]/50 backdrop-blur px-6">
+      <div className="border-b border-white/10 bg-[#0f2148]/50 backdrop-blur px-6">
         <div className="max-w-7xl mx-auto flex gap-1">
           {tabs.map((tab) => (
             <button
@@ -289,14 +289,14 @@ export default function IntelPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === tab.id
-                  ? "border-violet-500 text-white"
+                  ? "border-stone-500 text-white"
                   : "border-transparent text-white/50 hover:text-white/70"
               }`}
             >
               {tab.icon}
               {tab.label}
               {tab.badge ? (
-                <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-red-500/20 text-red-400 rounded-full">
+                <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-stone-500/20 text-stone-400 rounded-full">
                   {tab.badge}
                 </span>
               ) : null}
@@ -307,9 +307,9 @@ export default function IntelPage() {
 
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         {error && (
-          <div className="flex items-center gap-3 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-            <AlertTriangle className="w-5 h-5 text-red-400" />
-            <p className="text-sm text-red-400">{error}</p>
+          <div className="flex items-center gap-3 p-4 rounded-lg bg-stone-500/10 border border-stone-500/20">
+            <AlertTriangle className="w-5 h-5 text-stone-400" />
+            <p className="text-sm text-stone-400">{error}</p>
           </div>
         )}
 
@@ -319,19 +319,19 @@ export default function IntelPage() {
             {/* Score Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-5 rounded-xl bg-white/[0.03] border border-white/10">
-                <div className="text-2xl font-bold text-emerald-400">{zoobiconFeatureCount}/{FEATURE_MATRIX.length}</div>
+                <div className="text-2xl font-bold text-stone-400">{zoobiconFeatureCount}/{FEATURE_MATRIX.length}</div>
                 <div className="text-xs text-white/50 mt-1">Features (leading)</div>
               </div>
               <div className="p-5 rounded-xl bg-white/[0.03] border border-white/10">
-                <div className="text-2xl font-bold text-violet-400">7</div>
+                <div className="text-2xl font-bold text-stone-400">7</div>
                 <div className="text-xs text-white/50 mt-1">Competitors tracked</div>
               </div>
               <div className="p-5 rounded-xl bg-white/[0.03] border border-white/10">
-                <div className="text-2xl font-bold text-amber-400">{alerts.filter((a) => !a.acknowledged).length}</div>
+                <div className="text-2xl font-bold text-stone-400">{alerts.filter((a) => !a.acknowledged).length}</div>
                 <div className="text-xs text-white/50 mt-1">Unread alerts</div>
               </div>
               <div className="p-5 rounded-xl bg-white/[0.03] border border-white/10">
-                <div className="text-2xl font-bold text-blue-400">{trends.length}</div>
+                <div className="text-2xl font-bold text-stone-400">{trends.length}</div>
                 <div className="text-xs text-white/50 mt-1">Market trends (7d)</div>
               </div>
             </div>
@@ -339,7 +339,7 @@ export default function IntelPage() {
             {/* Competitive Position Summary */}
             <div className="p-6 rounded-xl bg-white/[0.03] border border-white/10">
               <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <Activity size={16} className="text-violet-400" />
+                <Activity size={16} className="text-stone-400" />
                 Competitive Position
               </h3>
               <div className="grid grid-cols-5 gap-4">
@@ -353,17 +353,17 @@ export default function IntelPage() {
                     <div
                       key={name}
                       className={`p-4 rounded-xl text-center ${
-                        isUs ? "bg-violet-500/10 border border-violet-500/30" : "bg-white/[0.02] border border-white/5"
+                        isUs ? "bg-stone-500/10 border border-stone-500/30" : "bg-white/[0.02] border border-white/5"
                       }`}
                     >
                       <div className="text-sm font-semibold mb-2">{name}</div>
-                      <div className={`text-3xl font-bold mb-1 ${isUs ? "text-violet-400" : "text-white/60"}`}>
+                      <div className={`text-3xl font-bold mb-1 ${isUs ? "text-stone-400" : "text-white/60"}`}>
                         {count}
                       </div>
                       <div className="text-[10px] text-white/40">features</div>
                       <div className="w-full bg-white/10 rounded-full h-1.5 mt-3">
                         <div
-                          className={`h-1.5 rounded-full ${isUs ? "bg-violet-500" : "bg-white/30"}`}
+                          className={`h-1.5 rounded-full ${isUs ? "bg-stone-500" : "bg-white/30"}`}
                           style={{ width: `${(count / FEATURE_MATRIX.length) * 100}%` }}
                         />
                       </div>
@@ -374,14 +374,14 @@ export default function IntelPage() {
             </div>
 
             {/* Unique Advantages */}
-            <div className="p-6 rounded-xl bg-gradient-to-r from-violet-500/5 to-purple-500/5 border border-violet-500/20">
-              <h3 className="text-sm font-semibold mb-3 text-violet-400">Unique to Zoobicon (No Competitor Has)</h3>
+            <div className="p-6 rounded-xl bg-gradient-to-r from-stone-500/5 to-stone-500/5 border border-stone-500/20">
+              <h3 className="text-sm font-semibold mb-3 text-stone-400">Unique to Zoobicon (No Competitor Has)</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {FEATURE_MATRIX.filter(
                   (f) => f.zoobicon && !f.lovable && !f.bolt && !f.v0 && !f.emergent
                 ).map((f) => (
                   <div key={f.feature} className="flex items-center gap-2 text-sm text-white/70">
-                    <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />
+                    <CheckCircle2 size={14} className="text-stone-400 shrink-0" />
                     {f.feature}
                   </div>
                 ))}
@@ -391,7 +391,7 @@ export default function IntelPage() {
             {/* Pricing Matrix */}
             <div className="p-6 rounded-xl bg-white/[0.03] border border-white/10">
               <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
-                <DollarSign size={16} className="text-emerald-400" />
+                <DollarSign size={16} className="text-stone-400" />
                 Pricing Comparison
               </h3>
               <div className="overflow-x-auto">
@@ -400,7 +400,7 @@ export default function IntelPage() {
                     <tr className="border-b border-white/10">
                       <th className="text-left py-3 px-4 text-white/50 font-medium">Tier</th>
                       {competitorNames.map((name) => (
-                        <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-violet-400" : "text-white/50"}`}>
+                        <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-stone-400" : "text-white/50"}`}>
                           {name}
                         </th>
                       ))}
@@ -410,7 +410,7 @@ export default function IntelPage() {
                     {PRICING_MATRIX.map((row) => (
                       <tr key={row.tier} className="border-b border-white/5">
                         <td className="py-3 px-4 text-white/70">{row.tier}</td>
-                        <td className="py-3 px-4 text-center text-violet-400 font-semibold">{row.zoobicon}</td>
+                        <td className="py-3 px-4 text-center text-stone-400 font-semibold">{row.zoobicon}</td>
                         <td className="py-3 px-4 text-center text-white/50">{row.lovable}</td>
                         <td className="py-3 px-4 text-center text-white/50">{row.bolt}</td>
                         <td className="py-3 px-4 text-center text-white/50">{row.v0}</td>
@@ -438,23 +438,23 @@ export default function IntelPage() {
                     }}
                     className={`p-4 rounded-xl border transition-all text-left ${
                       selectedCompetitor === c.name
-                        ? "bg-violet-500/10 border-violet-500/30"
+                        ? "bg-stone-500/10 border-stone-500/30"
                         : "bg-white/[0.02] border-white/10 hover:border-white/20"
                     }`}
                   >
                     <div className="text-sm font-semibold mb-1">{c.name}</div>
                     <div className="text-[10px] text-white/50">{c.domain}</div>
                     <div className={`text-[9px] mt-2 px-2 py-0.5 rounded-full inline-block ${
-                      c.category === "direct" ? "bg-red-500/10 text-red-400"
-                        : c.category === "emerging" ? "bg-amber-500/10 text-amber-400"
-                        : "bg-blue-500/10 text-blue-400"
+                      c.category === "direct" ? "bg-stone-500/10 text-stone-400"
+                        : c.category === "emerging" ? "bg-stone-500/10 text-stone-400"
+                        : "bg-stone-500/10 text-stone-400"
                     }`}>
                       {c.category}
                     </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); runCrawl(c.name); }}
                       disabled={isCrawling}
-                      className="mt-2 text-[10px] text-violet-400/60 hover:text-violet-400 transition-colors block"
+                      className="mt-2 text-[10px] text-stone-400/60 hover:text-stone-400 transition-colors block"
                     >
                       Crawl now
                     </button>
@@ -469,7 +469,7 @@ export default function IntelPage() {
         {activeTab === "matrix" && (
           <div className="p-6 rounded-xl bg-white/[0.03] border border-white/10">
             <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
-              <Layers size={16} className="text-violet-400" />
+              <Layers size={16} className="text-stone-400" />
               Full Feature Comparison
             </h3>
             <div className="overflow-x-auto">
@@ -478,7 +478,7 @@ export default function IntelPage() {
                   <tr className="border-b border-white/10">
                     <th className="text-left py-3 px-4 text-white/50 font-medium">Feature</th>
                     {competitorNames.map((name) => (
-                      <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-violet-400" : "text-white/50"}`}>
+                      <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-stone-400" : "text-white/50"}`}>
                         {name}
                       </th>
                     ))}
@@ -494,7 +494,7 @@ export default function IntelPage() {
                         return (
                           <td key={name} className="py-2.5 px-4 text-center">
                             {has ? (
-                              <Check size={16} className={name === "Zoobicon" ? "text-violet-400 mx-auto" : "text-emerald-400/60 mx-auto"} />
+                              <Check size={16} className={name === "Zoobicon" ? "text-stone-400 mx-auto" : "text-stone-400/60 mx-auto"} />
                             ) : (
                               <span className="text-white/15">—</span>
                             )}
@@ -513,7 +513,7 @@ export default function IntelPage() {
                         return f[key];
                       }).length;
                       return (
-                        <td key={name} className={`py-3 px-4 text-center font-bold ${name === "Zoobicon" ? "text-violet-400" : "text-white/50"}`}>
+                        <td key={name} className={`py-3 px-4 text-center font-bold ${name === "Zoobicon" ? "text-stone-400" : "text-white/50"}`}>
                           {count}
                         </td>
                       );
@@ -559,9 +559,9 @@ export default function IntelPage() {
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                            alert.severity === "critical" ? "bg-red-500/20 text-red-400"
-                              : alert.severity === "warning" ? "bg-amber-500/20 text-amber-400"
-                              : "bg-blue-500/20 text-blue-400"
+                            alert.severity === "critical" ? "bg-stone-500/20 text-stone-400"
+                              : alert.severity === "warning" ? "bg-stone-500/20 text-stone-400"
+                              : "bg-stone-500/20 text-stone-400"
                           }`}>
                             {alert.severity}
                           </span>
@@ -606,7 +606,7 @@ export default function IntelPage() {
                 <button
                   onClick={triggerFullIntel}
                   disabled={isLoading}
-                  className="mt-4 px-6 py-2.5 rounded-lg bg-violet-500/20 text-violet-400 hover:bg-violet-500/30 transition-colors text-sm font-medium"
+                  className="mt-4 px-6 py-2.5 rounded-lg bg-stone-500/20 text-stone-400 hover:bg-stone-500/30 transition-colors text-sm font-medium"
                 >
                   Scan Now
                 </button>
@@ -621,16 +621,16 @@ export default function IntelPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 uppercase tracking-wider">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-stone-500/10 text-stone-400 uppercase tracking-wider">
                             {trend.source}
                           </span>
                           {trend.category && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-stone-500/10 text-stone-400">
                               {trend.category}
                             </span>
                           )}
                           {trend.relevance_score > 0.7 && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-stone-500/10 text-stone-400">
                               High relevance
                             </span>
                           )}
@@ -649,7 +649,7 @@ export default function IntelPage() {
                             href={trend.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-violet-400/60 hover:text-violet-400"
+                            className="text-stone-400/60 hover:text-stone-400"
                           >
                             <ExternalLink size={14} />
                           </a>
@@ -671,7 +671,7 @@ export default function IntelPage() {
               <button
                 onClick={() => setSelectedCompetitor(null)}
                 className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
-                  !selectedCompetitor ? "bg-violet-500/20 text-violet-400" : "bg-white/5 text-white/50 hover:text-white/70"
+                  !selectedCompetitor ? "bg-stone-500/20 text-stone-400" : "bg-white/5 text-white/50 hover:text-white/70"
                 }`}
               >
                 All
@@ -682,7 +682,7 @@ export default function IntelPage() {
                   onClick={() => setSelectedCompetitor(selectedCompetitor === c.name ? null : c.name)}
                   className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
                     selectedCompetitor === c.name
-                      ? "bg-violet-500/20 text-violet-400"
+                      ? "bg-stone-500/20 text-stone-400"
                       : "bg-white/5 text-white/50 hover:text-white/70"
                   }`}
                 >
@@ -710,7 +710,7 @@ export default function IntelPage() {
                 {report?.insights && report.insights.length > 0 && (
                   <div className="space-y-2 mb-4">
                     {report.insights.map((insight, i) => (
-                      <div key={i} className="p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-sm text-emerald-200/80">
+                      <div key={i} className="p-3 rounded-lg bg-stone-500/5 border border-stone-500/10 text-sm text-stone-200/80">
                         {insight}
                       </div>
                     ))}
@@ -730,7 +730,7 @@ export default function IntelPage() {
                             href={result.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-violet-400/60 hover:text-violet-400 transition-colors flex items-center gap-1"
+                            className="text-xs text-stone-400/60 hover:text-stone-400 transition-colors flex items-center gap-1"
                           >
                             {result.url}
                             <ExternalLink size={10} />
@@ -752,17 +752,17 @@ export default function IntelPage() {
 
                       {result.pricing && (
                         <div className="mb-2">
-                          <span className="text-[10px] uppercase tracking-wider text-amber-400/60">Pricing</span>
+                          <span className="text-[10px] uppercase tracking-wider text-stone-400/60">Pricing</span>
                           <p className="text-sm text-white/70">{result.pricing}</p>
                         </div>
                       )}
 
                       {result.features && result.features.length > 0 && (
                         <div className="mb-2">
-                          <span className="text-[10px] uppercase tracking-wider text-emerald-400/60">Features</span>
+                          <span className="text-[10px] uppercase tracking-wider text-stone-400/60">Features</span>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {result.features.map((f, j) => (
-                              <span key={j} className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400/80">{f}</span>
+                              <span key={j} className="text-[10px] px-2 py-0.5 rounded-full bg-stone-500/10 text-stone-400/80">{f}</span>
                             ))}
                           </div>
                         </div>
@@ -770,10 +770,10 @@ export default function IntelPage() {
 
                       {result.techStack && result.techStack.length > 0 && (
                         <div className="mb-2">
-                          <span className="text-[10px] uppercase tracking-wider text-blue-400/60">Tech</span>
+                          <span className="text-[10px] uppercase tracking-wider text-stone-400/60">Tech</span>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {result.techStack.map((t, j) => (
-                              <span key={j} className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400/80">{t}</span>
+                              <span key={j} className="text-[10px] px-2 py-0.5 rounded-full bg-stone-500/10 text-stone-400/80">{t}</span>
                             ))}
                           </div>
                         </div>
@@ -781,11 +781,11 @@ export default function IntelPage() {
 
                       {result.keyChanges && result.keyChanges.length > 0 && (
                         <div>
-                          <span className="text-[10px] uppercase tracking-wider text-red-400/60">Key Changes</span>
+                          <span className="text-[10px] uppercase tracking-wider text-stone-400/60">Key Changes</span>
                           <ul className="mt-1 space-y-1">
                             {result.keyChanges.map((change, j) => (
                               <li key={j} className="text-xs text-white/60 flex items-start gap-2">
-                                <span className="text-red-400 mt-0.5">*</span>
+                                <span className="text-stone-400 mt-0.5">*</span>
                                 {change}
                               </li>
                             ))}
@@ -794,7 +794,7 @@ export default function IntelPage() {
                       )}
 
                       {result.errorMessage && (
-                        <p className="text-xs text-red-400/60 mt-2">{result.errorMessage}</p>
+                        <p className="text-xs text-stone-400/60 mt-2">{result.errorMessage}</p>
                       )}
                     </div>
                   ))}
@@ -809,7 +809,7 @@ export default function IntelPage() {
                 </p>
                 <button
                   onClick={() => runCrawl()}
-                  className="px-6 py-2.5 rounded-lg bg-violet-500/20 text-violet-400 hover:bg-violet-500/30 transition-colors text-sm font-medium"
+                  className="px-6 py-2.5 rounded-lg bg-stone-500/20 text-stone-400 hover:bg-stone-500/30 transition-colors text-sm font-medium"
                 >
                   Start First Crawl
                 </button>

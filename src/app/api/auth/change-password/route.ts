@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { auditLog } from "@/lib/audit-middleware";
 
 /**
  * Admin password change handler.
@@ -50,6 +51,14 @@ export async function POST(request: NextRequest) {
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
+
+    auditLog({
+      action: "password_change",
+      actor: process.env.ADMIN_EMAIL || "admin",
+      resourceType: "auth",
+      result: "success",
+      detail: "Admin password change instruction generated",
+    });
 
     return new Response(
       JSON.stringify({

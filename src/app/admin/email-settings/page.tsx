@@ -4,11 +4,33 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Mail, Save, CheckCircle2, AlertTriangle, ArrowLeft,
-  Server, Send, Eye, EyeOff, Loader2, TestTube,
-  Globe, Key, Bell, ExternalLink, Copy, Check,
-  Inbox, MessageSquare, ArrowRight, Bot, Shield,
-  Smartphone, Laptop2, Wifi, Monitor, RefreshCw,
+  Mail,
+  Save,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowLeft,
+  Server,
+  Send,
+  Eye,
+  EyeOff,
+  Loader2,
+  TestTube,
+  Globe,
+  Key,
+  Bell,
+  ExternalLink,
+  Copy,
+  Check,
+  Inbox,
+  MessageSquare,
+  ArrowRight,
+  Bot,
+  Shield,
+  Smartphone,
+  Laptop2,
+  Wifi,
+  Monitor,
+  RefreshCw,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
 
@@ -136,7 +158,7 @@ export default function AdminEmailSettingsPage() {
           to: targetEmail,
           subject: "[Zoobicon] Test Email - Configuration Verified",
           text: "This is a test email from your Zoobicon admin panel. If you received this, your Mailgun configuration is working correctly.",
-          html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;background:#131520;color:#fff;border-radius:16px">
+          html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;background:#0f2148;color:#fff;border-radius:16px">
             <h1 style="font-size:22px;font-weight:800;margin:0 0 16px">Email Configuration Test</h1>
             <p style="color:rgba(255,255,255,0.7);line-height:1.6">This is a test email from your Zoobicon admin panel. Your Mailgun configuration is working correctly.</p>
             <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:24px">Sent at ${new Date().toISOString()}</p>
@@ -172,14 +194,14 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
     setTimeout(() => setCopiedEnv(false), 2000);
   };
 
-  const inputClass = "w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/50 focus:outline-none focus:border-blue-500/50 transition-colors";
+  const inputClass = "w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500/50 transition-colors";
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#0f2148] text-white">
       <BackgroundEffects preset="admin" />
 
       {/* Navbar */}
-      <nav className="relative z-20 border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl">
+      <nav className="relative z-20 border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/admin" className="flex items-center gap-2 text-white/60 hover:text-white transition-colors">
@@ -191,7 +213,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
           </div>
           <div className="flex items-center gap-3">
             {user && (
-              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold">
+              <div className="w-8 h-8 rounded-full bg-stone-600 flex items-center justify-center text-xs font-bold">
                 {(user.name || user.email || "A").charAt(0).toUpperCase()}
               </div>
             )}
@@ -202,7 +224,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-3">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center">
             <Mail className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -219,32 +241,32 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
             {/* Admin Inbox flow */}
             <div className="bg-white/[0.04] border border-white/10 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                  <Inbox className="w-4 h-4 text-blue-400" />
+                <div className="w-8 h-8 rounded-lg bg-stone-500/20 flex items-center justify-center">
+                  <Inbox className="w-4 h-4 text-stone-400" />
                 </div>
-                <h3 className="text-sm font-semibold text-blue-300">Admin Inbox</h3>
+                <h3 className="text-sm font-semibold text-stone-300">Admin Inbox</h3>
               </div>
               <div className="space-y-2 text-xs text-white/60 leading-relaxed">
                 <p><span className="text-white/80">admin@zoobicon.com</span></p>
                 <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Mailgun receives it</span></div>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Webhook to <code className="text-cyan-400/80">/api/email/webhook</code></span></div>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Appears in <code className="text-cyan-400/80">/admin/email</code></span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Webhook to <code className="text-stone-400/80">/api/email/webhook</code></span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Appears in <code className="text-stone-400/80">/admin/email</code></span></div>
               </div>
             </div>
 
             {/* Support Tickets flow */}
             <div className="bg-white/[0.04] border border-white/10 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
-                  <MessageSquare className="w-4 h-4 text-purple-400" />
+                <div className="w-8 h-8 rounded-lg bg-stone-500/20 flex items-center justify-center">
+                  <MessageSquare className="w-4 h-4 text-stone-400" />
                 </div>
-                <h3 className="text-sm font-semibold text-purple-300">Support Tickets</h3>
+                <h3 className="text-sm font-semibold text-stone-300">Support Tickets</h3>
               </div>
               <div className="space-y-2 text-xs text-white/60 leading-relaxed">
                 <p><span className="text-white/80">support@zoobicon.com</span></p>
                 <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Mailgun receives it</span></div>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Webhook to <code className="text-cyan-400/80">/api/email/webhook</code></span></div>
-                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Ticket in <code className="text-cyan-400/80">/email-support</code></span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Webhook to <code className="text-stone-400/80">/api/email/webhook</code></span></div>
+                <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>Ticket in <code className="text-stone-400/80">/email-support</code></span></div>
                 <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/50 shrink-0" /><span>AI drafts reply</span></div>
               </div>
             </div>
@@ -252,10 +274,10 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
             {/* Outbound flow */}
             <div className="bg-white/[0.04] border border-white/10 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
-                  <Send className="w-4 h-4 text-green-400" />
+                <div className="w-8 h-8 rounded-lg bg-stone-500/20 flex items-center justify-center">
+                  <Send className="w-4 h-4 text-stone-400" />
                 </div>
-                <h3 className="text-sm font-semibold text-green-300">Outbound</h3>
+                <h3 className="text-sm font-semibold text-stone-300">Outbound</h3>
               </div>
               <div className="space-y-2 text-xs text-white/60 leading-relaxed">
                 <p>All outbound emails (notifications, replies, password resets) sent via Mailgun API from <span className="text-white/80">noreply@zoobicon.com</span>.</p>
@@ -265,16 +287,16 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
           </div>
           <div className="mt-4 bg-white/[0.04] border border-white/10 rounded-lg p-3">
             <p className="text-xs text-white/60 mb-1.5 font-medium">Mailgun Webhook URL (use this for ALL inbound routing):</p>
-            <code className="text-xs text-cyan-400 bg-black/30 px-2 py-1 rounded select-all">https://zoobicon.com/api/email/webhook</code>
+            <code className="text-xs text-stone-400 bg-black/30 px-2 py-1 rounded select-all">https://zoobicon.com/api/email/webhook</code>
           </div>
-          <p className="text-xs text-white/60 mt-3">Total cost: <span className="text-green-400/80">$0/month</span> on Mailgun free tier (5,000 emails/month). No Google Workspace, no per-seat charges.</p>
+          <p className="text-xs text-white/60 mt-3">Total cost: <span className="text-stone-400/80">$0/month</span> on Mailgun free tier (5,000 emails/month). No Google Workspace, no per-seat charges.</p>
         </motion.div>
 
         {/* Setup Guide — Expandable accordion */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
           className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-5">
-            <Shield className="w-5 h-5 text-green-400" />
+            <Shield className="w-5 h-5 text-stone-400" />
             <h2 className="text-lg font-semibold">Setup Guide — 5 Steps</h2>
           </div>
           <div className="space-y-2">
@@ -284,7 +306,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                   onClick={() => setExpandedStep(expandedStep === s.step ? null : s.step)}
                   className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-colors"
                 >
-                  <div className="w-7 h-7 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-xs font-bold text-blue-400 shrink-0">
+                  <div className="w-7 h-7 rounded-full bg-stone-600/20 border border-stone-500/30 flex items-center justify-center text-xs font-bold text-stone-400 shrink-0">
                     {s.step}
                   </div>
                   <span className="text-sm font-medium text-white/90 flex-1 text-left">{s.title}</span>
@@ -297,7 +319,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                     <p className="text-xs text-white/60 leading-relaxed">{s.description}</p>
                     {s.link && (
                       <a href={s.link} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 mt-2 transition-colors">
+                        className="inline-flex items-center gap-1.5 text-xs text-stone-400 hover:text-stone-300 mt-2 transition-colors">
                         <ExternalLink className="w-3 h-3" /> Open in Mailgun
                       </a>
                     )}
@@ -313,7 +335,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
           className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <Server className="w-5 h-5 text-green-400" />
+              <Server className="w-5 h-5 text-stone-400" />
               <h2 className="text-lg font-semibold">Connection Status</h2>
             </div>
             <div className="flex items-center gap-2">
@@ -330,7 +352,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                   setCheckingSetup(false);
                 }}
                 disabled={checkingSetup}
-                className="flex items-center gap-1.5 text-xs bg-green-600/20 hover:bg-green-600/30 border border-green-500/30 text-green-400 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
+                className="flex items-center gap-1.5 text-xs bg-stone-600/20 hover:bg-stone-600/30 border border-stone-500/30 text-stone-400 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
               >
                 {checkingSetup ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3 h-3" />}
                 Verify Setup
@@ -350,7 +372,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                   setCreatingTables(false);
                 }}
                 disabled={creatingTables}
-                className="flex items-center gap-1.5 text-xs bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
+                className="flex items-center gap-1.5 text-xs bg-stone-600/20 hover:bg-stone-600/30 border border-stone-500/30 text-stone-400 px-3 py-1.5 rounded-lg transition-all disabled:opacity-50"
               >
                 {creatingTables ? <Loader2 className="w-3 h-3 animate-spin" /> : <Server className="w-3 h-3" />}
                 Create DB Tables
@@ -360,7 +382,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
           {setupStatus && (
             <div className="space-y-2">
               {Object.entries(setupStatus).map(([key, val]) => (
-                <div key={key} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs ${val.ok ? "bg-green-500/10 text-green-400" : "bg-red-500/10 text-red-400"}`}>
+                <div key={key} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs ${val.ok ? "bg-stone-500/10 text-stone-400" : "bg-stone-500/10 text-stone-400"}`}>
                   {val.ok ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> : <AlertTriangle className="w-3.5 h-3.5 shrink-0" />}
                   <span className="font-medium min-w-[160px]">{key.replace(/_/g, " ")}</span>
                   <span className="text-white/60">{val.detail}</span>
@@ -377,7 +399,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
           className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-5">
-            <Globe className="w-5 h-5 text-blue-400" />
+            <Globe className="w-5 h-5 text-stone-400" />
             <h2 className="text-lg font-semibold">Email Addresses</h2>
           </div>
           <div className="space-y-4">
@@ -389,7 +411,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 placeholder="admin@zoobicon.com"
                 className={inputClass}
               />
-              <p className="text-xs text-white/60 mt-1">Your main inbox. Mailgun routes emails here &rarr; <code className="text-cyan-400/60">/admin/email</code></p>
+              <p className="text-xs text-white/60 mt-1">Your main inbox. Mailgun routes emails here &rarr; <code className="text-stone-400/60">/admin/email</code></p>
             </div>
             <div>
               <label className="block text-sm text-white/80 mb-1.5 font-medium">Support Email</label>
@@ -399,7 +421,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 placeholder="support@zoobicon.com"
                 className={inputClass}
               />
-              <p className="text-xs text-white/60 mt-1">Customer-facing support. Creates tickets in <code className="text-cyan-400/60">/email-support</code> with AI auto-reply.</p>
+              <p className="text-xs text-white/60 mt-1">Customer-facing support. Creates tickets in <code className="text-stone-400/60">/email-support</code> with AI auto-reply.</p>
             </div>
           </div>
         </motion.div>
@@ -408,7 +430,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-5">
-            <Send className="w-5 h-5 text-green-400" />
+            <Send className="w-5 h-5 text-stone-400" />
             <h2 className="text-lg font-semibold">Sender Identity</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -437,7 +459,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
           className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-5">
-            <Key className="w-5 h-5 text-amber-400" />
+            <Key className="w-5 h-5 text-stone-400" />
             <h2 className="text-lg font-semibold">Mailgun API Configuration</h2>
           </div>
           <div className="space-y-4">
@@ -463,7 +485,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 type="text" value={config.mailgunDomain}
                 onChange={(e) => setConfig((p) => ({ ...p, mailgunDomain: e.target.value }))}
                 placeholder="zoobicon.com"
-                className="w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/50 focus:outline-none focus:border-blue-500/50 transition-colors"
+                className="w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500/50 transition-colors"
               />
               <p className="text-xs text-white/60 mt-1">Just the domain name (e.g. <code className="text-white/60">zoobicon.com</code>), not the full API URL. The API base URL is added automatically.</p>
             </div>
@@ -474,12 +496,12 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-5">
-            <Bell className="w-5 h-5 text-purple-400" />
+            <Bell className="w-5 h-5 text-stone-400" />
             <h2 className="text-lg font-semibold">Notifications & AI</h2>
           </div>
           <div className="space-y-1">
             {[
-              { key: "aiAutoReply" as const, label: "AI auto-reply on support tickets", desc: "Zoobicon AI drafts a reply when a customer emails support@zoobicon.com", icon: <Bot className="w-4 h-4 text-purple-400" /> },
+              { key: "aiAutoReply" as const, label: "AI auto-reply on support tickets", desc: "Zoobicon AI drafts a reply when a customer emails support@zoobicon.com", icon: <Bot className="w-4 h-4 text-stone-400" /> },
               { key: "notifyOnSignup" as const, label: "New user signups", desc: "Get notified at admin@zoobicon.com when someone creates an account" },
               { key: "notifyOnDeploy" as const, label: "Site deployments", desc: "Get notified when a site is deployed to zoobicon.sh" },
               { key: "notifyOnContact" as const, label: "Contact form submissions", desc: "Get notified when someone submits a contact form" },
@@ -495,7 +517,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 </div>
                 <button
                   onClick={() => setConfig((p) => ({ ...p, [key]: !p[key] }))}
-                  className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ml-4 ${config[key] ? "bg-blue-600" : "bg-white/10"}`}
+                  className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ml-4 ${config[key] ? "bg-stone-600" : "bg-white/10"}`}
                 >
                   <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${config[key] ? "left-6" : "left-1"}`} />
                 </button>
@@ -509,25 +531,25 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
           className="bg-white/[0.06] border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
-              <Server className="w-5 h-5 text-cyan-400" />
+              <Server className="w-5 h-5 text-stone-400" />
               <h2 className="text-lg font-semibold">Environment Variables</h2>
             </div>
             <button onClick={copyEnvBlock}
-              className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 border border-cyan-500/20 hover:border-cyan-500/40 bg-cyan-500/5 hover:bg-cyan-500/10 rounded-lg px-3 py-1.5 transition-all">
+              className="flex items-center gap-1.5 text-xs text-stone-400 hover:text-stone-300 border border-stone-500/20 hover:border-stone-500/40 bg-stone-500/5 hover:bg-stone-500/10 rounded-lg px-3 py-1.5 transition-all">
               {copiedEnv ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
               {copiedEnv ? "Copied!" : "Copy all"}
             </button>
           </div>
           <p className="text-sm text-white/60 mb-4">
-            Add these to your <code className="bg-white/10 px-1.5 py-0.5 rounded text-xs text-cyan-300">.env.local</code> file or Vercel dashboard.
+            Add these to your <code className="bg-white/10 px-1.5 py-0.5 rounded text-xs text-stone-300">.env.local</code> file or Vercel dashboard.
           </p>
           <div className="bg-black/30 rounded-lg p-4 font-mono text-xs space-y-1.5 overflow-x-auto">
             <div><span className="text-white/60"># Email (Mailgun only — no Google Workspace needed)</span></div>
-            <div><span className="text-blue-400">MAILGUN_API_KEY</span><span className="text-white/50">=</span><span className="text-green-400">{config.mailgunApiKey ? maskKey(config.mailgunApiKey) : "key-xxxxx"}</span></div>
-            <div><span className="text-blue-400">MAILGUN_DOMAIN</span><span className="text-white/50">=</span><span className="text-green-400">{config.mailgunDomain || "zoobicon.com"}</span></div>
-            <div><span className="text-blue-400">MAILGUN_WEBHOOK_SIGNING_KEY</span><span className="text-white/50">=</span><span className="text-green-400">your-webhook-signing-key</span></div>
-            <div><span className="text-blue-400">ADMIN_EMAIL</span><span className="text-white/50">=</span><span className="text-green-400">{config.adminEmail || "admin@zoobicon.com"}</span></div>
-            <div><span className="text-blue-400">ADMIN_NOTIFICATION_EMAIL</span><span className="text-white/50">=</span><span className="text-green-400">{config.notificationEmail || config.adminEmail || "admin@zoobicon.com"}</span></div>
+            <div><span className="text-stone-400">MAILGUN_API_KEY</span><span className="text-white/50">=</span><span className="text-stone-400">{config.mailgunApiKey ? maskKey(config.mailgunApiKey) : "key-xxxxx"}</span></div>
+            <div><span className="text-stone-400">MAILGUN_DOMAIN</span><span className="text-white/50">=</span><span className="text-stone-400">{config.mailgunDomain || "zoobicon.com"}</span></div>
+            <div><span className="text-stone-400">MAILGUN_WEBHOOK_SIGNING_KEY</span><span className="text-white/50">=</span><span className="text-stone-400">your-webhook-signing-key</span></div>
+            <div><span className="text-stone-400">ADMIN_EMAIL</span><span className="text-white/50">=</span><span className="text-stone-400">{config.adminEmail || "admin@zoobicon.com"}</span></div>
+            <div><span className="text-stone-400">ADMIN_NOTIFICATION_EMAIL</span><span className="text-white/50">=</span><span className="text-stone-400">{config.notificationEmail || config.adminEmail || "admin@zoobicon.com"}</span></div>
           </div>
         </motion.div>
 
@@ -535,7 +557,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38 }}
           className="bg-gradient-to-br from-white/[0.06] to-white/[0.03] border border-white/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center">
               <Smartphone className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -547,11 +569,11 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
           {/* Architecture overview */}
           <div className="bg-white/[0.04] border border-white/10 rounded-lg p-4 mt-4 mb-5">
             <h3 className="text-sm font-semibold text-white/90 mb-2 flex items-center gap-2">
-              <RefreshCw className="w-4 h-4 text-indigo-400" /> Dual-Path Architecture
+              <RefreshCw className="w-4 h-4 text-stone-400" /> Dual-Path Architecture
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
-                <p className="text-xs font-semibold text-indigo-300 mb-1.5">Path 1: Device Access (Cloudflare)</p>
+                <p className="text-xs font-semibold text-stone-300 mb-1.5">Path 1: Device Access (Cloudflare)</p>
                 <div className="space-y-1.5 text-xs text-white/60">
                   <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/40 shrink-0" /><span>Inbound email arrives at Cloudflare</span></div>
                   <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/40 shrink-0" /><span>Forwarded to your personal email</span></div>
@@ -559,7 +581,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 </div>
               </div>
               <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
-                <p className="text-xs font-semibold text-purple-300 mb-1.5">Path 2: AI Ticketing (Mailgun)</p>
+                <p className="text-xs font-semibold text-stone-300 mb-1.5">Path 2: AI Ticketing (Mailgun)</p>
                 <div className="space-y-1.5 text-xs text-white/60">
                   <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/40 shrink-0" /><span>Catch-all route still hits Mailgun webhook</span></div>
                   <div className="flex items-center gap-1.5"><ArrowRight className="w-3 h-3 text-white/40 shrink-0" /><span>Emails stored in DB for AI processing</span></div>
@@ -567,8 +589,8 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 </div>
               </div>
             </div>
-            <div className="mt-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg px-3 py-2">
-              <p className="text-xs text-indigo-300"><span className="font-semibold">Outbound (both paths):</span> Mailgun SMTP lets you send FROM admin@zoobicon.com or support@zoobicon.com on any device.</p>
+            <div className="mt-3 bg-stone-500/10 border border-stone-500/20 rounded-lg px-3 py-2">
+              <p className="text-xs text-stone-300"><span className="font-semibold">Outbound (both paths):</span> Mailgun SMTP lets you send FROM admin@zoobicon.com or support@zoobicon.com on any device.</p>
             </div>
           </div>
 
@@ -581,8 +603,8 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 onClick={() => setExpandedDevice(expandedDevice === "cloudflare" ? null : "cloudflare")}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-colors"
               >
-                <div className="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center shrink-0">
-                  <Globe className="w-4 h-4 text-orange-400" />
+                <div className="w-8 h-8 rounded-lg bg-stone-500/20 flex items-center justify-center shrink-0">
+                  <Globe className="w-4 h-4 text-stone-400" />
                 </div>
                 <div className="flex-1 text-left">
                   <span className="text-sm font-medium text-white/90">Step 1: Cloudflare Email Routing Setup</span>
@@ -597,28 +619,28 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                   <div className="space-y-4 text-xs text-white/70 leading-relaxed">
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">1. Go to Cloudflare Email Routing</p>
-                      <p>Log in to <a href="https://dash.cloudflare.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 inline-flex items-center gap-1">Cloudflare Dashboard <ExternalLink className="w-3 h-3" /></a> &rarr; select <code className="bg-black/30 px-1.5 py-0.5 rounded text-cyan-400/80">zoobicon.com</code> &rarr; <strong>Email</strong> &rarr; <strong>Email Routing</strong>.</p>
+                      <p>Log in to <a href="https://dash.cloudflare.com" target="_blank" rel="noopener noreferrer" className="text-stone-400 hover:text-stone-300 inline-flex items-center gap-1">Cloudflare Dashboard <ExternalLink className="w-3 h-3" /></a> &rarr; select <code className="bg-black/30 px-1.5 py-0.5 rounded text-stone-400/80">zoobicon.com</code> &rarr; <strong>Email</strong> &rarr; <strong>Email Routing</strong>.</p>
                     </div>
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">2. Add a destination address</p>
-                      <p>Under <strong>Destination addresses</strong>, click <strong>Add destination</strong>. Enter your personal email (e.g. <code className="bg-black/30 px-1.5 py-0.5 rounded text-cyan-400/80">you@icloud.com</code> or <code className="bg-black/30 px-1.5 py-0.5 rounded text-cyan-400/80">you@gmail.com</code>). Cloudflare will send a verification email — click the link to confirm.</p>
+                      <p>Under <strong>Destination addresses</strong>, click <strong>Add destination</strong>. Enter your personal email (e.g. <code className="bg-black/30 px-1.5 py-0.5 rounded text-stone-400/80">you@icloud.com</code> or <code className="bg-black/30 px-1.5 py-0.5 rounded text-stone-400/80">you@gmail.com</code>). Cloudflare will send a verification email — click the link to confirm.</p>
                     </div>
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">3. Create routing rules</p>
                       <p className="mb-2">Under <strong>Routing rules</strong>, create two custom address rules:</p>
                       <div className="bg-black/30 rounded-lg p-3 space-y-2 font-mono">
-                        <div><span className="text-blue-400">admin@zoobicon.com</span> <span className="text-white/50">&rarr;</span> <span className="text-green-400">your-personal@email.com</span></div>
-                        <div><span className="text-blue-400">support@zoobicon.com</span> <span className="text-white/50">&rarr;</span> <span className="text-green-400">your-personal@email.com</span></div>
+                        <div><span className="text-stone-400">admin@zoobicon.com</span> <span className="text-white/50">&rarr;</span> <span className="text-stone-400">your-personal@email.com</span></div>
+                        <div><span className="text-stone-400">support@zoobicon.com</span> <span className="text-white/50">&rarr;</span> <span className="text-stone-400">your-personal@email.com</span></div>
                       </div>
                       <p className="mt-2">Action: <strong>Forward to</strong> for each rule.</p>
                     </div>
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">4. Keep the catch-all for Mailgun</p>
                       <p>Under <strong>Catch-all address</strong>, set the action to <strong>Send to an email address</strong> or leave the existing MX records pointing to Mailgun. The specific address rules above take priority, and unmatched addresses still go to Mailgun via MX records.</p>
-                      <p className="mt-2 text-amber-400/80"><AlertTriangle className="w-3 h-3 inline mr-1" />If you previously had MX records pointing to Mailgun, Cloudflare Email Routing will manage MX records automatically. Your Mailgun catch-all webhook continues to receive emails that are not matched by specific routing rules.</p>
+                      <p className="mt-2 text-stone-400/80"><AlertTriangle className="w-3 h-3 inline mr-1" />If you previously had MX records pointing to Mailgun, Cloudflare Email Routing will manage MX records automatically. Your Mailgun catch-all webhook continues to receive emails that are not matched by specific routing rules.</p>
                     </div>
-                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
-                      <p className="text-green-400 text-xs"><CheckCircle2 className="w-3 h-3 inline mr-1" /><strong>Result:</strong> Emails to admin@ and support@ now arrive in your personal inbox with push notifications on all devices, AND still flow to Mailgun for AI ticketing.</p>
+                    <div className="bg-stone-500/10 border border-stone-500/20 rounded-lg px-3 py-2">
+                      <p className="text-stone-400 text-xs"><CheckCircle2 className="w-3 h-3 inline mr-1" /><strong>Result:</strong> Emails to admin@ and support@ now arrive in your personal inbox with push notifications on all devices, AND still flow to Mailgun for AI ticketing.</p>
                     </div>
                   </div>
                 </div>
@@ -645,8 +667,8 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
               {expandedDevice === "apple" && (
                 <div className="px-4 pb-5 pt-1">
                   <div className="space-y-4 text-xs text-white/70 leading-relaxed">
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg px-3 py-2 mb-3">
-                      <p className="text-blue-300 text-xs"><Wifi className="w-3 h-3 inline mr-1" /><strong>Incoming mail</strong> already arrives in your personal email (iCloud/Gmail) via Cloudflare forwarding. These steps add the ability to <strong>send as</strong> admin@zoobicon.com or support@zoobicon.com.</p>
+                    <div className="bg-stone-500/10 border border-stone-500/20 rounded-lg px-3 py-2 mb-3">
+                      <p className="text-stone-300 text-xs"><Wifi className="w-3 h-3 inline mr-1" /><strong>Incoming mail</strong> already arrives in your personal email (iCloud/Gmail) via Cloudflare forwarding. These steps add the ability to <strong>send as</strong> admin@zoobicon.com or support@zoobicon.com.</p>
                     </div>
 
                     <p className="font-semibold text-white/90">iPhone / iPad Setup</p>
@@ -657,36 +679,36 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">2. Enter account details</p>
                       <div className="bg-black/30 rounded-lg p-3 space-y-1.5 font-mono">
-                        <div><span className="text-white/50">Name:</span> <span className="text-green-400">Zoobicon Admin</span></div>
-                        <div><span className="text-white/50">Email:</span> <span className="text-green-400">admin@zoobicon.com</span></div>
-                        <div><span className="text-white/50">Password:</span> <span className="text-green-400">[Mailgun SMTP password]</span></div>
-                        <div><span className="text-white/50">Description:</span> <span className="text-green-400">Zoobicon</span></div>
+                        <div><span className="text-white/50">Name:</span> <span className="text-stone-400">Zoobicon Admin</span></div>
+                        <div><span className="text-white/50">Email:</span> <span className="text-stone-400">admin@zoobicon.com</span></div>
+                        <div><span className="text-white/50">Password:</span> <span className="text-stone-400">[Mailgun SMTP password]</span></div>
+                        <div><span className="text-white/50">Description:</span> <span className="text-stone-400">Zoobicon</span></div>
                       </div>
                     </div>
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">3. Configure incoming mail server</p>
                       <p className="mb-2">Since incoming email is handled by Cloudflare forwarding to your personal inbox, you can skip the incoming server or set it to a dummy value. iOS may require values:</p>
                       <div className="bg-black/30 rounded-lg p-3 space-y-1.5 font-mono">
-                        <div><span className="text-white/50">Host Name:</span> <span className="text-green-400">imap.mailgun.org</span></div>
-                        <div><span className="text-white/50">Username:</span> <span className="text-green-400">admin@zoobicon.com</span></div>
-                        <div><span className="text-white/50">Password:</span> <span className="text-green-400">[Mailgun SMTP password]</span></div>
+                        <div><span className="text-white/50">Host Name:</span> <span className="text-stone-400">imap.mailgun.org</span></div>
+                        <div><span className="text-white/50">Username:</span> <span className="text-stone-400">admin@zoobicon.com</span></div>
+                        <div><span className="text-white/50">Password:</span> <span className="text-stone-400">[Mailgun SMTP password]</span></div>
                       </div>
-                      <p className="mt-2 text-amber-400/70">Note: Mailgun does not provide IMAP access. If iOS insists on verifying incoming, you can enter these values and let the verification fail for incoming — then disable incoming mail fetching for this account. You will still receive emails via Cloudflare forwarding to your personal inbox.</p>
+                      <p className="mt-2 text-stone-400/70">Note: Mailgun does not provide IMAP access. If iOS insists on verifying incoming, you can enter these values and let the verification fail for incoming — then disable incoming mail fetching for this account. You will still receive emails via Cloudflare forwarding to your personal inbox.</p>
                     </div>
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">4. Configure outgoing mail server (SMTP)</p>
                       <div className="bg-black/30 rounded-lg p-3 space-y-1.5 font-mono">
-                        <div><span className="text-white/50">SMTP Server:</span> <span className="text-green-400">smtp.mailgun.org</span></div>
-                        <div><span className="text-white/50">Port:</span> <span className="text-green-400">587</span></div>
-                        <div><span className="text-white/50">Username:</span> <span className="text-green-400">{config.smtpUsername || "postmaster@zoobicon.com"}</span></div>
-                        <div><span className="text-white/50">Password:</span> <span className="text-green-400">[Mailgun SMTP password]</span></div>
-                        <div><span className="text-white/50">Use TLS:</span> <span className="text-green-400">Yes (STARTTLS)</span></div>
-                        <div><span className="text-white/50">Authentication:</span> <span className="text-green-400">Password</span></div>
+                        <div><span className="text-white/50">SMTP Server:</span> <span className="text-stone-400">smtp.mailgun.org</span></div>
+                        <div><span className="text-white/50">Port:</span> <span className="text-stone-400">587</span></div>
+                        <div><span className="text-white/50">Username:</span> <span className="text-stone-400">{config.smtpUsername || "postmaster@zoobicon.com"}</span></div>
+                        <div><span className="text-white/50">Password:</span> <span className="text-stone-400">[Mailgun SMTP password]</span></div>
+                        <div><span className="text-white/50">Use TLS:</span> <span className="text-stone-400">Yes (STARTTLS)</span></div>
+                        <div><span className="text-white/50">Authentication:</span> <span className="text-stone-400">Password</span></div>
                       </div>
                     </div>
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">5. Save and test</p>
-                      <p>Tap <strong>Save</strong>. Open Mail, compose a new email, tap the <strong>From</strong> field, and select <code className="bg-black/30 px-1.5 py-0.5 rounded text-cyan-400/80">admin@zoobicon.com</code>. Send a test to yourself.</p>
+                      <p>Tap <strong>Save</strong>. Open Mail, compose a new email, tap the <strong>From</strong> field, and select <code className="bg-black/30 px-1.5 py-0.5 rounded text-stone-400/80">admin@zoobicon.com</code>. Send a test to yourself.</p>
                     </div>
 
                     <div className="border-t border-white/10 pt-4 mt-4">
@@ -696,8 +718,8 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                       </div>
                     </div>
 
-                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
-                      <p className="text-green-400 text-xs"><CheckCircle2 className="w-3 h-3 inline mr-1" /><strong>Result:</strong> You receive emails in your regular inbox via forwarding. When you reply, it sends FROM admin@zoobicon.com via Mailgun SMTP. Recipients see your Zoobicon address, not your personal one.</p>
+                    <div className="bg-stone-500/10 border border-stone-500/20 rounded-lg px-3 py-2">
+                      <p className="text-stone-400 text-xs"><CheckCircle2 className="w-3 h-3 inline mr-1" /><strong>Result:</strong> You receive emails in your regular inbox via forwarding. When you reply, it sends FROM admin@zoobicon.com via Mailgun SMTP. Recipients see your Zoobicon address, not your personal one.</p>
                     </div>
                   </div>
                 </div>
@@ -710,8 +732,8 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 onClick={() => setExpandedDevice(expandedDevice === "windows" ? null : "windows")}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-colors"
               >
-                <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center shrink-0">
-                  <Monitor className="w-4 h-4 text-blue-400" />
+                <div className="w-8 h-8 rounded-lg bg-stone-500/20 flex items-center justify-center shrink-0">
+                  <Monitor className="w-4 h-4 text-stone-400" />
                 </div>
                 <div className="flex-1 text-left">
                   <span className="text-sm font-medium text-white/90">Step 3: Windows (Outlook / Windows Mail)</span>
@@ -724,14 +746,14 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
               {expandedDevice === "windows" && (
                 <div className="px-4 pb-5 pt-1">
                   <div className="space-y-4 text-xs text-white/70 leading-relaxed">
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg px-3 py-2 mb-3">
-                      <p className="text-blue-300 text-xs"><Wifi className="w-3 h-3 inline mr-1" /><strong>Incoming mail</strong> already arrives in your personal email (Outlook.com/Gmail) via Cloudflare forwarding. These steps add the ability to <strong>send as</strong> admin@zoobicon.com.</p>
+                    <div className="bg-stone-500/10 border border-stone-500/20 rounded-lg px-3 py-2 mb-3">
+                      <p className="text-stone-300 text-xs"><Wifi className="w-3 h-3 inline mr-1" /><strong>Incoming mail</strong> already arrives in your personal email (Outlook.com/Gmail) via Cloudflare forwarding. These steps add the ability to <strong>send as</strong> admin@zoobicon.com.</p>
                     </div>
 
                     <p className="font-semibold text-white/90">Microsoft Outlook (Desktop) Setup</p>
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">1. Add a new account</p>
-                      <p>Open Outlook &rarr; <strong>File</strong> &rarr; <strong>Add Account</strong>. Enter <code className="bg-black/30 px-1.5 py-0.5 rounded text-cyan-400/80">admin@zoobicon.com</code>, then click <strong>Advanced options</strong> &rarr; check <strong>Let me set up my account manually</strong> &rarr; <strong>Connect</strong>.</p>
+                      <p>Open Outlook &rarr; <strong>File</strong> &rarr; <strong>Add Account</strong>. Enter <code className="bg-black/30 px-1.5 py-0.5 rounded text-stone-400/80">admin@zoobicon.com</code>, then click <strong>Advanced options</strong> &rarr; check <strong>Let me set up my account manually</strong> &rarr; <strong>Connect</strong>.</p>
                     </div>
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">2. Select account type</p>
@@ -741,28 +763,28 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                       <p className="font-semibold text-white/90 mb-2">3. Incoming mail settings</p>
                       <p className="mb-2">Since incoming is handled by Cloudflare forwarding, these values are placeholders. Outlook requires them to proceed:</p>
                       <div className="bg-black/30 rounded-lg p-3 space-y-1.5 font-mono">
-                        <div><span className="text-white/50">Server:</span> <span className="text-green-400">imap.mailgun.org</span></div>
-                        <div><span className="text-white/50">Port:</span> <span className="text-green-400">993</span></div>
-                        <div><span className="text-white/50">Encryption:</span> <span className="text-green-400">SSL/TLS</span></div>
-                        <div><span className="text-white/50">Username:</span> <span className="text-green-400">admin@zoobicon.com</span></div>
-                        <div><span className="text-white/50">Password:</span> <span className="text-green-400">[Mailgun SMTP password]</span></div>
+                        <div><span className="text-white/50">Server:</span> <span className="text-stone-400">imap.mailgun.org</span></div>
+                        <div><span className="text-white/50">Port:</span> <span className="text-stone-400">993</span></div>
+                        <div><span className="text-white/50">Encryption:</span> <span className="text-stone-400">SSL/TLS</span></div>
+                        <div><span className="text-white/50">Username:</span> <span className="text-stone-400">admin@zoobicon.com</span></div>
+                        <div><span className="text-white/50">Password:</span> <span className="text-stone-400">[Mailgun SMTP password]</span></div>
                       </div>
-                      <p className="mt-2 text-amber-400/70">Incoming may fail to verify since Mailgun does not offer IMAP. Click <strong>Next</strong> or <strong>Skip</strong> if prompted — the important part is the outgoing SMTP server.</p>
+                      <p className="mt-2 text-stone-400/70">Incoming may fail to verify since Mailgun does not offer IMAP. Click <strong>Next</strong> or <strong>Skip</strong> if prompted — the important part is the outgoing SMTP server.</p>
                     </div>
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">4. Outgoing mail settings (SMTP)</p>
                       <div className="bg-black/30 rounded-lg p-3 space-y-1.5 font-mono">
-                        <div><span className="text-white/50">Server:</span> <span className="text-green-400">smtp.mailgun.org</span></div>
-                        <div><span className="text-white/50">Port:</span> <span className="text-green-400">587</span></div>
-                        <div><span className="text-white/50">Encryption:</span> <span className="text-green-400">STARTTLS</span></div>
-                        <div><span className="text-white/50">Authentication:</span> <span className="text-green-400">Password</span></div>
-                        <div><span className="text-white/50">Username:</span> <span className="text-green-400">{config.smtpUsername || "postmaster@zoobicon.com"}</span></div>
-                        <div><span className="text-white/50">Password:</span> <span className="text-green-400">[Mailgun SMTP password]</span></div>
+                        <div><span className="text-white/50">Server:</span> <span className="text-stone-400">smtp.mailgun.org</span></div>
+                        <div><span className="text-white/50">Port:</span> <span className="text-stone-400">587</span></div>
+                        <div><span className="text-white/50">Encryption:</span> <span className="text-stone-400">STARTTLS</span></div>
+                        <div><span className="text-white/50">Authentication:</span> <span className="text-stone-400">Password</span></div>
+                        <div><span className="text-white/50">Username:</span> <span className="text-stone-400">{config.smtpUsername || "postmaster@zoobicon.com"}</span></div>
+                        <div><span className="text-white/50">Password:</span> <span className="text-stone-400">[Mailgun SMTP password]</span></div>
                       </div>
                     </div>
                     <div className="bg-white/[0.04] border border-white/10 rounded-lg p-3">
                       <p className="font-semibold text-white/90 mb-2">5. Finish setup</p>
-                      <p>Click <strong>Connect</strong> &rarr; <strong>Done</strong>. To test, compose a new email, click the <strong>From</strong> dropdown, and select <code className="bg-black/30 px-1.5 py-0.5 rounded text-cyan-400/80">admin@zoobicon.com</code>.</p>
+                      <p>Click <strong>Connect</strong> &rarr; <strong>Done</strong>. To test, compose a new email, click the <strong>From</strong> dropdown, and select <code className="bg-black/30 px-1.5 py-0.5 rounded text-stone-400/80">admin@zoobicon.com</code>.</p>
                     </div>
 
                     <div className="border-t border-white/10 pt-4 mt-4">
@@ -772,8 +794,8 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                       </div>
                     </div>
 
-                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
-                      <p className="text-green-400 text-xs"><CheckCircle2 className="w-3 h-3 inline mr-1" /><strong>Result:</strong> Emails forwarded to your personal Outlook.com/Gmail show up normally. Replies send FROM admin@zoobicon.com via Mailgun SMTP.</p>
+                    <div className="bg-stone-500/10 border border-stone-500/20 rounded-lg px-3 py-2">
+                      <p className="text-stone-400 text-xs"><CheckCircle2 className="w-3 h-3 inline mr-1" /><strong>Result:</strong> Emails forwarded to your personal Outlook.com/Gmail show up normally. Replies send FROM admin@zoobicon.com via Mailgun SMTP.</p>
                     </div>
                   </div>
                 </div>
@@ -786,8 +808,8 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 onClick={() => setExpandedDevice(expandedDevice === "config" ? null : "config")}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-colors"
               >
-                <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center shrink-0">
-                  <Key className="w-4 h-4 text-amber-400" />
+                <div className="w-8 h-8 rounded-lg bg-stone-500/20 flex items-center justify-center shrink-0">
+                  <Key className="w-4 h-4 text-stone-400" />
                 </div>
                 <div className="flex-1 text-left">
                   <span className="text-sm font-medium text-white/90">Device Configuration</span>
@@ -838,8 +860,8 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                       </div>
                       <p className="text-xs text-white/60 mt-1">This is NOT your Mailgun API key. Go to Mailgun &rarr; Sending &rarr; Domain settings &rarr; SMTP credentials to find or create an SMTP password.</p>
                     </div>
-                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
-                      <p className="text-xs text-amber-300"><AlertTriangle className="w-3 h-3 inline mr-1" />These credentials are saved to localStorage for your reference only. They are NOT sent to any server. Use them when configuring your mail apps.</p>
+                    <div className="bg-stone-500/10 border border-stone-500/20 rounded-lg px-3 py-2">
+                      <p className="text-xs text-stone-300"><AlertTriangle className="w-3 h-3 inline mr-1" />These credentials are saved to localStorage for your reference only. They are NOT sent to any server. Use them when configuring your mail apps.</p>
                     </div>
                   </div>
                 </div>
@@ -852,8 +874,8 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                 onClick={() => setExpandedDevice(expandedDevice === "reference" ? null : "reference")}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-colors"
               >
-                <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center shrink-0">
-                  <Laptop2 className="w-4 h-4 text-green-400" />
+                <div className="w-8 h-8 rounded-lg bg-stone-500/20 flex items-center justify-center shrink-0">
+                  <Laptop2 className="w-4 h-4 text-stone-400" />
                 </div>
                 <div className="flex-1 text-left">
                   <span className="text-sm font-medium text-white/90">Quick Reference Card</span>
@@ -869,25 +891,25 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
                     <div>
                       <div className="text-white/50 mb-1.5 uppercase tracking-wider font-sans font-semibold" style={{ fontSize: "10px" }}>Incoming (via Cloudflare forwarding)</div>
                       <div className="space-y-1">
-                        <div><span className="text-blue-400">admin@zoobicon.com</span> <span className="text-white/40">&rarr;</span> <span className="text-green-400">{config.personalForwardEmail || "your-personal@email.com"}</span></div>
-                        <div><span className="text-blue-400">support@zoobicon.com</span> <span className="text-white/40">&rarr;</span> <span className="text-green-400">{config.personalForwardEmail || "your-personal@email.com"}</span></div>
+                        <div><span className="text-stone-400">admin@zoobicon.com</span> <span className="text-white/40">&rarr;</span> <span className="text-stone-400">{config.personalForwardEmail || "your-personal@email.com"}</span></div>
+                        <div><span className="text-stone-400">support@zoobicon.com</span> <span className="text-white/40">&rarr;</span> <span className="text-stone-400">{config.personalForwardEmail || "your-personal@email.com"}</span></div>
                       </div>
                     </div>
                     <div className="border-t border-white/10 pt-3">
                       <div className="text-white/50 mb-1.5 uppercase tracking-wider font-sans font-semibold" style={{ fontSize: "10px" }}>Outgoing (via Mailgun SMTP)</div>
                       <div className="space-y-1">
-                        <div><span className="text-white/50">Server:</span>    <span className="text-green-400">smtp.mailgun.org</span></div>
-                        <div><span className="text-white/50">Port:</span>      <span className="text-green-400">587</span></div>
-                        <div><span className="text-white/50">Encryption:</span> <span className="text-green-400">TLS / STARTTLS</span></div>
-                        <div><span className="text-white/50">Auth:</span>      <span className="text-green-400">Password</span></div>
-                        <div><span className="text-white/50">Username:</span>  <span className="text-green-400">{config.smtpUsername || "postmaster@zoobicon.com"}</span></div>
-                        <div><span className="text-white/50">Password:</span>  <span className="text-green-400">{config.smtpPassword ? "********" : "[from Mailgun dashboard]"}</span></div>
+                        <div><span className="text-white/50">Server:</span>    <span className="text-stone-400">smtp.mailgun.org</span></div>
+                        <div><span className="text-white/50">Port:</span>      <span className="text-stone-400">587</span></div>
+                        <div><span className="text-white/50">Encryption:</span> <span className="text-stone-400">TLS / STARTTLS</span></div>
+                        <div><span className="text-white/50">Auth:</span>      <span className="text-stone-400">Password</span></div>
+                        <div><span className="text-white/50">Username:</span>  <span className="text-stone-400">{config.smtpUsername || "postmaster@zoobicon.com"}</span></div>
+                        <div><span className="text-white/50">Password:</span>  <span className="text-stone-400">{config.smtpPassword ? "********" : "[from Mailgun dashboard]"}</span></div>
                       </div>
                     </div>
                     <div className="border-t border-white/10 pt-3">
                       <div className="text-white/50 mb-1.5 uppercase tracking-wider font-sans font-semibold" style={{ fontSize: "10px" }}>AI Ticketing (unchanged)</div>
                       <div className="space-y-1">
-                        <div><span className="text-white/50">Webhook:</span> <span className="text-cyan-400">https://zoobicon.com/api/email/webhook</span></div>
+                        <div><span className="text-white/50">Webhook:</span> <span className="text-stone-400">https://zoobicon.com/api/email/webhook</span></div>
                         <div><span className="text-white/50">Mailgun catch-all still active for DB storage + AI auto-reply</span></div>
                       </div>
                     </div>
@@ -902,7 +924,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
         {/* Actions */}
         <div className="flex items-center gap-3 mb-4">
           <button onClick={handleSave} disabled={saving}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors">
+            className="flex items-center gap-2 bg-stone-600 hover:bg-stone-500 disabled:opacity-50 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
             {saving ? "Saving..." : saved ? "Saved!" : "Save Configuration"}
           </button>
@@ -915,7 +937,7 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
 
         {testResult && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            className={`flex items-center gap-3 p-4 rounded-lg mb-6 ${testResult.ok ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
+            className={`flex items-center gap-3 p-4 rounded-lg mb-6 ${testResult.ok ? "bg-stone-500/10 border border-stone-500/20 text-stone-400" : "bg-stone-500/10 border border-stone-500/20 text-stone-400"}`}>
             {testResult.ok ? <CheckCircle2 className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
             <span className="text-sm">{testResult.message}</span>
           </motion.div>

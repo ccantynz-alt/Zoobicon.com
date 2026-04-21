@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Globe,
   ExternalLink,
@@ -153,7 +154,7 @@ export default function ClientPortal() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             {agencyBrand?.logoUrl ? (
-              <img src={agencyBrand.logoUrl} alt="" className="w-12 h-12 rounded-xl mx-auto mb-4 object-cover" />
+              <Image src={agencyBrand.logoUrl} alt="" width={48} height={48} className="w-12 h-12 rounded-xl mx-auto mb-4 object-cover" unoptimized />
             ) : (
               <div
                 className="w-12 h-12 rounded-xl mx-auto mb-4 flex items-center justify-center text-white font-bold text-lg"
@@ -179,7 +180,7 @@ export default function ClientPortal() {
             />
 
             {error && (
-              <p className="mt-3 text-sm text-red-400">{error}</p>
+              <p className="mt-3 text-sm text-stone-400">{error}</p>
             )}
 
             <button
@@ -213,7 +214,7 @@ export default function ClientPortal() {
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] bg-[#12121a]/80 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           {agencyBrand?.logoUrl ? (
-            <img src={agencyBrand.logoUrl} alt="" className="w-8 h-8 rounded-lg object-cover" />
+            <Image src={agencyBrand.logoUrl} alt="" width={32} height={32} className="w-8 h-8 rounded-lg object-cover" unoptimized />
           ) : (
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
@@ -307,8 +308,8 @@ export default function ClientPortal() {
                   <p className="text-white/50 text-xs mt-1 truncate">{site.slug}.zoobicon.sh</p>
                   <div className="flex items-center justify-between mt-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      site.status === "published" ? "bg-green-500/20 text-green-400" :
-                      site.status === "draft" ? "bg-yellow-500/20 text-yellow-400" :
+                      site.status === "published" ? "bg-stone-500/20 text-stone-400" :
+                      site.status === "draft" ? "bg-stone-500/20 text-stone-400" :
                       "bg-white/10 text-white/50"
                     }`}>
                       {site.status}

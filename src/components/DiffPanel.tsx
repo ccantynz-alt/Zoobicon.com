@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { X, History, GitBranch, Plus, Minus, Eye, Columns2 } from "lucide-react";
+import {
+  X,
+  History,
+  GitBranch,
+  Plus,
+  Minus,
+  Eye,
+  Columns2,
+} from "lucide-react";
 
 /* ─── Types ─── */
 interface Snapshot {
@@ -151,7 +159,7 @@ export default function DiffPanel({
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative ml-auto w-full max-w-5xl bg-[#0a0a0f] border-l border-white/[0.06] flex h-full">
+      <div className="relative ml-auto w-full max-w-5xl bg-[#0a1628] border-l border-white/[0.06] flex h-full">
         {/* Left sidebar — snapshot list */}
         <div className="w-64 flex-shrink-0 border-r border-white/[0.06] flex flex-col">
           <div className="p-4 border-b border-white/[0.06]">
@@ -209,11 +217,11 @@ export default function DiffPanel({
               <h2 className="text-sm font-medium text-white/80">Diff View</h2>
               {diffResult && (
                 <div className="flex items-center gap-3 text-[11px]">
-                  <span className="flex items-center gap-1 text-green-400">
+                  <span className="flex items-center gap-1 text-stone-400">
                     <Plus size={12} />
                     {diffResult.stats.added} added
                   </span>
-                  <span className="flex items-center gap-1 text-red-400">
+                  <span className="flex items-center gap-1 text-stone-400">
                     <Minus size={12} />
                     {diffResult.stats.removed} removed
                   </span>
@@ -306,9 +314,9 @@ function UnifiedView({ lines }: { lines: DiffLine[] }) {
           key={idx}
           className={`flex ${
             line.type === "added"
-              ? "bg-green-900/20"
+              ? "bg-stone-900/20"
               : line.type === "removed"
-                ? "bg-red-900/20"
+                ? "bg-stone-900/20"
                 : ""
           }`}
         >
@@ -324,9 +332,9 @@ function UnifiedView({ lines }: { lines: DiffLine[] }) {
           <span
             className={`w-6 flex-shrink-0 text-center select-none ${
               line.type === "added"
-                ? "text-green-400"
+                ? "text-stone-400"
                 : line.type === "removed"
-                  ? "text-red-400"
+                  ? "text-stone-400"
                   : "text-white/10"
             }`}
           >
@@ -336,9 +344,9 @@ function UnifiedView({ lines }: { lines: DiffLine[] }) {
           <span
             className={`flex-1 px-2 whitespace-pre ${
               line.type === "added"
-                ? "text-green-300"
+                ? "text-stone-300"
                 : line.type === "removed"
-                  ? "text-red-300"
+                  ? "text-stone-300"
                   : "text-white/50"
             }`}
           >
@@ -386,14 +394,14 @@ function SideBySideView({ lines }: { lines: DiffLine[] }) {
   }, [lines]);
 
   const bgFor = (type: string) => {
-    if (type === "removed") return "bg-red-900/20";
-    if (type === "added") return "bg-green-900/20";
+    if (type === "removed") return "bg-stone-900/20";
+    if (type === "added") return "bg-stone-900/20";
     return "";
   };
 
   const textFor = (type: string) => {
-    if (type === "removed") return "text-red-300";
-    if (type === "added") return "text-green-300";
+    if (type === "removed") return "text-stone-300";
+    if (type === "added") return "text-stone-300";
     if (type === "empty") return "";
     return "text-white/50";
   };

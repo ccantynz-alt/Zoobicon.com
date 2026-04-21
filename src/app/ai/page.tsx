@@ -77,56 +77,57 @@ const AI_TOOLS = [
     icon: Palette,
     name: "AI Brand Kit Generator",
     description: "Logo, colors, typography, brand guidelines — generated instantly.",
-    color: "from-cyan-500 to-rose-600",
-    glowColor: "shadow-cyan-500/25",
+    color: "from-stone-500 to-stone-600",
+    glowColor: "shadow-stone-500/25",
     tag: "Design",
   },
   {
     icon: Bot,
     name: "AI Chatbot Builder",
     description: "Deploy intelligent chatbots that understand your business.",
-    color: "from-blue-500 to-indigo-600",
-    glowColor: "shadow-blue-500/25",
+    color: "from-stone-500 to-stone-600",
+    glowColor: "shadow-stone-500/25",
     tag: "Agent",
+    href: "/chatbot-widget",
   },
   {
     icon: Video,
     name: "AI Video Creator",
-    description: "Transform text scripts into professional marketing videos. Coming soon.",
-    color: "from-accent-purple to-blue-700",
-    glowColor: "shadow-blue-500/25",
-    tag: "Coming Soon",
+    description: "Transform text scripts into professional marketing videos in minutes.",
+    color: "from-accent-purple to-stone-700",
+    glowColor: "shadow-stone-500/25",
+    tag: "Video",
   },
   {
     icon: Mail,
     name: "AI Email Writer",
     description: "Campaigns, sequences, newsletters — written by AI.",
-    color: "from-rose-500 to-red-600",
-    glowColor: "shadow-rose-500/25",
+    color: "from-stone-500 to-stone-600",
+    glowColor: "shadow-stone-500/25",
     tag: "Marketing",
   },
   {
     icon: Search,
     name: "AI SEO Agent",
     description: "Autonomous SEO that ranks your content automatically.",
-    color: "from-accent-cyan to-emerald-600",
-    glowColor: "shadow-cyan-500/25",
+    color: "from-accent-cyan to-stone-600",
+    glowColor: "shadow-stone-500/25",
     tag: "Agent",
   },
   {
     icon: Bug,
     name: "AI Code Debugger",
     description: "Paste broken code. Get fixed, optimized code back.",
-    color: "from-red-500 to-orange-500",
-    glowColor: "shadow-red-500/25",
+    color: "from-stone-500 to-stone-500",
+    glowColor: "shadow-stone-500/25",
     tag: "Developer",
   },
   {
     icon: Languages,
     name: "AI Translation",
     description: "Translate your entire site to 30+ languages in one click.",
-    color: "from-emerald-500 to-teal-500",
-    glowColor: "shadow-emerald-500/25",
+    color: "from-stone-500 to-stone-500",
+    glowColor: "shadow-stone-500/25",
     tag: "Global",
   },
 ];
@@ -154,8 +155,8 @@ const HOW_IT_WORKS = [
     title: "Generate",
     subtitle: "AI builds it in seconds with auto-debugging",
     description: "Our AI writes production-grade code, designs responsive layouts, and auto-debugs every error — all in under 60 seconds.",
-    color: "from-accent-purple to-blue-700",
-    glowColor: "shadow-blue-500/30",
+    color: "from-accent-purple to-stone-700",
+    glowColor: "shadow-stone-500/30",
   },
   {
     step: "03",
@@ -163,8 +164,8 @@ const HOW_IT_WORKS = [
     title: "Deploy",
     subtitle: "One-click publish to your.zoobicon.sh or custom domain",
     description: "Hit deploy and your site goes live instantly. Free hosting on zoobicon.sh, or connect your own domain in one click.",
-    color: "from-accent-cyan to-emerald-600",
-    glowColor: "shadow-cyan-500/30",
+    color: "from-accent-cyan to-stone-600",
+    glowColor: "shadow-stone-500/30",
   },
 ];
 
@@ -181,7 +182,7 @@ export default function AiPage() {
     setGeneratedPreview(null);
 
     try {
-      const res = await fetch("/api/generate", {
+      const res = await fetch("/api/generate/react", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),
@@ -196,10 +197,10 @@ export default function AiPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-[#060e1f] text-white overflow-x-hidden relative">
       <BackgroundEffects preset="technical" />
       {/* ───────── Navigation ───────── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#050508]/80 backdrop-blur-xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#060e1f]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-zoo-500 to-zoo-400 flex items-center justify-center">
@@ -341,13 +342,18 @@ export default function AiPage() {
             viewport={{ once: true, amount: 0.1 }}
             className="grid md:grid-cols-2 lg:grid-cols-4 gap-5"
           >
-            {AI_TOOLS.map((tool) => (
+            {AI_TOOLS.map((tool) => {
+              const href = (tool as { href?: string }).href;
+              const Wrapper = ({ children }: { children: React.ReactNode }) =>
+                href ? <Link href={href} className="block h-full">{children}</Link> : <>{children}</>;
+              return (
               <motion.div
                 key={tool.name}
                 variants={fadeInUp}
                 whileHover={{ y: -6, transition: { duration: 0.2, ease: "easeOut" as const } }}
                 className={`group relative p-6 rounded-2xl border border-white/10 bg-white/[0.05] hover:border-white/15 hover:bg-white/[0.07] transition-all cursor-pointer shadow-lg ${tool.glowColor}`}
               >
+                <Wrapper>
                 {/* Tag */}
                 <span className="absolute top-4 right-4 text-[10px] font-semibold uppercase tracking-wider text-gray-300 bg-white/5 px-2 py-0.5 rounded-full">
                   {tool.tag}
@@ -367,8 +373,10 @@ export default function AiPage() {
                   Explore
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </div>
+                </Wrapper>
               </motion.div>
-            ))}
+              );
+            })}
           </motion.div>
         </div>
       </section>
@@ -502,7 +510,7 @@ export default function AiPage() {
             viewport={{ once: true, amount: 0.2 }}
             className="text-center mb-16"
           >
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-sm font-medium mb-4">
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-stone-500/30 bg-stone-500/5 text-stone-400 text-sm font-medium mb-4">
               <Zap className="w-4 h-4" />
               Simple as 1-2-3
             </motion.div>
@@ -536,7 +544,7 @@ export default function AiPage() {
 
                 <div className={`relative p-8 rounded-2xl border border-white/10 bg-white/[0.05] hover:border-white/15 transition-all shadow-lg ${step.glowColor}`}>
                   {/* Step number */}
-                  <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-[#050508] border border-white/15 flex items-center justify-center text-sm font-bold text-gray-300">
+                  <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-[#060e1f] border border-white/15 flex items-center justify-center text-sm font-bold text-gray-300">
                     {step.step}
                   </div>
 
@@ -607,7 +615,7 @@ export default function AiPage() {
                 <div className="relative">
                   {/* Glow ring */}
                   <div className="absolute inset-0 w-48 h-48 mx-auto rounded-full bg-gradient-to-br from-accent-purple/30 to-zoo-500/30 blur-2xl" />
-                  <div className="relative w-48 h-48 mx-auto rounded-full border border-white/15 bg-[#050508]/80 flex items-center justify-center">
+                  <div className="relative w-48 h-48 mx-auto rounded-full border border-white/15 bg-[#060e1f]/80 flex items-center justify-center">
                     <div className="w-36 h-36 rounded-full border border-accent-purple/20 bg-gradient-to-br from-accent-purple/10 to-zoo-500/10 flex items-center justify-center">
                       <div className="text-center">
                         <Brain className="w-12 h-12 text-accent-purple mx-auto mb-2" />
@@ -620,7 +628,7 @@ export default function AiPage() {
                   {/* Orbiting dots */}
                   {["top-0 left-1/2 -translate-x-1/2 -translate-y-2", "bottom-0 left-1/2 -translate-x-1/2 translate-y-2", "left-0 top-1/2 -translate-y-1/2 -translate-x-2", "right-0 top-1/2 -translate-y-1/2 translate-x-2"].map((pos, i) => (
                     <div key={i} className={`absolute ${pos}`}>
-                      <div className={`w-3 h-3 rounded-full ${["bg-zoo-500", "bg-accent-purple", "bg-accent-cyan", "bg-cyan-500"][i]} shadow-lg`} />
+                      <div className={`w-3 h-3 rounded-full ${["bg-zoo-500", "bg-accent-purple", "bg-accent-cyan", "bg-stone-500"][i]} shadow-lg`} />
                     </div>
                   ))}
                 </div>

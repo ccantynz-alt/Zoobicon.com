@@ -3,18 +3,43 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  FileText, Download, Sparkles, Wand2, TrendingUp, Target,
-  Users, BarChart3, ArrowUpRight, ArrowDownRight, Eye, Edit3,
-  ChevronRight, Plus, Copy, Check, Star, Clock, Zap,
-  Building2, Globe, Award, Briefcase, MessageSquare,
-  Layout, Layers, Share2, ExternalLink, Filter, Search
+  FileText,
+  Download,
+  Sparkles,
+  Wand2,
+  TrendingUp,
+  Target,
+  Users,
+  BarChart3,
+  ArrowUpRight,
+  ArrowDownRight,
+  Eye,
+  Edit3,
+  ChevronRight,
+  Plus,
+  Copy,
+  Check,
+  Star,
+  Clock,
+  Zap,
+  Building2,
+  Globe,
+  Award,
+  Briefcase,
+  MessageSquare,
+  Layout,
+  Layers,
+  Share2,
+  ExternalLink,
+  Filter,
+  Search,
 } from 'lucide-react';
 
 const TEMPLATE_FORMATS = [
-  { id: 'saas', name: 'SaaS', desc: 'Software product case study with metrics, onboarding, and ROI', icon: Zap, color: 'from-violet-500 to-blue-500' },
-  { id: 'agency', name: 'Agency', desc: 'Client success story with timeline, deliverables, and outcomes', icon: Briefcase, color: 'from-pink-500 to-rose-500' },
-  { id: 'ecommerce', name: 'E-commerce', desc: 'Revenue growth story with conversion and AOV improvements', icon: TrendingUp, color: 'from-emerald-500 to-teal-500' },
-  { id: 'enterprise', name: 'Enterprise', desc: 'Large-scale transformation with process and efficiency gains', icon: Building2, color: 'from-amber-500 to-orange-500' },
+  { id: 'saas', name: 'SaaS', desc: 'Software product case study with metrics, onboarding, and ROI', icon: Zap, color: 'from-stone-500 to-stone-500' },
+  { id: 'agency', name: 'Agency', desc: 'Client success story with timeline, deliverables, and outcomes', icon: Briefcase, color: 'from-stone-500 to-stone-500' },
+  { id: 'ecommerce', name: 'E-commerce', desc: 'Revenue growth story with conversion and AOV improvements', icon: TrendingUp, color: 'from-stone-500 to-stone-500' },
+  { id: 'enterprise', name: 'Enterprise', desc: 'Large-scale transformation with process and efficiency gains', icon: Building2, color: 'from-stone-500 to-stone-500' },
 ];
 
 const DEMO_CASE_STUDIES = [
@@ -125,15 +150,15 @@ export default function CaseStudyPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="font-semibold text-white">Case Study Generator</span>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
+            <button onClick={() => alert("Case study preview")} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition text-sm">
               <Eye className="w-4 h-4" /> Preview
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+            <button onClick={() => window.print()} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 hover:opacity-90 transition text-sm font-medium">
               <Download className="w-4 h-4" /> Export
             </button>
           </div>
@@ -144,10 +169,10 @@ export default function CaseStudyPage() {
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Published Studies', value: DEMO_CASE_STUDIES.length, icon: FileText, color: 'text-violet-400' },
-            { label: 'Total Views', value: DEMO_CASE_STUDIES.reduce((s, cs) => s + cs.views, 0).toLocaleString(), icon: Eye, color: 'text-blue-400' },
-            { label: 'Total Shares', value: DEMO_CASE_STUDIES.reduce((s, cs) => s + cs.shares, 0), icon: Share2, color: 'text-emerald-400' },
-            { label: 'Avg. Engagement', value: '4.2 min', icon: Clock, color: 'text-amber-400' },
+            { label: 'Published Studies', value: DEMO_CASE_STUDIES.length, icon: FileText, color: 'text-stone-400' },
+            { label: 'Total Views', value: DEMO_CASE_STUDIES.reduce((s, cs) => s + cs.views, 0).toLocaleString(), icon: Eye, color: 'text-stone-400' },
+            { label: 'Total Shares', value: DEMO_CASE_STUDIES.reduce((s, cs) => s + cs.shares, 0), icon: Share2, color: 'text-stone-400' },
+            { label: 'Avg. Engagement', value: '4.2 min', icon: Clock, color: 'text-stone-400' },
           ].map((s) => (
             <div key={s.label} className="p-5 rounded-xl bg-white/5 border border-white/10">
               <div className="flex items-center justify-between mb-2">
@@ -171,7 +196,7 @@ export default function CaseStudyPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
-                activeTab === tab.id ? 'bg-violet-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
+                activeTab === tab.id ? 'bg-stone-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
               }`}
             >
               <tab.icon className="w-4 h-4" /> {tab.label}
@@ -182,9 +207,9 @@ export default function CaseStudyPage() {
         {/* AI Generator */}
         {activeTab === 'generator' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="p-8 rounded-2xl bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20">
+            <div className="p-8 rounded-2xl bg-gradient-to-r from-stone-500/10 to-stone-500/10 border border-stone-500/20">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 flex items-center justify-center">
                   <Wand2 className="w-6 h-6" />
                 </div>
                 <div>
@@ -201,7 +226,7 @@ export default function CaseStudyPage() {
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
                     placeholder="e.g., Acme Technologies"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   />
                 </div>
                 <div>
@@ -210,7 +235,7 @@ export default function CaseStudyPage() {
                     value={problem}
                     onChange={(e) => setProblem(e.target.value)}
                     placeholder="What challenges was the client facing? What pain points led them to seek a solution?"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   />
                 </div>
                 <div>
@@ -219,7 +244,7 @@ export default function CaseStudyPage() {
                     value={solution}
                     onChange={(e) => setSolution(e.target.value)}
                     placeholder="How did your product/service solve the problem? What was the implementation process?"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   />
                 </div>
                 <div>
@@ -228,7 +253,7 @@ export default function CaseStudyPage() {
                     value={results}
                     onChange={(e) => setResults(e.target.value)}
                     placeholder="What measurable outcomes were achieved? Include specific numbers: revenue growth, time saved, cost reduction, etc."
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   />
                 </div>
                 <div>
@@ -239,10 +264,10 @@ export default function CaseStudyPage() {
                         key={t.id}
                         onClick={() => setSelectedTemplate(t.id)}
                         className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm transition ${
-                          selectedTemplate === t.id ? 'border-violet-500 bg-violet-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10'
+                          selectedTemplate === t.id ? 'border-stone-500 bg-stone-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10'
                         }`}
                       >
-                        <t.icon className="w-4 h-4 text-violet-400" />
+                        <t.icon className="w-4 h-4 text-stone-400" />
                         {t.name}
                       </button>
                     ))}
@@ -251,7 +276,7 @@ export default function CaseStudyPage() {
                 <button
                   onClick={handleGenerate}
                   disabled={generating}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-medium hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {generating ? (
                     <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generating Case Study...</>
@@ -279,13 +304,13 @@ export default function CaseStudyPage() {
                         <p className="text-xs text-white/30 line-through">{metric.before}</p>
                         <p className="text-xl font-bold">{metric.after}</p>
                       </div>
-                      <div className={`flex items-center gap-0.5 text-sm font-bold ${metric.direction === 'up' ? 'text-emerald-400' : 'text-emerald-400'}`}>
+                      <div className={`flex items-center gap-0.5 text-sm font-bold ${metric.direction === 'up' ? 'text-stone-400' : 'text-stone-400'}`}>
                         {metric.direction === 'up' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
                         {Math.abs(metric.change)}%
                       </div>
                     </div>
                     <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full" style={{ width: `${Math.min(100, Math.abs(metric.change) / 4)}%` }} />
+                      <div className="h-full bg-gradient-to-r from-stone-500 to-stone-500 rounded-full" style={{ width: `${Math.min(100, Math.abs(metric.change) / 4)}%` }} />
                     </div>
                   </div>
                 ))}
@@ -293,12 +318,12 @@ export default function CaseStudyPage() {
 
               <div className="p-6 rounded-xl bg-white/5 border border-white/10">
                 <h4 className="font-semibold mb-3">Testimonial Quote</h4>
-                <div className="relative pl-4 border-l-2 border-violet-500">
+                <div className="relative pl-4 border-l-2 border-stone-500">
                   <p className="text-sm text-white/60 italic leading-relaxed">
                     &ldquo;Zoobicon transformed how we deliver for clients. What used to take weeks now takes hours. Our team focuses on strategy while AI handles the execution. Revenue tripled in 6 months.&rdquo;
                   </p>
                   <div className="flex items-center gap-3 mt-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 flex items-center justify-center text-xs font-bold">MW</div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-stone-600 to-stone-600 flex items-center justify-center text-xs font-bold">MW</div>
                     <div>
                       <p className="text-sm font-medium">Marcus Wright</p>
                       <p className="text-xs text-white/40">CEO, Wright Digital Agency</p>
@@ -321,24 +346,24 @@ export default function CaseStudyPage() {
                   placeholder="Search case studies..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm w-80 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                  className="bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm w-80 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                 />
               </div>
               <div className="flex gap-2">
-                <button onClick={() => setFilterTemplate(null)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${!filterTemplate ? 'bg-violet-600' : 'bg-white/5 hover:bg-white/10'}`}>All</button>
+                <button onClick={() => setFilterTemplate(null)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${!filterTemplate ? 'bg-stone-600' : 'bg-white/5 hover:bg-white/10'}`}>All</button>
                 {TEMPLATE_FORMATS.map((t) => (
-                  <button key={t.id} onClick={() => setFilterTemplate(t.id)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${filterTemplate === t.id ? 'bg-violet-600' : 'bg-white/5 hover:bg-white/10'}`}>{t.name}</button>
+                  <button key={t.id} onClick={() => setFilterTemplate(t.id)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${filterTemplate === t.id ? 'bg-stone-600' : 'bg-white/5 hover:bg-white/10'}`}>{t.name}</button>
                 ))}
               </div>
             </div>
 
             <div className="space-y-6">
               {filteredCaseStudies.map((cs) => (
-                <div key={cs.id} className={`p-6 rounded-2xl border transition ${cs.featured ? 'bg-gradient-to-r from-violet-500/5 to-fuchsia-500/5 border-violet-500/20' : 'bg-white/5 border-white/10'}`}>
+                <div key={cs.id} className={`p-6 rounded-2xl border transition ${cs.featured ? 'bg-gradient-to-r from-stone-500/5 to-stone-500/5 border-stone-500/20' : 'bg-white/5 border-white/10'}`}>
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        {cs.featured && <Award className="w-4 h-4 text-amber-400" />}
+                        {cs.featured && <Award className="w-4 h-4 text-stone-400" />}
                         <span className="px-2 py-0.5 rounded-full bg-white/10 text-xs text-white/50">{cs.industry}</span>
                       </div>
                       <h3 className="text-lg font-bold">{cs.title}</h3>
@@ -346,9 +371,9 @@ export default function CaseStudyPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <button onClick={() => handleCopyLink(cs.id)} className="p-2 rounded-lg hover:bg-white/10 transition">
-                        {copiedLink === cs.id ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-white/40" />}
+                        {copiedLink === cs.id ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4 text-white/40" />}
                       </button>
-                      <button className="p-2 rounded-lg hover:bg-white/10 transition"><ExternalLink className="w-4 h-4 text-white/40" /></button>
+                      <button onClick={() => {}} className="p-2 rounded-lg hover:bg-white/10 transition"><ExternalLink className="w-4 h-4 text-white/40" /></button>
                     </div>
                   </div>
 
@@ -359,7 +384,7 @@ export default function CaseStudyPage() {
                         <div className="flex items-baseline gap-2">
                           <span className="text-lg font-bold">{m.after}</span>
                           {m.change !== 0 && (
-                            <span className={`text-xs font-medium flex items-center gap-0.5 ${m.direction === 'up' ? 'text-emerald-400' : 'text-emerald-400'}`}>
+                            <span className={`text-xs font-medium flex items-center gap-0.5 ${m.direction === 'up' ? 'text-stone-400' : 'text-stone-400'}`}>
                               {m.direction === 'up' ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                               {Math.abs(m.change)}%
                             </span>
@@ -375,7 +400,7 @@ export default function CaseStudyPage() {
                       <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {cs.views.toLocaleString()} views</span>
                       <span className="flex items-center gap-1"><Share2 className="w-3 h-3" /> {cs.shares} shares</span>
                     </div>
-                    <button className="flex items-center gap-1 text-violet-400 hover:text-violet-300 text-xs font-medium">
+                    <button onClick={() => {}} className="flex items-center gap-1 text-stone-400 hover:text-stone-300 text-xs font-medium">
                       Read Full Study <ChevronRight className="w-3 h-3" />
                     </button>
                   </div>
@@ -389,7 +414,7 @@ export default function CaseStudyPage() {
         {activeTab === 'templates' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {TEMPLATE_FORMATS.map((t) => (
-              <div key={t.id} className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition cursor-pointer">
+              <div key={t.id} className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-stone-500/30 transition cursor-pointer">
                 <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${t.color} flex items-center justify-center mb-4`}>
                   <t.icon className="w-7 h-7" />
                 </div>
@@ -408,7 +433,7 @@ export default function CaseStudyPage() {
                     'Key Takeaways',
                   ].map((item) => (
                     <div key={item} className="flex items-center gap-2 text-sm text-white/50">
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <Check className="w-3.5 h-3.5 text-stone-400" />
                       {item}
                     </div>
                   ))}
@@ -429,13 +454,13 @@ export default function CaseStudyPage() {
           <div className="max-w-2xl mx-auto space-y-4">
             <h3 className="font-semibold mb-4">Export Formats</h3>
             {[
-              { label: 'PDF Document', desc: 'Print-ready PDF with brand styling, charts, and metrics visualizations', icon: FileText, format: '.pdf', color: 'from-red-500 to-pink-500' },
-              { label: 'Web Page (HTML)', desc: 'Standalone responsive HTML page with embedded styles and animations', icon: Globe, format: '.html', color: 'from-blue-500 to-cyan-500' },
-              { label: 'Presentation Deck', desc: 'Slide deck format with key metrics, quotes, and visuals (coming soon)', icon: Layout, format: '.pptx', color: 'from-amber-500 to-orange-500' },
-              { label: 'Markdown', desc: 'Clean markdown format for CMS, GitHub, or documentation sites', icon: FileText, format: '.md', color: 'from-emerald-500 to-teal-500' },
-              { label: 'Social Media Kit', desc: 'Pre-sized images for LinkedIn, Twitter, and Instagram with key stats', icon: Share2, format: '.zip', color: 'from-violet-500 to-fuchsia-500' },
+              { label: 'PDF Document', desc: 'Print-ready PDF with brand styling, charts, and metrics visualizations', icon: FileText, format: '.pdf', color: 'from-stone-500 to-stone-500' },
+              { label: 'Web Page (HTML)', desc: 'Standalone responsive HTML page with embedded styles and animations', icon: Globe, format: '.html', color: 'from-stone-500 to-stone-500' },
+              { label: 'Presentation Deck', desc: 'Slide deck format with key metrics, quotes, and visuals (coming soon)', icon: Layout, format: '.pptx', color: 'from-stone-500 to-stone-500' },
+              { label: 'Markdown', desc: 'Clean markdown format for CMS, GitHub, or documentation sites', icon: FileText, format: '.md', color: 'from-stone-500 to-stone-500' },
+              { label: 'Social Media Kit', desc: 'Pre-sized images for LinkedIn, MessageCircle, and Camera with key stats', icon: Share2, format: '.zip', color: 'from-stone-500 to-stone-500' },
             ].map((opt) => (
-              <div key={opt.label} className="flex items-center gap-4 p-5 rounded-xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition cursor-pointer">
+              <div key={opt.label} className="flex items-center gap-4 p-5 rounded-xl bg-white/5 border border-white/10 hover:border-stone-500/30 transition cursor-pointer">
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${opt.color} flex items-center justify-center shrink-0`}>
                   <opt.icon className="w-6 h-6" />
                 </div>
@@ -445,7 +470,7 @@ export default function CaseStudyPage() {
                 </div>
                 <div className="text-right">
                   <span className="text-xs text-white/30 font-mono">{opt.format}</span>
-                  <button className="block mt-1 px-4 py-1.5 rounded-lg bg-violet-600 text-xs font-medium hover:bg-violet-500 transition">
+                  <button onClick={() => {}} className="block mt-1 px-4 py-1.5 rounded-lg bg-stone-600 text-xs font-medium hover:bg-stone-500 transition">
                     <Download className="w-3 h-3 inline mr-1" /> Export
                   </button>
                 </div>
@@ -456,9 +481,9 @@ export default function CaseStudyPage() {
               <h3 className="font-semibold mb-3">Bulk Export</h3>
               <p className="text-sm text-white/40 mb-4">Export all published case studies in a single download</p>
               <div className="flex gap-3">
-                <button className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as PDF (.zip)</button>
-                <button className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as HTML (.zip)</button>
-                <button className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as Markdown (.zip)</button>
+                <button onClick={() => alert("Export feature coming soon")} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as PDF (.zip)</button>
+                <button onClick={() => alert("Export feature coming soon")} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as HTML (.zip)</button>
+                <button onClick={() => alert("Export feature coming soon")} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium transition">All as Markdown (.zip)</button>
               </div>
             </div>
           </div>

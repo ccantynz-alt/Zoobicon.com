@@ -3,10 +3,29 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Map, ChevronUp, Calendar, Filter, Tag, MessageSquare,
-  ArrowRight, Check, Clock, Rocket, Zap, Users, Star,
-  LayoutGrid, GanttChart, ChevronDown, ExternalLink,
-  Lightbulb, Sparkles, Eye, Lock, Globe, Code
+  Map,
+  ChevronUp,
+  Calendar,
+  Filter,
+  Tag,
+  MessageSquare,
+  ArrowRight,
+  Check,
+  Clock,
+  Rocket,
+  Zap,
+  Users,
+  Star,
+  LayoutGrid,
+  GanttChart,
+  ChevronDown,
+  ExternalLink,
+  Lightbulb,
+  Sparkles,
+  Eye,
+  Lock,
+  Globe,
+  Code,
 } from 'lucide-react';
 
 type ViewMode = 'kanban' | 'timeline';
@@ -27,10 +46,10 @@ interface RoadmapItem {
 
 const COLUMN_CONFIG: Record<KanbanColumn, { label: string; color: string; icon: typeof Lightbulb }> = {
   'backlog': { label: 'Backlog', color: 'border-gray-500/30 bg-gray-500/5', icon: Lightbulb },
-  'planned': { label: 'Planned', color: 'border-blue-500/30 bg-blue-500/5', icon: Calendar },
-  'in-progress': { label: 'In Progress', color: 'border-yellow-500/30 bg-yellow-500/5', icon: Zap },
-  'beta': { label: 'Beta', color: 'border-purple-500/30 bg-purple-500/5', icon: Eye },
-  'shipped': { label: 'Shipped', color: 'border-green-500/30 bg-green-500/5', icon: Check },
+  'planned': { label: 'Planned', color: 'border-stone-500/30 bg-stone-500/5', icon: Calendar },
+  'in-progress': { label: 'In Progress', color: 'border-stone-500/30 bg-stone-500/5', icon: Zap },
+  'beta': { label: 'Beta', color: 'border-stone-500/30 bg-stone-500/5', icon: Eye },
+  'shipped': { label: 'Shipped', color: 'border-stone-500/30 bg-stone-500/5', icon: Check },
 };
 
 const CATEGORIES = [
@@ -49,7 +68,7 @@ const ROADMAP_ITEMS: RoadmapItem[] = [
   { id: '3', title: 'React/Next.js code export', description: 'Export as proper React components with JSX and hooks', column: 'planned', category: 'core', votes: 267, quarter: 'Q2 2026', eta: 'May 2026', tags: ['export'] },
   { id: '4', title: 'AI Brand Kit persistence', description: 'Save colors, fonts, logos, voice — auto-apply to all builds', column: 'in-progress', category: 'ai', votes: 234, quarter: 'Q1 2026', tags: ['personalization'] },
   { id: '5', title: 'Custom domain SSL auto-provisioning', description: "Let's Encrypt auto-provision for connected custom domains", column: 'planned', category: 'hosting', votes: 156, quarter: 'Q2 2026', tags: ['security'] },
-  { id: '6', title: 'Figma design import', description: 'Import Figma designs and convert to responsive HTML/CSS', column: 'in-progress', category: 'integrations', votes: 176, quarter: 'Q1 2026', eta: 'Apr 2026', tags: ['design'] },
+  { id: '6', title: 'Layers design import', description: 'Import Layers designs and convert to responsive HTML/CSS', column: 'in-progress', category: 'integrations', votes: 176, quarter: 'Q1 2026', eta: 'Apr 2026', tags: ['design'] },
   { id: '7', title: 'Multi-language generation', description: 'Generate sites in multiple languages from one prompt', column: 'in-progress', category: 'ai', votes: 187, quarter: 'Q1 2026', tags: ['i18n'] },
   { id: '8', title: 'Version branching & merging', description: 'Git-like version control for sites with branch and merge', column: 'backlog', category: 'collaboration', votes: 198, tags: ['versioning'] },
   { id: '9', title: 'Mobile app builder', description: 'React Native export via Expo for instant mobile preview', column: 'backlog', category: 'mobile', votes: 134, tags: ['mobile'] },
@@ -64,7 +83,7 @@ const ROADMAP_ITEMS: RoadmapItem[] = [
   { id: '18', title: 'Creator profiles & portfolios', description: 'Public profile pages showcasing built sites', column: 'planned', category: 'collaboration', votes: 145, quarter: 'Q2 2026', tags: ['community'] },
   { id: '19', title: 'Prompt gallery & community', description: 'Share prompts, upvote, remix sites', column: 'planned', category: 'collaboration', votes: 201, quarter: 'Q2 2026', tags: ['community'] },
   { id: '20', title: 'OpenClaw agent integration', description: 'Autonomous SEO/optimizer agents via OpenClaw framework', column: 'backlog', category: 'ai', votes: 67, tags: ['autonomous'] },
-  { id: '21', title: 'MCP support', description: 'Model Context Protocol for GitHub, Notion, Figma context', column: 'planned', category: 'integrations', votes: 112, quarter: 'Q2 2026', tags: ['context'] },
+  { id: '21', title: 'MCP support', description: 'Model Context Protocol for GitHub, Notion, Layers context', column: 'planned', category: 'integrations', votes: 112, quarter: 'Q2 2026', tags: ['context'] },
   { id: '22', title: 'Email marketing (native)', description: 'Built-in list builder, AI newsletters, one-click send', column: 'planned', category: 'core', votes: 189, quarter: 'Q3 2026', tags: ['marketing'] },
 ];
 
@@ -94,13 +113,13 @@ export default function RoadmapPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="text-white/70 font-medium">Roadmap</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/changelog" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Changelog</Link>
-            <Link href="/feature-requests" className="px-4 py-2 text-sm bg-gradient-to-r from-indigo-600 to-blue-600 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center gap-1">
+            <Link href="/feature-requests" className="px-4 py-2 text-sm bg-gradient-to-r from-stone-600 to-stone-600 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center gap-1">
               <Lightbulb className="w-4 h-4" /> Request Feature
             </Link>
           </div>
@@ -109,11 +128,11 @@ export default function RoadmapPage() {
 
       <main className="max-w-[90rem] mx-auto px-6 py-12">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm mb-6">
             <Map className="w-4 h-4" /> Public Roadmap
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Where We&apos;re <span className="bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">Headed</span>
+            Where We&apos;re <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Headed</span>
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             Our public product roadmap. Vote on planned features to help us prioritize what matters most to you.
@@ -123,13 +142,13 @@ export default function RoadmapPage() {
         {/* Controls */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           <div className="flex gap-1 p-1 bg-white/5 rounded-lg border border-white/10">
-            <button onClick={() => setViewMode('kanban')} className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm ${viewMode === 'kanban' ? 'bg-indigo-500/20 text-indigo-400' : 'text-gray-400'}`}><LayoutGrid className="w-4 h-4" /> Kanban</button>
-            <button onClick={() => setViewMode('timeline')} className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm ${viewMode === 'timeline' ? 'bg-indigo-500/20 text-indigo-400' : 'text-gray-400'}`}><GanttChart className="w-4 h-4" /> Timeline</button>
+            <button onClick={() => setViewMode('kanban')} className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm ${viewMode === 'kanban' ? 'bg-stone-500/20 text-stone-400' : 'text-gray-400'}`}><LayoutGrid className="w-4 h-4" /> Kanban</button>
+            <button onClick={() => setViewMode('timeline')} className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm ${viewMode === 'timeline' ? 'bg-stone-500/20 text-stone-400' : 'text-gray-400'}`}><GanttChart className="w-4 h-4" /> Timeline</button>
           </div>
           <div className="flex gap-1 p-1 bg-white/5 rounded-lg border border-white/10 overflow-x-auto">
             {CATEGORIES.map(c => (
               <button key={c.id} onClick={() => setCategoryFilter(c.id as Category)}
-                className={`px-3 py-1.5 rounded text-xs whitespace-nowrap ${categoryFilter === c.id ? 'bg-indigo-500/20 text-indigo-400' : 'text-gray-400 hover:text-white'}`}>{c.label}</button>
+                className={`px-3 py-1.5 rounded text-xs whitespace-nowrap ${categoryFilter === c.id ? 'bg-stone-500/20 text-stone-400' : 'text-gray-400 hover:text-white'}`}>{c.label}</button>
             ))}
           </div>
         </div>
@@ -159,7 +178,7 @@ export default function RoadmapPage() {
                           </div>
                           <div className="flex items-center justify-between">
                             <button onClick={() => handleVote(item.id)}
-                              className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs transition-all ${voted ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' : 'bg-white/5 text-gray-400 border border-white/10 hover:text-indigo-400'}`}>
+                              className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs transition-all ${voted ? 'bg-stone-500/20 text-stone-400 border border-stone-500/30' : 'bg-white/5 text-gray-400 border border-white/10 hover:text-stone-400'}`}>
                               <ChevronUp className="w-3 h-3" /> {item.votes}
                             </button>
                             {item.eta && <span className="text-[10px] text-gray-500">{item.eta}</span>}
@@ -183,17 +202,17 @@ export default function RoadmapPage() {
               return (
                 <div key={quarter}>
                   <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-indigo-400" />
+                    <Calendar className="w-5 h-5 text-stone-400" />
                     {quarter}
                     <span className="text-sm text-gray-400 font-normal">({quarterItems.length} items)</span>
                   </h3>
-                  <div className="relative pl-8 border-l-2 border-indigo-500/20 space-y-4">
+                  <div className="relative pl-8 border-l-2 border-stone-500/20 space-y-4">
                     {quarterItems.map(item => {
                       const colConfig = COLUMN_CONFIG[item.column];
                       const voted = votedIds.has(item.id);
                       return (
                         <div key={item.id} className="relative">
-                          <div className="absolute -left-[25px] top-3 w-4 h-4 rounded-full border-2 border-indigo-500 bg-[#0a0a12]" />
+                          <div className="absolute -left-[25px] top-3 w-4 h-4 rounded-full border-2 border-stone-500 bg-[#0a0a12]" />
                           <div className="p-4 rounded-xl border border-white/10 bg-white/5 hover:border-white/20 transition-colors">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <h4 className="font-medium text-sm">{item.title}</h4>
@@ -203,7 +222,7 @@ export default function RoadmapPage() {
                             <p className="text-xs text-gray-400 mb-2">{item.description}</p>
                             <div className="flex items-center gap-2">
                               <button onClick={() => handleVote(item.id)}
-                                className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs transition-all ${voted ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white/5 text-gray-400 hover:text-indigo-400'}`}>
+                                className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs transition-all ${voted ? 'bg-stone-500/20 text-stone-400' : 'bg-white/5 text-gray-400 hover:text-stone-400'}`}>
                                 <ChevronUp className="w-3 h-3" /> {item.votes}
                               </button>
                               {item.tags.map(t => <span key={t} className="px-1.5 py-0.5 rounded bg-white/10 text-[10px] text-gray-400">{t}</span>)}
@@ -233,7 +252,7 @@ export default function RoadmapPage() {
                         <h4 className="font-medium text-sm mb-1">{item.title}</h4>
                         <p className="text-xs text-gray-400 mb-2 line-clamp-2">{item.description}</p>
                         <button onClick={() => handleVote(item.id)}
-                          className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs ${voted ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white/5 text-gray-400 hover:text-indigo-400'}`}>
+                          className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs ${voted ? 'bg-stone-500/20 text-stone-400' : 'bg-white/5 text-gray-400 hover:text-stone-400'}`}>
                           <ChevronUp className="w-3 h-3" /> {item.votes}
                         </button>
                       </div>
@@ -246,11 +265,11 @@ export default function RoadmapPage() {
         )}
 
         {/* CTA */}
-        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-indigo-600/20 to-blue-600/20 border border-indigo-500/20">
+        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-stone-600/20 to-stone-600/20 border border-stone-500/20">
           <h2 className="text-3xl font-bold mb-4">Help Us Build the Future</h2>
           <p className="text-gray-400 mb-6 max-w-xl mx-auto">Vote on features that matter to you. Submit ideas. Track progress from backlog to shipped.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/feature-requests" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 font-semibold hover:opacity-90 transition-opacity">
+            <Link href="/feature-requests" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold hover:opacity-90 transition-opacity">
               Request a Feature <ArrowRight className="w-4 h-4" />
             </Link>
             <Link href="/changelog" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-white/20 font-semibold hover:bg-white/5 transition-colors">

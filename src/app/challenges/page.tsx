@@ -56,14 +56,14 @@ interface LeaderboardEntry {
 
 /* ---------- gradient map for challenge categories ---------- */
 const CATEGORY_GRADIENTS: Record<string, string> = {
-  Restaurant: "from-orange-600 to-amber-400",
-  Portfolio: "from-purple-600 to-pink-500",
-  "E-Commerce": "from-emerald-600 to-teal-400",
-  SaaS: "from-indigo-600 to-blue-400",
-  Agency: "from-violet-600 to-purple-400",
-  "Landing Page": "from-cyan-600 to-blue-400",
-  Blog: "from-rose-600 to-pink-400",
-  Creative: "from-fuchsia-600 to-pink-400",
+  Restaurant: "from-stone-600 to-stone-400",
+  Portfolio: "from-stone-600 to-stone-500",
+  "E-Commerce": "from-stone-600 to-stone-400",
+  SaaS: "from-stone-600 to-stone-400",
+  Agency: "from-stone-600 to-stone-400",
+  "Landing Page": "from-stone-600 to-stone-400",
+  Blog: "from-stone-600 to-stone-400",
+  Creative: "from-stone-600 to-stone-400",
 };
 
 /* ---------- demo data ---------- */
@@ -79,7 +79,7 @@ const DEMO_CHALLENGES: Challenge[] = [
     status: "active",
     startDate: "2026-03-17",
     endDate: "2026-03-24",
-    gradient: "from-orange-600 to-amber-400",
+    gradient: "from-stone-600 to-stone-400",
   },
   {
     id: "past-1",
@@ -94,7 +94,7 @@ const DEMO_CHALLENGES: Challenge[] = [
     winnerAvatar: "P",
     startDate: "2026-03-10",
     endDate: "2026-03-17",
-    gradient: "from-purple-600 to-pink-500",
+    gradient: "from-stone-600 to-stone-500",
   },
   {
     id: "past-2",
@@ -109,7 +109,7 @@ const DEMO_CHALLENGES: Challenge[] = [
     winnerAvatar: "B",
     startDate: "2026-03-03",
     endDate: "2026-03-10",
-    gradient: "from-emerald-600 to-teal-400",
+    gradient: "from-stone-600 to-stone-400",
   },
   {
     id: "past-3",
@@ -124,7 +124,7 @@ const DEMO_CHALLENGES: Challenge[] = [
     winnerAvatar: "C",
     startDate: "2026-02-24",
     endDate: "2026-03-03",
-    gradient: "from-indigo-600 to-blue-400",
+    gradient: "from-stone-600 to-stone-400",
   },
   {
     id: "past-4",
@@ -139,7 +139,7 @@ const DEMO_CHALLENGES: Challenge[] = [
     winnerAvatar: "D",
     startDate: "2026-02-17",
     endDate: "2026-02-24",
-    gradient: "from-violet-600 to-purple-400",
+    gradient: "from-stone-600 to-stone-400",
   },
   {
     id: "past-5",
@@ -154,7 +154,7 @@ const DEMO_CHALLENGES: Challenge[] = [
     winnerAvatar: "T",
     startDate: "2026-02-10",
     endDate: "2026-02-17",
-    gradient: "from-rose-600 to-pink-400",
+    gradient: "from-stone-600 to-stone-400",
   },
   {
     id: "past-6",
@@ -169,7 +169,7 @@ const DEMO_CHALLENGES: Challenge[] = [
     winnerAvatar: "N",
     startDate: "2026-02-03",
     endDate: "2026-02-10",
-    gradient: "from-fuchsia-600 to-pink-400",
+    gradient: "from-stone-600 to-stone-400",
   },
   {
     id: "past-7",
@@ -184,7 +184,7 @@ const DEMO_CHALLENGES: Challenge[] = [
     winnerAvatar: "S",
     startDate: "2026-01-27",
     endDate: "2026-02-03",
-    gradient: "from-cyan-600 to-blue-400",
+    gradient: "from-stone-600 to-stone-400",
   },
 ];
 
@@ -226,18 +226,18 @@ function useCountdown(endDate: string) {
 function tierColor(tier: string) {
   switch (tier) {
     case "Master":
-      return "text-amber-400 bg-amber-500/10 border-amber-500/20";
+      return "text-stone-400 bg-stone-500/10 border-stone-500/20";
     case "Pro":
-      return "text-cyan-400 bg-cyan-500/10 border-cyan-500/20";
+      return "text-stone-400 bg-stone-500/10 border-stone-500/20";
     default:
       return "text-gray-400 bg-white/[0.04] border-white/[0.06]";
   }
 }
 
 function rankIcon(rank: number) {
-  if (rank === 1) return <Crown className="w-4 h-4 text-amber-400" />;
+  if (rank === 1) return <Crown className="w-4 h-4 text-stone-400" />;
   if (rank === 2) return <Medal className="w-4 h-4 text-gray-300" />;
-  if (rank === 3) return <Medal className="w-4 h-4 text-amber-600" />;
+  if (rank === 3) return <Medal className="w-4 h-4 text-stone-600" />;
   return <span className="text-xs text-gray-500 font-mono w-4 text-center">{rank}</span>;
 }
 
@@ -249,7 +249,7 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
     <motion.div
       variants={fadeInUp}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] overflow-hidden hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300"
+      className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] overflow-hidden hover:border-stone-500/30 hover:shadow-lg hover:shadow-stone-500/10 transition-all duration-300"
     >
       {/* Gradient thumbnail */}
       <div className={`relative h-40 bg-gradient-to-br ${challenge.gradient} overflow-hidden`}>
@@ -277,8 +277,8 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
               Completed
             </span>
           ) : (
-            <span className="px-2.5 py-1 rounded-full bg-green-500/20 border border-green-500/30 text-green-400 text-xs backdrop-blur-sm font-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            <span className="px-2.5 py-1 rounded-full bg-stone-500/20 border border-stone-500/30 text-stone-400 text-xs backdrop-blur-sm font-medium flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-pulse" />
               Active
             </span>
           )}
@@ -287,7 +287,7 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
 
       {/* Content */}
       <div className="p-5">
-        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-stone-400 transition-colors">
           {challenge.title}
         </h3>
         <p className="text-sm text-gray-400 leading-relaxed line-clamp-2 mb-4 min-h-[2.5rem]">
@@ -301,7 +301,7 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
             {challenge.participants} participants
           </span>
           <span className="flex items-center gap-1.5">
-            <Star className="w-3.5 h-3.5 text-amber-500" />
+            <Star className="w-3.5 h-3.5 text-stone-500" />
             {challenge.prize}
           </span>
         </div>
@@ -311,7 +311,7 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
           {isPast && challenge.winner ? (
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-[11px] font-bold text-white">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center text-[11px] font-bold text-white">
                   {challenge.winnerAvatar}
                 </div>
                 <div>
@@ -319,12 +319,12 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
                   <p className="text-sm font-semibold text-white">{challenge.winner}</p>
                 </div>
               </div>
-              <Crown className="w-5 h-5 text-amber-400" />
+              <Crown className="w-5 h-5 text-stone-400" />
             </div>
           ) : (
             <Link
               href="/builder"
-              className="flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-sm font-semibold rounded-xl transition-all"
+              className="flex items-center justify-center gap-2 w-full py-2.5 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white text-sm font-semibold rounded-xl transition-all"
             >
               <Zap className="w-4 h-4" />
               Join Challenge
@@ -355,9 +355,9 @@ export default function ChallengesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-[#0a1628] text-white">
       {/* ===== NAV ===== */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/[0.06]">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a1628]/80 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
           <div className="flex items-center gap-4">
             <Link
@@ -404,7 +404,7 @@ export default function ChallengesPage() {
                 </Link>
                 <Link
                   href="/builder"
-                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-stone-600 hover:bg-stone-500 text-white text-sm font-medium rounded-lg transition-colors"
                 >
                   Start Building
                 </Link>
@@ -417,7 +417,7 @@ export default function ChallengesPage() {
       {/* ===== HERO ===== */}
       <div className="pt-32 pb-12 px-6 text-center relative overflow-hidden">
         {/* Background glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-amber-500/8 via-orange-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-stone-500/8 via-stone-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -425,16 +425,16 @@ export default function ChallengesPage() {
           transition={{ duration: 0.6 }}
           className="relative"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm font-medium mb-6">
             <Trophy className="w-4 h-4" />
             Weekly Competitions
-            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 uppercase tracking-wider">
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-stone-500/20 text-stone-300 uppercase tracking-wider">
               Beta
             </span>
           </div>
           <h1 className="text-5xl sm:text-6xl font-black tracking-tight mb-4">
             Weekly Design{" "}
-            <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               Challenges
             </span>
           </h1>
@@ -457,15 +457,15 @@ export default function ChallengesPage() {
           <div
             className={`absolute inset-0 bg-gradient-to-br ${activeChallenge.gradient} opacity-15`}
           />
-          <div className="absolute inset-0 bg-[#0a0a0f]/70 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-[#0a1628]/70 backdrop-blur-sm" />
 
           <div className="relative p-8 sm:p-12">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
               {/* Left: challenge info */}
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="px-3 py-1 rounded-full bg-green-500/15 border border-green-500/25 text-green-400 text-xs font-semibold flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="px-3 py-1 rounded-full bg-stone-500/15 border border-stone-500/25 text-stone-400 text-xs font-semibold flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-stone-400 animate-pulse" />
                     Active Now
                   </span>
                   <span className="px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-gray-400 text-xs">
@@ -478,11 +478,11 @@ export default function ChallengesPage() {
                 </p>
                 <div className="flex flex-wrap items-center gap-4 mb-6 text-sm text-gray-400">
                   <span className="flex items-center gap-1.5">
-                    <Users className="w-4 h-4 text-cyan-500" />
+                    <Users className="w-4 h-4 text-stone-500" />
                     {activeChallenge.participants} builders competing
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <Star className="w-4 h-4 text-amber-500" />
+                    <Star className="w-4 h-4 text-stone-500" />
                     {activeChallenge.prize}
                   </span>
                   <span className="flex items-center gap-1.5">
@@ -492,7 +492,7 @@ export default function ChallengesPage() {
                 </div>
                 <Link
                   href="/builder"
-                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 text-base"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-stone-500 to-stone-500 hover:from-stone-400 hover:to-stone-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-stone-500/20 hover:shadow-stone-500/30 text-base"
                 >
                   <Flame className="w-5 h-5" />
                   Enter This Challenge
@@ -539,7 +539,7 @@ export default function ChallengesPage() {
         >
           <h2 className="text-2xl font-bold text-center mb-10">
             How It{" "}
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               Works
             </span>
           </h2>
@@ -551,9 +551,9 @@ export default function ChallengesPage() {
                 description:
                   "Check the weekly theme and enter the challenge. Open to all builders, free and Pro.",
                 step: "01",
-                color: "text-cyan-400",
-                border: "border-cyan-500/20 hover:border-cyan-500/40",
-                glow: "group-hover:shadow-cyan-500/10",
+                color: "text-stone-400",
+                border: "border-stone-500/20 hover:border-stone-500/40",
+                glow: "group-hover:shadow-stone-500/10",
               },
               {
                 icon: Sparkles,
@@ -561,9 +561,9 @@ export default function ChallengesPage() {
                 description:
                   "Use the Zoobicon builder to create your best site matching the theme. One submission per week.",
                 step: "02",
-                color: "text-amber-400",
-                border: "border-amber-500/20 hover:border-amber-500/40",
-                glow: "group-hover:shadow-amber-500/10",
+                color: "text-stone-400",
+                border: "border-stone-500/20 hover:border-stone-500/40",
+                glow: "group-hover:shadow-stone-500/10",
               },
               {
                 icon: Trophy,
@@ -571,9 +571,9 @@ export default function ChallengesPage() {
                 description:
                   "Community votes pick the winner every Sunday. Top builders earn prizes and leaderboard points.",
                 step: "03",
-                color: "text-emerald-400",
-                border: "border-emerald-500/20 hover:border-emerald-500/40",
-                glow: "group-hover:shadow-emerald-500/10",
+                color: "text-stone-400",
+                border: "border-stone-500/20 hover:border-stone-500/40",
+                glow: "group-hover:shadow-stone-500/10",
               },
             ].map((step) => (
               <motion.div
@@ -640,7 +640,7 @@ export default function ChallengesPage() {
         >
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold mb-2">
-              <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
                 Leaderboard
               </span>
             </h2>
@@ -678,12 +678,12 @@ export default function ChallengesPage() {
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
                       entry.rank === 1
-                        ? "bg-gradient-to-br from-amber-500 to-orange-600"
+                        ? "bg-gradient-to-br from-stone-500 to-stone-600"
                         : entry.rank === 2
                         ? "bg-gradient-to-br from-gray-400 to-gray-500"
                         : entry.rank === 3
-                        ? "bg-gradient-to-br from-amber-600 to-amber-700"
-                        : "bg-gradient-to-br from-cyan-600 to-blue-600"
+                        ? "bg-gradient-to-br from-stone-600 to-stone-700"
+                        : "bg-gradient-to-br from-stone-600 to-stone-600"
                     }`}
                   >
                     {entry.username.charAt(0)}
@@ -733,7 +733,7 @@ export default function ChallengesPage() {
           >
             <h2 className="text-3xl font-bold mb-4">
               Ready to{" "}
-              <span className="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
                 compete
               </span>
               ?
@@ -745,7 +745,7 @@ export default function ChallengesPage() {
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link
                 href="/builder"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-semibold rounded-xl transition-all shadow-lg shadow-amber-500/20"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-stone-500 to-stone-500 hover:from-stone-400 hover:to-stone-400 text-white font-semibold rounded-xl transition-all shadow-lg shadow-stone-500/20"
               >
                 <Flame className="w-4 h-4" />
                 Join This Week&apos;s Challenge

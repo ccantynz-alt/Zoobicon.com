@@ -103,25 +103,25 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Framework: "text-blue-400 bg-blue-500/10 border-blue-500/20",
-  CMS: "text-purple-400 bg-purple-500/10 border-purple-500/20",
-  CSS: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
-  Analytics: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-  Hosting: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-  CDN: "text-orange-400 bg-orange-500/10 border-orange-500/20",
-  Auth: "text-red-400 bg-red-500/10 border-red-500/20",
-  Payments: "text-green-400 bg-green-500/10 border-green-500/20",
-  Chat: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
-  Email: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
+  Framework: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  CMS: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  CSS: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  Analytics: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  Hosting: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  CDN: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  Auth: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  Payments: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  Chat: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  Email: "text-stone-400 bg-stone-500/10 border-stone-500/20",
   Library: "text-slate-400 bg-slate-500/10 border-slate-500/20",
-  Animation: "text-violet-400 bg-violet-500/10 border-violet-500/20",
-  "3D": "text-fuchsia-400 bg-fuchsia-500/10 border-fuchsia-500/20",
-  Monitoring: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
-  Search: "text-teal-400 bg-teal-500/10 border-teal-500/20",
-  Fonts: "text-rose-400 bg-rose-500/10 border-rose-500/20",
-  Icons: "text-lime-400 bg-lime-500/10 border-lime-500/20",
-  Security: "text-red-400 bg-red-500/10 border-red-500/20",
-  "Feature Flags": "text-sky-400 bg-sky-500/10 border-sky-500/20",
+  Animation: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  "3D": "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  Monitoring: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  Search: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  Fonts: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  Icons: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  Security: "text-stone-400 bg-stone-500/10 border-stone-500/20",
+  "Feature Flags": "text-stone-400 bg-stone-500/10 border-stone-500/20",
 };
 
 function Collapsible({
@@ -222,7 +222,7 @@ export default function CrawlPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#060e1f]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -336,7 +336,7 @@ export default function CrawlPage() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mb-8 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-300 flex items-center gap-3"
+            className="mb-8 p-4 rounded-xl bg-stone-500/10 border border-stone-500/20 text-sm text-stone-300 flex items-center gap-3"
           >
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
             {error}
@@ -537,11 +537,11 @@ export default function CrawlPage() {
                   )}
                   {result.aiAnalysis.designAnalysis.strengths && result.aiAnalysis.designAnalysis.strengths.length > 0 && (
                     <div>
-                      <div className="text-[10px] text-emerald-400/60 uppercase tracking-wider mb-2">Strengths</div>
+                      <div className="text-[10px] text-stone-400/60 uppercase tracking-wider mb-2">Strengths</div>
                       <ul className="space-y-1">
                         {result.aiAnalysis.designAnalysis.strengths.map((s, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-white/60">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400/50 flex-shrink-0 mt-0.5" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-stone-400/50 flex-shrink-0 mt-0.5" />
                             {s}
                           </li>
                         ))}
@@ -550,11 +550,11 @@ export default function CrawlPage() {
                   )}
                   {result.aiAnalysis.designAnalysis.weaknesses && result.aiAnalysis.designAnalysis.weaknesses.length > 0 && (
                     <div>
-                      <div className="text-[10px] text-amber-400/60 uppercase tracking-wider mb-2">Weaknesses</div>
+                      <div className="text-[10px] text-stone-400/60 uppercase tracking-wider mb-2">Weaknesses</div>
                       <ul className="space-y-1">
                         {result.aiAnalysis.designAnalysis.weaknesses.map((w, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-white/60">
-                            <AlertTriangle className="w-3.5 h-3.5 text-amber-400/50 flex-shrink-0 mt-0.5" />
+                            <AlertTriangle className="w-3.5 h-3.5 text-stone-400/50 flex-shrink-0 mt-0.5" />
                             {w}
                           </li>
                         ))}
@@ -570,11 +570,11 @@ export default function CrawlPage() {
                 <div className="space-y-4">
                   {result.aiAnalysis.competitiveInsights.vulnerabilities && result.aiAnalysis.competitiveInsights.vulnerabilities.length > 0 && (
                     <div>
-                      <div className="text-[10px] text-red-400/60 uppercase tracking-wider mb-2">Vulnerabilities to Exploit</div>
+                      <div className="text-[10px] text-stone-400/60 uppercase tracking-wider mb-2">Vulnerabilities to Exploit</div>
                       <ul className="space-y-1">
                         {result.aiAnalysis.competitiveInsights.vulnerabilities.map((v, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-white/60">
-                            <Target className="w-3.5 h-3.5 text-red-400/50 flex-shrink-0 mt-0.5" />
+                            <Target className="w-3.5 h-3.5 text-stone-400/50 flex-shrink-0 mt-0.5" />
                             {v}
                           </li>
                         ))}

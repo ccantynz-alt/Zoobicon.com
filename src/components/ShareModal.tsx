@@ -22,6 +22,7 @@ import {
   trackShare,
 } from "@/lib/social-publish";
 import { trackEvent } from "@/lib/achievements";
+import Image from "next/image";
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -172,7 +173,7 @@ function InstagramIcon({ className }: { className?: string }) {
 const PLATFORM_CONFIG = [
   {
     id: "twitter",
-    name: "Twitter / X",
+    name: "MessageCircle / X",
     Icon: TwitterIcon,
     color: "from-zinc-800 to-zinc-900",
     hoverColor: "hover:from-zinc-700 hover:to-zinc-800",
@@ -190,7 +191,7 @@ const PLATFORM_CONFIG = [
   },
   {
     id: "facebook",
-    name: "Facebook",
+    name: "ThumbsUp",
     Icon: FacebookIcon,
     color: "from-[#1877F2] to-[#0C5DC7]",
     hoverColor: "hover:from-[#2088FF] hover:to-[#1877F2]",
@@ -199,7 +200,7 @@ const PLATFORM_CONFIG = [
   },
   {
     id: "reddit",
-    name: "Reddit",
+    name: "MessageSquare",
     Icon: RedditIcon,
     color: "from-[#FF4500] to-[#CC3700]",
     hoverColor: "hover:from-[#FF5722] hover:to-[#FF4500]",
@@ -217,7 +218,7 @@ const PLATFORM_CONFIG = [
   },
   {
     id: "instagram",
-    name: "Instagram",
+    name: "Camera",
     Icon: InstagramIcon,
     color: "from-[#833AB4] via-[#E1306C] to-[#F77737]",
     hoverColor: "hover:from-[#9B4DCA] hover:via-[#E94580] hover:to-[#F88B4D]",
@@ -291,7 +292,7 @@ export default function ShareModal({
         // Platforms with web share URLs — open in popup
         window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=500");
       } else {
-        // TikTok / Instagram — copy caption to clipboard
+        // TikTok / Camera — copy caption to clipboard
         const success = await copyToClipboard(text);
         if (success) {
           setCopiedPlatform(platformId);
@@ -332,14 +333,14 @@ export default function ShareModal({
 
           {/* Modal */}
           <motion.div
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a12] shadow-2xl shadow-cyan-500/5"
+            className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a12] shadow-2xl shadow-stone-500/5"
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
             {/* Top gradient accent */}
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-stone-500 to-transparent" />
 
             {/* Close button */}
             <button
@@ -354,12 +355,12 @@ export default function ShareModal({
               {/* Header */}
               <div className="mb-6 text-center">
                 <motion.div
-                  className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500/20 to-violet-500/20 ring-1 ring-cyan-500/30"
+                  className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-stone-500/20 to-stone-500/20 ring-1 ring-stone-500/30"
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", delay: 0.1, damping: 15 }}
                 >
-                  <Share2 className="h-5 w-5 text-cyan-400" />
+                  <Share2 className="h-5 w-5 text-stone-400" />
                 </motion.div>
                 <h2 className="text-xl font-bold text-white">
                   Your site is live!
@@ -372,7 +373,7 @@ export default function ShareModal({
               {/* Site URL with copy */}
               <div className="mb-4 flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-3">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-mono text-sm text-cyan-400">
+                  <p className="truncate font-mono text-sm text-stone-400">
                     {siteUrl}
                   </p>
                 </div>
@@ -384,7 +385,7 @@ export default function ShareModal({
                     {copied ? (
                       <motion.span
                         key="check"
-                        className="flex items-center gap-1.5 text-emerald-400"
+                        className="flex items-center gap-1.5 text-stone-400"
                         initial={{ scale: 0.5, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.5, opacity: 0 }}
@@ -421,11 +422,12 @@ export default function ShareModal({
                 {/* Site preview thumbnail */}
                 <div className="flex-1 overflow-hidden rounded-lg border border-white/10 bg-white/5">
                   <div className="relative aspect-video w-full overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={generateOGImageUrl(siteUrl) + `&name=${encodeURIComponent(siteName)}`}
                       alt={`Preview of ${siteName}`}
-                      className="h-full w-full object-cover"
+                      fill
+                      unoptimized
+                      className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a12]/60 to-transparent" />
                     <div className="absolute bottom-2 left-2">
@@ -442,7 +444,7 @@ export default function ShareModal({
                     onClick={() => setShowQR(!showQR)}
                     className={`flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-all ${
                       showQR
-                        ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-400"
+                        ? "border-stone-500/30 bg-stone-500/10 text-stone-400"
                         : "border-white/10 bg-white/5 text-zinc-400 hover:text-white"
                     }`}
                   >
@@ -468,19 +470,19 @@ export default function ShareModal({
               {/* Stats bar */}
               <div className="mb-5 flex items-center justify-center gap-6 rounded-lg border border-white/5 bg-white/[0.02] py-2.5">
                 <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                  <Clock className="h-3.5 w-3.5 text-cyan-500/70" />
+                  <Clock className="h-3.5 w-3.5 text-stone-500/70" />
                   <span className="font-medium text-zinc-300">{buildTime ? `${buildTime}s` : "~95s"}</span>
                   <span className="text-zinc-500">build</span>
                 </div>
                 <div className="h-3 w-px bg-white/10" />
                 <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                  <Layers className="h-3.5 w-3.5 text-violet-500/70" />
+                  <Layers className="h-3.5 w-3.5 text-stone-500/70" />
                   <span className="font-medium text-zinc-300">{pageCount}</span>
                   <span className="text-zinc-500">{pageCount === 1 ? "page" : "pages"}</span>
                 </div>
                 <div className="h-3 w-px bg-white/10" />
                 <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                  <FileCode className="h-3.5 w-3.5 text-emerald-500/70" />
+                  <FileCode className="h-3.5 w-3.5 text-stone-500/70" />
                   <span className="font-medium text-zinc-300">{formatSize(siteSize)}</span>
                   <span className="text-zinc-500">size</span>
                 </div>

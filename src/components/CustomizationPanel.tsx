@@ -1,6 +1,11 @@
 "use client";
 
-import { Palette, Type, Layout, Layers } from "lucide-react";
+import {
+  Palette,
+  Type,
+  Layout,
+  Layers,
+} from "lucide-react";
 
 export interface CustomizationOptions {
   palette: string;

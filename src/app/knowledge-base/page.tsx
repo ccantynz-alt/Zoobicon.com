@@ -3,10 +3,30 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  BookOpen, Search, Plus, ChevronRight, ArrowLeft, Sparkles,
-  FolderOpen, FileText, Eye, Edit3, Clock, ThumbsUp, ThumbsDown,
-  ExternalLink, ChevronDown, ChevronUp, Tag, Users, BarChart3,
-  Star, MessageSquare, Hash, Bookmark, Globe
+  BookOpen,
+  Search,
+  Plus,
+  ChevronRight,
+  ArrowLeft,
+  Sparkles,
+  FolderOpen,
+  FileText,
+  Eye,
+  Edit3,
+  Clock,
+  ThumbsUp,
+  ThumbsDown,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
+  Tag,
+  Users,
+  BarChart3,
+  Star,
+  MessageSquare,
+  Hash,
+  Bookmark,
+  Globe,
 } from 'lucide-react';
 
 type TabType = 'browse' | 'editor' | 'analytics';
@@ -33,12 +53,12 @@ interface Category {
 }
 
 const CATEGORIES: Category[] = [
-  { name: 'Getting Started', icon: <Star className="w-4 h-4" />, count: 8, color: 'text-amber-400' },
-  { name: 'How-To Guides', icon: <BookOpen className="w-4 h-4" />, count: 14, color: 'text-blue-400' },
-  { name: 'FAQ', icon: <MessageSquare className="w-4 h-4" />, count: 22, color: 'text-green-400' },
-  { name: 'API Documentation', icon: <Hash className="w-4 h-4" />, count: 11, color: 'text-violet-400' },
-  { name: 'Troubleshooting', icon: <FileText className="w-4 h-4" />, count: 9, color: 'text-red-400' },
-  { name: 'Best Practices', icon: <ThumbsUp className="w-4 h-4" />, count: 6, color: 'text-cyan-400' },
+  { name: 'Getting Started', icon: <Star className="w-4 h-4" />, count: 8, color: 'text-stone-400' },
+  { name: 'How-To Guides', icon: <BookOpen className="w-4 h-4" />, count: 14, color: 'text-stone-400' },
+  { name: 'FAQ', icon: <MessageSquare className="w-4 h-4" />, count: 22, color: 'text-stone-400' },
+  { name: 'API Documentation', icon: <Hash className="w-4 h-4" />, count: 11, color: 'text-stone-400' },
+  { name: 'Troubleshooting', icon: <FileText className="w-4 h-4" />, count: 9, color: 'text-stone-400' },
+  { name: 'Best Practices', icon: <ThumbsUp className="w-4 h-4" />, count: 6, color: 'text-stone-400' },
 ];
 
 const DEMO_ARTICLES: Article[] = [
@@ -88,17 +108,17 @@ export default function KnowledgeBasePage() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              <span className="font-bold text-lg bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</span>
+              <span className="font-bold text-lg bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</span>
             </Link>
             <ChevronRight className="w-4 h-4 text-white/30" />
             <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-violet-400" />
+              <BookOpen className="w-5 h-5 text-stone-400" />
               <span className="font-semibold">Knowledge Base</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/builder" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Builder</Link>
-            <Link href="/dashboard" className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors">Dashboard</Link>
+            <Link href="/dashboard" className="px-4 py-2 text-sm bg-stone-600 hover:bg-stone-500 rounded-lg transition-colors">Dashboard</Link>
           </div>
         </div>
       </header>
@@ -107,13 +127,13 @@ export default function KnowledgeBasePage() {
         {/* Search Bar */}
         <div className="relative max-w-2xl mx-auto mb-8">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
-          <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search articles, guides, and documentation..." className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-base text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/10 transition-all" />
+          <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search articles, guides, and documentation..." className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 text-base text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50 focus:ring-2 focus:ring-stone-500/10 transition-all" />
         </div>
 
         {/* Tabs */}
         <div className="flex gap-1 mb-8 bg-white/5 rounded-xl p-1 w-fit">
           {tabs.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-stone-600 text-white shadow-lg shadow-stone-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
               {tab.icon}{tab.label}
             </button>
           ))}
@@ -124,13 +144,13 @@ export default function KnowledgeBasePage() {
             {/* Sidebar Categories */}
             <div className="space-y-2">
               <h3 className="text-sm font-medium text-white/60 mb-3 uppercase tracking-wider">Categories</h3>
-              <button onClick={() => setSelectedCategory(null)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${!selectedCategory ? 'bg-violet-600/20 border border-violet-500/50 text-violet-300' : 'bg-white/5 border border-white/5 text-white/60 hover:bg-white/10'}`}>
+              <button onClick={() => setSelectedCategory(null)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${!selectedCategory ? 'bg-stone-600/20 border border-stone-500/50 text-stone-300' : 'bg-white/5 border border-white/5 text-white/60 hover:bg-white/10'}`}>
                 <Globe className="w-4 h-4" />
                 <span>All Articles</span>
                 <span className="ml-auto text-xs opacity-60">{DEMO_ARTICLES.length}</span>
               </button>
               {CATEGORIES.map(cat => (
-                <button key={cat.name} onClick={() => setSelectedCategory(cat.name)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${selectedCategory === cat.name ? 'bg-violet-600/20 border border-violet-500/50 text-violet-300' : 'bg-white/5 border border-white/5 text-white/60 hover:bg-white/10'}`}>
+                <button key={cat.name} onClick={() => setSelectedCategory(cat.name)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${selectedCategory === cat.name ? 'bg-stone-600/20 border border-stone-500/50 text-stone-300' : 'bg-white/5 border border-white/5 text-white/60 hover:bg-white/10'}`}>
                   <span className={cat.color}>{cat.icon}</span>
                   <span>{cat.name}</span>
                   <span className="ml-auto text-xs opacity-60">{cat.count}</span>
@@ -149,7 +169,7 @@ export default function KnowledgeBasePage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1">
                         <h3 className="font-medium text-sm">{article.title}</h3>
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300">{article.category}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-stone-500/20 text-stone-300">{article.category}</span>
                       </div>
                       <div className="flex items-center gap-4 text-xs text-white/40">
                         <span className="flex items-center gap-1"><Users className="w-3 h-3" />{article.author}</span>
@@ -164,7 +184,7 @@ export default function KnowledgeBasePage() {
                       <div className="prose prose-invert prose-sm max-w-none">
                         {article.content.split('\n').map((line, i) => {
                           if (line.startsWith('## ')) return <h3 key={i} className="text-base font-semibold mt-4 mb-2 text-white">{line.replace('## ', '')}</h3>;
-                          if (line.startsWith('```')) return <div key={i} className="bg-black/30 rounded-lg p-3 font-mono text-xs text-green-400 my-2">{line.replace(/```/g, '')}</div>;
+                          if (line.startsWith('```')) return <div key={i} className="bg-black/30 rounded-lg p-3 font-mono text-xs text-stone-400 my-2">{line.replace(/```/g, '')}</div>;
                           if (line.startsWith('- **')) return <p key={i} className="text-sm text-white/70 ml-4 my-1">{line}</p>;
                           if (line.trim()) return <p key={i} className="text-sm text-white/60 leading-relaxed">{line}</p>;
                           return <br key={i} />;
@@ -172,10 +192,10 @@ export default function KnowledgeBasePage() {
                       </div>
                       <div className="flex items-center gap-3 mt-6 pt-4 border-t border-white/5">
                         <span className="text-xs text-white/40">Was this helpful?</span>
-                        <button className="flex items-center gap-1 px-3 py-1.5 bg-white/5 hover:bg-green-500/20 rounded-lg text-xs text-white/60 hover:text-green-400 transition-all">
+                        <button onClick={() => {}} className="flex items-center gap-1 px-3 py-1.5 bg-white/5 hover:bg-stone-500/20 rounded-lg text-xs text-white/60 hover:text-stone-400 transition-all">
                           <ThumbsUp className="w-3.5 h-3.5" /> {article.helpful}
                         </button>
-                        <button className="flex items-center gap-1 px-3 py-1.5 bg-white/5 hover:bg-red-500/20 rounded-lg text-xs text-white/60 hover:text-red-400 transition-all">
+                        <button onClick={() => {}} className="flex items-center gap-1 px-3 py-1.5 bg-white/5 hover:bg-stone-500/20 rounded-lg text-xs text-white/60 hover:text-stone-400 transition-all">
                           <ThumbsDown className="w-3.5 h-3.5" /> {article.notHelpful}
                         </button>
                         <div className="ml-auto flex items-center gap-2">
@@ -196,7 +216,7 @@ export default function KnowledgeBasePage() {
           <div className="max-w-3xl mx-auto">
             <div className="bg-white/5 rounded-2xl border border-white/10 p-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stone-600 to-stone-600 flex items-center justify-center">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
@@ -207,18 +227,18 @@ export default function KnowledgeBasePage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">Article Title</label>
-                  <input type="text" placeholder="e.g., How to Set Up Email Notifications" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
+                  <input type="text" placeholder="e.g., How to Set Up Email Notifications" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Category</label>
-                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50">
+                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-stone-500/50">
                       {CATEGORIES.map(cat => <option key={cat.name} value={cat.name}>{cat.name}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Tone</label>
-                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50">
+                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-stone-500/50">
                       <option>Professional</option>
                       <option>Casual</option>
                       <option>Technical</option>
@@ -228,17 +248,17 @@ export default function KnowledgeBasePage() {
                 </div>
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">Topic Description</label>
-                  <textarea value={aiGeneratePrompt} onChange={e => setAiGeneratePrompt(e.target.value)} rows={4} placeholder="Describe what the article should cover. Include key points, target audience, and any specific sections needed..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 resize-none" />
+                  <textarea value={aiGeneratePrompt} onChange={e => setAiGeneratePrompt(e.target.value)} rows={4} placeholder="Describe what the article should cover. Include key points, target audience, and any specific sections needed..." className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50 resize-none" />
                 </div>
                 <div>
                   <label className="block text-sm text-white/70 mb-2">Include Sections</label>
                   <div className="flex flex-wrap gap-2">
                     {['Introduction', 'Step-by-Step', 'Screenshots', 'Code Examples', 'FAQ', 'Troubleshooting', 'Related Articles'].map(section => (
-                      <button key={section} className="px-3 py-1.5 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-lg text-xs text-white/60 hover:text-violet-300 transition-all">{section}</button>
+                      <button onClick={() => {}} key={section} className="px-3 py-1.5 bg-white/5 hover:bg-stone-600/20 border border-white/10 hover:border-stone-500/50 rounded-lg text-xs text-white/60 hover:text-stone-300 transition-all">{section}</button>
                     ))}
                   </div>
                 </div>
-                <button onClick={handleGenerate} disabled={generating} className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/25 disabled:opacity-50">
+                <button onClick={handleGenerate} disabled={generating} className="w-full py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-stone-600/25 disabled:opacity-50">
                   {generating ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generating Article...</> : <><Sparkles className="w-4 h-4" /> Generate Article</>}
                 </button>
               </div>
@@ -258,7 +278,7 @@ export default function KnowledgeBasePage() {
                 <div key={i} className="bg-white/5 rounded-xl border border-white/10 p-5">
                   <p className="text-sm text-white/50 mb-1">{stat.label}</p>
                   <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className="text-xs text-green-400 mt-1">{stat.change}</p>
+                  <p className="text-xs text-stone-400 mt-1">{stat.change}</p>
                 </div>
               ))}
             </div>
@@ -279,7 +299,7 @@ export default function KnowledgeBasePage() {
                     </div>
                     <div className="w-24">
                       <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div className="h-full bg-violet-500 rounded-full" style={{ width: `${(article.views / 4521) * 100}%` }} />
+                        <div className="h-full bg-stone-500 rounded-full" style={{ width: `${(article.views / 4521) * 100}%` }} />
                       </div>
                     </div>
                   </div>
@@ -293,7 +313,7 @@ export default function KnowledgeBasePage() {
       <footer className="border-t border-white/10 mt-20 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p className="text-white/40 text-sm">
-            Replaces Zendesk Guide ($49/mo), HelpScout ($20/mo), and Notion wikis &mdash; <span className="text-violet-400">included free with Zoobicon Pro</span>
+            Replaces Zendesk Guide ($49/mo), HelpScout ($20/mo), and Notion wikis &mdash; <span className="text-stone-400">included free with Zoobicon Pro</span>
           </p>
           <div className="flex items-center justify-center gap-6 mt-4">
             <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</Link>

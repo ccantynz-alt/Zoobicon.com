@@ -86,17 +86,17 @@ export default function BookingPage() {
   };
 
   const statusColor = (s: string) => {
-    if (s === "confirmed" || s === "completed") return "bg-emerald-500/20 text-emerald-400";
-    if (s === "pending") return "bg-amber-500/20 text-amber-400";
-    if (s === "cancelled") return "bg-red-500/20 text-red-400";
+    if (s === "confirmed" || s === "completed") return "bg-stone-500/20 text-stone-400";
+    if (s === "pending") return "bg-stone-500/20 text-stone-400";
+    if (s === "cancelled") return "bg-stone-500/20 text-stone-400";
     return "bg-white/10 text-white/60";
   };
 
   const STAT_CARDS = [
-    { label: "Upcoming Bookings", value: String(stats.upcoming), icon: Calendar, color: "from-indigo-500 to-purple-600" },
-    { label: "This Week Revenue", value: `$${stats.revenue.toLocaleString()}`, icon: DollarSign, color: "from-emerald-500 to-teal-600" },
-    { label: "Avg Rating", value: "4.8", icon: Star, color: "from-amber-500 to-orange-600" },
-    { label: "Completion Rate", value: `${stats.completionRate}%`, icon: CheckCircle2, color: "from-cyan-500 to-blue-600" },
+    { label: "Upcoming Bookings", value: String(stats.upcoming), icon: Calendar, color: "from-stone-500 to-stone-600" },
+    { label: "This Week Revenue", value: `$${stats.revenue.toLocaleString()}`, icon: DollarSign, color: "from-stone-500 to-stone-600" },
+    { label: "Avg Rating", value: "4.8", icon: Star, color: "from-stone-500 to-stone-600" },
+    { label: "Completion Rate", value: `${stats.completionRate}%`, icon: CheckCircle2, color: "from-stone-500 to-stone-600" },
   ];
 
   const TABS: { key: Tab; label: string }[] = [
@@ -113,7 +113,7 @@ export default function BookingPage() {
     <div className="min-h-screen bg-[#0a0a12] text-white">
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
-          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
             Zoobicon
           </Link>
           <div className="flex items-center gap-4">
@@ -132,15 +132,15 @@ export default function BookingPage() {
       </nav>
 
       <header className="relative overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/10 via-indigo-600/5 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-600/10 via-stone-600/5 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 py-16 relative">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-600"><Calendar className="w-6 h-6" /></div>
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-stone-500 to-stone-600"><Calendar className="w-6 h-6" /></div>
               <span className="text-sm font-medium text-white/50 uppercase tracking-wider">Business OS</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
-              <span className="bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">AI Booking & Scheduling</span>
+              <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">AI Booking & Scheduling</span>
             </h1>
             <p className="text-lg text-white/50 max-w-2xl">Let clients book you — powered by AI. Manage appointments, services, and availability in one place.</p>
           </motion.div>
@@ -169,13 +169,13 @@ export default function BookingPage() {
               <p className="text-sm text-white/40">Share this link so clients can book you</p>
             </div>
             <button onClick={copyBookingLink} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm hover:bg-white/10 transition-colors">
-              {linkCopied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-white/50" />}
+              {linkCopied ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4 text-white/50" />}
               {linkCopied ? "Copied!" : "Copy Link"}
             </button>
           </div>
-          <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-4 flex items-center gap-3">
+          <div className="bg-[#0f2148] border border-white/10 rounded-xl p-4 flex items-center gap-3">
             <ExternalLink className="w-4 h-4 text-white/30" />
-            <span className="text-sm text-indigo-400">https://zoobicon.sh/book/my-business</span>
+            <span className="text-sm text-stone-400">https://zoobicon.sh/book/my-business</span>
           </div>
         </motion.div>
 
@@ -263,7 +263,26 @@ export default function BookingPage() {
         {tab === "services" && (
           <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-4">
             <div className="flex justify-end">
-              <button className="text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-1"><Plus className="w-4 h-4" /> Add Service</button>
+              <button onClick={() => {
+                const name = prompt("Service name:");
+                if (!name) return;
+                const duration = parseInt(prompt("Duration in minutes (e.g. 30):") || "30", 10);
+                const price = parseFloat(prompt("Price in USD (e.g. 50):") || "0");
+                setServices((prev) => [
+                  ...prev,
+                  {
+                    id: `svc-${Date.now()}`,
+                    name,
+                    description: "Custom service",
+                    duration: isNaN(duration) ? 30 : duration,
+                    price: isNaN(price) ? 0 : price,
+                    currency: "USD",
+                    color: "#6366f1",
+                    location: "video" as const,
+                    enabled: true,
+                  },
+                ]);
+              }} className="text-sm text-stone-400 hover:text-stone-300 flex items-center gap-1"><Plus className="w-4 h-4" /> Add Service</button>
             </div>
             {services.map((svc) => {
               const Icon = LOCATION_ICONS[svc.location] || MapPin;
@@ -282,7 +301,7 @@ export default function BookingPage() {
                         </div>
                       </div>
                     </div>
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${svc.enabled ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/40"}`}>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${svc.enabled ? "bg-stone-500/20 text-stone-400" : "bg-white/10 text-white/40"}`}>
                       {svc.enabled ? "Active" : "Disabled"}
                     </span>
                   </div>

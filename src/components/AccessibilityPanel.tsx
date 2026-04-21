@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Accessibility, Loader2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import {
+  Accessibility,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+} from "lucide-react";
 
 interface A11yCheck {
   rule: string;
@@ -40,24 +46,24 @@ export default function AccessibilityPanel({ code }: { code: string }) {
   };
 
   const levelColor = (level: string) => {
-    if (level === "AAA") return "text-emerald-400";
-    if (level === "AA") return "text-blue-400";
-    if (level === "A") return "text-yellow-400";
-    return "text-red-400";
+    if (level === "AAA") return "text-stone-400";
+    if (level === "AA") return "text-stone-400";
+    if (level === "A") return "text-stone-400";
+    return "text-stone-400";
   };
 
   const statusIcon = (s: string) => {
-    if (s === "pass") return <CheckCircle size={14} className="text-emerald-400 shrink-0" />;
-    if (s === "fail") return <XCircle size={14} className="text-red-400 shrink-0" />;
-    return <AlertTriangle size={14} className="text-yellow-400 shrink-0" />;
+    if (s === "pass") return <CheckCircle size={14} className="text-stone-400 shrink-0" />;
+    if (s === "fail") return <XCircle size={14} className="text-stone-400 shrink-0" />;
+    return <AlertTriangle size={14} className="text-stone-400 shrink-0" />;
   };
 
   const impactBadge = (impact: string) => {
     const colors: Record<string, string> = {
-      critical: "bg-red-500/20 text-red-400",
-      serious: "bg-orange-500/20 text-orange-400",
-      moderate: "bg-yellow-500/20 text-yellow-400",
-      minor: "bg-blue-500/20 text-blue-400",
+      critical: "bg-stone-500/20 text-stone-400",
+      serious: "bg-stone-500/20 text-stone-400",
+      moderate: "bg-stone-500/20 text-stone-400",
+      minor: "bg-stone-500/20 text-stone-400",
     };
     return (
       <span className={`px-1.5 py-0.5 rounded text-[10px] uppercase ${colors[impact] || colors.minor}`}>
@@ -102,9 +108,9 @@ export default function AccessibilityPanel({ code }: { code: string }) {
           </div>
 
           <div className="flex gap-3 text-xs">
-            <span className="text-emerald-400">{result.summary.passed} passed</span>
-            <span className="text-red-400">{result.summary.failed} failed</span>
-            <span className="text-yellow-400">{result.summary.warnings} warnings</span>
+            <span className="text-stone-400">{result.summary.passed} passed</span>
+            <span className="text-stone-400">{result.summary.failed} failed</span>
+            <span className="text-stone-400">{result.summary.warnings} warnings</span>
           </div>
 
           <div className="space-y-1.5">

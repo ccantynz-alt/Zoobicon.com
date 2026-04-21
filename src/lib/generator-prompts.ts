@@ -825,7 +825,7 @@ WHAT TO ADD:
 6. Proper contrast — All text meets WCAG AA contrast ratios in both modes (4.5:1 for body text)
 
 COLOR MAPPING:
-- Light bg (#ffffff) → Dark bg (#0f172a or #1a1a2e)
+- Light bg (#ffffff) → Dark bg (#0f172a or #0f2148)
 - Light text (#111827) → Dark text (#e2e8f0)
 - Light cards (white) → Dark cards (#1e293b)
 - Light borders (#e5e7eb) → Dark borders (rgba(255,255,255,0.1))

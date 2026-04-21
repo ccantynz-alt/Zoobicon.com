@@ -78,22 +78,22 @@ interface PortfolioSite {
 
 /* ---------- tier config ---------- */
 const TIER_CONFIG: Record<string, { color: string; gradient: string; bg: string; icon: typeof Star }> = {
-  Rising: { color: "text-emerald-400", gradient: "from-emerald-500 to-teal-400", bg: "bg-emerald-500/10 border-emerald-500/20", icon: TrendingUp },
-  Pro: { color: "text-blue-400", gradient: "from-blue-500 to-cyan-400", bg: "bg-blue-500/10 border-blue-500/20", icon: Zap },
-  Master: { color: "text-purple-400", gradient: "from-purple-500 to-pink-400", bg: "bg-purple-500/10 border-purple-500/20", icon: Award },
-  Legend: { color: "text-amber-400", gradient: "from-amber-500 to-orange-400", bg: "bg-amber-500/10 border-amber-500/20", icon: Trophy },
+  Rising: { color: "text-stone-400", gradient: "from-stone-500 to-stone-400", bg: "bg-stone-500/10 border-stone-500/20", icon: TrendingUp },
+  Pro: { color: "text-stone-400", gradient: "from-stone-500 to-stone-400", bg: "bg-stone-500/10 border-stone-500/20", icon: Zap },
+  Master: { color: "text-stone-400", gradient: "from-stone-500 to-stone-400", bg: "bg-stone-500/10 border-stone-500/20", icon: Award },
+  Legend: { color: "text-stone-400", gradient: "from-stone-500 to-stone-400", bg: "bg-stone-500/10 border-stone-500/20", icon: Trophy },
 };
 
 /* ---------- gradient map for site cards ---------- */
 const GRADIENT_MAP: Record<string, string> = {
-  Business: "from-blue-600 to-cyan-500",
-  Portfolio: "from-purple-600 to-pink-500",
-  "E-Commerce": "from-emerald-600 to-teal-400",
-  SaaS: "from-indigo-600 to-blue-400",
-  Restaurant: "from-orange-600 to-amber-400",
-  Blog: "from-rose-600 to-pink-400",
-  Agency: "from-violet-600 to-purple-400",
-  "Landing Page": "from-cyan-600 to-blue-400",
+  Business: "from-stone-600 to-stone-500",
+  Portfolio: "from-stone-600 to-stone-500",
+  "E-Commerce": "from-stone-600 to-stone-400",
+  SaaS: "from-stone-600 to-stone-400",
+  Restaurant: "from-stone-600 to-stone-400",
+  Blog: "from-stone-600 to-stone-400",
+  Agency: "from-stone-600 to-stone-400",
+  "Landing Page": "from-stone-600 to-stone-400",
 };
 
 /* ---------- badge icon map ---------- */
@@ -179,7 +179,7 @@ function SiteCard({ site }: { site: PortfolioSite }) {
     <motion.div
       variants={fadeInUp}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] overflow-hidden hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300"
+      className="group relative rounded-2xl bg-white/[0.03] border border-white/[0.06] overflow-hidden hover:border-stone-500/30 hover:shadow-lg hover:shadow-stone-500/10 transition-all duration-300"
     >
       {/* Preview */}
       <div className={`relative h-44 bg-gradient-to-br ${gradient} overflow-hidden`}>
@@ -225,7 +225,7 @@ function SiteCard({ site }: { site: PortfolioSite }) {
         <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
           <Link
             href={`/builder?remix=${site.id}`}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-gray-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-gray-400 hover:text-stone-400 hover:bg-stone-500/10 transition-colors"
           >
             <GitFork className="w-3.5 h-3.5" />
             Remix
@@ -292,9 +292,9 @@ export default function CreatorProfilePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white">
+    <div className="min-h-screen bg-[#060e1f] text-white">
       {/* ===== NAV ===== */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#050508]/80 backdrop-blur-xl border-b border-white/[0.06]">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#060e1f]/80 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
           <div className="flex items-center gap-4">
             <Link
@@ -340,7 +340,7 @@ export default function CreatorProfilePage() {
                 </Link>
                 <Link
                   href="/builder"
-                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-sm font-medium rounded-lg transition-colors"
+                  className="px-4 py-2 bg-stone-600 hover:bg-stone-500 text-white text-sm font-medium rounded-lg transition-colors"
                 >
                   Start Building
                 </Link>
@@ -353,7 +353,7 @@ export default function CreatorProfilePage() {
       {/* ===== PROFILE HEADER ===== */}
       <div className="pt-28 pb-8 px-6 relative overflow-hidden">
         {/* Background glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[450px] bg-gradient-to-b from-cyan-500/8 via-blue-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[450px] bg-gradient-to-b from-stone-500/8 via-stone-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-4xl mx-auto relative">
           <motion.div
@@ -364,7 +364,7 @@ export default function CreatorProfilePage() {
           >
             {/* Avatar */}
             <div className="relative">
-              <div className={`w-28 h-28 rounded-2xl bg-gradient-to-br ${tierCfg.gradient} flex items-center justify-center text-4xl font-black text-white shadow-lg shadow-cyan-500/10`}>
+              <div className={`w-28 h-28 rounded-2xl bg-gradient-to-br ${tierCfg.gradient} flex items-center justify-center text-4xl font-black text-white shadow-lg shadow-stone-500/10`}>
                 {profile.displayName.charAt(0).toUpperCase()}
               </div>
               <div className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-lg ${tierCfg.bg} border flex items-center justify-center`}>
@@ -400,8 +400,8 @@ export default function CreatorProfilePage() {
                   onClick={handleFollow}
                   className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                     isFollowing
-                      ? "bg-white/[0.06] border border-white/[0.1] text-gray-300 hover:border-red-500/30 hover:text-red-400"
-                      : "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20"
+                      ? "bg-white/[0.06] border border-white/[0.1] text-gray-300 hover:border-stone-500/30 hover:text-stone-400"
+                      : "bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white shadow-lg shadow-stone-500/20"
                   }`}
                 >
                   {isFollowing ? (
@@ -423,7 +423,7 @@ export default function CreatorProfilePage() {
                 >
                   {copied ? (
                     <>
-                      <Check className="w-4 h-4 text-emerald-400" />
+                      <Check className="w-4 h-4 text-stone-400" />
                       Copied
                     </>
                   ) : (
@@ -452,9 +452,9 @@ export default function CreatorProfilePage() {
             return (
               <div
                 key={stat.label}
-                className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-cyan-500/20 transition-colors"
+                className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-stone-500/20 transition-colors"
               >
-                <Icon className="w-5 h-5 text-cyan-400" />
+                <Icon className="w-5 h-5 text-stone-400" />
                 <span className="text-2xl font-black">{stat.value}</span>
                 <span className="text-xs text-gray-500">{stat.label}</span>
               </div>
@@ -470,7 +470,7 @@ export default function CreatorProfilePage() {
             onClick={() => setActiveTab("portfolio")}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               activeTab === "portfolio"
-                ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/20"
+                ? "bg-stone-500/15 text-stone-400 border border-stone-500/20"
                 : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
             }`}
           >
@@ -481,7 +481,7 @@ export default function CreatorProfilePage() {
             onClick={() => setActiveTab("achievements")}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               activeTab === "achievements"
-                ? "bg-cyan-500/15 text-cyan-400 border border-cyan-500/20"
+                ? "bg-stone-500/15 text-stone-400 border border-stone-500/20"
                 : "text-gray-400 hover:text-white hover:bg-white/[0.04]"
             }`}
           >
@@ -519,10 +519,10 @@ export default function CreatorProfilePage() {
                 <motion.div
                   key={badge.id}
                   variants={fadeInUp}
-                  className="flex items-center gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-amber-500/20 transition-colors group"
+                  className="flex items-center gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-stone-500/20 transition-colors group"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                    <BadgeIcon className="w-6 h-6 text-amber-400" />
+                  <div className="w-12 h-12 rounded-xl bg-stone-500/10 border border-stone-500/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <BadgeIcon className="w-6 h-6 text-stone-400" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-semibold text-white mb-0.5">{badge.name}</h3>
@@ -547,7 +547,7 @@ export default function CreatorProfilePage() {
           >
             <h2 className="text-3xl font-bold mb-4">
               Create your{" "}
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
                 creator profile
               </span>
             </h2>
@@ -557,7 +557,7 @@ export default function CreatorProfilePage() {
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link
                 href="/builder"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-cyan-500/20"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-stone-500/20"
               >
                 <Sparkles className="w-4 h-4" />
                 Start Building

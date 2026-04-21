@@ -78,7 +78,7 @@ function generateInvoiceHTML(data: InvoiceRequest): {
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: #1a1a2e;
+      color: #0f2148;
       background: #f0f0f5;
       padding: 40px 20px;
       -webkit-print-color-adjust: exact;
@@ -95,7 +95,7 @@ function generateInvoiceHTML(data: InvoiceRequest): {
     }
 
     .invoice-header {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: linear-gradient(135deg, #0f2148 0%, #16213e 100%);
       color: #ffffff;
       padding: 40px;
       display: flex;
@@ -168,7 +168,7 @@ function generateInvoiceHTML(data: InvoiceRequest): {
     .party-name {
       font-size: 18px;
       font-weight: 700;
-      color: #1a1a2e;
+      color: #0f2148;
       margin-bottom: 6px;
     }
 
@@ -210,7 +210,7 @@ function generateInvoiceHTML(data: InvoiceRequest): {
 
     .item-desc {
       font-weight: 500;
-      color: #1a1a2e;
+      color: #0f2148;
     }
 
     .item-qty,
@@ -222,7 +222,7 @@ function generateInvoiceHTML(data: InvoiceRequest): {
 
     .item-amount {
       font-weight: 600;
-      color: #1a1a2e;
+      color: #0f2148;
     }
 
     .row-even {
@@ -252,12 +252,12 @@ function generateInvoiceHTML(data: InvoiceRequest): {
     }
 
     .totals-row.total {
-      border-top: 2px solid #1a1a2e;
+      border-top: 2px solid #0f2148;
       margin-top: 8px;
       padding-top: 12px;
       font-size: 18px;
       font-weight: 700;
-      color: #1a1a2e;
+      color: #0f2148;
     }
 
     .notes-section {
@@ -308,7 +308,7 @@ function generateInvoiceHTML(data: InvoiceRequest): {
       max-width: 800px;
       margin: 20px auto;
       padding: 12px 24px;
-      background: #1a1a2e;
+      background: #0f2148;
       color: #ffffff;
       border: none;
       border-radius: 8px;

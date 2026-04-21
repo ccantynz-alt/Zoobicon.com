@@ -1,212 +1,308 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, Zap } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Send,
+  Bot,
+  User,
+  Loader2,
+  Zap,
+  FileEdit,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+} from "lucide-react";
 
 interface ChatMessage {
-  role: "user" | "assistant";
+  id: string;
+  role: "user" | "assistant" | "system";
   content: string;
   timestamp: number;
-  editMode?: string;
+  status?: "pending" | "streaming" | "complete" | "error";
+  changedFiles?: string[];
+  durationMs?: number;
 }
 
 interface ChatPanelProps {
-  currentCode: string;
-  onCodeUpdate: (code: string) => void;
+  /** Current React files in the editor (for diff-based editing via /api/generate/edit) */
+  reactFiles?: Record<string, string> | null;
+  /** Callback to merge changed files into Sandpack preview */
+  onFilesUpdate?: (changedFiles: Record<string, string>) => void;
+  /** Legacy: current HTML code (for /api/chat based editing in the /edit page) */
+  currentCode?: string;
+  /** Legacy: callback to update HTML code */
+  onCodeUpdate?: (code: string) => void;
+  /** Whether the panel is visible */
   isVisible: boolean;
+  /** Whether a generation is currently running (disables input) */
+  isGenerating?: boolean;
 }
 
-/** Splice an edited section back into the full HTML using the original section as anchor */
-function spliceSection(fullHtml: string, originalSection: string, editedSection: string): string {
-  const idx = fullHtml.indexOf(originalSection);
-  if (idx === -1) return fullHtml; // fallback: can't find section, return unchanged
-  return fullHtml.slice(0, idx) + editedSection + fullHtml.slice(idx + originalSection.length);
+const SUGGESTION_PROMPTS = [
+  "Make the header background darker",
+  "Change the primary color to blue",
+  "Add a testimonials section",
+  "Make the hero section larger",
+  "Add smooth scroll animations",
+  "Update the footer with social links",
+];
+
+let messageIdCounter = 0;
+function nextId() {
+  return `msg-${++messageIdCounter}-${Date.now()}`;
 }
 
-/** Splice edited CSS back into the <style> block */
-function spliceCss(fullHtml: string, editedCss: string): string {
-  return fullHtml.replace(
-    /(<style[^>]*>)([\s\S]*?)(<\/style>)/i,
-    `$1${editedCss}$3`
-  );
-}
-
-/** Detect the section from HTML that matches a section name (mirrors server-side detection) */
-function findSectionHtml(html: string, sectionName: string): string | null {
-  const SECTION_PATTERNS: Record<string, RegExp[]> = {
-    hero: [/<section[^>]*(?:hero|banner|jumbotron)[^>]*>[\s\S]*?<\/section>/gi],
-    header: [/<header[^>]*>[\s\S]*?<\/header>/gi, /<nav[^>]*>[\s\S]*?<\/nav>/gi],
-    nav: [/<nav[^>]*>[\s\S]*?<\/nav>/gi],
-    footer: [/<footer[^>]*>[\s\S]*?<\/footer>/gi],
-    pricing: [/<section[^>]*(?:pricing|plans)[^>]*>[\s\S]*?<\/section>/gi],
-    features: [/<section[^>]*(?:features|benefits|services)[^>]*>[\s\S]*?<\/section>/gi],
-    about: [/<section[^>]*(?:about|story|mission)[^>]*>[\s\S]*?<\/section>/gi],
-    testimonials: [/<section[^>]*(?:testimonial|review|quote)[^>]*>[\s\S]*?<\/section>/gi],
-    contact: [/<section[^>]*(?:contact|form|cta)[^>]*>[\s\S]*?<\/section>/gi],
-    faq: [/<section[^>]*(?:faq|question|accordion)[^>]*>[\s\S]*?<\/section>/gi],
-    cta: [/<section[^>]*(?:cta|call-to-action)[^>]*>[\s\S]*?<\/section>/gi],
-  };
-
-  const patterns = SECTION_PATTERNS[sectionName];
-  if (!patterns) return null;
-
-  for (const pattern of patterns) {
-    pattern.lastIndex = 0;
-    const match = pattern.exec(html);
-    if (match) return match[0];
-  }
-  return null;
-}
-
-export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: ChatPanelProps) {
+export default function ChatPanel({
+  reactFiles,
+  onFilesUpdate,
+  currentCode,
+  onCodeUpdate,
+  isVisible,
+  isGenerating = false,
+}: ChatPanelProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [editMode, setEditMode] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
+  // Detect mode: React files (diff-based) or legacy HTML
+  const isReactMode = !!(reactFiles && Object.keys(reactFiles).length > 0 && onFilesUpdate);
+  const isLegacyMode = !isReactMode && !!currentCode && !!onCodeUpdate;
+  const hasFiles = isReactMode || isLegacyMode;
+
+  // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-    const instruction = input.trim();
-    setInput("");
+  // Focus input when panel becomes visible
+  useEffect(() => {
+    if (isVisible && hasFiles && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isVisible, hasFiles]);
 
-    const userMsg: ChatMessage = { role: "user", content: instruction, timestamp: Date.now() };
-    setMessages((prev) => [...prev, userMsg]);
-    setIsLoading(true);
-    setEditMode(null);
+  const handleSend = useCallback(async (instruction?: string) => {
+    const text = (instruction || input).trim();
+    if (!text || isEditing || !hasFiles) return;
+
+    setInput("");
+    setShowSuggestions(false);
+
+    // Add user message
+    const userMsgId = nextId();
+    const userMsg: ChatMessage = {
+      id: userMsgId,
+      role: "user",
+      content: text,
+      timestamp: Date.now(),
+    };
+
+    // Add pending assistant message
+    const assistantMsgId = nextId();
+    const pendingMsg: ChatMessage = {
+      id: assistantMsgId,
+      role: "assistant",
+      content: "",
+      timestamp: Date.now(),
+      status: "pending",
+    };
+
+    setMessages(prev => [...prev, userMsg, pendingMsg]);
+    setIsEditing(true);
+
+    const startTime = Date.now();
+
+    // Abort any previous request
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
-      // Admin flag for rate limit bypass
-      let adminFlag = false;
+      // Get auth headers
+      let headers: Record<string, string> = { "Content-Type": "application/json" };
       try {
-        const u = JSON.parse(localStorage.getItem("zoobicon_user") || "{}");
-        adminFlag = u.role === "admin" || u.plan === "unlimited";
+        const u = localStorage.getItem("zoobicon_user");
+        if (u) {
+          const parsed = JSON.parse(u);
+          if (parsed.email) headers["x-user-email"] = parsed.email;
+          if (parsed.role === "admin" || parsed.plan === "unlimited") headers["x-admin"] = "1";
+        }
       } catch { /* ignore */ }
 
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(adminFlag ? { "x-admin": "1" } : {}),
-        },
-        body: JSON.stringify({ currentCode, instruction }),
-      });
+      // Update to streaming state
+      setMessages(prev =>
+        prev.map(m =>
+          m.id === assistantMsgId
+            ? { ...m, status: "streaming", content: "Analyzing code and applying changes..." }
+            : m
+        )
+      );
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Chat failed");
-      }
+      if (isReactMode) {
+        // ── REACT MODE: diff-based editing via /api/generate/edit ──
+        const res = await fetch("/api/generate/edit", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            instruction: text,
+            files: reactFiles,
+          }),
+          signal: controller.signal,
+        });
 
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error("No stream");
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+          throw new Error(errData.error || `Request failed (${res.status})`);
+        }
 
-      const decoder = new TextDecoder();
-      let fullOutput = "";
-      let mode: string = "full";
-      let sectionName: string | null = null;
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error("No response stream");
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        const decoder = new TextDecoder();
+        let lineBuffer = "";
 
-        const text = decoder.decode(value, { stream: true });
-        const lines = text.split("\n");
+        const processLine = (line: string) => {
+          if (!line.startsWith("data: ")) return;
+          const jsonStr = line.slice(6).trim();
+          if (!jsonStr) return;
 
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          try {
-            const data = JSON.parse(line.slice(6));
-            if (data.type === "meta") {
-              mode = data.editMode || "full";
-              sectionName = data.sectionName || null;
-              setEditMode(mode);
-            } else if (data.type === "chunk") {
-              fullOutput += data.content;
-            } else if (data.type === "error") {
-              throw new Error(data.content);
+          const event = JSON.parse(jsonStr);
+
+          if (event.type === "status") {
+            setMessages(prev =>
+              prev.map(m =>
+                m.id === assistantMsgId ? { ...m, content: event.message } : m
+              )
+            );
+          } else if (event.type === "done" && event.files) {
+            const changedFiles = Object.keys(event.files);
+            const duration = Date.now() - startTime;
+            onFilesUpdate!(event.files);
+            setMessages(prev =>
+              prev.map(m =>
+                m.id === assistantMsgId
+                  ? {
+                      ...m,
+                      status: "complete" as const,
+                      content: changedFiles.length === 1
+                        ? `Updated ${changedFiles[0]}`
+                        : `Updated ${changedFiles.length} files`,
+                      changedFiles,
+                      durationMs: duration,
+                    }
+                  : m
+              )
+            );
+          } else if (event.type === "error") {
+            // Respect fatal:false — soft warnings should not abort the edit.
+            if (event.fatal === false) return;
+            throw new Error(event.message || "Edit failed");
+          }
+        };
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          lineBuffer += decoder.decode(value, { stream: true });
+          const lines = lineBuffer.split("\n");
+          lineBuffer = lines.pop() || "";
+          for (const line of lines) {
+            try { processLine(line); } catch (e) {
+              if (e instanceof Error && e.message && !e.message.includes("JSON")) throw e;
             }
-          } catch (e) {
-            if (e instanceof SyntaxError) continue;
-            throw e;
           }
         }
-      }
 
-      // Clean the output
-      let cleanOutput = fullOutput.trim();
-      cleanOutput = cleanOutput.replace(/^```(?:html|css|HTML|CSS)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-
-      let finalHtml: string;
-
-      if (mode === "css-only" && currentCode) {
-        // Splice edited CSS back into the style block
-        finalHtml = spliceCss(currentCode, cleanOutput);
-      } else if (mode === "targeted" && sectionName && currentCode) {
-        // Find the original section and splice in the edited version
-        const originalSection = findSectionHtml(currentCode, sectionName);
-        if (originalSection) {
-          finalHtml = spliceSection(currentCode, originalSection, cleanOutput);
-        } else {
-          // Fallback: treat as full replacement
-          finalHtml = cleanOutput;
+        // Flush remaining buffer
+        if (lineBuffer.trim()) {
+          for (const line of lineBuffer.split("\n")) {
+            try { processLine(line); } catch (e) {
+              if (e instanceof Error && e.message && !e.message.includes("JSON")) throw e;
+            }
+          }
         }
-      } else {
-        // Full document edit — standard cleaning
-        const docStart = cleanOutput.search(/<!doctype\s+html|<html/i);
-        if (docStart > 0) cleanOutput = cleanOutput.slice(docStart);
-        const htmlEnd = cleanOutput.lastIndexOf("</html>");
-        if (htmlEnd !== -1) cleanOutput = cleanOutput.slice(0, htmlEnd + "</html>".length);
-        finalHtml = cleanOutput.trim();
-      }
+      } else if (isLegacyMode) {
+        // ── LEGACY MODE: HTML editing via /api/chat ──
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ currentCode, instruction: text }),
+          signal: controller.signal,
+        });
 
-      if (finalHtml) {
-        // Validate that the edit didn't destroy the body content
-        const bodyM = finalHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-        const bodyChars = bodyM
-          ? bodyM[1].replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().length
-          : 0;
-
-        if (mode === "full" && currentCode && bodyChars < 50) {
-          // Edit destroyed the body — don't apply it
-          const assistantMsg: ChatMessage = {
-            role: "assistant",
-            content: "The edit response was incomplete (no visible body content). Your original site has been preserved. Try a simpler edit or try again.",
-            timestamp: Date.now(),
-          };
-          setMessages((prev) => [...prev, assistantMsg]);
-          setIsLoading(false);
-          setEditMode(null);
-          return;
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+          throw new Error(errData.error || `Request failed (${res.status})`);
         }
 
-        onCodeUpdate(finalHtml);
-      }
+        const reader = res.body?.getReader();
+        if (!reader) throw new Error("No stream");
 
-      const modeLabel = mode === "css-only" ? "Style update" : mode === "targeted" ? `${sectionName} section updated` : "Full edit";
-      const assistantMsg: ChatMessage = {
-        role: "assistant",
-        content: `${modeLabel} applied! Check the preview.`,
-        timestamp: Date.now(),
-        editMode: mode,
-      };
-      setMessages((prev) => [...prev, assistantMsg]);
+        const decoder = new TextDecoder();
+        let fullOutput = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const lines = decoder.decode(value, { stream: true }).split("\n");
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.type === "chunk") fullOutput += data.content;
+              else if (data.type === "error") throw new Error(data.content);
+            } catch (e) {
+              if (e instanceof SyntaxError) continue;
+              throw e;
+            }
+          }
+        }
+
+        let clean = fullOutput.trim().replace(/^```(?:html|css|HTML|CSS)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+        const ds = clean.search(/<!doctype\s+html|<html/i);
+        if (ds > 0) clean = clean.slice(ds);
+        const he = clean.lastIndexOf("</html>");
+        if (he !== -1) clean = clean.slice(0, he + "</html>".length);
+
+        if (clean) {
+          onCodeUpdate!(clean);
+          const duration = Date.now() - startTime;
+          setMessages(prev =>
+            prev.map(m =>
+              m.id === assistantMsgId
+                ? { ...m, status: "complete" as const, content: "Edit applied!", durationMs: duration }
+                : m
+            )
+          );
+        }
+      }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to apply changes";
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: `Error: ${msg}`, timestamp: Date.now() },
-      ]);
+      if ((err as Error).name === "AbortError") return;
+      const errMsg = err instanceof Error ? err.message : "Something went wrong";
+
+      setMessages(prev =>
+        prev.map(m =>
+          m.id === assistantMsgId
+            ? {
+                ...m,
+                status: "error",
+                content: errMsg,
+                durationMs: Date.now() - startTime,
+              }
+            : m
+        )
+      );
     } finally {
-      setIsLoading(false);
-      setEditMode(null);
+      setIsEditing(false);
     }
-  };
+  }, [input, isEditing, hasFiles, isReactMode, isLegacyMode, reactFiles, onFilesUpdate, currentCode, onCodeUpdate]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -218,114 +314,204 @@ export default function ChatPanel({ currentCode, onCodeUpdate, isVisible }: Chat
   if (!isVisible) return null;
 
   return (
-    <div className="flex flex-col h-full border-l border-white/[0.06] bg-dark-300/50 w-[340px]">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-white/[0.06] flex items-center gap-2">
-        <Bot className="w-4 h-4 text-brand-400" />
-        <span className="text-xs font-semibold text-white/60 uppercase tracking-wider">
-          AI Editor
-        </span>
-        {!currentCode && (
-          <span className="ml-auto text-[10px] text-white/50">Generate a site first</span>
-        )}
-      </div>
-
-      {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+    <div className="flex flex-col h-full">
+      {/* Messages area */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+        {/* Welcome state */}
         {messages.length === 0 && (
-          <div className="text-center py-8">
-            <Bot className="w-8 h-8 text-white/10 mx-auto mb-3" />
-            <p className="text-xs text-white/50 mb-4">
-              Tell me what to change in your website.
+          <div className="py-6">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 border border-stone-500/20 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-stone-400" />
+              </div>
+            </div>
+            <p className="text-center text-sm text-white/70 font-medium mb-1">
+              AI Editor
             </p>
-            <div className="space-y-1.5">
-              {[
-                "Make the header background darker",
-                "Add a contact form section",
-                "Change the primary color to blue",
-                "Make the font size larger",
-              ].map((suggestion) => (
-                <button
-                  key={suggestion}
-                  onClick={() => setInput(suggestion)}
-                  disabled={!currentCode}
-                  className="block w-full text-left text-xs text-white/50 hover:text-brand-400
-                             py-1.5 px-3 rounded-lg hover:bg-white/[0.02] transition-colors disabled:opacity-30"
-                >
-                  &ldquo;{suggestion}&rdquo;
-                </button>
-              ))}
-            </div>
+            <p className="text-center text-xs text-white/40 mb-5 leading-relaxed px-2">
+              {hasFiles
+                ? "Describe any change and it will be applied instantly. Only affected files are updated."
+                : "Generate a site first, then use the editor to make changes."}
+            </p>
+
+            {hasFiles && showSuggestions && (
+              <div className="space-y-1.5">
+                <p className="text-[10px] uppercase tracking-widest text-white/30 px-1 mb-2">
+                  Try saying
+                </p>
+                {SUGGESTION_PROMPTS.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    onClick={() => handleSend(suggestion)}
+                    disabled={isEditing || isGenerating}
+                    className="flex items-center gap-2 w-full text-left text-xs text-white/50
+                               hover:text-stone-300 py-2 px-3 rounded-lg hover:bg-stone-500/[0.06]
+                               transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed
+                               border border-transparent hover:border-stone-500/10"
+                  >
+                    <Zap className="w-3 h-3 text-stone-500/50 flex-shrink-0" />
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : ""}`}>
-            {msg.role === "assistant" && (
-              <div className="w-6 h-6 rounded-full bg-brand-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Bot className="w-3 h-3 text-brand-400" />
-              </div>
-            )}
-            <div
-              className={`px-3 py-2 rounded-xl text-xs max-w-[240px] ${
-                msg.role === "user"
-                  ? "bg-brand-500/20 text-brand-200"
-                  : msg.content.startsWith("Error:")
-                  ? "bg-red-500/10 text-red-400 border border-red-500/20"
-                  : "bg-white/[0.04] text-white/60"
-              }`}
+        {/* Message list */}
+        <AnimatePresence initial={false}>
+          {messages.map((msg) => (
+            <motion.div
+              key={msg.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : ""}`}
             >
-              {msg.content}
-              {msg.editMode && msg.editMode !== "full" && (
-                <span className="flex items-center gap-1 mt-1 text-[10px] text-brand-400/60">
-                  <Zap className="w-2.5 h-2.5" /> {msg.editMode === "css-only" ? "Fast CSS edit" : "Targeted edit"}
-                </span>
+              {/* Assistant avatar */}
+              {msg.role === "assistant" && (
+                <div className="flex-shrink-0 mt-0.5">
+                  <div
+                    className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                      msg.status === "error"
+                        ? "bg-stone-500/15 border border-stone-500/20"
+                        : msg.status === "complete"
+                        ? "bg-stone-500/15 border border-stone-500/20"
+                        : "bg-stone-500/15 border border-stone-500/20"
+                    }`}
+                  >
+                    {msg.status === "pending" || msg.status === "streaming" ? (
+                      <Loader2 className="w-3 h-3 text-stone-400 animate-spin" />
+                    ) : msg.status === "error" ? (
+                      <AlertCircle className="w-3 h-3 text-stone-400" />
+                    ) : msg.status === "complete" ? (
+                      <CheckCircle2 className="w-3 h-3 text-stone-400" />
+                    ) : (
+                      <Bot className="w-3 h-3 text-stone-400" />
+                    )}
+                  </div>
+                </div>
               )}
-            </div>
-            {msg.role === "user" && (
-              <div className="w-6 h-6 rounded-full bg-white/[0.06] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <User className="w-3 h-3 text-white/50" />
-              </div>
-            )}
-          </div>
-        ))}
 
-        {isLoading && (
-          <div className="flex gap-2">
-            <div className="w-6 h-6 rounded-full bg-brand-500/20 flex items-center justify-center flex-shrink-0">
-              <Loader2 className="w-3 h-3 text-brand-400 animate-spin" />
-            </div>
-            <div className="px-3 py-2 rounded-xl text-xs bg-white/[0.04] text-white/50">
-              {editMode === "css-only"
-                ? "Updating styles..."
-                : editMode === "targeted"
-                ? "Editing section..."
-                : "Editing your website..."}
-            </div>
-          </div>
-        )}
+              {/* Message bubble */}
+              <div
+                className={`max-w-[260px] ${
+                  msg.role === "user"
+                    ? "bg-stone-500/15 border border-stone-500/20 text-stone-200 rounded-2xl rounded-tr-md px-3.5 py-2"
+                    : msg.status === "error"
+                    ? "bg-stone-500/8 border border-stone-500/15 text-stone-300/80 rounded-2xl rounded-tl-md px-3.5 py-2"
+                    : msg.status === "complete"
+                    ? "bg-stone-500/8 border border-stone-500/15 rounded-2xl rounded-tl-md px-3.5 py-2"
+                    : "bg-white/[0.04] border border-white/[0.06] rounded-2xl rounded-tl-md px-3.5 py-2"
+                }`}
+              >
+                <p className={`text-xs leading-relaxed ${
+                  msg.role === "user"
+                    ? "text-stone-200"
+                    : msg.status === "error"
+                    ? "text-stone-300/80"
+                    : msg.status === "complete"
+                    ? "text-stone-300/90"
+                    : "text-white/60"
+                }`}>
+                  {msg.content}
+                </p>
+
+                {/* Changed files list */}
+                {msg.changedFiles && msg.changedFiles.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-stone-500/10">
+                    {msg.changedFiles.map((file) => (
+                      <div
+                        key={file}
+                        className="flex items-center gap-1.5 text-[10px] text-stone-400/70 py-0.5"
+                      >
+                        <FileEdit className="w-2.5 h-2.5" />
+                        <span className="font-mono">{file}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Duration badge */}
+                {msg.durationMs != null && msg.status === "complete" && (
+                  <div className="mt-1.5 flex items-center gap-1">
+                    <Zap className="w-2.5 h-2.5 text-stone-500/50" />
+                    <span className="text-[10px] text-stone-500/50">
+                      {(msg.durationMs / 1000).toFixed(1)}s
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* User avatar */}
+              {msg.role === "user" && (
+                <div className="flex-shrink-0 mt-0.5">
+                  <div className="w-6 h-6 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center">
+                    <User className="w-3 h-3 text-white/50" />
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {/* Scroll anchor */}
+        <div className="h-1" />
       </div>
 
-      {/* Input */}
+      {/* File count indicator */}
+      {hasFiles && messages.length > 0 && (
+        <div className="px-4 py-1.5 border-t border-white/[0.04]">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-white/25">
+              {Object.keys(reactFiles!).length} files in project
+            </span>
+            {messages.filter(m => m.status === "complete").length > 0 && (
+              <span className="text-[10px] text-white/25">
+                {messages.filter(m => m.status === "complete").length} edits applied
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Input area */}
       <div className="p-3 border-t border-white/[0.06]">
-        <div className="flex items-end gap-2">
+        <div className="relative">
           <textarea
+            ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={currentCode ? "Describe a change..." : "Generate a site first"}
-            disabled={!currentCode || isLoading}
+            placeholder={
+              !hasFiles
+                ? "Generate a site first..."
+                : isEditing
+                ? "Applying changes..."
+                : isGenerating
+                ? "Waiting for generation..."
+                : "Describe a change... (Enter to send)"
+            }
+            disabled={!hasFiles || isEditing || isGenerating}
             rows={2}
-            className="flex-1 bg-white/[0.03] border border-white/[0.08] rounded-xl px-3 py-2 text-xs
-                       placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-brand-500/20
-                       focus:border-brand-500/30 transition-all resize-none disabled:opacity-30"
+            className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5 pr-12 text-xs
+                       text-white/80 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/20
+                       focus:border-stone-500/30 transition-all resize-none disabled:opacity-30
+                       disabled:cursor-not-allowed"
           />
           <button
-            onClick={handleSend}
-            disabled={!input.trim() || !currentCode || isLoading}
-            className="p-2.5 btn-gradient rounded-xl disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+            onClick={() => handleSend()}
+            disabled={!input.trim() || !hasFiles || isEditing || isGenerating}
+            className="absolute right-2 bottom-2 p-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600
+                       text-white disabled:opacity-20 disabled:cursor-not-allowed
+                       hover:from-stone-500 hover:to-stone-500 transition-all
+                       shadow-lg shadow-stone-500/20 disabled:shadow-none"
           >
-            <Send className="w-3.5 h-3.5 text-white" />
+            {isEditing ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Send className="w-3.5 h-3.5" />
+            )}
           </button>
         </div>
       </div>

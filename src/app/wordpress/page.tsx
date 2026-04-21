@@ -66,10 +66,10 @@ export default function WordPressPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#060e1f]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-emerald-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-stone-600 flex items-center justify-center">
               <span className="text-sm font-bold text-white">Z</span>
             </div>
             <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -91,9 +91,9 @@ export default function WordPressPage() {
         <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="text-center">
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-blue-400/20 bg-blue-400/5 mb-6">
-              <svg className="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M21.469 6.825c.84 4.471-2.015 9.235-6.38 10.638-4.366 1.403-9.1-.587-10.58-4.445C3.03 9.16 5.885 4.395 10.25 2.992c.227-.073.454-.134.681-.182l-.184 2.072 2.36-2.072 2.36 2.072-.184-2.072c3.528.958 6.04 3.9 6.186 7.015z"/></svg>
-              <span className="text-xs font-medium text-blue-400">WordPress Export</span>
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-stone-400/20 bg-stone-400/5 mb-6">
+              <svg className="w-4 h-4 text-stone-400" viewBox="0 0 24 24" fill="currentColor"><path d="M21.469 6.825c.84 4.471-2.015 9.235-6.38 10.638-4.366 1.403-9.1-.587-10.58-4.445C3.03 9.16 5.885 4.395 10.25 2.992c.227-.073.454-.134.681-.182l-.184 2.072 2.36-2.072 2.36 2.072-.184-2.072c3.528.958 6.04 3.9 6.186 7.015z"/></svg>
+              <span className="text-xs font-medium text-stone-400">WordPress Export</span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-6">
@@ -197,7 +197,7 @@ export default function WordPressPage() {
                   <div key={i} className="flex items-center gap-3 px-5 py-3.5 hover:bg-white/[0.03]">
                     <span className="text-sm text-white/80 font-medium min-w-[200px]">{row.platform}</span>
                     <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${
-                      row.theme ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
+                      row.theme ? "bg-stone-500/15 text-stone-400" : "bg-stone-500/15 text-stone-400"
                     }`}>{row.theme ? "✓ Theme" : "✗ Theme"}</span>
                     <span className="text-xs text-white/50 hidden md:block ml-auto">{row.note}</span>
                   </div>

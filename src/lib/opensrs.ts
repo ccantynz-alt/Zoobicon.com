@@ -23,8 +23,21 @@ function sign(xml: string): string {
 /**
  * Check if OpenSRS credentials are configured.
  */
+let _configWarned = false;
 export function isOpenSRSConfigured(): boolean {
-  return !!(OPENSRS_API_KEY() && OPENSRS_USER());
+  const apiKey = OPENSRS_API_KEY();
+  const user = OPENSRS_USER();
+  if (!apiKey && !user) return false;
+  if (!apiKey || !user) {
+    if (!_configWarned) {
+      _configWarned = true;
+      console.error(
+        "[OpenSRS] Configuration incomplete: both OPENSRS_API_KEY and OPENSRS_RESELLER_USER must be set. Falling back to DNS."
+      );
+    }
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -148,27 +161,217 @@ export async function checkMultipleDomains(
 }
 
 /**
- * Check a single full domain (e.g. "mybusiness.com") with DNS fallback.
- * Uses OpenSRS if configured, otherwise falls back to Google DNS.
+ * Authoritative single-domain availability check.
+ *
+ * Strategy (in order, first authoritative answer wins):
+ *  1. RDAP (rdap.org) — official registry protocol. 404 = available, 200 = taken.
+ *     Retries once on 429 after a short delay.
+ *  2. OpenSRS LOOKUP — ONLY when env=live (test mode returns fake sandbox data
+ *     and was the root cause of "available domains" that were actually taken).
+ *  3. Google DNS NXDOMAIN — final fallback, requires BOTH A and NS to NXDOMAIN.
+ *
+ * Returns:
+ *   true  = definitely available
+ *   false = definitely taken
+ *   null  = uncertain (UI must NOT show as available)
+ *
+ * Results are memoised for 10 minutes to survive retries and burst checks.
  */
-export async function checkWithFallback(domain: string): Promise<boolean | null> {
-  if (isOpenSRSConfigured()) {
-    const result = await checkDomainAvailability(domain);
-    if (result.status !== "error" && result.status !== "unknown") {
-      return result.available;
-    }
-  }
+const AVAILABILITY_CACHE = new Map<string, { result: boolean | null; at: number }>();
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 
-  // DNS fallback — not authoritative but better than nothing
+function getCached(domain: string): boolean | null | undefined {
+  const hit = AVAILABILITY_CACHE.get(domain);
+  if (!hit) return undefined;
+  if (Date.now() - hit.at > CACHE_TTL_MS) {
+    AVAILABILITY_CACHE.delete(domain);
+    return undefined;
+  }
+  return hit.result;
+}
+
+function setCached(domain: string, result: boolean | null) {
+  AVAILABILITY_CACHE.set(domain, { result, at: Date.now() });
+  // Keep the cache bounded so it can't leak forever
+  if (AVAILABILITY_CACHE.size > 5000) {
+    const firstKey = AVAILABILITY_CACHE.keys().next().value;
+    if (firstKey) AVAILABILITY_CACHE.delete(firstKey);
+  }
+}
+
+/**
+ * RDAP authoritative check — tight timeout, full body validation.
+ *
+ * Status code alone is NOT trustworthy: rdap.org sometimes returns 200 with
+ * a JSON error body (RFC 9083 errorResponse), which previously caused every
+ * domain to be reported as TAKEN even when it was genuinely available.
+ *
+ * Rules:
+ *   - 404 → available (true)
+ *   - 200 + valid domain record (objectClassName === "domain") → taken (false)
+ *   - 200 + errorCode === 404 → available (true)  [RFC 9083 error response]
+ *   - 200 + unrecognised body → uncertain (null) — fall through to DNS
+ *   - 429 → retry once with jitter
+ *   - anything else → null (uncertain)
+ */
+async function rdapCheck(domain: string, attempt = 0): Promise<boolean | null> {
   try {
-    const res = await fetch(`https://dns.google/resolve?name=${domain}&type=A`, {
-      signal: AbortSignal.timeout(5000),
+    const rdapRes = await fetch(`https://rdap.org/domain/${domain}`, {
+      signal: AbortSignal.timeout(4000),
+      headers: { Accept: "application/rdap+json" },
+      redirect: "follow",
     });
-    const data = await res.json();
-    if (data.Status === 3) return true; // NXDOMAIN = likely available
-    if (data.Status === 0 && data.Answer) return false; // Resolves = taken
+
+    if (rdapRes.status === 404) return true;
+
+    if (rdapRes.status === 429 && attempt === 0) {
+      await new Promise((r) => setTimeout(r, 300 + Math.random() * 200));
+      return rdapCheck(domain, 1);
+    }
+
+    if (rdapRes.status === 200) {
+      try {
+        const body = (await rdapRes.json()) as {
+          objectClassName?: string;
+          ldhName?: string;
+          errorCode?: number;
+          title?: string;
+        };
+
+        // RFC 9083 error-response with 200 HTTP wrapper: treat as available
+        if (body && typeof body.errorCode === "number" && body.errorCode === 404) {
+          return true;
+        }
+
+        // Valid RDAP domain record: registered
+        if (
+          body &&
+          body.objectClassName === "domain" &&
+          typeof body.ldhName === "string" &&
+          body.ldhName.length > 0
+        ) {
+          return false;
+        }
+
+        // 200 but body isn't a domain record — uncertain, let DNS decide
+        return null;
+      } catch {
+        // Malformed JSON — treat as uncertain
+        return null;
+      }
+    }
+
     return null;
   } catch {
     return null;
   }
+}
+
+/**
+ * Google DNS check — only returns definitive answers.
+ *
+ *   - NXDOMAIN on both A and NS → available (true)
+ *   - NS records that belong to the domain itself → taken (false)
+ *   - Anything else → null (uncertain) — never guess, never cache
+ *
+ * The "NS belongs to the domain itself" rule prevents false TAKEN results
+ * from wildcard NS records at the TLD level (e.g. some registries publish
+ * placeholder NS records for unregistered names).
+ */
+async function dnsCheck(domain: string): Promise<boolean | null> {
+  try {
+    const [aRes, nsRes] = await Promise.all([
+      fetch(`https://dns.google/resolve?name=${domain}&type=A`, {
+        signal: AbortSignal.timeout(3000),
+      }),
+      fetch(`https://dns.google/resolve?name=${domain}&type=NS`, {
+        signal: AbortSignal.timeout(3000),
+      }),
+    ]);
+    const aData = (await aRes.json()) as { Status?: number; Answer?: Array<{ name?: string; type?: number }> };
+    const nsData = (await nsRes.json()) as { Status?: number; Answer?: Array<{ name?: string; type?: number }> };
+
+    // Both NXDOMAIN = definitely unregistered
+    if (aData.Status === 3 && nsData.Status === 3) return true;
+
+    // NS records must belong to the exact domain (not a wildcard parent)
+    if (nsData.Status === 0 && Array.isArray(nsData.Answer) && nsData.Answer.length > 0) {
+      const target = domain.toLowerCase().replace(/\.$/, "");
+      const hasOwnNS = nsData.Answer.some((a) => {
+        if (!a || typeof a.name !== "string") return false;
+        const name = a.name.toLowerCase().replace(/\.$/, "");
+        return name === target;
+      });
+      if (hasOwnNS) return false;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Race multiple availability probes in parallel.
+ *
+ * Resolves as soon as ANY probe returns a definitive true/false answer.
+ * If all probes return null, resolves to null. This halves worst-case
+ * latency vs. sequential RDAP → DNS fallback.
+ */
+function firstAuthoritative(
+  probes: Array<Promise<boolean | null>>,
+): Promise<boolean | null> {
+  return new Promise((resolve) => {
+    let pending = probes.length;
+    let settled = false;
+    probes.forEach((p) => {
+      p.then((v) => {
+        if (settled) return;
+        if (v !== null) {
+          settled = true;
+          resolve(v);
+          return;
+        }
+        if (--pending === 0) {
+          settled = true;
+          resolve(null);
+        }
+      }).catch(() => {
+        if (settled) return;
+        if (--pending === 0) {
+          settled = true;
+          resolve(null);
+        }
+      });
+    });
+  });
+}
+
+export async function checkWithFallback(domain: string): Promise<boolean | null> {
+  // ── 0. Cache ─────────────────────────────────────────────────────────────
+  const cached = getCached(domain);
+  if (cached !== undefined) return cached;
+
+  // ── 1. Race RDAP + DNS in parallel (first authoritative answer wins) ─────
+  const raced = await firstAuthoritative([rdapCheck(domain), dnsCheck(domain)]);
+  if (raced !== null) {
+    setCached(domain, raced);
+    return raced;
+  }
+
+  // ── 2. OpenSRS (LIVE mode only — test/horizon endpoint lies) ──────────────
+  if (isOpenSRSConfigured() && OPENSRS_ENV() === "live") {
+    const result = await checkDomainAvailability(domain);
+    if (result.status === "available") {
+      setCached(domain, true);
+      return true;
+    }
+    if (result.status === "taken") {
+      setCached(domain, false);
+      return false;
+    }
+  }
+
+  // Genuinely uncertain — do NOT cache, let the next call retry
+  return null;
 }

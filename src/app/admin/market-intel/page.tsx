@@ -79,9 +79,9 @@ const CATEGORY_META: Record<
   string,
   { label: string; icon: typeof Globe; color: string }
 > = {
-  "website-builder": { label: "Website Builders", icon: Globe, color: "text-blue-400" },
-  "video-generator": { label: "Video Generators", icon: Video, color: "text-purple-400" },
-  "code-tool": { label: "Code Tools", icon: Code2, color: "text-green-400" },
+  "website-builder": { label: "Website Builders", icon: Globe, color: "text-stone-400" },
+  "video-generator": { label: "Video Generators", icon: Video, color: "text-stone-400" },
+  "code-tool": { label: "Code Tools", icon: Code2, color: "text-stone-400" },
 };
 
 // ---------------------------------------------------------------------------
@@ -102,13 +102,13 @@ function timeAgo(dateStr: string): string {
 function severityColor(severity: string): string {
   switch (severity) {
     case "critical":
-      return "bg-red-500/20 text-red-400 border-red-500/30";
+      return "bg-stone-500/20 text-stone-400 border-stone-500/30";
     case "error":
-      return "bg-red-500/15 text-red-400 border-red-500/20";
+      return "bg-stone-500/15 text-stone-400 border-stone-500/20";
     case "warning":
-      return "bg-yellow-500/15 text-yellow-400 border-yellow-500/20";
+      return "bg-stone-500/15 text-stone-400 border-stone-500/20";
     case "info":
-      return "bg-blue-500/15 text-blue-400 border-blue-500/20";
+      return "bg-stone-500/15 text-stone-400 border-stone-500/20";
     default:
       return "bg-gray-500/15 text-gray-400 border-gray-500/20";
   }
@@ -205,11 +205,11 @@ export default function MarketIntelPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#0f2148] text-white">
       <BackgroundEffects />
 
       {/* Header */}
-      <div className="relative z-10 border-b border-white/10 bg-[#131520]/80 backdrop-blur-sm">
+      <div className="relative z-10 border-b border-white/10 bg-[#0f2148]/80 backdrop-blur-sm">
         <div className="mx-auto max-w-7xl px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -222,7 +222,7 @@ export default function MarketIntelPage() {
               </Link>
               <div className="h-6 w-px bg-white/10" />
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-stone-500 to-stone-600">
                   <Radar className="h-5 w-5 text-white" />
                 </div>
                 <div>
@@ -240,7 +240,7 @@ export default function MarketIntelPage() {
                 <select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value as CategoryFilter)}
-                  className="appearance-none rounded-lg border border-white/10 bg-white/5 px-4 py-2 pr-8 text-sm text-white focus:border-violet-500 focus:outline-none"
+                  className="appearance-none rounded-lg border border-white/10 bg-white/5 px-4 py-2 pr-8 text-sm text-white focus:border-stone-500 focus:outline-none"
                 >
                   <option value="all">All Categories</option>
                   <option value="website-builder">Website Builders</option>
@@ -263,7 +263,7 @@ export default function MarketIntelPage() {
               <button
                 onClick={triggerCrawl}
                 disabled={isCrawling}
-                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white hover:from-violet-500 hover:to-indigo-500 transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 px-4 py-2 text-sm font-medium text-white hover:from-stone-500 hover:to-stone-500 transition-colors disabled:opacity-50"
               >
                 {isCrawling ? (
                   <>
@@ -304,7 +304,7 @@ export default function MarketIntelPage() {
       <div className="relative z-10 mx-auto max-w-7xl px-6 py-8">
         {/* Error */}
         {error && (
-          <div className="mb-6 flex items-center gap-3 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-red-400">
+          <div className="mb-6 flex items-center gap-3 rounded-lg border border-stone-500/20 bg-stone-500/10 px-4 py-3 text-stone-400">
             <AlertTriangle className="h-5 w-5 flex-shrink-0" />
             <span className="text-sm">{error}</span>
           </div>
@@ -312,12 +312,12 @@ export default function MarketIntelPage() {
 
         {/* Crawl result banner */}
         {crawlResult && (
-          <div className="mb-6 rounded-lg border border-violet-500/20 bg-violet-500/10 p-4">
+          <div className="mb-6 rounded-lg border border-stone-500/20 bg-stone-500/10 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-violet-400" />
+                <CheckCircle2 className="h-5 w-5 text-stone-400" />
                 <div>
-                  <p className="text-sm font-medium text-violet-300">
+                  <p className="text-sm font-medium text-stone-300">
                     Crawl Complete in {((crawlResult.duration || 0) / 1000).toFixed(1)}s
                   </p>
                   <p className="text-xs text-gray-400">
@@ -329,12 +329,12 @@ export default function MarketIntelPage() {
               {(criticalFindings.length > 0 || warningFindings.length > 0) && (
                 <div className="flex items-center gap-2">
                   {criticalFindings.length > 0 && (
-                    <span className="rounded-full bg-red-500/20 px-3 py-1 text-xs font-medium text-red-400">
+                    <span className="rounded-full bg-stone-500/20 px-3 py-1 text-xs font-medium text-stone-400">
                       {criticalFindings.length} critical
                     </span>
                   )}
                   {warningFindings.length > 0 && (
-                    <span className="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-medium text-yellow-400">
+                    <span className="rounded-full bg-stone-500/20 px-3 py-1 text-xs font-medium text-stone-400">
                       {warningFindings.length} warnings
                     </span>
                   )}
@@ -364,7 +364,7 @@ export default function MarketIntelPage() {
         {/* Loading */}
         {isLoading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-violet-400" />
+            <Loader2 className="h-8 w-8 animate-spin text-stone-400" />
           </div>
         )}
 
@@ -502,7 +502,7 @@ export default function MarketIntelPage() {
                           href={snap.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 text-violet-400 hover:text-violet-300"
+                          className="flex items-center gap-1.5 text-stone-400 hover:text-stone-300"
                         >
                           {snap.competitor_name}
                           <ExternalLink className="h-3 w-3" />
@@ -512,10 +512,10 @@ export default function MarketIntelPage() {
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs ${
                             snap.category === "website-builder"
-                              ? "bg-blue-500/20 text-blue-400"
+                              ? "bg-stone-500/20 text-stone-400"
                               : snap.category === "video-generator"
-                                ? "bg-purple-500/20 text-purple-400"
-                                : "bg-green-500/20 text-green-400"
+                                ? "bg-stone-500/20 text-stone-400"
+                                : "bg-stone-500/20 text-stone-400"
                           }`}
                         >
                           {CATEGORY_META[snap.category]?.label || snap.category}
@@ -526,7 +526,7 @@ export default function MarketIntelPage() {
                       </td>
                       <td className="py-3 pr-4">
                         {snap.pricing ? (
-                          <span className="flex items-center gap-1 text-green-400">
+                          <span className="flex items-center gap-1 text-stone-400">
                             <DollarSign className="h-3 w-3" />
                             <span className="max-w-[180px] truncate">{snap.pricing}</span>
                           </span>
@@ -570,16 +570,16 @@ function StatCard({
   isText?: boolean;
 }) {
   const colorMap: Record<string, string> = {
-    violet: "from-violet-500/20 to-violet-600/10 border-violet-500/20",
-    blue: "from-blue-500/20 to-blue-600/10 border-blue-500/20",
-    yellow: "from-yellow-500/20 to-yellow-600/10 border-yellow-500/20",
-    green: "from-green-500/20 to-green-600/10 border-green-500/20",
+    violet: "from-stone-500/20 to-stone-600/10 border-stone-500/20",
+    blue: "from-stone-500/20 to-stone-600/10 border-stone-500/20",
+    yellow: "from-stone-500/20 to-stone-600/10 border-stone-500/20",
+    green: "from-stone-500/20 to-stone-600/10 border-stone-500/20",
   };
   const iconColor: Record<string, string> = {
-    violet: "text-violet-400",
-    blue: "text-blue-400",
-    yellow: "text-yellow-400",
-    green: "text-green-400",
+    violet: "text-stone-400",
+    blue: "text-stone-400",
+    yellow: "text-stone-400",
+    green: "text-stone-400",
   };
 
   return (
@@ -659,7 +659,7 @@ function CompetitorCard({
           {snapshot.pricing && (
             <div>
               <p className="text-xs font-medium text-gray-400 uppercase">Pricing Detected</p>
-              <p className="mt-0.5 flex items-center gap-1 text-sm text-green-400">
+              <p className="mt-0.5 flex items-center gap-1 text-sm text-stone-400">
                 <DollarSign className="h-3 w-3" />
                 {snapshot.pricing}
               </p>
@@ -684,7 +684,7 @@ function CompetitorCard({
             href={snapshot.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300"
+            className="inline-flex items-center gap-1 text-xs text-stone-400 hover:text-stone-300"
           >
             Visit site
             <ExternalLink className="h-3 w-3" />
@@ -706,8 +706,8 @@ function ChangeCard({ change }: { change: Change }) {
     <div className="rounded-lg border border-white/10 bg-white/5 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-500/20">
-            <Zap className="h-4 w-4 text-yellow-400" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-500/20">
+            <Zap className="h-4 w-4 text-stone-400" />
           </div>
           <div>
             <p className="font-medium">{change.competitor_name}</p>
@@ -717,10 +717,10 @@ function ChangeCard({ change }: { change: Change }) {
         <span
           className={`rounded-full px-2 py-0.5 text-xs ${
             change.category === "website-builder"
-              ? "bg-blue-500/20 text-blue-400"
+              ? "bg-stone-500/20 text-stone-400"
               : change.category === "video-generator"
-                ? "bg-purple-500/20 text-purple-400"
-                : "bg-green-500/20 text-green-400"
+                ? "bg-stone-500/20 text-stone-400"
+                : "bg-stone-500/20 text-stone-400"
           }`}
         >
           {CATEGORY_META[change.category]?.label || change.category}
@@ -731,22 +731,22 @@ function ChangeCard({ change }: { change: Change }) {
         {titleChanged && (
           <div className="rounded-md bg-white/5 p-2 text-xs">
             <span className="font-medium text-gray-400">Title:</span>{" "}
-            <span className="line-through text-red-400/70">{change.prev_title}</span>
+            <span className="line-through text-stone-400/70">{change.prev_title}</span>
             {" -> "}
-            <span className="text-green-400">{change.title}</span>
+            <span className="text-stone-400">{change.title}</span>
           </div>
         )}
         {pricingChanged && (
-          <div className="rounded-md bg-red-500/10 border border-red-500/20 p-2 text-xs">
-            <span className="font-medium text-red-400">Pricing Change:</span>{" "}
-            <span className="line-through text-red-400/70">{change.prev_pricing}</span>
+          <div className="rounded-md bg-stone-500/10 border border-stone-500/20 p-2 text-xs">
+            <span className="font-medium text-stone-400">Pricing Change:</span>{" "}
+            <span className="line-through text-stone-400/70">{change.prev_pricing}</span>
             {" -> "}
-            <span className="text-green-400">{change.pricing}</span>
+            <span className="text-stone-400">{change.pricing}</span>
           </div>
         )}
         {featuresChanged && (
-          <div className="rounded-md bg-yellow-500/10 border border-yellow-500/20 p-2 text-xs">
-            <span className="font-medium text-yellow-400">Feature Change:</span>{" "}
+          <div className="rounded-md bg-stone-500/10 border border-stone-500/20 p-2 text-xs">
+            <span className="font-medium text-stone-400">Feature Change:</span>{" "}
             <span className="text-gray-300">
               {change.features?.length || 0} features now (was{" "}
               {change.prev_features?.length || 0})

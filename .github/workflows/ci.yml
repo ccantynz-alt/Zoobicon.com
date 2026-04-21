@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Type-check & Build
+    name: Quality Gate → Test → Build
     runs-on: ubuntu-latest
 
     steps:
@@ -24,11 +24,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Quality Gate
+        run: node scripts/quality-gate.js
+
       - name: Lint
         run: npm run lint
 
-      - name: Type-check
+      - name: Type Check
         run: npx tsc --noEmit
+
+      - name: Unit Tests
+        run: npm test
+
 
       - name: Build
         run: npm run build
@@ -39,3 +46,24 @@ jobs:
           ADMIN_PASSWORD: ci-placeholder
           DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
           STRIPE_SECRET_KEY: sk_test_ci_placeholder
+
+  gatetest:
+    name: GateTest Quality Gate
+    runs-on: ubuntu-latest
+    needs: build  # only run if native tests and build pass
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run GateTest quality gate
+        run: npx gatetest@latest --suite quick
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # GateTest is advisory for now — reports findings but does not block merge.
+    # Flip continue-on-error to false once GateTest is correctly configured and stable.
+    continue-on-error: true

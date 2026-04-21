@@ -16,7 +16,11 @@
  */
 
 function getSecret(): string {
-  return process.env.RESET_TOKEN_SECRET || process.env.ADMIN_PASSWORD || "zoobicon-dev-secret";
+  const secret = process.env.RESET_TOKEN_SECRET || process.env.ADMIN_PASSWORD;
+  if (!secret) {
+    throw new Error("RESET_TOKEN_SECRET or ADMIN_PASSWORD must be set for API key generation.");
+  }
+  return secret;
 }
 
 async function hmacSign(data: string, secret: string): Promise<string> {

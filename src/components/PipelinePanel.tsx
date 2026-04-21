@@ -32,10 +32,10 @@ interface AgentStatus {
 }
 
 const PHASE_COLORS: Record<number, { bg: string; border: string; text: string; glow: string }> = {
-  1: { bg: "bg-amber-500/10", border: "border-amber-500/30", text: "text-amber-400", glow: "shadow-amber-500/20" },
-  2: { bg: "bg-sky-500/10", border: "border-sky-500/30", text: "text-sky-400", glow: "shadow-sky-500/20" },
-  3: { bg: "bg-violet-500/10", border: "border-violet-500/30", text: "text-violet-400", glow: "shadow-violet-500/20" },
-  4: { bg: "bg-teal-500/10", border: "border-teal-500/30", text: "text-teal-400", glow: "shadow-teal-500/20" },
+  1: { bg: "bg-stone-500/10", border: "border-stone-500/30", text: "text-stone-400", glow: "shadow-stone-500/20" },
+  2: { bg: "bg-stone-500/10", border: "border-stone-500/30", text: "text-stone-400", glow: "shadow-stone-500/20" },
+  3: { bg: "bg-stone-500/10", border: "border-stone-500/30", text: "text-stone-400", glow: "shadow-stone-500/20" },
+  4: { bg: "bg-stone-500/10", border: "border-stone-500/30", text: "text-stone-400", glow: "shadow-stone-500/20" },
 };
 
 function createInitialAgents(): AgentStatus[] {
@@ -161,7 +161,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
           </div>
           <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-violet-500 via-purple-500 to-emerald-400"
+              className="h-full rounded-full bg-gradient-to-r from-stone-500 via-stone-500 to-stone-400"
               animate={{ width: `${Math.max(progress * 100, 5)}%` }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             />
@@ -182,12 +182,12 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
               {/* Phase label */}
               <div className="flex items-center gap-2">
                 <span className={`text-[9px] uppercase tracking-wider font-bold ${
-                  phaseDone ? "text-emerald-400/70" : phaseActive ? phaseColors.text : "text-white/50"
+                  phaseDone ? "text-stone-400/70" : phaseActive ? phaseColors.text : "text-white/50"
                 }`}>
                   Phase {phase.num}: {phase.name}
                 </span>
                 <span className="text-[8px] text-white/15">({phase.desc})</span>
-                {phaseDone && <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400/60" />}
+                {phaseDone && <CheckCircle2 className="w-2.5 h-2.5 text-stone-400/60" />}
               </div>
 
               {/* Phase agents */}
@@ -208,7 +208,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
                         isRunning
                           ? `${phaseColors.bg} ${phaseColors.border} shadow-lg ${phaseColors.glow}`
                           : isDone
-                            ? "bg-emerald-500/[0.04] border-emerald-500/15"
+                            ? "bg-stone-500/[0.04] border-stone-500/15"
                             : "bg-white/[0.015] border-white/[0.04]"
                       }`}
                     >
@@ -217,7 +217,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
                         isRunning
                           ? `${phaseColors.bg} ${phaseColors.text}`
                           : isDone
-                            ? "bg-emerald-500/15 text-emerald-400"
+                            ? "bg-stone-500/15 text-stone-400"
                             : "bg-white/[0.03] text-white/15"
                       }`}>
                         <AnimatePresence mode="wait">
@@ -241,9 +241,9 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
                           <span className="text-[11px] font-medium">{agent.name}</span>
                           <span className={`text-[8px] px-1.5 py-0.5 rounded font-semibold uppercase tracking-wider ${
                             agent.model === "Opus"
-                              ? "bg-violet-500/15 text-violet-400/80"
+                              ? "bg-stone-500/15 text-stone-400/80"
                               : agent.model === "Sonnet"
-                                ? "bg-blue-500/15 text-blue-400/80"
+                                ? "bg-stone-500/15 text-stone-400/80"
                                 : "bg-white/[0.06] text-white/50"
                           }`}>
                             {agent.model}
@@ -253,7 +253,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
                           {isRunning ? (
                             <span className={phaseColors.text}>Working...</span>
                           ) : isDone ? (
-                            <span className="text-emerald-400/60">
+                            <span className="text-stone-400/60">
                               Done in {((agent.duration || 0) / 1000).toFixed(1)}s
                             </span>
                           ) : (
@@ -322,12 +322,12 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-start gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20"
+          className="flex items-start gap-2 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20"
         >
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+          <CheckCircle2 className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-xs text-emerald-400 font-medium">Pipeline complete</p>
-            <p className="text-[10px] text-emerald-400/60 mt-0.5">
+            <p className="text-xs text-stone-400 font-medium">Pipeline complete</p>
+            <p className="text-[10px] text-stone-400/60 mt-0.5">
               Built by 7 agents in {(totalDuration / 1000).toFixed(1)}s — Strategy → Planning → Build → Enhancement.
             </p>
           </div>
@@ -335,9 +335,9 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
       )}
 
       {status === "error" && (
-        <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-          <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-red-400">{error}</p>
+        <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
+          <AlertCircle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-stone-400">{error}</p>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import { callLLM } from "@/lib/llm-provider";
+import { callLLMWithFailover } from "@/lib/llm-provider";
 
 export const maxDuration = 45;
 
@@ -117,12 +117,17 @@ ${keyPoints?.length ? `KEY POINTS TO COVER:\n${keyPoints.map((p, i) => `${i + 1}
 
 Write the script as JSON now.`;
 
-    const response = await callLLM({
-      model: "claude-sonnet-4-6",
-      system: systemPrompt,
-      userMessage,
-      maxTokens: 4096,
-    });
+    const response = await callLLMWithFailover(
+      {
+        model: "claude-sonnet-4-6",
+        system: systemPrompt,
+        userMessage,
+        maxTokens: 4096,
+      },
+      (provider, model) => {
+        console.warn(`[video-creator/script] Failed over to ${provider}:${model}`);
+      },
+    );
 
     let parsed;
     try {

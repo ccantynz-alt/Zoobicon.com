@@ -199,8 +199,8 @@ export default function UsagePage() {
       sub: `${trendUp ? "+" : ""}${trendPct}% vs last month`,
       trend: trendUp,
       icon: Zap,
-      iconColor: "text-blue-400",
-      iconBg: "bg-blue-500/10",
+      iconColor: "text-stone-400",
+      iconBg: "bg-stone-500/10",
     },
     {
       label: "API Calls",
@@ -208,8 +208,8 @@ export default function UsagePage() {
       sub: "This billing period",
       trend: true,
       icon: BarChart3,
-      iconColor: "text-emerald-400",
-      iconBg: "bg-emerald-500/10",
+      iconColor: "text-stone-400",
+      iconBg: "bg-stone-500/10",
     },
     {
       label: "Active Sites",
@@ -217,8 +217,8 @@ export default function UsagePage() {
       sub: "Currently deployed",
       trend: true,
       icon: Globe,
-      iconColor: "text-violet-400",
-      iconBg: "bg-violet-500/10",
+      iconColor: "text-stone-400",
+      iconBg: "bg-stone-500/10",
     },
     {
       label: "Storage Used",
@@ -226,22 +226,22 @@ export default function UsagePage() {
       sub: `of ${currentLimits.storage}`,
       trend: null,
       icon: HardDrive,
-      iconColor: "text-amber-400",
-      iconBg: "bg-amber-500/10",
+      iconColor: "text-stone-400",
+      iconBg: "bg-stone-500/10",
     },
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#131520]">
+    <div className="relative min-h-screen bg-[#0f2148]">
       <BackgroundEffects preset="admin" />
 
       {/* Nav */}
-      <nav className="border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-600 to-stone-600 flex items-center justify-center">
                   <Zap className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-lg font-bold tracking-tight text-white">Zoobicon</span>
@@ -257,7 +257,7 @@ export default function UsagePage() {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-white/[0.05] hover:bg-white/[0.07] transition-colors"
               >
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center text-[10px] font-bold text-white">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-stone-600 to-stone-600 flex items-center justify-center text-[10px] font-bold text-white">
                   {userName.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-sm text-white/60 hidden sm:block">{userName}</span>
@@ -274,7 +274,7 @@ export default function UsagePage() {
                       <Link href="/auth/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-white/65 hover:text-white hover:bg-white/[0.07]">
                         <Settings className="w-4 h-4" /> Settings
                       </Link>
-                      <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400/60 hover:text-red-400 hover:bg-white/[0.07]">
+                      <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-stone-400/60 hover:text-stone-400 hover:bg-white/[0.07]">
                         <LogOut className="w-4 h-4" /> Sign out
                       </button>
                     </div>
@@ -290,7 +290,7 @@ export default function UsagePage() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-1">
-            <CreditCard className="w-6 h-6 text-blue-400" />
+            <CreditCard className="w-6 h-6 text-stone-400" />
             <h1 className="text-2xl font-bold tracking-tight text-white">Usage &amp; Credits</h1>
           </div>
           <p className="text-white/60 text-sm">Monitor your platform usage, credit balance, and API activity.</p>
@@ -312,7 +312,7 @@ export default function UsagePage() {
                   <card.icon className={`w-5 h-5 ${card.iconColor}`} />
                 </div>
                 {card.trend !== null && (
-                  <span className={`flex items-center gap-0.5 text-xs font-semibold ${card.trend ? "text-emerald-400" : "text-red-400"}`}>
+                  <span className={`flex items-center gap-0.5 text-xs font-semibold ${card.trend ? "text-stone-400" : "text-stone-400"}`}>
                     {card.trend ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
                   </span>
                 )}
@@ -337,7 +337,7 @@ export default function UsagePage() {
             </div>
             <div className="text-right">
               <div className="text-lg font-bold text-white">{totalMonth.toLocaleString()}</div>
-              <div className={`text-xs font-semibold flex items-center gap-0.5 justify-end ${trendUp ? "text-emerald-400" : "text-red-400"}`}>
+              <div className={`text-xs font-semibold flex items-center gap-0.5 justify-end ${trendUp ? "text-stone-400" : "text-stone-400"}`}>
                 {trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                 {Math.abs(trendPct)}% vs prev
               </div>
@@ -349,7 +349,7 @@ export default function UsagePage() {
               return (
                 <div key={i} className="flex-1 group relative flex flex-col items-center justify-end h-full">
                   <div
-                    className="w-full rounded-t bg-blue-600/80 hover:bg-blue-500 transition-colors cursor-default min-h-[3px]"
+                    className="w-full rounded-t bg-stone-600/80 hover:bg-stone-500 transition-colors cursor-default min-h-[3px]"
                     style={{ height: `${heightPct}%` }}
                   />
                   {/* Tooltip */}
@@ -375,7 +375,7 @@ export default function UsagePage() {
           className="rounded-xl border border-white/10 bg-[#111318]/80 p-6 mb-10"
         >
           <div className="flex items-center gap-2 mb-6">
-            <CreditCard className="w-5 h-5 text-blue-400" />
+            <CreditCard className="w-5 h-5 text-stone-400" />
             <h2 className="text-base font-bold text-white">Credit Balance</h2>
           </div>
 
@@ -391,9 +391,9 @@ export default function UsagePage() {
               <div className="flex items-center gap-2 mb-4">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                   stats.plan === "enterprise"
-                    ? "bg-amber-500/20 text-amber-400"
+                    ? "bg-stone-500/20 text-stone-400"
                     : stats.plan === "pro"
-                      ? "bg-blue-500/20 text-blue-400"
+                      ? "bg-stone-500/20 text-stone-400"
                       : "bg-white/10 text-white/60"
                 }`}>
                   {stats.plan} Plan
@@ -425,7 +425,7 @@ export default function UsagePage() {
                 <div className="w-full h-3 bg-[#111318] rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-700 ${
-                      creditPct > 90 ? "bg-red-500" : creditPct > 70 ? "bg-amber-500" : "bg-blue-600"
+                      creditPct > 90 ? "bg-stone-500" : creditPct > 70 ? "bg-stone-500" : "bg-stone-600"
                     }`}
                     style={{ width: `${creditPct}%` }}
                   />
@@ -434,7 +434,7 @@ export default function UsagePage() {
               </div>
               <Link
                 href="/pricing"
-                className="mt-4 inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors w-full"
+                className="mt-4 inline-flex items-center justify-center gap-2 bg-stone-600 hover:bg-stone-500 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors w-full"
               >
                 <ArrowUpRight className="w-4 h-4" />
                 Upgrade Plan
@@ -451,7 +451,7 @@ export default function UsagePage() {
           className="rounded-xl border border-white/10 bg-[#111318]/80 p-6 mb-10"
         >
           <div className="flex items-center gap-2 mb-6">
-            <Key className="w-5 h-5 text-blue-400" />
+            <Key className="w-5 h-5 text-stone-400" />
             <h2 className="text-base font-bold text-white">API Key Usage</h2>
           </div>
 
@@ -478,7 +478,7 @@ export default function UsagePage() {
                     <td className="py-3 px-4 text-center">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                         key.status === "active"
-                          ? "bg-emerald-500/15 text-emerald-400"
+                          ? "bg-stone-500/15 text-stone-400"
                           : "bg-white/[0.06] text-white/50"
                       }`}>
                         {key.status}
@@ -499,7 +499,7 @@ export default function UsagePage() {
           className="rounded-xl border border-white/10 bg-[#111318]/80 p-6"
         >
           <div className="flex items-center gap-2 mb-6">
-            <Activity className="w-5 h-5 text-blue-400" />
+            <Activity className="w-5 h-5 text-stone-400" />
             <h2 className="text-base font-bold text-white">Recent Activity</h2>
           </div>
 
@@ -512,10 +512,10 @@ export default function UsagePage() {
                 {/* Type badge */}
                 <span className={`flex-shrink-0 w-20 text-center px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
                   item.type === "generate"
-                    ? "bg-blue-500/15 text-blue-400"
+                    ? "bg-stone-500/15 text-stone-400"
                     : item.type === "deploy"
-                      ? "bg-emerald-500/15 text-emerald-400"
-                      : "bg-violet-500/15 text-violet-400"
+                      ? "bg-stone-500/15 text-stone-400"
+                      : "bg-stone-500/15 text-stone-400"
                 }`}>
                   {item.type}
                 </span>
@@ -530,7 +530,7 @@ export default function UsagePage() {
 
                 {/* Status */}
                 <span className={`flex-shrink-0 w-2 h-2 rounded-full ${
-                  item.status === "success" ? "bg-emerald-400" : "bg-red-400"
+                  item.status === "success" ? "bg-stone-400" : "bg-stone-400"
                 }`} />
 
                 {/* Timestamp */}

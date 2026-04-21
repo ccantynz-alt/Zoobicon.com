@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { ImagePlus, Loader2, CheckCircle2, AlertCircle, Sparkles, Wand2 } from "lucide-react";
+import Image from "next/image";
+import {
+  ImagePlus,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Sparkles,
+  Wand2,
+} from "lucide-react";
 
 interface AiImagesPanelProps {
   code: string;
@@ -140,13 +148,13 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
         </button>
 
         {status === "done" && results && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
+            <CheckCircle2 className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-xs text-emerald-400 font-medium">
+              <p className="text-xs text-stone-400 font-medium">
                 Replaced {results.count} images
               </p>
-              <p className="text-[10px] text-emerald-400/60 mt-0.5">
+              <p className="text-[10px] text-stone-400/60 mt-0.5">
                 Providers: {results.providers.join(", ")}
               </p>
             </div>
@@ -154,9 +162,9 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
         )}
 
         {status === "error" && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-red-400">{error}</p>
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
+            <AlertCircle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-stone-400">{error}</p>
           </div>
         )}
       </div>
@@ -195,16 +203,17 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
         </button>
 
         {singleStatus === "error" && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-            <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-red-400">{singleError || "Image generation failed"}</p>
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
+            <AlertCircle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-stone-400">{singleError || "Image generation failed"}</p>
           </div>
         )}
 
         {singleResult && (
           <div className="rounded-lg overflow-hidden border border-white/[0.08]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={singleResult} alt="AI Generated" className="w-full h-40 object-cover" />
+            <div className="relative w-full h-40">
+              <Image src={singleResult} alt="AI Generated" fill unoptimized className="object-cover" />
+            </div>
             <div className="p-2 bg-white/[0.02]">
               <button
                 onClick={() => navigator.clipboard.writeText(singleResult).catch(() => {})}

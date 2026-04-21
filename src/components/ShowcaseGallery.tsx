@@ -3,7 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, ArrowRight, Clock, Wand2 } from "lucide-react";
+import {
+  Sparkles,
+  ArrowRight,
+  Clock,
+  Wand2,
+} from "lucide-react";
 
 interface ShowcaseItem {
   id: number;
@@ -133,7 +138,7 @@ export default function ShowcaseGallery() {
               onClick={() => setActiveFilter(cat)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                 activeFilter === cat
-                  ? "bg-violet-600 text-white shadow-lg shadow-violet-500/25 border border-violet-500/30"
+                  ? "bg-stone-600 text-white shadow-lg shadow-stone-500/25 border border-stone-500/30"
                   : "bg-white/[0.03] text-white/40 hover:bg-white/[0.06] hover:text-white/70 border border-white/[0.06]"
               }`}
             >
@@ -183,7 +188,7 @@ export default function ShowcaseGallery() {
                   <div className="relative z-[2] p-4 bg-[#0a0a12]/90 backdrop-blur-xl border-t border-white/[0.04]">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="text-white font-bold text-[15px] tracking-tight">{item.name}</h3>
-                      <span className="text-[10px] px-2.5 py-0.5 rounded-full font-semibold bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                      <span className="text-[10px] px-2.5 py-0.5 rounded-full font-semibold bg-stone-500/10 text-stone-400 border border-stone-500/20">
                         {item.category}
                       </span>
                     </div>
@@ -193,7 +198,7 @@ export default function ShowcaseGallery() {
                         <Clock className="w-3 h-3" />
                         {item.buildTime}
                       </span>
-                      <Wand2 className="w-3 h-3 text-violet-400/60" />
+                      <Wand2 className="w-3 h-3 text-stone-400/60" />
                     </div>
 
                     <p className="text-[11px] text-white/30 italic line-clamp-2 leading-relaxed">
@@ -212,7 +217,7 @@ export default function ShowcaseGallery() {
                     >
                       <Link
                         href="/builder"
-                        className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-500 hover:to-indigo-500 transition-all shadow-lg shadow-violet-500/20"
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 text-white hover:from-stone-500 hover:to-stone-500 transition-all shadow-lg shadow-stone-500/20"
                       >
                         Build Similar
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -238,7 +243,7 @@ export default function ShowcaseGallery() {
           </p>
           <Link
             href="/builder"
-            className="inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-500/25 text-sm"
+            className="inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-stone-500/25 text-sm"
           >
             Start Building for Free
             <ArrowRight className="w-4 h-4" />

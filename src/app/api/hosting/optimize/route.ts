@@ -177,8 +177,8 @@ async function runCheck(
       ],
     });
 
-    const text =
-      response.content[0].type === "text" ? response.content[0].text : "";
+    const textBlock = response.content.find((b) => b.type === "text") as { type: "text"; text: string } | undefined;
+    const text = textBlock?.text || "";
 
     // Extract JSON from response (handle potential markdown wrapping)
     let jsonStr = text;

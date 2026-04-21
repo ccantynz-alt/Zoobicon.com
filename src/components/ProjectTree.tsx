@@ -47,15 +47,15 @@ function getFileIcon(filename: string) {
     case "ts":
     case "jsx":
     case "js":
-      return <FileCode size={14} className="text-blue-400 shrink-0" />;
+      return <FileCode size={14} className="text-stone-400 shrink-0" />;
     case "css":
     case "scss":
     case "less":
-      return <FileType size={14} className="text-purple-400 shrink-0" />;
+      return <FileType size={14} className="text-stone-400 shrink-0" />;
     case "json":
-      return <FileJson size={14} className="text-yellow-400 shrink-0" />;
+      return <FileJson size={14} className="text-stone-400 shrink-0" />;
     case "html":
-      return <FileCode size={14} className="text-orange-400 shrink-0" />;
+      return <FileCode size={14} className="text-stone-400 shrink-0" />;
     default:
       return <File size={14} className="text-white/50 shrink-0" />;
   }
@@ -181,9 +181,9 @@ function TreeNodeItem({
               }`}
             />
             {isExpanded ? (
-              <FolderOpen size={14} className="text-amber-400/80 shrink-0" />
+              <FolderOpen size={14} className="text-stone-400/80 shrink-0" />
             ) : (
-              <FolderClosed size={14} className="text-amber-400/60 shrink-0" />
+              <FolderClosed size={14} className="text-stone-400/60 shrink-0" />
             )}
           </>
         ) : (
@@ -196,7 +196,7 @@ function TreeNodeItem({
         <span className="truncate">{node.name}</span>
 
         {isModified && (
-          <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0 ml-auto" />
+          <span className="w-2 h-2 rounded-full bg-stone-400 shrink-0 ml-auto" />
         )}
       </button>
 
@@ -338,7 +338,7 @@ export default function ProjectTree({
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#1a1a2e] border-r border-white/10 select-none">
+    <div className="flex flex-col h-full bg-[#0f2148] border-r border-white/10 select-none">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.06]">
         <span className="text-[11px] uppercase tracking-[1.5px] text-white/50 font-medium truncate">
@@ -410,7 +410,7 @@ export default function ProjectTree({
       {contextMenu && (
         <div
           ref={contextMenuRef}
-          className="fixed z-50 bg-[#1a1a2e] border border-white/10 rounded-md shadow-xl py-1 min-w-[140px]"
+          className="fixed z-50 bg-[#0f2148] border border-white/10 rounded-md shadow-xl py-1 min-w-[140px]"
           style={{ left: contextMenu.x, top: contextMenu.y }}
         >
           {!contextMenu.isFolder && onFileRename && (
@@ -433,7 +433,7 @@ export default function ProjectTree({
                 onFileDelete(contextMenu.path);
                 setContextMenu(null);
               }}
-              className="w-full flex items-center gap-2 px-3 py-1.5 text-[12px] text-red-400/70 hover:bg-red-400/10 hover:text-red-400 transition-colors"
+              className="w-full flex items-center gap-2 px-3 py-1.5 text-[12px] text-stone-400/70 hover:bg-stone-400/10 hover:text-stone-400 transition-colors"
             >
               <Trash2 size={12} />
               Delete
@@ -458,7 +458,7 @@ export default function ProjectTree({
       {/* Rename dialog */}
       {renamingPath && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-[#1a1a2e] border border-white/10 rounded-lg p-4 w-80 shadow-2xl">
+          <div className="bg-[#0f2148] border border-white/10 rounded-lg p-4 w-80 shadow-2xl">
             <p className="text-[12px] text-white/50 mb-2">Rename file</p>
             <input
               ref={renameInputRef}

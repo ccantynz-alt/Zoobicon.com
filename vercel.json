@@ -8,12 +8,28 @@
 
   "crons": [
     {
+      "path": "/api/cron/warmup",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/intel/health",
+      "schedule": "*/15 * * * *"
+    },
+    {
       "path": "/api/health?deep=true",
       "schedule": "0 */2 * * *"
     },
     {
       "path": "/api/seo/agent/cron",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/intel/competitors",
+      "schedule": "0 */12 * * *"
+    },
+    {
+      "path": "/api/intel/technology",
+      "schedule": "0 0 */2 * *"
     },
     {
       "path": "/api/intel/cron",
@@ -24,12 +40,12 @@
       "schedule": "0 3 * * 1"
     },
     {
-      "path": "/api/todo",
-      "schedule": "0 13 * * *"
-    },
-    {
       "path": "/api/agents/cron",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/daily-comeback",
+      "schedule": "0 3 * * *"
     }
   ],
 

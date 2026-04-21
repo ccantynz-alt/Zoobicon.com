@@ -3,110 +3,116 @@ import { NextRequest } from "next/server";
 import { authenticateRequest, checkUsageQuota, trackUsage } from "@/lib/auth-guard";
 import { getGeneratorSystemSupplement } from "@/lib/generator-prompts";
 
-const REACT_SYSTEM = `You are Zoobicon, an elite AI that generates React applications. You produce beautiful, production-quality React components with TypeScript and Tailwind CSS.
+const REACT_SYSTEM = `You are Zoobicon, the most advanced AI website generator on the market. You produce FULL-STACK, production-ready React applications that ACTUALLY WORK — not just pretty pages with fake data.
 
 Output ONLY a valid JSON object with this exact structure — no markdown, no code fences, no explanation before or after:
 
 {
   "files": {
-    "App.tsx": "// Main app component importing all sections",
-    "components/Hero.tsx": "// Hero section component",
-    "components/Features.tsx": "// Features grid component",
-    "components/About.tsx": "// About section component",
-    "components/Testimonials.tsx": "// Testimonials section",
-    "components/Stats.tsx": "// Stats section",
-    "components/FAQ.tsx": "// FAQ accordion",
+    "App.tsx": "// Main app component with routing and state management",
+    "components/Navbar.tsx": "// Navigation bar with mobile menu",
+    "components/Hero.tsx": "// Hero section",
+    "components/Features.tsx": "// Features grid",
+    "components/About.tsx": "// About section",
+    "components/Testimonials.tsx": "// Testimonials with real metrics",
+    "components/Stats.tsx": "// Animated stats section",
+    "components/Pricing.tsx": "// Pricing cards with toggle",
+    "components/FAQ.tsx": "// Interactive FAQ accordion",
+    "components/Contact.tsx": "// WORKING contact form with validation",
     "components/CTA.tsx": "// Call to action section",
-    "components/Footer.tsx": "// Footer component",
-    "components/Navbar.tsx": "// Navigation bar",
-    "styles.css": "// Custom CSS variables and minimal overrides (Tailwind via CDN)"
+    "components/Footer.tsx": "// Footer with newsletter signup",
+    "lib/store.ts": "// App state management using React context",
+    "styles.css": "// CSS custom properties and overrides"
   },
   "dependencies": {}
 }
 
-## RULES — FOLLOW EXACTLY
+## CRITICAL RULES — WHAT MAKES US BETTER THAN EVERY COMPETITOR
 
-### Component Architecture
-- Use React 18 functional components with TypeScript (.tsx)
-- Every component exports a default function: \`export default function Hero() { ... }\`
-- App.tsx is the entry point that imports and renders ALL section components in order
-- App.tsx must import "./styles.css" at the top
-- Each component is self-contained — all data (copy, images, stats) is defined inside the component
-- Use React hooks where needed (useState for FAQ accordion, mobile menu toggle, etc.)
+### 1. APPS MUST ACTUALLY WORK
+- Contact forms: validate inputs, show success/error states, store submissions in localStorage
+- Newsletter signups: validate email, show confirmation, prevent duplicates
+- FAQ sections: working accordion with smooth open/close animation
+- Pricing toggles: monthly/annual switch that updates prices with animation
+- Mobile menu: hamburger that opens/closes with transition
+- Scroll effects: smooth scroll to sections, active nav highlighting
+- Counters: animate numbers when they scroll into view
+- Tabs/filters: working tab switching for feature sections or portfolios
+- Search: if the app has a search feature, make it filter real data
+- Shopping carts: if e-commerce, items add to cart with count badge
+- Dark/light mode: if requested, working toggle with localStorage persistence
+- Forms: EVERY form must validate on submit, show inline errors, clear on success
 
-### Styling
-- Use Tailwind CSS classes for ALL styling (Tailwind is loaded via CDN in the preview)
-- styles.css should ONLY contain: CSS custom properties (:root variables), @import for Google Fonts, and minimal overrides (under 30 lines)
-- NEVER use inline style objects unless absolutely necessary for dynamic values
-- Use modern Tailwind: bg-gradient-to-r, backdrop-blur, ring, shadow-xl, etc.
+### 2. STATE MANAGEMENT
+- Create a lib/store.ts file using React Context for app-wide state
+- Contact form submissions stored in state (and localStorage for persistence)
+- Newsletter signups stored in state
+- Shopping cart items in state
+- Any user preferences (theme, language) in state
+- Export a useStore() hook for components to consume
 
-### Visual Quality — $20K+ Agency Standard
-- Hero: Split layout (text left + image/visual right) or full-bleed gradient with overlay text
-- Navbar: Sticky, semi-transparent with backdrop-blur, logo left + nav links + CTA button right
-- Features: 6 cards in a responsive grid (grid-cols-1 md:grid-cols-2 lg:grid-cols-3)
-- About: Two-column layout with image/visual left, text + bullet points right
-- Testimonials: 3 cards with star ratings, avatar photos (randomuser.me), name, role, and specific quotes
-- Stats: 4 bold numbers on a dark background section
-- FAQ: Accordion with useState toggle — clicking question reveals/hides answer
-- CTA: Bold colored background section with headline + two buttons
-- Footer: Dark background, 4-column layout with links
+### 3. COMPONENT ARCHITECTURE
+- React 18 functional components with TypeScript (.tsx)
+- Every component exports a default function
+- App.tsx imports and renders all components in order
+- App.tsx wraps everything in the StoreProvider from lib/store.ts
+- Use useState, useEffect, useRef, useCallback where appropriate
+- MINIMUM 12 components per site
 
-### Images
-- Hero: Use CSS gradient backgrounds or Tailwind gradient classes for tech/SaaS. For other industries, use https://images.unsplash.com/photo-{relevant-id}?w=800&h=600&fit=crop
-- Feature cards: Use inline SVG icons (create simple icon components or use JSX SVGs)
-- Testimonial avatars: https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg (N=1-99, unique per person)
-- About section: CSS gradient or relevant Unsplash image
-- All images: className="object-cover rounded-xl" or similar
+### 4. VISUAL QUALITY — $50K+ AGENCY STANDARD
+- Hero: Split layout or full-bleed gradient. MUST include a compelling image area (gradient mockup, floating cards, or dashboard illustration built in CSS/JSX)
+- Navbar: Sticky, backdrop-blur, logo + nav links + CTA. Mobile hamburger with animated menu
+- Features: 6+ cards in responsive grid with hover effects (scale, shadow, border glow)
+- Testimonials: 3+ cards with star ratings, photos (randomuser.me), specific metrics
+- Pricing: 3 tiers with monthly/annual toggle. Featured plan highlighted. All features listed
+- Stats: 4+ animated counters on gradient background
+- Contact: Working form with name, email, message fields. Validation. Success state
+- FAQ: 5+ questions with smooth accordion animation
+- Footer: 4-column layout with newsletter input, social icons, domain links
+- CTA: Bold gradient section with compelling headline
 
-### Icons
-- Create simple inline SVG icons as JSX within components — do NOT import from external packages
-- Example: <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+### 5. ANIMATIONS & INTERACTIONS
+- Intersection Observer for scroll-triggered animations (fade in, slide up)
+- Hover effects on ALL interactive elements (cards, buttons, links)
+- Smooth transitions (transition-all duration-300)
+- Loading states on form submissions
+- Success/error toast notifications after form actions
+- Counter animation when stats section scrolls into view
+- Staggered animations for card grids
 
-### Colors & Typography
-- Define :root CSS custom properties in styles.css for the brand colors
-- Use industry-appropriate color schemes:
-  - Tech/SaaS: Dark bg (slate-900), electric accents (indigo-500, cyan-500)
-  - Restaurant: Warm palette (amber, orange), serif-style headings
-  - Healthcare: Teal, soft greens, warm whites
-  - Real Estate: Navy + gold, serif headings
-  - Portfolio: Bold typography, vivid accent colors
-- Text contrast must meet WCAG AA (4.5:1 body, 3:1 large text)
+### 6. IMAGES & ICONS
+- Create inline SVG icons as JSX — do NOT import external packages
+- Testimonial avatars: https://randomuser.me/api/portraits/men/N.jpg or women/N.jpg
+- Hero: use CSS gradient backgrounds with floating decorative elements
+- Feature icons: gradient background circles with inline SVG icons
 
-### Copy Quality — AGENCY STANDARD
-- Headlines MUST be specific to the business — NO generic phrases like "Welcome to [Brand]" or "Get Started Today" or "Your Solution"
-- Every headline should stop someone scrolling — punchy, benefit-driven, specific
-- Testimonials include specific metrics: "Increased conversions by 47%", "Saved 15 hours per week"
-- CTAs are action-specific: "Schedule Free Assessment", "Start Building Today" — NOT generic "Learn More"
-- Company name in the Navbar should be creative and industry-appropriate — NOT "Brand" or "Company"
-- Feature descriptions should be 2-3 sentences of real, specific benefits — NOT one-line platitudes
-- About section tells a compelling origin story — NOT "We are a team of experts"
+### 7. COPY & CONTENT
+- Headlines MUST be specific to the business — NO generic "Welcome" or "Get Started"
+- Every headline should stop someone scrolling
+- Testimonials include specific metrics: "Increased conversions by 47%"
+- Feature descriptions: 2-3 real sentences, not one-liners
+- CTAs are action-specific: "Schedule Free Assessment", not "Learn More"
 
-### Visual Richness — CRITICAL
-- EVERY section must have visual depth — gradients, shadows, rounded corners, accent borders
-- Cards need hover effects: hover:shadow-xl, hover:scale-[1.02], hover:-translate-y-1, transition-all duration-300
-- Use ring-1 ring-white/10 on dark themes, ring-1 ring-gray-200 on light themes
-- Stats section: use a bold gradient background (bg-gradient-to-r from-indigo-600 to-purple-700)
-- Testimonial cards: include star ratings (★★★★★) and company logos (text placeholders)
-- Feature icons: use gradient backgrounds behind icons (bg-gradient-to-br from-indigo-500/20 to-purple-500/20 p-3 rounded-xl)
-- Footer: must have newsletter signup input + social media icon row
-- Hero image area: use glassmorphism cards, floating stat badges, or dashboard mockups — NOT empty placeholder boxes
-- MINIMUM 8 images across the site (hero, features, about, testimonials)
+### 8. STYLING
+- Tailwind CSS classes for ALL styling (loaded via CDN)
+- styles.css: ONLY CSS custom properties + Google Fonts import + minimal overrides
+- Industry-appropriate colors (tech=indigo, health=teal, food=amber, legal=navy)
+- Text contrast WCAG AA compliant
+- Fully responsive: sm:, md:, lg: breakpoints throughout
 
-### Critical Rules
-- Output ONLY the JSON object — start with { and end with }
-- NO markdown code fences (\`\`\`) around the JSON
-- NO explanation text before or after the JSON
-- Every file path in "files" must be a string containing valid TypeScript/JSX or CSS
-- App.tsx MUST import every component file using relative paths: import Hero from "./components/Hero"
-- The "dependencies" object should be empty {} unless lucide-react icons are absolutely needed
-- Minimum 9 sections: Navbar, Hero, Features, About, Testimonials, Stats, FAQ, CTA, Footer
-- Every component must render meaningful, complete content — no "TODO" or placeholder comments`;
+### 9. CRITICAL OUTPUT RULES
+- Start with { and end with } — no preamble, no markdown fences
+- Every file in "files" must contain valid TypeScript/JSX or CSS
+- App.tsx MUST import every component
+- lib/store.ts MUST exist with React Context provider
+- Minimum 12 sections/components
+- EVERY interactive element must work — no placeholder onClick handlers`;
 
-export const maxDuration = 300; // 5 minutes — React component generation needs more time than HTML
+export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, tier, model: requestedModel, generator } = await req.json();
+    const { prompt, tier, model: requestedModel, generator, fullStack: requestFullStack } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(
@@ -122,7 +128,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Auth + usage enforcement
     const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
     if (auth.error) return auth.error;
 
@@ -140,8 +145,6 @@ export async function POST(req: NextRequest) {
     const client = new Anthropic({ apiKey, timeout: 240_000 });
 
     let systemPrompt = REACT_SYSTEM;
-
-    // Append generator-specific instructions
     if (generator && typeof generator === "string") {
       const supplement = getGeneratorSystemSupplement(generator);
       if (supplement) {
@@ -150,125 +153,245 @@ export async function POST(req: NextRequest) {
     }
 
     const isPremium = tier === "premium";
-    const model = requestedModel || (isPremium ? "claude-sonnet-4-6" : "claude-sonnet-4-6");
+    const fullStack = requestFullStack === true;
+    const model = requestedModel || (isPremium ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001");
     const maxTokens = 32000;
 
-    const userMessage = `Build a premium, agency-quality React application for: ${prompt}
+    // If full-stack requested AND Supabase is configured, add database integration
+    let supabaseContext = "";
+    if (fullStack) {
+      try {
+        const { isSupabaseConfigured, generateClientCode } = await import("@/lib/supabase-provision");
+        if (isSupabaseConfigured()) {
+          supabaseContext = `\n\nFULL-STACK MODE — INCLUDE THESE ADDITIONAL FILES:
+- "lib/supabase.ts" — Supabase client with auth helpers (signUp, signIn, signOut, getUser) and database helpers (query, insert, update, remove). Use this URL pattern: const supabaseUrl = 'SUPABASE_URL'; const supabaseAnonKey = 'SUPABASE_ANON_KEY'; (these will be replaced after provisioning)
+- "components/AuthForm.tsx" — Working login/signup form with email + password, form validation, error states, toggle between login/signup modes
+- "components/Dashboard.tsx" — Protected dashboard that shows after login. Displays user data from Supabase.
+- "lib/store.ts" — MUST include auth state (user, isLoggedIn) managed via Supabase auth listener
 
+The app MUST have:
+1. A working auth flow (signup → verify → login → dashboard)
+2. Database reads/writes using the Supabase client
+3. Protected routes that redirect to login if not authenticated
+4. Real-time data updates using Supabase subscriptions where appropriate`;
+        }
+      } catch { /* Supabase not available, generate frontend-only */ }
+    }
+
+    const userMessage = `Build a premium, agency-quality React application for: ${prompt}
+${supabaseContext}
 Requirements:
-- Split into logical components (Navbar, Hero, Features, About, Testimonials, Stats, FAQ, CTA, Footer)
+- Split into logical components (Navbar, Hero, Features, About, Testimonials, Stats, Pricing, FAQ, Contact, CTA, Footer)
 - Use Tailwind CSS classes for all styling
 - Industry-appropriate colors and typography
 - Professional copy specific to the business — no generic placeholder text
 - Every section must be visually complete with real content
 - FAQ should have working accordion (useState toggle)
+- Contact form MUST validate and show success state
+- Pricing cards MUST have monthly/annual toggle
+- Stats MUST animate when scrolling into view
 - Mobile-responsive (use Tailwind responsive prefixes: sm:, md:, lg:)
 
 Output the JSON object with "files" and "dependencies" keys. Start with { — no preamble.`;
 
-    let response;
-    try {
-      response = await client.messages.create({
-        model,
-        max_tokens: maxTokens,
-        system: systemPrompt,
-        messages: [{ role: "user", content: userMessage }],
-      });
-    } catch (apiErr: unknown) {
-      // If primary model fails, try Haiku as fallback
-      if (model !== "claude-haiku-4-5") {
-        console.warn(`[React] ${model} failed, falling back to Haiku`);
+    // ── STREAMING: Send partial results as files are completed ──
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        const sendEvent = (data: Record<string, unknown>) => {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+        };
+
+        sendEvent({ type: "status", message: "AI is generating your React application..." });
+
         try {
-          response = await client.messages.create({
-            model: "claude-haiku-4-5",
+          let fullText = "";
+
+          const apiStream = client.messages.stream({
+            model,
             max_tokens: maxTokens,
             system: systemPrompt,
             messages: [{ role: "user", content: userMessage }],
           });
-        } catch {
-          throw apiErr;
+
+          let lastFileCount = 0;
+          let chunkCounter = 0;
+
+          apiStream.on("text", (text) => {
+            fullText += text;
+            chunkCounter++;
+
+            // Every 4 chunks, try to extract completed files and send them
+            // More frequent = components appear in preview faster
+            if (chunkCounter % 4 === 0) {
+              try {
+                const partialFiles = extractCompletedFiles(fullText);
+                const fileCount = Object.keys(partialFiles).length;
+
+                if (fileCount > lastFileCount) {
+                  lastFileCount = fileCount;
+                  const fileNames = Object.keys(partialFiles);
+                  const latestFile = fileNames[fileNames.length - 1];
+                  sendEvent({
+                    type: "partial",
+                    files: partialFiles,
+                    fileCount,
+                    latestFile,
+                  });
+                  sendEvent({
+                    type: "status",
+                    message: `Built ${fileCount} files — ${latestFile}...`,
+                  });
+                }
+              } catch {
+                // JSON not complete yet — that's normal during streaming
+              }
+            }
+          });
+
+          const finalMessage = await apiStream.finalMessage();
+
+          // Extract final text
+          const textBlock = finalMessage.content.find((b) => b.type === "text");
+          if (!textBlock || textBlock.type !== "text") {
+            sendEvent({ type: "error", message: "AI returned no text content" });
+            controller.close();
+            return;
+          }
+
+          let rawText = textBlock.text.trim();
+          rawText = rawText.replace(/^```(?:json|JSON)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
+
+          const jsonStart = rawText.indexOf("{");
+          const jsonEnd = rawText.lastIndexOf("}");
+          if (jsonStart === -1 || jsonEnd === -1) {
+            sendEvent({ type: "error", message: "AI response was not valid JSON. Please try again." });
+            controller.close();
+            return;
+          }
+
+          const jsonStr = rawText.slice(jsonStart, jsonEnd + 1);
+
+          let parsed: { files?: Record<string, string>; dependencies?: Record<string, string> };
+          try {
+            parsed = JSON.parse(jsonStr);
+          } catch {
+            sendEvent({ type: "error", message: "AI response contained invalid JSON. Please try again." });
+            controller.close();
+            return;
+          }
+
+          if (!parsed.files || !parsed.files["App.tsx"]) {
+            sendEvent({ type: "error", message: "AI response missing App.tsx. Please try again." });
+            controller.close();
+            return;
+          }
+
+          // Track usage
+          await trackUsage(auth.user.email, "generation").catch(() => {});
+
+          // Auto-inject backend service into every generated app
+          if (fullStack) {
+            try {
+              const { generateBackend, needsBackend: checkBackend } = await import("@/lib/backend-generator");
+              if (fullStack || checkBackend(prompt)) {
+                const appName = prompt.slice(0, 40).replace(/[^a-zA-Z0-9 ]/g, "").trim() || "app";
+                const backendResult = await generateBackend(
+                  appName,
+                  prompt,
+                  auth.user.email,
+                );
+
+                // Merge backend files into the generated app
+                for (const [filePath, code] of Object.entries(backendResult.files)) {
+                  parsed.files[filePath] = code;
+                }
+
+                // Merge backend dependencies
+                if (Object.keys(backendResult.dependencies).length > 0) {
+                  parsed.dependencies = { ...(parsed.dependencies || {}), ...backendResult.dependencies };
+                }
+
+                sendEvent({
+                  type: "status",
+                  message: backendResult.provisioned
+                    ? "Backend ready — Supabase (real Postgres + auth + storage)"
+                    : "Backend ready — Local mode (deploy to Zoobicon Cloud for real database)",
+                });
+              }
+            } catch (backendErr) {
+              console.error("[react] Backend injection failed:", backendErr);
+              // App still works without backend — continue
+            }
+          }
+
+          // Send final complete result
+          sendEvent({
+            type: "done",
+            files: parsed.files,
+            dependencies: parsed.dependencies || {},
+            fileCount: Object.keys(parsed.files).length,
+          });
+        } catch (err) {
+          const message =
+            err instanceof Anthropic.AuthenticationError
+              ? "AI service is temporarily unavailable."
+              : err instanceof Anthropic.RateLimitError
+              ? "AI service is busy. Please wait a moment and try again."
+              : "React generation failed. Please try again.";
+          sendEvent({ type: "error", message });
+        } finally {
+          controller.close();
         }
-      } else {
-        throw apiErr;
-      }
-    }
+      },
+    });
 
-    // Extract text from response
-    const textBlock = response.content.find((b) => b.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
-      return new Response(
-        JSON.stringify({ error: "AI returned no text content" }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    let rawText = textBlock.text.trim();
-
-    // Strip markdown code fences if present
-    rawText = rawText.replace(/^```(?:json|JSON)?\s*\n?/, "").replace(/\n?\s*```\s*$/, "");
-
-    // Find the JSON object boundaries
-    const jsonStart = rawText.indexOf("{");
-    const jsonEnd = rawText.lastIndexOf("}");
-    if (jsonStart === -1 || jsonEnd === -1) {
-      return new Response(
-        JSON.stringify({ error: "AI response was not valid JSON. Please try again." }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const jsonStr = rawText.slice(jsonStart, jsonEnd + 1);
-
-    let parsed: { files?: Record<string, string>; dependencies?: Record<string, string> };
-    try {
-      parsed = JSON.parse(jsonStr);
-    } catch (parseErr) {
-      console.error("[React] JSON parse failed:", parseErr);
-      return new Response(
-        JSON.stringify({ error: "AI response contained invalid JSON. Please try again." }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    if (!parsed.files || typeof parsed.files !== "object" || Object.keys(parsed.files).length === 0) {
-      return new Response(
-        JSON.stringify({ error: "AI response missing files. Please try again." }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Validate that App.tsx exists
-    if (!parsed.files["App.tsx"]) {
-      return new Response(
-        JSON.stringify({ error: "AI response missing App.tsx entry point. Please try again." }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Track usage
-    await trackUsage(auth.user.email, "generation").catch(() => {});
-
-    return new Response(
-      JSON.stringify({
-        files: parsed.files,
-        dependencies: parsed.dependencies || {},
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+      },
+    });
   } catch (err) {
     console.error("[React Generate] Error:", err);
-    const message =
-      err instanceof Anthropic.AuthenticationError
-        ? "AI service is temporarily unavailable. The site owner needs to update their API key."
-        : err instanceof Anthropic.RateLimitError
-        ? "AI service is busy. Please wait a moment and try again."
-        : "React generation failed. Please try again.";
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: "React generation failed. Please try again." }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
+}
+
+/**
+ * Try to extract completed file entries from a partially-streamed JSON response.
+ * This is a best-effort parser — it extracts files whose content appears complete
+ * (the value string is closed properly).
+ */
+function extractCompletedFiles(partial: string): Record<string, string> {
+  const files: Record<string, string> = {};
+
+  // Find "files": { ... and try to extract key-value pairs
+  const filesStart = partial.indexOf('"files"');
+  if (filesStart === -1) return files;
+
+  const braceStart = partial.indexOf("{", filesStart + 7);
+  if (braceStart === -1) return files;
+
+  // Extract file entries using regex — match "filename": "content" pairs
+  // where content is a complete string (ends with unescaped quote)
+  const fileRegex = /"([^"]+\.(?:tsx?|css|json))"\s*:\s*"((?:[^"\\]|\\.)*)"/g;
+  const searchArea = partial.slice(braceStart);
+
+  let match;
+  while ((match = fileRegex.exec(searchArea)) !== null) {
+    const fileName = match[1];
+    const content = match[2]
+      .replace(/\\n/g, "\n")
+      .replace(/\\t/g, "\t")
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, "\\");
+    files[fileName] = content;
+  }
+
+  return files;
 }

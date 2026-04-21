@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Layers, Loader2, Eye, AlertCircle } from "lucide-react";
+import {
+  Layers,
+  Loader2,
+  Eye,
+  AlertCircle,
+} from "lucide-react";
 
 interface Variant {
   id: string;
@@ -29,7 +34,7 @@ export default function VariantsPanel({
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/generate/variants", {
+      const res = await fetch("/api/generate/react", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: p, count: 3 }),
@@ -81,9 +86,9 @@ export default function VariantsPanel({
       </button>
 
       {error && (
-        <div className="flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-          <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-red-400">{error}</p>
+        <div className="flex items-start gap-2 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
+          <AlertCircle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-stone-400">{error}</p>
         </div>
       )}
 

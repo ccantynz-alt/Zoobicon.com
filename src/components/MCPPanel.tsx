@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  Github,
+  GitFork,
   BookOpen,
-  Figma,
+  Layers,
   Sheet,
   Database,
   Link,
@@ -54,11 +54,11 @@ interface ContextSource {
 // ---------------------------------------------------------------------------
 
 const PROVIDER_META: Record<string, { icon: React.ReactNode; label: string; color: string }> = {
-  github: { icon: <Github className="w-4 h-4" />, label: "GitHub", color: "text-white" },
+  github: { icon: <GitFork className="w-4 h-4" />, label: "GitHub", color: "text-white" },
   notion: { icon: <BookOpen className="w-4 h-4" />, label: "Notion", color: "text-white" },
-  figma: { icon: <Figma className="w-4 h-4" />, label: "Figma", color: "text-purple-400" },
-  "google-sheets": { icon: <Sheet className="w-4 h-4" />, label: "Google Sheets", color: "text-green-400" },
-  custom: { icon: <Database className="w-4 h-4" />, label: "Custom", color: "text-blue-400" },
+  figma: { icon: <Layers className="w-4 h-4" />, label: "Layers", color: "text-stone-400" },
+  "google-sheets": { icon: <Sheet className="w-4 h-4" />, label: "Google Sheets", color: "text-stone-400" },
+  custom: { icon: <Database className="w-4 h-4" />, label: "Custom", color: "text-stone-400" },
 };
 
 // ---------------------------------------------------------------------------
@@ -106,8 +106,8 @@ const PRESETS: QuickAddPreset[] = [
   },
   {
     toolName: "figma_get_design",
-    label: "Reference Figma Design",
-    description: "Fetch design metadata from Figma",
+    label: "Reference Layers Design",
+    description: "Fetch design metadata from Layers",
     fields: [{ key: "fileKey", label: "File Key", placeholder: "From URL: figma.com/file/<KEY>/..." }],
   },
   {
@@ -134,6 +134,10 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
   const [sources, setSources] = useState<ContextSource[]>([]);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [loadingTools, setLoadingTools] = useState(true);
+  // Quick-import state
+  const [quickUrl, setQuickUrl] = useState("");
+  const [quickLoading, setQuickLoading] = useState(false);
+  const [quickError, setQuickError] = useState("");
 
   // Load available tools on mount
   useEffect(() => {
@@ -152,6 +156,49 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
     };
     loadTools();
   }, []);
+
+  // Quick-import: paste any URL and auto-detect source type
+  const handleQuickImport = async () => {
+    if (!quickUrl.trim() || quickLoading) return;
+    setQuickLoading(true);
+    setQuickError("");
+
+    try {
+      const res = await fetch("/api/mcp/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: quickUrl.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setQuickError(data.error || "Failed to fetch context");
+        return;
+      }
+
+      // Add as a resolved source
+      const newSource: ContextSource = {
+        id: `mcp-quick-${Date.now()}`,
+        toolName: `${data.source.type}_import`,
+        provider: data.source.type === "github" ? "github" : data.source.type === "notion" ? "notion" : data.source.type === "figma" ? "figma" : "custom",
+        params: { url: quickUrl.trim() },
+        result: {
+          success: true,
+          data: data.content,
+          contentType: "text",
+          summary: `Imported from ${data.source.name} (${data.tokens} tokens)`,
+        },
+        loading: false,
+        included: true,
+        expanded: false,
+      };
+      setSources((prev) => [...prev, newSource]);
+      setQuickUrl("");
+    } catch {
+      setQuickError("Network error — could not reach the server");
+    } finally {
+      setQuickLoading(false);
+    }
+  };
 
   // Notify parent when included context changes
   const buildContextString = useCallback(() => {
@@ -258,22 +305,54 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
   const includedCount = sources.filter((s) => s.included && s.result?.success).length;
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0f] text-white">
+    <div className="flex flex-col h-full bg-[#0a1628] text-white">
       {/* Header */}
       <div className="px-4 py-3 border-b border-white/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Link className="w-4 h-4 text-indigo-400" />
+            <Link className="w-4 h-4 text-stone-400" />
             <h3 className="text-sm font-semibold">External Context (MCP)</h3>
           </div>
           {includedCount > 0 && (
-            <span className="text-xs bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-stone-500/20 text-stone-300 px-2 py-0.5 rounded-full">
               {includedCount} source{includedCount !== 1 ? "s" : ""} active
             </span>
           )}
         </div>
         <p className="text-xs text-white/50 mt-1">
-          Pull context from GitHub, Notion, Figma, or Google Sheets into your AI generation.
+          Pull context from GitHub, Notion, Layers, or Google Sheets into your AI generation.
+        </p>
+      </div>
+
+      {/* Quick Import — paste any URL */}
+      <div className="px-4 py-3 border-b border-white/10">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={quickUrl}
+            onChange={(e) => { setQuickUrl(e.target.value); setQuickError(""); }}
+            onKeyDown={(e) => { if (e.key === "Enter") handleQuickImport(); }}
+            placeholder="Paste GitHub, Notion, Figma, or any URL..."
+            className="flex-1 px-2.5 py-1.5 text-xs bg-white/5 border border-white/10 rounded-lg focus:border-stone-500/50 focus:outline-none text-white placeholder-white/30"
+          />
+          <button
+            onClick={handleQuickImport}
+            disabled={quickLoading || !quickUrl.trim()}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-stone-500/20 text-stone-300 rounded-lg hover:bg-stone-500/30 transition-colors disabled:opacity-40"
+          >
+            {quickLoading ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Download className="w-3 h-3" />
+            )}
+            Import
+          </button>
+        </div>
+        {quickError && (
+          <p className="mt-1.5 text-[10px] text-stone-400">{quickError}</p>
+        )}
+        <p className="mt-1.5 text-[10px] text-white/30">
+          Auto-detects GitHub repos, Notion pages, Figma files, or crawls any website.
         </p>
       </div>
 
@@ -299,7 +378,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                   <span className={meta.color}>{meta.icon}</span>
                   <span className="text-white/60">{meta.label}</span>
                   {isConnected ? (
-                    <Check className="w-3 h-3 text-green-400" />
+                    <Check className="w-3 h-3 text-stone-400" />
                   ) : (
                     <span className="text-[10px] text-white/50 bg-white/5 px-1 rounded">demo</span>
                   )}
@@ -342,7 +421,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                         title={source.included ? "Included in generation" : "Excluded from generation"}
                       >
                         {source.included ? (
-                          <ToggleRight className="w-4 h-4 text-indigo-400" />
+                          <ToggleRight className="w-4 h-4 text-stone-400" />
                         ) : (
                           <ToggleLeft className="w-4 h-4 text-white/50" />
                         )}
@@ -361,9 +440,9 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                       {/* Remove */}
                       <button
                         onClick={() => removeSource(source.id)}
-                        className="p-1 rounded hover:bg-red-500/20 transition-colors"
+                        className="p-1 rounded hover:bg-stone-500/20 transition-colors"
                       >
-                        <X className="w-3.5 h-3.5 text-white/50 hover:text-red-400" />
+                        <X className="w-3.5 h-3.5 text-white/50 hover:text-stone-400" />
                       </button>
                     </div>
                   </div>
@@ -382,7 +461,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                               value={source.params[field.key] || ""}
                               onChange={(e) => updateParam(source.id, field.key, e.target.value)}
                               placeholder={field.placeholder}
-                              className="w-full mt-0.5 px-2 py-1.5 text-xs bg-white/5 border border-white/10 rounded focus:border-indigo-500/50 focus:outline-none text-white placeholder-white/50"
+                              className="w-full mt-0.5 px-2 py-1.5 text-xs bg-white/5 border border-white/10 rounded focus:border-stone-500/50 focus:outline-none text-white placeholder-white/50"
                             />
                           </div>
                         ))}
@@ -392,7 +471,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                       <button
                         onClick={() => fetchSource(source.id)}
                         disabled={source.loading}
-                        className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium bg-indigo-500/20 text-indigo-300 rounded hover:bg-indigo-500/30 transition-colors disabled:opacity-50"
+                        className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium bg-stone-500/20 text-stone-300 rounded hover:bg-stone-500/30 transition-colors disabled:opacity-50"
                       >
                         {source.loading ? (
                           <>
@@ -412,19 +491,19 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                         <div
                           className={`mt-2 p-2 rounded border text-xs ${
                             source.result.success
-                              ? "bg-green-500/5 border-green-500/20"
-                              : "bg-red-500/5 border-red-500/20"
+                              ? "bg-stone-500/5 border-stone-500/20"
+                              : "bg-stone-500/5 border-stone-500/20"
                           }`}
                         >
                           <div className="flex items-start gap-2">
                             {source.result.success ? (
-                              <Check className="w-3 h-3 text-green-400 mt-0.5 flex-shrink-0" />
+                              <Check className="w-3 h-3 text-stone-400 mt-0.5 flex-shrink-0" />
                             ) : (
-                              <X className="w-3 h-3 text-red-400 mt-0.5 flex-shrink-0" />
+                              <X className="w-3 h-3 text-stone-400 mt-0.5 flex-shrink-0" />
                             )}
                             <p
                               className={`leading-relaxed ${
-                                source.result.success ? "text-green-300/80" : "text-red-300/80"
+                                source.result.success ? "text-stone-300/80" : "text-stone-300/80"
                               }`}
                             >
                               {source.result.summary}
@@ -432,16 +511,16 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
                           </div>
 
                           {/* Preview data */}
-                          {source.result.success && source.result.data && (
+                          {source.result.success && source.result.data != null && (
                             <details className="mt-2">
                               <summary className="text-[10px] text-white/50 cursor-pointer hover:text-white/60 flex items-center gap-1">
                                 <Eye className="w-3 h-3" />
                                 Preview data
                               </summary>
                               <pre className="mt-1 p-2 bg-black/30 rounded text-[10px] text-white/50 overflow-x-auto max-h-40 overflow-y-auto">
-                                {String(typeof source.result.data === "string"
+                                {typeof source.result.data === "string"
                                   ? (source.result.data as string).slice(0, 2000)
-                                  : JSON.stringify(source.result.data, null, 2).slice(0, 2000))}
+                                  : JSON.stringify(source.result.data, null, 2).slice(0, 2000)}
                               </pre>
                             </details>
                           )}
@@ -492,7 +571,7 @@ export default function MCPPanel({ onContextChange }: MCPPanelProps) {
         ) : (
           <button
             onClick={() => setShowAddMenu(true)}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium border border-dashed border-white/20 rounded hover:border-indigo-500/40 hover:bg-indigo-500/5 text-white/50 hover:text-indigo-300 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium border border-dashed border-white/20 rounded hover:border-stone-500/40 hover:bg-stone-500/5 text-white/50 hover:text-stone-300 transition-colors"
           >
             <Link className="w-3.5 h-3.5" />
             Add Context Source

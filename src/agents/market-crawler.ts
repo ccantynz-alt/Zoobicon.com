@@ -33,7 +33,7 @@ import { registerAgent } from "./registry";
 interface CompetitorTarget {
   name: string;
   url: string;
-  category: "website-builder" | "video-generator" | "code-tool" | "market-trend";
+  category: "website-builder" | "video-generator" | "code-tool" | "market-trend" | "connectivity" | "cloud-infra";
 }
 
 interface CrawlOutput {
@@ -67,6 +67,20 @@ const COMPETITORS: CompetitorTarget[] = [
   // AI Code Tools
   { name: "Cursor", url: "https://cursor.sh", category: "code-tool" },
   { name: "Windsurf", url: "https://codeium.com/windsurf", category: "code-tool" },
+  // Connectivity — eSIM, Starlink, MVNO
+  { name: "Starlink Direct-to-Cell", url: "https://www.starlink.com/business/direct-to-cell", category: "connectivity" },
+  { name: "Starlink News", url: "https://www.starlink.com/updates", category: "connectivity" },
+  { name: "Celitech", url: "https://www.celitech.com", category: "connectivity" },
+  { name: "Airalo", url: "https://www.airalo.com", category: "connectivity" },
+  { name: "Holafly", url: "https://www.holafly.com", category: "connectivity" },
+  { name: "One NZ (eSIM)", url: "https://one.nz/esim", category: "connectivity" },
+  { name: "Spark NZ (eSIM)", url: "https://www.spark.co.nz/esim", category: "connectivity" },
+  { name: "Telstra (eSIM)", url: "https://www.telstra.com.au/esim", category: "connectivity" },
+  // Cloud Infrastructure — Storage, VPN, Hosting competitors
+  { name: "Backblaze B2", url: "https://www.backblaze.com/cloud-storage", category: "cloud-infra" },
+  { name: "Hetzner", url: "https://www.hetzner.com/cloud", category: "cloud-infra" },
+  { name: "Mullvad VPN", url: "https://mullvad.net", category: "cloud-infra" },
+  { name: "Deepgram", url: "https://deepgram.com", category: "connectivity" },
 ];
 
 // Feature keywords to detect per category
@@ -99,6 +113,26 @@ const FEATURE_KEYWORDS: Record<string, string[]> = {
     "background agent", "parallel agents",
   ],
   "market-trend": [],
+  "connectivity": [
+    "direct-to-cell", "direct to cell", "d2c", "satellite", "starlink",
+    "esim", "eSIM", "mvno", "mvne", "wholesale", "reseller api",
+    "5g", "lte", "roaming", "travel data", "global coverage",
+    "qr activation", "deep link install", "sm-dp+", "gsma",
+    "pacific islands", "oceania", "new zealand", "australia",
+    "one nz", "spark", "telstra", "optus", "2degrees",
+    "airalo partner", "celitech api", "carrier api",
+    "iot sim", "m2m", "connected device",
+    "starlink api", "starlink reseller", "starlink wholesale",
+    "starlink data", "starlink mobile", "starlink phone",
+  ],
+  "cloud-infra": [
+    "s3 compatible", "object storage", "minio", "ceph",
+    "wireguard", "vpn api", "vpn reseller",
+    "speech to text", "transcription api", "whisper", "nova-2",
+    "self-hosted", "open source", "hetzner",
+    "edge computing", "serverless", "cdn",
+    "price drop", "free tier", "new region",
+  ],
 };
 
 // ---------------------------------------------------------------------------

@@ -2,22 +2,72 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import BackgroundEffects from "@/components/BackgroundEffects";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
-  Sparkles, Globe, Layout, Calendar, BarChart3, Palette, Search, Moon,
-  FileText, Link2, Briefcase, BookOpen, MapPin, Ticket, Store, Smartphone,
-  Settings, FormInput, Mail, Presentation, PenTool, Code2, Boxes, UtensilsCrossed,
-  Home, FileBarChart, Chrome, PaintBucket, Users, FolderKanban, GraduationCap,
-  Package, Workflow, ArrowRight, Zap, Bot, Layers, Star, Menu, X, ShoppingCart,
-  MessageCircle, Newspaper, Share2, FileSearch, Mic, Heart, Dumbbell, PartyPopper,
+  Sparkles,
+  Layout,
+  Calendar,
+  BarChart3,
+  Palette,
+  Search,
+  Moon,
+  FileText,
+  Link2,
+  Briefcase,
+  BookOpen,
+  MapPin,
+  Ticket,
+  Store,
+  Smartphone,
+  Settings,
+  FormInput,
+  Mail,
+  Presentation,
+  PenTool,
+  Code2,
+  Boxes,
+  UtensilsCrossed,
+  Home,
+  FileBarChart,
+  Globe2,
+  PaintBucket,
+  Users,
+  FolderKanban,
+  GraduationCap,
+  Package,
+  Workflow,
+  ArrowRight,
+  Zap,
+  Bot,
+  ShoppingCart,
+  MessageCircle,
+  Newspaper,
+  Share2,
+  FileSearch,
+  Mic,
+  Heart,
+  Dumbbell,
+  PartyPopper,
+  BadgeCheck,
 } from "lucide-react";
 import { endpointToGeneratorId } from "@/lib/generator-prompts";
+
+const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const PRIMARY_CTA = {
+  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  color: "#0a1628",
+  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+} as const;
+const SERIF: React.CSSProperties = {
+  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+  fontStyle: "italic",
+  fontWeight: 400,
+  color: "#E8D4B0",
+};
 
 const GENERATOR_CATEGORIES = [
   {
     name: "Websites",
-    color: "from-blue-500 to-cyan-500",
+    tagline: "Every kind of site, production-ready.",
     generators: [
       { name: "Landing Page", description: "High-converting pages with 12 optimized sections, pricing tables, FAQ accordions", endpoint: "/api/generate/landing", icon: Layout, tag: "Popular" },
       { name: "Portfolio & Case Studies", description: "Awwwards-quality creative portfolios with filterable projects and lightbox galleries", endpoint: "/api/generate/portfolio", icon: Briefcase },
@@ -36,7 +86,7 @@ const GENERATOR_CATEGORIES = [
   },
   {
     name: "Business Applications",
-    color: "from-blue-500 to-blue-500",
+    tagline: "Full-stack apps with real logic and state.",
     generators: [
       { name: "SaaS Dashboard", description: "Full SaaS apps with user management, analytics, billing, settings, and team features", endpoint: "/api/generate/saas", icon: Layout, tag: "Popular" },
       { name: "Booking System", description: "Appointment booking with calendar, time slots, services, staff selection, and confirmations", endpoint: "/api/generate/booking", icon: Calendar },
@@ -47,24 +97,24 @@ const GENERATOR_CATEGORIES = [
       { name: "Inventory Management", description: "Stock tracking, order management, supplier directory, low-stock alerts, and analytics reports", endpoint: "/api/generate/inventory", icon: Package },
       { name: "Data Dashboard", description: "Analytics dashboards with KPI cards, SVG charts, heatmaps, tables, and date range pickers", endpoint: "/api/generate/dashboard", icon: BarChart3 },
       { name: "Mobile App UI", description: "Native-feeling app interfaces with bottom tabs, onboarding flow, profile page, and empty states", endpoint: "/api/generate/mobile-app", icon: Smartphone, tag: "New" },
-      { name: "React Native/Expo App", description: "Multi-file React Native/Expo apps with tab navigation, typed screens, Context state, and native UI", endpoint: "/api/generate/mobile", icon: Smartphone, tag: "New" },
+      { name: "React Native/Expo App", description: "Multi-file React Native/Expo apps with tab navigation, typed screens, Context state, and native UI", endpoint: "/api/generate/react", icon: Smartphone, tag: "New" },
       { name: "Chatbot Interface", description: "AI chatbot UIs with message bubbles, quick replies, typing indicators, and conversation history", endpoint: "/api/generate/chatbot-ui", icon: MessageCircle, tag: "New" },
     ],
   },
   {
     name: "Enhancement Agents",
-    color: "from-emerald-500 to-teal-500",
+    tagline: "Specialised agents that upgrade any site in place.",
     generators: [
       { name: "Animation Agent", description: "Inject scroll reveals, parallax, animated counters, text animations, and micro-interactions", endpoint: "/api/generate/animations", icon: Sparkles, tag: "Agent" },
-      { name: "SEO Markup Agent", description: "Add Open Graph, Twitter Cards, JSON-LD schema, heading fixes, image alt text, and performance hints", endpoint: "/api/generate/seo-markup", icon: Search, tag: "Agent" },
+      { name: "SEO Markup Agent", description: "Add Open Graph, MessageCircle Cards, JSON-LD schema, heading fixes, image alt text, and performance hints", endpoint: "/api/generate/seo-markup", icon: Search, tag: "Agent" },
       { name: "Dark Mode Agent", description: "Add complete theme system with toggle, CSS variables, system preference detection, and persistence", endpoint: "/api/generate/dark-mode", icon: Moon, tag: "Agent" },
       { name: "Forms Backend Agent", description: "Make forms functional with validation, submission handling, spam protection, and email templates", endpoint: "/api/generate/forms-backend", icon: FileText, tag: "Agent" },
-      { name: "Integrations Agent", description: "Inject GA4, Facebook Pixel, Calendly, Google Maps, WhatsApp, Intercom, cookie consent, and more", endpoint: "/api/generate/integrations", icon: Link2, tag: "Agent" },
+      { name: "Integrations Agent", description: "Inject GA4, ThumbsUp Pixel, Calendly, Google Maps, WhatsApp, Intercom, cookie consent, and more", endpoint: "/api/generate/integrations", icon: Link2, tag: "Agent" },
     ],
   },
   {
     name: "Marketing & Content",
-    color: "from-orange-500 to-red-500",
+    tagline: "Campaigns, copy and collateral in a single pass.",
     generators: [
       { name: "Email Sequence", description: "Multi-email campaigns with HTML templates, send timing, segmentation rules, and KPI benchmarks", endpoint: "/api/generate/email-sequence", icon: Mail },
       { name: "Pitch Deck", description: "Interactive HTML slide decks with SVG charts, keyboard navigation, and print-to-PDF support", endpoint: "/api/generate/pitch-deck", icon: Presentation },
@@ -78,17 +128,17 @@ const GENERATOR_CATEGORIES = [
   },
   {
     name: "Developer Tools",
-    color: "from-cyan-500 to-blue-500",
+    tagline: "Ship complete developer-grade artefacts.",
     generators: [
       { name: "REST API Generator", description: "Complete APIs with database schema, endpoint handlers, auth, rate limiting, and interactive docs", endpoint: "/api/generate/api-gen", icon: Code2 },
-      { name: "Chrome Extension", description: "Manifest V3 extensions with popup UI, content scripts, background workers, and options page", endpoint: "/api/generate/chrome-ext", icon: Chrome },
+      { name: "Globe2 Extension", description: "Manifest V3 extensions with popup UI, content scripts, background workers, and options page", endpoint: "/api/generate/chrome-ext", icon: Globe2 },
       { name: "Component Library", description: "UI component libraries with live demos, all states, dark mode toggle, and usage code snippets", endpoint: "/api/generate/component-lib", icon: Boxes },
       { name: "Progressive Web App", description: "Installable PWAs with service worker, offline support, install prompt, and native-app feel", endpoint: "/api/generate/pwa", icon: Smartphone },
     ],
   },
   {
     name: "Design Systems",
-    color: "from-cyan-500 to-rose-500",
+    tagline: "Colour, type and brand, codified.",
     generators: [
       { name: "Brand Kit", description: "Complete design systems with colors, typography, spacing, components, voice, and style guide page", endpoint: "/api/generate/brand-kit", icon: Palette },
       { name: "Style Guide Extractor", description: "Analyze existing sites to extract and document every color, font, spacing value, and component", endpoint: "/api/generate/style-guide", icon: PaintBucket },
@@ -103,13 +153,20 @@ const PIPELINE_TIERS = [
   { name: "Ultra", agents: 10, description: "Full pipeline + Animation, SEO, and Forms agents in parallel", speed: "~120s", tag: "Best Quality" },
 ];
 
+type GeneratorItem = {
+  name: string;
+  description: string;
+  endpoint: string;
+  icon: React.ElementType;
+  tag?: string;
+};
+
 export default function GeneratorsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const allGenerators = GENERATOR_CATEGORIES.flatMap((cat) =>
-    cat.generators.map((gen) => ({ ...gen, category: cat.name, color: cat.color }))
+    cat.generators.map((gen) => ({ ...gen, category: cat.name }))
   );
 
   const filteredGenerators = selectedCategory
@@ -148,66 +205,45 @@ export default function GeneratorsPage() {
     ]
   };
 
+  const isFiltering = Boolean(selectedCategory || searchQuery);
+
   return (
-    <div className="min-h-screen text-white relative">
+    <div className="min-h-screen bg-[#060e1f] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(generatorsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <BackgroundEffects preset="technical" />
-      {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.10] bg-[#0a0a12]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
-              <Zap size={16} className="text-white" />
-            </div>
-            <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/builder" className="text-sm text-white/65 hover:text-white transition-colors">Builder</Link>
-            <Link href="/pricing" className="text-sm text-white/65 hover:text-white transition-colors">Pricing</Link>
-            <Link href="/generators" className="text-sm text-brand-400">Generators</Link>
-            <Link href="/developers" className="text-sm text-white/65 hover:text-white transition-colors">API</Link>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/builder"
-              className="hidden sm:flex items-center gap-2 px-4 py-2 bg-brand-500/20 text-brand-400 rounded-lg text-sm font-medium hover:bg-brand-500/30 transition-colors"
-            >
-              Open Builder
-              <ArrowRight size={14} />
-            </Link>
-            <button className="md:hidden text-white/65" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-        </div>
-      </nav>
-      <CursorGlowTracker />
 
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
-        <div className="max-w-7xl mx-auto px-6 pt-20 pb-16 text-center relative">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-medium mb-6">
-            <Bot size={14} />
-            {totalGenerators} AI Generators + 10-Agent Pipeline
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div
+            className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }}
+          />
+          <div
+            className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.07), transparent 70%)" }}
+          />
+        </div>
+
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+            <Bot className="w-3 h-3" />
+            {totalGenerators} AI generators · 10-agent pipeline
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+
+          <h1 className="fs-display-xl mb-6">
             Generate{" "}
-            <span className="bg-gradient-to-r from-brand-400 to-blue-400 bg-clip-text text-transparent">
-              anything
-            </span>
+            <span style={SERIF}>anything.</span>
           </h1>
-          <p className="text-lg text-white/65 max-w-2xl mx-auto mb-10">
-            {totalGenerators} specialized AI generators for websites, dashboards, apps, marketing campaigns,
-            APIs, and design systems. Each one produces production-quality output in seconds.
+
+          <p className="max-w-3xl mx-auto text-[17px] md:text-[19px] leading-relaxed text-white/60 mb-10">
+            {totalGenerators} specialised AI generators for websites, dashboards, apps, marketing campaigns,
+            APIs and design systems. Each one produces production-quality output in seconds.
           </p>
 
           {/* Search */}
-          <div className="max-w-lg mx-auto relative mb-8">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/65" />
+          <div className="max-w-xl mx-auto relative mb-8">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/45" />
             <input
               type="text"
               value={searchQuery}
@@ -216,18 +252,18 @@ export default function GeneratorsPage() {
                 setSelectedCategory(null);
               }}
               placeholder="Search generators..."
-              className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white/[0.07] border border-white/[0.12] text-white placeholder:text-white/65 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/20 text-sm"
+              className="w-full rounded-full border border-white/[0.12] bg-white/[0.03] pl-12 pr-5 py-3.5 text-[14px] text-white placeholder:text-white/40 backdrop-blur transition-all focus:outline-none focus:border-[#E8D4B0]/40 focus:bg-white/[0.05]"
             />
           </div>
 
           {/* Category filters */}
-          <div className="flex flex-wrap justify-center gap-2 mb-4">
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
             <button
               onClick={() => { setSelectedCategory(null); setSearchQuery(""); }}
-              className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
-                !selectedCategory && !searchQuery
-                  ? "bg-brand-500/20 text-brand-400 border border-brand-500/30"
-                  : "bg-white/[0.07] text-white/65 border border-white/[0.10] hover:bg-white/[0.08] hover:text-white/80"
+              className={`rounded-full px-4 py-1.5 text-[12px] font-medium transition-all duration-500 ${
+                !isFiltering
+                  ? "border border-[#E8D4B0]/35 bg-[#E8D4B0]/[0.08] text-[#E8D4B0]"
+                  : "border border-white/[0.10] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/25 hover:text-[#E8D4B0]"
               }`}
             >
               All ({totalGenerators})
@@ -236,118 +272,208 @@ export default function GeneratorsPage() {
               <button
                 key={cat.name}
                 onClick={() => { setSelectedCategory(cat.name); setSearchQuery(""); }}
-                className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+                className={`rounded-full px-4 py-1.5 text-[12px] font-medium transition-all duration-500 ${
                   selectedCategory === cat.name
-                    ? "bg-brand-500/20 text-brand-400 border border-brand-500/30"
-                    : "bg-white/[0.07] text-white/65 border border-white/[0.10] hover:bg-white/[0.08] hover:text-white/80"
+                    ? "border border-[#E8D4B0]/35 bg-[#E8D4B0]/[0.08] text-[#E8D4B0]"
+                    : "border border-white/[0.10] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/25 hover:text-[#E8D4B0]"
                 }`}
               >
                 {cat.name} ({cat.generators.length})
               </button>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Pipeline Section */}
-      <section className="max-w-7xl mx-auto px-6 pb-16">
-        <div className="rounded-2xl border border-white/[0.10] bg-white/[0.08] p-8 mb-16">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-blue-500 flex items-center justify-center">
-              <Workflow size={20} />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold">Multi-Agent Pipeline</h2>
-              <p className="text-sm text-white/60">Orchestrate specialized AI agents for superior output</p>
-            </div>
-          </div>
-          <div className="grid md:grid-cols-3 gap-4">
-            {PIPELINE_TIERS.map((tier) => (
-              <div
-                key={tier.name}
-                className={`relative rounded-xl border p-5 transition-all hover:border-brand-500/30 ${
-                  tier.tag ? "border-brand-500/20 bg-brand-500/[0.03]" : "border-white/[0.10] bg-white/[0.08]"
-                }`}
-              >
-                {tier.tag && (
-                  <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-brand-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
-                    {tier.tag}
-                  </span>
-                )}
-                <div className="flex items-center gap-2 mb-3">
-                  <h3 className="font-semibold">{tier.name}</h3>
-                  <span className="px-2 py-0.5 rounded-full bg-white/[0.09] text-[10px] font-medium text-white/65">
-                    {tier.agents} agents
-                  </span>
-                </div>
-                <p className="text-xs text-white/60 mb-3">{tier.description}</p>
-                <div className="flex items-center gap-2 text-xs text-white/65">
-                  <Zap size={12} />
-                  <span>{tier.speed}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Generator Grid */}
-      <section className="max-w-7xl mx-auto px-6 pb-24">
-        {selectedCategory || searchQuery ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredGenerators.map((gen) => (
-              <GeneratorCard key={gen.name} gen={gen} />
-            ))}
-            {filteredGenerators.length === 0 && (
-              <div className="col-span-full text-center py-20">
-                <Search size={40} className="mx-auto text-white/50 mb-4" />
-                <p className="text-white/65">No generators match your search.</p>
-              </div>
-            )}
-          </div>
-        ) : (
-          GENERATOR_CATEGORIES.map((cat) => (
-            <div key={cat.name} className="mb-16">
-              <div className="flex items-center gap-3 mb-6">
-                <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${cat.color} flex items-center justify-center`}>
-                  <Layers size={16} />
-                </div>
-                <h2 className="text-xl font-bold">{cat.name}</h2>
-                <span className="px-2.5 py-0.5 rounded-full bg-white/[0.09] text-[10px] font-medium text-white/60">
-                  {cat.generators.length}
-                </span>
-              </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {cat.generators.map((gen) => (
-                  <GeneratorCard key={gen.name} gen={{ ...gen, category: cat.name, color: cat.color }} />
-                ))}
-              </div>
-            </div>
-          ))
-        )}
-      </section>
-
-      {/* CTA */}
-      <section className="border-t border-white/[0.10] bg-white/[0.07]">
-        <div className="max-w-4xl mx-auto px-6 py-20 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to build?</h2>
-          <p className="text-white/60 mb-8">
-            All {totalGenerators} generators are available in the builder. Start with a prompt or pick a generator.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/builder"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-500 text-white font-semibold hover:bg-brand-600 transition-colors"
+              className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
             >
-              Open Builder
-              <ArrowRight size={16} />
+              Open the builder
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
               href="/developers"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/[0.09] text-white/80 font-medium hover:bg-white/[0.1] transition-colors"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
             >
-              API Docs
-              <Code2 size={16} />
+              <Code2 className="w-4 h-4" />
+              API docs
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats strip */}
+      <section className="relative py-16 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { value: String(totalGenerators), label: "Specialised generators" },
+              { value: String(GENERATOR_CATEGORIES.length), label: "Categories" },
+              { value: "10", label: "Agents in the pipeline" },
+              { value: "~60s", label: "Average build time" },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] mb-2" style={{ color: "#E8D4B0" }}>
+                  {stat.value}
+                </div>
+                <div className="text-[13px] text-white/55">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pipeline */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              <Workflow className="w-3 h-3" />
+              Multi-agent pipeline
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Specialised agents, in{" "}
+              <span style={SERIF}>orchestration.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Pick the pipeline tier that matches your quality bar. Every tier runs the same 10-agent core — deeper tiers simply think harder.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {PIPELINE_TIERS.map((tier) => (
+              <div
+                key={tier.name}
+                className={`relative overflow-hidden rounded-[24px] p-7 transition-all duration-500 hover:-translate-y-1 ${
+                  tier.tag ? "border-2 border-[#E8D4B0]/35" : "border border-white/[0.08] hover:border-[#E8D4B0]/25"
+                }`}
+                style={{
+                  background: tier.tag
+                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(17,17,24,0.85) 100%)"
+                    : CARD_BG,
+                }}
+              >
+                {tier.tag && (
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a1628" }}
+                  >
+                    {tier.tag}
+                  </div>
+                )}
+                <div className="flex items-center gap-3 mb-4">
+                  <h3 className="text-[18px] font-semibold tracking-[-0.01em]">{tier.name}</h3>
+                  <span className="rounded-full border border-white/[0.10] bg-white/[0.03] px-2.5 py-0.5 text-[10px] font-medium text-white/60">
+                    {tier.agents} agents
+                  </span>
+                </div>
+                <p className="text-[13px] text-white/55 leading-relaxed mb-6">{tier.description}</p>
+                <div className="flex items-center gap-2 text-[12px]" style={{ color: "#E8D4B0" }}>
+                  <Zap className="w-3.5 h-3.5" />
+                  <span className="font-semibold">{tier.speed}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Generators — filtered view or category stack */}
+      {isFiltering ? (
+        <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="text-center mb-14">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+                {selectedCategory || "Search results"}
+              </div>
+              <h2 className="fs-display-lg mb-4">
+                {filteredGenerators.length} matching{" "}
+                <span style={SERIF}>generators.</span>
+              </h2>
+            </div>
+
+            {filteredGenerators.length === 0 ? (
+              <div
+                className="mx-auto max-w-lg rounded-[24px] border border-white/[0.08] p-10 text-center"
+                style={{ background: CARD_BG }}
+              >
+                <Search className="w-8 h-8 mx-auto mb-4 text-[#E8D4B0]/60" />
+                <p className="text-[14px] text-white/60">
+                  No generators match your search. Try a different keyword or clear the filter.
+                </p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {filteredGenerators.map((gen) => (
+                  <GeneratorCard key={gen.name} gen={gen} />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      ) : (
+        GENERATOR_CATEGORIES.map((cat, idx) => (
+          <section key={cat.name} className="relative py-20 md:py-24 border-t border-white/[0.06]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+              <div className="text-center mb-14">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+                  {String(idx + 1).padStart(2, "0")} · {cat.generators.length} generators
+                </div>
+                <h2 className="fs-display-lg mb-4">
+                  {cat.name.split(" ").slice(0, -1).join(" ")}{" "}
+                  <span style={SERIF}>
+                    {cat.name.split(" ").slice(-1).join(" ")}.
+                  </span>
+                </h2>
+                <p className="max-w-2xl mx-auto text-[15px] text-white/55">{cat.tagline}</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {cat.generators.map((gen) => (
+                  <GeneratorCard key={gen.name} gen={gen} />
+                ))}
+              </div>
+            </div>
+          </section>
+        ))
+      )}
+
+      {/* Final CTA */}
+      <section className="relative py-24 md:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div
+            className="absolute left-1/2 top-1/2 h-[560px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.11), transparent 70%)" }}
+          />
+        </div>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+            <BadgeCheck className="w-3 h-3" />
+            All {totalGenerators} generators live in the builder
+          </div>
+          <h2 className="fs-display-lg mb-5">
+            Ready to{" "}
+            <span style={SERIF}>build?</span>
+          </h2>
+          <p className="text-[17px] text-white/60 mb-10">
+            Start with a prompt or pick a generator. Production-quality output in seconds.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/builder"
+              className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
+            >
+              Open the builder
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              href="/developers"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-8 py-4 text-[15px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+            >
+              <Code2 className="w-4 h-4" />
+              API docs
             </Link>
           </div>
         </div>
@@ -356,37 +482,41 @@ export default function GeneratorsPage() {
   );
 }
 
-function GeneratorCard({ gen }: { gen: { name: string; description: string; endpoint: string; icon: React.ElementType; tag?: string; category: string; color: string } }) {
+function GeneratorCard({ gen }: { gen: GeneratorItem }) {
   const Icon = gen.icon;
   const generatorId = endpointToGeneratorId(gen.endpoint);
   return (
     <Link
       href={`/generators/${generatorId}`}
-      className="group relative rounded-xl border border-white/[0.10] bg-white/[0.08] p-5 hover:border-brand-500/30 hover:bg-brand-500/[0.03] transition-all duration-200"
+      className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+      style={{ background: CARD_BG }}
     >
+      <div
+        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }}
+      />
       {gen.tag && (
-        <span className={`absolute top-3 right-3 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-          gen.tag === "Popular"
-            ? "bg-amber-500/20 text-amber-400"
-            : gen.tag === "Agent"
-              ? "bg-emerald-500/20 text-emerald-400"
-              : "bg-brand-500/20 text-brand-400"
-        }`}>
+        <span
+          className="absolute top-5 right-5 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+          style={{ color: "#E8D4B0" }}
+        >
           {gen.tag}
         </span>
       )}
-      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${gen.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-        <Icon size={18} className="text-white" />
-      </div>
-      <h3 className="font-semibold text-sm mb-2 text-white/90 group-hover:text-white transition-colors">
-        {gen.name}
-      </h3>
-      <p className="text-xs text-white/65 leading-relaxed line-clamp-3">
-        {gen.description}
-      </p>
-      <div className="mt-3 flex items-center gap-1 text-[10px] text-brand-400/60 group-hover:text-brand-400 transition-colors">
-        <span>Configure & Generate</span>
-        <ArrowRight size={10} />
+      <div className="relative">
+        <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+          <Icon className="h-5 w-5 text-[#E8D4B0]" />
+        </div>
+        <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2 text-white">
+          {gen.name}
+        </h3>
+        <p className="text-[13px] text-white/55 leading-relaxed mb-5">
+          {gen.description}
+        </p>
+        <div className="flex items-center gap-1.5 text-[12px] font-semibold transition-all" style={{ color: "#E8D4B0" }}>
+          <span>Generate</span>
+          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+        </div>
       </div>
     </Link>
   );

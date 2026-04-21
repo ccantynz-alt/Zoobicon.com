@@ -4,8 +4,20 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Mail, Plus, Search, Edit, Trash2, Power, ArrowRight, Shield,
-  HardDrive, User, X, Loader2, Check, AlertTriangle,
+  Mail,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Power,
+  ArrowRight,
+  Shield,
+  HardDrive,
+  User,
+  X,
+  Loader2,
+  Check,
+  AlertTriangle,
 } from "lucide-react";
 import BackgroundEffects from "@/components/BackgroundEffects";
 
@@ -43,9 +55,9 @@ const DEMO_MAILBOXES: Mailbox[] = [
 const DOMAINS = ["zoobicon.com", "zoobicon.ai"] as const;
 
 const STATUS_STYLES: Record<Mailbox["status"], { bg: string; text: string; label: string }> = {
-  active: { bg: "bg-emerald-500/30", text: "text-emerald-300", label: "Active" },
-  suspended: { bg: "bg-red-500/30", text: "text-red-300", label: "Suspended" },
-  pending: { bg: "bg-amber-500/30", text: "text-amber-300", label: "Pending" },
+  active: { bg: "bg-stone-500/30", text: "text-stone-300", label: "Active" },
+  suspended: { bg: "bg-stone-500/30", text: "text-stone-300", label: "Suspended" },
+  pending: { bg: "bg-stone-500/30", text: "text-stone-300", label: "Pending" },
 };
 
 // ---------------------------------------------------------------------------
@@ -235,11 +247,11 @@ export default function AdminMailboxesPage() {
 
   // ---- Render ----
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#0f2148] text-white">
       <BackgroundEffects preset="admin" />
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl">
+      <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-lg font-bold tracking-tight">Zoobicon</Link>
@@ -252,7 +264,7 @@ export default function AdminMailboxesPage() {
             {user ? (
               <>
                 <Link href="/dashboard" className="text-sm text-white/60 hover:text-white transition-colors">Dashboard</Link>
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-600 text-xs font-bold">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-600 text-xs font-bold">
                   {(user.name?.[0] ?? user.email?.[0] ?? "U").toUpperCase()}
                 </div>
               </>
@@ -268,7 +280,7 @@ export default function AdminMailboxesPage() {
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-              <Mail className="h-6 w-6 text-violet-400" />
+              <Mail className="h-6 w-6 text-stone-400" />
               Staff Mailboxes
             </h1>
             <p className="mt-1 text-sm text-white/60">
@@ -277,7 +289,7 @@ export default function AdminMailboxesPage() {
           </div>
           <button
             onClick={() => setCreateOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-stone-600 px-4 py-2 text-sm font-medium text-white hover:bg-stone-500 transition-colors"
           >
             <Plus className="h-4 w-4" />
             Create Mailbox
@@ -293,7 +305,7 @@ export default function AdminMailboxesPage() {
                 onClick={() => setDomainFilter(tab.value)}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   domainFilter === tab.value
-                    ? "bg-violet-600 text-white"
+                    ? "bg-stone-600 text-white"
                     : "text-white/80 hover:text-white hover:bg-white/10"
                 }`}
               >
@@ -309,7 +321,7 @@ export default function AdminMailboxesPage() {
               placeholder="Search by address or name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-[#111318] py-2 pl-9 pr-3 text-sm text-white placeholder-white/50 outline-none focus:border-violet-500 transition-colors"
+              className="w-full rounded-lg border border-white/10 bg-[#111318] py-2 pl-9 pr-3 text-sm text-white placeholder-white/50 outline-none focus:border-stone-500 transition-colors"
             />
           </div>
         </div>
@@ -317,7 +329,7 @@ export default function AdminMailboxesPage() {
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-6 w-6 animate-spin text-violet-400" />
+            <Loader2 className="h-6 w-6 animate-spin text-stone-400" />
           </div>
         )}
 
@@ -344,7 +356,7 @@ export default function AdminMailboxesPage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="rounded-xl border border-white/10 bg-[#111318] p-5 flex flex-col gap-3 hover:border-violet-500/50 transition-colors"
+                    className="rounded-xl border border-white/10 bg-[#111318] p-5 flex flex-col gap-3 hover:border-stone-500/50 transition-colors"
                   >
                     {/* Top row: address + status */}
                     <div className="flex items-start justify-between gap-2">
@@ -369,7 +381,7 @@ export default function AdminMailboxesPage() {
                       <div className="h-1.5 w-full rounded-full bg-white/10">
                         <div
                           className={`h-1.5 rounded-full transition-all ${
-                            pct > 90 ? "bg-red-500" : pct > 70 ? "bg-amber-500" : "bg-violet-500"
+                            pct > 90 ? "bg-stone-500" : pct > 70 ? "bg-stone-500" : "bg-stone-500"
                           }`}
                           style={{ width: `${pct}%` }}
                         />
@@ -380,13 +392,13 @@ export default function AdminMailboxesPage() {
                     <div className="space-y-1 text-[11px] text-white/60">
                       {m.forwardTo && (
                         <p className="flex items-center gap-1 truncate">
-                          <ArrowRight className="h-3 w-3 text-blue-300" />
-                          <span className="text-white/80">Forwards to</span> <span className="text-blue-300">{m.forwardTo}</span>
+                          <ArrowRight className="h-3 w-3 text-stone-300" />
+                          <span className="text-white/80">Forwards to</span> <span className="text-stone-300">{m.forwardTo}</span>
                         </p>
                       )}
                       {m.autoReply && (
                         <p className="flex items-center gap-1">
-                          <Shield className="h-3 w-3 text-amber-300" />
+                          <Shield className="h-3 w-3 text-stone-300" />
                           <span className="text-white/80">Auto-reply enabled</span>
                         </p>
                       )}
@@ -405,8 +417,8 @@ export default function AdminMailboxesPage() {
                         onClick={() => toggleStatus(m)}
                         className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs transition-colors ${
                           m.status === "active"
-                            ? "text-amber-400 hover:bg-amber-500/10"
-                            : "text-emerald-400 hover:bg-emerald-500/10"
+                            ? "text-stone-400 hover:bg-stone-500/10"
+                            : "text-stone-400 hover:bg-stone-500/10"
                         }`}
                       >
                         <Power className="h-3.5 w-3.5" />
@@ -414,7 +426,7 @@ export default function AdminMailboxesPage() {
                       </button>
                       <button
                         onClick={() => setDeleteTarget(m)}
-                        className="ml-auto inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors"
+                        className="ml-auto inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs text-stone-400 hover:bg-stone-500/10 transition-colors"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -466,13 +478,13 @@ export default function AdminMailboxesPage() {
                       placeholder="sarah"
                       value={createForm.localPart}
                       onChange={(e) => setCreateForm((f) => ({ ...f, localPart: e.target.value.replace(/[^a-z0-9._-]/gi, "").toLowerCase() }))}
-                      className="flex-1 rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-violet-600"
+                      className="flex-1 rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-stone-600"
                     />
                     <span className="flex items-center text-sm text-white/50">@</span>
                     <select
                       value={createForm.domain}
                       onChange={(e) => setCreateForm((f) => ({ ...f, domain: e.target.value }))}
-                      className="rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white outline-none focus:border-violet-600"
+                      className="rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white outline-none focus:border-stone-600"
                     >
                       {DOMAINS.map((d) => (
                         <option key={d} value={d}>{d}</option>
@@ -489,7 +501,7 @@ export default function AdminMailboxesPage() {
                     placeholder="Sarah Chen"
                     value={createForm.displayName}
                     onChange={(e) => setCreateForm((f) => ({ ...f, displayName: e.target.value }))}
-                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-violet-600"
+                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-stone-600"
                   />
                 </div>
 
@@ -501,7 +513,7 @@ export default function AdminMailboxesPage() {
                     placeholder="personal@gmail.com"
                     value={createForm.forwardTo}
                     onChange={(e) => setCreateForm((f) => ({ ...f, forwardTo: e.target.value }))}
-                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-violet-600"
+                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-stone-600"
                   />
                 </div>
               </div>
@@ -516,7 +528,7 @@ export default function AdminMailboxesPage() {
                 <button
                   onClick={handleCreate}
                   disabled={creating || !createForm.localPart.trim()}
-                  className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg bg-stone-600 px-4 py-2 text-sm font-medium text-white hover:bg-stone-500 disabled:opacity-50 transition-colors"
                 >
                   {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                   Create
@@ -566,7 +578,7 @@ export default function AdminMailboxesPage() {
                     type="text"
                     value={editForm.displayName}
                     onChange={(e) => setEditForm((f) => ({ ...f, displayName: e.target.value }))}
-                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white outline-none focus:border-violet-600"
+                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white outline-none focus:border-stone-600"
                   />
                 </div>
 
@@ -577,7 +589,7 @@ export default function AdminMailboxesPage() {
                     placeholder="team@company.com"
                     value={editForm.forwardTo}
                     onChange={(e) => setEditForm((f) => ({ ...f, forwardTo: e.target.value }))}
-                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-violet-600"
+                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-stone-600"
                   />
                 </div>
 
@@ -588,7 +600,7 @@ export default function AdminMailboxesPage() {
                     placeholder="Optional auto-reply to incoming emails..."
                     value={editForm.autoReply}
                     onChange={(e) => setEditForm((f) => ({ ...f, autoReply: e.target.value }))}
-                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-violet-600 resize-none"
+                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white placeholder-white/50 outline-none focus:border-stone-600 resize-none"
                   />
                 </div>
 
@@ -597,7 +609,7 @@ export default function AdminMailboxesPage() {
                   <select
                     value={editForm.status}
                     onChange={(e) => setEditForm((f) => ({ ...f, status: e.target.value as Mailbox["status"] }))}
-                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white outline-none focus:border-violet-600"
+                    className="w-full rounded-lg border border-white/10 bg-[#0e1015] px-3 py-2 text-sm text-white outline-none focus:border-stone-600"
                   >
                     <option value="active">Active</option>
                     <option value="suspended">Suspended</option>
@@ -616,7 +628,7 @@ export default function AdminMailboxesPage() {
                 <button
                   onClick={handleEdit}
                   disabled={saving}
-                  className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500 disabled:opacity-50 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg bg-stone-600 px-4 py-2 text-sm font-medium text-white hover:bg-stone-500 disabled:opacity-50 transition-colors"
                 >
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                   Save Changes
@@ -650,8 +662,8 @@ export default function AdminMailboxesPage() {
               className="w-full max-w-sm rounded-xl border border-white/10 bg-[#111318] p-6"
             >
               <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/20">
-                  <AlertTriangle className="h-5 w-5 text-red-400" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-stone-500/20">
+                  <AlertTriangle className="h-5 w-5 text-stone-400" />
                 </div>
                 <div>
                   <h2 className="text-base font-semibold">Delete Mailbox</h2>
@@ -675,7 +687,7 @@ export default function AdminMailboxesPage() {
                 <button
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg bg-stone-600 px-4 py-2 text-sm font-medium text-white hover:bg-stone-500 disabled:opacity-50 transition-colors"
                 >
                   {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                   Delete

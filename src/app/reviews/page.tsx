@@ -3,10 +3,28 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Star, MessageSquare, TrendingUp, Send, Sparkles, Globe,
-  ArrowRight, ThumbsUp, ThumbsDown, Copy, Check, Filter,
-  BarChart3, RefreshCw, Bell, ExternalLink, Zap, Clock,
-  Users, ChevronDown, Code, Shield
+  Star,
+  MessageSquare,
+  TrendingUp,
+  Send,
+  Sparkles,
+  Globe,
+  ArrowRight,
+  ThumbsUp,
+  ThumbsDown,
+  Copy,
+  Check,
+  Filter,
+  BarChart3,
+  RefreshCw,
+  Bell,
+  ExternalLink,
+  Zap,
+  Clock,
+  Users,
+  ChevronDown,
+  Code,
+  Shield,
 } from 'lucide-react';
 
 interface Review {
@@ -21,10 +39,10 @@ interface Review {
 }
 
 const PLATFORMS = {
-  google: { name: 'Google', color: 'text-blue-400', bg: 'bg-blue-500/20' },
-  yelp: { name: 'Yelp', color: 'text-red-400', bg: 'bg-red-500/20' },
-  g2: { name: 'G2', color: 'text-orange-400', bg: 'bg-orange-500/20' },
-  trustpilot: { name: 'TrustPilot', color: 'text-green-400', bg: 'bg-green-500/20' },
+  google: { name: 'Google', color: 'text-stone-400', bg: 'bg-stone-500/20' },
+  yelp: { name: 'Yelp', color: 'text-stone-400', bg: 'bg-stone-500/20' },
+  g2: { name: 'G2', color: 'text-stone-400', bg: 'bg-stone-500/20' },
+  trustpilot: { name: 'TrustPilot', color: 'text-stone-400', bg: 'bg-stone-500/20' },
 };
 
 const DEMO_REVIEWS: Review[] = [
@@ -57,7 +75,7 @@ function Stars({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'lg' }) 
   return (
     <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map(i => (
-        <Star key={i} className={`${size === 'lg' ? 'w-5 h-5' : 'w-3.5 h-3.5'} ${i <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} />
+        <Star key={i} className={`${size === 'lg' ? 'w-5 h-5' : 'w-3.5 h-3.5'} ${i <= rating ? 'text-stone-400 fill-stone-400' : 'text-gray-600'}`} />
       ))}
     </div>
   );
@@ -94,13 +112,13 @@ export default function ReviewsPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="text-white/70 font-medium">Review Manager</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/builder" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Builder</Link>
-            <Link href="/pricing" className="px-4 py-2 text-sm bg-gradient-to-r from-yellow-600 to-orange-600 rounded-lg font-medium hover:opacity-90 transition-opacity">Get Started</Link>
+            <Link href="/pricing" className="px-4 py-2 text-sm bg-gradient-to-r from-stone-600 to-stone-600 rounded-lg font-medium hover:opacity-90 transition-opacity">Get Started</Link>
           </div>
         </div>
       </header>
@@ -108,11 +126,11 @@ export default function ReviewsPage() {
       <main className="max-w-7xl mx-auto px-6 py-12">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm mb-6">
-            <Star className="w-4 h-4 fill-yellow-400" /> Review Management
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm mb-6">
+            <Star className="w-4 h-4 fill-stone-400" /> Review Management
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Every Review, <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">One Dashboard</span>
+            Every Review, <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">One Dashboard</span>
           </h1>
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             Aggregate reviews from Google, Yelp, G2, and TrustPilot. AI generates perfect responses in seconds. Turn feedback into growth.
@@ -122,7 +140,7 @@ export default function ReviewsPage() {
         {/* Overview Stats */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           <div className="p-4 rounded-xl border border-white/10 bg-white/5 text-center">
-            <div className="text-3xl font-bold text-yellow-400">{avgRating}</div>
+            <div className="text-3xl font-bold text-stone-400">{avgRating}</div>
             <Stars rating={Math.round(Number(avgRating))} size="lg" />
             <div className="text-xs text-gray-400 mt-1">Average Rating</div>
           </div>
@@ -131,7 +149,7 @@ export default function ReviewsPage() {
             <div className="text-xs text-gray-400">Total Reviews</div>
           </div>
           <div className="p-4 rounded-xl border border-white/10 bg-white/5">
-            <div className="text-2xl font-bold text-green-400">+12</div>
+            <div className="text-2xl font-bold text-stone-400">+12</div>
             <div className="text-xs text-gray-400">This Week</div>
           </div>
           <div className="p-4 rounded-xl border border-white/10 bg-white/5">
@@ -139,7 +157,7 @@ export default function ReviewsPage() {
             <div className="text-xs text-gray-400">Response Rate</div>
           </div>
           <div className="p-4 rounded-xl border border-white/10 bg-white/5">
-            <div className="text-2xl font-bold text-blue-400">4</div>
+            <div className="text-2xl font-bold text-stone-400">4</div>
             <div className="text-xs text-gray-400">Platforms</div>
           </div>
         </div>
@@ -153,7 +171,7 @@ export default function ReviewsPage() {
             { id: 'widget' as const, label: 'Embed Widget', icon: Code },
           ].map(t => (
             <button key={t.id} onClick={() => setActiveTab(t.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTab === t.id ? 'bg-yellow-500/20 text-yellow-400' : 'text-gray-400 hover:text-white'}`}>
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTab === t.id ? 'bg-stone-500/20 text-stone-400' : 'text-gray-400 hover:text-white'}`}>
               <t.icon className="w-4 h-4" /> {t.label}
             </button>
           ))}
@@ -166,7 +184,7 @@ export default function ReviewsPage() {
               <span className="text-sm text-gray-400">Filter:</span>
               {['all', 'google', 'yelp', 'g2', 'trustpilot'].map(p => (
                 <button key={p} onClick={() => setPlatformFilter(p)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${platformFilter === p ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-white/5 text-gray-400 border border-white/10 hover:text-white'}`}>
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${platformFilter === p ? 'bg-stone-500/20 text-stone-400 border border-stone-500/30' : 'bg-white/5 text-gray-400 border border-white/10 hover:text-white'}`}>
                   {p === 'all' ? 'All' : PLATFORMS[p as keyof typeof PLATFORMS].name}
                 </button>
               ))}
@@ -185,28 +203,28 @@ export default function ReviewsPage() {
                         <span className="font-medium text-sm">{review.author}</span>
                         <span className={`px-2 py-0.5 rounded text-xs ${platform.bg} ${platform.color}`}>{platform.name}</span>
                         <span className="text-xs text-gray-500">{review.date}</span>
-                        {review.replied && <span className="px-2 py-0.5 rounded bg-green-500/20 text-green-400 text-xs">Replied</span>}
+                        {review.replied && <span className="px-2 py-0.5 rounded bg-stone-500/20 text-stone-400 text-xs">Replied</span>}
                       </div>
                       <Stars rating={review.rating} />
                       <p className="text-sm text-gray-300 mt-2">{review.text}</p>
 
                       {/* AI Response */}
                       {aiResponses[review.id] ? (
-                        <div className="mt-3 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                        <div className="mt-3 p-3 rounded-lg bg-stone-500/10 border border-stone-500/20">
                           <div className="flex items-center gap-2 mb-1">
-                            <Sparkles className="w-3 h-3 text-blue-400" />
-                            <span className="text-xs text-blue-400 font-medium">AI-Generated Response</span>
+                            <Sparkles className="w-3 h-3 text-stone-400" />
+                            <span className="text-xs text-stone-400 font-medium">AI-Generated Response</span>
                           </div>
                           <p className="text-sm text-gray-300">{aiResponses[review.id]}</p>
                           <div className="flex gap-2 mt-2">
-                            <button className="px-3 py-1 rounded bg-blue-600 text-xs font-medium hover:bg-blue-500 transition-colors flex items-center gap-1"><Send className="w-3 h-3" /> Send</button>
-                            <button className="px-3 py-1 rounded bg-white/10 text-xs hover:bg-white/20 transition-colors">Edit</button>
+                            <button onClick={() => {}} className="px-3 py-1 rounded bg-stone-600 text-xs font-medium hover:bg-stone-500 transition-colors flex items-center gap-1"><Send className="w-3 h-3" /> Send</button>
+                            <button onClick={() => {}} className="px-3 py-1 rounded bg-white/10 text-xs hover:bg-white/20 transition-colors">Edit</button>
                           </div>
                         </div>
                       ) : !review.replied && (
                         <button onClick={() => handleGenerateResponse(review.id)} disabled={generatingResponse === review.id}
                           className="mt-2 px-3 py-1.5 rounded-lg bg-white/10 text-xs font-medium hover:bg-white/20 transition-colors flex items-center gap-1 disabled:opacity-50">
-                          {generatingResponse === review.id ? <><RefreshCw className="w-3 h-3 animate-spin" /> Generating...</> : <><Sparkles className="w-3 h-3 text-yellow-400" /> Generate AI Response</>}
+                          {generatingResponse === review.id ? <><RefreshCw className="w-3 h-3 animate-spin" /> Generating...</> : <><Sparkles className="w-3 h-3 text-stone-400" /> Generate AI Response</>}
                         </button>
                       )}
                     </div>
@@ -227,10 +245,10 @@ export default function ReviewsPage() {
                   <div key={d.stars} className="flex items-center gap-3 mb-2">
                     <div className="flex items-center gap-1 w-12">
                       <span className="text-sm">{d.stars}</span>
-                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                      <Star className="w-3 h-3 text-stone-400 fill-stone-400" />
                     </div>
                     <div className="flex-1 h-4 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${d.pct}%` }} />
+                      <div className="h-full bg-stone-400 rounded-full" style={{ width: `${d.pct}%` }} />
                     </div>
                     <span className="text-sm text-gray-400 w-12 text-right">{d.count}</span>
                   </div>
@@ -241,8 +259,8 @@ export default function ReviewsPage() {
                 <div className="flex items-end gap-2 h-32">
                   {[4.1, 4.0, 4.2, 4.3, 4.2, 4.4].map((v, i) => (
                     <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                      <span className="text-xs text-yellow-400 font-medium">{v}</span>
-                      <div className="w-full bg-gradient-to-t from-yellow-600 to-yellow-400 rounded-t" style={{ height: `${((v - 3.5) / 1.5) * 100}%` }} />
+                      <span className="text-xs text-stone-400 font-medium">{v}</span>
+                      <div className="w-full bg-gradient-to-t from-stone-600 to-stone-400 rounded-t" style={{ height: `${((v - 3.5) / 1.5) * 100}%` }} />
                       <span className="text-xs text-gray-500">{['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'][i]}</span>
                     </div>
                   ))}
@@ -253,9 +271,9 @@ export default function ReviewsPage() {
               <h3 className="font-semibold mb-4">Sentiment Analysis</h3>
               <div className="grid grid-cols-3 gap-4">
                 {[
-                  { label: 'Positive', pct: 74, color: 'bg-green-500', textColor: 'text-green-400' },
-                  { label: 'Neutral', pct: 18, color: 'bg-yellow-500', textColor: 'text-yellow-400' },
-                  { label: 'Negative', pct: 8, color: 'bg-red-500', textColor: 'text-red-400' },
+                  { label: 'Positive', pct: 74, color: 'bg-stone-500', textColor: 'text-stone-400' },
+                  { label: 'Neutral', pct: 18, color: 'bg-stone-500', textColor: 'text-stone-400' },
+                  { label: 'Negative', pct: 8, color: 'bg-stone-500', textColor: 'text-stone-400' },
                 ].map(s => (
                   <div key={s.label} className="text-center">
                     <div className={`text-3xl font-bold ${s.textColor}`}>{s.pct}%</div>
@@ -284,7 +302,7 @@ export default function ReviewsPage() {
                   <p className="text-sm text-gray-300">Hi there! Thank you for choosing Zoobicon. We&apos;d love to hear about your experience. Could you take a moment to share your feedback? Your review helps us improve and helps others discover us. [Review Link]</p>
                 </div>
                 <button onClick={() => { setRequestSent(true); setTimeout(() => setRequestSent(false), 3000); }}
-                  className="w-full py-2.5 rounded-lg bg-gradient-to-r from-yellow-600 to-orange-600 font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                  className="w-full py-2.5 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 font-medium text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
                   {requestSent ? <><Check className="w-4 h-4" /> Sent!</> : <><Send className="w-4 h-4" /> Send Review Request</>}
                 </button>
               </div>
@@ -296,18 +314,18 @@ export default function ReviewsPage() {
         {activeTab === 'widget' && (
           <div className="max-w-2xl space-y-6">
             <div className="p-6 rounded-xl border border-white/10 bg-white/5 space-y-4">
-              <h3 className="font-semibold flex items-center gap-2"><Code className="w-5 h-5 text-yellow-400" /> Embed Review Widget</h3>
+              <h3 className="font-semibold flex items-center gap-2"><Code className="w-5 h-5 text-stone-400" /> Embed Review Widget</h3>
               <p className="text-sm text-gray-400">Display your best reviews on any website with a single embed code.</p>
               <div className="relative">
-                <pre className="p-4 rounded-lg bg-black/50 border border-white/10 text-sm text-green-400 overflow-x-auto">{widgetCode}</pre>
+                <pre className="p-4 rounded-lg bg-black/50 border border-white/10 text-sm text-stone-400 overflow-x-auto">{widgetCode}</pre>
                 <button onClick={() => { navigator.clipboard.writeText(widgetCode); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
                   className="absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
-                  {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-400" />}
+                  {copied ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4 text-gray-400" />}
                 </button>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 {['Carousel', 'Grid', 'List'].map(layout => (
-                  <button key={layout} className="p-3 rounded-lg border border-white/10 bg-white/5 text-sm text-center hover:border-yellow-500/30 transition-colors">{layout}</button>
+                  <button onClick={() => {}} key={layout} className="p-3 rounded-lg border border-white/10 bg-white/5 text-sm text-center hover:border-stone-500/30 transition-colors">{layout}</button>
                 ))}
               </div>
             </div>
@@ -315,10 +333,10 @@ export default function ReviewsPage() {
         )}
 
         {/* CTA */}
-        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-yellow-600/20 to-orange-600/20 border border-yellow-500/20">
+        <div className="mt-20 text-center p-12 rounded-2xl bg-gradient-to-br from-stone-600/20 to-stone-600/20 border border-stone-500/20">
           <h2 className="text-3xl font-bold mb-4">Turn Reviews Into Revenue</h2>
           <p className="text-gray-400 mb-6 max-w-xl mx-auto">Respond to every review with AI, request 5-star reviews automatically, and showcase social proof on your site.</p>
-          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-yellow-600 to-orange-600 font-semibold hover:opacity-90 transition-opacity">
+          <Link href="/auth/signup" className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold hover:opacity-90 transition-opacity">
             Start Managing Reviews <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

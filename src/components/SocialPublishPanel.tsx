@@ -237,7 +237,7 @@ export default function SocialPublishPanel({
               Publish to Social Media
             </div>
             <div className="text-[11px] text-white/50">
-              Auto-post to TikTok, YouTube Shorts & Instagram Reels
+              Auto-post to TikTok, YouTube Shorts & Camera Reels
             </div>
           </div>
         </div>
@@ -258,9 +258,9 @@ export default function SocialPublishPanel({
           >
             <div className="px-4 pb-4 space-y-4">
               {!hasContent && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                  <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <p className="text-xs text-amber-300">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-stone-500/10 border border-stone-500/20">
+                  <AlertCircle className="w-4 h-4 text-stone-400 flex-shrink-0" />
+                  <p className="text-xs text-stone-300">
                     Generate a video, images, or voiceover first to enable publishing.
                   </p>
                 </div>
@@ -305,12 +305,12 @@ export default function SocialPublishPanel({
 
                       {isConnected ? (
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-green-400 flex items-center gap-1">
+                          <span className="text-[10px] text-stone-400 flex items-center gap-1">
                             <Check className="w-3 h-3" />@{conn.username}
                           </span>
                           <button
                             onClick={() => handleDisconnect(platform.id)}
-                            className="text-[9px] text-white/30 hover:text-red-400 transition-colors"
+                            className="text-[9px] text-white/30 hover:text-stone-400 transition-colors"
                           >
                             Disconnect
                           </button>
@@ -339,7 +339,7 @@ export default function SocialPublishPanel({
                           >
                             {copiedCaption === platform.id ? (
                               <>
-                                <Check className="w-3 h-3 text-green-400" />{" "}
+                                <Check className="w-3 h-3 text-stone-400" />{" "}
                                 Copied
                               </>
                             ) : (
@@ -358,7 +358,7 @@ export default function SocialPublishPanel({
                             }))
                           }
                           rows={2}
-                          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder:text-white/30 outline-none focus:border-cyan-500/30 resize-none"
+                          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white placeholder:text-white/30 outline-none focus:border-stone-500/30 resize-none"
                           placeholder="Write your caption..."
                         />
                       </div>
@@ -379,7 +379,7 @@ export default function SocialPublishPanel({
                                 onClick={() =>
                                   handleRemoveHashtag(platform.id, i)
                                 }
-                                className="text-white/30 hover:text-red-400 transition-colors ml-0.5"
+                                className="text-white/30 hover:text-stone-400 transition-colors ml-0.5"
                               >
                                 <X className="w-2.5 h-2.5" />
                               </button>
@@ -397,7 +397,7 @@ export default function SocialPublishPanel({
                               }
                             }}
                             placeholder="Add hashtag..."
-                            className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-md px-2 py-1 text-[10px] text-white placeholder:text-white/30 outline-none focus:border-cyan-500/30"
+                            className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-md px-2 py-1 text-[10px] text-white placeholder:text-white/30 outline-none focus:border-stone-500/30"
                           />
                           <button
                             onClick={() => handleAddHashtag(platform.id)}
@@ -483,7 +483,7 @@ export default function SocialPublishPanel({
                                   min={
                                     new Date().toISOString().split("T")[0]
                                   }
-                                  className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-md px-2 py-1.5 text-[10px] text-white outline-none focus:border-cyan-500/30"
+                                  className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-md px-2 py-1.5 text-[10px] text-white outline-none focus:border-stone-500/30"
                                 />
                                 <input
                                   type="time"
@@ -491,13 +491,13 @@ export default function SocialPublishPanel({
                                   onChange={(e) =>
                                     setScheduleTime(e.target.value)
                                   }
-                                  className="w-24 bg-white/[0.04] border border-white/[0.08] rounded-md px-2 py-1.5 text-[10px] text-white outline-none focus:border-cyan-500/30"
+                                  className="w-24 bg-white/[0.04] border border-white/[0.08] rounded-md px-2 py-1.5 text-[10px] text-white outline-none focus:border-stone-500/30"
                                 />
                               </div>
                               <button
                                 onClick={() => handleSchedule(platform)}
                                 disabled={!scheduleDate}
-                                className="w-full py-1.5 rounded-md bg-cyan-600/20 text-cyan-300 text-[10px] font-medium hover:bg-cyan-600/30 transition-all disabled:opacity-30 flex items-center justify-center gap-1"
+                                className="w-full py-1.5 rounded-md bg-stone-600/20 text-stone-300 text-[10px] font-medium hover:bg-stone-600/30 transition-all disabled:opacity-30 flex items-center justify-center gap-1"
                               >
                                 <Calendar className="w-3 h-3" />
                                 Schedule Post
@@ -581,11 +581,11 @@ export default function SocialPublishPanel({
                         <span
                           className={`text-[9px] px-1.5 py-0.5 rounded-full ${
                             post.status === "posted"
-                              ? "bg-green-500/20 text-green-400"
+                              ? "bg-stone-500/20 text-stone-400"
                               : post.status === "scheduled"
-                              ? "bg-blue-500/20 text-blue-400"
+                              ? "bg-stone-500/20 text-stone-400"
                               : post.status === "failed"
-                              ? "bg-red-500/20 text-red-400"
+                              ? "bg-stone-500/20 text-stone-400"
                               : "bg-white/10 text-white/50"
                           }`}
                         >
@@ -593,7 +593,7 @@ export default function SocialPublishPanel({
                         </span>
                         <button
                           onClick={() => handleRemovePost(post.id)}
-                          className="p-1 text-white/30 hover:text-red-400 transition-colors"
+                          className="p-1 text-white/30 hover:text-stone-400 transition-colors"
                         >
                           <Trash2 className="w-3 h-3" />
                         </button>
@@ -622,7 +622,7 @@ export default function SocialPublishPanel({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-[#1a1a2e] rounded-xl border border-white/[0.10] p-5 space-y-4"
+              className="w-full max-w-sm bg-[#0f2148] rounded-xl border border-white/[0.10] p-5 space-y-4"
             >
               <div className="text-center">
                 <div className="text-lg font-bold text-white mb-1">
@@ -648,15 +648,15 @@ export default function SocialPublishPanel({
                   value={connectUsername}
                   onChange={(e) => setConnectUsername(e.target.value)}
                   placeholder="@username"
-                  className="w-full bg-white/[0.06] border border-white/[0.10] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-cyan-500/40"
+                  className="w-full bg-white/[0.06] border border-white/[0.10] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/30 outline-none focus:border-stone-500/40"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") confirmConnect();
                   }}
                 />
               </div>
 
-              <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
-                <p className="text-[10px] text-amber-300">
+              <div className="bg-stone-500/10 border border-stone-500/20 rounded-lg px-3 py-2">
+                <p className="text-[10px] text-stone-300">
                   Auto-posting requires OAuth app approval from{" "}
                   {
                     VIDEO_PLATFORMS.find(
@@ -678,7 +678,7 @@ export default function SocialPublishPanel({
                 <button
                   onClick={confirmConnect}
                   disabled={!connectUsername.trim()}
-                  className="flex-1 py-2.5 rounded-lg bg-cyan-600 text-white text-xs font-semibold hover:bg-cyan-500 transition-all disabled:opacity-30"
+                  className="flex-1 py-2.5 rounded-lg bg-stone-600 text-white text-xs font-semibold hover:bg-stone-500 transition-all disabled:opacity-30"
                 >
                   Connect
                 </button>

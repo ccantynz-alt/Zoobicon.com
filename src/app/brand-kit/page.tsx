@@ -154,7 +154,7 @@ export default function BrandKitPage() {
     <div className="min-h-screen bg-[#0a0a12] text-white">
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
-          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Zoobicon</Link>
+          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1.5"><LayoutDashboard className="w-3.5 h-3.5" /> Dashboard</Link>
             {user ? (
@@ -167,15 +167,15 @@ export default function BrandKitPage() {
       </nav>
 
       <header className="relative overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-600/10 via-violet-600/5 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-600/10 via-stone-600/5 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 py-16 relative">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-gradient-to-br from-fuchsia-500 to-violet-600"><Palette className="w-6 h-6" /></div>
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-stone-500 to-stone-600"><Palette className="w-6 h-6" /></div>
               <span className="text-sm font-medium text-white/50 uppercase tracking-wider">Identity</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
-              <span className="bg-gradient-to-r from-fuchsia-400 via-violet-400 to-indigo-400 bg-clip-text text-transparent">AI Brand Kit</span>
+              <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">AI Brand Kit</span>
             </h1>
             <p className="text-lg text-white/50 max-w-2xl">Your brand identity, everywhere — automatically. Define your colors, voice, and audience once. Every AI generation pulls from your kit.</p>
           </motion.div>
@@ -191,7 +191,7 @@ export default function BrandKitPage() {
                 type="checkbox"
                 checked={kit.appliedToAll}
                 onChange={(e) => setKit({ ...kit, appliedToAll: e.target.checked })}
-                className="rounded border-white/20 bg-white/5 text-indigo-500 focus:ring-indigo-500/50"
+                className="rounded border-white/20 bg-white/5 text-stone-500 focus:ring-stone-500/50"
               />
               Apply to All Sites
             </label>
@@ -201,10 +201,10 @@ export default function BrandKitPage() {
               <RotateCcw className="w-3.5 h-3.5" /> Reset
             </button>
             <button onClick={handleExport} className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm hover:bg-white/10 transition-colors flex items-center gap-2">
-              {exportCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {exportCopied ? <Check className="w-3.5 h-3.5 text-stone-400" /> : <Copy className="w-3.5 h-3.5" />}
               {exportCopied ? "Copied!" : "Export"}
             </button>
-            <button onClick={handleSave} className="px-5 py-2 bg-gradient-to-r from-fuchsia-500 to-violet-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
+            <button onClick={handleSave} className="px-5 py-2 bg-gradient-to-r from-stone-500 to-stone-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
               {saved ? <Check className="w-4 h-4" /> : <Save className="w-4 h-4" />}
               {saved ? "Saved!" : "Save Kit"}
             </button>
@@ -227,7 +227,7 @@ export default function BrandKitPage() {
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold">Brand Colors</h3>
                 {kit.audience.industry && (
-                  <button onClick={handleSuggestColors} className="text-sm text-fuchsia-400 hover:text-fuchsia-300 flex items-center gap-1">
+                  <button onClick={handleSuggestColors} className="text-sm text-stone-400 hover:text-stone-300 flex items-center gap-1">
                     <Sparkles className="w-4 h-4" /> Suggest for {kit.audience.industry}
                   </button>
                 )}
@@ -247,7 +247,7 @@ export default function BrandKitPage() {
                         type="text"
                         value={kit.colors[f.key]}
                         onChange={(e) => updateColor(f.key, e.target.value)}
-                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                       />
                     </div>
                   </div>
@@ -274,9 +274,9 @@ export default function BrandKitPage() {
                   <select
                     value={kit.typography.headingFont}
                     onChange={(e) => setKit({ ...kit, typography: { ...kit.typography, headingFont: e.target.value } })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   >
-                    {FONT_OPTIONS.map((f) => <option key={f} value={f} className="bg-[#1a1a2e]">{f}</option>)}
+                    {FONT_OPTIONS.map((f) => <option key={f} value={f} className="bg-[#0f2148]">{f}</option>)}
                   </select>
                 </div>
                 <div>
@@ -284,9 +284,9 @@ export default function BrandKitPage() {
                   <select
                     value={kit.typography.bodyFont}
                     onChange={(e) => setKit({ ...kit, typography: { ...kit.typography, bodyFont: e.target.value } })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   >
-                    {FONT_OPTIONS.map((f) => <option key={f} value={f} className="bg-[#1a1a2e]">{f}</option>)}
+                    {FONT_OPTIONS.map((f) => <option key={f} value={f} className="bg-[#0f2148]">{f}</option>)}
                   </select>
                 </div>
               </div>
@@ -298,7 +298,7 @@ export default function BrandKitPage() {
                       key={s.value}
                       onClick={() => setKit({ ...kit, typography: { ...kit.typography, scale: s.value } })}
                       className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                        kit.typography.scale === s.value ? "bg-fuchsia-500/20 text-fuchsia-400 border border-fuchsia-500/30" : "bg-white/5 text-white/50 border border-white/10 hover:text-white/70"
+                        kit.typography.scale === s.value ? "bg-stone-500/20 text-stone-400 border border-stone-500/30" : "bg-white/5 text-white/50 border border-white/10 hover:text-white/70"
                       }`}
                     >
                       {s.label}
@@ -307,7 +307,7 @@ export default function BrandKitPage() {
                 </div>
               </div>
               {/* Preview */}
-              <div className="mt-6 bg-[#1a1a2e] border border-white/10 rounded-xl p-6" style={{ fontFamily: kit.typography.bodyFont }}>
+              <div className="mt-6 bg-[#0f2148] border border-white/10 rounded-xl p-6" style={{ fontFamily: kit.typography.bodyFont }}>
                 <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: kit.typography.headingFont }}>Heading Preview</h2>
                 <h3 className="text-lg font-semibold mb-2 text-white/70" style={{ fontFamily: kit.typography.headingFont }}>Subheading Preview</h3>
                 <p className="text-sm text-white/50">This is body text using {kit.typography.bodyFont}. It demonstrates how your content will look with the selected typography settings.</p>
@@ -323,7 +323,7 @@ export default function BrandKitPage() {
                   value={kit.logo?.text || ""}
                   onChange={(e) => setKit({ ...kit, logo: { ...kit.logo, text: e.target.value } })}
                   placeholder="My Brand"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                 />
               </div>
               <div className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center">
@@ -355,7 +355,7 @@ export default function BrandKitPage() {
                         max="100"
                         value={kit.voice[s.key]}
                         onChange={(e) => updateVoice(s.key, Number(e.target.value))}
-                        className="flex-1 h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-fuchsia-500"
+                        className="flex-1 h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-stone-500"
                       />
                       <span className="text-xs text-white/40 w-24 text-right">{s.high}</span>
                     </div>
@@ -368,7 +368,7 @@ export default function BrandKitPage() {
                   value={kit.voice.keywords.join(", ")}
                   onChange={(e) => updateVoice("keywords", e.target.value.split(",").map((k) => k.trim()).filter(Boolean) as unknown as string[])}
                   placeholder="e.g. innovative, fast, reliable, premium"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                 />
               </div>
             </motion.div>
@@ -377,11 +377,11 @@ export default function BrandKitPage() {
             <motion.div variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-semibold">Voice Sample</h3>
-                <button onClick={() => setVoiceSample(generateVoiceSample(kit))} className="text-sm text-fuchsia-400 hover:text-fuchsia-300 flex items-center gap-1">
+                <button onClick={() => setVoiceSample(generateVoiceSample(kit))} className="text-sm text-stone-400 hover:text-stone-300 flex items-center gap-1">
                   <RefreshCw className="w-3.5 h-3.5" /> Regenerate
                 </button>
               </div>
-              <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-5">
+              <div className="bg-[#0f2148] border border-white/10 rounded-xl p-5">
                 <p className="text-sm text-white/70 leading-relaxed italic">&ldquo;{voiceSample}&rdquo;</p>
               </div>
               <p className="text-xs text-white/30 mt-2">This is how AI will write content for your brand. Adjust the sliders to change the voice.</p>
@@ -399,10 +399,10 @@ export default function BrandKitPage() {
                 <select
                   value={kit.audience.industry}
                   onChange={(e) => setKit({ ...kit, audience: { ...kit.audience, industry: e.target.value } })}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                 >
-                  <option value="" className="bg-[#1a1a2e]">Select industry...</option>
-                  {INDUSTRY_OPTIONS.map((i) => <option key={i} value={i} className="bg-[#1a1a2e]">{i}</option>)}
+                  <option value="" className="bg-[#0f2148]">Select industry...</option>
+                  {INDUSTRY_OPTIONS.map((i) => <option key={i} value={i} className="bg-[#0f2148]">{i}</option>)}
                 </select>
               </div>
               <div>
@@ -411,7 +411,7 @@ export default function BrandKitPage() {
                   value={kit.audience.ageRange}
                   onChange={(e) => setKit({ ...kit, audience: { ...kit.audience, ageRange: e.target.value } })}
                   placeholder="e.g. 25-45"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                 />
               </div>
               <div>
@@ -420,7 +420,7 @@ export default function BrandKitPage() {
                   value={kit.audience.location}
                   onChange={(e) => setKit({ ...kit, audience: { ...kit.audience, location: e.target.value } })}
                   placeholder="e.g. United States, Global"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                 />
               </div>
               <div>
@@ -429,7 +429,7 @@ export default function BrandKitPage() {
                   value={kit.audience.description}
                   onChange={(e) => setKit({ ...kit, audience: { ...kit.audience, description: e.target.value } })}
                   placeholder="Describe your ideal customer..."
-                  className="w-full h-[46px] bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 resize-none focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+                  className="w-full h-[46px] bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 resize-none focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                 />
               </div>
             </div>
@@ -461,13 +461,13 @@ export default function BrandKitPage() {
                 <p className="text-lg mb-6 max-w-xl mx-auto" style={{ color: `${kit.colors.text}70`, fontFamily: kit.typography.bodyFont }}>
                   Building the future, one pixel at a time. Let us help you create something extraordinary.
                 </p>
-                <button
+                <button onClick={() => {}}
                   className="px-6 py-3 rounded-xl text-sm font-semibold text-white"
                   style={{ backgroundColor: kit.colors.primary }}
                 >
                   Get Started
                 </button>
-                <button
+                <button onClick={() => {}}
                   className="px-6 py-3 rounded-xl text-sm font-semibold ml-3 border"
                   style={{ color: kit.colors.secondary, borderColor: kit.colors.secondary }}
                 >
@@ -483,7 +483,7 @@ export default function BrandKitPage() {
                     </div>
                     <h3 className="font-semibold mb-1" style={{ color: kit.colors.text, fontFamily: kit.typography.headingFont }}>{feat}</h3>
                     <p className="text-xs" style={{ color: `${kit.colors.text}50`, fontFamily: kit.typography.bodyFont }}>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                      A powerful feature that sets your brand apart from the competition.
                     </p>
                   </div>
                 ))}
@@ -498,7 +498,7 @@ export default function BrandKitPage() {
                 value={importText}
                 onChange={(e) => setImportText(e.target.value)}
                 placeholder="Paste brand kit JSON here..."
-                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white font-mono placeholder:text-white/30 resize-none focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50"
+                className="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white font-mono placeholder:text-white/30 resize-none focus:outline-none focus:ring-2 focus:ring-stone-500/50"
               />
               <div className="flex justify-end mt-3">
                 <button

@@ -3,9 +3,28 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
-  Activity, AlertTriangle, ArrowRight, Bell, Bot, CheckCircle, ChevronRight,
-  Clock, CreditCard, Globe, Heart, Loader2, Play, Pause, RefreshCw,
-  Server, Shield, TrendingUp, Users, Zap, XCircle, BarChart3
+  Activity,
+  AlertTriangle,
+  ArrowRight,
+  Bell,
+  Bot,
+  CheckCircle,
+  ChevronRight,
+  Clock,
+  CreditCard,
+  Globe,
+  Heart,
+  Loader2,
+  Play,
+  Pause,
+  RefreshCw,
+  Server,
+  Shield,
+  TrendingUp,
+  Users,
+  Zap,
+  XCircle,
+  BarChart3,
 } from "lucide-react";
 
 // ── Types ──
@@ -55,13 +74,13 @@ function formatInterval(ms: number): string {
 
 function StatusDot({ status }: { status: string }) {
   const colors: Record<string, string> = {
-    running: "bg-green-400 animate-pulse",
-    idle: "bg-yellow-400",
-    error: "bg-red-400",
+    running: "bg-stone-400 animate-pulse",
+    idle: "bg-stone-400",
+    error: "bg-stone-400",
     paused: "bg-gray-500",
-    healthy: "bg-green-400",
-    degraded: "bg-yellow-400",
-    unhealthy: "bg-red-400",
+    healthy: "bg-stone-400",
+    degraded: "bg-stone-400",
+    unhealthy: "bg-stone-400",
   };
   return <div className={`w-2.5 h-2.5 rounded-full ${colors[status] || "bg-gray-500"}`} />;
 }
@@ -148,8 +167,8 @@ export default function OperationsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#131520] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
+      <div className="min-h-screen bg-[#0f2148] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-stone-400 animate-spin" />
       </div>
     );
   }
@@ -158,7 +177,7 @@ export default function OperationsPage() {
   const healthColor = healthStatus === "healthy" ? "emerald" : healthStatus === "degraded" ? "yellow" : "red";
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white p-4 md:p-8">
+    <div className="min-h-screen bg-[#0f2148] text-white p-4 md:p-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -177,16 +196,16 @@ export default function OperationsPage() {
 
       {/* Health Banner */}
       <div className={`rounded-xl border p-4 mb-6 flex items-center justify-between ${
-        healthColor === "emerald" ? "bg-emerald-500/10 border-emerald-500/20" :
-        healthColor === "yellow" ? "bg-yellow-500/10 border-yellow-500/20" :
-        "bg-red-500/10 border-red-500/20"
+        healthColor === "emerald" ? "bg-stone-500/10 border-stone-500/20" :
+        healthColor === "yellow" ? "bg-stone-500/10 border-stone-500/20" :
+        "bg-stone-500/10 border-stone-500/20"
       }`}>
         <div className="flex items-center gap-3">
           <StatusDot status={healthStatus === "healthy" ? "healthy" : healthStatus === "degraded" ? "degraded" : "unhealthy"} />
           <div>
             <span className={`font-semibold ${
-              healthColor === "emerald" ? "text-emerald-400" :
-              healthColor === "yellow" ? "text-yellow-400" : "text-red-400"
+              healthColor === "emerald" ? "text-stone-400" :
+              healthColor === "yellow" ? "text-stone-400" : "text-stone-400"
             }`}>
               {healthStatus === "healthy" ? "All Systems Operational" :
                healthStatus === "degraded" ? "Performance Degraded" : "Issues Detected"}
@@ -225,11 +244,11 @@ export default function OperationsPage() {
         {/* Agent Control Panel */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2"><Bot className="w-5 h-5 text-indigo-400" /> Agent Control</h2>
+            <h2 className="text-lg font-semibold flex items-center gap-2"><Bot className="w-5 h-5 text-stone-400" /> Agent Control</h2>
             <button
               onClick={runAllAgents}
               disabled={runningAgent === "all"}
-              className="text-xs px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition-colors disabled:opacity-50 flex items-center gap-1"
+              className="text-xs px-3 py-1.5 rounded-lg bg-stone-600 hover:bg-stone-500 transition-colors disabled:opacity-50 flex items-center gap-1"
             >
               {runningAgent === "all" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
               Run All
@@ -252,7 +271,7 @@ export default function OperationsPage() {
                       {agent.successRate !== undefined && <span>{Math.round(agent.successRate * 100)}% success</span>}
                     </div>
                     {agent.lastError && (
-                      <div className="text-xs text-red-400 truncate mt-0.5">{agent.lastError}</div>
+                      <div className="text-xs text-stone-400 truncate mt-0.5">{agent.lastError}</div>
                     )}
                   </div>
                 </div>
@@ -260,7 +279,7 @@ export default function OperationsPage() {
                   <button
                     onClick={() => togglePause(agent.id)}
                     className={`p-1.5 rounded-lg transition-colors ${
-                      pausedAgents.has(agent.id) ? "bg-yellow-500/20 text-yellow-400" : "bg-white/5 text-slate-400 hover:bg-white/10"
+                      pausedAgents.has(agent.id) ? "bg-stone-500/20 text-stone-400" : "bg-white/5 text-slate-400 hover:bg-white/10"
                     }`}
                     title={pausedAgents.has(agent.id) ? "Resume" : "Pause"}
                   >
@@ -269,7 +288,7 @@ export default function OperationsPage() {
                   <button
                     onClick={() => runAgent(agent.id)}
                     disabled={runningAgent === agent.id}
-                    className="p-1.5 rounded-lg bg-white/5 text-slate-400 hover:bg-indigo-500/20 hover:text-indigo-400 transition-colors disabled:opacity-50"
+                    className="p-1.5 rounded-lg bg-white/5 text-slate-400 hover:bg-stone-500/20 hover:text-stone-400 transition-colors disabled:opacity-50"
                     title="Run Now"
                   >
                     {runningAgent === agent.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
@@ -284,7 +303,7 @@ export default function OperationsPage() {
         <div className="space-y-6">
           {/* Quick Actions */}
           <div>
-            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2"><Zap className="w-5 h-5 text-cyan-400" /> Quick Actions</h2>
+            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2"><Zap className="w-5 h-5 text-stone-400" /> Quick Actions</h2>
             <div className="grid grid-cols-2 gap-2">
               {[
                 { label: "Health Check", action: runHealthCheck, icon: Heart },
@@ -314,7 +333,7 @@ export default function OperationsPage() {
 
           {/* Activity Feed */}
           <div>
-            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2"><Activity className="w-5 h-5 text-emerald-400" /> Live Activity</h2>
+            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2"><Activity className="w-5 h-5 text-stone-400" /> Live Activity</h2>
             <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
               {activity.length === 0 ? (
                 <div className="text-sm text-slate-500 p-4 text-center">No recent activity</div>

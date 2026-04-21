@@ -3,12 +3,41 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  ClipboardList, ChevronRight, ArrowLeft, Sparkles, Plus,
-  Search, GripVertical, Trash2, Copy, Eye, Settings, Star,
-  BarChart3, MessageSquare, Hash, CheckSquare, List,
-  AlignLeft, ChevronDown, ChevronUp, X, Edit3, Zap,
-  PieChart, TrendingUp, Users, Calendar, Download, Share2,
-  LayoutGrid, FileText, ThumbsUp, Smile, Frown, Meh
+  ClipboardList,
+  ChevronRight,
+  ArrowLeft,
+  Sparkles,
+  Plus,
+  Search,
+  GripVertical,
+  Trash2,
+  Copy,
+  Eye,
+  Settings,
+  Star,
+  BarChart3,
+  MessageSquare,
+  Hash,
+  CheckSquare,
+  List,
+  AlignLeft,
+  ChevronDown,
+  ChevronUp,
+  X,
+  Edit3,
+  Zap,
+  PieChart,
+  TrendingUp,
+  Users,
+  Calendar,
+  Download,
+  Share2,
+  LayoutGrid,
+  FileText,
+  ThumbsUp,
+  Smile,
+  Frown,
+  Meh,
 } from 'lucide-react';
 
 type TabType = 'builder' | 'responses' | 'templates' | 'generate';
@@ -59,14 +88,14 @@ const DEMO_QUESTIONS: Question[] = [
 ];
 
 const TEMPLATES = [
-  { name: 'Customer Satisfaction (CSAT)', description: 'Measure overall customer satisfaction with your product or service.', questions: 8, category: 'Feedback', color: 'text-green-400' },
-  { name: 'Net Promoter Score (NPS)', description: 'Gauge customer loyalty and willingness to recommend.', questions: 5, category: 'Loyalty', color: 'text-blue-400' },
-  { name: 'Product Feedback', description: 'Collect detailed feedback on specific product features.', questions: 10, category: 'Product', color: 'text-violet-400' },
-  { name: 'Website Usability', description: 'Evaluate the user experience of your website.', questions: 12, category: 'UX', color: 'text-cyan-400' },
-  { name: 'Employee Engagement', description: 'Measure employee satisfaction and workplace culture.', questions: 15, category: 'HR', color: 'text-amber-400' },
-  { name: 'Event Feedback', description: 'Post-event survey for attendee satisfaction.', questions: 7, category: 'Events', color: 'text-pink-400' },
-  { name: 'Market Research', description: 'Understand market needs and customer demographics.', questions: 14, category: 'Research', color: 'text-orange-400' },
-  { name: 'Onboarding Experience', description: 'Evaluate the new user onboarding process.', questions: 6, category: 'Product', color: 'text-emerald-400' },
+  { name: 'Customer Satisfaction (CSAT)', description: 'Measure overall customer satisfaction with your product or service.', questions: 8, category: 'Feedback', color: 'text-stone-400' },
+  { name: 'Net Promoter Score (NPS)', description: 'Gauge customer loyalty and willingness to recommend.', questions: 5, category: 'Loyalty', color: 'text-stone-400' },
+  { name: 'Product Feedback', description: 'Collect detailed feedback on specific product features.', questions: 10, category: 'Product', color: 'text-stone-400' },
+  { name: 'Website Usability', description: 'Evaluate the user experience of your website.', questions: 12, category: 'UX', color: 'text-stone-400' },
+  { name: 'Employee Engagement', description: 'Measure employee satisfaction and workplace culture.', questions: 15, category: 'HR', color: 'text-stone-400' },
+  { name: 'Event Feedback', description: 'Post-event survey for attendee satisfaction.', questions: 7, category: 'Events', color: 'text-stone-400' },
+  { name: 'Market Research', description: 'Understand market needs and customer demographics.', questions: 14, category: 'Research', color: 'text-stone-400' },
+  { name: 'Onboarding Experience', description: 'Evaluate the new user onboarding process.', questions: 6, category: 'Product', color: 'text-stone-400' },
 ];
 
 // Simulated response data for analytics
@@ -96,15 +125,15 @@ const RESPONSE_STATS = {
 };
 
 function NPSGauge({ score }: { score: number }) {
-  const color = score >= 50 ? 'text-green-400' : score >= 0 ? 'text-amber-400' : 'text-red-400';
+  const color = score >= 50 ? 'text-stone-400' : score >= 0 ? 'text-stone-400' : 'text-stone-400';
   return (
     <div className="flex flex-col items-center">
       <div className={`text-5xl font-bold ${color}`}>{score}</div>
       <div className="text-sm text-white/50 mt-1">NPS Score</div>
       <div className="flex gap-4 mt-3 text-xs">
-        <span className="text-green-400">{RESPONSE_STATS.npsBreakdown.promoters}% Promoters</span>
-        <span className="text-amber-400">{RESPONSE_STATS.npsBreakdown.passives}% Passives</span>
-        <span className="text-red-400">{RESPONSE_STATS.npsBreakdown.detractors}% Detractors</span>
+        <span className="text-stone-400">{RESPONSE_STATS.npsBreakdown.promoters}% Promoters</span>
+        <span className="text-stone-400">{RESPONSE_STATS.npsBreakdown.passives}% Passives</span>
+        <span className="text-stone-400">{RESPONSE_STATS.npsBreakdown.detractors}% Detractors</span>
       </div>
     </div>
   );
@@ -114,7 +143,7 @@ function StarRatingDisplay({ value, max = 5 }: { value: number; max?: number }) 
   return (
     <div className="flex items-center gap-1">
       {Array.from({ length: max }).map((_, i) => (
-        <Star key={i} className={`w-5 h-5 ${i < Math.round(value) ? 'text-amber-400 fill-amber-400' : 'text-white/20'}`} />
+        <Star key={i} className={`w-5 h-5 ${i < Math.round(value) ? 'text-stone-400 fill-stone-400' : 'text-white/20'}`} />
       ))}
       <span className="ml-2 text-lg font-bold">{value.toFixed(1)}</span>
     </div>
@@ -173,17 +202,17 @@ export default function SurveysPage() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              <span className="font-bold text-lg bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</span>
+              <span className="font-bold text-lg bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</span>
             </Link>
             <ChevronRight className="w-4 h-4 text-white/30" />
             <div className="flex items-center gap-2">
-              <ClipboardList className="w-5 h-5 text-violet-400" />
+              <ClipboardList className="w-5 h-5 text-stone-400" />
               <span className="font-semibold">Survey Builder</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-sm transition-colors"><Share2 className="w-4 h-4" />Share</button>
-            <Link href="/dashboard" className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors">Dashboard</Link>
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/15 rounded-lg text-sm transition-colors"><Share2 className="w-4 h-4" />Share</button>
+            <Link href="/dashboard" className="px-4 py-2 text-sm bg-stone-600 hover:bg-stone-500 rounded-lg transition-colors">Dashboard</Link>
           </div>
         </div>
       </header>
@@ -192,10 +221,10 @@ export default function SurveysPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Responses', value: RESPONSE_STATS.total, icon: <Users className="w-5 h-5 text-violet-400" /> },
-            { label: 'Completion', value: `${RESPONSE_STATS.completionRate}%`, icon: <CheckSquare className="w-5 h-5 text-green-400" /> },
-            { label: 'Avg. Time', value: RESPONSE_STATS.avgTime, icon: <Calendar className="w-5 h-5 text-blue-400" /> },
-            { label: 'NPS Score', value: RESPONSE_STATS.npsScore, icon: <TrendingUp className="w-5 h-5 text-amber-400" /> },
+            { label: 'Responses', value: RESPONSE_STATS.total, icon: <Users className="w-5 h-5 text-stone-400" /> },
+            { label: 'Completion', value: `${RESPONSE_STATS.completionRate}%`, icon: <CheckSquare className="w-5 h-5 text-stone-400" /> },
+            { label: 'Avg. Time', value: RESPONSE_STATS.avgTime, icon: <Calendar className="w-5 h-5 text-stone-400" /> },
+            { label: 'NPS Score', value: RESPONSE_STATS.npsScore, icon: <TrendingUp className="w-5 h-5 text-stone-400" /> },
           ].map((stat, i) => (
             <div key={i} className="bg-white/5 rounded-xl border border-white/10 p-5 flex items-center gap-4">
               {stat.icon}
@@ -210,7 +239,7 @@ export default function SurveysPage() {
         {/* Tabs */}
         <div className="flex gap-1 mb-8 bg-white/5 rounded-xl p-1 w-fit">
           {tabs.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-stone-600 text-white shadow-lg shadow-stone-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
               {tab.icon}{tab.label}
             </button>
           ))}
@@ -239,8 +268,8 @@ export default function SurveysPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-3">
                           <span className="text-xs font-medium text-white/30">Q{i + 1}</span>
-                          <span className="text-xs px-2 py-0.5 bg-violet-500/20 text-violet-300 rounded-full flex items-center gap-1">{typeCfg.icon}{typeCfg.label}</span>
-                          {question.required && <span className="text-xs px-2 py-0.5 bg-red-500/20 text-red-300 rounded-full">Required</span>}
+                          <span className="text-xs px-2 py-0.5 bg-stone-500/20 text-stone-300 rounded-full flex items-center gap-1">{typeCfg.icon}{typeCfg.label}</span>
+                          {question.required && <span className="text-xs px-2 py-0.5 bg-stone-500/20 text-stone-300 rounded-full">Required</span>}
                         </div>
                         <input type="text" value={question.text} onChange={e => setQuestions(prev => prev.map(q => q.id === question.id ? { ...q, text: e.target.value } : q))} className="w-full text-sm font-medium bg-transparent border-none outline-none" placeholder="Enter your question..." />
 
@@ -258,7 +287,7 @@ export default function SurveysPage() {
                         {question.type === 'rating' && (
                           <div className="mt-3 flex gap-1">
                             {Array.from({ length: question.scale || 5 }).map((_, si) => (
-                              <Star key={si} className="w-6 h-6 text-white/20 hover:text-amber-400 cursor-pointer transition-colors" />
+                              <Star key={si} className="w-6 h-6 text-white/20 hover:text-stone-400 cursor-pointer transition-colors" />
                             ))}
                           </div>
                         )}
@@ -266,7 +295,7 @@ export default function SurveysPage() {
                         {question.type === 'nps' && (
                           <div className="mt-3 flex gap-1">
                             {Array.from({ length: 11 }).map((_, si) => (
-                              <button key={si} className="w-8 h-8 rounded-lg border border-white/10 text-xs text-white/40 hover:bg-violet-600/20 hover:border-violet-500/50 hover:text-violet-300 transition-all">{si}</button>
+                              <button onClick={() => {}} key={si} className="w-8 h-8 rounded-lg border border-white/10 text-xs text-white/40 hover:bg-stone-600/20 hover:border-stone-500/50 hover:text-stone-300 transition-all">{si}</button>
                             ))}
                           </div>
                         )}
@@ -305,8 +334,8 @@ export default function SurveysPage() {
                         )}
                       </div>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"><Copy className="w-3.5 h-3.5 text-white/30" /></button>
-                        <button onClick={() => handleDeleteQuestion(question.id)} className="p-1.5 hover:bg-red-500/20 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5 text-white/30 hover:text-red-400" /></button>
+                        <button onClick={() => { navigator.clipboard.writeText("Question copied"); alert("Copied!"); }} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"><Copy className="w-3.5 h-3.5 text-white/30" /></button>
+                        <button onClick={() => handleDeleteQuestion(question.id)} className="p-1.5 hover:bg-stone-500/20 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5 text-white/30 hover:text-stone-400" /></button>
                       </div>
                     </div>
                   </div>
@@ -316,22 +345,22 @@ export default function SurveysPage() {
 
             {/* Add Question */}
             {showAddQuestion ? (
-              <div className="mt-4 bg-white/5 rounded-2xl border border-violet-500/30 p-4">
+              <div className="mt-4 bg-white/5 rounded-2xl border border-stone-500/30 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-medium">Add Question Type</span>
                   <button onClick={() => setShowAddQuestion(false)}><X className="w-4 h-4 text-white/40" /></button>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                   {QUESTION_TYPES.map(qt => (
-                    <button key={qt.type} onClick={() => handleAddQuestion(qt.type)} className="flex flex-col items-center gap-2 p-3 bg-white/5 hover:bg-violet-600/20 border border-white/10 hover:border-violet-500/50 rounded-xl transition-all text-center">
-                      <span className="text-violet-400">{qt.icon}</span>
+                    <button key={qt.type} onClick={() => handleAddQuestion(qt.type)} className="flex flex-col items-center gap-2 p-3 bg-white/5 hover:bg-stone-600/20 border border-white/10 hover:border-stone-500/50 rounded-xl transition-all text-center">
+                      <span className="text-stone-400">{qt.icon}</span>
                       <span className="text-xs font-medium">{qt.label}</span>
                     </button>
                   ))}
                 </div>
               </div>
             ) : (
-              <button onClick={() => setShowAddQuestion(true)} className="mt-4 w-full py-4 border-2 border-dashed border-white/20 hover:border-violet-500/50 rounded-2xl text-center text-sm text-white/30 hover:text-violet-400 transition-all flex items-center justify-center gap-2">
+              <button onClick={() => setShowAddQuestion(true)} className="mt-4 w-full py-4 border-2 border-dashed border-white/20 hover:border-stone-500/50 rounded-2xl text-center text-sm text-white/30 hover:text-stone-400 transition-all flex items-center justify-center gap-2">
                 <Plus className="w-4 h-4" /> Add Question
               </button>
             )}
@@ -360,7 +389,7 @@ export default function SurveysPage() {
                   <div key={feature.label} className="flex items-center gap-4">
                     <span className="text-sm text-white/70 w-36">{feature.label}</span>
                     <div className="flex-1 h-6 bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-full transition-all flex items-center justify-end pr-2" style={{ width: `${feature.pct}%` }}>
+                      <div className="h-full bg-gradient-to-r from-stone-600 to-stone-600 rounded-full transition-all flex items-center justify-end pr-2" style={{ width: `${feature.pct}%` }}>
                         <span className="text-[10px] font-bold">{feature.pct}%</span>
                       </div>
                     </div>
@@ -378,7 +407,7 @@ export default function SurveysPage() {
                   <div key={item.label} className="flex-1 flex flex-col items-center">
                     <span className="text-xs font-bold text-white/70 mb-1">{item.pct}%</span>
                     <div className="w-full bg-white/5 rounded-t-lg overflow-hidden flex flex-col-reverse" style={{ height: `${(item.pct / 35) * 100}%` }}>
-                      <div className="w-full h-full bg-gradient-to-t from-violet-600 to-violet-400 rounded-t-lg" />
+                      <div className="w-full h-full bg-gradient-to-t from-stone-600 to-stone-400 rounded-t-lg" />
                     </div>
                     <span className="text-[10px] text-white/40 mt-2 text-center leading-tight">{item.label}</span>
                   </div>
@@ -388,10 +417,10 @@ export default function SurveysPage() {
 
             {/* Export */}
             <div className="flex gap-3">
-              <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white transition-all">
+              <button onClick={() => {}} className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white transition-all">
                 <Download className="w-4 h-4" /> Export CSV
               </button>
-              <button className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white transition-all">
+              <button onClick={() => {}} className="flex-1 flex items-center justify-center gap-2 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm text-white/60 hover:text-white transition-all">
                 <Download className="w-4 h-4" /> Export PDF Report
               </button>
             </div>
@@ -401,14 +430,14 @@ export default function SurveysPage() {
         {activeTab === 'templates' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {TEMPLATES.map((template, i) => (
-              <div key={i} className="bg-white/5 rounded-2xl border border-white/10 hover:border-violet-500/50 p-6 transition-all group cursor-pointer">
+              <div key={i} className="bg-white/5 rounded-2xl border border-white/10 hover:border-stone-500/50 p-6 transition-all group cursor-pointer">
                 <div className="flex items-center justify-between mb-3">
                   <span className={`text-xs px-2 py-0.5 rounded-full bg-white/10 ${template.color}`}>{template.category}</span>
                   <span className="text-xs text-white/30">{template.questions} questions</span>
                 </div>
                 <h3 className="font-semibold text-sm mb-2">{template.name}</h3>
                 <p className="text-xs text-white/50 leading-relaxed mb-4">{template.description}</p>
-                <button className="w-full py-2 bg-white/5 group-hover:bg-violet-600/20 rounded-lg text-xs font-medium text-white/60 group-hover:text-violet-300 transition-all flex items-center justify-center gap-1.5">
+                <button onClick={() => {}} className="w-full py-2 bg-white/5 group-hover:bg-stone-600/20 rounded-lg text-xs font-medium text-white/60 group-hover:text-stone-300 transition-all flex items-center justify-center gap-1.5">
                   <Plus className="w-3.5 h-3.5" /> Use Template
                 </button>
               </div>
@@ -420,7 +449,7 @@ export default function SurveysPage() {
           <div className="max-w-3xl mx-auto">
             <div className="bg-white/5 rounded-2xl border border-white/10 p-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stone-600 to-stone-600 flex items-center justify-center">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div>
@@ -431,12 +460,12 @@ export default function SurveysPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">Survey Title</label>
-                  <input type="text" placeholder="e.g., Q1 Customer Satisfaction Survey" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
+                  <input type="text" placeholder="e.g., Q1 Customer Satisfaction Survey" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Survey Type</label>
-                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50">
+                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-stone-500/50">
                       <option>Customer Feedback</option>
                       <option>Product Research</option>
                       <option>Employee Engagement</option>
@@ -447,7 +476,7 @@ export default function SurveysPage() {
                   </div>
                   <div>
                     <label className="block text-sm text-white/70 mb-1.5">Question Count</label>
-                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50">
+                    <select className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-stone-500/50">
                       <option>5-7 questions</option>
                       <option>8-12 questions</option>
                       <option>13-20 questions</option>
@@ -456,19 +485,19 @@ export default function SurveysPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">What do you want to learn?</label>
-                  <textarea value={aiPrompt} onChange={e => setAiPrompt(e.target.value)} rows={4} placeholder="Describe the goals of your survey. What insights are you looking for? Who is your audience?" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 resize-none" />
+                  <textarea value={aiPrompt} onChange={e => setAiPrompt(e.target.value)} rows={4} placeholder="Describe the goals of your survey. What insights are you looking for? Who is your audience?" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50 resize-none" />
                 </div>
                 <div>
                   <label className="block text-sm text-white/70 mb-2">Question Types to Include</label>
                   <div className="flex flex-wrap gap-2">
                     {QUESTION_TYPES.map(qt => (
-                      <button key={qt.type} className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-600/20 border border-violet-500/30 rounded-lg text-xs text-violet-300 hover:bg-violet-600/30 transition-colors">
+                      <button onClick={() => {}} key={qt.type} className="flex items-center gap-1.5 px-3 py-1.5 bg-stone-600/20 border border-stone-500/30 rounded-lg text-xs text-stone-300 hover:bg-stone-600/30 transition-colors">
                         {qt.icon} {qt.label}
                       </button>
                     ))}
                   </div>
                 </div>
-                <button onClick={handleGenerate} disabled={generating} className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/25 disabled:opacity-50">
+                <button onClick={handleGenerate} disabled={generating} className="w-full py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-stone-600/25 disabled:opacity-50">
                   {generating ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generating Survey...</> : <><Sparkles className="w-4 h-4" /> Generate Survey</>}
                 </button>
               </div>
@@ -480,7 +509,7 @@ export default function SurveysPage() {
       <footer className="border-t border-white/10 mt-20 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p className="text-white/40 text-sm">
-            Replaces Typeform ($25/mo), SurveyMonkey ($25/mo), and Google Forms &mdash; <span className="text-violet-400">included free with Zoobicon Pro</span>
+            Replaces Typeform ($25/mo), SurveyMonkey ($25/mo), and Google Forms &mdash; <span className="text-stone-400">included free with Zoobicon Pro</span>
           </p>
           <div className="flex items-center justify-center gap-6 mt-4">
             <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</Link>

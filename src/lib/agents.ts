@@ -123,7 +123,7 @@ const BRAND_SYSTEM = `You are an elite brand designer. Given a strategy and brie
 
 CRITICAL COLOR RULE: Your palettes must be BOLD and VIBRANT. Never produce dull, washed-out, or generic blue palettes.
 - Primary color must be SATURATED and DISTINCTIVE (not generic blue #2563eb or plain gray)
-- Background should NEVER be plain white (#ffffff) — use tinted whites (#fdf8f4, #fafafa, #f0fdf4) or dark backgrounds (#0f172a, #1a1a2e)
+- Background should NEVER be plain white (#ffffff) — use tinted whites (#fdf8f4, #fafafa, #f0fdf4) or dark backgrounds (#0f172a, #0f2148)
 - BackgroundAlt must be noticeably different from background (not just a shade lighter)
 - Accent color must CONTRAST with primary (complementary or analogous, not the same hue)
 - Every palette needs at least ONE bold, eye-catching color
@@ -134,7 +134,7 @@ Industry color guidance:
 - Real Estate: Navy (#1a365d) + gold (#c9a96e) on warm white (#faf8f5)
 - Healthcare: Teal (#0d9488), sage (#059669) on soft mint (#f0fdf4)
 - E-commerce: Coral (#f43f5e), orange (#f97316), or emerald (#059669) — bold conversion colors
-- Portfolio: Deep charcoal bg (#1a1a2e) with vivid accent (#f43f5e, #8b5cf6, #06b6d4)
+- Portfolio: Deep charcoal bg (#0f2148) with vivid accent (#f43f5e, #8b5cf6, #06b6d4)
 - Legal/Finance: Deep navy (#1e3a5f) or forest (#0f766e) — professional but NOT dull
 
 Output a JSON object:
@@ -407,7 +407,7 @@ Use ALL the copy from the COPY input. Every section must appear with real visibl
 - Mobile hamburger menu in <script>
 - NEVER set opacity:0 on any element
 - Nav should have a colored or dark background — never plain white
-- Footer MUST have a dark background (#1a1a2e, #0f172a, or the dark primary color)
+- Footer MUST have a dark background (#0f2148, #0f172a, or the dark primary color)
 - CTA section MUST have a bold colored or gradient background
 
 ## NEVER DO
@@ -435,13 +435,18 @@ Use ONLY the component library's animation system:
 3. Do NOT write your own IntersectionObserver for fade-in animations — it's already handled.
 4. Do NOT set opacity:0 anywhere — the component library handles the initial hidden state safely with failsafes.
 
-## What You CAN Add
+## What You SHOULD Add (this is what makes the site feel alive — DO NOT skip)
 - Parallax effect on hero background (0.3x scroll speed via transform, NOT by hiding content).
 - Animated number counters (0 → target value on scroll) — numbers must START visible at their target value as a fallback.
-- Scroll progress bar at page top (a thin colored bar).
-- Smooth hover micro-interactions (scale, shadow changes).
-- CSS transition enhancements on buttons, cards, links.
-- \`prefers-reduced-motion\` media query that disables all animation.
+- Scroll progress bar at page top (a thin colored gradient bar fixed at top).
+- Sticky navbar that subtly shrinks + adds backdrop-blur after 80px of scroll.
+- Staggered scroll reveals on feature/testimonial cards (use the existing .fade-in class — the failsafe IntersectionObserver handles it). Add nth-child transition-delay so cards appear in sequence (60-100ms apart).
+- Button hover micro-interactions: scale(1.02) + soft glow shadow on hover, scale(0.98) on active.
+- Card hover micro-interactions: translateY(-4px) + larger shadow on hover.
+- Gradient text on the hero headline using background-clip:text (only if the design spec uses a gradient palette).
+- Smooth scroll behavior on the html element + scroll-padding-top to account for sticky nav.
+- Cursor-aware spotlight on the CTA section (radial-gradient that follows mousemove) — guard with prefers-reduced-motion.
+- \`prefers-reduced-motion\` media query that disables all motion animations (transforms only, opacity stays).
 
 ## Rules
 - Output ONLY the complete updated HTML. No markdown, no explanation, no code fences.

@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Monitor, Tablet, Smartphone, ExternalLink, Loader2 } from "lucide-react";
+import {
+  Monitor,
+  Tablet,
+  Smartphone,
+  ExternalLink,
+  Loader2,
+} from "lucide-react";
 
 type Viewport = "desktop" | "tablet" | "mobile";
 
@@ -44,9 +50,9 @@ export default function SharedProjectPage({ params }: { params: { token: string 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-blue-400 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 text-stone-400 animate-spin mx-auto mb-4" />
           <p className="text-white/50 text-sm">Loading shared project...</p>
         </div>
       </div>
@@ -55,16 +61,16 @@ export default function SharedProjectPage({ params }: { params: { token: string 
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-6">
-          <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
-            <ExternalLink className="w-7 h-7 text-red-400" />
+          <div className="w-16 h-16 rounded-2xl bg-stone-500/10 border border-stone-500/20 flex items-center justify-center mx-auto mb-6">
+            <ExternalLink className="w-7 h-7 text-stone-400" />
           </div>
           <h1 className="text-xl font-bold text-white mb-2">Project Not Found</h1>
           <p className="text-white/50 text-sm mb-8">{error}</p>
           <Link
             href="/builder"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-stone-600 hover:bg-stone-500 text-white text-sm font-medium rounded-lg transition-colors"
           >
             Build Your Own
           </Link>
@@ -76,13 +82,13 @@ export default function SharedProjectPage({ params }: { params: { token: string 
   const currentConfig = viewportConfig[viewport];
 
   return (
-    <div className="h-screen flex flex-col bg-[#0a0a0f]">
+    <div className="h-screen flex flex-col bg-[#0a1628]">
       {/* Top bar */}
       <header className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06] bg-[#12121a]/90 backdrop-blur-sm shrink-0">
         {/* Left: branding + project name */}
         <div className="flex items-center gap-3 min-w-0">
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center text-white font-bold text-xs">
               Z
             </div>
           </Link>
@@ -102,7 +108,7 @@ export default function SharedProjectPage({ params }: { params: { token: string 
                 onClick={() => setViewport(vp)}
                 className={`p-1.5 rounded-md transition-all ${
                   isActive
-                    ? "bg-blue-500/20 text-blue-400"
+                    ? "bg-stone-500/20 text-stone-400"
                     : "text-white/50 hover:text-white/60 hover:bg-white/[0.04]"
                 }`}
                 title={config.label}
@@ -120,7 +126,7 @@ export default function SharedProjectPage({ params }: { params: { token: string 
           </span>
           <Link
             href="/builder"
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-stone-600 hover:bg-stone-500 text-white text-xs font-medium rounded-lg transition-colors"
           >
             Build Your Own
             <ExternalLink className="w-3 h-3" />
@@ -129,7 +135,7 @@ export default function SharedProjectPage({ params }: { params: { token: string 
       </header>
 
       {/* Preview area */}
-      <div className="flex-1 flex items-start justify-center overflow-auto bg-[#0a0a0f] p-0">
+      <div className="flex-1 flex items-start justify-center overflow-auto bg-[#0a1628] p-0">
         <div
           className="h-full transition-all duration-300 ease-in-out bg-white"
           style={{

@@ -226,7 +226,7 @@ export default function OnboardingTooltips({ active }: OnboardingTooltipsProps) 
         <div className="bg-zinc-800 border border-white/10 rounded-xl shadow-2xl shadow-black/60 overflow-hidden">
           {/* Header */}
           <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center text-blue-400">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-stone-500/15 flex items-center justify-center text-stone-400">
               <Icon size={16} />
             </div>
             <div className="flex-1 min-w-0">
@@ -255,9 +255,9 @@ export default function OnboardingTooltips({ active }: OnboardingTooltipsProps) 
                   key={i}
                   className={`w-1.5 h-1.5 rounded-full transition-colors ${
                     i === currentStep
-                      ? "bg-blue-400"
+                      ? "bg-stone-400"
                       : i < currentStep
-                      ? "bg-blue-400/40"
+                      ? "bg-stone-400/40"
                       : "bg-white/15"
                   }`}
                 />
@@ -276,7 +276,7 @@ export default function OnboardingTooltips({ active }: OnboardingTooltipsProps) 
               </button>
               <button
                 onClick={handleNext}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-medium text-white transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-600 hover:bg-stone-500 text-xs font-medium text-white transition-colors"
               >
                 {isLast ? "Done" : "Next"}
                 {!isLast && <ChevronRight size={12} />}

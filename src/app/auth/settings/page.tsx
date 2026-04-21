@@ -268,10 +268,10 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-500/5 border border-amber-500/15">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400/60 mt-0.5 flex-shrink-0" />
+                <div className="flex items-start gap-2 p-3 rounded-xl bg-stone-500/5 border border-stone-500/15">
+                  <AlertTriangle className="w-3.5 h-3.5 text-stone-400/60 mt-0.5 flex-shrink-0" />
                   <p className="text-xs text-white/50">
-                    On <strong className="text-white/50">Vercel</strong>: Settings → Environment Variables → update <code className="text-amber-300/70">ADMIN_PASSWORD</code> then redeploy.
+                    On <strong className="text-white/50">Vercel</strong>: Settings → Environment Variables → update <code className="text-stone-300/70">ADMIN_PASSWORD</code> then redeploy.
                     On <strong className="text-white/50">Render</strong>: Dashboard → Environment → update the variable (no redeploy needed).
                   </p>
                 </div>
@@ -344,7 +344,7 @@ export default function SettingsPage() {
                 </div>
 
                 {pwError && (
-                  <div className="flex items-center gap-2 text-sm text-red-400/80">
+                  <div className="flex items-center gap-2 text-sm text-stone-400/80">
                     <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
                     {pwError}
                   </div>
@@ -428,7 +428,7 @@ export default function SettingsPage() {
                   onClick={copyApiKey}
                   className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-colors text-xs font-medium flex-shrink-0"
                 >
-                  {apiKeyCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  {apiKeyCopied ? <Check className="w-3.5 h-3.5 text-stone-400" /> : <Copy className="w-3.5 h-3.5" />}
                   {apiKeyCopied ? "Copied" : "Copy"}
                 </button>
               </div>
@@ -441,7 +441,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleRevokeApiKey}
                   disabled={apiKeyLoading}
-                  className="flex items-center gap-1.5 text-[10px] text-red-400/40 hover:text-red-400/70 transition-colors"
+                  className="flex items-center gap-1.5 text-[10px] text-stone-400/40 hover:text-stone-400/70 transition-colors"
                 >
                   <Trash2 className="w-3 h-3" />
                   Revoke & regenerate

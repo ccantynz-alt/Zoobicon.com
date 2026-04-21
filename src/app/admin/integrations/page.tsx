@@ -10,8 +10,8 @@ import {
   BookOpen,
   MessageSquare,
   CreditCard,
-  Github,
-  Figma,
+  GitFork,
+  Layers,
   Mail,
   BarChart3,
   Zap,
@@ -88,7 +88,7 @@ const INTEGRATIONS: IntegrationDef[] = [
   },
   {
     id: "slack",
-    name: "Slack",
+    name: "Hash",
     description: "Receive build notifications and deploy alerts in your channels.",
     icon: MessageSquare,
     color: "#E01E5A",
@@ -113,7 +113,7 @@ const INTEGRATIONS: IntegrationDef[] = [
     id: "github",
     name: "GitHub",
     description: "Export projects and import repositories for AI-assisted building.",
-    icon: Github,
+    icon: GitFork,
     color: "#FFFFFF",
     bgColor: "rgba(255,255,255,0.08)",
     status: "connected",
@@ -124,9 +124,9 @@ const INTEGRATIONS: IntegrationDef[] = [
   },
   {
     id: "figma",
-    name: "Figma",
-    description: "Import Figma designs and convert them to production HTML.",
-    icon: Figma,
+    name: "Layers",
+    description: "Import Layers designs and convert them to production HTML.",
+    icon: Layers,
     color: "#A259FF",
     bgColor: "rgba(162,89,255,0.1)",
     status: "connected",
@@ -176,9 +176,9 @@ const INTEGRATIONS: IntegrationDef[] = [
 // ---------------------------------------------------------------------------
 function StatusBadge({ status }: { status: IntegrationStatus }) {
   const map = {
-    connected: { label: "Connected", bg: "bg-emerald-500/20", text: "text-emerald-400", dot: "bg-emerald-400" },
+    connected: { label: "Connected", bg: "bg-stone-500/20", text: "text-stone-400", dot: "bg-stone-400" },
     not_connected: { label: "Not Connected", bg: "bg-white/5", text: "text-white/70", dot: "bg-white/30" },
-    coming_soon: { label: "Coming Soon", bg: "bg-amber-500/20", text: "text-amber-400", dot: "bg-amber-400" },
+    coming_soon: { label: "Coming Soon", bg: "bg-stone-500/20", text: "text-stone-400", dot: "bg-stone-400" },
   };
   const s = map[status];
   return (
@@ -274,14 +274,14 @@ function ConnectModal({
                   placeholder={f.placeholder}
                   value={fields[f.key] || ""}
                   onChange={(e) => setFields({ ...fields, [f.key]: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-[#111318] border border-white/10 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-2.5 bg-[#111318] border border-white/10 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
                 />
               </div>
             ))}
             <button
               onClick={() => onConnect(fields)}
               disabled={integration.fields?.some((f) => !fields[f.key])}
-              className="w-full py-3 rounded-xl font-medium text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              className="w-full py-3 rounded-xl font-medium text-white bg-stone-600 hover:bg-stone-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
               Save & Connect
             </button>
@@ -296,17 +296,17 @@ function ConnectModal({
               send events to this endpoint.
             </p>
             <div className="flex items-center gap-2 bg-[#111318] border border-white/10 rounded-xl p-3">
-              <code className="text-sm text-indigo-400 flex-1 truncate">{integration.webhookUrl}</code>
+              <code className="text-sm text-stone-400 flex-1 truncate">{integration.webhookUrl}</code>
               <button
                 onClick={() => handleCopy(integration.webhookUrl || "")}
                 className="text-white/70 hover:text-white transition-colors shrink-0"
               >
-                {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                {copied ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
             <button
               onClick={() => onConnect({ webhookUrl: integration.webhookUrl || "" })}
-              className="w-full py-3 rounded-xl font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition-all"
+              className="w-full py-3 rounded-xl font-medium text-white bg-stone-600 hover:bg-stone-500 transition-all"
             >
               Mark as Connected
             </button>
@@ -440,7 +440,7 @@ export default function IntegrationsPage() {
   const available = integrations.filter((i) => i.status !== "connected");
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#0f2148] text-white">
       <BackgroundEffects preset="admin" />
 
       {/* Notification toast */}
@@ -452,8 +452,8 @@ export default function IntegrationsPage() {
             exit={{ opacity: 0, y: -40 }}
             className={`fixed top-6 right-6 z-[60] px-5 py-3 rounded-xl text-sm font-medium shadow-lg ${
               notification.type === "success"
-                ? "bg-emerald-600/90 text-white"
-                : "bg-red-600/90 text-white"
+                ? "bg-stone-600/90 text-white"
+                : "bg-stone-600/90 text-white"
             }`}
           >
             {notification.message}
@@ -462,10 +462,10 @@ export default function IntegrationsPage() {
       </AnimatePresence>
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-40 bg-[#131520]/90 backdrop-blur-2xl border-b border-white/10">
+      <nav className="sticky top-0 z-40 bg-[#0f2148]/90 backdrop-blur-2xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               Zoobicon
             </Link>
             <div className="hidden md:flex items-center gap-1 text-sm text-white/70">
@@ -498,8 +498,8 @@ export default function IntegrationsPage() {
           className="mb-10"
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600/20 flex items-center justify-center">
-              <Plug className="w-5 h-5 text-indigo-400" />
+            <div className="w-10 h-10 rounded-xl bg-stone-600/20 flex items-center justify-center">
+              <Plug className="w-5 h-5 text-stone-400" />
             </div>
             <h1 className="text-3xl font-bold">Integrations</h1>
           </div>
@@ -518,9 +518,9 @@ export default function IntegrationsPage() {
         >
           {[
             { label: "Total Available", value: integrations.length, color: "text-white" },
-            { label: "Connected", value: connected.length, color: "text-emerald-400" },
+            { label: "Connected", value: connected.length, color: "text-stone-400" },
             { label: "Not Connected", value: available.filter((i) => i.status === "not_connected").length, color: "text-white/70" },
-            { label: "Coming Soon", value: available.filter((i) => i.status === "coming_soon").length, color: "text-amber-400" },
+            { label: "Coming Soon", value: available.filter((i) => i.status === "coming_soon").length, color: "text-stone-400" },
           ].map((s, i) => (
             <div
               key={i}
@@ -541,7 +541,7 @@ export default function IntegrationsPage() {
               transition={{ delay: 0.1 }}
               className="text-lg font-semibold mb-4 flex items-center gap-2"
             >
-              <Shield className="w-4 h-4 text-emerald-400" />
+              <Shield className="w-4 h-4 text-stone-400" />
               Connected Services
             </motion.h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-10">
@@ -599,7 +599,7 @@ export default function IntegrationsPage() {
                         )}
                         <button
                           onClick={() => handleDisconnect(integration)}
-                          className="flex-1 text-center py-2 rounded-xl text-sm font-medium bg-red-600/10 text-red-400 hover:bg-red-600/20 transition-all"
+                          className="flex-1 text-center py-2 rounded-xl text-sm font-medium bg-stone-600/10 text-stone-400 hover:bg-stone-600/20 transition-all"
                         >
                           Disconnect
                         </button>
@@ -656,14 +656,14 @@ export default function IntegrationsPage() {
 
                       <div className="mt-4">
                         {isSoon ? (
-                          <button className="w-full py-2.5 rounded-xl text-sm font-medium bg-amber-600/10 text-amber-400 hover:bg-amber-600/20 transition-all flex items-center justify-center gap-2">
+                          <button onClick={() => {}} className="w-full py-2.5 rounded-xl text-sm font-medium bg-stone-600/10 text-stone-400 hover:bg-stone-600/20 transition-all flex items-center justify-center gap-2">
                             <Bell className="w-3.5 h-3.5" />
                             Notify Me
                           </button>
                         ) : (
                           <button
                             onClick={() => setConnectModal(integration)}
-                            className="w-full py-2.5 rounded-xl text-sm font-medium bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600/30 transition-all"
+                            className="w-full py-2.5 rounded-xl text-sm font-medium bg-stone-600/20 text-stone-400 hover:bg-stone-600/30 transition-all"
                           >
                             Connect
                           </button>
@@ -680,7 +680,7 @@ export default function IntegrationsPage() {
         {/* Loading state */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-stone-500 border-t-transparent rounded-full animate-spin" />
           </div>
         )}
       </main>

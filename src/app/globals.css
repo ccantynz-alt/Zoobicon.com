@@ -5,16 +5,21 @@
 /* Fonts loaded via <link> in layout.tsx with display=swap to prevent FOIT */
 
 :root {
-  --brand-500: #3b82f6;
-  --brand-600: #2563eb;
-  --accent-cyan: #22d3ee;
-  --accent-purple: #67e8f9;
-  --accent-pink: #38bdf8;
-  /* Signature Zoobicon violet */
-  --zoo-400: #7c5aff;
-  --zoo-500: #6d3bff;
-  --zoo-600: #5a1eff;
-  --zoo-glow: rgba(124, 90, 255, 0.25);
+  /* Editorial palette — retired brand-500/brand-600/accent-cyan/accent-purple/
+     accent-pink/zoo-400/zoo-500/zoo-600 now alias to the warm accent so
+     every derived gradient/border/shadow in this file lands on the editorial
+     register without rewriting 1,700 lines of legacy CSS. */
+  --brand-500: #E8D4B0;
+  --brand-600: #D4B887;
+  --accent-cyan: #E8D4B0;
+  --accent-purple: #E8D4B0;
+  --accent-pink: #E8D4B0;
+  --zoo-400: #E8D4B0;
+  --zoo-500: #D4B887;
+  --zoo-600: #B89B64;
+  --zoo-glow: rgba(232, 212, 176, 0.2);
+  --editorial-ink: #1c1917;
+  --editorial-paper: #FAF9F6;
 }
 
 * {
@@ -29,10 +34,11 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #050508;
+  background: #060e1f;
   color: #e8e8ec;
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
+  overscroll-behavior-y: none;
   min-height: 100vh;
   min-height: 100dvh;
   -webkit-text-size-adjust: 100%;
@@ -107,16 +113,16 @@ img, video {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0f;
+  background: #0a1628;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1a1a25;
+  background: #162044;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a3a5a;
+  background: #2d4d8c;
 }
 
 /* Scrollbar — Firefox */
@@ -186,7 +192,7 @@ pre code {
   position: relative;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
   border: 1px solid rgba(59, 130, 246, 0.5);
-  color: #93c5fd;
+  color: var(--zoo-400);
   padding: 12px 24px;
   font-family: "Inter", system-ui, sans-serif;
   font-size: 14px;
@@ -220,14 +226,14 @@ pre code {
    ============================================ */
 
 .cyber-panel {
-  background: #1a1a2e;
+  background: #0f2148;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .cyber-input {
-  background: #0f0f1a;
+  background: #0a1628;
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #f0f0f5;
   font-family: "Inter", system-ui, sans-serif;
@@ -262,6 +268,16 @@ pre code {
   75% { content: "..."; }
 }
 
+@keyframes autoplay-waveform {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes chat-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
   50% { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
@@ -292,8 +308,8 @@ pre code {
 }
 
 .cyber-tab.active {
-  color: #93c5fd;
-  border-bottom-color: #3b82f6;
+  color: var(--zoo-400);
+  border-bottom-color: var(--zoo-400);
 }
 
 /* ============================================
@@ -301,14 +317,14 @@ pre code {
    ============================================ */
 
 .gradient-text {
-  background: linear-gradient(135deg, #3b82f6, #93c5fd);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-hero {
-  background: linear-gradient(135deg, #3b82f6, #6366f1, #818cf8);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-500), var(--zoo-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -316,7 +332,7 @@ pre code {
 }
 
 .gradient-text-static {
-  background: linear-gradient(135deg, #3b82f6, #93c5fd);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -337,14 +353,14 @@ pre code {
 
 /* Signature Zoobicon gradient text */
 .gradient-text-zoo {
-  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-400), var(--zoo-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-zoo-animated {
-  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee, #7c5aff);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-400), var(--zoo-400), var(--zoo-400));
   background-size: 300% 300%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -355,7 +371,7 @@ pre code {
 /* Signature CTA button — impossible to miss */
 .btn-zoo {
   position: relative;
-  background: linear-gradient(135deg, #7c5aff, #5a1eff);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-600));
   color: #fff;
   font-weight: 700;
   padding: 16px 32px;
@@ -372,7 +388,7 @@ pre code {
   position: absolute;
   inset: -3px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee, #7c5aff);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-400), var(--zoo-400), var(--zoo-400));
   background-size: 300% 300%;
   animation: gradient-rotate 4s ease infinite;
   z-index: -1;
@@ -414,9 +430,9 @@ pre code {
   box-shadow: 0 4px 20px rgba(124, 90, 255, 0.15);
 }
 
-/* Black fog page — override background to pure black */
+/* Void page — deep navy canvas */
 .bg-void {
-  background: #050508 !important;
+  background: #060e1f !important;
 }
 
 /* Crisp white text with subtle glow for black fog pages */
@@ -434,7 +450,7 @@ pre code {
    ============================================ */
 
 .btn-gradient {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background: linear-gradient(135deg, var(--zoo-500), var(--zoo-600));
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
@@ -445,7 +461,7 @@ pre code {
 }
 
 .btn-gradient:hover {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-500));
   box-shadow: 0 4px 20px rgba(37, 99, 235, 0.25), 0 0 0 1px rgba(37,99,235,0.3);
   transform: translateY(-1px);
 }
@@ -1504,7 +1520,7 @@ select {
    ============================================ */
 
 .gradient-text-animated {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #22d3ee, #3b82f6);
+  background: linear-gradient(135deg, var(--zoo-400), var(--zoo-500), var(--zoo-400), var(--zoo-400));
   background-size: 300% 300%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -1733,3 +1749,249 @@ select {
 .notif-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .notif-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 .notif-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FILMORA-TIER DESIGN SYSTEM — SERIOUS BUSINESS STANDARD
+   Locked 2026-04-10 per CLAUDE.md rule 29. Every zoobicon.com surface
+   must clear this floor. Reference: filmora.wondershare.com
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Deep navy canvas — replaces pure black, still dark enough for editorial contrast */
+  --fs-bg-0: #060e1f;           /* page background (navy-950) */
+  --fs-bg-1: #0a1628;           /* nav + footer (navy-900) */
+  --fs-bg-2: #0f2148;           /* cards (navy-800) */
+  --fs-bg-3: #152e60;           /* elevated cards (navy-700) */
+  --fs-hair: rgba(255,255,255,0.06);
+  --fs-hair-strong: rgba(255,255,255,0.12);
+
+  /* Display typography scale (Filmora uses 204px for final CTA) */
+  --fs-display-2xl: clamp(4rem, 11vw, 11rem);     /* ~176px */
+  --fs-display-xl: clamp(3rem, 8.5vw, 8rem);      /* ~128px */
+  --fs-display-lg: clamp(2.5rem, 6vw, 5.5rem);    /* ~88px */
+  --fs-display-md: clamp(2rem, 4.5vw, 4rem);      /* ~64px */
+  --fs-display-sm: clamp(1.625rem, 3vw, 2.75rem); /* ~44px */
+
+  /* The signature neon gradient (kept restrained — used only on accents) */
+  --fs-gradient-primary: linear-gradient(135deg, #53FBD5 0%, #75FF9C 45%, #BDFF89 100%);
+  --fs-gradient-magenta: linear-gradient(270deg, #FF6C3A 0%, #F20091 100%);
+  --fs-gradient-cinema: linear-gradient(135deg, #E8D4B0 0%, #F7C8A0 40%, #E08BB0 100%);
+  --fs-gradient-text: linear-gradient(135deg, #FFFFFF 0%, #E8D4B0 50%, #F7C8A0 100%);
+
+  /* Warm editorial accent stays as primary brand (kept from earlier reskin) */
+  --fs-accent: #E8D4B0;
+  --fs-accent-hover: #F0DCB8;
+  --fs-accent-ring: rgba(232, 212, 176, 0.35);
+
+  /* Radii — Filmora uses generous 30px / 40px / 60px */
+  --fs-radius-sm: 12px;
+  --fs-radius-md: 20px;
+  --fs-radius-lg: 30px;
+  --fs-radius-xl: 40px;
+  --fs-radius-2xl: 60px;
+
+  /* Shadows — cinematic depth */
+  --fs-shadow-card: 0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 48px -24px rgba(0,0,0,0.6);
+  --fs-shadow-hover: 0 1px 0 rgba(255,255,255,0.08) inset, 0 32px 80px -32px rgba(0,0,0,0.8);
+  --fs-shadow-warm: 0 24px 72px -32px rgba(232, 212, 176, 0.35);
+}
+
+/* ── Display typography helpers ── */
+.fs-display-2xl { font-size: var(--fs-display-2xl); font-weight: 700; letter-spacing: -0.045em; line-height: 0.95; }
+.fs-display-xl  { font-size: var(--fs-display-xl);  font-weight: 700; letter-spacing: -0.04em;  line-height: 0.98; }
+.fs-display-lg  { font-size: var(--fs-display-lg);  font-weight: 700; letter-spacing: -0.035em; line-height: 1.02; }
+.fs-display-md  { font-size: var(--fs-display-md);  font-weight: 600; letter-spacing: -0.03em;  line-height: 1.05; }
+.fs-display-sm  { font-size: var(--fs-display-sm);  font-weight: 600; letter-spacing: -0.025em; line-height: 1.1;  }
+
+.fs-eyebrow {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.45);
+}
+
+.fs-serif-italic {
+  font-family: "Fraunces", "Playfair Display", ui-serif, Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--fs-accent);
+}
+
+.fs-text-gradient {
+  background: var(--fs-gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.fs-text-gradient-cinema {
+  background: var(--fs-gradient-cinema);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ── Cards — the bento/feature-grid primitive ── */
+.fs-card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%);
+  border: 1px solid var(--fs-hair);
+  border-radius: var(--fs-radius-lg);
+  box-shadow: var(--fs-shadow-card);
+  overflow: hidden;
+  transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1),
+              border-color 0.4s ease,
+              box-shadow 0.5s ease;
+}
+
+.fs-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--fs-accent-ring);
+  box-shadow: var(--fs-shadow-hover);
+}
+
+.fs-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(232,212,176,0) 0%, rgba(232,212,176,0.15) 50%, rgba(232,212,176,0) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.fs-card:hover::before {
+  opacity: 1;
+}
+
+/* Cinematic glow rim used on hero CTAs + pricing featured tier */
+.fs-glow-warm {
+  box-shadow: var(--fs-shadow-warm);
+}
+
+/* ── Buttons — Filmora uses animated gradient background buttons ── */
+.fs-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #060e1f;
+  background: var(--fs-accent);
+  border: 1px solid rgba(0,0,0,0.1);
+  transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1),
+              box-shadow 0.45s ease,
+              background 0.35s ease;
+}
+
+.fs-btn-primary:hover {
+  transform: translateY(-2px);
+  background: var(--fs-accent-hover);
+  box-shadow: 0 14px 40px -12px rgba(232,212,176,0.45);
+}
+
+.fs-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--fs-hair-strong);
+  backdrop-filter: blur(12px);
+  transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.fs-btn-ghost:hover {
+  color: var(--fs-accent);
+  border-color: var(--fs-accent-ring);
+  background: rgba(232,212,176,0.04);
+  transform: translateY(-2px);
+}
+
+/* ── Infinite marquee track — trust strip + testimonials ── */
+@keyframes fsMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.fs-marquee {
+  display: flex;
+  width: max-content;
+  gap: 2.5rem;
+  animation: fsMarquee 60s linear infinite;
+}
+
+.fs-marquee-paused:hover .fs-marquee {
+  animation-play-state: paused;
+}
+
+/* ── Subtle cinematic orbs — background mood, never dominant ── */
+.fs-ambient-glow {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fs-ambient-glow::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  width: 1200px;
+  height: 700px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(232,212,176,0.08), transparent 70%);
+  filter: blur(120px);
+}
+
+.fs-ambient-glow::after {
+  content: "";
+  position: absolute;
+  right: -10%;
+  bottom: -20%;
+  width: 900px;
+  height: 900px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(83, 251, 213, 0.05), transparent 70%);
+  filter: blur(140px);
+}
+
+/* Fine grain overlay — cinematic film texture */
+.fs-grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* Section dividers — a single hairline so pages feel continuous */
+.fs-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--fs-hair-strong) 50%, transparent);
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fs-marquee { animation: none; }
+  .fs-card:hover { transform: none; }
+}

@@ -27,14 +27,14 @@ import EmailTemplatePanel from "@/components/EmailTemplatePanel";
 
 import {
   Bug,
-  Github,
+  GitFork,
   Languages,
   FileArchive,
   Database,
   Wand2,
   ShoppingCart,
   Users,
-  Figma,
+  Layers,
   Search,
   X,
   Save,
@@ -44,7 +44,6 @@ import {
   Accessibility,
   Gauge,
   Download,
-  Layers,
   Mail,
   Clock,
   Loader2,
@@ -88,8 +87,8 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "crm", label: "CRM", icon: <Users size={18} /> },
   { id: "scaffold", label: "Scaffolding", icon: <Database size={18} /> },
   { id: "translate", label: "Translate", icon: <Languages size={18} /> },
-  { id: "github", label: "GitHub Import", icon: <Github size={18} /> },
-  { id: "figma", label: "Figma Import", icon: <Figma size={18} /> },
+  { id: "github", label: "GitHub Import", icon: <GitFork size={18} /> },
+  { id: "figma", label: "Layers Import", icon: <Layers size={18} /> },
   { id: "wordpress", label: "Zoobicon Connect", icon: <FileArchive size={18} /> },
 ];
 
@@ -225,7 +224,7 @@ export default function EditSitePage() {
       abortRef.current = controller;
 
       try {
-        const res = await fetch("/api/generate/stream", {
+        const res = await fetch("/api/generate/react", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -238,7 +237,7 @@ export default function EditSitePage() {
 
         if (!res.ok) {
           // Fallback to non-streaming
-          const fallbackRes = await fetch("/api/generate", {
+          const fallbackRes = await fetch("/api/generate/react", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -328,7 +327,7 @@ export default function EditSitePage() {
                   key={v.id}
                   className={`p-3 rounded-lg border transition-all ${
                     i === 0
-                      ? "bg-emerald-500/10 border-emerald-500/20"
+                      ? "bg-stone-500/10 border-stone-500/20"
                       : "bg-white/5 border-white/10 hover:border-white/20"
                   }`}
                 >
@@ -440,7 +439,7 @@ export default function EditSitePage() {
       <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.10] bg-[#141e33]">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-stone-400 animate-pulse" />
             <span className="text-sm font-medium text-white">{site?.name || slug}</span>
           </div>
           {site?.url && (
@@ -454,7 +453,7 @@ export default function EditSitePage() {
             </a>
           )}
           {hasUnsavedChanges && (
-            <span className="px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 text-[10px] font-medium">
+            <span className="px-2 py-0.5 rounded-full bg-stone-500/20 text-stone-400 text-[10px] font-medium">
               Unsaved changes
             </span>
           )}
@@ -462,7 +461,7 @@ export default function EditSitePage() {
 
         <div className="flex items-center gap-2">
           {saveMessage && (
-            <span className="flex items-center gap-1 text-xs text-emerald-400">
+            <span className="flex items-center gap-1 text-xs text-stone-400">
               <Check size={14} /> {saveMessage}
             </span>
           )}
@@ -471,7 +470,7 @@ export default function EditSitePage() {
             disabled={!isDirty || isSaving}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
               isDirty
-                ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                ? "bg-stone-500/20 text-stone-400 hover:bg-stone-500/30"
                 : "bg-white/5 text-white/50 cursor-not-allowed"
             }`}
           >

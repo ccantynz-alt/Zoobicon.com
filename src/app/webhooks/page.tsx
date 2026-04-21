@@ -3,11 +3,34 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Webhook, Plus, Trash2, Edit3, Play, Check, X, Copy,
-  AlertCircle, CheckCircle2, Clock, RefreshCw, ChevronDown,
-  ChevronRight, ExternalLink, Send, Shield, Eye, EyeOff,
-  RotateCw, Settings, Zap, Globe, Code, Filter,
-  ArrowUpRight, Hash, AlertTriangle
+  Webhook,
+  Plus,
+  Trash2,
+  Edit3,
+  Play,
+  Check,
+  X,
+  Copy,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  RefreshCw,
+  ChevronDown,
+  ChevronRight,
+  ExternalLink,
+  Send,
+  Shield,
+  Eye,
+  EyeOff,
+  RotateCw,
+  Settings,
+  Zap,
+  Globe,
+  Code,
+  Filter,
+  ArrowUpRight,
+  Hash,
+  AlertTriangle,
 } from 'lucide-react';
 
 const EVENT_TYPES = [
@@ -106,11 +129,11 @@ export default function WebhooksPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="font-semibold text-white">Webhooks</span>
           </div>
-          <button onClick={() => { setShowAddForm(true); setActiveTab('endpoints'); }} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:opacity-90 transition text-sm font-medium">
+          <button onClick={() => { setShowAddForm(true); setActiveTab('endpoints'); }} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 hover:opacity-90 transition text-sm font-medium">
             <Plus className="w-4 h-4" /> Add Endpoint
           </button>
         </div>
@@ -120,10 +143,10 @@ export default function WebhooksPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Active Endpoints', value: webhooks.filter(w => w.active).length, icon: Webhook, color: 'text-emerald-400' },
-            { label: 'Total Deliveries (24h)', value: DEMO_DELIVERIES.length, icon: Send, color: 'text-blue-400' },
-            { label: 'Success Rate', value: `${Math.round(DEMO_DELIVERIES.filter(d => d.status === 200).length / DEMO_DELIVERIES.length * 100)}%`, icon: CheckCircle2, color: 'text-emerald-400' },
-            { label: 'Avg Response', value: `${Math.round(DEMO_DELIVERIES.reduce((s, d) => s + d.duration, 0) / DEMO_DELIVERIES.length)}ms`, icon: Clock, color: 'text-violet-400' },
+            { label: 'Active Endpoints', value: webhooks.filter(w => w.active).length, icon: Webhook, color: 'text-stone-400' },
+            { label: 'Total Deliveries (24h)', value: DEMO_DELIVERIES.length, icon: Send, color: 'text-stone-400' },
+            { label: 'Success Rate', value: `${Math.round(DEMO_DELIVERIES.filter(d => d.status === 200).length / DEMO_DELIVERIES.length * 100)}%`, icon: CheckCircle2, color: 'text-stone-400' },
+            { label: 'Avg Response', value: `${Math.round(DEMO_DELIVERIES.reduce((s, d) => s + d.duration, 0) / DEMO_DELIVERIES.length)}ms`, icon: Clock, color: 'text-stone-400' },
           ].map((s) => (
             <div key={s.label} className="p-5 rounded-xl bg-white/5 border border-white/10">
               <div className="flex items-center justify-between mb-2">
@@ -147,7 +170,7 @@ export default function WebhooksPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
-                activeTab === tab.id ? 'bg-violet-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
+                activeTab === tab.id ? 'bg-stone-600 text-white' : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
               }`}
             >
               <tab.icon className="w-4 h-4" /> {tab.label}
@@ -159,7 +182,7 @@ export default function WebhooksPage() {
         {activeTab === 'endpoints' && (
           <div className="space-y-4">
             {showAddForm && (
-              <div className="p-6 rounded-2xl bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20">
+              <div className="p-6 rounded-2xl bg-gradient-to-r from-stone-500/10 to-stone-500/10 border border-stone-500/20">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold">New Webhook Endpoint</h3>
                   <button onClick={() => setShowAddForm(false)}><X className="w-5 h-5 text-white/40" /></button>
@@ -167,7 +190,7 @@ export default function WebhooksPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm text-white/50 mb-1 block">Endpoint URL</label>
-                    <input type="url" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder="https://your-server.com/webhooks" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                    <input type="url" value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder="https://your-server.com/webhooks" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-stone-500/50" />
                   </div>
                   <div>
                     <label className="text-sm text-white/50 mb-2 block">Events to subscribe</label>
@@ -177,7 +200,7 @@ export default function WebhooksPage() {
                           key={ev.id}
                           onClick={() => setNewEvents(prev => prev.includes(ev.id) ? prev.filter(e => e !== ev.id) : [...prev, ev.id])}
                           className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition ${
-                            newEvents.includes(ev.id) ? 'bg-violet-600/20 border border-violet-500/30 text-violet-300' : 'bg-white/5 border border-white/10 text-white/50 hover:text-white'
+                            newEvents.includes(ev.id) ? 'bg-stone-600/20 border border-stone-500/30 text-stone-300' : 'bg-white/5 border border-white/10 text-white/50 hover:text-white'
                           }`}
                         >
                           {newEvents.includes(ev.id) ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
@@ -186,7 +209,7 @@ export default function WebhooksPage() {
                       ))}
                     </div>
                   </div>
-                  <button onClick={handleAddWebhook} className="px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition">Create Endpoint</button>
+                  <button onClick={handleAddWebhook} className="px-6 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-medium text-sm hover:opacity-90 transition">Create Endpoint</button>
                 </div>
               </div>
             )}
@@ -195,20 +218,20 @@ export default function WebhooksPage() {
               <div key={wh.id} className={`p-5 rounded-2xl border transition ${wh.active ? 'bg-white/5 border-white/10' : 'bg-white/[0.02] border-white/5 opacity-60'}`}>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className={`w-2.5 h-2.5 rounded-full ${wh.active ? 'bg-emerald-400' : 'bg-white/20'}`} />
+                    <div className={`w-2.5 h-2.5 rounded-full ${wh.active ? 'bg-stone-400' : 'bg-white/20'}`} />
                     <span className="font-mono text-sm">{wh.url}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => handleToggleWebhook(wh.id)} className={`px-3 py-1 rounded-lg text-xs font-medium ${wh.active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/10 text-white/40'}`}>
+                    <button onClick={() => handleToggleWebhook(wh.id)} className={`px-3 py-1 rounded-lg text-xs font-medium ${wh.active ? 'bg-stone-500/20 text-stone-400' : 'bg-white/10 text-white/40'}`}>
                       {wh.active ? 'Active' : 'Paused'}
                     </button>
-                    <button className="p-1.5 rounded-lg hover:bg-white/10"><Edit3 className="w-4 h-4 text-white/40" /></button>
-                    <button className="p-1.5 rounded-lg hover:bg-red-500/10"><Trash2 className="w-4 h-4 text-red-400/60" /></button>
+                    <button onClick={() => alert("Edit webhook configuration")} className="p-1.5 rounded-lg hover:bg-white/10"><Edit3 className="w-4 h-4 text-white/40" /></button>
+                    <button onClick={() => { if (confirm("Delete this webhook?")) alert("Webhook deleted"); }} className="p-1.5 rounded-lg hover:bg-stone-500/10"><Trash2 className="w-4 h-4 text-stone-400/60" /></button>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {wh.events.map((ev) => (
-                    <span key={ev} className="px-2 py-0.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-xs text-violet-300">{ev}</span>
+                    <span key={ev} className="px-2 py-0.5 rounded-full bg-stone-500/10 border border-stone-500/20 text-xs text-stone-300">{ev}</span>
                   ))}
                 </div>
                 <div className="flex items-center gap-4 text-xs text-white/30">
@@ -235,7 +258,7 @@ export default function WebhooksPage() {
                   {EVENT_TYPES.filter(e => e.category === cat).map((ev) => (
                     <div key={ev.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10">
                       <div className="flex items-center gap-3">
-                        <Zap className="w-4 h-4 text-violet-400" />
+                        <Zap className="w-4 h-4 text-stone-400" />
                         <div>
                           <p className="font-mono text-sm">{ev.id}</p>
                           <p className="text-xs text-white/40">{ev.desc}</p>
@@ -255,9 +278,9 @@ export default function WebhooksPage() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-sm text-white/40">Filter by endpoint:</span>
-              <button onClick={() => setSelectedWebhookFilter(null)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${!selectedWebhookFilter ? 'bg-violet-600' : 'bg-white/5 hover:bg-white/10'}`}>All</button>
+              <button onClick={() => setSelectedWebhookFilter(null)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${!selectedWebhookFilter ? 'bg-stone-600' : 'bg-white/5 hover:bg-white/10'}`}>All</button>
               {webhooks.map((wh) => (
-                <button key={wh.id} onClick={() => setSelectedWebhookFilter(wh.id)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition truncate max-w-48 ${selectedWebhookFilter === wh.id ? 'bg-violet-600' : 'bg-white/5 hover:bg-white/10'}`}>
+                <button key={wh.id} onClick={() => setSelectedWebhookFilter(wh.id)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition truncate max-w-48 ${selectedWebhookFilter === wh.id ? 'bg-stone-600' : 'bg-white/5 hover:bg-white/10'}`}>
                   {new URL(wh.url).hostname}
                 </button>
               ))}
@@ -269,9 +292,9 @@ export default function WebhooksPage() {
                     onClick={() => setExpandedDelivery(expandedDelivery === d.id ? null : d.id)}
                     className="w-full flex items-center gap-4 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/[0.07] transition"
                   >
-                    {d.status === 200 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" /> : <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />}
-                    <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${d.status === 200 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>{d.status}</span>
-                    <span className="text-sm font-mono text-violet-300">{d.event}</span>
+                    {d.status === 200 ? <CheckCircle2 className="w-4 h-4 text-stone-400 shrink-0" /> : <AlertCircle className="w-4 h-4 text-stone-400 shrink-0" />}
+                    <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${d.status === 200 ? 'bg-stone-500/20 text-stone-400' : 'bg-stone-500/20 text-stone-400'}`}>{d.status}</span>
+                    <span className="text-sm font-mono text-stone-300">{d.event}</span>
                     <span className="text-xs text-white/30 ml-auto">{d.duration}ms</span>
                     <span className="text-xs text-white/30">{d.timestamp}</span>
                     {expandedDelivery === d.id ? <ChevronDown className="w-4 h-4 text-white/30" /> : <ChevronRight className="w-4 h-4 text-white/30" />}
@@ -282,9 +305,9 @@ export default function WebhooksPage() {
                         <div><span className="text-white/30">Request ID:</span> <span className="font-mono">{d.request_id}</span></div>
                         <div><span className="text-white/30">Duration:</span> <span>{d.duration}ms</span></div>
                         <div><span className="text-white/30">Endpoint:</span> <span className="font-mono">{webhooks.find(w => w.id === d.webhook_id)?.url}</span></div>
-                        <div><span className="text-white/30">Status:</span> <span className={d.status === 200 ? 'text-emerald-400' : 'text-red-400'}>{d.status}</span></div>
+                        <div><span className="text-white/30">Status:</span> <span className={d.status === 200 ? 'text-stone-400' : 'text-stone-400'}>{d.status}</span></div>
                       </div>
-                      <button className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300">
+                      <button onClick={() => {}} className="flex items-center gap-1 text-xs text-stone-400 hover:text-stone-300">
                         <RotateCw className="w-3 h-3" /> Retry delivery
                       </button>
                     </div>
@@ -298,9 +321,9 @@ export default function WebhooksPage() {
         {/* Test Sender */}
         {activeTab === 'test' && (
           <div className="max-w-3xl mx-auto">
-            <div className="p-6 rounded-2xl bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20">
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-stone-500/10 to-stone-500/10 border border-stone-500/20">
               <div className="flex items-center gap-3 mb-4">
-                <Play className="w-5 h-5 text-violet-400" />
+                <Play className="w-5 h-5 text-stone-400" />
                 <h3 className="font-semibold">Test Webhook Delivery</h3>
               </div>
               <div className="space-y-4">
@@ -314,15 +337,15 @@ export default function WebhooksPage() {
                 </div>
                 <div>
                   <label className="text-sm text-white/50 mb-1 block">Payload</label>
-                  <textarea value={testPayload} onChange={(e) => setTestPayload(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono resize-none h-48 focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                  <textarea value={testPayload} onChange={(e) => setTestPayload(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono resize-none h-48 focus:outline-none focus:ring-2 focus:ring-stone-500/50" />
                 </div>
-                <button onClick={handleSendTest} disabled={sending} className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2">
+                <button onClick={handleSendTest} disabled={sending} className="w-full py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-medium text-sm hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2">
                   {sending ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Sending...</> : <><Send className="w-4 h-4" /> Send Test Webhook</>}
                 </button>
                 {testResult && (
-                  <div className={`p-4 rounded-xl border ${testResult.status === 200 ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+                  <div className={`p-4 rounded-xl border ${testResult.status === 200 ? 'bg-stone-500/10 border-stone-500/20' : 'bg-stone-500/10 border-stone-500/20'}`}>
                     <div className="flex items-center gap-2">
-                      {testResult.status === 200 ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <AlertCircle className="w-5 h-5 text-red-400" />}
+                      {testResult.status === 200 ? <CheckCircle2 className="w-5 h-5 text-stone-400" /> : <AlertCircle className="w-5 h-5 text-stone-400" />}
                       <span className="font-medium">{testResult.status === 200 ? 'Delivered successfully' : 'Delivery failed'}</span>
                       <span className="text-sm text-white/40 ml-auto">{testResult.duration}ms</span>
                     </div>

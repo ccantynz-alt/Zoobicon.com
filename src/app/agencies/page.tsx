@@ -1,18 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import BackgroundEffects from "@/components/BackgroundEffects";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
-  Zap,
-  Building2,
   Users,
   Palette,
-  Globe,
   ArrowRight,
-  Shield,
-  BarChart3,
   Layers,
   Crown,
   Briefcase,
@@ -25,16 +17,9 @@ import {
   FileText,
   TrendingUp,
   Lock,
+  BadgeCheck,
+  Building2,
 } from "lucide-react";
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
-};
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
-};
 
 const WHITE_LABEL_FEATURES = [
   { icon: PaintBucket, title: "Your Brand, Everywhere", desc: "Custom logo, colors, domain, emails — your clients never see Zoobicon. It's 100% your platform." },
@@ -134,269 +119,361 @@ const TIERS = [
   },
 ];
 
+const HERO_STATS = [
+  { value: "50x", label: "Faster delivery" },
+  { value: "100%", label: "Your branding" },
+  { value: "$0", label: "Per client seat" },
+  { value: "24/7", label: "AI agents working" },
+];
+
+const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const PRIMARY_CTA = {
+  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  color: "#0a1628",
+  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+} as const;
+const SERIF: React.CSSProperties = {
+  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+  fontStyle: "italic",
+  fontWeight: 400,
+  color: "#E8D4B0",
+};
+
 export default function AgenciesPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Zoobicon for Agencies",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "149",
+      "highPrice": "399",
+      "priceCurrency": "USD",
+      "offerCount": "3"
+    },
+    "description": "White-label AI platform for agencies. Generate client websites in bulk, run autonomous SEO campaigns, and scale to 100+ clients without hiring.",
+    "url": "https://zoobicon.com/agencies",
+    "screenshot": "https://zoobicon.com/og-image.png"
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
+      { "@type": "ListItem", "position": 2, "name": "Agencies", "item": "https://zoobicon.com/agencies" }
+    ]
+  };
+
   return (
-    <div className="relative min-h-screen">
-      <BackgroundEffects preset="technical" />
-
-      {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
-                <Building2 className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-              <span className="text-xs font-semibold text-accent-purple bg-accent-purple/10 px-2 py-0.5 rounded-md border border-accent-purple/20">Agencies</span>
-            </Link>
-            <div className="hidden md:flex items-center gap-4">
-              <a href="#white-label" className="text-sm text-white/60 hover:text-white transition-colors">White Label</a>
-              <a href="#tools" className="text-sm text-white/60 hover:text-white transition-colors">Tools</a>
-              <a href="#pricing" className="text-sm text-white/60 hover:text-white transition-colors">Pricing</a>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/agencies/dashboard" className="text-sm text-white/60 hover:text-white/70 transition-colors">
-              Dashboard
-            </Link>
-            <Link href="/agencies/portal" className="text-sm text-white/60 hover:text-white/70 transition-colors">
-              Client Portal
-            </Link>
-            <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
-              <span>Start Free Trial</span>
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      <CursorGlowTracker />
+    <div className="min-h-screen bg-[#060e1f] text-white fs-grain pt-[72px]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
-        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-purple/20 bg-accent-purple/5 mb-6">
-              <Building2 className="w-3 h-3 text-accent-purple" />
-              <span className="text-xs font-medium text-accent-purple">Built for Agencies</span>
-            </motion.div>
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }} />
+          <div className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.07), transparent 70%)" }} />
+        </div>
 
-            <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-6">
-              Your Agency.<br />
-              <span className="gradient-text-hero">Supercharged by AI.</span>
-            </motion.h1>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+            <Building2 className="w-3 h-3" />
+            Built for agencies · White-label platform · Unlimited seats
+          </div>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg text-white/60 leading-relaxed mb-10">
-              White-label the most advanced AI platform under your brand. Generate client websites in bulk,
-              run autonomous SEO campaigns, and scale your agency to 100+ clients without hiring.
-            </motion.p>
+          <h1 className="fs-display-xl mb-6">
+            Your agency.{" "}
+            <span style={SERIF}>supercharged by AI.</span>
+          </h1>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-3 mb-16">
-              <Link href="/auth/signup" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow">
-                <span>Start 14-Day Free Trial</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <a href="mailto:sales@zoobicon.com?subject=Agency Demo Request" className="px-8 py-4 rounded-2xl text-base font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-3">
-                <Briefcase className="w-5 h-5" />
-                <span>Book a Demo</span>
-              </a>
-            </motion.div>
+          <p className="max-w-3xl mx-auto text-[17px] md:text-[19px] leading-relaxed text-white/60 mb-10">
+            White-label the most advanced AI platform under your brand. Generate client websites in bulk,
+            run autonomous SEO campaigns, and scale your agency to 100+ clients without hiring.
+          </p>
 
-            {/* Stats */}
-            <motion.div variants={fadeInUp} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { value: "50x", label: "Faster delivery" },
-                { value: "100%", label: "Your branding" },
-                { value: "$0", label: "Per client seat" },
-                { value: "24/7", label: "AI agents working" },
-              ].map((stat) => (
-                <div key={stat.label} className="gradient-border p-4 rounded-xl text-center">
-                  <div className="text-2xl font-black gradient-text-static">{stat.value}</div>
-                  <div className="text-xs text-white/60 mt-1">{stat.label}</div>
+          <div className="flex flex-wrap justify-center gap-2 mb-10 max-w-3xl mx-auto">
+            {["White-label", "Unlimited clients", "Bulk generation", "SEO agents", "Team roles", "Priority support"].map((pill) => (
+              <span
+                key={pill}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] text-white/60"
+              >
+                <Check className="w-3 h-3" style={{ color: "#E8D4B0" }} />
+                {pill}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-16">
+            <Link
+              href="/auth/signup"
+              className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
+            >
+              Start 14-Day Free Trial
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <a
+              href="mailto:sales@zoobicon.com?subject=Agency Demo Request"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+            >
+              <Briefcase className="w-4 h-4" />
+              Book a Demo
+            </a>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 max-w-4xl mx-auto">
+            {HERO_STATS.map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-[20px] border border-white/[0.08] p-5 text-center"
+                style={{ background: CARD_BG }}
+              >
+                <div className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] mb-1" style={{ color: "#E8D4B0" }}>
+                  {stat.value}
                 </div>
-              ))}
-            </motion.div>
-          </motion.div>
+                <div className="text-[12px] text-white/55">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* White Label */}
-      <section id="white-label" className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-purple/20 bg-accent-purple/5 mb-6">
-                <Palette className="w-3 h-3 text-accent-purple" />
-                <span className="text-xs font-medium text-accent-purple">White Label Platform</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Your Platform.<br /><span className="gradient-text">Your Rules.</span>
-              </h2>
-              <p className="text-lg text-white/60 max-w-2xl mx-auto">
-                Rebrand Zoobicon as your own AI platform. Your logo, your colors, your domain.
-                Clients will think you built it.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {WHITE_LABEL_FEATURES.map((f, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
-                  <f.icon className="w-8 h-8 text-accent-purple/60 mb-4 group-hover:text-accent-purple transition-colors" />
-                  <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
-                </motion.div>
-              ))}
+      <section id="white-label" className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              <Palette className="w-3 h-3" />
+              White label platform
             </div>
-          </motion.div>
+            <h2 className="fs-display-lg mb-4">
+              Your platform.{" "}
+              <span style={SERIF}>your rules.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Rebrand Zoobicon as your own AI platform. Your logo, your colors, your domain. Clients will think you built it.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {WHITE_LABEL_FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                    <f.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{f.title}</h3>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Agency Tools */}
-      <section id="tools" className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Scale Without <span className="gradient-text">Hiring</span>
-              </h2>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              {AGENCY_TOOLS.map((tool, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-8 rounded-2xl group">
-                  <div className="flex items-start justify-between mb-4">
-                    <tool.icon className="w-10 h-10 text-brand-400/60" />
-                    <span className="text-xs font-bold text-accent-cyan bg-accent-cyan/10 px-2.5 py-1 rounded-full">{tool.stat}</span>
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{tool.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{tool.desc}</p>
-                </motion.div>
-              ))}
+      <section id="tools" className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Agency tools
             </div>
-          </motion.div>
+            <h2 className="fs-display-lg mb-4">
+              Scale without{" "}
+              <span style={SERIF}>hiring.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Run a 100-client agency with a team of three. Automation handles everything the senior staff used to burn hours on.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            {AGENCY_TOOLS.map((tool) => (
+              <div
+                key={tool.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="flex items-start justify-between mb-5">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                      <tool.icon className="h-5 w-5 text-[#E8D4B0]" />
+                    </div>
+                    <span
+                      className="rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                      style={{ color: "#E8D4B0" }}
+                    >
+                      {tool.stat}
+                    </span>
+                  </div>
+                  <h3 className="text-[18px] font-semibold tracking-[-0.01em] mb-2">{tool.title}</h3>
+                  <p className="text-[14px] text-white/55 leading-relaxed">{tool.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Agencies <span className="gradient-text">Love Us</span>
-              </h2>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-4">
-              {TESTIMONIALS.map((t, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border p-6 rounded-xl">
-                  <div className="flex gap-0.5 mb-4">
-                    {Array.from({ length: t.stars }).map((_, j) => (
-                      <Star key={j} className="w-4 h-4 text-amber-400 fill-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-white/60 leading-relaxed mb-4">&ldquo;{t.text}&rdquo;</p>
-                  <div>
-                    <div className="text-sm font-semibold">{t.name}</div>
-                    <div className="text-xs text-white/60">{t.role}</div>
-                  </div>
-                </motion.div>
-              ))}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[480px] w-[860px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.06), transparent 70%)" }} />
+        </div>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              <BadgeCheck className="w-3 h-3" />
+              Loved by agencies
             </div>
-          </motion.div>
+            <h2 className="fs-display-lg mb-4">
+              Agencies{" "}
+              <span style={SERIF}>love us.</span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {TESTIMONIALS.map((t) => (
+              <div
+                key={t.name}
+                className="rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="flex gap-0.5 mb-5">
+                  {Array.from({ length: t.stars }).map((_, j) => (
+                    <Star key={j} className="w-4 h-4" style={{ color: "#E8D4B0", fill: "#E8D4B0" }} />
+                  ))}
+                </div>
+                <p className="text-[14px] text-white/70 leading-relaxed mb-6">&ldquo;{t.text}&rdquo;</p>
+                <div className="pt-4 border-t border-white/[0.06]">
+                  <div className="text-[14px] font-semibold text-white">{t.name}</div>
+                  <div className="text-[12px] text-white/50">{t.role}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Agency <span className="gradient-text">Pricing</span>
-              </h2>
-              <p className="text-lg text-white/60">14-day free trial. No credit card required.</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-4">
-              {TIERS.map((tier, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  className={`p-6 rounded-xl ${
-                    tier.featured
-                      ? "border border-brand-500/30 bg-brand-500/[0.02] shadow-glow relative"
-                      : "gradient-border"
-                  }`}
-                >
-                  {tier.featured && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-accent-purple text-xs font-bold text-white">
-                      Best Value
-                    </div>
-                  )}
-                  <div className="text-sm font-semibold text-white/65 mb-2">{tier.name}</div>
-                  <div className="text-3xl font-black mb-0.5">{tier.price}<span className="text-base font-normal text-white/60">{tier.period}</span></div>
-                  <div className="text-xs text-white/60 mb-4">{tier.desc}</div>
-                  <ul className="space-y-2 mb-6">
-                    {tier.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-sm text-white/65">
-                        <Check className="w-3.5 h-3.5 text-accent-cyan flex-shrink-0" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  {tier.cta === "Contact Sales" ? (
-                    <a
-                      href="mailto:sales@zoobicon.com?subject=Agency Enterprise Inquiry"
-                      className="block w-full py-2.5 rounded-xl text-sm font-bold text-center border border-white/[0.12] text-white/60 hover:border-white/20 transition-all"
-                    >
-                      Contact Sales
-                    </a>
-                  ) : (
-                    <Link
-                      href="/auth/signup"
-                      className={`block w-full py-2.5 rounded-xl text-sm font-bold text-center ${
-                        tier.featured
-                          ? "btn-gradient text-white"
-                          : "border border-white/[0.12] text-white/60 hover:border-white/20 transition-all"
-                      }`}
-                    >
-                      {tier.cta}
-                    </Link>
-                  )}
-                </motion.div>
-              ))}
+      <section id="pricing" className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Pricing
             </div>
-          </motion.div>
-        </div>
-      </section>
+            <h2 className="fs-display-lg mb-4">
+              Agency{" "}
+              <span style={SERIF}>pricing.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              14-day free trial. No credit card required.
+            </p>
+          </div>
 
-      {/* CTA */}
-      <section className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-            Ready to Scale <span className="gradient-text">Your Agency?</span>
-          </h2>
-          <p className="text-lg text-white/60 mb-8">Join hundreds of agencies using Zoobicon to 10x their output.</p>
-          <Link href="/auth/signup" className="inline-flex group btn-gradient px-10 py-4 rounded-2xl text-lg font-bold text-white items-center gap-3 shadow-glow-lg">
-            <span>Start 14-Day Free Trial</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-white/[0.08] py-8">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/60">&copy; 2026 Zoobicon. All rights reserved.</div>
-          <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
-            <Link href="/developers" className="text-xs text-white/60 hover:text-white/60">Developers</Link>
-            <Link href="/cli" className="text-xs text-white/60 hover:text-white/60">CLI</Link>
+          <div className="grid md:grid-cols-3 gap-5">
+            {TIERS.map((tier) => (
+              <div
+                key={tier.name}
+                className={`relative rounded-[24px] p-7 transition-all duration-500 hover:-translate-y-1 ${
+                  tier.featured ? "border-2 border-[#E8D4B0]/35" : "border border-white/[0.08] hover:border-[#E8D4B0]/25"
+                }`}
+                style={{
+                  background: tier.featured
+                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(17,17,24,0.85) 100%)"
+                    : CARD_BG,
+                }}
+              >
+                {tier.featured && (
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a1628" }}
+                  >
+                    Most popular
+                  </div>
+                )}
+                <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{tier.name}</h3>
+                <div className="flex items-baseline gap-1 mb-3">
+                  <span className="text-4xl font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>{tier.price}</span>
+                  {tier.period && <span className="text-[13px] text-white/50">{tier.period}</span>}
+                </div>
+                <p className="text-[13px] text-white/55 mb-6">{tier.desc}</p>
+                <ul className="space-y-2.5 mb-7">
+                  {tier.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-[13px] text-white/65">
+                      <Check className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#E8D4B0" }} />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                {tier.cta === "Contact Sales" ? (
+                  <a
+                    href="mailto:sales@zoobicon.com?subject=Agency Enterprise Inquiry"
+                    className="block text-center rounded-full py-3 text-[13px] font-semibold transition-all border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                  >
+                    {tier.cta}
+                  </a>
+                ) : (
+                  <Link
+                    href="/auth/signup"
+                    className={`block text-center rounded-full py-3 text-[13px] font-semibold transition-all ${
+                      tier.featured ? "" : "border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                    }`}
+                    style={tier.featured ? PRIMARY_CTA : undefined}
+                  >
+                    {tier.cta}
+                  </Link>
+                )}
+              </div>
+            ))}
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative py-24 md:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[560px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.11), transparent 70%)" }} />
+        </div>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="fs-display-lg mb-5">
+            Ready to scale{" "}
+            <span style={SERIF}>your agency?</span>
+          </h2>
+          <p className="text-[17px] text-white/60 mb-10">
+            Join hundreds of agencies using Zoobicon to 10x their output.
+          </p>
+          <Link
+            href="/auth/signup"
+            className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+            style={PRIMARY_CTA}
+          >
+            Start 14-Day Free Trial
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-[12px] text-white/55">
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> No credit card</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> 14-day free trial</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> Cancel anytime</span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

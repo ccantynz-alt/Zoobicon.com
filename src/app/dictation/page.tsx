@@ -174,7 +174,7 @@ export default function DictationPage() {
       window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert(
-        "Speech recognition not supported in this browser. Use Chrome or Edge."
+        "Speech recognition not supported in this browser. Use Globe2 or Edge."
       );
       return;
     }
@@ -529,22 +529,22 @@ export default function DictationPage() {
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col">
+    <div className="min-h-screen bg-[#0a1628] text-white flex flex-col">
       {/* Top Bar */}
-      <header className="border-b border-white/10 bg-[#0a0a0f]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[#0a1628]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center">
               <Mic className="w-4 h-4 text-white" />
             </div>
             <h1 className="text-lg font-semibold tracking-tight">Dictation</h1>
             {engine === "whisper" && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-stone-500/20 text-stone-400 border border-stone-500/30">
                 Whisper API
               </span>
             )}
             {engine === "browser" && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-stone-500/20 text-stone-400 border border-stone-500/30">
                 Browser Speech
               </span>
             )}
@@ -631,7 +631,7 @@ export default function DictationPage() {
                     }}
                     className={`flex-1 px-3 py-2 rounded-lg text-sm border transition-colors ${
                       engine === "browser"
-                        ? "bg-blue-500/20 border-blue-500/50 text-blue-400"
+                        ? "bg-stone-500/20 border-stone-500/50 text-stone-400"
                         : "bg-white/5 border-white/10 text-white/50 hover:text-white/80"
                     }`}
                   >
@@ -645,7 +645,7 @@ export default function DictationPage() {
                     }}
                     className={`flex-1 px-3 py-2 rounded-lg text-sm border transition-colors ${
                       engine === "whisper"
-                        ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400"
+                        ? "bg-stone-500/20 border-stone-500/50 text-stone-400"
                         : "bg-white/5 border-white/10 text-white/50 hover:text-white/80"
                     }`}
                   >
@@ -673,7 +673,7 @@ export default function DictationPage() {
                       onClick={() => setMicMode(mode)}
                       className={`flex-1 px-3 py-2 rounded-lg text-sm border transition-colors ${
                         micMode === mode
-                          ? "bg-violet-500/20 border-violet-500/50 text-violet-400"
+                          ? "bg-stone-500/20 border-stone-500/50 text-stone-400"
                           : "bg-white/5 border-white/10 text-white/50 hover:text-white/80"
                       }`}
                     >
@@ -694,7 +694,7 @@ export default function DictationPage() {
                     value={whisperApiKey}
                     onChange={(e) => setWhisperApiKey(e.target.value)}
                     placeholder="sk-..."
-                    className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50"
+                    className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50"
                   />
                   <p className="text-xs text-white/30 mt-1">
                     Stored in browser only. Never sent to our servers.
@@ -710,7 +710,7 @@ export default function DictationPage() {
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-violet-500/50"
+                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-stone-500/50"
                 >
                   <option value="en-US">English (US)</option>
                   <option value="en-GB">English (UK)</option>
@@ -744,7 +744,7 @@ export default function DictationPage() {
                   max={32}
                   value={fontSize}
                   onChange={(e) => setFontSize(Number(e.target.value))}
-                  className="w-full accent-violet-500"
+                  className="w-full accent-stone-500"
                 />
               </div>
 
@@ -755,7 +755,7 @@ export default function DictationPage() {
                     type="checkbox"
                     checked={autoCapitalize}
                     onChange={(e) => setAutoCapitalize(e.target.checked)}
-                    className="accent-violet-500"
+                    className="accent-stone-500"
                   />
                   Auto-capitalize sentences
                 </label>
@@ -764,7 +764,7 @@ export default function DictationPage() {
                     type="checkbox"
                     checked={voiceCommands}
                     onChange={(e) => setVoiceCommands(e.target.checked)}
-                    className="accent-violet-500"
+                    className="accent-stone-500"
                   />
                   Voice commands (say &ldquo;period&rdquo;, &ldquo;new line&rdquo;, etc.)
                 </label>
@@ -773,7 +773,7 @@ export default function DictationPage() {
                     type="checkbox"
                     checked={continuousRestart}
                     onChange={(e) => setContinuousRestart(e.target.checked)}
-                    className="accent-violet-500"
+                    className="accent-stone-500"
                   />
                   Auto-restart on silence (keeps mic active)
                 </label>
@@ -789,7 +789,7 @@ export default function DictationPage() {
             {isListening && (
               <div className="h-1 bg-white/5">
                 <div
-                  className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-all duration-100"
+                  className="h-full bg-gradient-to-r from-stone-500 to-stone-500 transition-all duration-100"
                   style={{ width: `${Math.min(audioLevel * 100, 100)}%` }}
                 />
               </div>
@@ -835,7 +835,7 @@ export default function DictationPage() {
             <span>{charCount} characters</span>
             <span>{segments.length} segments</span>
             {engine === "whisper" && whisperStatus && (
-              <span className="text-emerald-400/60">{whisperStatus}</span>
+              <span className="text-stone-400/60">{whisperStatus}</span>
             )}
           </div>
 
@@ -854,8 +854,8 @@ export default function DictationPage() {
               onClick={toggleListening}
               className={`relative p-5 rounded-2xl transition-all duration-300 ${
                 isListening
-                  ? "bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30 scale-110"
-                  : "bg-gradient-to-br from-violet-500 to-fuchsia-500 hover:from-violet-400 hover:to-fuchsia-400 shadow-lg shadow-violet-500/20"
+                  ? "bg-stone-500 hover:bg-stone-600 shadow-lg shadow-stone-500/30 scale-110"
+                  : "bg-gradient-to-br from-stone-500 to-stone-500 hover:from-stone-400 hover:to-stone-400 shadow-lg shadow-stone-500/20"
               }`}
               title={
                 isListening
@@ -871,8 +871,8 @@ export default function DictationPage() {
               {/* Pulse animation when listening */}
               {isListening && (
                 <>
-                  <span className="absolute inset-0 rounded-2xl bg-red-500 animate-ping opacity-20" />
-                  <span className="absolute -inset-1 rounded-2xl border-2 border-red-400/30 animate-pulse" />
+                  <span className="absolute inset-0 rounded-2xl bg-stone-500 animate-ping opacity-20" />
+                  <span className="absolute -inset-1 rounded-2xl border-2 border-stone-400/30 animate-pulse" />
                 </>
               )}
             </button>
@@ -899,7 +899,7 @@ export default function DictationPage() {
               title="Copy to clipboard"
             >
               {copied ? (
-                <Check className="w-4 h-4 text-emerald-400" />
+                <Check className="w-4 h-4 text-stone-400" />
               ) : (
                 <Copy className="w-4 h-4" />
               )}
@@ -915,7 +915,7 @@ export default function DictationPage() {
             <button
               onClick={clearText}
               disabled={!text}
-              className="p-2.5 rounded-xl bg-white/5 hover:bg-red-500/10 text-white/50 hover:text-red-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              className="p-2.5 rounded-xl bg-white/5 hover:bg-stone-500/10 text-white/50 hover:text-stone-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               title="Clear all"
             >
               <Trash2 className="w-4 h-4" />

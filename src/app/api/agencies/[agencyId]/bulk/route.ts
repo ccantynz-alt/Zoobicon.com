@@ -137,11 +137,11 @@ async function processJobInBackground(
       const prompt = `Create a professional website for ${biz.name}, a ${biz.industry} business. ${biz.description}`;
 
       // Use the quick generation endpoint for speed in bulk mode
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.VERCEL_URL
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
-        : "http://localhost:3000";
+        : "http://localhost:3000");
 
-      const resp = await fetch(`${baseUrl}/api/generate/quick`, {
+      const resp = await fetch(`${baseUrl}/api/generate/react`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, style: "modern" }),

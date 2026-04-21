@@ -3,7 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
-import { Zap, ArrowRight, ArrowLeft, Mail, CheckCircle2 } from "lucide-react";
+import {
+  Zap,
+  ArrowRight,
+  ArrowLeft,
+  Mail,
+  CheckCircle2,
+} from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -113,7 +119,7 @@ export default function ForgotPasswordPage() {
                 </div>
 
                 {error && (
-                  <p className="text-sm text-red-400/80 text-center py-1">{error}</p>
+                  <p className="text-sm text-stone-400/80 text-center py-1">{error}</p>
                 )}
 
                 <button

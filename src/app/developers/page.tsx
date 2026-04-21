@@ -1,389 +1,412 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
-import BackgroundEffects from "@/components/BackgroundEffects";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
-  Zap,
-  Code2,
-  Terminal,
-  Copy,
-  Check,
-  ArrowRight,
-  BookOpen,
-  Layers,
-  Webhook,
+  Code,
   Key,
-  BarChart3,
-  Shield,
+  Zap,
+  ArrowRight,
+  Check,
+  Terminal,
+  Rocket,
+  Video,
   Globe,
-  Cpu,
-  GitBranch,
-  Package,
-  ChevronRight,
+  Database,
+  Signal,
+  Wifi,
+  Calendar,
+  FileText,
+  Activity,
+  ShieldCheck,
 } from "lucide-react";
-import { useState } from "react";
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
-};
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
+// Force dynamic rendering — this page timed out during static generation on Vercel
+export const dynamic = "force-dynamic";
+
+export const metadata = {
+  title: "Developers — Zoobicon API",
+  description:
+    "Real domains. Real video. Real websites. One API key. Build production apps on the Zoobicon platform API.",
 };
 
-const CODE_EXAMPLES = {
-  generate: `// POST /api/v1/generate — Generate a complete website
-const response = await fetch("https://zoobicon.com/api/v1/generate", {
-  method: "POST",
-  headers: {
-    "Authorization": "Bearer zbk_live_...",
-    "Content-Type": "application/json"
+type Endpoint = {
+  method: "GET" | "POST";
+  path: string;
+  description: string;
+  snippet: string;
+  icon: typeof Code;
+};
+
+const endpoints: Endpoint[] = [
+  { method: "POST", path: "/api/v1/sites", description: "Generate a complete React site from a single prompt.", snippet: `{ "prompt": "saas landing for a dog walking app" }`, icon: Rocket },
+  { method: "POST", path: "/api/v1/generate", description: "Lower-level generation endpoint with model + agent control.", snippet: `{ "prompt": "...", "model": "claude-opus-4-6" }`, icon: Code },
+  { method: "POST", path: "/api/v1/deploy", description: "Deploy a generated site to a live zoobicon.sh subdomain.", snippet: `{ "siteId": "abc123", "slug": "my-site" }`, icon: Rocket },
+  { method: "POST", path: "/api/v1/video/generate", description: "Produce a talking-avatar video from a script. Fish Speech + OmniHuman.", snippet: `{ "script": "Hello world" }`, icon: Video },
+  { method: "POST", path: "/api/v1/transcribe", description: "Speech-to-text transcription with speaker diarization.", snippet: `{ "audioUrl": "https://..." }`, icon: Activity },
+  { method: "GET", path: "/api/v1/status", description: "Health check, quota usage and rate-limit headers.", snippet: `// returns { ok, plan, used, limit }`, icon: Activity },
+  { method: "POST", path: "/api/v1/storage/upload", description: "Upload a file to managed object storage.", snippet: `multipart/form-data: file=@image.png`, icon: Database },
+  { method: "GET", path: "/api/v1/storage/buckets", description: "List your project's storage buckets and usage.", snippet: `// returns Bucket[]`, icon: Database },
+  { method: "GET", path: "/api/v1/esim/plans", description: "List available eSIM data plans across 190+ countries.", snippet: `?country=JP`, icon: Signal },
+  { method: "POST", path: "/api/v1/esim/purchase", description: "Purchase and provision an eSIM for a customer.", snippet: `{ "planId": "jp-5gb" }`, icon: Signal },
+  { method: "GET", path: "/api/v1/esim/usage", description: "Real-time data usage for an active eSIM.", snippet: `?iccid=89014...`, icon: Signal },
+  { method: "POST", path: "/api/v1/esim/topup", description: "Add data to an existing active eSIM.", snippet: `{ "iccid": "...", "gb": 5 }`, icon: Signal },
+  { method: "GET", path: "/api/v1/vpn/plans", description: "List WireGuard VPN plans and regions.", snippet: `// returns Plan[]`, icon: Wifi },
+  { method: "POST", path: "/api/v1/vpn/provision", description: "Provision a WireGuard VPN config for a customer.", snippet: `{ "region": "us-west" }`, icon: Wifi },
+  { method: "GET", path: "/api/v1/vpn/status", description: "Connection status and bandwidth usage.", snippet: `?sessionId=...`, icon: Wifi },
+  { method: "GET", path: "/api/v1/booking/services", description: "List bookable services for a calendar account.", snippet: `// returns Service[]`, icon: Calendar },
+  { method: "GET", path: "/api/v1/booking/availability", description: "Open time slots for a service over a date range.", snippet: `?serviceId=...&from=2026-04-10`, icon: Calendar },
+  { method: "POST", path: "/api/v1/booking/appointments", description: "Create a booking and trigger confirmation email.", snippet: `{ "serviceId": "...", "start": "..." }`, icon: Calendar },
+  { method: "POST", path: "/api/v1/wordpress/generate", description: "Generate WordPress post content from a brief.", snippet: `{ "topic": "...", "tone": "expert" }`, icon: FileText },
+  { method: "POST", path: "/api/v1/wordpress/seo", description: "Audit and rewrite a page for on-page SEO.", snippet: `{ "url": "..." }`, icon: FileText },
+  { method: "POST", path: "/api/v1/wordpress/site-audit", description: "Full crawl-based site audit with prioritized fixes.", snippet: `{ "domain": "example.com" }`, icon: FileText },
+  { method: "POST", path: "/api/v1/wordpress/translate", description: "Translate content into 50+ languages with tone preservation.", snippet: `{ "text": "...", "to": "ja" }`, icon: Globe },
+];
+
+const limits = [
+  { plan: "Free", quota: "100 requests / day", price: "$0" },
+  { plan: "Pro", quota: "10,000 requests / day", price: "$49 / mo" },
+  { plan: "Agency", quota: "100,000 requests / day", price: "$299 / mo" },
+  { plan: "Enterprise", quota: "Unlimited + dedicated capacity", price: "Custom" },
+];
+
+const QUICKSTART_FEATURES = [
+  "HMAC bearer auth — no OAuth dance",
+  "JSON in, JSON out — no SDK required",
+  "Streaming SSE available on every endpoint",
+  "99.95% uptime SLA on Pro and above",
+];
+
+const PRICING_TIERS = [
+  {
+    name: "Free",
+    price: "$0",
+    period: "",
+    description: "Try every endpoint. No credit card.",
+    rate: "10 requests / min",
+    features: ["Standard tier generation", "Deploy to zoobicon.sh", "Community support", "1 API key"],
+    cta: "Get started",
+    href: "/auth/signup",
+    highlighted: false,
   },
-  body: JSON.stringify({
-    prompt: "A modern SaaS landing page with pricing tables",
-    generator: "saas",          // 43 specialized generators
-    tier: "premium",            // standard | premium
-    style: "dark minimal",      // freeform style description
-    deploy: true,               // auto-deploy to zoobicon.sh
-    deploy_name: "my-saas",     // custom subdomain
-    webhook_url: "https://your-app.com/hooks/zoobicon"
-  })
-});
-
-const { data } = await response.json();
-// data.id:               "a1b2c3d4-..."
-// data.html:             "<!DOCTYPE html>..."  (complete site)
-// data.tokens_used:      18420
-// data.generation_time_ms: 12500
-// data.deployed.url:     "https://my-saas.zoobicon.sh"`,
-  deploy: `// POST /api/v1/deploy — Deploy any HTML to zoobicon.sh
-const response = await fetch("https://zoobicon.com/api/v1/deploy", {
-  method: "POST",
-  headers: {
-    "Authorization": "Bearer zbk_live_...",
-    "Content-Type": "application/json"
+  {
+    name: "Pro",
+    price: "$79",
+    period: "/mo",
+    description: "For production apps at scale.",
+    rate: "60 requests / min",
+    features: ["Premium tier generation", "43 specialized generators", "White-label branding", "Webhook callbacks", "Priority support"],
+    cta: "Start Pro",
+    href: "/pricing",
+    highlighted: true,
   },
-  body: JSON.stringify({
-    html: myGeneratedHTML,
-    name: "Client Portfolio",
-    slug: "client-portfolio",        // → client-portfolio.zoobicon.sh
-    commit_message: "Initial launch"
-  })
-});
+  {
+    name: "Enterprise",
+    price: "Custom",
+    period: "",
+    description: "Dedicated capacity and SLA.",
+    rate: "600 requests / min",
+    features: ["Dedicated rate limits", "Custom model routing", "SLA guarantee", "Agency bulk generation", "24/7 support"],
+    cta: "Contact sales",
+    href: "mailto:sales@zoobicon.com?subject=Enterprise API Inquiry",
+    highlighted: false,
+  },
+];
 
-const { data } = await response.json();
-// data.site_id:        "uuid-..."
-// data.url:            "https://client-portfolio.zoobicon.sh"
-// data.deployment_id:  "uuid-..."
-
-// Update later with PUT /api/v1/sites
-await fetch("https://zoobicon.com/api/v1/sites", {
-  method: "PUT",
-  headers: { "Authorization": "Bearer zbk_live_...", "Content-Type": "application/json" },
-  body: JSON.stringify({ slug: "client-portfolio", html: updatedHTML })
-});`,
-  sites: `// GET /api/v1/sites — List all your deployed sites
-const response = await fetch("https://zoobicon.com/api/v1/sites?page=1&limit=20", {
-  headers: { "Authorization": "Bearer zbk_live_..." }
-});
-
-const { data } = await response.json();
-// data.sites: [
-//   { id, name, slug, url, plan, status, created_at },
-//   ...
-// ]
-// data.pagination: { page: 1, limit: 20, total: 47, totalPages: 3 }
-
-// DELETE /api/v1/sites — Deactivate a site
-await fetch("https://zoobicon.com/api/v1/sites", {
-  method: "DELETE",
-  headers: { "Authorization": "Bearer zbk_live_...", "Content-Type": "application/json" },
-  body: JSON.stringify({ slug: "old-site" })
-});`,
-  status: `// GET /api/v1/status — API health + account info
-const response = await fetch("https://zoobicon.com/api/v1/status", {
-  headers: { "Authorization": "Bearer zbk_live_..." }
-});
-
-const { data } = await response.json();
-// data.status:     "operational"
-// data.plan:       "pro"
-// data.rate_limit: { limit: 60, window_ms: 60000 }
-// data.usage:      { sites_count: 47, deployments_count: 132, generations_count: 89 }
-// data.endpoints:  [{ method, path, description }, ...]
-// data.version:    "1.0.0"
-
-// White-label branding (agency plans)
-const branded = await fetch("https://zoobicon.com/api/v1/generate", {
-  method: "POST",
-  headers: { "Authorization": "Bearer zbk_live_...", "Content-Type": "application/json" },
-  body: JSON.stringify({
-    prompt: "Restaurant website for Bella Italia",
-    agency_brand: {
-      agencyName: "WebCraft Agency",
-      primaryColor: "#1e40af",
-      logoUrl: "https://webcraft.agency/logo.png"
-    }
-  })
-});`,
+const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const PRIMARY_CTA = {
+  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  color: "#0a1628",
+  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+} as const;
+const SERIF: React.CSSProperties = {
+  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+  fontStyle: "italic",
+  fontWeight: 400,
+  color: "#E8D4B0",
 };
 
-const API_ENDPOINTS = [
-  { method: "POST", path: "/api/v1/generate", desc: "Generate a website from prompt with 43 specialized generators" },
-  { method: "GET", path: "/api/v1/sites", desc: "List all your deployed sites with pagination" },
-  { method: "PUT", path: "/api/v1/sites", desc: "Update site HTML and create new deployment version" },
-  { method: "DELETE", path: "/api/v1/sites", desc: "Deactivate a site by ID or slug" },
-  { method: "POST", path: "/api/v1/deploy", desc: "Deploy HTML to zoobicon.sh with custom slug" },
-  { method: "GET", path: "/api/v1/deploy", desc: "Get deployment history for a site" },
-  { method: "GET", path: "/api/v1/status", desc: "API health check, usage stats, and account info" },
-];
-
-const SDKS = [
-  { lang: "JavaScript/TypeScript", pkg: "@zoobicon/sdk", install: "npm install @zoobicon/sdk", color: "text-yellow-400" },
-  { lang: "Python", pkg: "zoobicon", install: "pip install zoobicon", color: "text-blue-400" },
-  { lang: "Go", pkg: "go-zoobicon", install: "go get github.com/zoobicon/go-zoobicon", color: "text-cyan-400" },
-  { lang: "Ruby", pkg: "zoobicon-ruby", install: "gem install zoobicon", color: "text-red-400" },
-  { lang: "PHP", pkg: "zoobicon/sdk", install: "composer require zoobicon/sdk", color: "text-blue-400" },
-  { lang: "cURL", pkg: "REST API", install: "Works with any HTTP client", color: "text-green-400" },
-];
-
-const FEATURES = [
-  { icon: Webhook, title: "Webhooks", desc: "Real-time notifications for generation, deployment, and SEO events." },
-  { icon: Shield, title: "OAuth 2.0", desc: "Secure authentication with scoped API keys and team permissions." },
-  { icon: BarChart3, title: "Rate Limiting", desc: "Tiered limits: 10 req/min (Free), 60 req/min (Pro), 600 req/min (Enterprise)." },
-  { icon: Layers, title: "Batch Operations", desc: "Generate up to 50 sites in a single batch request with parallel processing." },
-  { icon: Globe, title: "CDN Hosting", desc: "Auto-deploy to our global CDN. Custom domains with free SSL certificates." },
-  { icon: GitBranch, title: "Version Control", desc: "Every generation is versioned. Roll back, diff, and branch your sites." },
-];
+function MethodBadge({ method }: { method: "GET" | "POST" }) {
+  return (
+    <span
+      className="inline-flex items-center rounded-md border px-2 py-0.5 font-mono text-[10px] font-semibold"
+      style={{
+        borderColor: "rgba(232,212,176,0.25)",
+        background: "rgba(232,212,176,0.06)",
+        color: "#E8D4B0",
+      }}
+    >
+      {method}
+    </span>
+  );
+}
 
 export default function DevelopersPage() {
-  const [activeTab, setActiveTab] = useState<keyof typeof CODE_EXAMPLES>("generate");
-  const [copiedEndpoint, setCopiedEndpoint] = useState<string | null>(null);
-
-  const copyCode = (code: string, id: string) => {
-    navigator.clipboard.writeText(code).catch(() => {});
-    setCopiedEndpoint(id);
-    setTimeout(() => setCopiedEndpoint(null), 2000);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebAPI",
+    "name": "Zoobicon Platform API",
+    "description":
+      "Real domains. Real video. Real websites. One API key. Build production apps on the Zoobicon platform API.",
+    "url": "https://zoobicon.com/developers",
+    "provider": {
+      "@type": "Organization",
+      "name": "Zoobicon",
+      "url": "https://zoobicon.com",
+    },
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "0",
+      "highPrice": "299",
+      "priceCurrency": "USD",
+      "offerCount": "4",
+    },
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://zoobicon.com" },
+      { "@type": "ListItem", "position": 2, "name": "Developers", "item": "https://zoobicon.com/developers" },
+    ],
   };
 
   return (
-    <div className="relative min-h-screen">
-      <BackgroundEffects preset="technical" />
-
-      {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-emerald-600 flex items-center justify-center">
-                <Code2 className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-              <span className="text-xs font-mono text-accent-cyan bg-accent-cyan/10 px-2 py-0.5 rounded-md border border-accent-cyan/20">.io</span>
-            </Link>
-            <div className="hidden md:flex items-center gap-4">
-              <a href="#api" className="text-sm text-white/60 hover:text-white transition-colors">API</a>
-              <a href="#sdks" className="text-sm text-white/60 hover:text-white transition-colors">SDKs</a>
-              <a href="#endpoints" className="text-sm text-white/60 hover:text-white transition-colors">Endpoints</a>
-              <a href="#features" className="text-sm text-white/60 hover:text-white transition-colors">Features</a>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
-              <span>Get API Key</span>
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      <CursorGlowTracker />
+    <div className="min-h-screen bg-[#060e1f] text-white fs-grain pt-[72px]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
-        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="flex items-center gap-2 mb-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5">
-                <Terminal className="w-3 h-3 text-accent-cyan" />
-                <span className="text-xs font-medium text-accent-cyan">Developer Platform</span>
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div
+            className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }}
+          />
+          <div
+            className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.07), transparent 70%)" }}
+          />
+        </div>
+
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+            <ShieldCheck className="w-3 h-3" />
+            Public API v1 — production ready
+          </div>
+
+          <h1 className="fs-display-xl mb-6">
+            Build with{" "}
+            <span style={SERIF}>Zoobicon.</span>
+          </h1>
+
+          <p className="max-w-3xl mx-auto text-[17px] md:text-[19px] leading-relaxed text-white/60 mb-10">
+            Real domains. Real video. Real websites. One API key. The same infrastructure that powers
+            Zoobicon.com — exposed to your code in a single REST surface.
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-2 mb-10 max-w-3xl mx-auto">
+            {["Sites", "Video", "Domains", "eSIM", "VPN", "Storage", "Booking", "WordPress"].map((pill) => (
+              <span
+                key={pill}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] text-white/60"
+              >
+                <Check className="w-3 h-3" style={{ color: "#E8D4B0" }} />
+                {pill}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/pricing"
+              className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
+            >
+              <Key className="w-4 h-4" />
+              Get API key
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <a
+              href="#quickstart"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+            >
+              <Code className="w-4 h-4" />
+              Read docs
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Quick start */}
+      <section id="quickstart" className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+                Quick start
               </div>
-              <span className="text-xs text-white/60 font-mono">zoobicon.io</span>
-            </motion.div>
+              <h2 className="fs-display-lg mb-5">
+                Generate a site{" "}
+                <span style={SERIF}>in one curl.</span>
+              </h2>
+              <p className="text-[15px] text-white/60 leading-relaxed max-w-md mb-8">
+                Send a prompt, get back a fully-built React site object with files, dependencies and a
+                deploy URL. Average response: 28 seconds end-to-end.
+              </p>
+              <ul className="space-y-3">
+                {QUICKSTART_FEATURES.map((feat) => (
+                  <li key={feat} className="flex items-start gap-3 text-[14px] text-white/70">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "#E8D4B0" }} />
+                    {feat}
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-            <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-6">
-              Build With the<br />
-              <span className="gradient-text">Most Powerful API</span>
-            </motion.h1>
+            <div
+              className="relative overflow-hidden rounded-[24px] border border-white/[0.08]"
+              style={{ background: CARD_BG }}
+            >
+              <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: "rgba(232,212,176,0.5)" }} />
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: "rgba(232,212,176,0.3)" }} />
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: "rgba(232,212,176,0.2)" }} />
+                </div>
+                <span className="font-mono text-[11px] text-white/45">POST /api/v1/sites</span>
+              </div>
+              <pre className="overflow-x-auto px-5 py-5 font-mono text-[12px] leading-relaxed text-white/80 bg-black/40">
+                <code>
+                  <span className="text-white/35">{"# Generate a complete React site\n"}</span>
+                  <span style={{ color: "#E8D4B0" }}>curl</span>
+                  {" -X "}
+                  <span style={{ color: "#E8D4B0" }}>POST</span>
+                  {" https://zoobicon.com/api/v1/sites \\\n"}
+                  {"  -H "}
+                  <span className="text-white/90">{'"Authorization: Bearer zbk_live_••••••"'}</span>
+                  {" \\\n"}
+                  {"  -H "}
+                  <span className="text-white/90">{'"Content-Type: application/json"'}</span>
+                  {" \\\n"}
+                  {"  -d "}
+                  <span className="text-white/90">{"'{\n"}</span>
+                  <span style={{ color: "#E8D4B0" }}>{'    "prompt"'}</span>
+                  <span className="text-white/90">{': "saas landing for a dog walking app",\n'}</span>
+                  <span style={{ color: "#E8D4B0" }}>{'    "deploy"'}</span>
+                  <span className="text-white/90">{": true\n  }'"}</span>
+                </code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <motion.p variants={fadeInUp} className="max-w-2xl text-lg text-white/60 leading-relaxed mb-10">
-              One API to generate websites, run SEO campaigns, create videos, and automate your entire digital pipeline.
-              SDKs for every language. Ship in minutes, not months.
-            </motion.p>
+      {/* Endpoints */}
+      <section id="endpoints" className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Endpoints
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              {endpoints.length} production endpoints.{" "}
+              <span style={SERIF}>Live today.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Each endpoint is rate-limited per key, signed with HMAC-SHA256 and returns standard JSON.
+            </p>
+          </div>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-3 mb-16">
-              <Link href="/auth/signup" className="group btn-gradient px-6 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2">
-                <Key className="w-4 h-4" />
-                <span>Get Free API Key</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <a href="#api" className="px-6 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 hover:text-white/70 transition-all flex items-center gap-2">
-                <BookOpen className="w-4 h-4" />
-                Read the Docs
-              </a>
-            </motion.div>
-
-            {/* Code example */}
-            <motion.div variants={fadeInUp} id="api">
-              <div className="gradient-border rounded-2xl overflow-hidden">
-                <div className="bg-dark-300/80 backdrop-blur-xl">
-                  {/* Tabs */}
-                  <div className="flex border-b border-white/[0.10] overflow-x-auto">
-                    {(Object.keys(CODE_EXAMPLES) as Array<keyof typeof CODE_EXAMPLES>).map((tab) => (
-                      <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`px-5 py-3 text-xs font-medium whitespace-nowrap transition-colors ${
-                          activeTab === tab
-                            ? "text-accent-cyan border-b-2 border-accent-cyan"
-                            : "text-white/60 hover:text-white/60"
-                        }`}
-                      >
-                        {tab === "generate" ? "Generate" : tab === "deploy" ? "Deploy" : tab === "sites" ? "Manage Sites" : "Status & Branding"}
-                      </button>
-                    ))}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {endpoints.map((ep) => (
+              <div
+                key={ep.path}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }}
+                />
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                      <ep.icon className="h-5 w-5 text-[#E8D4B0]" />
+                    </div>
+                    <MethodBadge method={ep.method} />
                   </div>
-                  {/* Code */}
-                  <div className="relative">
-                    <button
-                      onClick={() => copyCode(CODE_EXAMPLES[activeTab], activeTab)}
-                      className="absolute top-3 right-3 p-2 rounded-lg bg-white/[0.07] hover:bg-white/[0.08] transition-colors z-10"
-                    >
-                      {copiedEndpoint === activeTab ? (
-                        <Check className="w-4 h-4 text-accent-cyan" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-white/60" />
-                      )}
-                    </button>
-                    <pre className="p-6 overflow-x-auto text-sm font-mono leading-relaxed text-white/60">
-                      <code>{CODE_EXAMPLES[activeTab]}</code>
-                    </pre>
-                  </div>
+                  <code className="block font-mono text-[12px] text-white/85 mb-3 truncate">{ep.path}</code>
+                  <p className="text-[13px] text-white/55 leading-relaxed mb-4">{ep.description}</p>
+                  <pre className="rounded-[12px] border border-white/[0.06] bg-black/40 px-3 py-2.5 font-mono text-[11px] leading-relaxed text-white/70 overflow-x-auto">
+                    {ep.snippet}
+                  </pre>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* SDKs */}
-      <section id="sdks" className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
-                <Package className="w-3 h-3 text-accent-cyan" />
-                <span className="text-xs font-medium text-accent-cyan">Official SDKs</span>
+      {/* Usage pricing strip */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div
+            className="relative overflow-hidden rounded-[32px] border border-white/[0.08] p-10 md:p-14"
+            style={{ background: CARD_BG }}
+          >
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{ background: "radial-gradient(circle at top right, rgba(232,212,176,0.1), transparent 55%)" }}
+            />
+            <div className="relative flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-5">
+                  Usage pricing
+                </div>
+                <h2 className="fs-display-lg mb-4">
+                  Pay only for{" "}
+                  <span style={SERIF}>what you call.</span>
+                </h2>
+                <p className="max-w-lg text-[15px] text-white/60 leading-relaxed">
+                  Bulk pricing kicks in at scale. Annual contracts get up to 60% off list. No idle
+                  minimums.
+                </p>
               </div>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Your Language.<br /><span className="gradient-text">Our Power.</span>
-              </h2>
-              <p className="text-lg text-white/60 max-w-xl mx-auto">First-class SDKs for every major language. Type-safe, well-documented, battle-tested.</p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {SDKS.map((sdk) => (
-                <motion.div key={sdk.lang} variants={fadeInUp} className="gradient-border card-hover p-5 rounded-xl group">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className={`text-sm font-bold ${sdk.color}`}>{sdk.lang}</span>
-                    <span className="text-[10px] font-mono text-white/60">{sdk.pkg}</span>
-                  </div>
-                  <div className="bg-dark-400/80 rounded-lg px-3 py-2 font-mono text-xs text-white/60 flex items-center justify-between">
-                    <code>{sdk.install}</code>
-                    <button
-                      onClick={() => copyCode(sdk.install, sdk.lang)}
-                      className="text-white/60 hover:text-white/65 transition-colors ml-2 flex-shrink-0"
-                    >
-                      {copiedEndpoint === sdk.lang ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* API Endpoints */}
-      <section id="endpoints" className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                API <span className="gradient-text">Reference</span>
-              </h2>
-              <p className="text-lg text-white/60">RESTful API with Bearer token auth. Base URL: <code className="text-accent-cyan font-mono text-sm">https://zoobicon.com/api/v1</code></p>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="gradient-border rounded-2xl overflow-hidden">
-              <div className="bg-dark-300/60">
-                {API_ENDPOINTS.map((endpoint, i) => (
-                  <div key={i} className={`flex items-center gap-4 px-6 py-3.5 ${i !== API_ENDPOINTS.length - 1 ? "border-b border-white/[0.06]" : ""} hover:bg-white/[0.05] transition-colors`}>
-                    <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded ${
-                      endpoint.method === "POST" ? "bg-brand-500/15 text-brand-400" : "bg-accent-cyan/15 text-accent-cyan"
-                    }`}>
-                      {endpoint.method}
-                    </span>
-                    <code className="text-sm font-mono text-white/70 flex-shrink-0">{endpoint.path}</code>
-                    <span className="text-sm text-white/60 hidden md:block">{endpoint.desc}</span>
-                    <ChevronRight className="w-4 h-4 text-white/50 ml-auto" />
+              <div className="grid w-full grid-cols-2 gap-4 lg:w-auto lg:grid-cols-4">
+                {[
+                  { label: "per site", price: "$0.10" },
+                  { label: "per video", price: "$0.50" },
+                  { label: "per domain check", price: "$0.05" },
+                  { label: "per email send", price: "$0.01" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-[16px] border border-white/[0.08] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/25"
+                    style={{ background: "rgba(10,10,15,0.6)" }}
+                  >
+                    <div className="font-mono text-2xl font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>
+                      {item.price}
+                    </div>
+                    <div className="mt-1 text-[12px] text-white/55">{item.label}</div>
                   </div>
                 ))}
               </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Enterprise <span className="gradient-text">Infrastructure</span>
-              </h2>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {FEATURES.map((f, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl">
-                  <f.icon className="w-8 h-8 text-accent-cyan/60 mb-4" />
-                  <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
-                </motion.div>
-              ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Pricing */}
       <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-5xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="text-center mb-12">
+          <div>
+            <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                 API <span className="gradient-text">Pricing</span>
               </h2>
               <p className="text-lg text-white/60">Start free. Pay only for what you use.</p>
-            </motion.div>
+            </div>
 
             <div className="grid md:grid-cols-3 gap-4">
-              <motion.div variants={fadeInUp} className="gradient-border p-6 rounded-xl">
+              <div className="gradient-border p-6 rounded-xl">
                 <div className="text-sm font-semibold text-white/65 mb-2">Free</div>
                 <div className="text-3xl font-black mb-1">$0</div>
                 <div className="text-xs text-white/60 mb-4">10 requests/min</div>
@@ -396,9 +419,9 @@ export default function DevelopersPage() {
                 <Link href="/auth/signup" className="block text-center py-2.5 rounded-xl border border-white/[0.12] text-sm font-semibold text-white/60 hover:border-white/20 transition-all">
                   Get Started
                 </Link>
-              </motion.div>
+              </div>
 
-              <motion.div variants={fadeInUp} className="relative p-6 rounded-xl border border-accent-cyan/30 bg-accent-cyan/[0.02] shadow-glow-cyan">
+              <div className="relative p-6 rounded-xl border border-accent-cyan/30 bg-accent-cyan/[0.02] shadow-glow-cyan">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-accent-cyan to-emerald-500 text-xs font-bold text-white">
                   Popular
                 </div>
@@ -412,12 +435,12 @@ export default function DevelopersPage() {
                   <li>Webhook callbacks</li>
                   <li>Priority support</li>
                 </ul>
-                <button className="w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-emerald-500 text-sm font-bold text-white">
+                <Link href="/auth/signup" className="block text-center w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-emerald-500 text-sm font-bold text-white">
                   Start Pro
-                </button>
-              </motion.div>
+                </Link>
+              </div>
 
-              <motion.div variants={fadeInUp} className="gradient-border p-6 rounded-xl">
+              <div className="gradient-border p-6 rounded-xl">
                 <div className="text-sm font-semibold text-white/65 mb-2">Enterprise</div>
                 <div className="text-3xl font-black mb-1">Custom</div>
                 <div className="text-xs text-white/60 mb-4">600 requests/min</div>
@@ -431,46 +454,209 @@ export default function DevelopersPage() {
                 <a href="mailto:sales@zoobicon.com?subject=Enterprise API Inquiry" className="block w-full py-2.5 rounded-xl border border-white/[0.12] text-sm font-semibold text-white/60 hover:border-white/20 transition-all text-center">
                   Contact Sales
                 </a>
-              </motion.div>
+              </div>
             </div>
-          </motion.div>
+            <h2 className="fs-display-lg mb-4">
+              API pricing,{" "}
+              <span style={SERIF}>simply put.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Start free. Pay only for what you use.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5 mb-10">
+            {PRICING_TIERS.map((tier) => (
+              <div
+                key={tier.name}
+                className={`relative rounded-[24px] p-7 transition-all duration-500 hover:-translate-y-1 ${
+                  tier.highlighted
+                    ? "border-2 border-[#E8D4B0]/35"
+                    : "border border-white/[0.08] hover:border-[#E8D4B0]/25"
+                }`}
+                style={{
+                  background: tier.highlighted
+                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(17,17,24,0.85) 100%)"
+                    : CARD_BG,
+                }}
+              >
+                {tier.highlighted && (
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a1628" }}
+                  >
+                    Most popular
+                  </div>
+                )}
+                <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{tier.name}</h3>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-4xl font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>
+                    {tier.price}
+                  </span>
+                  {tier.period && <span className="text-[13px] text-white/50">{tier.period}</span>}
+                </div>
+                <div className="text-[12px] text-white/50 mb-4">{tier.rate}</div>
+                <p className="text-[13px] text-white/55 mb-6">{tier.description}</p>
+                <ul className="space-y-2.5 mb-7">
+                  {tier.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-[13px] text-white/65">
+                      <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#E8D4B0" }} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                {tier.href.startsWith("mailto:") ? (
+                  <a
+                    href={tier.href}
+                    className="block text-center rounded-full py-3 text-[13px] font-semibold border border-white/[0.12] bg-white/[0.03] text-white/80 backdrop-blur transition-all hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                  >
+                    {tier.cta}
+                  </a>
+                ) : (
+                  <Link
+                    href={tier.href}
+                    className={`block text-center rounded-full py-3 text-[13px] font-semibold transition-all ${
+                      tier.highlighted
+                        ? ""
+                        : "border border-white/[0.12] bg-white/[0.03] text-white/80 backdrop-blur hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                    }`}
+                    style={tier.highlighted ? PRIMARY_CTA : undefined}
+                  >
+                    {tier.cta}
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Auth header example */}
+          <div
+            className="relative overflow-hidden rounded-[24px] border border-white/[0.08] max-w-3xl mx-auto"
+            style={{ background: CARD_BG }}
+          >
+            <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
+              <div className="flex items-center gap-2 text-[11px] text-white/55">
+                <Terminal className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} />
+                Authorization header
+              </div>
+              <span className="font-mono text-[11px] text-white/45">HMAC-SHA256</span>
+            </div>
+            <pre className="overflow-x-auto px-5 py-5 font-mono text-[12px] leading-relaxed text-white/80 bg-black/40">
+              <code>
+                <span className="text-white/35">{"# Every request signs with your key\n"}</span>
+                <span style={{ color: "#E8D4B0" }}>Authorization</span>
+                {": "}
+                <span className="text-white/90">Bearer zbk_live_a3f9c2e8b1d4...</span>
+                {"\n"}
+                <span style={{ color: "#E8D4B0" }}>Content-Type</span>
+                {": "}
+                <span className="text-white/90">application/json</span>
+                {"\n"}
+                <span style={{ color: "#E8D4B0" }}>X-Zoobicon-Signature</span>
+                {": "}
+                <span className="text-white/90">sha256=••••••</span>
+              </code>
+            </pre>
+          </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 border-t border-white/[0.08]">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-          <Cpu className="w-12 h-12 text-accent-cyan/30 mx-auto mb-6" />
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-            Start Building <span className="gradient-text">Today</span>
+      {/* Rate limits table */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              <Zap className="w-3 h-3" />
+              Rate limits
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Built for scale{" "}
+              <span style={SERIF}>from request one.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Quotas that grow with your app. Upgrade any time — no contract resets.
+            </p>
+          </div>
+
+          <div
+            className="overflow-hidden rounded-[24px] border border-white/[0.08]"
+            style={{ background: CARD_BG }}
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full text-left min-w-[560px]">
+                <thead>
+                  <tr className="border-b border-white/[0.08] text-[11px] uppercase tracking-[0.15em] font-semibold text-white/55">
+                    <th className="px-7 py-5 font-medium">Plan</th>
+                    <th className="px-7 py-5 font-medium">Rate limit</th>
+                    <th className="px-7 py-5 text-right font-medium">Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {limits.map((row, i) => (
+                    <tr
+                      key={row.plan}
+                      className={`transition-colors hover:bg-white/[0.02] ${
+                        i !== limits.length - 1 ? "border-b border-white/[0.04]" : ""
+                      }`}
+                    >
+                      <td className="px-7 py-5 text-[14px] font-semibold text-white">{row.plan}</td>
+                      <td className="px-7 py-5 text-[13px] text-white/65">{row.quota}</td>
+                      <td className="px-7 py-5 text-right font-mono text-[13px]" style={{ color: "#E8D4B0" }}>
+                        {row.price}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative py-24 md:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div
+            className="absolute left-1/2 top-1/2 h-[560px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.11), transparent 70%)" }}
+          />
+        </div>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="fs-display-lg mb-5">
+            Start building{" "}
+            <span style={SERIF}>today.</span>
           </h2>
-          <p className="text-lg text-white/60 mb-8">Free API key. No credit card. Ship your first integration in under 5 minutes.</p>
-          <div className="inline-flex items-center gap-2 bg-dark-200 border border-white/[0.12] rounded-xl px-5 py-3 font-mono text-sm text-white/65 mb-6">
-            <span className="text-accent-cyan">$</span> npm install @zoobicon/sdk
-            <button onClick={() => copyCode("npm install @zoobicon/sdk", "cta-install")} className="ml-2 text-white/60 hover:text-white/65">
-              {copiedEndpoint === "cta-install" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4" />}
-            </button>
+          <p className="text-[17px] text-white/60 mb-10">
+            Free key, 100 requests a day, no credit card. Upgrade when your traffic does.
+          </p>
+          <Link
+            href="/pricing"
+            className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+            style={PRIMARY_CTA}
+          >
+            <Key className="w-4 h-4" />
+            Get your API key
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-[12px] text-white/55">
+            <span className="flex items-center gap-1.5">
+              <Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} />
+              No credit card
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} />
+              100 free requests / day
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} />
+              Streaming SSE
+            </span>
           </div>
-          <div className="flex justify-center gap-3">
-            <Link href="/auth/signup" className="btn-gradient px-8 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2">
-              <span>Get API Key</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
+          <p className="mt-10 font-mono text-[11px] text-white/30">
+            zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh
+          </p>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="border-t border-white/[0.08] py-8">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <div className="text-xs text-white/60">&copy; 2026 Zoobicon. All rights reserved.</div>
-          <div className="flex gap-4">
-            <Link href="/" className="text-xs text-white/60 hover:text-white/60">Home</Link>
-            <Link href="/agencies" className="text-xs text-white/60 hover:text-white/60">Agencies</Link>
-            <Link href="/cli" className="text-xs text-white/60 hover:text-white/60">CLI</Link>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

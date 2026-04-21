@@ -87,25 +87,25 @@ interface MarketplaceItem {
 /* ---------- hardcoded fallback (matches API catalog) ---------- */
 const FALLBACK_ITEMS: MarketplaceItem[] = [
   { id: "premium-template-pack", name: "Premium Template Pack", category: "Templates", description: "50 hand-crafted, conversion-optimized website templates for SaaS, e-commerce, portfolios, and more.", price: 2900, priceLabel: "$29", priceType: "one-time", rating: 4.9, installs: "12.4K", iconName: "Layout", gradient: "from-brand-500 to-brand-700", featured: true, tag: "Best Seller" },
-  { id: "seo-campaign-agent", name: "SEO Campaign Agent", category: "AI Agents", description: "Autonomous SEO agent that researches keywords, writes content, builds backlinks, and tracks rankings 24/7.", price: 2900, priceLabel: "$29/mo", priceType: "monthly", rating: 4.8, installs: "8.2K", iconName: "Search", gradient: "from-accent-cyan to-emerald-600", featured: true, tag: "Top Rated" },
-  { id: "ai-video-creator", name: "AI Video Creator", category: "AI Agents", description: "Generate scroll-stopping videos for TikTok, Instagram, YouTube, and Facebook. No scripts needed.", price: 1900, priceLabel: "$19/mo", priceType: "monthly", rating: 4.7, installs: "6.8K", iconName: "Video", gradient: "from-accent-purple to-blue-700", featured: true },
-  { id: "ai-email-support", name: "AI Email Support", category: "AI Agents", description: "World-class AI customer support. Auto-replies, sentiment analysis, smart routing, 24/7 operation.", price: 2400, priceLabel: "$24/mo", priceType: "monthly", rating: 4.9, installs: "4.5K", iconName: "Mail", gradient: "from-amber-500 to-orange-600", tag: "New" },
-  { id: "stripe-payments", name: "Stripe Payments", category: "E-Commerce", description: "Accept payments instantly. Stripe integration with checkout pages, subscriptions, and invoicing.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.8, installs: "15.1K", iconName: "CreditCard", gradient: "from-indigo-500 to-blue-600" },
-  { id: "google-analytics", name: "Google Analytics", category: "Analytics", description: "Full Google Analytics 4 integration. Track visitors, conversions, and user behavior automatically.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.6, installs: "18.3K", iconName: "BarChart3", gradient: "from-emerald-500 to-teal-600" },
-  { id: "social-media-manager", name: "Social Media Manager", category: "Marketing", description: "AI auto-creates, schedules, and publishes social media posts across all platforms. Hashtag optimization.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.5, installs: "5.1K", iconName: "MessageSquare", gradient: "from-cyan-500 to-blue-600" },
-  { id: "ai-brand-kit", name: "AI Brand Kit", category: "Design", description: "Complete brand identity: logo, colors, typography, style guide — all AI-generated from your description.", price: 1900, priceLabel: "$19", priceType: "one-time", rating: 4.7, installs: "7.9K", iconName: "Palette", gradient: "from-cyan-500 to-rose-600" },
-  { id: "ai-chatbot-builder", name: "AI Chatbot Builder", category: "AI Agents", description: "Deploy custom AI chatbots on any website. Trained on your content, branded to your style. 24/7 support bot.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.6, installs: "3.8K", iconName: "Bot", gradient: "from-blue-500 to-indigo-600" },
+  { id: "seo-campaign-agent", name: "SEO Campaign Agent", category: "AI Agents", description: "Autonomous SEO agent that researches keywords, writes content, builds backlinks, and tracks rankings 24/7.", price: 2900, priceLabel: "$29/mo", priceType: "monthly", rating: 4.8, installs: "8.2K", iconName: "Search", gradient: "from-accent-cyan to-stone-600", featured: true, tag: "Top Rated" },
+  { id: "ai-video-creator", name: "AI Video Creator", category: "AI Agents", description: "Generate scroll-stopping videos for TikTok, Camera, YouTube, and ThumbsUp. No scripts needed.", price: 1900, priceLabel: "$19/mo", priceType: "monthly", rating: 4.7, installs: "6.8K", iconName: "Video", gradient: "from-accent-purple to-stone-700", featured: true },
+  { id: "ai-email-support", name: "AI Email Support", category: "AI Agents", description: "World-class AI customer support. Auto-replies, sentiment analysis, smart routing, 24/7 operation.", price: 2400, priceLabel: "$24/mo", priceType: "monthly", rating: 4.9, installs: "4.5K", iconName: "Mail", gradient: "from-stone-500 to-stone-600", tag: "New" },
+  { id: "stripe-payments", name: "Stripe Payments", category: "E-Commerce", description: "Accept payments instantly. Stripe integration with checkout pages, subscriptions, and invoicing.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.8, installs: "15.1K", iconName: "CreditCard", gradient: "from-stone-500 to-stone-600" },
+  { id: "google-analytics", name: "Google Analytics", category: "Analytics", description: "Full Google Analytics 4 integration. Track visitors, conversions, and user behavior automatically.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.6, installs: "18.3K", iconName: "BarChart3", gradient: "from-stone-500 to-stone-600" },
+  { id: "social-media-manager", name: "Social Media Manager", category: "Marketing", description: "AI auto-creates, schedules, and publishes social media posts across all platforms. Hashtag optimization.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.5, installs: "5.1K", iconName: "MessageSquare", gradient: "from-stone-500 to-stone-600" },
+  { id: "ai-brand-kit", name: "AI Brand Kit", category: "Design", description: "Complete brand identity: logo, colors, typography, style guide — all AI-generated from your description.", price: 1900, priceLabel: "$19", priceType: "one-time", rating: 4.7, installs: "7.9K", iconName: "Palette", gradient: "from-stone-500 to-stone-600" },
+  { id: "ai-chatbot-builder", name: "AI Chatbot Builder", category: "AI Agents", description: "Deploy custom AI chatbots on any website. Trained on your content, branded to your style. 24/7 support bot.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.6, installs: "3.8K", iconName: "Bot", gradient: "from-stone-500 to-stone-600" },
   { id: "custom-code-injection", name: "Custom Code Injection", category: "Developer Tools", description: "Add custom HTML, CSS, and JavaScript to any page. Header/footer injection, Google Tag Manager, pixels.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.4, installs: "9.2K", iconName: "Code2", gradient: "from-slate-500 to-zinc-600" },
-  { id: "blog-cms-engine", name: "Blog & CMS Engine", category: "Templates", description: "Full-featured blog with AI writing assistant, categories, tags, RSS feed, and SEO optimization built in.", price: 900, priceLabel: "$9/mo", priceType: "monthly", rating: 4.7, installs: "6.3K", iconName: "FileText", gradient: "from-amber-600 to-yellow-500" },
-  { id: "image-optimizer", name: "Image Optimizer", category: "Developer Tools", description: "Auto-compress, resize, and convert images to WebP/AVIF. Lazy loading and responsive images built in.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.5, installs: "11.7K", iconName: "Image", gradient: "from-green-500 to-emerald-600" },
-  { id: "custom-fonts-pack", name: "Custom Fonts Pack", category: "Design", description: "1,000+ premium web fonts. Google Fonts integration plus exclusive custom typefaces for your brand.", price: 900, priceLabel: "$9", priceType: "one-time", rating: 4.3, installs: "8.6K", iconName: "Type", gradient: "from-rose-500 to-blue-700" },
-  { id: "multi-language-i18n", name: "Multi-Language (i18n)", category: "Integrations", description: "Auto-translate your website into 30+ languages. AI-powered translations with locale-specific SEO.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.6, installs: "3.2K", iconName: "Globe", gradient: "from-blue-500 to-indigo-600" },
-  { id: "lead-gen-forms", name: "Lead Gen & Forms", category: "Marketing", description: "Smart forms with conditional logic, file uploads, and CRM integrations. Captures and scores leads with AI.", price: 900, priceLabel: "$9/mo", priceType: "monthly", rating: 4.7, installs: "7.4K", iconName: "Users", gradient: "from-orange-500 to-red-500" },
-  { id: "uptime-monitor", name: "Uptime Monitor", category: "Analytics", description: "24/7 website monitoring with instant alerts via email, Slack, and SMS. 1-minute check intervals.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.4, installs: "5.6K", iconName: "Clock", gradient: "from-teal-500 to-cyan-600" },
-  { id: "ab-testing-engine", name: "A/B Testing Engine", category: "Analytics", description: "Test headlines, layouts, CTAs, and more. AI-powered statistical analysis picks the winner for you.", price: 1900, priceLabel: "$19/mo", priceType: "monthly", rating: 4.8, installs: "2.9K", iconName: "TrendingUp", gradient: "from-blue-500 to-blue-600", tag: "New" },
-  { id: "email-marketing-suite", name: "Email Marketing Suite", category: "Marketing", description: "AI writes and designs email campaigns. Auto-segment audiences, drip sequences, analytics, and A/B testing.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.6, installs: "4.8K", iconName: "Megaphone", gradient: "from-red-500 to-orange-500" },
-  { id: "ssl-security-suite", name: "SSL & Security Suite", category: "Integrations", description: "Wildcard SSL, DDoS protection, WAF, malware scanning, and automatic security patching. Enterprise-grade.", price: 900, priceLabel: "$9/mo", priceType: "monthly", rating: 4.9, installs: "10.2K", iconName: "Shield", gradient: "from-emerald-600 to-green-500" },
-  { id: "component-library", name: "Component Library", category: "Developer Tools", description: "200+ pre-built UI components: navbars, hero sections, pricing tables, footers, testimonials, and more.", price: 1900, priceLabel: "$19", priceType: "one-time", rating: 4.5, installs: "6.1K", iconName: "Layers", gradient: "from-sky-500 to-blue-600" },
+  { id: "blog-cms-engine", name: "Blog & CMS Engine", category: "Templates", description: "Full-featured blog with AI writing assistant, categories, tags, RSS feed, and SEO optimization built in.", price: 900, priceLabel: "$9/mo", priceType: "monthly", rating: 4.7, installs: "6.3K", iconName: "FileText", gradient: "from-stone-600 to-stone-500" },
+  { id: "image-optimizer", name: "Image Optimizer", category: "Developer Tools", description: "Auto-compress, resize, and convert images to WebP/AVIF. Lazy loading and responsive images built in.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.5, installs: "11.7K", iconName: "Image", gradient: "from-stone-500 to-stone-600" },
+  { id: "custom-fonts-pack", name: "Custom Fonts Pack", category: "Design", description: "1,000+ premium web fonts. Google Fonts integration plus exclusive custom typefaces for your brand.", price: 900, priceLabel: "$9", priceType: "one-time", rating: 4.3, installs: "8.6K", iconName: "Type", gradient: "from-stone-500 to-stone-700" },
+  { id: "multi-language-i18n", name: "Multi-Language (i18n)", category: "Integrations", description: "Auto-translate your website into 30+ languages. AI-powered translations with locale-specific SEO.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.6, installs: "3.2K", iconName: "Globe", gradient: "from-stone-500 to-stone-600" },
+  { id: "lead-gen-forms", name: "Lead Gen & Forms", category: "Marketing", description: "Smart forms with conditional logic, file uploads, and CRM integrations. Captures and scores leads with AI.", price: 900, priceLabel: "$9/mo", priceType: "monthly", rating: 4.7, installs: "7.4K", iconName: "Users", gradient: "from-stone-500 to-stone-500" },
+  { id: "uptime-monitor", name: "Uptime Monitor", category: "Analytics", description: "24/7 website monitoring with instant alerts via email, Hash, and SMS. 1-minute check intervals.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.4, installs: "5.6K", iconName: "Clock", gradient: "from-stone-500 to-stone-600" },
+  { id: "ab-testing-engine", name: "A/B Testing Engine", category: "Analytics", description: "Test headlines, layouts, CTAs, and more. AI-powered statistical analysis picks the winner for you.", price: 1900, priceLabel: "$19/mo", priceType: "monthly", rating: 4.8, installs: "2.9K", iconName: "TrendingUp", gradient: "from-stone-500 to-stone-600", tag: "New" },
+  { id: "email-marketing-suite", name: "Email Marketing Suite", category: "Marketing", description: "AI writes and designs email campaigns. Auto-segment audiences, drip sequences, analytics, and A/B testing.", price: 1400, priceLabel: "$14/mo", priceType: "monthly", rating: 4.6, installs: "4.8K", iconName: "Megaphone", gradient: "from-stone-500 to-stone-500" },
+  { id: "ssl-security-suite", name: "SSL & Security Suite", category: "Integrations", description: "Wildcard SSL, DDoS protection, WAF, malware scanning, and automatic security patching. Enterprise-grade.", price: 900, priceLabel: "$9/mo", priceType: "monthly", rating: 4.9, installs: "10.2K", iconName: "Shield", gradient: "from-stone-600 to-stone-500" },
+  { id: "component-library", name: "Component Library", category: "Developer Tools", description: "200+ pre-built UI components: navbars, hero sections, pricing tables, footers, testimonials, and more.", price: 1900, priceLabel: "$19", priceType: "one-time", rating: 4.5, installs: "6.1K", iconName: "Layers", gradient: "from-stone-500 to-stone-600" },
 ];
 
 /* ---------- helpers ---------- */
@@ -296,7 +296,7 @@ export default function MarketplacePage() {
         onClick={() => handleInstall(item)}
         className={`${sizeClasses} font-bold flex items-center gap-1.5 transition-all ${
           isInstalled
-            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+            ? "bg-stone-500/10 text-stone-400 border border-stone-500/20"
             : "btn-gradient text-white"
         }`}
         disabled={isInstalled || isInstalling}
@@ -324,7 +324,7 @@ export default function MarketplacePage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-blue-700 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-stone-700 flex items-center justify-center">
                 <Store className="w-4 h-4 text-white" />
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -346,15 +346,15 @@ export default function MarketplacePage() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-between gap-3 px-5 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20"
+              className="flex items-center justify-between gap-3 px-5 py-3 rounded-xl bg-stone-500/10 border border-stone-500/20"
             >
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                <span className="text-sm font-medium text-emerald-300">
+                <CheckCircle2 className="w-5 h-5 text-stone-400 flex-shrink-0" />
+                <span className="text-sm font-medium text-stone-300">
                   <strong>{successBanner}</strong> has been installed successfully!
                 </span>
               </div>
-              <button onClick={() => setSuccessBanner(null)} className="text-emerald-400/60 hover:text-emerald-400 transition-colors">
+              <button onClick={() => setSuccessBanner(null)} className="text-stone-400/60 hover:text-stone-400 transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </motion.div>
@@ -369,10 +369,10 @@ export default function MarketplacePage() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-between gap-3 px-5 py-3 rounded-xl bg-red-500/10 border border-red-500/20"
+              className="flex items-center justify-between gap-3 px-5 py-3 rounded-xl bg-stone-500/10 border border-stone-500/20"
             >
-              <span className="text-sm font-medium text-red-300">{error}</span>
-              <button onClick={() => setError(null)} className="text-red-400/60 hover:text-red-400 transition-colors">
+              <span className="text-sm font-medium text-stone-300">{error}</span>
+              <button onClick={() => setError(null)} className="text-stone-400/60 hover:text-stone-400 transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </motion.div>
@@ -476,7 +476,7 @@ export default function MarketplacePage() {
                         <h3 className="text-base font-bold mb-0.5 group-hover:text-white transition-colors">{item.name}</h3>
                         <div className="flex items-center gap-2">
                           <div className="flex items-center gap-0.5">
-                            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                            <Star className="w-3 h-3 text-stone-500 fill-stone-500" />
                             <span className="text-xs text-white/65">{item.rating}</span>
                           </div>
                           <span className="text-[10px] text-white/60">&bull;</span>
@@ -486,7 +486,7 @@ export default function MarketplacePage() {
                     </div>
                     <p className="text-xs text-white/60 leading-relaxed mb-4">{item.description}</p>
                     <div className="flex items-center justify-between">
-                      <span className={`text-sm font-bold ${item.priceType === "free" ? "text-emerald-400" : "text-white/70"}`}>
+                      <span className={`text-sm font-bold ${item.priceType === "free" ? "text-stone-400" : "text-white/70"}`}>
                         {item.priceLabel}
                       </span>
                       <div className="flex items-center gap-2">
@@ -561,10 +561,10 @@ export default function MarketplacePage() {
                     <div className="flex items-center justify-between mt-auto">
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5">
-                          <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                          <Star className="w-3 h-3 text-stone-500 fill-stone-500" />
                           <span className="text-[10px] text-white/65">{item.rating}</span>
                         </div>
-                        <span className={`text-[10px] font-semibold ${item.priceType === "free" ? "text-emerald-400/70" : "text-white/60"}`}>
+                        <span className={`text-[10px] font-semibold ${item.priceType === "free" ? "text-stone-400/70" : "text-white/60"}`}>
                           {item.priceLabel}
                         </span>
                       </div>

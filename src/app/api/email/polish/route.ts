@@ -81,8 +81,8 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    const raw =
-      message.content[0].type === "text" ? message.content[0].text : "";
+    const textBlock = message.content.find((b: { type: string }) => b.type === "text") as { type: "text"; text: string } | undefined;
+    const raw = textBlock?.text || "";
 
     // Parse the JSON response
     let result;

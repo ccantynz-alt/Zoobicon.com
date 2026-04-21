@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Copy, Check, Users, Gift, ExternalLink } from "lucide-react";
+import {
+  Copy,
+  Check,
+  Users,
+  Gift,
+  ExternalLink,
+} from "lucide-react";
 import { getReferralTier } from "@/lib/referral";
 
 interface ReferralData {
@@ -110,7 +116,7 @@ export default function ReferralCard() {
           onClick={handleCopy}
           className={`flex-shrink-0 p-2 rounded-lg transition-all ${
             copied
-              ? "bg-emerald-500/20 text-emerald-400"
+              ? "bg-stone-500/20 text-stone-400"
               : "bg-white/5 text-white/50 hover:bg-white/10 hover:text-white"
           }`}
           title={copied ? "Copied!" : "Copy referral link"}
@@ -130,8 +136,8 @@ export default function ReferralCard() {
         </div>
         <div className="bg-white/[0.03] rounded-lg p-3 text-center">
           <div className="flex items-center justify-center gap-1 mb-1">
-            <Gift className="w-3 h-3 text-emerald-400/60" />
-            <span className="text-lg font-bold text-emerald-400">{data.buildsEarned}</span>
+            <Gift className="w-3 h-3 text-stone-400/60" />
+            <span className="text-lg font-bold text-stone-400">{data.buildsEarned}</span>
           </div>
           <span className="text-[10px] text-white/40 uppercase tracking-wider">Builds Earned</span>
         </div>

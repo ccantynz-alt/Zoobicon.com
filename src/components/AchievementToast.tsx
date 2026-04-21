@@ -117,7 +117,7 @@ function ToastCard({
       animate={{ x: 0, opacity: 1, scale: 1 }}
       exit={{ x: 80, opacity: 0, scale: 0.9 }}
       transition={{ type: "spring", damping: 20, stiffness: 300 }}
-      className="relative w-80 rounded-xl border border-amber-500/20 bg-[#12121a]/95 backdrop-blur-xl shadow-2xl shadow-amber-500/10 overflow-hidden"
+      className="relative w-80 rounded-xl border border-stone-500/20 bg-[#12121a]/95 backdrop-blur-xl shadow-2xl shadow-stone-500/10 overflow-hidden"
     >
       {/* Confetti layer */}
       {showConfetti && (
@@ -129,15 +129,15 @@ function ToastCard({
       <div className="relative z-20 p-4 flex items-start gap-3">
         {/* Gold badge icon with glow */}
         <div className="relative flex-shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-stone-400 to-stone-600 flex items-center justify-center shadow-lg shadow-stone-500/30">
             <AchievementIcon name={achievement.icon} className="w-5 h-5 text-white" />
           </div>
           {/* Glow ring */}
-          <div className="absolute -inset-1 rounded-xl bg-amber-400/20 blur-sm -z-10" />
+          <div className="absolute -inset-1 rounded-xl bg-stone-400/20 blur-sm -z-10" />
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-amber-400/80 uppercase tracking-wider mb-0.5">
+          <p className="text-xs font-medium text-stone-400/80 uppercase tracking-wider mb-0.5">
             Achievement Unlocked
           </p>
           <p className="text-sm font-semibold text-white/90 truncate">
@@ -162,7 +162,7 @@ function ToastCard({
       {/* Auto-dismiss progress bar */}
       <div className="h-0.5 bg-white/[0.04]">
         <motion.div
-          className="h-full bg-gradient-to-r from-amber-500/60 to-amber-400/60"
+          className="h-full bg-gradient-to-r from-stone-500/60 to-stone-400/60"
           initial={{ width: "100%" }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.05, ease: "linear" }}

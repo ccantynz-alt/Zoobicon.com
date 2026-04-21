@@ -1,7 +1,21 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Mic, MicOff, Sparkles, Zap, Pencil, Send, Check, ChevronDown, Cpu, LayoutTemplate, SlidersHorizontal, FileText, Files, Layers, Code2 } from "lucide-react";
+import {
+  Mic,
+  MicOff,
+  Sparkles,
+  Zap,
+  Pencil,
+  Send,
+  Check,
+  ChevronDown,
+  Cpu,
+  LayoutTemplate,
+  SlidersHorizontal,
+  FileText,
+  Code2,
+} from "lucide-react";
 import TemplateGallery from "./TemplateGallery";
 import CustomizationPanel, {
   DEFAULT_CUSTOMIZATION,
@@ -39,7 +53,7 @@ export interface AIModel {
   tier: string;
 }
 
-export type GenerationMode = "single" | "multi" | "fullstack" | "react";
+export type GenerationMode = "react";
 
 interface PromptInputProps {
   prompt: string;
@@ -57,6 +71,8 @@ interface PromptInputProps {
   availableModels?: AIModel[];
   generationMode?: GenerationMode;
   onGenerationModeChange?: (mode: GenerationMode) => void;
+  fullStack?: boolean;
+  onFullStackChange?: (enabled: boolean) => void;
 }
 
 const EXAMPLE_PROMPTS = [
@@ -72,8 +88,6 @@ const PREMIUM_FEATURES = ["10-agent pipeline", "Animations", "SEO + Forms", "Rea
 
 const GENERATION_MODES: { id: GenerationMode; label: string; icon: typeof FileText; description: string }[] = [
   { id: "react", label: "React App", icon: Code2, description: "Modern React components with TypeScript + Tailwind" },
-  { id: "multi", label: "Multi-Page", icon: Files, description: "Multi-page React app with routing" },
-  { id: "fullstack", label: "Full-Stack", icon: Layers, description: "React frontend + API routes + database" },
 ];
 
 export default function PromptInput({
@@ -92,6 +106,8 @@ export default function PromptInput({
   availableModels,
   generationMode,
   onGenerationModeChange,
+  fullStack,
+  onFullStackChange,
 }: PromptInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const editInputRef = useRef<HTMLTextAreaElement>(null);
@@ -348,9 +364,9 @@ export default function PromptInput({
                           {model.label}
                         </span>
                         <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${
-                          model.tier === "premium" ? "bg-amber-500/10 text-amber-400/60" :
-                          model.tier === "fast" ? "bg-emerald-500/10 text-emerald-400/60" :
-                          "bg-blue-500/10 text-blue-400/60"
+                          model.tier === "premium" ? "bg-stone-500/10 text-stone-400/60" :
+                          model.tier === "fast" ? "bg-stone-500/10 text-stone-400/60" :
+                          "bg-stone-500/10 text-stone-400/60"
                         }`}>
                           {model.tier}
                         </span>
@@ -405,7 +421,7 @@ export default function PromptInput({
                   disabled={isGenerating}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all disabled:opacity-40 ${
                     isActive
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
+                      ? "bg-stone-600 text-white shadow-md shadow-stone-600/20"
                       : "bg-white/[0.05] text-white/50 hover:bg-white/[0.10] hover:text-white/70"
                   }`}
                 >
@@ -429,7 +445,7 @@ export default function PromptInput({
       <div className="relative flex-1 min-h-0">
         <textarea
           ref={textareaRef}
-          className="w-full h-full min-h-[120px] bg-[#0a0a0f] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-4 pr-12 outline-none transition-colors focus:border-brand-500/50 focus:shadow-glow resize-none placeholder:text-white/50"
+          className="w-full h-full min-h-[120px] bg-[#0a1628] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-4 pr-12 outline-none transition-colors focus:border-brand-500/50 focus:shadow-glow resize-none placeholder:text-white/50"
           placeholder="Describe the website you want to build..."
           value={prompt}
           onChange={(e) => onPromptChange(e.target.value)}
@@ -444,7 +460,7 @@ export default function PromptInput({
             disabled={isGenerating}
             className={`absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg transition-all ${
               isListening
-                ? "bg-red-500/20 text-red-400 animate-pulse"
+                ? "bg-stone-500/20 text-stone-400 animate-pulse"
                 : "bg-white/[0.04] text-white/50 hover:text-white/50 hover:bg-white/[0.08]"
             }`}
             title={isListening ? "Stop listening" : "Voice input"}
@@ -461,6 +477,26 @@ export default function PromptInput({
           {isMac ? "Cmd" : "Ctrl"}+Enter to build
         </span>
       </div>
+
+      {/* Full-Stack toggle */}
+      {onFullStackChange && (
+        <button
+          type="button"
+          onClick={() => onFullStackChange(!fullStack)}
+          className={`w-full py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all border flex items-center justify-center gap-2 ${
+            fullStack
+              ? "bg-stone-500/10 border-stone-500/30 text-stone-400 hover:bg-stone-500/20"
+              : "bg-white/[0.03] border-white/[0.08] text-white/40 hover:text-white/60 hover:border-white/20"
+          }`}
+          title={fullStack
+            ? "Full-Stack enabled: generates real database, auth, and storage"
+            : "Frontend only: click to enable database, auth, and storage"
+          }
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+          {fullStack ? "Full-Stack (Database + Auth + Storage)" : "Frontend Only — click for Full-Stack"}
+        </button>
+      )}
 
       {/* Build button */}
       <button
@@ -496,7 +532,7 @@ export default function PromptInput({
           <div className="relative">
             <textarea
               ref={editInputRef}
-              className="w-full min-h-[70px] bg-[#0a0a0f] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-3 pr-20 outline-none transition-colors focus:border-brand-500/50 resize-none placeholder:text-white/50"
+              className="w-full min-h-[70px] bg-[#0a1628] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-3 pr-20 outline-none transition-colors focus:border-brand-500/50 resize-none placeholder:text-white/50"
               placeholder="e.g. Change the hero background to blue, add a pricing section..."
               value={editPrompt}
               onChange={(e) => onEditPromptChange(e.target.value)}
@@ -510,7 +546,7 @@ export default function PromptInput({
                   disabled={isGenerating}
                   className={`w-7 h-7 flex items-center justify-center rounded-lg transition-all ${
                     isListening
-                      ? "bg-red-500/20 text-red-400 animate-pulse"
+                      ? "bg-stone-500/20 text-stone-400 animate-pulse"
                       : "bg-white/[0.04] text-white/50 hover:text-white/50"
                   }`}
                   title={isListening ? "Stop listening" : "Voice input"}

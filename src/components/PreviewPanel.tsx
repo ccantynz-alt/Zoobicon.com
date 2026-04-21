@@ -1,7 +1,12 @@
 "use client";
 
 import { useMemo, useState, useEffect, useRef, useCallback, lazy, Suspense } from "react";
-import { Monitor, Tablet, Smartphone, Play } from "lucide-react";
+import {
+  Monitor,
+  Tablet,
+  Smartphone,
+  Play,
+} from "lucide-react";
 import { injectVisualEditingScript } from "@/lib/dom-bridge";
 import type { SelectedElement, BridgeMessage } from "@/lib/dom-bridge";
 
@@ -101,7 +106,7 @@ function IdleAtmosphere() {
       <div
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse at 50% 100%, #0c1a30 0%, #080c18 40%, #0a0a0f 70%)",
+          background: "radial-gradient(ellipse at 50% 100%, #0c1a30 0%, #080c18 40%, #0a1628 70%)",
         }}
       />
 
@@ -200,7 +205,7 @@ function GeneratingAtmosphere() {
       <div
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse at 50% 50%, #0d1f3c 0%, #080e1e 50%, #0a0a0f 80%)",
+          background: "radial-gradient(ellipse at 50% 50%, #0d1f3c 0%, #080e1e 50%, #0a1628 80%)",
         }}
       />
 
@@ -521,7 +526,7 @@ export default function PreviewPanel({
             Creating
           </p>
           <p
-            className="text-[11px] text-blue-300/40 mt-4 tracking-[3px] uppercase"
+            className="text-[11px] text-stone-300/40 mt-4 tracking-[3px] uppercase"
             style={{ animation: "text-breathe 3s ease-in-out infinite" }}
           >
             AI agents building your site
@@ -552,7 +557,7 @@ export default function PreviewPanel({
             >
               Ready to build
             </p>
-            <p className="text-xs text-blue-300/20 leading-relaxed max-w-xs mx-auto">
+            <p className="text-xs text-stone-300/20 leading-relaxed max-w-xs mx-auto">
               Describe your website and watch it come to life
             </p>
           </div>
@@ -569,12 +574,12 @@ export default function PreviewPanel({
 
   if (!looksLikeHtml && html.length > 0 && !isGenerating) {
     return (
-      <div className="h-full overflow-auto bg-gray-950 p-6">
-        <div className="bg-yellow-900/30 border border-yellow-600/40 rounded-lg p-4 mb-4">
-          <p className="text-yellow-300 text-sm font-medium mb-2">Preview Issue — Generated output is not valid HTML</p>
-          <p className="text-yellow-200/60 text-xs">The AI returned text that doesn&apos;t appear to be a complete HTML document. First 200 characters shown below:</p>
+      <div className="h-full overflow-auto bg-navy-950 p-6">
+        <div className="bg-stone-900/30 border border-stone-600/40 rounded-lg p-4 mb-4">
+          <p className="text-stone-300 text-sm font-medium mb-2">Preview Issue — Generated output is not valid HTML</p>
+          <p className="text-stone-200/60 text-xs">The AI returned text that doesn&apos;t appear to be a complete HTML document. First 200 characters shown below:</p>
         </div>
-        <pre className="text-xs text-blue-300/70 whitespace-pre-wrap break-all font-mono">{html.substring(0, 500)}</pre>
+        <pre className="text-xs text-stone-300/70 whitespace-pre-wrap break-all font-mono">{html.substring(0, 500)}</pre>
       </div>
     );
   }
@@ -602,15 +607,15 @@ export default function PreviewPanel({
     }
 
     return (
-      <div className="h-full overflow-auto bg-gray-950 p-6">
-        <div className="bg-red-900/30 border border-red-600/40 rounded-lg p-4 mb-4">
-          <p className="text-red-300 text-sm font-medium mb-2">Generation incomplete — empty page detected</p>
-          <p className="text-red-200/60 text-xs mb-3">
+      <div className="h-full overflow-auto bg-navy-950 p-6">
+        <div className="bg-stone-900/30 border border-stone-600/40 rounded-lg p-4 mb-4">
+          <p className="text-stone-300 text-sm font-medium mb-2">Generation incomplete — empty page detected</p>
+          <p className="text-stone-200/60 text-xs mb-3">
             {likelyCause}
           </p>
-          <div className="bg-red-950/50 rounded p-3 mb-3">
-            <p className="text-[10px] text-red-300/60 uppercase tracking-wider mb-2">Diagnostics</p>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-red-200/50 font-mono">
+          <div className="bg-stone-950/50 rounded p-3 mb-3">
+            <p className="text-[10px] text-stone-300/60 uppercase tracking-wider mb-2">Diagnostics</p>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px] text-stone-200/50 font-mono">
               <span>Total HTML:</span><span>{htmlLen.toLocaleString()} chars</span>
               <span>Body text:</span><span>{bodyTextLength} chars</span>
               <span>Has &lt;head&gt;:</span><span>{hasHead ? "yes" : "NO"}</span>
@@ -619,13 +624,13 @@ export default function PreviewPanel({
               <span>Has &lt;script&gt;:</span><span>{hasScript ? "yes" : "no"}</span>
             </div>
           </div>
-          <p className="text-red-200/60 text-xs">
-            <strong className="text-red-300/80">Next steps:</strong> Visit <code className="text-red-300/70 bg-red-950/50 px-1 rounded">/api/health</code> to check if your API key and models are working. Then try &quot;New Site&quot; again.
+          <p className="text-stone-200/60 text-xs">
+            <strong className="text-stone-300/80">Next steps:</strong> Visit <code className="text-stone-300/70 bg-stone-950/50 px-1 rounded">/api/health</code> to check if your API key and models are working. Then try &quot;New Site&quot; again.
           </p>
         </div>
         <div className="bg-gray-900/50 rounded-lg p-4">
           <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Raw HTML (first 1000 chars)</p>
-          <pre className="text-[11px] text-blue-300/50 whitespace-pre-wrap break-all font-mono leading-relaxed">{html.substring(0, 1000)}</pre>
+          <pre className="text-[11px] text-stone-300/50 whitespace-pre-wrap break-all font-mono leading-relaxed">{html.substring(0, 1000)}</pre>
         </div>
       </div>
     );
@@ -652,7 +657,7 @@ export default function PreviewPanel({
             Optimizing
           </p>
           <p
-            className="text-[11px] text-blue-300/40 mt-4 tracking-[3px] uppercase"
+            className="text-[11px] text-stone-300/40 mt-4 tracking-[3px] uppercase"
             style={{ animation: "text-breathe 3s ease-in-out infinite" }}
           >
             Enhancing content quality
@@ -677,7 +682,7 @@ export default function PreviewPanel({
               onClick={() => setViewport(mode)}
               className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] transition-colors duration-150 ${
                 isActive
-                  ? "text-blue-400"
+                  ? "text-stone-400"
                   : "text-white/50 hover:text-white/70"
               }`}
               title={config.label}
@@ -695,7 +700,7 @@ export default function PreviewPanel({
           onClick={() => setActivePreviewMode(activePreviewMode === "iframe" ? "sandpack" : "iframe")}
           className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] transition-colors duration-150 ${
             activePreviewMode === "sandpack"
-              ? "text-green-400"
+              ? "text-stone-400"
               : "text-white/50 hover:text-white/70"
           }`}
           title={activePreviewMode === "sandpack" ? "Switch to iframe preview" : "Switch to Sandpack hot-reload preview"}
@@ -706,8 +711,8 @@ export default function PreviewPanel({
 
         {visualEditMode && (
           <div className="ml-auto flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            <span className="text-[10px] text-blue-400/70 uppercase tracking-wider font-medium">
+            <div className="w-1.5 h-1.5 rounded-full bg-stone-400 animate-pulse" />
+            <span className="text-[10px] text-stone-400/70 uppercase tracking-wider font-medium">
               Visual Edit
             </span>
           </div>
@@ -715,12 +720,12 @@ export default function PreviewPanel({
       </div>
 
       {/* Preview area */}
-      <div className="flex-1 overflow-hidden bg-gray-950 flex items-start justify-center">
+      <div className="flex-1 overflow-hidden bg-navy-950 flex items-start justify-center">
         {activePreviewMode === "sandpack" ? (
           <div className="w-full h-full">
             <Suspense
               fallback={
-                <div className="h-full flex items-center justify-center bg-[#131520] text-white/40 text-sm">
+                <div className="h-full flex items-center justify-center bg-[#0f2148] text-white/40 text-sm">
                   Loading Sandpack...
                 </div>
               }

@@ -1,307 +1,292 @@
-/**
- * Zoobicon Notification Management System
- *
- * All notifications stored in localStorage("zoobicon_notifications").
- * Max 100 notifications — oldest pruned on overflow.
- */
+import { sql } from "@/lib/db";
 
-export type NotificationType =
-  | "site_views"
-  | "deploy_success"
-  | "achievement"
-  | "gallery_comment"
-  | "gallery_upvote"
-  | "quota_warning"
-  | "weekly_report"
-  | "referral"
-  | "challenge"
-  | "system"
-  | "auto_pilot"
-  | "competitor_alert"
-  | "traffic_spike"
-  | "booking_reminder"
-  | "invoice_paid"
-  | "subscriber_milestone"
-  | "admin_email"
-  | "support_ticket"
-  | "support_reply";
+export type NotificationChannel = "inapp" | "email" | "sms" | "push";
 
-export interface Notification {
-  id: string;
-  type: NotificationType;
+export interface NotificationInput {
+  type: string;
   title: string;
-  description: string;
-  timestamp: number;
-  read: boolean;
+  body: string;
   link?: string;
-  metadata?: Record<string, unknown>;
+  channels?: NotificationChannel[];
+  email?: string;
+  phone?: string;
 }
 
-const STORAGE_KEY = "zoobicon_notifications";
-const MAX_NOTIFICATIONS = 100;
-
-function generateId(): string {
-  return `notif_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+export interface NotificationPreferences {
+  inapp: boolean;
+  email: boolean;
+  sms: boolean;
+  push: boolean;
 }
 
-function loadNotifications(): Notification[] {
-  if (typeof window === "undefined") return [];
+export interface NotificationRow {
+  id: string;
+  user_id: string;
+  type: string;
+  title: string;
+  body: string;
+  link: string | null;
+  channel: NotificationChannel;
+  status: string;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface DispatchResult {
+  channel: NotificationChannel;
+  ok: boolean;
+  error?: string;
+  note?: string;
+}
+
+const DEFAULT_PREFS: NotificationPreferences = {
+  inapp: true,
+  email: true,
+  sms: true,
+  push: true,
+};
+
+let tablesEnsured = false;
+
+export async function ensureNotificationTables(): Promise<void> {
+  if (tablesEnsured) return;
+  await sql`
+    CREATE TABLE IF NOT EXISTS notifications (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      type TEXT NOT NULL,
+      title TEXT NOT NULL,
+      body TEXT NOT NULL,
+      link TEXT,
+      channel TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      read_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS notifications_user_idx ON notifications(user_id, created_at DESC)`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS notification_preferences (
+      user_id TEXT NOT NULL,
+      type TEXT NOT NULL,
+      inapp BOOLEAN NOT NULL DEFAULT TRUE,
+      email BOOLEAN NOT NULL DEFAULT TRUE,
+      sms BOOLEAN NOT NULL DEFAULT TRUE,
+      push BOOLEAN NOT NULL DEFAULT TRUE,
+      PRIMARY KEY (user_id, type)
+    )
+  `;
+  tablesEnsured = true;
+}
+
+function genId(): string {
+  return `ntf_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+async function sendInApp(
+  userId: string,
+  notif: NotificationInput
+): Promise<DispatchResult> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed;
-  } catch {
-    return [];
+    const id = genId();
+    await sql`
+      INSERT INTO notifications (id, user_id, type, title, body, link, channel, status)
+      VALUES (${id}, ${userId}, ${notif.type}, ${notif.title}, ${notif.body}, ${notif.link ?? null}, 'inapp', 'delivered')
+    `;
+    return { channel: "inapp", ok: true };
+  } catch (err) {
+    return {
+      channel: "inapp",
+      ok: false,
+      error: err instanceof Error ? err.message : String(err),
+    };
   }
 }
 
-function saveNotifications(notifications: Notification[]): void {
-  if (typeof window === "undefined") return;
+async function sendEmail(notif: NotificationInput): Promise<DispatchResult> {
   try {
-    // Prune to max limit — keep the newest
-    const pruned =
-      notifications.length > MAX_NOTIFICATIONS
-        ? notifications.slice(-MAX_NOTIFICATIONS)
-        : notifications;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(pruned));
+    const apiKey = process.env.MAILGUN_API_KEY;
+    const domain = process.env.MAILGUN_DOMAIN;
+    const from =
+      process.env.MAILGUN_FROM || `Zoobicon <noreply@${domain || "zoobicon.com"}>`;
+    if (!apiKey || !domain) {
+      return {
+        channel: "email",
+        ok: false,
+        error: "MAILGUN_API_KEY or MAILGUN_DOMAIN not configured",
+      };
+    }
+    if (!notif.email) {
+      return { channel: "email", ok: false, error: "no recipient email" };
+    }
+    const params = new URLSearchParams();
+    params.append("from", from);
+    params.append("to", notif.email);
+    params.append("subject", notif.title);
+    const text = notif.link ? `${notif.body}\n\n${notif.link}` : notif.body;
+    params.append("text", text);
+    const res = await fetch(`https://api.mailgun.net/v3/${domain}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`api:${apiKey}`).toString("base64")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString(),
+    });
+    if (!res.ok) {
+      return { channel: "email", ok: false, error: `mailgun ${res.status}` };
+    }
+    return { channel: "email", ok: true };
+  } catch (err) {
+    return {
+      channel: "email",
+      ok: false,
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+
+async function sendSmsChannel(notif: NotificationInput): Promise<DispatchResult> {
+  try {
+    if (!notif.phone) {
+      return { channel: "sms", ok: false, error: "no recipient phone" };
+    }
+    const mod = (await import("@/lib/twilio-sms")) as {
+      sendSms: (req: { to: string; body: string }) => Promise<{ sid: string; status: string }>;
+    };
+    const text = notif.link
+      ? `${notif.title}: ${notif.body} ${notif.link}`
+      : `${notif.title}: ${notif.body}`;
+    await mod.sendSms({ to: notif.phone, body: text });
+    return { channel: "sms", ok: true };
+  } catch (err) {
+    return {
+      channel: "sms",
+      ok: false,
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
+
+async function sendPush(): Promise<DispatchResult> {
+  return { channel: "push", ok: true, note: "web-push not configured" };
+}
+
+export async function dispatch(
+  userId: string,
+  notif: NotificationInput
+): Promise<DispatchResult[]> {
+  await ensureNotificationTables();
+  const requested: NotificationChannel[] =
+    notif.channels && notif.channels.length > 0
+      ? notif.channels
+      : ["inapp", "email", "sms", "push"];
+  const prefs = await getPreferences(userId, notif.type);
+  const enabled = requested.filter((c) => prefs[c]);
+
+  const tasks: Array<Promise<DispatchResult>> = enabled.map((c) => {
+    if (c === "inapp") return sendInApp(userId, notif);
+    if (c === "email") return sendEmail(notif);
+    if (c === "sms") return sendSmsChannel(notif);
+    return sendPush();
+  });
+
+  const settled = await Promise.allSettled(tasks);
+  return settled.map((s, i) => {
+    if (s.status === "fulfilled") return s.value;
+    return {
+      channel: enabled[i],
+      ok: false,
+      error: s.reason instanceof Error ? s.reason.message : String(s.reason),
+    };
+  });
+}
+
+export async function listNotifications(
+  userId: string,
+  unreadOnly = false
+): Promise<NotificationRow[]> {
+  await ensureNotificationTables();
+  const rows = unreadOnly
+    ? await sql`
+        SELECT * FROM notifications
+        WHERE user_id = ${userId} AND read_at IS NULL
+        ORDER BY created_at DESC
+        LIMIT 200
+      `
+    : await sql`
+        SELECT * FROM notifications
+        WHERE user_id = ${userId}
+        ORDER BY created_at DESC
+        LIMIT 200
+      `;
+  return rows as unknown as NotificationRow[];
+}
+
+export async function markRead(
+  notificationId: string,
+  userId: string
+): Promise<void> {
+  await ensureNotificationTables();
+  await sql`
+    UPDATE notifications SET read_at = NOW()
+    WHERE id = ${notificationId} AND user_id = ${userId}
+  `;
+}
+
+export async function markAllRead(userId: string): Promise<void> {
+  await ensureNotificationTables();
+  await sql`
+    UPDATE notifications SET read_at = NOW()
+    WHERE user_id = ${userId} AND read_at IS NULL
+  `;
+}
+
+export async function getPreferences(
+  userId: string,
+  type: string
+): Promise<NotificationPreferences> {
+  await ensureNotificationTables();
+  const rows = (await sql`
+    SELECT inapp, email, sms, push FROM notification_preferences
+    WHERE user_id = ${userId} AND type = ${type}
+    LIMIT 1
+  `) as unknown as Array<NotificationPreferences>;
+  if (rows.length === 0) return { ...DEFAULT_PREFS };
+  const r = rows[0];
+  return {
+    inapp: Boolean(r.inapp),
+    email: Boolean(r.email),
+    sms: Boolean(r.sms),
+    push: Boolean(r.push),
+  };
+}
+
+export async function setPreferences(
+  userId: string,
+  type: string,
+  prefs: Partial<NotificationPreferences>
+): Promise<NotificationPreferences> {
+  await ensureNotificationTables();
+  const current = await getPreferences(userId, type);
+  const merged: NotificationPreferences = { ...current, ...prefs };
+  await sql`
+    INSERT INTO notification_preferences (user_id, type, inapp, email, sms, push)
+    VALUES (${userId}, ${type}, ${merged.inapp}, ${merged.email}, ${merged.sms}, ${merged.push})
+    ON CONFLICT (user_id, type) DO UPDATE SET
+      inapp = EXCLUDED.inapp,
+      email = EXCLUDED.email,
+      sms = EXCLUDED.sms,
+      push = EXCLUDED.push
+  `;
+  return merged;
+}
+
+/** Simple helper to log a deploy notification. Non-blocking — never throws. */
+export async function notifyDeploy(siteName: string, url: string): Promise<void> {
+  try {
+    console.log(`[notifications] Deploy: "${siteName}" → ${url}`);
   } catch {
-    /* storage full or unavailable */
+    // best-effort notification; never throw
   }
-}
-
-// ── Core CRUD ──────────────────────────────────────────
-
-export function getNotifications(): Notification[] {
-  return loadNotifications().sort((a, b) => b.timestamp - a.timestamp);
-}
-
-export function addNotification(
-  notification: Omit<Notification, "id" | "timestamp" | "read">
-): Notification {
-  const all = loadNotifications();
-  const entry: Notification = {
-    ...notification,
-    id: generateId(),
-    timestamp: Date.now(),
-    read: false,
-  };
-  all.push(entry);
-  saveNotifications(all);
-  // Dispatch a custom event so open NotificationInbox components can react
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent("zoobicon_notification", { detail: entry }));
-  }
-  return entry;
-}
-
-export function markAsRead(id: string): void {
-  const all = loadNotifications();
-  const target = all.find((n) => n.id === id);
-  if (target) {
-    target.read = true;
-    saveNotifications(all);
-  }
-}
-
-export function markAllAsRead(): void {
-  const all = loadNotifications();
-  all.forEach((n) => {
-    n.read = true;
-  });
-  saveNotifications(all);
-}
-
-export function getUnreadCount(): number {
-  return loadNotifications().filter((n) => !n.read).length;
-}
-
-export function clearNotifications(): void {
-  if (typeof window === "undefined") return;
-  localStorage.removeItem(STORAGE_KEY);
-}
-
-// ── Typed notification helpers ─────────────────────────
-
-export function notifyDeploy(siteName: string, siteUrl: string): void {
-  addNotification({
-    type: "deploy_success",
-    title: "Site deployed!",
-    description: `${siteName} is now live.`,
-    link: siteUrl,
-    metadata: { siteName, siteUrl },
-  });
-}
-
-export function notifyAchievement(achievementTitle: string): void {
-  addNotification({
-    type: "achievement",
-    title: "Achievement unlocked!",
-    description: achievementTitle,
-    link: "/dashboard",
-    metadata: { achievementTitle },
-  });
-}
-
-export function notifyQuotaWarning(used: number, limit: number): void {
-  const pct = Math.round((used / limit) * 100);
-  addNotification({
-    type: "quota_warning",
-    title: "Build quota warning",
-    description: `You've used ${used} of ${limit} builds this month (${pct}%).`,
-    link: "/pricing",
-    metadata: { used, limit, pct },
-  });
-}
-
-export function notifyViews(siteName: string, viewCount: number): void {
-  addNotification({
-    type: "site_views",
-    title: "Traffic update",
-    description: `Your site "${siteName}" got ${viewCount.toLocaleString()} views today.`,
-    link: "/dashboard",
-    metadata: { siteName, viewCount },
-  });
-}
-
-export function notifyGalleryActivity(
-  activityType: "comment" | "upvote",
-  siteName: string
-): void {
-  if (activityType === "comment") {
-    addNotification({
-      type: "gallery_comment",
-      title: "New comment",
-      description: `Someone commented on your site "${siteName}" in the gallery.`,
-      link: "/gallery",
-      metadata: { siteName },
-    });
-  } else {
-    addNotification({
-      type: "gallery_upvote",
-      title: "New upvote",
-      description: `Your site "${siteName}" got an upvote in the gallery!`,
-      link: "/gallery",
-      metadata: { siteName },
-    });
-  }
-}
-
-export function notifyReferral(referredUserName: string): void {
-  addNotification({
-    type: "referral",
-    title: "Referral success!",
-    description: `${referredUserName} signed up using your referral link.`,
-    link: "/dashboard",
-    metadata: { referredUserName },
-  });
-}
-
-export function notifyChallenge(challengeName: string): void {
-  addNotification({
-    type: "challenge",
-    title: "New weekly challenge",
-    description: challengeName,
-    link: "/gallery",
-    metadata: { challengeName },
-  });
-}
-
-export function notifyWeeklyReport(): void {
-  addNotification({
-    type: "weekly_report",
-    title: "Weekly report ready",
-    description: "Your weekly site performance report is available.",
-    link: "/dashboard",
-  });
-}
-
-export function notifySystem(title: string, description: string, link?: string): void {
-  addNotification({
-    type: "system",
-    title,
-    description,
-    link,
-  });
-}
-
-// ── Smart Notification Helpers (Auto-Pilot, Intel, Business OS) ──
-
-export function notifyAutoPilot(
-  siteName: string,
-  scoreBefore: number,
-  scoreAfter: number,
-  findingsCount: number
-): void {
-  const improved = scoreAfter > scoreBefore;
-  addNotification({
-    type: "auto_pilot",
-    title: improved ? "Auto-Pilot improved your site" : "Auto-Pilot audit complete",
-    description: improved
-      ? `SEO score for "${siteName}" improved from ${scoreBefore} to ${scoreAfter}. ${findingsCount} issues found.`
-      : `"${siteName}" scored ${scoreAfter}/100. ${findingsCount} recommendations available.`,
-    link: "/dashboard",
-    metadata: { siteName, scoreBefore, scoreAfter, findingsCount },
-  });
-}
-
-export function notifyCompetitorAlert(
-  competitorName: string,
-  alertType: string,
-  summary: string
-): void {
-  const typeLabels: Record<string, string> = {
-    price_change: "changed pricing",
-    new_feature: "launched a new feature",
-    tech_change: "updated their tech stack",
-    new_launch: "made a major announcement",
-  };
-  addNotification({
-    type: "competitor_alert",
-    title: `${competitorName} ${typeLabels[alertType] || "update detected"}`,
-    description: summary,
-    link: "/admin/intel",
-    metadata: { competitorName, alertType },
-  });
-}
-
-export function notifyTrafficSpike(siteName: string, views: number, percentIncrease: number): void {
-  addNotification({
-    type: "traffic_spike",
-    title: "Traffic spike detected!",
-    description: `"${siteName}" received ${views.toLocaleString()} views — up ${percentIncrease}% from average.`,
-    link: "/analytics",
-    metadata: { siteName, views, percentIncrease },
-  });
-}
-
-export function notifyBookingReminder(clientName: string, time: string): void {
-  addNotification({
-    type: "booking_reminder",
-    title: "Upcoming booking",
-    description: `Appointment with ${clientName} at ${time}.`,
-    link: "/booking",
-    metadata: { clientName, time },
-  });
-}
-
-export function notifyInvoicePaid(clientName: string, amount: string): void {
-  addNotification({
-    type: "invoice_paid",
-    title: "Invoice paid!",
-    description: `${clientName} paid ${amount}.`,
-    link: "/invoicing",
-    metadata: { clientName, amount },
-  });
-}
-
-export function notifySubscriberMilestone(listName: string, count: number): void {
-  addNotification({
-    type: "subscriber_milestone",
-    title: "Subscriber milestone!",
-    description: `Your "${listName}" list reached ${count.toLocaleString()} subscribers.`,
-    link: "/email-marketing",
-    metadata: { listName, count },
-  });
 }

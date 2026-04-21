@@ -6,7 +6,7 @@ export default function Loading() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0b0b11",
+        background: "#060e1f",
       }}
     >
       <div

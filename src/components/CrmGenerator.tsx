@@ -100,12 +100,12 @@ const BUSINESS_TYPES = [
 ];
 
 const COLOR_SCHEMES = [
-  { name: "Blue", primary: "#3b82f6", bg: "bg-blue-500" },
-  { name: "Purple", primary: "#8b5cf6", bg: "bg-purple-500" },
-  { name: "Emerald", primary: "#10b981", bg: "bg-emerald-500" },
-  { name: "Rose", primary: "#f43f5e", bg: "bg-rose-500" },
-  { name: "Amber", primary: "#f59e0b", bg: "bg-amber-500" },
-  { name: "Cyan", primary: "#06b6d4", bg: "bg-cyan-500" },
+  { name: "Blue", primary: "#3b82f6", bg: "bg-stone-500" },
+  { name: "Purple", primary: "#8b5cf6", bg: "bg-stone-500" },
+  { name: "Emerald", primary: "#10b981", bg: "bg-stone-500" },
+  { name: "Rose", primary: "#f43f5e", bg: "bg-stone-500" },
+  { name: "Amber", primary: "#f59e0b", bg: "bg-stone-500" },
+  { name: "Cyan", primary: "#06b6d4", bg: "bg-stone-500" },
 ];
 
 export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
@@ -183,7 +183,7 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
     return (
       <button
         onClick={() => setShowConfig(true)}
-        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-500 hover:to-blue-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+        className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
       >
         <Briefcase className="w-5 h-5" />
         Generate CRM System
@@ -194,9 +194,9 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
   return (
     <div className="w-full max-w-4xl mx-auto bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-5 bg-gradient-to-r from-blue-600/20 to-blue-600/20 border-b border-gray-700">
+      <div className="px-6 py-5 bg-gradient-to-r from-stone-600/20 to-stone-600/20 border-b border-gray-700">
         <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          <Briefcase className="w-6 h-6 text-blue-400" />
+          <Briefcase className="w-6 h-6 text-stone-400" />
           CRM System Generator
         </h2>
         <p className="text-sm text-gray-400 mt-1">
@@ -216,7 +216,7 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
               placeholder="e.g. Acme Corp"
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all"
             />
           </div>
           <div>
@@ -226,7 +226,7 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
             <select
               value={businessType}
               onChange={(e) => setBusinessType(e.target.value)}
-              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-2.5 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent transition-all"
             >
               {BUSINESS_TYPES.map((type) => (
                 <option key={type} value={type}>
@@ -269,7 +269,7 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
             <div className="flex gap-2">
               <button
                 onClick={selectAll}
-                className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                className="text-xs text-stone-400 hover:text-stone-300 transition-colors"
               >
                 Select All
               </button>
@@ -291,14 +291,14 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
                   onClick={() => toggleFeature(feature.id)}
                   className={`flex items-start gap-3 p-3 rounded-lg border text-left transition-all ${
                     isSelected
-                      ? "border-blue-500/50 bg-blue-500/10 shadow-sm"
+                      ? "border-stone-500/50 bg-stone-500/10 shadow-sm"
                       : "border-gray-700 hover:border-gray-600 hover:bg-gray-800/50"
                   }`}
                 >
                   <div
                     className={`mt-0.5 p-1.5 rounded-md ${
                       isSelected
-                        ? "bg-blue-500/20 text-blue-400"
+                        ? "bg-stone-500/20 text-stone-400"
                         : "bg-gray-800 text-gray-500"
                     }`}
                   >
@@ -314,7 +314,7 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
                         {feature.label}
                       </span>
                       {isSelected && (
-                        <Clock className="w-3.5 h-3.5 text-blue-400" />
+                        <Clock className="w-3.5 h-3.5 text-stone-400" />
                       )}
                     </div>
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -329,7 +329,7 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
 
         {/* Error Message */}
         {error && (
-          <div className="px-4 py-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+          <div className="px-4 py-3 bg-stone-500/10 border border-stone-500/30 rounded-lg text-stone-400 text-sm">
             {error}
           </div>
         )}
@@ -345,7 +345,7 @@ export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {
           <button
             onClick={handleGenerate}
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-500 hover:to-blue-500 disabled:from-gray-600 disabled:to-gray-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl disabled:shadow-none transition-all duration-200 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 disabled:from-gray-600 disabled:to-gray-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl disabled:shadow-none transition-all duration-200 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>

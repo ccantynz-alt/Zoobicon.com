@@ -133,16 +133,16 @@ Just tell me the client name and email, and I'll set it up in your invoicing sys
 **LinkedIn** (Post at 9:00 AM):
 > "3 things I learned building 50+ client websites this year: [Thread] 1. Speed beats perfection at the prototype stage..."
 
-**Twitter/X** (Post at 12:00 PM):
+**MessageCircle/X** (Post at 12:00 PM):
 > "Just shipped a new client site in under 2 minutes with AI. The future of web development isn't code — it's conversation. 🚀"
 
-**Instagram** (Post at 6:00 PM):
+**Camera** (Post at 6:00 PM):
 > Before/After carousel of your latest project. Caption: "From prompt to production in 90 seconds..."
 
 Want me to:
 1. Generate the full content for any of these?
 2. Schedule them in your content calendar?
-3. Create the Instagram carousel images?`;
+3. Create the Camera carousel images?`;
   }
 
   if (lower.includes("email") || lower.includes("campaign") || lower.includes("newsletter")) {
@@ -324,11 +324,11 @@ export default function BusinessChat() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/25 flex items-center justify-center hover:scale-110 transition-transform duration-200 group"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-stone-600 to-stone-600 text-white shadow-lg shadow-stone-500/25 flex items-center justify-center hover:scale-110 transition-transform duration-200 group"
         aria-label="Open Business Assistant"
       >
         <MessageSquare size={24} />
-        <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#0a0a12]" />
+        <span className="absolute -top-1 -right-1 w-3 h-3 bg-stone-400 rounded-full border-2 border-[#0a0a12]" />
         <span className="absolute bottom-full right-0 mb-2 px-3 py-1.5 rounded-lg bg-gray-900 text-white text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
           AI Business Assistant
         </span>
@@ -338,19 +338,19 @@ export default function BusinessChat() {
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-50 bg-[#0f0f1a] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 flex flex-col transition-all duration-300 ${
+      className={`fixed bottom-6 right-6 z-50 bg-[#0a1628] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 flex flex-col transition-all duration-300 ${
         isMinimized ? "w-80 h-14" : "w-96 h-[600px] max-h-[80vh]"
       }`}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center">
             <Sparkles size={16} className="text-white" />
           </div>
           <div>
             <span className="text-sm font-semibold text-white">Business Assistant</span>
-            <span className="block text-[10px] text-emerald-400">Online</span>
+            <span className="block text-[10px] text-stone-400">Online</span>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -381,8 +381,8 @@ export default function BusinessChat() {
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
                     msg.role === "assistant"
-                      ? "bg-violet-500/20 text-violet-400"
-                      : "bg-blue-500/20 text-blue-400"
+                      ? "bg-stone-500/20 text-stone-400"
+                      : "bg-stone-500/20 text-stone-400"
                   }`}
                 >
                   {msg.role === "assistant" ? <Bot size={14} /> : <User size={14} />}
@@ -390,7 +390,7 @@ export default function BusinessChat() {
                 <div
                   className={`max-w-[80%] rounded-xl px-3 py-2 text-sm leading-relaxed ${
                     msg.role === "user"
-                      ? "bg-violet-600/20 text-white"
+                      ? "bg-stone-600/20 text-white"
                       : "bg-white/5 text-white/80"
                   }`}
                 >
@@ -406,11 +406,11 @@ export default function BusinessChat() {
             ))}
             {isTyping && (
               <div className="flex gap-2">
-                <div className="w-7 h-7 rounded-full bg-violet-500/20 text-violet-400 flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-full bg-stone-500/20 text-stone-400 flex items-center justify-center shrink-0">
                   <Bot size={14} />
                 </div>
                 <div className="bg-white/5 rounded-xl px-4 py-3">
-                  <Loader2 size={16} className="animate-spin text-violet-400" />
+                  <Loader2 size={16} className="animate-spin text-stone-400" />
                 </div>
               </div>
             )}
@@ -450,12 +450,12 @@ export default function BusinessChat() {
                   }
                 }}
                 placeholder="Ask me anything about your business..."
-                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50 transition-colors"
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50 transition-colors"
               />
               <button
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim() || isTyping}
-                className="w-9 h-9 rounded-xl bg-violet-600 text-white flex items-center justify-center hover:bg-violet-500 transition-colors disabled:opacity-30 disabled:hover:bg-violet-600 shrink-0"
+                className="w-9 h-9 rounded-xl bg-stone-600 text-white flex items-center justify-center hover:bg-stone-500 transition-colors disabled:opacity-30 disabled:hover:bg-stone-600 shrink-0"
               >
                 <Send size={16} />
               </button>

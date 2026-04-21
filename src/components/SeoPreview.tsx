@@ -1,7 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
-import { Globe, Share2 } from "lucide-react";
+import Image from "next/image";
+import {
+  Globe,
+  Share2,
+} from "lucide-react";
 
 interface SeoPreviewProps {
   html: string;
@@ -68,7 +72,7 @@ function extractMeta(html: string): MetaData {
 
 function ScoreBar({ score, max }: { score: number; max: number }) {
   const pct = Math.min(100, (score / max) * 100);
-  const color = pct >= 80 ? "bg-emerald-500" : pct >= 50 ? "bg-amber-500" : "bg-red-500";
+  const color = pct >= 80 ? "bg-stone-500" : pct >= 50 ? "bg-stone-500" : "bg-stone-500";
   return (
     <div className="flex items-center gap-2">
       <div className="flex-1 h-1.5 rounded-full bg-white/[0.06]">
@@ -118,7 +122,7 @@ export default function SeoPreview({ html }: SeoPreviewProps) {
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold text-white/80">SEO Score</h2>
         <div className="flex items-center gap-2">
-          <span className={`text-2xl font-bold ${score >= 80 ? "text-emerald-400" : score >= 50 ? "text-amber-400" : "text-red-400"}`}>
+          <span className={`text-2xl font-bold ${score >= 80 ? "text-stone-400" : score >= 50 ? "text-stone-400" : "text-stone-400"}`}>
             {score}
           </span>
           <span className="text-xs text-white/50">/100</span>
@@ -134,7 +138,7 @@ export default function SeoPreview({ html }: SeoPreviewProps) {
         </div>
         <div className="bg-white rounded-lg p-4 shadow-lg">
           <div className="text-xs text-[#202124] mb-1 flex items-center gap-1">
-            <span className="w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center text-[8px] text-white font-bold">Z</span>
+            <span className="w-4 h-4 rounded-full bg-stone-600 flex items-center justify-center text-[8px] text-white font-bold">Z</span>
             <span className="text-[#4d5156]">{displayUrl}</span>
           </div>
           <h3 className="text-[#1a0dab] text-lg leading-snug hover:underline cursor-pointer mb-1">
@@ -154,9 +158,8 @@ export default function SeoPreview({ html }: SeoPreviewProps) {
         </div>
         <div className="rounded-lg overflow-hidden border border-[#e1e8ed] bg-white shadow">
           {meta.ogImage && (
-            <div className="w-full h-[160px] bg-gray-200 flex items-center justify-center overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={meta.ogImage} alt="OG Preview" className="w-full h-full object-cover" />
+            <div className="relative w-full h-[160px] bg-gray-200 overflow-hidden">
+              <Image src={meta.ogImage} alt="OG Preview" fill unoptimized className="object-cover" />
             </div>
           )}
           <div className="p-3">
@@ -189,9 +192,9 @@ export default function SeoPreview({ html }: SeoPreviewProps) {
             { label: "Content length", ok: meta.wordCount >= 300, detail: `${meta.wordCount} words` },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-3 text-xs">
-              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${item.ok ? "bg-emerald-500" : "bg-red-500/70"}`} />
+              <span className={`w-2 h-2 rounded-full flex-shrink-0 ${item.ok ? "bg-stone-500" : "bg-stone-500/70"}`} />
               <span className="text-white/50 flex-1">{item.label}</span>
-              <span className={`text-[10px] ${item.ok ? "text-emerald-400/60" : "text-red-400/60"}`}>
+              <span className={`text-[10px] ${item.ok ? "text-stone-400/60" : "text-stone-400/60"}`}>
                 {item.detail}
               </span>
             </div>

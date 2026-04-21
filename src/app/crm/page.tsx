@@ -2,7 +2,33 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Users, PieChart, LayoutGrid, Zap, Search, Plus, Phone, Mail, Calendar, MessageSquare, Star, TrendingUp, DollarSign, Clock, ChevronRight, MoreHorizontal, Sparkles, Filter, ArrowUpRight, Building2, UserPlus, Target, Activity, BarChart3, Send } from 'lucide-react';
+import {
+  Users,
+  PieChart,
+  LayoutGrid,
+  Zap,
+  Search,
+  Plus,
+  Phone,
+  Mail,
+  Calendar,
+  MessageSquare,
+  Star,
+  TrendingUp,
+  DollarSign,
+  Clock,
+  ChevronRight,
+  MoreHorizontal,
+  Sparkles,
+  Filter,
+  ArrowUpRight,
+  Building2,
+  UserPlus,
+  Target,
+  Activity,
+  BarChart3,
+  Send,
+} from 'lucide-react';
 
 interface Deal {
   id: string;
@@ -67,7 +93,7 @@ const AUTOMATIONS = [
   { id: '1', name: 'New lead → Welcome email + CRM entry', trigger: 'form.submitted', active: true, runs: 1234 },
   { id: '2', name: 'No activity 7d → Send reminder', trigger: 'inactivity.7d', active: true, runs: 567 },
   { id: '3', name: 'Deal won → Send thank you + invoice', trigger: 'deal.won', active: true, runs: 89 },
-  { id: '4', name: 'New proposal viewed → Slack notification', trigger: 'proposal.viewed', active: false, runs: 234 },
+  { id: '4', name: 'New proposal viewed → Hash notification', trigger: 'proposal.viewed', active: false, runs: 234 },
 ];
 
 export default function CRMPage() {
@@ -111,7 +137,7 @@ export default function CRMPage() {
     }, 1000);
   };
 
-  const scoreColor = (score: string) => score === 'hot' ? 'bg-red-500/20 text-red-400' : score === 'warm' ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400';
+  const scoreColor = (score: string) => score === 'hot' ? 'bg-stone-500/20 text-stone-400' : score === 'warm' ? 'bg-stone-500/20 text-stone-400' : 'bg-stone-500/20 text-stone-400';
   const activityIcon = (type: string) => type === 'email' ? Mail : type === 'call' ? Phone : type === 'meeting' ? Calendar : type === 'note' ? MessageSquare : Target;
 
   const filteredContacts = searchQuery
@@ -123,15 +149,15 @@ export default function CRMPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
-            <div className="flex items-center gap-2"><Users className="w-5 h-5 text-violet-400" /><span className="font-semibold">CRM</span></div>
+            <div className="flex items-center gap-2"><Users className="w-5 h-5 text-stone-400" /><span className="font-semibold">CRM</span></div>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/forms" className="px-3 py-1.5 text-sm text-white/60 hover:text-white transition-colors">Forms</Link>
             <Link href="/invoicing" className="px-3 py-1.5 text-sm text-white/60 hover:text-white transition-colors">Invoicing</Link>
             <Link href="/automation" className="px-3 py-1.5 text-sm text-white/60 hover:text-white transition-colors">Automation</Link>
-            <button className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"><UserPlus className="w-4 h-4" /> Add Contact</button>
+            <button onClick={() => {}} className="px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"><UserPlus className="w-4 h-4" /> Add Contact</button>
           </div>
         </div>
       </header>
@@ -139,7 +165,7 @@ export default function CRMPage() {
       <div className="border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 flex gap-6">
           {(['dashboard', 'pipeline', 'contacts', 'automation'] as const).map(t => (
-            <button key={t} onClick={() => setTab(t)} className={`py-3 px-1 text-sm font-medium border-b-2 transition-colors capitalize ${tab === t ? 'border-violet-500 text-violet-400' : 'border-transparent text-white/50 hover:text-white/80'}`}>
+            <button key={t} onClick={() => setTab(t)} className={`py-3 px-1 text-sm font-medium border-b-2 transition-colors capitalize ${tab === t ? 'border-stone-500 text-stone-400' : 'border-transparent text-white/50 hover:text-white/80'}`}>
               {t}
             </button>
           ))}
@@ -165,7 +191,7 @@ export default function CRMPage() {
                       <Icon className="w-4 h-4 text-white/30" />
                     </div>
                     <div className="text-2xl font-bold">{stat.value}</div>
-                    <div className="text-xs text-green-400 mt-1">{stat.change} vs last month</div>
+                    <div className="text-xs text-stone-400 mt-1">{stat.change} vs last month</div>
                   </div>
                 );
               })}
@@ -174,11 +200,11 @@ export default function CRMPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Revenue Forecast */}
               <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-                <h3 className="font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-4 h-4 text-violet-400" /> Revenue Forecast</h3>
+                <h3 className="font-semibold mb-4 flex items-center gap-2"><BarChart3 className="w-4 h-4 text-stone-400" /> Revenue Forecast</h3>
                 <div className="h-40 flex items-end gap-3">
                   {[35, 42, 58, 67, 72, 87, 95, 82, 91, 105, 118, 132].map((v, i) => (
                     <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                      <div className={`w-full rounded-t transition-all ${i < 3 ? 'bg-violet-600' : 'bg-violet-600/40 border border-dashed border-violet-500/30'}`} style={{ height: `${(v / 132) * 100}%` }} />
+                      <div className={`w-full rounded-t transition-all ${i < 3 ? 'bg-stone-600' : 'bg-stone-600/40 border border-dashed border-stone-500/30'}`} style={{ height: `${(v / 132) * 100}%` }} />
                       <span className="text-[10px] text-white/30">{['J','F','M','A','M','J','J','A','S','O','N','D'][i]}</span>
                     </div>
                   ))}
@@ -187,14 +213,14 @@ export default function CRMPage() {
 
               {/* Activity Feed */}
               <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-                <h3 className="font-semibold mb-4 flex items-center gap-2"><Activity className="w-4 h-4 text-violet-400" /> Recent Activity</h3>
+                <h3 className="font-semibold mb-4 flex items-center gap-2"><Activity className="w-4 h-4 text-stone-400" /> Recent Activity</h3>
                 <div className="space-y-3">
                   {ACTIVITIES.slice(0, 5).map(act => {
                     const Icon = activityIcon(act.type);
                     return (
                       <div key={act.id} className="flex items-start gap-3">
                         <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
-                          <Icon className="w-3.5 h-3.5 text-violet-400" />
+                          <Icon className="w-3.5 h-3.5 text-stone-400" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm"><span className="font-medium">{act.contact}</span> — {act.desc}</p>
@@ -208,19 +234,19 @@ export default function CRMPage() {
             </div>
 
             {/* AI Insights */}
-            <div className="mt-6 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 rounded-xl p-6">
-              <h3 className="font-semibold mb-3 flex items-center gap-2"><Sparkles className="w-5 h-5 text-violet-400" /> AI Insights</h3>
+            <div className="mt-6 bg-gradient-to-r from-stone-500/10 to-stone-500/10 border border-stone-500/20 rounded-xl p-6">
+              <h3 className="font-semibold mb-3 flex items-center gap-2"><Sparkles className="w-5 h-5 text-stone-400" /> AI Insights</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white/5 rounded-lg p-4">
-                  <p className="text-sm font-medium text-violet-300">High Priority Follow-up</p>
+                  <p className="text-sm font-medium text-stone-300">High Priority Follow-up</p>
                   <p className="text-sm text-white/60 mt-1">David Kim (ScaleUp) — $67K deal in negotiation. No contact in 24h. Suggest: Send pricing breakdown.</p>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4">
-                  <p className="text-sm font-medium text-green-300">Hot Lead Alert</p>
+                  <p className="text-sm font-medium text-stone-300">Hot Lead Alert</p>
                   <p className="text-sm text-white/60 mt-1">Emma Rodriguez (BrandWise) viewed your proposal 3 times today. Score: 94/100. Ready to close.</p>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4">
-                  <p className="text-sm font-medium text-orange-300">Risk Warning</p>
+                  <p className="text-sm font-medium text-stone-300">Risk Warning</p>
                   <p className="text-sm text-white/60 mt-1">Lisa Thompson (DataFlow) hasn&apos;t responded in 2 days. Engagement dropping. Suggest: Offer demo call.</p>
                 </div>
               </div>
@@ -258,7 +284,7 @@ export default function CRMPage() {
                         key={deal.id}
                         draggable
                         onDragStart={() => handleDragStart(deal.id, stage.id)}
-                        className="bg-white/5 border border-white/10 rounded-lg p-3 cursor-grab active:cursor-grabbing hover:border-violet-500/30 transition-colors"
+                        className="bg-white/5 border border-white/10 rounded-lg p-3 cursor-grab active:cursor-grabbing hover:border-stone-500/30 transition-colors"
                       >
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium text-sm">{deal.contact}</span>
@@ -268,15 +294,15 @@ export default function CRMPage() {
                           <Building2 className="w-3 h-3" /> {deal.company}
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-bold text-green-400">${deal.value.toLocaleString()}</span>
+                          <span className="text-sm font-bold text-stone-400">${deal.value.toLocaleString()}</span>
                           <span className="text-[10px] text-white/30">{deal.lastActivity}</span>
                         </div>
                         <div className="mt-2 flex gap-1">
-                          <button onClick={() => generateFollowUp(deal.contact, deal.company)} className="flex-1 py-1 bg-violet-500/20 text-violet-400 rounded text-[10px] hover:bg-violet-500/30 transition-colors flex items-center justify-center gap-1">
+                          <button onClick={() => generateFollowUp(deal.contact, deal.company)} className="flex-1 py-1 bg-stone-500/20 text-stone-400 rounded text-[10px] hover:bg-stone-500/30 transition-colors flex items-center justify-center gap-1">
                             <Sparkles className="w-2.5 h-2.5" /> AI Follow-up
                           </button>
-                          <button className="p-1 bg-white/5 rounded hover:bg-white/10 transition-colors"><Mail className="w-3 h-3 text-white/40" /></button>
-                          <button className="p-1 bg-white/5 rounded hover:bg-white/10 transition-colors"><Phone className="w-3 h-3 text-white/40" /></button>
+                          <button onClick={() => {}} className="p-1 bg-white/5 rounded hover:bg-white/10 transition-colors"><Mail className="w-3 h-3 text-white/40" /></button>
+                          <button onClick={() => {}} className="p-1 bg-white/5 rounded hover:bg-white/10 transition-colors"><Phone className="w-3 h-3 text-white/40" /></button>
                         </div>
                       </div>
                     ))}
@@ -295,9 +321,9 @@ export default function CRMPage() {
               <div className="flex gap-3">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
-                  <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search contacts..." className="pl-9 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-sm w-64 focus:outline-none focus:border-violet-500" />
+                  <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder="Search contacts..." className="pl-9 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-sm w-64 focus:outline-none focus:border-stone-500" />
                 </div>
-                <button className="px-3 py-2 bg-white/10 rounded-lg text-sm flex items-center gap-2"><Filter className="w-4 h-4" /> Filter</button>
+                <button onClick={() => {}} className="px-3 py-2 bg-white/10 rounded-lg text-sm flex items-center gap-2"><Filter className="w-4 h-4" /> Filter</button>
               </div>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
@@ -317,7 +343,7 @@ export default function CRMPage() {
                     <tr key={contact.id} className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer" onClick={() => setSelectedContact(selectedContact === contact.id ? null : contact.id)}>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center text-sm font-medium text-violet-400">{contact.name[0]}</div>
+                          <div className="w-8 h-8 rounded-full bg-stone-500/20 flex items-center justify-center text-sm font-medium text-stone-400">{contact.name[0]}</div>
                           <div>
                             <div className="text-sm font-medium">{contact.name}</div>
                             <div className="text-xs text-white/40">{contact.email}</div>
@@ -325,14 +351,14 @@ export default function CRMPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-sm text-white/70">{contact.company}</td>
-                      <td className="px-4 py-3 text-sm font-medium text-green-400">${contact.dealValue.toLocaleString()}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-stone-400">${contact.dealValue.toLocaleString()}</td>
                       <td className="px-4 py-3"><span className={`text-xs px-2 py-0.5 rounded-full ${scoreColor(contact.score)}`}>{contact.score}</span></td>
                       <td className="px-4 py-3 text-sm text-white/50">{contact.lastContact}</td>
                       <td className="px-4 py-3">
                         <div className="flex gap-1">
                           <button className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"><Mail className="w-3.5 h-3.5 text-white/40" /></button>
                           <button className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"><Phone className="w-3.5 h-3.5 text-white/40" /></button>
-                          <button onClick={e => { e.stopPropagation(); generateFollowUp(contact.name, contact.company); }} className="p-1.5 hover:bg-violet-500/20 rounded-lg transition-colors"><Sparkles className="w-3.5 h-3.5 text-violet-400" /></button>
+                          <button onClick={e => { e.stopPropagation(); generateFollowUp(contact.name, contact.company); }} className="p-1.5 hover:bg-stone-500/20 rounded-lg transition-colors"><Sparkles className="w-3.5 h-3.5 text-stone-400" /></button>
                         </div>
                       </td>
                     </tr>
@@ -348,14 +374,14 @@ export default function CRMPage() {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Automations</h2>
-              <Link href="/automation" className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"><Plus className="w-4 h-4" /> Create Workflow</Link>
+              <Link href="/automation" className="px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"><Plus className="w-4 h-4" /> Create Workflow</Link>
             </div>
             <div className="space-y-3">
               {AUTOMATIONS.map(auto => (
-                <div key={auto.id} className="bg-white/5 border border-white/10 rounded-xl p-5 flex items-center justify-between hover:border-violet-500/20 transition-colors">
+                <div key={auto.id} className="bg-white/5 border border-white/10 rounded-xl p-5 flex items-center justify-between hover:border-stone-500/20 transition-colors">
                   <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${auto.active ? 'bg-green-500/20' : 'bg-white/10'}`}>
-                      <Zap className={`w-5 h-5 ${auto.active ? 'text-green-400' : 'text-white/30'}`} />
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${auto.active ? 'bg-stone-500/20' : 'bg-white/10'}`}>
+                      <Zap className={`w-5 h-5 ${auto.active ? 'text-stone-400' : 'text-white/30'}`} />
                     </div>
                     <div>
                       <h3 className="font-medium text-sm">{auto.name}</h3>
@@ -364,7 +390,7 @@ export default function CRMPage() {
                   </div>
                   <div className="flex items-center gap-6">
                     <span className="text-sm text-white/50">{auto.runs.toLocaleString()} runs</span>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs ${auto.active ? 'bg-green-500/20 text-green-400' : 'bg-white/10 text-white/40'}`}>{auto.active ? 'Active' : 'Paused'}</span>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs ${auto.active ? 'bg-stone-500/20 text-stone-400' : 'bg-white/10 text-white/40'}`}>{auto.active ? 'Active' : 'Paused'}</span>
                   </div>
                 </div>
               ))}
@@ -376,21 +402,21 @@ export default function CRMPage() {
       {/* AI Follow-up Modal */}
       {aiFollowUp && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => { setAiFollowUp(null); setGeneratedEmail(''); }}>
-          <div className="bg-[#1a1a2e] border border-white/10 rounded-2xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold mb-2 flex items-center gap-2"><Sparkles className="w-5 h-5 text-violet-400" /> AI Follow-up Email</h3>
+          <div className="bg-[#0f2148] border border-white/10 rounded-2xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold mb-2 flex items-center gap-2"><Sparkles className="w-5 h-5 text-stone-400" /> AI Follow-up Email</h3>
             <p className="text-sm text-white/50 mb-4">Generated for {aiFollowUp}</p>
             {generatedEmail ? (
               <div>
-                <textarea value={generatedEmail} onChange={e => setGeneratedEmail(e.target.value)} className="w-full bg-white/10 border border-white/20 rounded-lg p-4 text-sm h-48 resize-none focus:outline-none focus:border-violet-500" />
+                <textarea value={generatedEmail} onChange={e => setGeneratedEmail(e.target.value)} className="w-full bg-white/10 border border-white/20 rounded-lg p-4 text-sm h-48 resize-none focus:outline-none focus:border-stone-500" />
                 <div className="flex gap-2 mt-4">
-                  <button className="flex-1 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"><Send className="w-4 h-4" /> Send Email</button>
+                  <button className="flex-1 py-2.5 bg-stone-600 hover:bg-stone-500 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"><Send className="w-4 h-4" /> Send Email</button>
                   <button className="px-4 py-2.5 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-colors">Copy</button>
                   <button onClick={() => { setAiFollowUp(null); setGeneratedEmail(''); }} className="px-4 py-2.5 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-colors">Close</button>
                 </div>
               </div>
             ) : (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full" />
+                <div className="animate-spin w-6 h-6 border-2 border-stone-500 border-t-transparent rounded-full" />
                 <span className="ml-3 text-sm text-white/50">Generating personalized email...</span>
               </div>
             )}

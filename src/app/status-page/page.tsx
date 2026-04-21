@@ -3,10 +3,29 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
-  Activity, CheckCircle, AlertTriangle, XCircle, Clock,
-  ChevronRight, ArrowLeft, Plus, Bell, Globe, Server,
-  Database, Shield, Zap, Wifi, Mail, Eye, Settings,
-  Calendar, TrendingUp, Users, ExternalLink, ChevronDown
+  Activity,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  Clock,
+  ChevronRight,
+  ArrowLeft,
+  Plus,
+  Bell,
+  Globe,
+  Server,
+  Database,
+  Shield,
+  Zap,
+  Wifi,
+  Mail,
+  Eye,
+  Settings,
+  Calendar,
+  TrendingUp,
+  Users,
+  ExternalLink,
+  ChevronDown,
 } from 'lucide-react';
 
 type TabType = 'status' | 'incidents' | 'subscribers' | 'settings';
@@ -34,10 +53,10 @@ interface Incident {
 }
 
 const STATUS_CONFIG: Record<ComponentStatus, { label: string; color: string; bgColor: string; dotColor: string; icon: React.ReactNode }> = {
-  operational: { label: 'Operational', color: 'text-green-400', bgColor: 'bg-green-500/20', dotColor: 'bg-green-400', icon: <CheckCircle className="w-4 h-4" /> },
-  degraded: { label: 'Degraded Performance', color: 'text-amber-400', bgColor: 'bg-amber-500/20', dotColor: 'bg-amber-400', icon: <AlertTriangle className="w-4 h-4" /> },
-  outage: { label: 'Major Outage', color: 'text-red-400', bgColor: 'bg-red-500/20', dotColor: 'bg-red-400', icon: <XCircle className="w-4 h-4" /> },
-  maintenance: { label: 'Under Maintenance', color: 'text-blue-400', bgColor: 'bg-blue-500/20', dotColor: 'bg-blue-400', icon: <Clock className="w-4 h-4" /> },
+  operational: { label: 'Operational', color: 'text-stone-400', bgColor: 'bg-stone-500/20', dotColor: 'bg-stone-400', icon: <CheckCircle className="w-4 h-4" /> },
+  degraded: { label: 'Degraded Performance', color: 'text-stone-400', bgColor: 'bg-stone-500/20', dotColor: 'bg-stone-400', icon: <AlertTriangle className="w-4 h-4" /> },
+  outage: { label: 'Major Outage', color: 'text-stone-400', bgColor: 'bg-stone-500/20', dotColor: 'bg-stone-400', icon: <XCircle className="w-4 h-4" /> },
+  maintenance: { label: 'Under Maintenance', color: 'text-stone-400', bgColor: 'bg-stone-500/20', dotColor: 'bg-stone-400', icon: <Clock className="w-4 h-4" /> },
 };
 
 const COMPONENTS: StatusComponent[] = [
@@ -95,7 +114,7 @@ function UptimeBar({ uptime, days = 90 }: { uptime: number; days?: number }) {
     const isDown = Math.random() > uptime / 100;
     const isDegraded = !isDown && Math.random() > 0.97;
     bars.push(
-      <div key={i} className={`flex-1 h-8 rounded-sm ${isDown ? 'bg-red-500' : isDegraded ? 'bg-amber-500' : 'bg-green-500/70'}`} title={`Day ${days - i}: ${isDown ? 'Outage' : isDegraded ? 'Degraded' : 'Operational'}`} />
+      <div key={i} className={`flex-1 h-8 rounded-sm ${isDown ? 'bg-stone-500' : isDegraded ? 'bg-stone-500' : 'bg-stone-500/70'}`} title={`Day ${days - i}: ${isDown ? 'Outage' : isDegraded ? 'Degraded' : 'Operational'}`} />
     );
   }
   return <div className="flex gap-px">{bars}</div>;
@@ -127,24 +146,24 @@ export default function StatusPagePage() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              <span className="font-bold text-lg bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</span>
+              <span className="font-bold text-lg bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</span>
             </Link>
             <ChevronRight className="w-4 h-4 text-white/30" />
             <div className="flex items-center gap-2">
-              <Activity className="w-5 h-5 text-violet-400" />
+              <Activity className="w-5 h-5 text-stone-400" />
               <span className="font-semibold">Status Page</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/builder" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Builder</Link>
-            <Link href="/dashboard" className="px-4 py-2 text-sm bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors">Dashboard</Link>
+            <Link href="/dashboard" className="px-4 py-2 text-sm bg-stone-600 hover:bg-stone-500 rounded-lg transition-colors">Dashboard</Link>
           </div>
         </div>
       </header>
 
       <div className="max-w-5xl mx-auto px-6 py-8">
         {/* Overall Status Banner */}
-        <div className={`${overallConfig.bgColor} border ${overallStatus === 'operational' ? 'border-green-500/30' : overallStatus === 'degraded' ? 'border-amber-500/30' : 'border-red-500/30'} rounded-2xl p-6 mb-8 flex items-center gap-4`}>
+        <div className={`${overallConfig.bgColor} border ${overallStatus === 'operational' ? 'border-stone-500/30' : overallStatus === 'degraded' ? 'border-stone-500/30' : 'border-stone-500/30'} rounded-2xl p-6 mb-8 flex items-center gap-4`}>
           <div className={`w-12 h-12 rounded-xl ${overallConfig.bgColor} flex items-center justify-center ${overallConfig.color}`}>
             {overallConfig.icon}
           </div>
@@ -157,7 +176,7 @@ export default function StatusPagePage() {
         {/* Tabs */}
         <div className="flex gap-1 mb-8 bg-white/5 rounded-xl p-1 w-fit">
           {tabs.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-stone-600 text-white shadow-lg shadow-stone-600/25' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>
               {tab.icon}{tab.label}
             </button>
           ))}
@@ -195,7 +214,7 @@ export default function StatusPagePage() {
                   <div key={component.id} className="bg-white/5 rounded-xl border border-white/10 p-4">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm font-medium">{component.name}</span>
-                      <span className={`text-sm font-mono ${component.uptime90 >= 99.95 ? 'text-green-400' : component.uptime90 >= 99.5 ? 'text-amber-400' : 'text-red-400'}`}>{component.uptime90}%</span>
+                      <span className={`text-sm font-mono ${component.uptime90 >= 99.95 ? 'text-stone-400' : component.uptime90 >= 99.5 ? 'text-stone-400' : 'text-stone-400'}`}>{component.uptime90}%</span>
                     </div>
                     <UptimeBar uptime={component.uptime90} />
                     <div className="flex justify-between mt-2 text-xs text-white/30">
@@ -212,16 +231,16 @@ export default function StatusPagePage() {
         {activeTab === 'incidents' && (
           <div className="space-y-4">
             {INCIDENTS.map(incident => {
-              const severityColors = { minor: 'text-amber-400 bg-amber-500/20', major: 'text-orange-400 bg-orange-500/20', critical: 'text-red-400 bg-red-500/20' };
+              const severityColors = { minor: 'text-stone-400 bg-stone-500/20', major: 'text-stone-400 bg-stone-500/20', critical: 'text-stone-400 bg-stone-500/20' };
               return (
                 <div key={incident.id} className="bg-white/5 rounded-2xl border border-white/10 overflow-hidden">
                   <button onClick={() => setExpandedIncident(expandedIncident === incident.id ? null : incident.id)} className="w-full px-6 py-5 text-left flex items-center gap-4">
-                    <div className={`w-2 h-2 rounded-full ${incident.status === 'resolved' ? 'bg-green-400' : 'bg-amber-400 animate-pulse'}`} />
+                    <div className={`w-2 h-2 rounded-full ${incident.status === 'resolved' ? 'bg-stone-400' : 'bg-stone-400 animate-pulse'}`} />
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
                         <h3 className="font-medium text-sm">{incident.title}</h3>
                         <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${severityColors[incident.severity]}`}>{incident.severity}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${incident.status === 'resolved' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'}`}>{incident.status}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${incident.status === 'resolved' ? 'bg-stone-500/20 text-stone-400' : 'bg-stone-500/20 text-stone-400'}`}>{incident.status}</span>
                       </div>
                       <p className="text-xs text-white/40 mt-1">{incident.createdAt}{incident.resolvedAt ? ` — Resolved ${incident.resolvedAt}` : ''}</p>
                     </div>
@@ -238,7 +257,7 @@ export default function StatusPagePage() {
                       <div className="relative pl-6 border-l-2 border-white/10 space-y-6">
                         {incident.updates.map((update, i) => (
                           <div key={i} className="relative">
-                            <div className={`absolute -left-[25px] w-3 h-3 rounded-full border-2 ${update.status === 'resolved' ? 'bg-green-400 border-green-400' : update.status === 'monitoring' ? 'bg-blue-400 border-blue-400' : update.status === 'identified' ? 'bg-amber-400 border-amber-400' : 'bg-white/40 border-white/40'}`} />
+                            <div className={`absolute -left-[25px] w-3 h-3 rounded-full border-2 ${update.status === 'resolved' ? 'bg-stone-400 border-stone-400' : update.status === 'monitoring' ? 'bg-stone-400 border-stone-400' : update.status === 'identified' ? 'bg-stone-400 border-stone-400' : 'bg-white/40 border-white/40'}`} />
                             <div>
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="text-xs font-medium capitalize text-white/70">{update.status}</span>
@@ -262,8 +281,8 @@ export default function StatusPagePage() {
             <div className="bg-white/5 rounded-2xl border border-white/10 p-6">
               <h3 className="text-sm font-medium text-white/60 mb-4 uppercase tracking-wider">Subscribe to Updates</h3>
               <div className="flex gap-3">
-                <input type="email" value={newSubscriberEmail} onChange={e => setNewSubscriberEmail(e.target.value)} placeholder="Enter email address" className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-violet-500/50" />
-                <button className="flex items-center gap-2 px-6 py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">
+                <input type="email" value={newSubscriberEmail} onChange={e => setNewSubscriberEmail(e.target.value)} placeholder="Enter email address" className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-stone-500/50" />
+                <button onClick={() => {}} className="flex items-center gap-2 px-6 py-2.5 bg-stone-600 hover:bg-stone-500 rounded-lg text-sm font-medium transition-colors">
                   <Bell className="w-4 h-4" /> Subscribe
                 </button>
               </div>
@@ -294,18 +313,18 @@ export default function StatusPagePage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">Status Page Title</label>
-                  <input type="text" defaultValue="Zoobicon Status" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50" />
+                  <input type="text" defaultValue="Zoobicon Status" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-stone-500/50" />
                 </div>
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">Custom Domain</label>
-                  <input type="text" defaultValue="status.zoobicon.com" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50" />
+                  <input type="text" defaultValue="status.zoobicon.com" className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-stone-500/50" />
                 </div>
                 <div>
                   <label className="block text-sm text-white/70 mb-1.5">Notification Channels</label>
                   <div className="space-y-2">
-                    {['Email', 'Webhook', 'Slack', 'SMS'].map(channel => (
+                    {['Email', 'Webhook', 'Hash', 'SMS'].map(channel => (
                       <label key={channel} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg cursor-pointer hover:bg-white/10 transition-colors">
-                        <input type="checkbox" defaultChecked={channel === 'Email' || channel === 'Webhook'} className="accent-violet-500" />
+                        <input type="checkbox" defaultChecked={channel === 'Email' || channel === 'Webhook'} className="accent-stone-500" />
                         <span className="text-sm">{channel}</span>
                       </label>
                     ))}
@@ -320,7 +339,7 @@ export default function StatusPagePage() {
       <footer className="border-t border-white/10 mt-20 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <p className="text-white/40 text-sm">
-            Replaces Statuspage.io ($29/mo), BetterUptime ($20/mo), and Instatus &mdash; <span className="text-violet-400">included free with Zoobicon Pro</span>
+            Replaces Statuspage.io ($29/mo), BetterUptime ($20/mo), and Instatus &mdash; <span className="text-stone-400">included free with Zoobicon Pro</span>
           </p>
           <div className="flex items-center justify-center gap-6 mt-4">
             <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</Link>

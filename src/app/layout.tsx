@@ -5,7 +5,10 @@ import CookieConsent from "@/components/CookieConsent";
 import SpeculationRules from "@/components/SpeculationRules";
 import AutoIndexNow from "@/components/AutoIndexNow";
 import StagingBanner from "@/components/StagingBanner";
+import MaintenanceBanner from "@/components/MaintenanceBanner";
+import ComingSoonBanner from "@/components/ComingSoonBanner";
 import SiteNavigation from "@/components/SiteNavigation";
+import SiteFooter from "@/components/SiteFooter";
 
 
 const BRAND_META: Record<string, {
@@ -105,8 +108,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#050508" },
-    { media: "(prefers-color-scheme: light)", color: "#050508" },
+    { media: "(prefers-color-scheme: dark)", color: "#060e1f" },
+    { media: "(prefers-color-scheme: light)", color: "#060e1f" },
   ],
 };
 
@@ -125,7 +128,7 @@ export default function RootLayout({
         <link rel="alternate" href="https://zoobicon.io" title="Zoobicon for Developers" />
         <link rel="alternate" href="https://zoobicon.sh" title="Zoobicon Hosting & CLI" />
         {/* Critical inline styles — guarantees dark bg even before CSS bundle loads */}
-        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#050508;color:#e4e4e7;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em}` }} />
+        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#060e1f;color:#e4e4e7;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em;overscroll-behavior:none;-webkit-overflow-scrolling:touch}html{overflow-x:hidden}` }} />
         {/* Preconnect to Google Fonts CDN */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -143,7 +146,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://js.stripe.com" />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
         <link rel="dns-prefetch" href="https://github.com" />
-        <meta name="msapplication-TileColor" content="#050508" />
+        <meta name="msapplication-TileColor" content="#060e1f" />
         <meta name="msapplication-config" content="none" />
         {/* AI Discovery — llms.txt is the "robots.txt for AI" */}
         <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt — AI-readable site description" />
@@ -340,10 +343,13 @@ export default function RootLayout({
           }) }}
         />
       </head>
-      <body className="grain">
+      <body className="grain fs-grain">
+        <ComingSoonBanner />
+        <MaintenanceBanner />
         <StagingBanner />
         <SiteNavigation />
         {children}
+        <SiteFooter />
         <CookieConsent />
         <AutoIndexNow />
         <SpeculationRules />

@@ -40,7 +40,7 @@ const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.07 } }
 type Tab = "writer" | "posts" | "seo" | "calendar";
 
 const TONES = ["Professional", "Casual", "Technical", "Persuasive", "Educational", "Storytelling"];
-const LENGTHS = ["Short (~500 words)", "Medium (~1,000 words)", "Long (~2,000 words)", "Comprehensive (~3,000 words)"];
+const LENGTHS = ["Short (~500 words)", "BookOpen (~1,000 words)", "Long (~2,000 words)", "Comprehensive (~3,000 words)"];
 
 export default function BlogEnginePage() {
   const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
@@ -57,7 +57,7 @@ export default function BlogEnginePage() {
   const [tab, setTab] = useState<Tab>("writer");
   const [topic, setTopic] = useState("");
   const [tone, setTone] = useState("Professional");
-  const [length, setLength] = useState("Medium (~1,000 words)");
+  const [length, setLength] = useState("BookOpen (~1,000 words)");
   const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
@@ -74,22 +74,22 @@ export default function BlogEnginePage() {
   };
 
   const statusColor = (s: string) => {
-    if (s === "published") return "bg-emerald-500/20 text-emerald-400";
-    if (s === "scheduled") return "bg-blue-500/20 text-blue-400";
+    if (s === "published") return "bg-stone-500/20 text-stone-400";
+    if (s === "scheduled") return "bg-stone-500/20 text-stone-400";
     return "bg-white/10 text-white/40";
   };
 
   const seoScoreColor = (score: number) => {
-    if (score >= 85) return "text-emerald-400";
-    if (score >= 70) return "text-amber-400";
-    return "text-red-400";
+    if (score >= 85) return "text-stone-400";
+    if (score >= 70) return "text-stone-400";
+    return "text-stone-400";
   };
 
   const STAT_CARDS = [
-    { label: "Total Posts", value: String(stats.totalPosts), icon: FileText, color: "from-indigo-500 to-purple-600" },
-    { label: "Total Views", value: stats.totalViews.toLocaleString(), icon: Eye, color: "from-emerald-500 to-teal-600" },
-    { label: "Avg SEO Score", value: String(stats.avgSeoScore), icon: BarChart3, color: "from-amber-500 to-orange-600" },
-    { label: "Search Impressions", value: stats.impressions >= 1000 ? `${(stats.impressions / 1000).toFixed(0)}K` : String(stats.impressions), icon: Globe, color: "from-cyan-500 to-blue-600" },
+    { label: "Total Posts", value: String(stats.totalPosts), icon: FileText, color: "from-stone-500 to-stone-600" },
+    { label: "Total Views", value: stats.totalViews.toLocaleString(), icon: Eye, color: "from-stone-500 to-stone-600" },
+    { label: "Avg SEO Score", value: String(stats.avgSeoScore), icon: BarChart3, color: "from-stone-500 to-stone-600" },
+    { label: "Search Impressions", value: stats.impressions >= 1000 ? `${(stats.impressions / 1000).toFixed(0)}K` : String(stats.impressions), icon: Globe, color: "from-stone-500 to-stone-600" },
   ];
 
   const TABS: { key: Tab; label: string }[] = [
@@ -114,7 +114,7 @@ export default function BlogEnginePage() {
     <div className="min-h-screen bg-[#0a0a12] text-white">
       <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
-          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Zoobicon</Link>
+          <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1.5"><LayoutDashboard className="w-3.5 h-3.5" /> Dashboard</Link>
             {user ? (
@@ -127,15 +127,15 @@ export default function BlogEnginePage() {
       </nav>
 
       <header className="relative overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-600/10 via-orange-600/5 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-600/10 via-stone-600/5 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-6 py-16 relative">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-gradient-to-br from-rose-500 to-orange-600"><FileText className="w-6 h-6" /></div>
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-stone-500 to-stone-600"><FileText className="w-6 h-6" /></div>
               <span className="text-sm font-medium text-white/50 uppercase tracking-wider">Business OS</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold mb-3">
-              <span className="bg-gradient-to-r from-rose-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">AI Blog Engine</span>
+              <span className="bg-gradient-to-r from-stone-400 via-stone-400 to-stone-400 bg-clip-text text-transparent">AI Blog Engine</span>
             </h1>
             <p className="text-lg text-white/50 max-w-2xl">Write once, rank everywhere. AI-powered blog creation with auto-SEO, keyword tracking, and cross-platform publishing.</p>
           </motion.div>
@@ -168,7 +168,7 @@ export default function BlogEnginePage() {
           <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6">
             <motion.div variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-orange-400" /> AI Post Writer
+                <Sparkles className="w-5 h-5 text-stone-400" /> AI Post Writer
               </h3>
               <div className="space-y-4">
                 <div>
@@ -177,7 +177,7 @@ export default function BlogEnginePage() {
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
                     placeholder="e.g. 'How to build a SaaS landing page that converts'"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -186,9 +186,9 @@ export default function BlogEnginePage() {
                     <select
                       value={tone}
                       onChange={(e) => setTone(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                     >
-                      {TONES.map((t) => <option key={t} value={t} className="bg-[#1a1a2e]">{t}</option>)}
+                      {TONES.map((t) => <option key={t} value={t} className="bg-[#0f2148]">{t}</option>)}
                     </select>
                   </div>
                   <div>
@@ -196,9 +196,9 @@ export default function BlogEnginePage() {
                     <select
                       value={length}
                       onChange={(e) => setLength(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                     >
-                      {LENGTHS.map((l) => <option key={l} value={l} className="bg-[#1a1a2e]">{l}</option>)}
+                      {LENGTHS.map((l) => <option key={l} value={l} className="bg-[#0f2148]">{l}</option>)}
                     </select>
                   </div>
                 </div>
@@ -206,7 +206,7 @@ export default function BlogEnginePage() {
                   <button
                     onClick={handleGenerate}
                     disabled={generating || !topic.trim()}
-                    className="px-5 py-2.5 bg-gradient-to-r from-rose-500 to-orange-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center gap-2"
+                    className="px-5 py-2.5 bg-gradient-to-r from-stone-500 to-stone-600 rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center gap-2"
                   >
                     {generating ? (
                       <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Writing...</>
@@ -225,7 +225,7 @@ export default function BlogEnginePage() {
           <motion.div variants={fadeUp} initial="hidden" animate="visible" className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <h3 className="text-lg font-semibold">All Posts</h3>
-              <button className="text-sm text-orange-400 hover:text-orange-300 flex items-center gap-1"><Plus className="w-4 h-4" /> New Post</button>
+              <button onClick={() => {}} className="text-sm text-stone-400 hover:text-stone-300 flex items-center gap-1"><Plus className="w-4 h-4" /> New Post</button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -282,9 +282,9 @@ export default function BlogEnginePage() {
                       </div>
                       <div className="flex items-center gap-1 w-20">
                         {kw.change > 0 ? (
-                          <><TrendingUp className="w-4 h-4 text-emerald-400" /><span className="text-sm text-emerald-400">+{kw.change}</span></>
+                          <><TrendingUp className="w-4 h-4 text-stone-400" /><span className="text-sm text-stone-400">+{kw.change}</span></>
                         ) : kw.change < 0 ? (
-                          <><TrendingDown className="w-4 h-4 text-red-400" /><span className="text-sm text-red-400">{kw.change}</span></>
+                          <><TrendingDown className="w-4 h-4 text-stone-400" /><span className="text-sm text-stone-400">{kw.change}</span></>
                         ) : (
                           <><Minus className="w-4 h-4 text-white/30" /><span className="text-sm text-white/30">0</span></>
                         )}
@@ -314,16 +314,16 @@ export default function BlogEnginePage() {
                   <div
                     key={`day-${day}`}
                     className={`relative p-2 min-h-[60px] rounded-lg border transition-colors ${
-                      isToday ? "border-orange-500/50 bg-orange-500/5" : "border-white/5 hover:border-white/10"
+                      isToday ? "border-stone-500/50 bg-stone-500/5" : "border-white/5 hover:border-white/10"
                     }`}
                   >
-                    <span className={`text-xs ${isToday ? "text-orange-400 font-bold" : "text-white/50"}`}>{day}</span>
+                    <span className={`text-xs ${isToday ? "text-stone-400 font-bold" : "text-white/50"}`}>{day}</span>
                     {postsOnDay.map((p, j) => (
                       <div
                         key={j}
                         className={`mt-1 px-1.5 py-0.5 rounded text-[10px] truncate ${
-                          p.status === "published" ? "bg-emerald-500/20 text-emerald-400" :
-                          p.status === "scheduled" ? "bg-blue-500/20 text-blue-400" : "bg-white/10 text-white/40"
+                          p.status === "published" ? "bg-stone-500/20 text-stone-400" :
+                          p.status === "scheduled" ? "bg-stone-500/20 text-stone-400" : "bg-white/10 text-white/40"
                         }`}
                       >
                         {p.title.slice(0, 20)}...

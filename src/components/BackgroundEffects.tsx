@@ -21,6 +21,7 @@ export default function BackgroundEffects({
     <div
       className={`fixed inset-0 pointer-events-none z-0 overflow-hidden ${className}`}
       aria-hidden="true"
+      style={{ WebkitBackfaceVisibility: "hidden", willChange: "auto" }}
     >
       {/* Mesh gradient */}
       {(preset === "default" || preset === "energetic") && (

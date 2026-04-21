@@ -3,9 +3,24 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Megaphone, Sparkles, Wrench, Bug, Tag, ThumbsUp, Heart,
-  Rocket, PartyPopper, Code, Bell, ArrowRight, Copy, Check,
-  ExternalLink, Calendar, Filter, ChevronDown
+  Megaphone,
+  Sparkles,
+  Wrench,
+  Bug,
+  Tag,
+  ThumbsUp,
+  Heart,
+  Rocket,
+  PartyPopper,
+  Code,
+  Bell,
+  ArrowRight,
+  Copy,
+  Check,
+  ExternalLink,
+  Calendar,
+  Filter,
+  ChevronDown,
 } from 'lucide-react';
 
 type Category = 'all' | 'new' | 'improvement' | 'fix';
@@ -125,9 +140,9 @@ const CHANGELOG_ENTRIES: ChangelogEntry[] = [
 ];
 
 const CATEGORY_CONFIG = {
-  new: { label: 'New', icon: Sparkles, color: 'bg-green-500/20 text-green-400 border-green-500/30' },
-  improvement: { label: 'Improvement', icon: Wrench, color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-  fix: { label: 'Fix', icon: Bug, color: 'bg-orange-500/20 text-orange-400 border-orange-500/30' },
+  new: { label: 'New', icon: Sparkles, color: 'bg-stone-500/20 text-stone-400 border-stone-500/30' },
+  improvement: { label: 'Improvement', icon: Wrench, color: 'bg-stone-500/20 text-stone-400 border-stone-500/30' },
+  fix: { label: 'Fix', icon: Bug, color: 'bg-stone-500/20 text-stone-400 border-stone-500/30' },
 };
 
 const EMBED_CODE = `<iframe
@@ -163,7 +178,7 @@ export default function ChangelogPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="text-white/70 font-medium">Changelog</span>
           </div>
@@ -177,7 +192,7 @@ export default function ChangelogPage() {
       <main className="max-w-3xl mx-auto px-6 py-12">
         {/* Hero */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-sm mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-stone-500/10 border border-stone-500/20 text-stone-400 text-sm mb-6">
             <Megaphone className="w-4 h-4" /> Product Updates
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">What&apos;s New</h1>
@@ -188,11 +203,11 @@ export default function ChangelogPage() {
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           <div className="flex-1 flex gap-2">
             {subscribed ? (
-              <div className="flex items-center gap-2 text-green-400 text-sm"><Check className="w-4 h-4" /> Subscribed! You&apos;ll get email updates.</div>
+              <div className="flex items-center gap-2 text-stone-400 text-sm"><Check className="w-4 h-4" /> Subscribed! You&apos;ll get email updates.</div>
             ) : (
               <>
                 <input value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" className="flex-1 bg-white/10 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-gray-500" />
-                <button onClick={handleSubscribe} className="px-4 py-2 rounded-lg bg-green-600 text-sm font-medium hover:bg-green-500 transition-colors flex items-center gap-1"><Bell className="w-3 h-3" /> Subscribe</button>
+                <button onClick={handleSubscribe} className="px-4 py-2 rounded-lg bg-stone-600 text-sm font-medium hover:bg-stone-500 transition-colors flex items-center gap-1"><Bell className="w-3 h-3" /> Subscribe</button>
               </>
             )}
           </div>
@@ -228,7 +243,7 @@ export default function ChangelogPage() {
                     <ul className="space-y-1.5 mb-4">
                       {entry.details.map((d, i) => (
                         <li key={i} className="text-sm text-gray-300 flex items-start gap-2">
-                          <Check className="w-3 h-3 text-green-400 mt-1 flex-shrink-0" /> {d}
+                          <Check className="w-3 h-3 text-stone-400 mt-1 flex-shrink-0" /> {d}
                         </li>
                       ))}
                     </ul>
@@ -262,26 +277,26 @@ export default function ChangelogPage() {
         {/* Embeddable Widget */}
         <div className="mt-16 p-6 rounded-xl border border-white/10 bg-white/5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold flex items-center gap-2"><Code className="w-5 h-5 text-green-400" /> Embed This Changelog</h3>
-            <button onClick={() => setShowEmbed(!showEmbed)} className="text-sm text-green-400 hover:text-green-300 transition-colors">{showEmbed ? 'Hide' : 'Show'} Code</button>
+            <h3 className="font-semibold flex items-center gap-2"><Code className="w-5 h-5 text-stone-400" /> Embed This Changelog</h3>
+            <button onClick={() => setShowEmbed(!showEmbed)} className="text-sm text-stone-400 hover:text-stone-300 transition-colors">{showEmbed ? 'Hide' : 'Show'} Code</button>
           </div>
           <p className="text-sm text-gray-400 mb-4">Add a live changelog widget to your own site. Updates automatically when we ship new features.</p>
           {showEmbed && (
             <div className="relative">
-              <pre className="p-4 rounded-lg bg-black/50 border border-white/10 text-sm text-green-400 overflow-x-auto">{EMBED_CODE}</pre>
+              <pre className="p-4 rounded-lg bg-black/50 border border-white/10 text-sm text-stone-400 overflow-x-auto">{EMBED_CODE}</pre>
               <button onClick={handleCopy} className="absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
-                {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-gray-400" />}
+                {copied ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4 text-gray-400" />}
               </button>
             </div>
           )}
         </div>
 
         {/* CTA */}
-        <div className="mt-16 text-center p-12 rounded-2xl bg-gradient-to-br from-green-600/20 to-emerald-600/20 border border-green-500/20">
+        <div className="mt-16 text-center p-12 rounded-2xl bg-gradient-to-br from-stone-600/20 to-stone-600/20 border border-stone-500/20">
           <h2 className="text-3xl font-bold mb-4">Building the Future of Web Creation</h2>
           <p className="text-gray-400 mb-6">Want to shape what we build next? Submit a feature request or vote on upcoming features.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/feature-requests" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 font-semibold hover:opacity-90 transition-opacity">
+            <Link href="/feature-requests" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold hover:opacity-90 transition-opacity">
               Request a Feature <ArrowRight className="w-4 h-4" />
             </Link>
             <Link href="/roadmap" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/20 font-semibold hover:bg-white/5 transition-colors">

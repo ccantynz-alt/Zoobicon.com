@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  Github,
+  GitFork,
   GitBranch,
   FileCode,
   ArrowRight,
@@ -99,10 +99,10 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Input Section */}
-      <div className="rounded-xl border border-white/10 bg-[#0a0a0f] p-6 space-y-4">
+      <div className="rounded-xl border border-white/10 bg-[#0a1628] p-6 space-y-4">
         <div className="flex items-center gap-3 mb-2">
           <div className="p-2 rounded-lg bg-white/5">
-            <Github className="w-5 h-5 text-white" />
+            <GitFork className="w-5 h-5 text-white" />
           </div>
           <h3 className="text-lg font-semibold text-white">Import from GitHub</h3>
         </div>
@@ -168,18 +168,18 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
 
       {/* Progress Steps */}
       {isLoading && (
-        <div className="rounded-xl border border-white/10 bg-[#0a0a0f] p-6 space-y-3">
+        <div className="rounded-xl border border-white/10 bg-[#0a1628] p-6 space-y-3">
           {PROGRESS_STEPS.map((step) => {
             const status = getStepStatus(step.key);
             return (
               <div key={step.key} className="flex items-center gap-3">
                 {status === "done" ? (
-                  <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <Check className="w-3.5 h-3.5 text-green-400" />
+                  <div className="w-6 h-6 rounded-full bg-stone-500/20 flex items-center justify-center">
+                    <Check className="w-3.5 h-3.5 text-stone-400" />
                   </div>
                 ) : status === "active" ? (
-                  <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
-                    <Loader2 className="w-3.5 h-3.5 text-blue-400 animate-spin" />
+                  <div className="w-6 h-6 rounded-full bg-stone-500/20 flex items-center justify-center">
+                    <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin" />
                   </div>
                 ) : (
                   <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10" />
@@ -203,14 +203,14 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
 
       {/* Error */}
       {error && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="rounded-xl border border-stone-500/20 bg-stone-500/5 p-4">
+          <p className="text-sm text-stone-400">{error}</p>
         </div>
       )}
 
       {/* Results Panel */}
       {result && (
-        <div className="rounded-xl border border-white/10 bg-[#0a0a0f] p-6 space-y-5">
+        <div className="rounded-xl border border-white/10 bg-[#0a1628] p-6 space-y-5">
           <h4 className="text-lg font-semibold text-white">Import Complete</h4>
 
           {/* Files Analyzed */}

@@ -1,18 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import BackgroundEffects from "@/components/BackgroundEffects";
-import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import {
-  Zap,
   Globe,
   ArrowRight,
   Shield,
   Lock,
-  Image,
+  Image as ImageIcon,
   BarChart3,
-  Server,
   GitBranch,
   Terminal,
   Upload,
@@ -21,21 +16,15 @@ import {
   Clock,
   Gauge,
   Network,
-  Eye,
   FileCode,
   Check,
   Minus,
-  ChevronRight,
   Cpu,
   Workflow,
   Layers,
+  BadgeCheck,
 } from "lucide-react";
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
-};
-const staggerContainer = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 const SPEED_STATS = [
   { value: "50ms", label: "Global edge latency" },
   { value: "99.99%", label: "Uptime SLA" },
@@ -67,7 +56,7 @@ const HOSTING_FEATURES = [
   { icon: Lock, title: "Automatic SSL", desc: "Free SSL certificates, auto-renewed. HTTPS everywhere." },
   { icon: Shield, title: "DDoS Protection", desc: "Enterprise-grade protection included on every plan." },
   { icon: RefreshCw, title: "Smart Caching", desc: "Intelligent cache invalidation. Always fresh content." },
-  { icon: Image, title: "Image Optimization", desc: "Auto WebP/AVIF conversion. 60% smaller images." },
+  { icon: ImageIcon, title: "Image Optimization", desc: "Auto WebP/AVIF conversion. 60% smaller images." },
   { icon: FileCode, title: "Brotli Compression", desc: "Next-gen compression. 20% smaller than gzip." },
   { icon: Cpu, title: "Edge Computing", desc: "Run serverless functions at the edge. Zero cold starts." },
   { icon: Layers, title: "Staging Environments", desc: "Test before you deploy. Preview URLs for every change." },
@@ -78,86 +67,23 @@ const HOSTING_FEATURES = [
 ];
 
 const DEPLOY_METHODS = [
-  {
-    icon: Sparkles,
-    title: "AI Builder",
-    desc: "Describe → Generate → Deploy. Your site goes live in 60 seconds.",
-    color: "from-brand-500 to-accent-purple",
-    content: (
-      <div className="mt-4 rounded-lg bg-white/[0.06] border border-white/[0.10] p-4">
-        <div className="flex items-center gap-2 text-xs text-white/60 mb-2">
-          <Sparkles className="w-3 h-3" /> AI Builder
-        </div>
-        <p className="text-sm text-white/65">&quot;Build me a portfolio site with a dark theme and project gallery&quot;</p>
-        <div className="mt-3 flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-xs text-green-400">Deploying to portfolio.zoobicon.sh...</span>
-        </div>
-      </div>
-    ),
-  },
-  {
-    icon: Terminal,
-    title: "CLI",
-    desc: "Deploy from your terminal in one command.",
-    color: "from-emerald-500 to-teal-600",
-    content: (
-      <div className="mt-4 rounded-lg bg-black/60 border border-white/[0.10] p-4 font-mono text-sm">
-        <div className="flex items-center gap-2 text-xs text-white/60 mb-3">
-          <div className="w-3 h-3 rounded-full bg-red-500/60" />
-          <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-          <div className="w-3 h-3 rounded-full bg-green-500/60" />
-        </div>
-        <div className="text-white/60">$ <span className="text-accent-cyan">zb deploy</span></div>
-        <div className="text-white/60 mt-1">✓ Building project...</div>
-        <div className="text-white/60">✓ Optimizing assets...</div>
-        <div className="text-green-400">✓ Deployed to my-site.zoobicon.sh</div>
-      </div>
-    ),
-  },
-  {
-    icon: GitBranch,
-    title: "GitHub",
-    desc: "Push to main, auto-deploy. Zero config CI/CD.",
-    color: "from-gray-400 to-gray-600",
-    content: (
-      <div className="mt-4 rounded-lg bg-white/[0.06] border border-white/[0.10] p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <GitBranch className="w-4 h-4 text-white/60" />
-          <span className="text-sm text-white/65">main</span>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">deployed</span>
-        </div>
-        <div className="text-xs text-white/60">feat: update hero section</div>
-        <div className="text-xs text-white/60 mt-1">Deployed 3s ago</div>
-      </div>
-    ),
-  },
-  {
-    icon: Upload,
-    title: "Drag & Drop",
-    desc: "Upload your HTML/CSS/JS files directly.",
-    color: "from-amber-500 to-orange-600",
-    content: (
-      <div className="mt-4 rounded-lg border-2 border-dashed border-white/[0.12] p-6 text-center">
-        <Upload className="w-8 h-8 text-white/60 mx-auto mb-2" />
-        <p className="text-xs text-white/60">Drop your files here</p>
-        <p className="text-xs text-white/60 mt-1">HTML, CSS, JS, images</p>
-      </div>
-    ),
-  },
+  { icon: Sparkles, title: "AI Builder", desc: "Describe → Generate → Deploy. Your site goes live in 60 seconds." },
+  { icon: Terminal, title: "CLI", desc: "Deploy from your terminal in one command." },
+  { icon: GitBranch, title: "GitHub", desc: "Push to main, auto-deploy. Zero-config CI/CD." },
+  { icon: Upload, title: "Drag & Drop", desc: "Upload your HTML / CSS / JS files directly." },
 ];
 
 const LIGHTHOUSE_SCORES = [
-  { label: "Performance", score: 100, color: "text-green-400" },
-  { label: "Accessibility", score: 100, color: "text-green-400" },
-  { label: "Best Practices", score: 100, color: "text-green-400" },
-  { label: "SEO", score: 100, color: "text-green-400" },
+  { label: "Performance", score: 100 },
+  { label: "Accessibility", score: 100 },
+  { label: "Best Practices", score: 100 },
+  { label: "SEO", score: 100 },
 ];
 
 const CORE_VITALS = [
-  { metric: "LCP", value: "< 1s", label: "Largest Contentful Paint", status: "Good" },
-  { metric: "FID", value: "< 50ms", label: "First Input Delay", status: "Good" },
-  { metric: "CLS", value: "< 0.05", label: "Cumulative Layout Shift", status: "Good" },
+  { metric: "LCP", value: "< 1s", label: "Largest Contentful Paint" },
+  { metric: "FID", value: "< 50ms", label: "First Input Delay" },
+  { metric: "CLS", value: "< 0.05", label: "Cumulative Layout Shift" },
 ];
 
 const PRICING_TIERS = [
@@ -166,15 +92,8 @@ const PRICING_TIERS = [
     price: "Free",
     period: "",
     description: "Perfect for personal projects and experiments.",
-    features: [
-      "1 site",
-      "1GB storage",
-      "10GB/mo bandwidth",
-      ".zoobicon.sh subdomain",
-      "Shared SSL",
-      "Community support",
-    ],
-    cta: "Get Started Free",
+    features: ["1 site", "1GB storage", "10GB/mo bandwidth", ".zoobicon.sh subdomain", "Shared SSL", "Community support"],
+    cta: "Get started free",
     highlighted: false,
   },
   {
@@ -182,17 +101,8 @@ const PRICING_TIERS = [
     price: "$19",
     period: "/mo",
     description: "For professionals and growing businesses.",
-    features: [
-      "10 sites",
-      "25GB storage",
-      "100GB/mo bandwidth",
-      "Custom domains",
-      "Dedicated SSL",
-      "Global CDN",
-      "Analytics dashboard",
-      "Email support",
-    ],
-    cta: "Start Pro Trial",
+    features: ["10 sites", "25GB storage", "100GB/mo bandwidth", "Custom domains", "Dedicated SSL", "Global CDN", "Analytics dashboard", "Email support"],
+    cta: "Start Pro trial",
     highlighted: false,
   },
   {
@@ -200,17 +110,8 @@ const PRICING_TIERS = [
     price: "$49",
     period: "/mo",
     description: "For teams that need advanced features.",
-    features: [
-      "50 sites",
-      "100GB storage",
-      "500GB/mo bandwidth",
-      "WAF protection",
-      "Staging environments",
-      "Priority support",
-      "Advanced analytics",
-      "Team collaboration",
-    ],
-    cta: "Start Business Trial",
+    features: ["50 sites", "100GB storage", "500GB/mo bandwidth", "WAF protection", "Staging environments", "Priority support", "Advanced analytics", "Team collaboration"],
+    cta: "Start Business trial",
     highlighted: true,
   },
   {
@@ -218,17 +119,8 @@ const PRICING_TIERS = [
     price: "$149",
     period: "/mo",
     description: "Unlimited everything. White-glove service.",
-    features: [
-      "Unlimited sites",
-      "Unlimited storage",
-      "Unlimited bandwidth",
-      "99.99% SLA",
-      "Dedicated infrastructure",
-      "24/7 phone support",
-      "Custom edge rules",
-      "SOC 2 compliance",
-    ],
-    cta: "Contact Sales",
+    features: ["Unlimited sites", "Unlimited storage", "Unlimited bandwidth", "99.99% SLA", "Dedicated infrastructure", "24/7 phone support", "Custom edge rules", "SOC 2 compliance"],
+    cta: "Contact sales",
     highlighted: false,
   },
 ];
@@ -240,6 +132,19 @@ const MIGRATION_FEATURES = [
   { icon: Sparkles, title: "Free Migration Assistance", desc: "Our team handles the migration for you, free of charge." },
 ];
 
+const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const PRIMARY_CTA = {
+  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  color: "#0a1628",
+  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+} as const;
+const SERIF: React.CSSProperties = {
+  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+  fontStyle: "italic",
+  fontWeight: 400,
+  color: "#E8D4B0",
+};
+
 export default function HostingPage() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -250,7 +155,7 @@ export default function HostingPage() {
     "offers": {
       "@type": "AggregateOffer",
       "lowPrice": "0",
-      "highPrice": "99",
+      "highPrice": "149",
       "priceCurrency": "USD",
       "offerCount": "4"
     },
@@ -269,492 +174,407 @@ export default function HostingPage() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="min-h-screen bg-[#060e1f] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <BackgroundEffects preset="technical" />
 
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight">Zoobicon</span>
-            </Link>
-            <span className="text-xs text-white/60">/</span>
-            <span className="text-sm text-white/65">Hosting</span>
-          </div>
-          <Link href="/builder" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
-            <span>Deploy Now</span>
-          </Link>
+      {/* Hero */}
+      <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          <div className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }} />
+          <div className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.07), transparent 70%)" }} />
         </div>
-      </nav>
-      <CursorGlowTracker />
 
-      {/* ============================================ */}
-      {/* 1. HERO SECTION                              */}
-      {/* ============================================ */}
-      <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-28">
-        <HeroEffects variant="cyan" cursorGlow particles particleCount={35} interactiveGrid aurora beams />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
-              <Server className="w-3 h-3 text-accent-cyan" />
-              <span className="text-xs font-medium text-accent-cyan">Zoobicon Hosting</span>
-            </motion.div>
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+            <BadgeCheck className="w-3 h-3" />
+            300+ edge locations · 99.99% SLA · Auto-scaling
+          </div>
 
-            <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[0.9] mb-6">
-              Web Hosting That<br />
-              <span className="gradient-text-hero">Actually Keeps Up</span><br />
-              <span className="gradient-text-hero">With You</span>
-            </motion.h1>
+          <h1 className="fs-display-xl mb-6">
+            Web hosting that{" "}
+            <span style={SERIF}>keeps up.</span>
+          </h1>
 
-            <motion.p variants={fadeInUp} className="max-w-3xl text-lg md:text-xl text-white/60 leading-relaxed mb-10">
-              AI-powered hosting with global CDN, automatic SSL, edge caching, and 99.99% uptime.
-              Deploy in seconds, scale to millions.
-            </motion.p>
+          <p className="max-w-3xl mx-auto text-[17px] md:text-[19px] leading-relaxed text-white/60 mb-10">
+            AI-powered hosting with global CDN, automatic SSL, edge caching, and a 99.99% uptime
+            guarantee. Deploy in seconds. Scale to millions.
+          </p>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-2 mb-12 max-w-3xl">
-              {["Global CDN", "Auto SSL", "Edge Functions", "DDoS Protection", "Smart Caching", "Instant Rollbacks"].map((pill) => (
-                <span
-                  key={pill}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/[0.12] bg-white/[0.06] text-xs font-medium text-white/65"
-                >
-                  <Check className="w-3 h-3 text-accent-cyan" />
-                  {pill}
-                </span>
-              ))}
-            </motion.div>
+          <div className="flex flex-wrap justify-center gap-2 mb-10 max-w-3xl mx-auto">
+            {["Global CDN", "Auto SSL", "Edge Functions", "DDoS Protection", "Smart Caching", "Instant Rollbacks"].map((pill) => (
+              <span
+                key={pill}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] text-white/60"
+              >
+                <Check className="w-3 h-3" style={{ color: "#E8D4B0" }} />
+                {pill}
+              </span>
+            ))}
+          </div>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
-              <Link href="/builder" className="group btn-gradient px-8 py-4 rounded-2xl text-base font-bold text-white flex items-center gap-3 shadow-glow">
-                <span>Deploy Your First Site Free</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link href="#pricing" className="px-8 py-4 rounded-2xl text-base font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-3">
-                <Gauge className="w-5 h-5" />
-                <span>View Plans</span>
-              </Link>
-            </motion.div>
-          </motion.div>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/builder"
+              className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+              style={PRIMARY_CTA}
+            >
+              Deploy your first site free
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              href="#pricing"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+            >
+              <Gauge className="w-4 h-4" />
+              View plans
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* ============================================ */}
-      {/* 2. SPEED STATS BANNER                        */}
-      {/* ============================================ */}
-      <section className="relative py-16 border-y border-white/[0.08]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8"
-          >
-            {SPEED_STATS.map((stat, i) => (
-              <motion.div key={i} variants={fadeInUp} className="text-center">
-                <div className="text-4xl md:text-5xl font-black gradient-text-static mb-2">
+      {/* Speed stats */}
+      <section className="relative py-16 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {SPEED_STATS.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] mb-2" style={{ color: "#E8D4B0" }}>
                   {stat.value}
                 </div>
-                <div className="text-sm text-white/60">{stat.label}</div>
-              </motion.div>
+                <div className="text-[13px] text-white/55">{stat.label}</div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* ============================================ */}
-      {/* 3. FEATURE COMPARISON VS COMPETITORS         */}
-      {/* ============================================ */}
-      <section className="relative py-24 lg:py-32 border-b border-white/[0.06] overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-blue w-[700px] h-[700px] top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 opacity-5" />
-          <div className="glow-orb glow-orb-purple w-[500px] h-[500px] top-1/3 right-0 opacity-5" />
+      {/* Competitor comparison */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[520px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
         </div>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-brand-500/20 bg-brand-500/5 mb-6">
-                <Eye className="w-3 h-3 text-brand-400" />
-                <span className="text-xs font-medium text-brand-400">Industry Comparison</span>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Industry comparison
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              See how we{" "}
+              <span style={SERIF}>stack up.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              The only hosting platform with AI generation, auto-debugging, and a full suite of infrastructure tools.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto rounded-[28px] border border-white/[0.08]" style={{ background: CARD_BG }}>
+            <div className="min-w-[820px]">
+              <div className="grid grid-cols-6 px-6 py-4 border-b border-white/[0.08] text-[11px] uppercase tracking-[0.15em] font-semibold text-white/55">
+                <div>Feature</div>
+                <div className="text-center" style={{ color: "#E8D4B0" }}>Zoobicon</div>
+                <div className="text-center">SiteGround</div>
+                <div className="text-center">Cloudflare</div>
+                <div className="text-center">Vercel</div>
+                <div className="text-center">Netlify</div>
               </div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight mb-6">
-                See How We<br />
-                <span className="gradient-text">Stack Up</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                The only hosting platform with AI generation, auto-debugging, and a full suite of infrastructure tools.
-              </p>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="overflow-x-auto">
-              <div className="min-w-[800px]">
-                {/* Header Row */}
-                <div className="grid grid-cols-6 gap-0 mb-2">
-                  <div className="p-4" />
-                  <div className="p-4 text-center">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-brand-500/20 to-accent-purple/20 border border-brand-500/30">
-                      <Zap className="w-4 h-4 text-brand-400" />
-                      <span className="text-sm font-bold text-white">Zoobicon</span>
-                    </div>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm text-white/60">SiteGround</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm text-white/60">Cloudflare</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm text-white/60">Vercel</span>
-                  </div>
-                  <div className="p-4 text-center">
-                    <span className="text-sm text-white/60">Netlify</span>
-                  </div>
-                </div>
-
-                {/* Feature Rows */}
-                {COMPETITOR_FEATURES.map((feature, i) => (
-                  <motion.div
-                    key={i}
-                    variants={fadeInUp}
-                    className={`grid grid-cols-6 gap-0 ${i % 2 === 0 ? "bg-white/[0.05]" : ""} rounded-lg`}
-                  >
-                    <div className="p-4 flex items-center">
-                      <span className="text-sm text-white/60">{feature.name}</span>
-                    </div>
-                    <div className="p-4 flex items-center justify-center">
-                      <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                        <Check className="w-3.5 h-3.5 text-green-400" />
-                      </div>
-                    </div>
-                    {[feature.siteground, feature.cloudflare, feature.vercel, feature.netlify].map((has, j) => (
-                      <div key={j} className="p-4 flex items-center justify-center">
-                        {has ? (
-                          <Check className="w-4 h-4 text-white/60" />
-                        ) : (
-                          <Minus className="w-4 h-4 text-white/50" />
-                        )}
-                      </div>
-                    ))}
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 4. HOSTING FEATURES GRID                     */}
-      {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Infrastructure That<br /><span className="gradient-text">Just Works</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                Enterprise-grade hosting features on every plan. No surprises, no hidden limits.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {HOSTING_FEATURES.map((f, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
-                  <f.icon className="w-8 h-8 text-accent-cyan/50 mb-4 group-hover:text-accent-cyan transition-colors" />
-                  <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 5. DEPLOYMENT METHODS                        */}
-      {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Deploy <span className="gradient-text">Your Way</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                Four ways to go live. Pick the one that fits your workflow.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              {DEPLOY_METHODS.map((method, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${method.color} flex items-center justify-center`}>
-                      <method.icon className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold">{method.title}</h3>
-                      <p className="text-sm text-white/60">{method.desc}</p>
-                    </div>
-                  </div>
-                  {method.content}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 6. PERFORMANCE SHOWCASE                      */}
-      {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.06] overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-cyan w-[600px] h-[600px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5" />
-        </div>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Performance That<br /><span className="gradient-text">Speaks for Itself</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                Faster than 99% of websites. Every metric, green.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Lighthouse Scores */}
-              <motion.div variants={fadeInUp} className="gradient-border p-8 rounded-2xl">
-                <h3 className="text-sm font-semibold text-white/65 uppercase tracking-wider mb-8">Lighthouse Scores</h3>
-                <div className="grid grid-cols-2 gap-6">
-                  {LIGHTHOUSE_SCORES.map((item, i) => (
-                    <div key={i} className="text-center">
-                      <div className="relative w-24 h-24 mx-auto mb-3">
-                        <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
-                          <circle cx="50" cy="50" r="42" stroke="currentColor" strokeWidth="6" fill="none" className="text-white/[0.05]" />
-                          <circle
-                            cx="50" cy="50" r="42"
-                            stroke="currentColor" strokeWidth="6" fill="none"
-                            className="text-green-400"
-                            strokeDasharray={`${2 * Math.PI * 42}`}
-                            strokeDashoffset="0"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className={`text-2xl font-black ${item.color}`}>{item.score}</span>
-                        </div>
-                      </div>
-                      <span className="text-sm text-white/65">{item.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Core Web Vitals */}
-              <motion.div variants={fadeInUp} className="gradient-border p-8 rounded-2xl">
-                <h3 className="text-sm font-semibold text-white/65 uppercase tracking-wider mb-8">Core Web Vitals</h3>
-                <div className="space-y-6">
-                  {CORE_VITALS.map((vital, i) => (
-                    <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-white/[0.05] border border-white/[0.08]">
-                      <div>
-                        <div className="flex items-center gap-3 mb-1">
-                          <span className="text-lg font-bold text-white">{vital.metric}</span>
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">{vital.status}</span>
-                        </div>
-                        <span className="text-sm text-white/60">{vital.label}</span>
-                      </div>
-                      <div className="text-2xl font-black text-green-400">{vital.value}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-8 p-4 rounded-xl bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 text-center">
-                  <Gauge className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                  <p className="text-sm font-semibold text-green-400">Faster than 99% of websites</p>
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ============================================ */}
-      {/* 7. PRICING SECTION                           */}
-      {/* ============================================ */}
-      <section id="pricing" className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Simple, Transparent<br /><span className="gradient-text">Pricing</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                Start free. Scale as you grow. No hidden fees.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {PRICING_TIERS.map((tier, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  className={`relative p-6 rounded-2xl ${
-                    tier.highlighted
-                      ? "bg-gradient-to-b from-brand-500/10 to-accent-purple/10 border-2 border-brand-500/30"
-                      : "gradient-border"
+              {COMPETITOR_FEATURES.map((feature, i) => (
+                <div
+                  key={feature.name}
+                  className={`grid grid-cols-6 px-6 py-4 text-[13px] ${
+                    i !== COMPETITOR_FEATURES.length - 1 ? "border-b border-white/[0.04]" : ""
                   }`}
                 >
-                  {tier.highlighted && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500 to-accent-purple text-xs font-semibold text-white">
-                      Most Popular
+                  <div className="text-white/75 font-medium">{feature.name}</div>
+                  <div className="text-center">
+                    {feature.zoobicon ? <Check className="w-4 h-4 mx-auto" style={{ color: "#E8D4B0" }} /> : <Minus className="w-4 h-4 mx-auto text-white/25" />}
+                  </div>
+                  {[feature.siteground, feature.cloudflare, feature.vercel, feature.netlify].map((has, j) => (
+                    <div key={j} className="text-center">
+                      {has ? <Check className="w-4 h-4 mx-auto text-white/55" /> : <Minus className="w-4 h-4 mx-auto text-white/25" />}
                     </div>
-                  )}
-                  <h3 className="text-lg font-bold mb-2">{tier.name}</h3>
-                  <div className="flex items-baseline gap-1 mb-3">
-                    <span className="text-4xl font-black">{tier.price}</span>
-                    {tier.period && <span className="text-sm text-white/60">{tier.period}</span>}
-                  </div>
-                  <p className="text-sm text-white/60 mb-6">{tier.description}</p>
-                  <ul className="space-y-3 mb-8">
-                    {tier.features.map((feature, j) => (
-                      <li key={j} className="flex items-center gap-2 text-sm text-white/60">
-                        <Check className="w-4 h-4 text-accent-cyan flex-shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href={tier.price === "Free" ? "/builder" : "/auth/signup"}
-                    className={`block text-center py-3 rounded-xl text-sm font-semibold transition-all ${
-                      tier.highlighted
-                        ? "btn-gradient text-white shadow-glow"
-                        : "border border-white/[0.12] text-white/60 hover:text-white hover:border-white/20"
-                    }`}
-                  >
-                    {tier.cta}
-                  </Link>
-                </motion.div>
+                  ))}
+                </div>
               ))}
             </div>
-          </motion.div>
+          </div>
+          <p className="text-[11px] text-white/30 mt-4 text-center">
+            Comparison based on publicly available information. Features and pricing may change.
+            All trademarks belong to their respective owners. See our{" "}
+            <Link href="/disclaimers" className="underline hover:text-white/55">disclaimers</Link>.
+          </p>
         </div>
       </section>
 
-      {/* ============================================ */}
-      {/* 8. MIGRATION SECTION                         */}
-      {/* ============================================ */}
-      <section className="py-24 lg:py-32 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
-                <RefreshCw className="w-3 h-3 text-accent-cyan" />
-                <span className="text-xs font-medium text-accent-cyan">Easy Migration</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
-                Moving from SiteGround<br /><span className="gradient-text">or Cloudflare?</span>
-              </h2>
-              <p className="max-w-2xl mx-auto text-lg text-white/60">
-                Switch to Zoobicon Hosting in minutes. We handle everything.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {MIGRATION_FEATURES.map((f, i) => (
-                <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl group text-center">
-                  <div className="w-12 h-12 rounded-xl bg-accent-cyan/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-accent-cyan/20 transition-colors">
-                    <f.icon className="w-6 h-6 text-accent-cyan" />
-                  </div>
-                  <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                  <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
-                </motion.div>
-              ))}
+      {/* Features grid */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Infrastructure
             </div>
-          </motion.div>
-        </div>
-      </section>
+            <h2 className="fs-display-lg mb-4">
+              Infrastructure that{" "}
+              <span style={SERIF}>just works.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Enterprise-grade hosting features on every plan. No surprises, no hidden limits.
+            </p>
+          </div>
 
-      {/* ============================================ */}
-      {/* 9. FINAL CTA                                 */}
-      {/* ============================================ */}
-      <section className="py-32 lg:py-40 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="glow-orb glow-orb-blue w-[800px] h-[800px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-15" />
-        </div>
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-          >
-            <motion.h2
-              variants={fadeInUp}
-              className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6"
-            >
-              Deploy Your First<br />
-              <span className="gradient-text-hero">Site Free</span>
-            </motion.h2>
-
-            <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-lg text-white/60 mb-10">
-              No credit card required. Go from zero to live in under 60 seconds
-              with Zoobicon Hosting.
-            </motion.p>
-
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/hosting"
-                className="group btn-gradient px-10 py-5 rounded-2xl text-lg font-bold text-white flex items-center gap-3 shadow-glow"
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {HOSTING_FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-6 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
               >
-                <span>Deploy Your First Site Free</span>
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative">
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                    <f.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{f.title}</h3>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-white/60">
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> No credit card</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> Free subdomain</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-accent-cyan" /> Deploy in seconds</span>
-            </motion.div>
-          </motion.div>
+      {/* Deploy methods */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <h2 className="fs-display-lg mb-4">
+              Deploy{" "}
+              <span style={SERIF}>your way.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Four ways to go live. Pick the one that fits your workflow.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            {DEPLOY_METHODS.map((m) => (
+              <div
+                key={m.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                <div className="relative flex items-start gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05] flex-shrink-0">
+                    <m.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  </div>
+                  <div>
+                    <h3 className="text-[18px] font-semibold tracking-[-0.01em] mb-1.5">{m.title}</h3>
+                    <p className="text-[14px] text-white/55 leading-relaxed">{m.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Performance showcase */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <h2 className="fs-display-lg mb-4">
+              Performance that{" "}
+              <span style={SERIF}>speaks for itself.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Faster than 99% of websites. Every metric, green.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            <div className="rounded-[28px] border border-white/[0.08] p-8" style={{ background: CARD_BG }}>
+              <div className="text-[11px] uppercase tracking-[0.18em] font-semibold mb-6" style={{ color: "rgba(232,212,176,0.75)" }}>
+                Lighthouse scores
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                {LIGHTHOUSE_SCORES.map((item) => (
+                  <div key={item.label} className="text-center">
+                    <div className="relative w-24 h-24 mx-auto mb-3">
+                      <svg className="w-24 h-24 -rotate-90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="42" stroke="currentColor" strokeWidth="6" fill="none" className="text-white/[0.05]" />
+                        <circle cx="50" cy="50" r="42" stroke="#E8D4B0" strokeWidth="6" fill="none"
+                          strokeDasharray={`${2 * Math.PI * 42}`} strokeDashoffset="0" strokeLinecap="round" />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-2xl font-semibold" style={{ color: "#E8D4B0" }}>{item.score}</span>
+                      </div>
+                    </div>
+                    <span className="text-[13px] text-white/65">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[28px] border border-white/[0.08] p-8" style={{ background: CARD_BG }}>
+              <div className="text-[11px] uppercase tracking-[0.18em] font-semibold mb-6" style={{ color: "rgba(232,212,176,0.75)" }}>
+                Core Web Vitals
+              </div>
+              <div className="space-y-4">
+                {CORE_VITALS.map((v) => (
+                  <div key={v.metric} className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[15px] font-semibold text-white">{v.metric}</span>
+                        <span className="text-[10px] uppercase tracking-wide rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05] px-2 py-0.5 font-semibold" style={{ color: "#E8D4B0" }}>Good</span>
+                      </div>
+                      <span className="text-[12px] text-white/55">{v.label}</span>
+                    </div>
+                    <div className="text-xl font-semibold" style={{ color: "#E8D4B0" }}>{v.value}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] p-4 text-center">
+                <Gauge className="w-5 h-5 mx-auto mb-2" style={{ color: "#E8D4B0" }} />
+                <p className="text-[13px] font-semibold" style={{ color: "#E8D4B0" }}>Faster than 99% of websites</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Pricing
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Simple, transparent{" "}
+              <span style={SERIF}>pricing.</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Start free. Scale as you grow. No hidden fees.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {PRICING_TIERS.map((tier) => (
+              <div
+                key={tier.name}
+                className={`relative rounded-[24px] p-7 transition-all duration-500 hover:-translate-y-1 ${
+                  tier.highlighted ? "border-2 border-[#E8D4B0]/35" : "border border-white/[0.08] hover:border-[#E8D4B0]/25"
+                }`}
+                style={{
+                  background: tier.highlighted
+                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(17,17,24,0.85) 100%)"
+                    : CARD_BG,
+                }}
+              >
+                {tier.highlighted && (
+                  <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a1628" }}
+                  >
+                    Most popular
+                  </div>
+                )}
+                <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{tier.name}</h3>
+                <div className="flex items-baseline gap-1 mb-3">
+                  <span className="text-4xl font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>{tier.price}</span>
+                  {tier.period && <span className="text-[13px] text-white/50">{tier.period}</span>}
+                </div>
+                <p className="text-[13px] text-white/55 mb-6">{tier.description}</p>
+                <ul className="space-y-2.5 mb-7">
+                  {tier.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-[13px] text-white/65">
+                      <Check className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#E8D4B0" }} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href={tier.price === "Free" ? "/builder" : "/auth/signup"}
+                  className={`block text-center rounded-full py-3 text-[13px] font-semibold transition-all ${
+                    tier.highlighted ? "" : "border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                  }`}
+                  style={tier.highlighted ? PRIMARY_CTA : undefined}
+                >
+                  {tier.cta}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Migration */}
+      <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              Easy migration
+            </div>
+            <h2 className="fs-display-lg mb-4">
+              Moving from SiteGround{" "}
+              <span style={SERIF}>or Cloudflare?</span>
+            </h2>
+            <p className="max-w-2xl mx-auto text-[15px] text-white/55">
+              Switch to Zoobicon Hosting in minutes. We handle everything.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {MIGRATION_FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 text-center transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                style={{ background: CARD_BG }}
+              >
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
+                  <f.icon className="h-5 w-5 text-[#E8D4B0]" />
+                </div>
+                <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{f.title}</h3>
+                <p className="text-[13px] text-white/55 leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative py-24 md:py-32 border-t border-white/[0.06] overflow-hidden">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute left-1/2 top-1/2 h-[560px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
+            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.11), transparent 70%)" }} />
+        </div>
+        <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="fs-display-lg mb-5">
+            Deploy your first site{" "}
+            <span style={SERIF}>free.</span>
+          </h2>
+          <p className="text-[17px] text-white/60 mb-10">
+            No credit card required. Zero to live in under 60 seconds.
+          </p>
+          <Link
+            href="/builder"
+            className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+            style={PRIMARY_CTA}
+          >
+            Deploy now
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-[12px] text-white/55">
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> No credit card</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> Free subdomain</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> Deploy in seconds</span>
+          </div>
         </div>
       </section>
     </div>

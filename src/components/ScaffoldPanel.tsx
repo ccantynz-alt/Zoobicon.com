@@ -124,11 +124,11 @@ const extraFeatures: FeatureOption[] = [
 
 function MethodBadge({ method }: { method: string }) {
   const colors: Record<string, string> = {
-    GET: "bg-emerald-500/20 text-emerald-400",
-    POST: "bg-blue-500/20 text-blue-400",
-    PUT: "bg-amber-500/20 text-amber-400",
-    PATCH: "bg-orange-500/20 text-orange-400",
-    DELETE: "bg-red-500/20 text-red-400",
+    GET: "bg-stone-500/20 text-stone-400",
+    POST: "bg-stone-500/20 text-stone-400",
+    PUT: "bg-stone-500/20 text-stone-400",
+    PATCH: "bg-stone-500/20 text-stone-400",
+    DELETE: "bg-stone-500/20 text-stone-400",
   };
   return (
     <span
@@ -199,7 +199,7 @@ export default function ScaffoldPanel({
         key={feature.id}
         className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
           isSelected
-            ? "border-blue-500/50 bg-blue-500/10"
+            ? "border-stone-500/50 bg-stone-500/10"
             : "border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]"
         }`}
       >
@@ -212,7 +212,7 @@ export default function ScaffoldPanel({
         <div
           className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
             isSelected
-              ? "bg-blue-500 border-blue-500"
+              ? "bg-stone-500 border-stone-500"
               : "border-white/20 bg-transparent"
           }`}
         >
@@ -220,7 +220,7 @@ export default function ScaffoldPanel({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-blue-400">{feature.icon}</span>
+            <span className="text-stone-400">{feature.icon}</span>
             <span className="text-sm font-medium text-white">
               {feature.label}
             </span>
@@ -235,7 +235,7 @@ export default function ScaffoldPanel({
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-300 hover:bg-blue-600/30 hover:border-blue-500/50 transition-all text-sm font-medium"
+        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-600/20 border border-stone-500/30 text-stone-300 hover:bg-stone-600/30 hover:border-stone-500/50 transition-all text-sm font-medium"
       >
         <Database className="w-4 h-4" />
         Add Full-Stack Features
@@ -245,12 +245,12 @@ export default function ScaffoldPanel({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#0a0a0f] border border-white/10 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
+      <div className="bg-[#0a1628] border border-white/10 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
-              <Database className="w-4 h-4 text-blue-400" />
+            <div className="w-8 h-8 rounded-lg bg-stone-500/20 flex items-center justify-center">
+              <Database className="w-4 h-4 text-stone-400" />
             </div>
             <div>
               <h2 className="text-white font-semibold text-lg">
@@ -280,7 +280,7 @@ export default function ScaffoldPanel({
               {/* Auth Section */}
               <div>
                 <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-blue-400" />
+                  <Shield className="w-4 h-4 text-stone-400" />
                   Authentication
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -291,7 +291,7 @@ export default function ScaffoldPanel({
               {/* Database Section */}
               <div>
                 <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Database className="w-4 h-4 text-blue-400" />
+                  <Database className="w-4 h-4 text-stone-400" />
                   Database Tables
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -302,7 +302,7 @@ export default function ScaffoldPanel({
               {/* Features Section */}
               <div>
                 <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-emerald-400" />
+                  <Settings className="w-4 h-4 text-stone-400" />
                   Features
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -311,7 +311,7 @@ export default function ScaffoldPanel({
               </div>
 
               {error && (
-                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                <div className="p-3 rounded-lg bg-stone-500/10 border border-stone-500/30 text-stone-400 text-sm">
                   {error}
                 </div>
               )}
@@ -329,7 +329,7 @@ export default function ScaffoldPanel({
                       key={feature}
                       className="flex items-center gap-2 text-sm"
                     >
-                      <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      <Check className="w-4 h-4 text-stone-400 flex-shrink-0" />
                       <span className="text-white/80">{feature}</span>
                     </div>
                   ))}
@@ -341,7 +341,7 @@ export default function ScaffoldPanel({
                 <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3">
                   SQL Schema
                 </h3>
-                <pre className="bg-[#06060a] border border-white/5 rounded-lg p-4 overflow-x-auto text-xs text-emerald-300/80 font-mono leading-relaxed max-h-60 overflow-y-auto">
+                <pre className="bg-[#06060a] border border-white/5 rounded-lg p-4 overflow-x-auto text-xs text-stone-300/80 font-mono leading-relaxed max-h-60 overflow-y-auto">
                   <code>{result.schema}</code>
                 </pre>
               </div>
@@ -410,7 +410,7 @@ export default function ScaffoldPanel({
                 className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all ${
                   selectedFeatures.length === 0 || isLoading
                     ? "bg-white/5 text-white/50 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-500"
+                    : "bg-stone-600 text-white hover:bg-stone-500"
                 }`}
               >
                 {isLoading ? (
@@ -439,7 +439,7 @@ export default function ScaffoldPanel({
               </button>
               <button
                 onClick={handleApply}
-                className="flex items-center gap-2 px-5 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-500 transition-all"
+                className="flex items-center gap-2 px-5 py-2 rounded-lg bg-stone-600 text-white text-sm font-medium hover:bg-stone-500 transition-all"
               >
                 <Check className="w-4 h-4" />
                 Apply to Code

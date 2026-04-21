@@ -81,10 +81,10 @@ function getScoreColor(score: number): string {
 }
 
 function getScoreColorClass(score: number): string {
-  if (score < 50) return "text-red-400";
-  if (score < 70) return "text-orange-400";
-  if (score < 80) return "text-yellow-400";
-  return "text-green-400";
+  if (score < 50) return "text-stone-400";
+  if (score < 70) return "text-stone-400";
+  if (score < 80) return "text-stone-400";
+  return "text-stone-400";
 }
 
 function getScoreLabel(score: number): string {
@@ -196,9 +196,9 @@ function PriorityBadge({
   priority: "high" | "medium" | "low";
 }) {
   const styles: Record<string, string> = {
-    high: "bg-red-500/15 text-red-400 border-red-500/25",
-    medium: "bg-yellow-500/15 text-yellow-400 border-yellow-500/25",
-    low: "bg-blue-500/15 text-blue-400 border-blue-500/25",
+    high: "bg-stone-500/15 text-stone-400 border-stone-500/25",
+    medium: "bg-stone-500/15 text-stone-400 border-stone-500/25",
+    low: "bg-stone-500/15 text-stone-400 border-stone-500/25",
   };
 
   return (
@@ -277,9 +277,9 @@ function CategorySection({ category }: { category: SeoCategory }) {
                 className="flex items-start gap-2 text-xs py-0.5"
               >
                 {check.passed ? (
-                  <Check className="w-3.5 h-3.5 text-green-400 mt-0.5 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-stone-400 mt-0.5 shrink-0" />
                 ) : (
-                  <X className="w-3.5 h-3.5 text-red-400 mt-0.5 shrink-0" />
+                  <X className="w-3.5 h-3.5 text-stone-400 mt-0.5 shrink-0" />
                 )}
                 <span
                   className={
@@ -387,16 +387,16 @@ export default function SeoScorePanel({
     : 0;
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0f] text-white">
+    <div className="flex flex-col h-full bg-[#0a1628] text-white">
       {/* ---- Header ---- */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <Search className="w-4 h-4 text-blue-400" />
+          <Search className="w-4 h-4 text-stone-400" />
           <span className="text-sm font-semibold tracking-tight">
             SEO Score
           </span>
           {loading && (
-            <Loader2 className="w-3.5 h-3.5 text-blue-400 animate-spin ml-1" />
+            <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin ml-1" />
           )}
         </div>
         <button
@@ -416,16 +416,16 @@ export default function SeoScorePanel({
         {/* Loading – first load */}
         {loading && !result && (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
-            <Loader2 className="w-7 h-7 text-blue-400 animate-spin" />
+            <Loader2 className="w-7 h-7 text-stone-400 animate-spin" />
             <span className="text-sm text-white/50">Analyzing SEO...</span>
           </div>
         )}
 
         {/* Error */}
         {error && (
-          <div className="flex items-start gap-2.5 px-3 py-2.5 bg-red-500/10 border border-red-500/20 rounded-lg">
-            <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-            <span className="text-xs text-red-300 leading-relaxed">
+          <div className="flex items-start gap-2.5 px-3 py-2.5 bg-stone-500/10 border border-stone-500/20 rounded-lg">
+            <AlertTriangle className="w-4 h-4 text-stone-400 shrink-0 mt-0.5" />
+            <span className="text-xs text-stone-300 leading-relaxed">
               {error}
             </span>
           </div>
@@ -480,7 +480,7 @@ export default function SeoScorePanel({
             {highCount > 0 && (
               <button
                 onClick={handleAutoFix}
-                className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 active:from-blue-700 active:to-blue-600 text-white text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-stone-600 to-stone-500 hover:from-stone-500 hover:to-stone-400 active:from-stone-700 active:to-stone-600 text-white text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-stone-500/20 hover:shadow-stone-500/30"
               >
                 <Wrench className="w-4 h-4" />
                 Auto-Fix SEO Issues

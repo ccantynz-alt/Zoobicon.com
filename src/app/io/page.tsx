@@ -119,7 +119,7 @@ function DomainSearch() {
               <div className="flex items-center gap-3">
                 <div
                   className={`w-2 h-2 rounded-full ${
-                    r.available ? "bg-green-400" : "bg-red-400"
+                    r.available ? "bg-stone-400" : "bg-stone-400"
                   }`}
                 />
                 <span className="font-mono text-sm text-white">{r.domain}</span>
@@ -254,50 +254,50 @@ const EMAIL_FEATURES = [
     title: "Transactional Email API",
     description:
       "Send via REST API or SMTP relay. Automatic retry, queuing, and throttling. $0.10 per 1,000 emails.",
-    color: "text-blue-400",
-    border: "border-blue-500/20",
+    color: "text-stone-400",
+    border: "border-stone-500/20",
   },
   {
     icon: Inbox,
     title: "Email Receiving & Routing",
     description:
       "Receive email on your domain. Forward, store, or process with webhooks. Catch-all and per-address rules.",
-    color: "text-green-400",
-    border: "border-green-500/20",
+    color: "text-stone-400",
+    border: "border-stone-500/20",
   },
   {
     icon: Shield,
     title: "Auto Authentication",
     description:
       "Full-featured SDK with TypeScript types, streaming support, and automatic retries. Coming soon.",
-    color: "text-yellow-400",
-    borderColor: "border-yellow-500/30",
-    bgGlow: "bg-yellow-500/8",
+    color: "text-stone-400",
+    borderColor: "border-stone-500/30",
+    bgGlow: "bg-stone-500/8",
   },
   {
     icon: Bot,
     title: "AI Deliverability Agent",
     description:
       "Pythonic interface with async support, Pydantic models, and comprehensive type hints. Coming soon.",
-    color: "text-blue-400",
-    borderColor: "border-blue-500/30",
-    bgGlow: "bg-blue-500/8",
+    color: "text-stone-400",
+    borderColor: "border-stone-500/30",
+    bgGlow: "bg-stone-500/8",
   },
   {
     icon: BarChart3,
     title: "Real-Time Analytics",
     description:
       "Track sends, deliveries, opens, clicks, bounces, and complaints. Webhooks for every event.",
-    color: "text-cyan-400",
-    border: "border-cyan-500/20",
+    color: "text-stone-400",
+    border: "border-stone-500/20",
   },
   {
     icon: Users,
     title: "Mailbox Hosting",
     description:
       "Create mailboxes on your domain. info@, support@, hello@ — with forwarding, auto-reply, and 1GB storage.",
-    color: "text-cyan-400",
-    border: "border-cyan-500/20",
+    color: "text-stone-400",
+    border: "border-stone-500/20",
   },
 ];
 
@@ -308,17 +308,17 @@ const DOMAIN_FEATURES = [
     description:
       "Direct HTTP calls with JSON. OpenAPI 3.1 spec available. Works with any language.",
     color: "text-zoo-400",
-    borderColor: "border-green-500/30",
-    bgGlow: "bg-green-500/8",
+    borderColor: "border-stone-500/30",
+    bgGlow: "bg-stone-500/8",
   },
   {
     icon: Lock,
     title: "Free WHOIS Privacy",
     description:
       "Generate, deploy, and manage sites from your terminal. Perfect for scripting and automation.",
-    color: "text-blue-400",
-    borderColor: "border-blue-500/30",
-    bgGlow: "bg-blue-500/8",
+    color: "text-stone-400",
+    borderColor: "border-stone-500/30",
+    bgGlow: "bg-stone-500/8",
   },
   {
     icon: Server,
@@ -334,9 +334,9 @@ const DOMAIN_FEATURES = [
     title: "One-Click Email Setup",
     description:
       "Real-time notifications for build completion, deployment, SEO alerts, and more.",
-    color: "text-orange-400",
-    borderColor: "border-orange-500/30",
-    bgGlow: "bg-orange-500/8",
+    color: "text-stone-400",
+    borderColor: "border-stone-500/30",
+    bgGlow: "bg-stone-500/8",
   },
 ];
 
@@ -407,27 +407,27 @@ const SDK_CARDS = [
   {
     icon: Code2,
     title: "Node.js / TypeScript",
-    color: "text-green-400",
-    borderColor: "border-green-500/20",
-    bgGlow: "bg-green-500/8",
+    color: "text-stone-400",
+    borderColor: "border-stone-500/20",
+    bgGlow: "bg-stone-500/8",
     install: "npm install @zoobicon/sdk",
     description: "Full-featured SDK with TypeScript types, streaming support, and automatic retries.",
   },
   {
     icon: Terminal,
     title: "Python",
-    color: "text-yellow-400",
-    borderColor: "border-yellow-500/20",
-    bgGlow: "bg-yellow-500/8",
+    color: "text-stone-400",
+    borderColor: "border-stone-500/20",
+    bgGlow: "bg-stone-500/8",
     install: "pip install zoobicon",
     description: "Pythonic interface with async support, Pydantic models, and comprehensive type hints.",
   },
   {
     icon: Globe,
     title: "REST API",
-    color: "text-blue-400",
-    borderColor: "border-blue-500/20",
-    bgGlow: "bg-blue-500/8",
+    color: "text-stone-400",
+    borderColor: "border-stone-500/20",
+    bgGlow: "bg-stone-500/8",
     install: "curl https://api.zoobicon.io/v1/...",
     description: "Direct HTTP calls with JSON. OpenAPI 3.1 spec available. Works with any language.",
   },
@@ -484,7 +484,7 @@ export default function ZoobiconIOPage() {
   const [activeLang, setActiveLang] = useState<"curl" | "javascript" | "python">("curl");
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white overflow-hidden relative">
+    <div className="min-h-screen bg-[#060e1f] text-white overflow-hidden relative">
       <BackgroundEffects preset="technical" />
       <CursorGlowTracker />
 
@@ -826,9 +826,9 @@ export default function ZoobiconIOPage() {
               {/* Window header */}
               <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 bg-white/[0.05]">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                  <div className="w-3 h-3 rounded-full bg-stone-500/60" />
+                  <div className="w-3 h-3 rounded-full bg-stone-500/60" />
+                  <div className="w-3 h-3 rounded-full bg-stone-500/60" />
                 </div>
                 <span className="text-xs font-mono text-gray-300">
                   {API_EXAMPLES[activeExample].method} {API_EXAMPLES[activeExample].label}
@@ -905,8 +905,8 @@ export default function ZoobiconIOPage() {
                   <span
                     className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
                       endpoint.method === "POST"
-                        ? "bg-green-500/10 text-green-400"
-                        : "bg-blue-500/10 text-blue-400"
+                        ? "bg-stone-500/10 text-stone-400"
+                        : "bg-stone-500/10 text-stone-400"
                     }`}
                   >
                     {endpoint.method}
@@ -1137,7 +1137,7 @@ export default function ZoobiconIOPage() {
                     </li>
                     <li className="flex items-center gap-2">
                       <Shield className="w-4 h-4 text-zoo-400/70 flex-shrink-0" />
-                      Use test keys (<code className="text-yellow-400 bg-yellow-500/10 px-1.5 py-0.5 rounded text-xs">zbk_test_...</code>) for development
+                      Use test keys (<code className="text-stone-400 bg-stone-500/10 px-1.5 py-0.5 rounded text-xs">zbk_test_...</code>) for development
                     </li>
                   </ul>
                 </div>

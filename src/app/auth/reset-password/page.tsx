@@ -3,7 +3,15 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Zap, Eye, EyeOff, ArrowRight, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import {
+  Zap,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+} from "lucide-react";
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
@@ -74,19 +82,19 @@ function ResetPasswordContent() {
 
           {status === "success" ? (
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-cyan/10 to-emerald-500/10 border border-accent-cyan/20 mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-cyan/10 to-stone-500/10 border border-accent-cyan/20 mb-6">
                 <CheckCircle2 className="w-8 h-8 text-accent-cyan" />
               </div>
               <h1 className="text-2xl font-black tracking-tight mb-3">Password reset</h1>
               <p className="text-white/50 text-sm mb-6">{message}</p>
 
               {envInstruction && (
-                <div className="mb-6 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-left">
+                <div className="mb-6 p-4 rounded-xl border border-stone-500/20 bg-stone-500/5 text-left">
                   <div className="flex items-start gap-2 mb-3">
-                    <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-amber-400/80 font-medium">Admin — update Vercel env var then redeploy</p>
+                    <AlertTriangle className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-stone-400/80 font-medium">Admin — update Vercel env var then redeploy</p>
                   </div>
-                  <code className="block text-xs font-mono text-emerald-400 bg-dark-400/50 rounded-lg p-3 break-all">
+                  <code className="block text-xs font-mono text-stone-400 bg-dark-400/50 rounded-lg p-3 break-all">
                     {envInstruction}
                   </code>
                 </div>
@@ -102,8 +110,8 @@ function ResetPasswordContent() {
             </div>
           ) : status === "error" && !token ? (
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 mb-6">
-                <XCircle className="w-8 h-8 text-red-400" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-stone-500/10 border border-stone-500/20 mb-6">
+                <XCircle className="w-8 h-8 text-stone-400" />
               </div>
               <h1 className="text-2xl font-black tracking-tight mb-3">Invalid link</h1>
               <p className="text-white/50 text-sm mb-6">{message}</p>
@@ -170,7 +178,7 @@ function ResetPasswordContent() {
                 )}
 
                 {status === "error" && message && (
-                  <p className="text-sm text-red-400/80 text-center py-1">{message}</p>
+                  <p className="text-sm text-stone-400/80 text-center py-1">{message}</p>
                 )}
 
                 <button

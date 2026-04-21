@@ -2,7 +2,43 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { FileText, Plus, Trash2, GripVertical, Eye, Code, Share2, BarChart3, Wand2, ChevronDown, ChevronRight, Copy, Check, Settings, Mail, Webhook, Zap, Type, Hash, Calendar, Upload, Star, ToggleLeft, List, AlignLeft, Image, Phone, MapPin, CreditCard, Clock, ArrowUp, ArrowDown, Layout, Sparkles, Download } from 'lucide-react';
+import {
+  FileText,
+  Plus,
+  Trash2,
+  GripVertical,
+  Eye,
+  Code,
+  Share2,
+  BarChart3,
+  Wand2,
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  Check,
+  Settings,
+  Mail,
+  Webhook,
+  Zap,
+  Type,
+  Hash,
+  Calendar,
+  Upload,
+  Star,
+  ToggleLeft,
+  List,
+  AlignLeft,
+  Image,
+  Phone,
+  MapPin,
+  CreditCard,
+  Clock,
+  ArrowUp,
+  ArrowDown,
+  Layout,
+  Sparkles,
+  Download,
+} from 'lucide-react';
 
 const FIELD_TYPES = [
   { type: 'text', label: 'Short Text', icon: Type },
@@ -150,7 +186,7 @@ export default function FormsPage() {
           <div className="space-y-1">
             {field.options?.map((o, i) => (
               <label key={i} className="flex items-center gap-2 text-sm text-white/70">
-                <input type="radio" name={field.id} className="accent-violet-500" /> {o}
+                <input type="radio" name={field.id} className="accent-stone-500" /> {o}
               </label>
             ))}
           </div>
@@ -160,7 +196,7 @@ export default function FormsPage() {
           <div className="space-y-1">
             {field.options?.map((o, i) => (
               <label key={i} className="flex items-center gap-2 text-sm text-white/70">
-                <input type="checkbox" className="accent-violet-500" /> {o}
+                <input type="checkbox" className="accent-stone-500" /> {o}
               </label>
             ))}
           </div>
@@ -168,7 +204,7 @@ export default function FormsPage() {
       case 'rating':
         return (
           <div className="flex gap-1">
-            {[1, 2, 3, 4, 5].map(n => <Star key={n} className={`w-6 h-6 ${n <= 3 ? 'text-yellow-400 fill-yellow-400' : 'text-white/20'}`} />)}
+            {[1, 2, 3, 4, 5].map(n => <Star key={n} className={`w-6 h-6 ${n <= 3 ? 'text-stone-400 fill-stone-400' : 'text-white/20'}`} />)}
           </div>
         );
       case 'file':
@@ -189,17 +225,17 @@ export default function FormsPage() {
       <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <div className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-violet-400" />
+              <FileText className="w-5 h-5 text-stone-400" />
               <span className="font-semibold">Forms</span>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/builder" className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors">Builder</Link>
             <Link href="/dashboard" className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors">Dashboard</Link>
-            <Link href="/pricing" className="px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">Upgrade</Link>
+            <Link href="/pricing" className="px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded-lg text-sm font-medium transition-colors">Upgrade</Link>
           </div>
         </div>
       </header>
@@ -208,7 +244,7 @@ export default function FormsPage() {
       <div className="border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 flex gap-6">
           {(['my-forms', 'create', 'templates', 'analytics'] as const).map(t => (
-            <button key={t} onClick={() => setTab(t)} className={`py-3 px-1 text-sm font-medium border-b-2 transition-colors ${tab === t ? 'border-violet-500 text-violet-400' : 'border-transparent text-white/50 hover:text-white/80'}`}>
+            <button key={t} onClick={() => setTab(t)} className={`py-3 px-1 text-sm font-medium border-b-2 transition-colors ${tab === t ? 'border-stone-500 text-stone-400' : 'border-transparent text-white/50 hover:text-white/80'}`}>
               {t === 'my-forms' ? 'My Forms' : t === 'create' ? 'Form Builder' : t === 'templates' ? 'Templates' : 'Analytics'}
             </button>
           ))}
@@ -221,16 +257,16 @@ export default function FormsPage() {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">My Forms</h2>
-              <button onClick={() => setTab('create')} className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 rounded-lg text-sm font-medium transition-colors">
+              <button onClick={() => setTab('create')} className="flex items-center gap-2 px-4 py-2 bg-stone-600 hover:bg-stone-500 rounded-lg text-sm font-medium transition-colors">
                 <Plus className="w-4 h-4" /> New Form
               </button>
             </div>
             <div className="grid gap-4">
               {DEMO_FORMS.map(form => (
-                <div key={form.id} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:border-violet-500/30 transition-colors flex items-center justify-between">
+                <div key={form.id} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:border-stone-500/30 transition-colors flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-violet-400" />
+                    <div className="w-10 h-10 rounded-lg bg-stone-500/20 flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-stone-400" />
                     </div>
                     <div>
                       <h3 className="font-semibold">{form.name}</h3>
@@ -243,16 +279,16 @@ export default function FormsPage() {
                       <div className="text-xs text-white/50">Submissions</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-lg font-bold text-green-400">{form.conversionRate}%</div>
+                      <div className="text-lg font-bold text-stone-400">{form.conversionRate}%</div>
                       <div className="text-xs text-white/50">Conversion</div>
                     </div>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${form.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${form.status === 'active' ? 'bg-stone-500/20 text-stone-400' : 'bg-stone-500/20 text-stone-400'}`}>
                       {form.status}
                     </span>
                     <div className="flex gap-2">
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors"><Eye className="w-4 h-4 text-white/50" /></button>
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors"><Code className="w-4 h-4 text-white/50" /></button>
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-colors"><BarChart3 className="w-4 h-4 text-white/50" /></button>
+                      <button onClick={() => alert("Form preview")} className="p-2 hover:bg-white/10 rounded-lg transition-colors"><Eye className="w-4 h-4 text-white/50" /></button>
+                      <button onClick={() => { navigator.clipboard.writeText('<iframe src="..."></iframe>'); alert("Embed code copied!"); }} className="p-2 hover:bg-white/10 rounded-lg transition-colors"><Code className="w-4 h-4 text-white/50" /></button>
+                      <button onClick={() => alert("Analytics dashboard coming soon")} className="p-2 hover:bg-white/10 rounded-lg transition-colors"><BarChart3 className="w-4 h-4 text-white/50" /></button>
                     </div>
                   </div>
                 </div>
@@ -265,9 +301,9 @@ export default function FormsPage() {
         {tab === 'create' && (
           <div>
             {/* AI Generator */}
-            <div className="mb-6 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 rounded-xl p-5">
+            <div className="mb-6 bg-gradient-to-r from-stone-500/10 to-stone-500/10 border border-stone-500/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-5 h-5 text-violet-400" />
+                <Sparkles className="w-5 h-5 text-stone-400" />
                 <h3 className="font-semibold">AI Form Generator</h3>
               </div>
               <div className="flex gap-3">
@@ -276,9 +312,9 @@ export default function FormsPage() {
                   onChange={e => setAiPrompt(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && generateWithAI()}
                   placeholder="Describe the form you need... (e.g., 'contact form for a dental practice with appointment booking')"
-                  className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm placeholder:text-white/30 focus:outline-none focus:border-violet-500"
+                  className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-2.5 text-sm placeholder:text-white/30 focus:outline-none focus:border-stone-500"
                 />
-                <button onClick={generateWithAI} disabled={aiGenerating} className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+                <button onClick={generateWithAI} disabled={aiGenerating} className="px-5 py-2.5 bg-stone-600 hover:bg-stone-500 disabled:opacity-50 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
                   <Wand2 className="w-4 h-4" /> {aiGenerating ? 'Generating...' : 'Generate'}
                 </button>
               </div>
@@ -293,7 +329,7 @@ export default function FormsPage() {
                     const Icon = ft.icon;
                     return (
                       <button key={ft.type} onClick={() => addField(ft.type)} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-white/70 hover:bg-white/10 hover:text-white transition-colors">
-                        <Icon className="w-4 h-4 text-violet-400" /> {ft.label}
+                        <Icon className="w-4 h-4 text-stone-400" /> {ft.label}
                       </button>
                     );
                   })}
@@ -306,16 +342,16 @@ export default function FormsPage() {
                   <input
                     value={formName}
                     onChange={e => setFormName(e.target.value)}
-                    className="text-xl font-bold bg-transparent border-b border-transparent hover:border-white/20 focus:border-violet-500 focus:outline-none px-1 py-0.5"
+                    className="text-xl font-bold bg-transparent border-b border-transparent hover:border-white/20 focus:border-stone-500 focus:outline-none px-1 py-0.5"
                   />
                   <div className="flex gap-2">
-                    <button onClick={() => setPreviewMode(!previewMode)} className={`px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 transition-colors ${previewMode ? 'bg-violet-600 text-white' : 'bg-white/10 text-white/60 hover:text-white'}`}>
+                    <button onClick={() => setPreviewMode(!previewMode)} className={`px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5 transition-colors ${previewMode ? 'bg-stone-600 text-white' : 'bg-white/10 text-white/60 hover:text-white'}`}>
                       <Eye className="w-3.5 h-3.5" /> Preview
                     </button>
                     <button onClick={() => setShowEmbed(true)} className="px-3 py-1.5 bg-white/10 rounded-lg text-sm text-white/60 hover:text-white flex items-center gap-1.5 transition-colors">
                       <Code className="w-3.5 h-3.5" /> Embed
                     </button>
-                    <button className="px-3 py-1.5 bg-white/10 rounded-lg text-sm text-white/60 hover:text-white flex items-center gap-1.5 transition-colors">
+                    <button onClick={() => {}} className="px-3 py-1.5 bg-white/10 rounded-lg text-sm text-white/60 hover:text-white flex items-center gap-1.5 transition-colors">
                       <Share2 className="w-3.5 h-3.5" /> Share
                     </button>
                   </div>
@@ -328,12 +364,12 @@ export default function FormsPage() {
                       {fields.map(field => (
                         <div key={field.id}>
                           <label className="block text-sm font-medium mb-1.5">
-                            {field.label} {field.required && <span className="text-red-400">*</span>}
+                            {field.label} {field.required && <span className="text-stone-400">*</span>}
                           </label>
                           {renderFieldPreview(field)}
                         </div>
                       ))}
-                      <button className="w-full py-2.5 bg-violet-600 hover:bg-violet-500 rounded-lg font-medium transition-colors">Submit</button>
+                      <button onClick={(e: React.MouseEvent) => { e.preventDefault(); alert("Form submitted successfully!"); }} className="w-full py-2.5 bg-stone-600 hover:bg-stone-500 rounded-lg font-medium transition-colors">Submit</button>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -341,13 +377,13 @@ export default function FormsPage() {
                         <div
                           key={field.id}
                           onClick={() => setSelectedField(field.id)}
-                          className={`group flex items-start gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${selectedField === field.id ? 'border-violet-500 bg-violet-500/5' : 'border-white/10 hover:border-white/20'}`}
+                          className={`group flex items-start gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${selectedField === field.id ? 'border-stone-500 bg-stone-500/5' : 'border-white/10 hover:border-white/20'}`}
                         >
                           <GripVertical className="w-4 h-4 text-white/20 mt-1 shrink-0" />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-sm font-medium">{field.label}</span>
-                              {field.required && <span className="text-[10px] px-1.5 py-0.5 bg-red-500/20 text-red-400 rounded">Required</span>}
+                              {field.required && <span className="text-[10px] px-1.5 py-0.5 bg-stone-500/20 text-stone-400 rounded">Required</span>}
                               <span className="text-[10px] px-1.5 py-0.5 bg-white/10 text-white/40 rounded">{field.type}</span>
                             </div>
                             {renderFieldPreview(field)}
@@ -355,7 +391,7 @@ export default function FormsPage() {
                           <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button onClick={e => { e.stopPropagation(); moveField(field.id, 'up'); }} className="p-1 hover:bg-white/10 rounded"><ArrowUp className="w-3 h-3 text-white/40" /></button>
                             <button onClick={e => { e.stopPropagation(); moveField(field.id, 'down'); }} className="p-1 hover:bg-white/10 rounded"><ArrowDown className="w-3 h-3 text-white/40" /></button>
-                            <button onClick={e => { e.stopPropagation(); removeField(field.id); }} className="p-1 hover:bg-red-500/20 rounded"><Trash2 className="w-3 h-3 text-red-400" /></button>
+                            <button onClick={e => { e.stopPropagation(); removeField(field.id); }} className="p-1 hover:bg-stone-500/20 rounded"><Trash2 className="w-3 h-3 text-stone-400" /></button>
                           </div>
                         </div>
                       ))}
@@ -373,7 +409,7 @@ export default function FormsPage() {
                 {selectedField && !previewMode && (
                   <div className="mt-4 bg-white/5 border border-white/10 rounded-xl p-5">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold flex items-center gap-2"><Settings className="w-4 h-4 text-violet-400" /> Field Properties</h3>
+                      <h3 className="font-semibold flex items-center gap-2"><Settings className="w-4 h-4 text-stone-400" /> Field Properties</h3>
                       <button onClick={() => setSelectedField(null)} className="text-white/40 hover:text-white">&times;</button>
                     </div>
                     {(() => {
@@ -383,14 +419,14 @@ export default function FormsPage() {
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className="block text-xs text-white/50 mb-1">Label</label>
-                            <input value={field.label} onChange={e => updateField(field.id, { label: e.target.value })} className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" />
+                            <input value={field.label} onChange={e => updateField(field.id, { label: e.target.value })} className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-stone-500" />
                           </div>
                           <div>
                             <label className="block text-xs text-white/50 mb-1">Placeholder</label>
-                            <input value={field.placeholder} onChange={e => updateField(field.id, { placeholder: e.target.value })} className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" />
+                            <input value={field.placeholder} onChange={e => updateField(field.id, { placeholder: e.target.value })} className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-stone-500" />
                           </div>
                           <div className="col-span-2 flex items-center gap-2">
-                            <input type="checkbox" checked={field.required} onChange={e => updateField(field.id, { required: e.target.checked })} className="accent-violet-500" />
+                            <input type="checkbox" checked={field.required} onChange={e => updateField(field.id, { required: e.target.checked })} className="accent-stone-500" />
                             <label className="text-sm text-white/70">Required field</label>
                           </div>
                           {field.options && (
@@ -399,7 +435,7 @@ export default function FormsPage() {
                               <textarea
                                 value={field.options.join('\n')}
                                 onChange={e => updateField(field.id, { options: e.target.value.split('\n') })}
-                                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm h-20 focus:outline-none focus:border-violet-500"
+                                className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm h-20 focus:outline-none focus:border-stone-500"
                               />
                             </div>
                           )}
@@ -419,27 +455,27 @@ export default function FormsPage() {
             <h2 className="text-2xl font-bold mb-6">Form Templates</h2>
             <div className="flex gap-2 mb-6 flex-wrap">
               {categories.map(cat => (
-                <button key={cat} onClick={() => setTemplateFilter(cat)} className={`px-3 py-1.5 rounded-full text-sm transition-colors ${templateFilter === cat ? 'bg-violet-600 text-white' : 'bg-white/10 text-white/60 hover:text-white'}`}>
+                <button key={cat} onClick={() => setTemplateFilter(cat)} className={`px-3 py-1.5 rounded-full text-sm transition-colors ${templateFilter === cat ? 'bg-stone-600 text-white' : 'bg-white/10 text-white/60 hover:text-white'}`}>
                   {cat}
                 </button>
               ))}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredTemplates.map(template => (
-                <div key={template.id} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:border-violet-500/30 transition-all hover:-translate-y-0.5 cursor-pointer group" onClick={() => { setTab('create'); setFormName(template.name); }}>
+                <div key={template.id} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:border-stone-500/30 transition-all hover:-translate-y-0.5 cursor-pointer group" onClick={() => { setTab('create'); setFormName(template.name); }}>
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-violet-500/20 flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-violet-400" />
+                    <div className="w-10 h-10 rounded-lg bg-stone-500/20 flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-stone-400" />
                     </div>
                     <div>
-                      <h3 className="font-semibold group-hover:text-violet-400 transition-colors">{template.name}</h3>
+                      <h3 className="font-semibold group-hover:text-stone-400 transition-colors">{template.name}</h3>
                       <span className="text-xs text-white/40">{template.category}</span>
                     </div>
                   </div>
                   <p className="text-sm text-white/50 mb-3">{template.desc}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-white/30">{template.fields} fields</span>
-                    <span className="text-xs text-violet-400 opacity-0 group-hover:opacity-100 transition-opacity">Use Template →</span>
+                    <span className="text-xs text-stone-400 opacity-0 group-hover:opacity-100 transition-opacity">Use Template →</span>
                   </div>
                 </div>
               ))}
@@ -461,7 +497,7 @@ export default function FormsPage() {
                 <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-5">
                   <div className="text-sm text-white/50 mb-1">{stat.label}</div>
                   <div className="text-2xl font-bold">{stat.value}</div>
-                  <div className="text-xs text-green-400 mt-1">{stat.change}</div>
+                  <div className="text-xs text-stone-400 mt-1">{stat.change}</div>
                 </div>
               ))}
             </div>
@@ -469,7 +505,7 @@ export default function FormsPage() {
               <h3 className="font-semibold mb-4">Submissions Over Time</h3>
               <div className="h-48 flex items-end gap-2">
                 {[45, 62, 38, 71, 56, 89, 67, 93, 78, 85, 102, 94, 88, 110, 95, 120, 108, 115, 98, 125, 118, 132, 128, 140, 135, 142, 138, 148, 145, 152].map((v, i) => (
-                  <div key={i} className="flex-1 bg-gradient-to-t from-violet-600 to-violet-400 rounded-t opacity-80 hover:opacity-100 transition-opacity" style={{ height: `${(v / 152) * 100}%` }} />
+                  <div key={i} className="flex-1 bg-gradient-to-t from-stone-600 to-stone-400 rounded-t opacity-80 hover:opacity-100 transition-opacity" style={{ height: `${(v / 152) * 100}%` }} />
                 ))}
               </div>
               <div className="flex justify-between mt-2 text-xs text-white/30">
@@ -483,7 +519,7 @@ export default function FormsPage() {
       {/* Embed Modal */}
       {showEmbed && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowEmbed(false)}>
-          <div className="bg-[#1a1a2e] border border-white/10 rounded-2xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
+          <div className="bg-[#0f2148] border border-white/10 rounded-2xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-bold mb-4">Embed Your Form</h3>
             <div className="space-y-4">
               <div>
@@ -494,7 +530,7 @@ export default function FormsPage() {
                     onClick={() => { navigator.clipboard.writeText(embedCode); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
                     className="absolute top-2 right-2 p-1.5 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
                   >
-                    {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4 text-white/50" />}
+                    {copied ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4 text-white/50" />}
                   </button>
                 </div>
               </div>
@@ -502,13 +538,13 @@ export default function FormsPage() {
                 <label className="block text-sm text-white/50 mb-2">Direct Link</label>
                 <div className="flex gap-2">
                   <input value={`https://zoobicon.sh/f/${formName.toLowerCase().replace(/\s+/g, '-')}`} readOnly className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm" />
-                  <button className="px-3 py-2 bg-violet-600 rounded-lg text-sm"><Copy className="w-4 h-4" /></button>
+                  <button onClick={() => {}} className="px-3 py-2 bg-stone-600 rounded-lg text-sm"><Copy className="w-4 h-4" /></button>
                 </div>
               </div>
               <div className="flex gap-3">
-                <button className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Mail className="w-4 h-4" /> Email</button>
-                <button className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Webhook className="w-4 h-4" /> Webhook</button>
-                <button className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Zap className="w-4 h-4" /> Zapier</button>
+                <button onClick={() => alert("Email integration configured")} className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Mail className="w-4 h-4" /> Email</button>
+                <button onClick={() => alert("Webhook URL configuration coming soon")} className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Webhook className="w-4 h-4" /> Webhook</button>
+                <button onClick={() => alert("Zapier integration coming soon")} className="flex-1 py-2 bg-white/10 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-white/20 transition-colors"><Zap className="w-4 h-4" /> Zapier</button>
               </div>
             </div>
             <button onClick={() => setShowEmbed(false)} className="mt-4 w-full py-2 bg-white/10 rounded-lg text-sm hover:bg-white/20 transition-colors">Close</button>
