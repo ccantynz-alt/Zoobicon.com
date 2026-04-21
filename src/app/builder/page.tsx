@@ -1664,7 +1664,7 @@ root.render(React.createElement(App));
   /* ─── Recording Mode: fullscreen preview only ─── */
   if (recordingMode) {
     return (
-      <div className="h-screen w-screen bg-[#060e1f] relative overflow-hidden">
+      <div className="h-screen w-screen bg-[#0b1530] relative overflow-hidden">
         {/* Minimal recording chrome — press Escape to exit */}
         <div className="absolute top-3 right-3 z-50 flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-500/20 border border-stone-500/40 text-stone-400 text-xs font-semibold animate-pulse">

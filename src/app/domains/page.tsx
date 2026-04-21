@@ -261,7 +261,7 @@ function BundleUpsell({
     <div
       className="rounded-[28px] border border-[#E8D4B0]/25 p-7 mb-8 backdrop-blur-xl relative overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, rgba(232,212,176,0.10) 0%, rgba(224,139,176,0.06) 50%, rgba(17,17,24,0.92) 100%)",
+        background: "linear-gradient(135deg, rgba(232,212,176,0.10) 0%, rgba(224,139,176,0.06) 50%, rgba(20,40,95,0.92) 100%)",
         boxShadow: "0 1px 0 rgba(232,212,176,0.18) inset, 0 40px 100px -40px rgba(232,212,176,0.35)",
       }}
     >
@@ -507,7 +507,7 @@ function ScopeToggle({
       {scope === "custom" && customOpen && (
         <div
           className="mt-3 rounded-2xl border border-[#E8D4B0]/15 p-4 backdrop-blur-xl"
-          style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.03) 0%, rgba(17,17,24,0.7) 100%)" }}
+          style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.03) 0%, rgba(20,40,95,0.7) 100%)" }}
         >
           <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
             <div className="text-[11px] uppercase tracking-[0.15em] font-semibold text-[#E8D4B0]/75">
@@ -1332,7 +1332,7 @@ export default function DomainsPage() {
   const cartTotal = cart.reduce((sum, c) => sum + c.price, 0);
 
   return (
-    <div className="min-h-screen bg-[#060e1f] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[#0b1530] text-white fs-grain pt-[72px]">
 
       {/* ═══════════════════════════════════════════ */}
       {/* CHECKOUT FORM MODAL                        */}
@@ -1342,7 +1342,7 @@ export default function DomainsPage() {
           <div
             className="rounded-[28px] border border-white/[0.08] w-full max-w-lg max-h-[90vh] overflow-y-auto p-7 sm:p-8 backdrop-blur-xl"
             style={{
-              background: "linear-gradient(135deg, rgba(17,17,24,0.95) 0%, rgba(10,10,15,0.92) 100%)",
+              background: "linear-gradient(135deg, rgba(20,40,95,0.95) 0%, rgba(10,10,15,0.92) 100%)",
               boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset, 0 50px 120px -40px rgba(0,0,0,0.8), 0 30px 80px -30px rgba(232,212,176,0.2)",
             }}
           >
@@ -1363,7 +1363,7 @@ export default function DomainsPage() {
             {/* Cart summary */}
             <div
               className="mb-6 p-5 rounded-[20px] border border-[#E8D4B0]/15"
-              style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(17,17,24,0.6) 100%)" }}
+              style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.6) 100%)" }}
             >
               <p className="text-[11px] uppercase tracking-[0.15em] font-semibold text-[#E8D4B0]/75 mb-2">{cart.length} domain{cart.length > 1 ? "s" : ""}</p>
               {cart.map(c => (
@@ -1623,7 +1623,7 @@ export default function DomainsPage() {
             <div
               className="relative rounded-[28px] border border-white/[0.08] p-6 md:p-8 text-left max-w-3xl mx-auto backdrop-blur-xl"
               style={{
-                background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+                background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)",
                 boxShadow: "0 1px 0 rgba(255,255,255,0.04) inset, 0 40px 120px -40px rgba(232,212,176,0.15)",
               }}
             >
@@ -1706,7 +1706,7 @@ export default function DomainsPage() {
             <div
               className="relative rounded-[28px] border border-[#E8D4B0]/15 p-6 md:p-8 text-left max-w-3xl mx-auto backdrop-blur-xl"
               style={{
-                background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+                background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)",
                 boxShadow: "0 1px 0 rgba(232,212,176,0.08) inset, 0 40px 120px -40px rgba(232,212,176,0.2)",
               }}
             >
@@ -1809,7 +1809,7 @@ export default function DomainsPage() {
             <div
               className="relative rounded-[28px] border border-[#E8D4B0]/15 p-6 md:p-8 text-left max-w-3xl mx-auto backdrop-blur-xl"
               style={{
-                background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+                background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)",
                 boxShadow: "0 1px 0 rgba(232,212,176,0.08) inset, 0 40px 120px -40px rgba(232,212,176,0.2)",
               }}
             >
@@ -1979,7 +1979,7 @@ export default function DomainsPage() {
                       }`}
                       style={{
                         background: c.anyAvailable
-                          ? "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(17,17,24,0.7) 100%)"
+                          ? "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.7) 100%)"
                           : "rgba(255,255,255,0.02)",
                       }}
                     >
@@ -2106,7 +2106,7 @@ export default function DomainsPage() {
               {!searching && !results.some(r => r.checking) && availableResults.length === 0 && results.length > 0 && !autoGenerating && (
                 <div
                   className="rounded-[24px] border border-[#E8D4B0]/15 p-8 text-center backdrop-blur-xl"
-                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(17,17,24,0.8) 100%)" }}
+                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.8) 100%)" }}
                 >
                   <div
                     className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
@@ -2152,7 +2152,7 @@ export default function DomainsPage() {
               {autoGenerating && (
                 <div
                   className="rounded-[24px] border border-[#E8D4B0]/15 p-8 text-center backdrop-blur-xl"
-                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(17,17,24,0.8) 100%)" }}
+                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.8) 100%)" }}
                 >
                   <div
                     className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
@@ -2200,7 +2200,7 @@ export default function DomainsPage() {
                 <div
                   key={r.domain}
                   className="group rounded-2xl border border-[#E8D4B0]/15 transition-all duration-500 hover:border-[#E8D4B0]/30 hover:-translate-y-0.5 overflow-hidden"
-                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(17,17,24,0.6) 100%)" }}
+                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.6) 100%)" }}
                 >
                   <div className="flex items-center justify-between p-5 flex-wrap gap-4">
                     <div className="flex items-center gap-3 min-w-0">
@@ -2291,7 +2291,7 @@ export default function DomainsPage() {
               <div
                 className="rounded-[28px] border border-[#E8D4B0]/20 p-7 mb-8 backdrop-blur-xl"
                 style={{
-                  background: "linear-gradient(135deg, rgba(232,212,176,0.06) 0%, rgba(17,17,24,0.85) 100%)",
+                  background: "linear-gradient(135deg, rgba(232,212,176,0.06) 0%, rgba(20,40,95,0.85) 100%)",
                   boxShadow: "0 1px 0 rgba(232,212,176,0.1) inset, 0 32px 80px -32px rgba(232,212,176,0.3)",
                 }}
               >
@@ -2419,7 +2419,7 @@ export default function DomainsPage() {
             {(genIndustry || genRecommendedTlds.length > 0) && (
               <div
                 className="rounded-[20px] border border-[#E8D4B0]/15 p-5 mb-5 backdrop-blur-xl"
-                style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.03) 0%, rgba(17,17,24,0.65) 100%)" }}
+                style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.03) 0%, rgba(20,40,95,0.65) 100%)" }}
               >
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-xl bg-[#E8D4B0]/[0.08] flex items-center justify-center shrink-0">
@@ -2570,7 +2570,7 @@ export default function DomainsPage() {
                     } ${allTaken ? "opacity-55" : ""}`}
                     style={{
                       background: hasAvailable
-                        ? "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(17,17,24,0.7) 100%)"
+                        ? "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.7) 100%)"
                         : "rgba(255,255,255,0.02)",
                     }}
                   >
@@ -2861,7 +2861,7 @@ export default function DomainsPage() {
                 !generatedNames.some((gn) => gn.domains.some((d) => d.available === true)) && (
                 <div
                   className="rounded-[24px] border border-[#E8D4B0]/15 p-8 text-center backdrop-blur-xl"
-                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(17,17,24,0.7) 100%)" }}
+                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.7) 100%)" }}
                 >
                   <Sparkles className="w-8 h-8 text-[#E8D4B0] mx-auto mb-3" />
                   <h3 className="text-[18px] font-semibold text-white mb-2 tracking-[-0.01em]">All names are taken</h3>
@@ -2887,7 +2887,7 @@ export default function DomainsPage() {
               <div
                 className="rounded-[28px] border border-[#E8D4B0]/20 p-7 mt-8 backdrop-blur-xl"
                 style={{
-                  background: "linear-gradient(135deg, rgba(232,212,176,0.06) 0%, rgba(17,17,24,0.85) 100%)",
+                  background: "linear-gradient(135deg, rgba(232,212,176,0.06) 0%, rgba(20,40,95,0.85) 100%)",
                   boxShadow: "0 1px 0 rgba(232,212,176,0.1) inset, 0 32px 80px -32px rgba(232,212,176,0.3)",
                 }}
               >
@@ -2966,7 +2966,7 @@ export default function DomainsPage() {
                 key={t.tld}
                 onClick={() => { setSelectedTlds(new Set([t.tld])); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                 className="group relative rounded-[24px] border border-white/[0.08] p-7 text-left transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/30 backdrop-blur-xl"
-                style={{ background: "linear-gradient(135deg, rgba(17,17,24,0.65) 0%, rgba(10,10,15,0.45) 100%)" }}
+                style={{ background: "linear-gradient(135deg, rgba(20,40,95,0.65) 0%, rgba(10,10,15,0.45) 100%)" }}
               >
                 {t.popular && (
                   <span className="absolute top-4 right-4 text-[10px] px-2.5 py-0.5 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] text-[#E8D4B0] font-semibold uppercase tracking-[0.1em]">
@@ -3047,7 +3047,7 @@ export default function DomainsPage() {
                 <div
                   key={f.title}
                   className="rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25 backdrop-blur-xl"
-                  style={{ background: "linear-gradient(135deg, rgba(17,17,24,0.65) 0%, rgba(10,10,15,0.45) 100%)" }}
+                  style={{ background: "linear-gradient(135deg, rgba(20,40,95,0.65) 0%, rgba(10,10,15,0.45) 100%)" }}
                 >
                   <div
                     className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5"
@@ -3096,7 +3096,7 @@ export default function DomainsPage() {
 
           <div
             className="rounded-[28px] border border-white/[0.08] overflow-hidden backdrop-blur-xl"
-            style={{ background: "linear-gradient(135deg, rgba(17,17,24,0.75) 0%, rgba(10,10,15,0.55) 100%)" }}
+            style={{ background: "linear-gradient(135deg, rgba(20,40,95,0.75) 0%, rgba(10,10,15,0.55) 100%)" }}
           >
             <div className="grid grid-cols-4 px-6 py-5 border-b border-white/[0.06]" style={{ background: "rgba(232,212,176,0.03)" }}>
               <div className="text-[11px] font-semibold text-white/50 uppercase tracking-[0.15em]">Feature</div>

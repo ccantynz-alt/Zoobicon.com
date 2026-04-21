@@ -486,7 +486,7 @@ SCRIPT_2:
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#060e1f] text-white relative overflow-hidden fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[#0b1530] text-white relative overflow-hidden fs-grain pt-[72px]">
       {/* Ambient cinematic glow — matches Filmora standard */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
         <div
@@ -501,7 +501,7 @@ SCRIPT_2:
       </div>
 
       {/* Step indicator sub-header — below global nav */}
-      <div className="relative z-40 border-b border-white/[0.04] bg-[#060e1f]/60 backdrop-blur-xl">
+      <div className="relative z-40 border-b border-white/[0.04] bg-[#0b1530]/60 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-2.5">
             <div
@@ -610,7 +610,7 @@ SCRIPT_2:
               <div
                 className="relative overflow-hidden rounded-[28px] border border-white/[0.08] backdrop-blur-xl transition-all focus-within:border-[#E8D4B0]/35"
                 style={{
-                  background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+                  background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)",
                   boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset, 0 24px 60px -28px rgba(0,0,0,0.7)",
                 }}
               >
@@ -717,7 +717,7 @@ SCRIPT_2:
                   style={{
                     background: selectedScript === i
                       ? "linear-gradient(135deg, rgba(232,212,176,0.07) 0%, rgba(224,139,176,0.04) 100%)"
-                      : "linear-gradient(135deg, rgba(17,17,24,0.6) 0%, rgba(10,10,15,0.4) 100%)",
+                      : "linear-gradient(135deg, rgba(20,40,95,0.6) 0%, rgba(10,10,15,0.4) 100%)",
                     boxShadow: selectedScript === i
                       ? "0 1px 0 rgba(232,212,176,0.15) inset, 0 28px 70px -32px rgba(232,212,176,0.35)"
                       : "0 1px 0 rgba(255,255,255,0.03) inset, 0 20px 50px -30px rgba(0,0,0,0.6)",

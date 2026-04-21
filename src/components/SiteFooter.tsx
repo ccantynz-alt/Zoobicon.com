@@ -33,7 +33,7 @@ export default function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative border-t border-white/[0.06] bg-[#060e1f] overflow-hidden">
+    <footer className="relative border-t border-white/[0.06] bg-[#0b1530] overflow-hidden">
       {/* Ambient warm glow — restrained, just enough to signal depth */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
         <div
@@ -48,7 +48,7 @@ export default function SiteFooter() {
           className="relative mb-20 overflow-hidden rounded-[32px] border border-white/[0.08] p-10 sm:p-14"
           style={{
             background:
-              "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(26,26,36,0.65) 100%)",
+              "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(26,26,36,0.65) 100%)",
           }}
         >
           <div

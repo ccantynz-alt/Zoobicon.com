@@ -122,7 +122,7 @@ export default function WebsiteBuilderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060e1f] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[#0b1530] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
@@ -218,7 +218,7 @@ export default function WebsiteBuilderPage() {
                 key={step.num}
                 className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
                 style={{
-                  background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+                  background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)",
                 }}
               >
                 <div
@@ -269,7 +269,7 @@ export default function WebsiteBuilderPage() {
                 key={f.title}
                 className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
                 style={{
-                  background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+                  background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)",
                 }}
               >
                 <div
@@ -316,7 +316,7 @@ export default function WebsiteBuilderPage() {
           <div
             className="overflow-hidden rounded-[28px] border border-white/[0.08]"
             style={{
-              background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+              background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)",
             }}
           >
             <div className="grid grid-cols-4 px-6 py-4 border-b border-white/[0.08] text-[11px] uppercase tracking-[0.15em] font-semibold text-white/55">

@@ -109,7 +109,7 @@ const statusBadge = (s: string) => {
   return <span className="px-2 py-0.5 rounded-full border border-white/15 bg-white/[0.05] text-white/55 text-[9px] font-semibold">Open</span>;
 };
 
-const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const CARD_BG = "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)";
 const PRIMARY_CTA = {
   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
   color: "#0a1628",
@@ -179,7 +179,7 @@ export default function EmailSupportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060e1f] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[#0b1530] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
@@ -446,7 +446,7 @@ export default function EmailSupportPage() {
                 }`}
                 style={{
                   background: tier.highlighted
-                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(17,17,24,0.85) 100%)"
+                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(20,40,95,0.85) 100%)"
                     : CARD_BG,
                 }}
               >

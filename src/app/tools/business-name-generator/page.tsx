@@ -193,7 +193,7 @@ export default function BusinessNameGeneratorPage() {
     Object.values(n.domains).filter(d => d.available === true).length;
 
   return (
-    <div className="min-h-screen bg-[#060e1f] text-white">
+    <div className="min-h-screen bg-[#0b1530] text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Nav */}
@@ -233,7 +233,7 @@ export default function BusinessNameGeneratorPage() {
         {/* Canonical banner — point power users to the unified search */}
         <div
           className="mb-8 rounded-2xl border border-[#E8D4B0]/20 p-4 sm:p-5 flex items-start sm:items-center justify-between gap-4 flex-wrap"
-          style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.06) 0%, rgba(17,17,24,0.7) 100%)" }}
+          style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.06) 0%, rgba(20,40,95,0.7) 100%)" }}
         >
           <div className="flex items-start gap-3 min-w-0">
             <div
@@ -275,7 +275,7 @@ export default function BusinessNameGeneratorPage() {
             onChange={(e) => setDescription(e.target.value)}
             placeholder="e.g. A modern coffee roastery in Auckland that delivers fresh beans nationwide..."
             rows={3}
-            className="w-full px-4 py-3 bg-[#060e1f] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/30 focus:border-stone-500/30 mb-4 resize-none"
+            className="w-full px-4 py-3 bg-[#0b1530] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/30 focus:border-stone-500/30 mb-4 resize-none"
           />
 
           {/* Industry */}
