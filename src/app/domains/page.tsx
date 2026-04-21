@@ -1363,7 +1363,7 @@ export default function DomainsPage() {
             {/* Cart summary */}
             <div
               className="mb-6 p-5 rounded-[20px] border border-[#E8D4B0]/15"
-              style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.6) 100%)" }}
+              style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.10) 0%, rgba(38,70,140,0.92) 100%)" }}
             >
               <p className="text-[11px] uppercase tracking-[0.15em] font-semibold text-[#E8D4B0]/75 mb-2">{cart.length} domain{cart.length > 1 ? "s" : ""}</p>
               {cart.map(c => (
@@ -1974,13 +1974,16 @@ export default function DomainsPage() {
                       key={c.name}
                       className={`rounded-[20px] border p-5 transition-all duration-500 backdrop-blur-xl ${
                         c.anyAvailable
-                          ? "border-[#E8D4B0]/15 hover:border-[#E8D4B0]/30 hover:-translate-y-0.5"
-                          : "border-white/[0.06] opacity-55"
+                          ? "border-[#E8D4B0]/30 hover:border-[#E8D4B0]/50 hover:-translate-y-0.5"
+                          : "border-white/10 opacity-55"
                       }`}
                       style={{
                         background: c.anyAvailable
-                          ? "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.7) 100%)"
-                          : "rgba(255,255,255,0.02)",
+                          ? "linear-gradient(135deg, rgba(232,212,176,0.10) 0%, rgba(38,70,140,0.92) 100%)"
+                          : "rgba(36,60,120,0.55)",
+                        boxShadow: c.anyAvailable
+                          ? "0 20px 40px -20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(232,212,176,0.1)"
+                          : undefined,
                       }}
                     >
                       <div className="flex items-start justify-between gap-3 mb-2">
@@ -2091,7 +2094,7 @@ export default function DomainsPage() {
             <div className="space-y-3 mb-8">
               {/* Checking — show while still loading */}
               {results.filter(r => r.checking).map(r => (
-                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl border border-white/[0.05] bg-white/[0.02]">
+                <div key={r.domain} className="flex items-center justify-between p-5 rounded-2xl border border-white/15 bg-[rgba(36,60,120,0.55)]">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center">
                       <Loader2 className="w-5 h-5 text-white/40 animate-spin" />
@@ -2105,8 +2108,8 @@ export default function DomainsPage() {
               {/* No available results — suggest alternatives */}
               {!searching && !results.some(r => r.checking) && availableResults.length === 0 && results.length > 0 && !autoGenerating && (
                 <div
-                  className="rounded-[24px] border border-[#E8D4B0]/15 p-8 text-center backdrop-blur-xl"
-                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.8) 100%)" }}
+                  className="rounded-[24px] border border-[#E8D4B0]/30 p-8 text-center backdrop-blur-xl shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)]"
+                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.10) 0%, rgba(38,70,140,0.92) 100%)" }}
                 >
                   <div
                     className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
@@ -2151,8 +2154,8 @@ export default function DomainsPage() {
               {/* Auto-generating alternatives */}
               {autoGenerating && (
                 <div
-                  className="rounded-[24px] border border-[#E8D4B0]/15 p-8 text-center backdrop-blur-xl"
-                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.8) 100%)" }}
+                  className="rounded-[24px] border border-[#E8D4B0]/30 p-8 text-center backdrop-blur-xl shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)]"
+                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.10) 0%, rgba(38,70,140,0.92) 100%)" }}
                 >
                   <div
                     className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
@@ -2199,8 +2202,11 @@ export default function DomainsPage() {
                 return (
                 <div
                   key={r.domain}
-                  className="group rounded-2xl border border-[#E8D4B0]/15 transition-all duration-500 hover:border-[#E8D4B0]/30 hover:-translate-y-0.5 overflow-hidden"
-                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.6) 100%)" }}
+                  className="group rounded-2xl border border-[#E8D4B0]/30 transition-all duration-500 hover:border-[#E8D4B0]/50 hover:-translate-y-0.5 overflow-hidden"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(232,212,176,0.10) 0%, rgba(38,70,140,0.92) 100%)",
+                    boxShadow: "0 20px 40px -20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(232,212,176,0.1)",
+                  }}
                 >
                   <div className="flex items-center justify-between p-5 flex-wrap gap-4">
                     <div className="flex items-center gap-3 min-w-0">
@@ -2563,14 +2569,14 @@ export default function DomainsPage() {
                 return (
                   <div
                     key={gn.name}
-                    className={`rounded-[24px] border p-6 transition-all duration-500 backdrop-blur-xl ${
+                    className={`rounded-[24px] border p-6 transition-all duration-500 backdrop-blur-xl shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)] ${
                       hasAvailable
-                        ? "border-[#E8D4B0]/15 hover:border-[#E8D4B0]/25 hover:-translate-y-0.5"
-                        : "border-white/[0.06]"
+                        ? "border-[#E8D4B0]/30 hover:border-[#E8D4B0]/50 hover:-translate-y-0.5"
+                        : "border-white/15"
                     } ${allTaken ? "opacity-55" : ""}`}
                     style={{
                       background: hasAvailable
-                        ? "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.7) 100%)"
+                        ? "linear-gradient(135deg, rgba(232,212,176,0.10) 0%, rgba(38,70,140,0.92) 100%)"
                         : "rgba(255,255,255,0.02)",
                     }}
                   >
@@ -2860,8 +2866,8 @@ export default function DomainsPage() {
                 generatedNames.every((gn) => gn.domains.every((d) => !d.checking)) &&
                 !generatedNames.some((gn) => gn.domains.some((d) => d.available === true)) && (
                 <div
-                  className="rounded-[24px] border border-[#E8D4B0]/15 p-8 text-center backdrop-blur-xl"
-                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.04) 0%, rgba(20,40,95,0.7) 100%)" }}
+                  className="rounded-[24px] border border-[#E8D4B0]/30 p-8 text-center backdrop-blur-xl shadow-[0_20px_40px_-20px_rgba(0,0,0,0.5)]"
+                  style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.10) 0%, rgba(38,70,140,0.92) 100%)" }}
                 >
                   <Sparkles className="w-8 h-8 text-[#E8D4B0] mx-auto mb-3" />
                   <h3 className="text-[18px] font-semibold text-white mb-2 tracking-[-0.01em]">All names are taken</h3>
