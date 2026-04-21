@@ -111,7 +111,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
           // Determine model: Sonnet first, escalate to Opus if score < 60 after pass 1
           let model = "claude-sonnet-4-6";
           if (i > 1 && records.length > 0 && records[records.length - 1].score < 60) {
-            model = "claude-opus-4-6";
+            model = "claude-opus-4-7";
           }
 
           const startTime = Date.now();
@@ -218,7 +218,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
   };
 
   const getModelLabel = (model: string) => {
-    if (model === "claude-opus-4-6") return "Opus";
+    if (model === "claude-opus-4-7") return "Opus";
     return "Sonnet";
   };
 
@@ -386,7 +386,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
                 {/* Model badge */}
                 <span
                   className={`px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide shrink-0 ${
-                    iter.model === "claude-opus-4-6"
+                    iter.model === "claude-opus-4-7"
                       ? "bg-stone-500/20 text-stone-400 border border-stone-500/30"
                       : "bg-stone-500/20 text-stone-400 border border-stone-500/30"
                   }`}
@@ -395,7 +395,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
                 </span>
 
                 {/* Escalation indicator */}
-                {iter.model === "claude-opus-4-6" && iter.pass > 1 && (
+                {iter.model === "claude-opus-4-7" && iter.pass > 1 && (
                   <ArrowUp className="w-3 h-3 text-stone-400 shrink-0 -ml-1.5" />
                 )}
 

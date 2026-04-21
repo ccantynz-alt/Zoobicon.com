@@ -297,7 +297,7 @@ export default function LiveBuildDemo() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               <Sparkles className="h-2.5 w-2.5 text-white/50" />
-              <span className="font-mono text-white/50">Opus 4.6</span>
+              <span className="font-mono text-white/50">Opus 4.7</span>
             </div>
             <span className="text-white/20">·</span>
             <span className="font-mono text-white/40">

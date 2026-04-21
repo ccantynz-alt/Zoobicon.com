@@ -202,7 +202,7 @@ export default function SiteFooter() {
             </span>
           </div>
           <div className="text-[11px] text-white/35">
-            © {year} Zoobicon Limited. Built on Opus 4.6.
+            © {year} Zoobicon Limited. Built on Opus 4.7.
           </div>
         </div>
       </div>

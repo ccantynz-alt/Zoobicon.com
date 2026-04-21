@@ -19,7 +19,7 @@ export interface LLMModel {
 export const AVAILABLE_MODELS: LLMModel[] = [
   // Claude (Anthropic)
   { provider: "claude", id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6", maxTokens: 64000, tier: "balanced" },
-  { provider: "claude", id: "claude-opus-4-6", label: "Claude Opus 4.6", maxTokens: 64000, tier: "premium" },
+  { provider: "claude", id: "claude-opus-4-7", label: "Claude Opus 4.7", maxTokens: 64000, tier: "premium" },
   { provider: "claude", id: "claude-haiku-4-5-20251001", label: "Claude Haiku 4.5", maxTokens: 8192, tier: "fast" },
   // OpenAI
   { provider: "openai", id: "gpt-4o", label: "GPT-4o", maxTokens: 16384, tier: "balanced" },

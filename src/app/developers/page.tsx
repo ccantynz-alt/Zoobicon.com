@@ -37,7 +37,7 @@ type Endpoint = {
 
 const endpoints: Endpoint[] = [
   { method: "POST", path: "/api/v1/sites", description: "Generate a complete React site from a single prompt.", snippet: `{ "prompt": "saas landing for a dog walking app" }`, icon: Rocket },
-  { method: "POST", path: "/api/v1/generate", description: "Lower-level generation endpoint with model + agent control.", snippet: `{ "prompt": "...", "model": "claude-opus-4-6" }`, icon: Code },
+  { method: "POST", path: "/api/v1/generate", description: "Lower-level generation endpoint with model + agent control.", snippet: `{ "prompt": "...", "model": "claude-opus-4-7" }`, icon: Code },
   { method: "POST", path: "/api/v1/deploy", description: "Deploy a generated site to a live zoobicon.sh subdomain.", snippet: `{ "siteId": "abc123", "slug": "my-site" }`, icon: Rocket },
   { method: "POST", path: "/api/v1/video/generate", description: "Produce a talking-avatar video from a script. Fish Speech + OmniHuman.", snippet: `{ "script": "Hello world" }`, icon: Video },
   { method: "POST", path: "/api/v1/transcribe", description: "Speech-to-text transcription with speaker diarization.", snippet: `{ "audioUrl": "https://..." }`, icon: Activity },

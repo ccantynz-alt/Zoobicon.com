@@ -127,7 +127,7 @@ const FAQS = [
   },
   {
     q: "What AI models power the builder?",
-    a: "Every plan uses Claude Opus 4.6 for the core developer agent, the most powerful AI model available. We also use Claude Haiku for planning and Sonnet for enhancements. Same quality across all tiers.",
+    a: "Every plan uses Claude Opus 4.7 for the core developer agent, the most powerful AI model available. We also use Claude Haiku for planning and Sonnet for enhancements. Same quality across all tiers.",
   },
   {
     q: "Do you offer refunds?",

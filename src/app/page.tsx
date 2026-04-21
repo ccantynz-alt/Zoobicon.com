@@ -27,7 +27,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 // ── Trust strip data (verifiable, never inflated) ──
 const TRUST_ITEMS = [
-  { label: "Opus 4.6", sub: "Latest Claude" },
+  { label: "Opus 4.7", sub: "Latest Claude" },
   { label: "Next.js 15", sub: "App Router" },
   { label: "Vercel Edge", sub: "iad1 region" },
   { label: "Stripe Verified", sub: "Live Connect" },
@@ -101,7 +101,7 @@ const DOMAINS = [
   {
     name: "zoobicon.ai",
     role: "The AI brain",
-    desc: "Seven agents, Opus 4.6, Fish Audio S1. The model stack we run on.",
+    desc: "Seven agents, Opus 4.7, Fish Audio S1. The model stack we run on.",
     cta: "See the agents",
     href: "/ai",
     color: "violet" as const,

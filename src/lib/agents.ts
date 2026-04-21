@@ -630,7 +630,7 @@ export async function runPipeline(
   // Total: ~95s — well within 300s
   const MODEL_PLANNER = userModel || "claude-haiku-4-5-20251001";   // Fast JSON agents (strategy, brand, copy, architecture)
   const MODEL_BALANCED = userModel || "claude-sonnet-4-6";           // Enhancement agents (SEO, animation)
-  const MODEL_PREMIUM = userModel || "claude-opus-4-6";              // Developer agent — Opus for jaw-dropping output
+  const MODEL_PREMIUM = userModel || "claude-opus-4-7";              // Developer agent — Opus for jaw-dropping output
 
   // Helper: call the right LLM based on user selection
   // Returns { text, stopReason } so we can detect truncation
@@ -647,7 +647,7 @@ export async function runPipeline(
     } else {
       // Direct Anthropic SDK for Claude models
       // Timeout: 60s for planners, 180s for Opus builder, 120s for Sonnet enhancers
-      const timeoutMs = opts.model === "claude-opus-4-6" ? 180_000
+      const timeoutMs = opts.model === "claude-opus-4-7" ? 180_000
         : opts.maxTokens <= 16384 ? 60_000 : 120_000;
       const client = new Anthropic({ apiKey, timeout: timeoutMs });
       const messages: { role: "user" | "assistant"; content: string }[] = [
@@ -684,7 +684,7 @@ export async function runPipeline(
         return await callWithModel(opts.model);
       } catch (err) {
         // If Opus fails, automatically fall back to Sonnet (still good quality)
-        if (opts.model === "claude-opus-4-6") {
+        if (opts.model === "claude-opus-4-7") {
           console.warn(`[Pipeline] Opus failed (${err instanceof Error ? err.message : "unknown"}), falling back to Sonnet`);
           return await callWithModel("claude-sonnet-4-6");
         }

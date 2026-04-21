@@ -150,7 +150,7 @@ export async function GET(req: NextRequest) {
     const s4Start = Date.now();
     try {
       const res = await client.messages.create({
-        model: "claude-opus-4-6",
+        model: "claude-opus-4-7",
         max_tokens: 8192,
         system: "You are a web developer. Build a simple but complete HTML page. Output ONLY raw HTML starting with <!DOCTYPE html>. Include a nav, hero, one content section, and footer. Use inline styles. No code fences.",
         messages: [{ role: "user", content: `Build a simple page for: ${testPrompt}\n\nIMPORTANT: Start your response IMMEDIATELY with <!DOCTYPE html>. Output raw HTML only.` }],
@@ -166,7 +166,7 @@ export async function GET(req: NextRequest) {
 
       steps.push({
         step: "4. Developer (Opus) — THE CRITICAL STEP",
-        model: "claude-opus-4-6",
+        model: "claude-opus-4-7",
         status: hasBody && bodyChars > 50 ? "pass" : "fail",
         durationMs: Date.now() - s4Start,
         outputChars: text.length,
@@ -177,7 +177,7 @@ export async function GET(req: NextRequest) {
       const errMsg = err instanceof Error ? err.message : String(err);
       steps.push({
         step: "4. Developer (Opus) — THE CRITICAL STEP",
-        model: "claude-opus-4-6",
+        model: "claude-opus-4-7",
         status: "fail",
         durationMs: Date.now() - s4Start,
         outputChars: 0,

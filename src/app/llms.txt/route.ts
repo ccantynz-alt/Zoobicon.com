@@ -18,7 +18,7 @@ Zoobicon is an AI-powered website builder that uses a multi-agent pipeline (7 sp
 - Website: https://zoobicon.com
 - Domains: zoobicon.com, zoobicon.ai, zoobicon.io, zoobicon.sh, dominat8.io
 - Category: AI Website Builder, SaaS Platform
-- AI Models: Claude Opus 4.6, GPT-4o, Gemini 2.5 Pro
+- AI Models: Claude Opus 4.7, GPT-4o, Gemini 2.5 Pro
 - Pipeline: 7-agent (Strategist → Brand Designer → Copywriter → Architect → Developer → SEO Agent → Animation Agent)
 - Generation time: ~60-95 seconds for a complete website
 - Templates: 100+ across 13 categories
