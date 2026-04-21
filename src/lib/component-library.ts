@@ -51,7 +51,7 @@ ul, ol { list-style: none; }
   border: 2px solid var(--color-primary, #2563eb);
 }
 .btn-secondary:hover { background: color-mix(in srgb, var(--color-primary, #2563eb) 8%, transparent); transform: translateY(-2px); }
-.btn-ghost { background: transparent; color: var(--color-text, #1a1a2e); }
+.btn-ghost { background: transparent; color: var(--color-text, #0f2148); }
 .btn-ghost:hover { background: var(--color-surface, #f1f5f9); }
 .btn-lg { padding: 1rem 2.25rem; font-size: 1.0625rem; }
 .btn-sm { padding: 0.5rem 1.25rem; font-size: 0.8125rem; }
@@ -77,7 +77,7 @@ ul, ol { list-style: none; }
 .input {
   width: 100%; padding: 0.75rem 1rem; border-radius: 8px;
   border: 1.5px solid var(--color-border, #e2e8f0);
-  background: var(--color-surface, #fff); color: var(--color-text, #1a1a2e);
+  background: var(--color-surface, #fff); color: var(--color-text, #0f2148);
   font-size: 0.9375rem; transition: all 0.2s;
 }
 .input:focus { border-color: var(--color-primary, #2563eb); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary, #2563eb) 15%, transparent); }
@@ -205,7 +205,7 @@ ul, ol { list-style: none; }
   width: 100%; display: flex; justify-content: space-between; align-items: center;
   padding: 1.25rem 0; background: none; border: none; cursor: pointer;
   font-size: 1.0625rem; font-weight: 600; text-align: left;
-  color: var(--color-text, #1a1a2e); transition: color 0.2s;
+  color: var(--color-text, #0f2148); transition: color 0.2s;
 }
 .faq-question:hover { color: var(--color-primary, #2563eb); }
 .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
@@ -380,7 +380,7 @@ ul, ol { list-style: none; }
 .carousel-nav { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); display: flex; gap: 0.5rem; z-index: 10; }
 .carousel-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; background: transparent; cursor: pointer; transition: all 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 .carousel-dot.active { background: #fff; }
-.carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 10; font-size: 1.25rem; color: #1a1a2e; transition: all 0.3s; }
+.carousel-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 10; font-size: 1.25rem; color: #0f2148; transition: all 0.3s; }
 .carousel-arrow:hover { background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
 .carousel-arrow-prev { left: 1rem; }
 .carousel-arrow-next { right: 1rem; }

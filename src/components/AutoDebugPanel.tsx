@@ -233,7 +233,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
   return (
     <div className="flex flex-col gap-3">
       {/* Auto-Fix Toggle & Target Score */}
-      <div className="flex flex-col gap-2 p-3 rounded-lg border border-white/10 bg-[#0a0a0f]">
+      <div className="flex flex-col gap-2 p-3 rounded-lg border border-white/10 bg-[#0a1628]">
         {/* Auto-Fix Toggle */}
         <label className="flex items-center justify-between cursor-pointer">
           <div className="flex items-center gap-2">
@@ -330,7 +330,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
 
       {/* Iteration History (autonomous mode) */}
       {iterations.length > 0 && (
-        <div className="rounded-lg border border-white/10 bg-[#0a0a0f] overflow-hidden">
+        <div className="rounded-lg border border-white/10 bg-[#0a1628] overflow-hidden">
           <div className="flex items-center gap-2 p-3 border-b border-white/5">
             <RotateCw className="w-4 h-4 text-stone-400" />
             <span className="text-sm font-medium text-white">Iteration History</span>
@@ -436,7 +436,7 @@ export default function AutoDebugPanel({ code, onApplyFix }: AutoDebugPanelProps
 
       {/* Results Panel */}
       {result && !isAutoRunning && (
-        <div className="rounded-lg border border-white/10 bg-[#0a0a0f] overflow-hidden">
+        <div className="rounded-lg border border-white/10 bg-[#0a1628] overflow-hidden">
           {/* Header with score */}
           <button
             onClick={() => setIsExpanded(!isExpanded)}

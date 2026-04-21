@@ -60,7 +60,7 @@ registerComponent({
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const links = ["Features", "Pricing", "FAQ", "Contact"];
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-gray-800/50">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-navy-950/80 backdrop-blur-xl border-b border-gray-800/50">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center">
@@ -84,7 +84,7 @@ registerComponent({
         </button>
       </div>
       {mobileOpen && (
-        <div className="md:hidden bg-gray-950/95 backdrop-blur-xl border-t border-gray-800 px-6 py-4 space-y-3">
+        <div className="md:hidden bg-navy-950/95 backdrop-blur-xl border-t border-gray-800 px-6 py-4 space-y-3">
           {links.map(l => (
             <a key={l} href={\`#\${l.toLowerCase()}\`} className="block text-sm font-medium text-gray-300 py-2">{l}</a>
           ))}

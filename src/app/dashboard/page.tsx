@@ -189,10 +189,10 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050508]">
+    <div className="relative min-h-screen bg-[#060e1f]">
       <BackgroundEffects preset="admin" />
       {/* Top Nav */}
-      <nav className="border-b border-white/10 bg-[#050508]/90 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/10 bg-[#060e1f]/90 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">

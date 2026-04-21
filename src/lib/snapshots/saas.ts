@@ -6,7 +6,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/5">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-navy-950/80 backdrop-blur-xl border-b border-white/5">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
@@ -40,7 +40,7 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div className="md:hidden bg-slate-950/95 backdrop-blur-xl border-t border-white/5 px-6 py-4 space-y-3">
+        <div className="md:hidden bg-navy-950/95 backdrop-blur-xl border-t border-white/5 px-6 py-4 space-y-3">
           <a href="#features" className="block text-sm text-slate-300 hover:text-white">Features</a>
           <a href="#how-it-works" className="block text-sm text-slate-300 hover:text-white">How It Works</a>
           <a href="#pricing" className="block text-sm text-slate-300 hover:text-white">Pricing</a>
@@ -223,7 +223,7 @@ export default function Features() {
                   alt={f.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/50 to-transparent" />
               </div>
               <div className="p-6">
                 <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center mb-4">
@@ -403,7 +403,7 @@ const footer = `import React from "react";
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-950 border-t border-white/5 pt-16 pb-8 px-6">
+    <footer className="bg-navy-950 border-t border-white/5 pt-16 pb-8 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-5 gap-12 mb-12">
           <div className="md:col-span-2">

@@ -33,7 +33,7 @@ export default function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative border-t border-white/[0.06] bg-[#050508] overflow-hidden">
+    <footer className="relative border-t border-white/[0.06] bg-[#060e1f] overflow-hidden">
       {/* Ambient warm glow — restrained, just enough to signal depth */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
         <div
@@ -85,7 +85,7 @@ export default function SiteFooter() {
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
                 style={{
                   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                  color: "#0a0a0f",
+                  color: "#0a1628",
                   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                 }}
               >
@@ -185,7 +185,7 @@ export default function SiteFooter() {
               links={[
                 { name: "Sign in", href: "/auth/login" },
                 { name: "Create account", href: "/auth/signup" },
-                { name: "Contact", href: "/contact" },
+                { name: "Contact", href: "/support" },
                 { name: "Legal", href: "/disclaimers" },
                 { name: "Privacy", href: "/privacy" },
               ]}

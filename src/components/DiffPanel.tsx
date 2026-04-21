@@ -159,7 +159,7 @@ export default function DiffPanel({
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative ml-auto w-full max-w-5xl bg-[#0a0a0f] border-l border-white/[0.06] flex h-full">
+      <div className="relative ml-auto w-full max-w-5xl bg-[#0a1628] border-l border-white/[0.06] flex h-full">
         {/* Left sidebar — snapshot list */}
         <div className="w-64 flex-shrink-0 border-r border-white/[0.06] flex flex-col">
           <div className="p-4 border-b border-white/[0.06]">

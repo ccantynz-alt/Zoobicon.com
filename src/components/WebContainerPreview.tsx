@@ -417,9 +417,9 @@ createRoot(document.getElementById("root")!).render(<App />);
           : "Initializing...";
 
   return (
-    <div className="relative h-full w-full bg-gray-950">
+    <div className="relative h-full w-full bg-navy-950">
       {isLoading && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-gray-950/90">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-navy-950/90">
           <div className="relative">
             <div className="w-10 h-10 rounded-full border-2 border-stone-500/20 border-t-violet-500 animate-spin" />
           </div>

@@ -122,7 +122,7 @@ export default function WebsiteBuilderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[#060e1f] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
@@ -172,7 +172,7 @@ export default function WebsiteBuilderPage() {
               className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
               style={{
                 background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                color: "#0a0a0f",
+                color: "#0a1628",
                 boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
               }}
             >
@@ -385,7 +385,7 @@ export default function WebsiteBuilderPage() {
             className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
             style={{
               background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-              color: "#0a0a0f",
+              color: "#0a1628",
               boxShadow: "0 14px 40px -16px rgba(232,212,176,0.55)",
             }}
           >

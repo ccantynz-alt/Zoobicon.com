@@ -701,7 +701,7 @@ export default function DomainsPage() {
   const cartTotal = cart.reduce((sum, c) => sum + c.price, 0);
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[#060e1f] text-white fs-grain pt-[72px]">
 
       {/* ═══════════════════════════════════════════ */}
       {/* CHECKOUT FORM MODAL                        */}
@@ -824,7 +824,7 @@ export default function DomainsPage() {
                 className="w-full py-3.5 mt-3 rounded-2xl font-semibold text-[14px] transition-all duration-500 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 style={{
                   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                  color: "#0a0a0f",
+                  color: "#0a1628",
                   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                 }}
               >
@@ -903,7 +903,7 @@ export default function DomainsPage() {
               onClick={() => setMode("search")}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-semibold transition-all duration-500 ${
                 mode === "search"
-                  ? "text-[#0a0a0f]"
+                  ? "text-[#0a1628]"
                   : "border border-white/[0.12] bg-white/[0.03] text-white/70 backdrop-blur hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
               }`}
               style={mode === "search" ? {
@@ -922,7 +922,7 @@ export default function DomainsPage() {
               }}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-semibold transition-all duration-500 ${
                 mode === "generate"
-                  ? "text-[#0a0a0f]"
+                  ? "text-[#0a1628]"
                   : "border border-white/[0.12] bg-white/[0.03] text-white/70 backdrop-blur hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
               }`}
               style={mode === "generate" ? {
@@ -998,7 +998,7 @@ export default function DomainsPage() {
                     className="px-8 py-4 rounded-2xl font-semibold text-[14px] flex items-center justify-center gap-2 disabled:opacity-40 transition-all duration-500 hover:-translate-y-0.5 shrink-0"
                     style={{
                       background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                      color: "#0a0a0f",
+                      color: "#0a1628",
                       boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                     }}
                   >
@@ -1040,7 +1040,7 @@ export default function DomainsPage() {
                       onClick={() => toggleTld(tld)}
                       className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-300 ${
                         selectedTlds.has(tld)
-                          ? "text-[#0a0a0f]"
+                          ? "text-[#0a1628]"
                           : "border border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/30 hover:text-[#E8D4B0]"
                       }`}
                       style={selectedTlds.has(tld) ? {
@@ -1113,7 +1113,7 @@ export default function DomainsPage() {
                         onClick={() => setGenStyle(s.id)}
                         className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-300 ${
                           genStyle === s.id
-                            ? "text-[#0a0a0f]"
+                            ? "text-[#0a1628]"
                             : "border border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/30 hover:text-[#E8D4B0]"
                         }`}
                         style={genStyle === s.id ? {
@@ -1136,7 +1136,7 @@ export default function DomainsPage() {
                         onClick={() => toggleTld(tld)}
                         className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-300 ${
                           selectedTlds.has(tld)
-                            ? "text-[#0a0a0f]"
+                            ? "text-[#0a1628]"
                             : "border border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/30 hover:text-[#E8D4B0]"
                         }`}
                         style={selectedTlds.has(tld) ? {
@@ -1156,7 +1156,7 @@ export default function DomainsPage() {
                   className="w-full py-4 rounded-2xl font-semibold text-[14px] flex items-center justify-center gap-2 disabled:opacity-40 transition-all duration-500 hover:-translate-y-0.5"
                   style={{
                     background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                    color: "#0a0a0f",
+                    color: "#0a1628",
                     boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                   }}
                 >
@@ -1277,7 +1277,7 @@ export default function DomainsPage() {
                       className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-[14px] transition-all duration-500 hover:-translate-y-0.5"
                       style={{
                         background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                        color: "#0a0a0f",
+                        color: "#0a1628",
                         boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                       }}
                     >
@@ -1319,7 +1319,7 @@ export default function DomainsPage() {
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-[14px] transition-all duration-500 hover:-translate-y-0.5"
                     style={{
                       background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                      color: "#0a0a0f",
+                      color: "#0a1628",
                       boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                     }}
                   >
@@ -1368,7 +1368,7 @@ export default function DomainsPage() {
                         className="px-5 py-2.5 rounded-full text-[13px] font-semibold flex items-center gap-1.5 transition-all duration-500 hover:-translate-y-0.5"
                         style={{
                           background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                          color: "#0a0a0f",
+                          color: "#0a1628",
                           boxShadow: "0 14px 30px -16px rgba(232,212,176,0.5)",
                         }}
                       >
@@ -1418,7 +1418,7 @@ export default function DomainsPage() {
                   className="w-full py-4 rounded-2xl font-semibold text-[15px] transition-all duration-500 hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center gap-2"
                   style={{
                     background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                    color: "#0a0a0f",
+                    color: "#0a1628",
                     boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                   }}
                 >
@@ -1770,7 +1770,7 @@ export default function DomainsPage() {
                                   className="px-4 py-2 rounded-full text-[12px] font-semibold flex items-center gap-1.5 transition-all duration-500 hover:-translate-y-0.5"
                                   style={{
                                     background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                                    color: "#0a0a0f",
+                                    color: "#0a1628",
                                     boxShadow: "0 10px 24px -12px rgba(232,212,176,0.5)",
                                   }}
                                 >
@@ -1902,7 +1902,7 @@ export default function DomainsPage() {
                                                   className="px-2.5 py-1 rounded-full text-[11px] font-semibold flex items-center gap-1 transition-all hover:-translate-y-0.5"
                                                   style={{
                                                     background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                                                    color: "#0a0a0f",
+                                                    color: "#0a1628",
                                                   }}
                                                 >
                                                   <ShoppingCart className="w-3 h-3" /> Add
@@ -1941,7 +1941,7 @@ export default function DomainsPage() {
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-[14px] transition-all duration-500 hover:-translate-y-0.5"
                     style={{
                       background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                      color: "#0a0a0f",
+                      color: "#0a1628",
                       boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                     }}
                   >
@@ -1989,7 +1989,7 @@ export default function DomainsPage() {
                   className="w-full py-4 rounded-2xl font-semibold text-[15px] transition-all duration-500 hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center gap-2"
                   style={{
                     background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                    color: "#0a0a0f",
+                    color: "#0a1628",
                     boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                   }}
                 >
@@ -2192,7 +2192,7 @@ export default function DomainsPage() {
               className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
               style={{
                 background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                color: "#0a0a0f",
+                color: "#0a1628",
                 boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
               }}
             >
@@ -2275,7 +2275,7 @@ export default function DomainsPage() {
                 className="px-6 py-3 rounded-full font-semibold text-[14px] transition-all duration-500 hover:-translate-y-0.5 disabled:opacity-50 flex items-center gap-2"
                 style={{
                   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                  color: "#0a0a0f",
+                  color: "#0a1628",
                   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                 }}
               >

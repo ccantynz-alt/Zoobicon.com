@@ -276,7 +276,7 @@ export default function BrandKitPage() {
                     onChange={(e) => setKit({ ...kit, typography: { ...kit.typography, headingFont: e.target.value } })}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   >
-                    {FONT_OPTIONS.map((f) => <option key={f} value={f} className="bg-[#1a1a2e]">{f}</option>)}
+                    {FONT_OPTIONS.map((f) => <option key={f} value={f} className="bg-[#0f2148]">{f}</option>)}
                   </select>
                 </div>
                 <div>
@@ -286,7 +286,7 @@ export default function BrandKitPage() {
                     onChange={(e) => setKit({ ...kit, typography: { ...kit.typography, bodyFont: e.target.value } })}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   >
-                    {FONT_OPTIONS.map((f) => <option key={f} value={f} className="bg-[#1a1a2e]">{f}</option>)}
+                    {FONT_OPTIONS.map((f) => <option key={f} value={f} className="bg-[#0f2148]">{f}</option>)}
                   </select>
                 </div>
               </div>
@@ -307,7 +307,7 @@ export default function BrandKitPage() {
                 </div>
               </div>
               {/* Preview */}
-              <div className="mt-6 bg-[#1a1a2e] border border-white/10 rounded-xl p-6" style={{ fontFamily: kit.typography.bodyFont }}>
+              <div className="mt-6 bg-[#0f2148] border border-white/10 rounded-xl p-6" style={{ fontFamily: kit.typography.bodyFont }}>
                 <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: kit.typography.headingFont }}>Heading Preview</h2>
                 <h3 className="text-lg font-semibold mb-2 text-white/70" style={{ fontFamily: kit.typography.headingFont }}>Subheading Preview</h3>
                 <p className="text-sm text-white/50">This is body text using {kit.typography.bodyFont}. It demonstrates how your content will look with the selected typography settings.</p>
@@ -381,7 +381,7 @@ export default function BrandKitPage() {
                   <RefreshCw className="w-3.5 h-3.5" /> Regenerate
                 </button>
               </div>
-              <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-5">
+              <div className="bg-[#0f2148] border border-white/10 rounded-xl p-5">
                 <p className="text-sm text-white/70 leading-relaxed italic">&ldquo;{voiceSample}&rdquo;</p>
               </div>
               <p className="text-xs text-white/30 mt-2">This is how AI will write content for your brand. Adjust the sliders to change the voice.</p>
@@ -401,8 +401,8 @@ export default function BrandKitPage() {
                   onChange={(e) => setKit({ ...kit, audience: { ...kit.audience, industry: e.target.value } })}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                 >
-                  <option value="" className="bg-[#1a1a2e]">Select industry...</option>
-                  {INDUSTRY_OPTIONS.map((i) => <option key={i} value={i} className="bg-[#1a1a2e]">{i}</option>)}
+                  <option value="" className="bg-[#0f2148]">Select industry...</option>
+                  {INDUSTRY_OPTIONS.map((i) => <option key={i} value={i} className="bg-[#0f2148]">{i}</option>)}
                 </select>
               </div>
               <div>

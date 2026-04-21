@@ -95,7 +95,7 @@ export default function VisualEditor({ active, onEdit, files, onToggle }: Visual
   return (
     <div className="absolute top-0 left-0 right-0 z-30">
       {/* Toolbar */}
-      <div className="flex items-center gap-1 px-3 py-2 bg-[#1a1a2e]/95 backdrop-blur-sm border-b border-white/10">
+      <div className="flex items-center gap-1 px-3 py-2 bg-[#0f2148]/95 backdrop-blur-sm border-b border-white/10">
         <div className="flex items-center gap-1 mr-3">
           {([
             { id: "select" as const, icon: Move, label: "Select" },
@@ -150,7 +150,7 @@ export default function VisualEditor({ active, onEdit, files, onToggle }: Visual
 
       {/* Quick edit panel — shows when element is selected */}
       {tool === "color" && (
-        <div className="mx-3 mt-2 p-3 rounded-xl bg-[#1a1a2e]/95 backdrop-blur-sm border border-white/10">
+        <div className="mx-3 mt-2 p-3 rounded-xl bg-[#0f2148]/95 backdrop-blur-sm border border-white/10">
           <div className="text-xs font-semibold text-white/70 mb-2">Quick Color Changes</div>
           <div className="grid grid-cols-2 gap-2">
             {[
@@ -174,7 +174,7 @@ export default function VisualEditor({ active, onEdit, files, onToggle }: Visual
       )}
 
       {tool === "text" && (
-        <div className="mx-3 mt-2 p-3 rounded-xl bg-[#1a1a2e]/95 backdrop-blur-sm border border-white/10">
+        <div className="mx-3 mt-2 p-3 rounded-xl bg-[#0f2148]/95 backdrop-blur-sm border border-white/10">
           <div className="text-xs font-semibold text-white/70 mb-2">Click any text in the preview to edit it</div>
           <p className="text-[10px] text-white/40">Or type an instruction below to change text via AI</p>
         </div>

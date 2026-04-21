@@ -309,7 +309,7 @@ export default function PortfolioPage() {
             </div>
             <div className="bg-white/5 rounded-2xl border border-white/10 p-8 mx-auto transition-all" style={{ maxWidth: viewport === 'desktop' ? '100%' : viewport === 'tablet' ? '768px' : '375px' }}>
               {/* Simulated Portfolio Preview */}
-              <div className="bg-[#0f0f1a] rounded-xl p-8 min-h-[600px]">
+              <div className="bg-[#0a1628] rounded-xl p-8 min-h-[600px]">
                 <nav className="flex items-center justify-between mb-12">
                   <span className="text-xl font-bold">{aboutInfo.name}</span>
                   <div className="flex gap-6 text-sm text-white/50">

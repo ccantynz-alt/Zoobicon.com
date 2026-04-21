@@ -486,7 +486,7 @@ SCRIPT_2:
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white relative overflow-hidden fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[#060e1f] text-white relative overflow-hidden fs-grain pt-[72px]">
       {/* Ambient cinematic glow — matches Filmora standard */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
         <div
@@ -501,7 +501,7 @@ SCRIPT_2:
       </div>
 
       {/* Step indicator sub-header — below global nav */}
-      <div className="relative z-40 border-b border-white/[0.04] bg-[#050508]/60 backdrop-blur-xl">
+      <div className="relative z-40 border-b border-white/[0.04] bg-[#060e1f]/60 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-2.5">
             <div
@@ -637,7 +637,7 @@ SCRIPT_2:
                     className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                     style={{
                       background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                      color: "#0a0a0f",
+                      color: "#0a1628",
                       boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                     }}
                   >
@@ -775,7 +775,7 @@ SCRIPT_2:
                   className="w-full py-5 rounded-full font-semibold text-[15px] transition-all duration-500 hover:-translate-y-0.5 flex items-center justify-center gap-2.5"
                   style={{
                     background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                    color: "#0a0a0f",
+                    color: "#0a1628",
                     boxShadow: "0 18px 48px -18px rgba(232,212,176,0.55)",
                   }}
                 >
@@ -952,7 +952,7 @@ SCRIPT_2:
                     className="w-full py-5 rounded-full font-semibold text-[15px] transition-all duration-500 hover:-translate-y-0.5 flex items-center justify-center gap-2.5 group/gen"
                     style={{
                       background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                      color: "#0a0a0f",
+                      color: "#0a1628",
                       boxShadow: "0 18px 48px -18px rgba(232,212,176,0.55)",
                     }}
                   >
@@ -1047,7 +1047,7 @@ SCRIPT_2:
                 className="flex-1 inline-flex items-center justify-center gap-2 rounded-full py-4 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
                 style={{
                   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                  color: "#0a0a0f",
+                  color: "#0a1628",
                   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                 }}
               >

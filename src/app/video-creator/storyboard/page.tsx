@@ -393,7 +393,7 @@ export default function VideoCreatorDashboard() {
   const [spokespersonAvatarId, setSpokespersonAvatarId] = useState("");
   const [spokespersonVoiceId, setSpokespersonVoiceId] = useState("");
   const [spokespersonFormat, setSpokespersonFormat] = useState<"portrait" | "landscape" | "square">("portrait");
-  const [spokespersonBg, setSpokespersonBg] = useState("#1a1a2e");
+  const [spokespersonBg, setSpokespersonBg] = useState("#0f2148");
   const [spokespersonGenerating, setSpokespersonGenerating] = useState(false);
   const [spokespersonVideoId, setSpokespersonVideoId] = useState<string | null>(null);
   const [spokespersonVideoUrl, setSpokespersonVideoUrl] = useState<string | null>(null);

@@ -193,7 +193,7 @@ export default function BusinessNameGeneratorPage() {
     Object.values(n.domains).filter(d => d.available === true).length;
 
   return (
-    <div className="min-h-screen bg-[#0a0a14] text-white">
+    <div className="min-h-screen bg-[#060e1f] text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Nav */}
@@ -240,7 +240,7 @@ export default function BusinessNameGeneratorPage() {
             onChange={(e) => setDescription(e.target.value)}
             placeholder="e.g. A modern coffee roastery in Auckland that delivers fresh beans nationwide..."
             rows={3}
-            className="w-full px-4 py-3 bg-[#0a0a14] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/30 focus:border-stone-500/30 mb-4 resize-none"
+            className="w-full px-4 py-3 bg-[#060e1f] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/30 focus:border-stone-500/30 mb-4 resize-none"
           />
 
           {/* Industry */}

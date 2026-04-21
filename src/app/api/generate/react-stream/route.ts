@@ -293,7 +293,7 @@ This site ships on the Zoobicon editorial preset. It is a restrained, world-stag
   light: `
 LIGHT / BRIGHT DESIGN SYSTEM — MANDATORY
 This site ships BRIGHT, AIRY, and WELCOMING — the visual opposite of the dark-tech default. You MUST:
-- Backgrounds are WHITE (bg-white) or very light (bg-slate-50, bg-stone-50). NEVER bg-gray-900, bg-gray-950, bg-black, bg-[#0a0a0f], or any other dark background. If the base component has a dark background class, REPLACE it with bg-white.
+- Backgrounds are WHITE (bg-white) or very light (bg-slate-50, bg-stone-50). NEVER bg-gray-900, bg-navy-950, bg-black, bg-[#0a1628], or any other dark background. If the base component has a dark background class, REPLACE it with bg-white.
 - Primary text is dark on light: text-slate-900, text-stone-900, text-slate-800. Body text text-slate-600 or text-stone-600.
 - Accent color is allowed and encouraged — pick ONE family (blue-600, indigo-600, sky-600, emerald-600, teal-600) and use it consistently for buttons, links, and highlights. Do NOT mix multiple accent colors.
 - Borders are light: border-slate-200, border-stone-200, border-gray-200.
@@ -314,7 +314,7 @@ This site ships on a warm cream + amber palette. Restaurant, bakery, hospitality
   dark: `
 DARK DESIGN SYSTEM — MANDATORY
 This site ships DARK. You MUST:
-- Backgrounds are dark: bg-gray-950, bg-[#0a0a0f], bg-slate-950, bg-zinc-950.
+- Backgrounds are dark: bg-navy-950, bg-[#0a1628], bg-navy-950, bg-zinc-950.
 - Primary text is light: text-white, text-slate-100, text-stone-100. Body text text-slate-400 or text-slate-300.
 - Accent color is neon-ish — cyan-400, emerald-400, violet-500, fuchsia-500 — pick ONE and stick with it.
 - Borders are subtle white: border-white/10, border-slate-800.
@@ -739,7 +739,7 @@ export async function POST(req: NextRequest): Promise<Response> {
             // renders in the correct theme even when the LLM ignores the
             // system prompt. This is the HARD FIX for "every site comes
             // out dark even when it's an airport shuttle service": when
-            // theme is "light", reskinLight swaps bg-gray-950 → bg-white,
+            // theme is "light", reskinLight swaps bg-navy-950 → bg-white,
             // text-white → text-stone-900, etc. When theme is "editorial",
             // reskinEditorial collapses vibrant colors into stone. When
             // theme is "dark", pass through unchanged. All reskins are

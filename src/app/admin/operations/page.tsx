@@ -167,7 +167,7 @@ export default function OperationsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#131520] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0f2148] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-stone-400 animate-spin" />
       </div>
     );
@@ -177,7 +177,7 @@ export default function OperationsPage() {
   const healthColor = healthStatus === "healthy" ? "emerald" : healthStatus === "degraded" ? "yellow" : "red";
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white p-4 md:p-8">
+    <div className="min-h-screen bg-[#0f2148] text-white p-4 md:p-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>

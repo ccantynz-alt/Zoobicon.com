@@ -168,7 +168,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050508] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
+    <div className="relative min-h-screen bg-[#060e1f] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
       {/* ── structured data ── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -314,7 +314,7 @@ export default function PricingPage() {
                             className="whitespace-nowrap rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em]"
                             style={{
                               background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                              color: "#0a0a0f",
+                              color: "#0a1628",
                               boxShadow: "0 10px 24px -10px rgba(232,212,176,0.55)",
                             }}
                           >
@@ -402,7 +402,7 @@ export default function PricingPage() {
                           className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
                           style={plan.featured ? {
                             background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                            color: "#0a0a0f",
+                            color: "#0a1628",
                             boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                           } : {
                             background: "rgba(255,255,255,0.03)",
@@ -583,7 +583,7 @@ export default function PricingPage() {
                     className="group inline-flex items-center gap-2 rounded-full px-7 py-4 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
                     style={{
                       background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                      color: "#0a0a0f",
+                      color: "#0a1628",
                       boxShadow: "0 18px 48px -18px rgba(232,212,176,0.55)",
                     }}
                   >

@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 
 const THEMES = [
-  { id: 'dark', name: 'Dark', bg: 'bg-gray-950', text: 'text-white', card: 'bg-white/10' },
+  { id: 'dark', name: 'Dark', bg: 'bg-navy-950', text: 'text-white', card: 'bg-white/10' },
   { id: 'gradient', name: 'Gradient', bg: 'bg-gradient-to-b from-stone-950 to-stone-950', text: 'text-white', card: 'bg-white/10' },
   { id: 'neon', name: 'Neon', bg: 'bg-black', text: 'text-stone-400', card: 'bg-stone-500/10 border-stone-500/30' },
   { id: 'minimal', name: 'Minimal', bg: 'bg-white', text: 'text-gray-900', card: 'bg-gray-100' },

@@ -205,11 +205,11 @@ export default function MarketIntelPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#0f2148] text-white">
       <BackgroundEffects />
 
       {/* Header */}
-      <div className="relative z-10 border-b border-white/10 bg-[#131520]/80 backdrop-blur-sm">
+      <div className="relative z-10 border-b border-white/10 bg-[#0f2148]/80 backdrop-blur-sm">
         <div className="mx-auto max-w-7xl px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

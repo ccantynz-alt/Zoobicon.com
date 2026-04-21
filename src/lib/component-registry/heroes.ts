@@ -10,7 +10,7 @@ registerComponent({
   tags: ["dark", "tech", "saas", "cyber", "software", "startup", "developer", "api", "platform"],
   code: `export default function Hero() {
   return (
-    <section className="relative min-h-screen bg-gray-950 pt-24 pb-16 px-6 overflow-hidden">
+    <section className="relative min-h-screen bg-navy-950 pt-24 pb-16 px-6 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(56,189,248,0.08),transparent_60%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.06),transparent_60%)]" />
       <div className="relative max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center min-h-[80vh]">
@@ -221,7 +221,7 @@ registerComponent({
   tags: ["video", "agency", "brand", "cinematic", "studio", "creative", "marketing", "media", "production"],
   code: `export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden bg-gray-950">
+    <section className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden bg-navy-950">
       <video
         autoPlay
         muted
@@ -232,7 +232,7 @@ registerComponent({
       >
         <source src="" type="video/mp4" />
       </video>
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-950/40 via-gray-950/60 to-gray-950" />
+      <div className="absolute inset-0 bg-gradient-to-b from-navy-950/40 via-navy-950/60 to-navy-950" />
       <div className="relative text-center max-w-4xl mx-auto pt-16">
         <div className="inline-flex items-center gap-2 border border-white/20 text-white/70 text-xs font-semibold px-4 py-1.5 rounded-full mb-8 backdrop-blur-sm">
           <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
@@ -394,7 +394,7 @@ registerComponent({
   tags: ["dark", "neon", "gradient", "cyber", "gaming", "hacker", "devtools", "infrastructure", "security", "ai"],
   code: `export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-6 pt-24 pb-16 overflow-hidden bg-[#0a0a0f]">
+    <section className="relative min-h-screen flex items-center justify-center px-6 pt-24 pb-16 overflow-hidden bg-[#0a1628]">
       {/* Neon glow effects */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-r from-cyan-500/10 via-violet-500/15 to-fuchsia-500/10 blur-[100px] rounded-full" />
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/40 to-transparent" />
@@ -454,7 +454,7 @@ registerComponent({
   tags: ["dashboard", "saas", "app", "product", "tool", "analytics", "platform", "software", "startup", "b2b"],
   code: `export default function Hero() {
   return (
-    <section className="relative min-h-screen px-6 pt-32 pb-16 overflow-hidden bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
+    <section className="relative min-h-screen px-6 pt-32 pb-16 overflow-hidden bg-gradient-to-b from-navy-950 via-gray-900 to-navy-950">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-indigo-500/15 to-transparent rounded-full blur-[80px]" />
       <div className="relative max-w-6xl mx-auto text-center">
         <div className="inline-flex items-center gap-2 bg-indigo-500/10 text-indigo-400 text-xs font-semibold px-4 py-1.5 rounded-full border border-indigo-500/20 mb-8">
@@ -720,7 +720,7 @@ registerComponent({
             </div>
           </div>
           {/* Simulated dashboard UI */}
-          <div className="p-6 sm:p-8 bg-gradient-to-b from-gray-900 to-gray-950 min-h-[300px] sm:min-h-[400px]">
+          <div className="p-6 sm:p-8 bg-gradient-to-b from-gray-900 to-navy-950 min-h-[300px] sm:min-h-[400px]">
             <div className="grid grid-cols-3 gap-4 mb-6">
               {[
                 { label: "Total Users", value: "48,294", change: "+12.5%", color: "violet" },
@@ -805,7 +805,7 @@ registerComponent({
         <div className={\`transition-all duration-1000 delay-500 \${visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-16 scale-95"}\`}>
           <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-gray-900/60 backdrop-blur-xl shadow-2xl shadow-purple-900/20 group cursor-pointer" onClick={() => setPlaying(!playing)}>
             {/* Video content area */}
-            <div className="relative aspect-video bg-gradient-to-br from-gray-900 via-[#0f0f1a] to-gray-950 flex items-center justify-center">
+            <div className="relative aspect-video bg-gradient-to-br from-gray-900 via-[#0a1628] to-navy-950 flex items-center justify-center">
               {/* Decorative timeline bar */}
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
                 <div className="flex items-center gap-3">

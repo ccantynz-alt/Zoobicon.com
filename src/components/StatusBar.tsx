@@ -134,8 +134,8 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
               <svg width="10" height="14" viewBox="0 0 10 14" className={`transition-colors duration-500 ${isComplete ? "text-stone-400" : "text-white/50"}`}>
                 <line x1="1" y1="0" x2="1" y2="14" stroke="currentColor" strokeWidth="1" />
                 <rect x="1" y="0" width="8" height="5" fill="currentColor" opacity={isComplete ? "0.8" : "0.3"} />
-                <rect x="1" y="0" width="4" height="2.5" fill={isComplete ? "#0a0a0f" : "transparent"} opacity="0.5" />
-                <rect x="5" y="2.5" width="4" height="2.5" fill={isComplete ? "#0a0a0f" : "transparent"} opacity="0.5" />
+                <rect x="1" y="0" width="4" height="2.5" fill={isComplete ? "#0a1628" : "transparent"} opacity="0.5" />
+                <rect x="5" y="2.5" width="4" height="2.5" fill={isComplete ? "#0a1628" : "transparent"} opacity="0.5" />
               </svg>
             </div>
             {/* Stick figure runner */}

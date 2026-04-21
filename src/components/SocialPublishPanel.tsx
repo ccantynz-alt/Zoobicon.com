@@ -622,7 +622,7 @@ export default function SocialPublishPanel({
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-[#1a1a2e] rounded-xl border border-white/[0.10] p-5 space-y-4"
+              className="w-full max-w-sm bg-[#0f2148] rounded-xl border border-white/[0.10] p-5 space-y-4"
             >
               <div className="text-center">
                 <div className="text-lg font-bold text-white mb-1">

@@ -106,7 +106,7 @@ function IdleAtmosphere() {
       <div
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse at 50% 100%, #0c1a30 0%, #080c18 40%, #0a0a0f 70%)",
+          background: "radial-gradient(ellipse at 50% 100%, #0c1a30 0%, #080c18 40%, #0a1628 70%)",
         }}
       />
 
@@ -205,7 +205,7 @@ function GeneratingAtmosphere() {
       <div
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse at 50% 50%, #0d1f3c 0%, #080e1e 50%, #0a0a0f 80%)",
+          background: "radial-gradient(ellipse at 50% 50%, #0d1f3c 0%, #080e1e 50%, #0a1628 80%)",
         }}
       />
 
@@ -574,7 +574,7 @@ export default function PreviewPanel({
 
   if (!looksLikeHtml && html.length > 0 && !isGenerating) {
     return (
-      <div className="h-full overflow-auto bg-gray-950 p-6">
+      <div className="h-full overflow-auto bg-navy-950 p-6">
         <div className="bg-stone-900/30 border border-stone-600/40 rounded-lg p-4 mb-4">
           <p className="text-stone-300 text-sm font-medium mb-2">Preview Issue — Generated output is not valid HTML</p>
           <p className="text-stone-200/60 text-xs">The AI returned text that doesn&apos;t appear to be a complete HTML document. First 200 characters shown below:</p>
@@ -607,7 +607,7 @@ export default function PreviewPanel({
     }
 
     return (
-      <div className="h-full overflow-auto bg-gray-950 p-6">
+      <div className="h-full overflow-auto bg-navy-950 p-6">
         <div className="bg-stone-900/30 border border-stone-600/40 rounded-lg p-4 mb-4">
           <p className="text-stone-300 text-sm font-medium mb-2">Generation incomplete — empty page detected</p>
           <p className="text-stone-200/60 text-xs mb-3">
@@ -720,12 +720,12 @@ export default function PreviewPanel({
       </div>
 
       {/* Preview area */}
-      <div className="flex-1 overflow-hidden bg-gray-950 flex items-start justify-center">
+      <div className="flex-1 overflow-hidden bg-navy-950 flex items-start justify-center">
         {activePreviewMode === "sandpack" ? (
           <div className="w-full h-full">
             <Suspense
               fallback={
-                <div className="h-full flex items-center justify-center bg-[#131520] text-white/40 text-sm">
+                <div className="h-full flex items-center justify-center bg-[#0f2148] text-white/40 text-sm">
                   Loading Sandpack...
                 </div>
               }

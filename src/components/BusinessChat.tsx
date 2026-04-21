@@ -338,7 +338,7 @@ export default function BusinessChat() {
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-50 bg-[#0f0f1a] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 flex flex-col transition-all duration-300 ${
+      className={`fixed bottom-6 right-6 z-50 bg-[#0a1628] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 flex flex-col transition-all duration-300 ${
         isMinimized ? "w-80 h-14" : "w-96 h-[600px] max-h-[80vh]"
       }`}
     >
