@@ -178,7 +178,7 @@ const TESTIMONIALS = [
 
 export default function HomePage() {
   return (
-    <div className="bg-[#060e1f] text-white selection:bg-indigo-500/30 selection:text-white">
+    <div className="bg-[#0b1530] text-white selection:bg-indigo-500/30 selection:text-white">
 
       {/* ── HERO ── built live in the browser via Sandpack.
           Pre-merge the page opened on a <HeroShowcase> slideshow defined
@@ -464,7 +464,7 @@ export default function HomePage() {
                   className="relative overflow-hidden border border-white/[0.08]"
                   style={{
                     borderRadius: "40px",
-                    background: "linear-gradient(180deg, rgba(17,17,24,0.6) 0%, rgba(26,26,36,0.6) 100%)",
+                    background: "linear-gradient(180deg, rgba(20,40,95,0.6) 0%, rgba(26,26,36,0.6) 100%)",
                     boxShadow:
                       "0 60px 120px -30px rgba(0,0,0,0.6), 0 30px 60px -20px rgba(232,212,176,0.15)",
                   }}
@@ -611,7 +611,7 @@ export default function HomePage() {
                     className="h-full rounded-[30px] border border-white/[0.08] p-8"
                     style={{
                       background:
-                        "linear-gradient(180deg, rgba(17,17,24,0.8) 0%, rgba(26,26,36,0.4) 100%)",
+                        "linear-gradient(180deg, rgba(20,40,95,0.8) 0%, rgba(26,26,36,0.4) 100%)",
                       boxShadow: "0 30px 60px -30px rgba(0,0,0,0.5)",
                     }}
                   >

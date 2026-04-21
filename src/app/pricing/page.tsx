@@ -168,7 +168,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#060e1f] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
+    <div className="relative min-h-screen bg-[#0b1530] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
       {/* ── structured data ── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -300,8 +300,8 @@ export default function PricingPage() {
                       style={{
                         borderColor: plan.featured ? "rgba(232,212,176,0.35)" : "rgba(255,255,255,0.08)",
                         background: plan.featured
-                          ? "linear-gradient(180deg, rgba(232,212,176,0.07) 0%, rgba(17,17,24,0.85) 60%)"
-                          : "linear-gradient(180deg, rgba(17,17,24,0.6) 0%, rgba(10,10,15,0.4) 100%)",
+                          ? "linear-gradient(180deg, rgba(232,212,176,0.07) 0%, rgba(20,40,95,0.85) 60%)"
+                          : "linear-gradient(180deg, rgba(20,40,95,0.6) 0%, rgba(10,10,15,0.4) 100%)",
                         boxShadow: plan.featured
                           ? "0 1px 0 rgba(232,212,176,0.15) inset, 0 32px 80px -32px rgba(232,212,176,0.45)"
                           : "0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 50px -30px rgba(0,0,0,0.6)",
@@ -497,8 +497,8 @@ export default function PricingPage() {
                       style={{
                         borderColor: isOpen ? "rgba(232,212,176,0.25)" : "rgba(255,255,255,0.08)",
                         background: isOpen
-                          ? "linear-gradient(135deg, rgba(232,212,176,0.05) 0%, rgba(17,17,24,0.6) 100%)"
-                          : "linear-gradient(135deg, rgba(17,17,24,0.6) 0%, rgba(10,10,15,0.4) 100%)",
+                          ? "linear-gradient(135deg, rgba(232,212,176,0.05) 0%, rgba(20,40,95,0.6) 100%)"
+                          : "linear-gradient(135deg, rgba(20,40,95,0.6) 0%, rgba(10,10,15,0.4) 100%)",
                         boxShadow: isOpen
                           ? "0 1px 0 rgba(232,212,176,0.12) inset, 0 20px 50px -28px rgba(232,212,176,0.3)"
                           : "0 1px 0 rgba(255,255,255,0.03) inset",
@@ -555,7 +555,7 @@ export default function PricingPage() {
             <div
               className="relative overflow-hidden rounded-[40px] border border-white/[0.08] p-12 sm:p-16 text-center"
               style={{
-                background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(26,26,36,0.65) 100%)",
+                background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(26,26,36,0.65) 100%)",
                 boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset, 0 40px 100px -40px rgba(0,0,0,0.8)",
               }}
             >

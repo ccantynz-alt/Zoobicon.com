@@ -12,7 +12,7 @@
  *
  * Design: cinematic deep-navy, dotted grid pattern, large display typography,
  * lucide icons, framer-motion reveals. Matches the rest of the navy palette
- * (bg-[#060e1f], surface / surface-elevated from globals.css).
+ * (bg-[#0b1530], surface / surface-elevated from globals.css).
  *
  * Law 8 — no blank screens. Every failure state renders a visible message.
  */
@@ -348,7 +348,7 @@ export default function LaunchPage() {
   );
 
   return (
-    <main className="relative min-h-screen bg-[#060e1f] text-white overflow-x-hidden">
+    <main className="relative min-h-screen bg-[#0b1530] text-white overflow-x-hidden">
       {/* Ambient background */}
       <div
         aria-hidden

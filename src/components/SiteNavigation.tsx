@@ -176,8 +176,8 @@ export default function SiteNavigation() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-[#060e1f]/85 backdrop-blur-2xl border-b border-white/[0.08] shadow-[0_8px_32px_-16px_rgba(0,0,0,0.6)]"
-          : "bg-[#060e1f]/40 backdrop-blur-xl border-b border-white/[0.03]"
+          ? "bg-[#0b1530]/85 backdrop-blur-2xl border-b border-white/[0.08] shadow-[0_8px_32px_-16px_rgba(0,0,0,0.6)]"
+          : "bg-[#0b1530]/40 backdrop-blur-xl border-b border-white/[0.03]"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -221,7 +221,7 @@ export default function SiteNavigation() {
                   className="fixed top-[72px] left-0 right-0 border-b border-white/[0.08] shadow-[0_40px_80px_-24px_rgba(0,0,0,0.8)]"
                   style={{
                     background:
-                      "linear-gradient(180deg, rgba(10,10,15,0.98) 0%, rgba(17,17,24,0.98) 100%)",
+                      "linear-gradient(180deg, rgba(10,10,15,0.98) 0%, rgba(20,40,95,0.98) 100%)",
                     backdropFilter: "blur(24px)",
                   }}
                 >
