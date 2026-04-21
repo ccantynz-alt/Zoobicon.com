@@ -28,7 +28,7 @@ type SandpackPreviewProps = SandpackPreviewPropsHTML | SandpackPreviewPropsReact
  */
 const zoobiconTheme = {
   colors: {
-    surface1: "#131520",
+    surface1: "#0f2148",
     surface2: "#1a1d2e",
     surface3: "#252840",
     clickable: "#999999",
@@ -236,7 +236,7 @@ export default function App() {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "#131520",
+      background: "#0f2148",
       color: "rgba(255,255,255,0.4)",
       fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
       fontSize: "14px",
@@ -267,7 +267,7 @@ export default function App() {
 <head>
   <meta charset="utf-8" />
   <style>
-    body { margin: 0; background: #131520; color: rgba(255,255,255,0.4); font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 14px; text-align: center; }
+    body { margin: 0; background: #0f2148; color: rgba(255,255,255,0.4); font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 14px; text-align: center; }
     .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid rgba(109,93,252,0.2); border-top-color: #6d5dfc; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>

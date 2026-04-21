@@ -142,7 +142,7 @@ export default function TranslatePanel({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-[540px] rounded-xl border border-white/10 bg-[#0a0a0f] shadow-2xl shadow-stone-500/5">
+        <div className="absolute right-0 top-full z-50 mt-2 w-[540px] rounded-xl border border-white/10 bg-[#0a1628] shadow-2xl shadow-stone-500/5">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
             <div className="flex items-center gap-2">

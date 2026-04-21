@@ -104,7 +104,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           }}
           className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
             activeTab === "url"
-              ? "bg-[#1a1a2e] text-white shadow-lg"
+              ? "bg-[#0f2148] text-white shadow-lg"
               : "text-[#666] hover:text-[#999]"
           }`}
         >
@@ -118,7 +118,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           }}
           className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
             activeTab === "json"
-              ? "bg-[#1a1a2e] text-white shadow-lg"
+              ? "bg-[#0f2148] text-white shadow-lg"
               : "text-[#666] hover:text-[#999]"
           }`}
         >
@@ -230,7 +230,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           className={`mt-6 w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl text-sm font-semibold transition-all duration-200 ${
             canSubmit && !loading
               ? "bg-gradient-to-r from-[#3b82f6] to-[#3b82f6] text-white hover:shadow-lg hover:shadow-stone-500/20 cursor-pointer"
-              : "bg-[#1a1a2e] text-[#444] cursor-not-allowed"
+              : "bg-[#0f2148] text-[#444] cursor-not-allowed"
           }`}
         >
           {loading ? (
@@ -259,7 +259,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
               ) : i === loadingStep ? (
                 <Loader2 className="w-5 h-5 text-[#3b82f6] animate-spin" />
               ) : (
-                <div className="w-5 h-5 rounded-full bg-[#1a1a2e]" />
+                <div className="w-5 h-5 rounded-full bg-[#0f2148]" />
               )}
               <span
                 className={`text-sm ${
@@ -325,7 +325,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
                 {result.designTokens.fonts.map((font) => (
                   <span
                     key={font}
-                    className="px-3 py-1.5 bg-[#1a1a2e] border border-[#2a2a3a] rounded-lg text-xs text-[#ccc] font-medium"
+                    className="px-3 py-1.5 bg-[#0f2148] border border-[#2a2a3a] rounded-lg text-xs text-[#ccc] font-medium"
                   >
                     {font}
                   </span>
@@ -345,7 +345,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
                 {result.designTokens.spacing.map((sp) => (
                   <span
                     key={sp}
-                    className="px-2.5 py-1 bg-[#1a1a2e] border border-[#2a2a3a] rounded-lg text-xs text-[#ccc] font-mono"
+                    className="px-2.5 py-1 bg-[#0f2148] border border-[#2a2a3a] rounded-lg text-xs text-[#ccc] font-mono"
                   >
                     {sp}px
                   </span>

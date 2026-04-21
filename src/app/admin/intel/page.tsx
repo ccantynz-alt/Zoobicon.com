@@ -237,11 +237,11 @@ export default function IntelPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#0f2148] text-white">
       <BackgroundEffects preset="admin" />
 
       {/* Header */}
-      <header className="border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl px-6 py-4 sticky top-0 z-20">
+      <header className="border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl px-6 py-4 sticky top-0 z-20">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/admin" className="text-white/50 hover:text-white/60 transition-colors">
@@ -281,7 +281,7 @@ export default function IntelPage() {
       </header>
 
       {/* Tabs */}
-      <div className="border-b border-white/10 bg-[#131520]/50 backdrop-blur px-6">
+      <div className="border-b border-white/10 bg-[#0f2148]/50 backdrop-blur px-6">
         <div className="max-w-7xl mx-auto flex gap-1">
           {tabs.map((tab) => (
             <button

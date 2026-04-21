@@ -369,8 +369,8 @@ export default function WhitePaperPage() {
             {/* Gate Preview */}
             <div className="sticky top-24">
               <div className="p-1 rounded-2xl bg-gradient-to-r from-stone-500/20 to-stone-500/20">
-                <div className="bg-[#0f0f1a] rounded-xl p-8 min-h-[500px] flex items-center justify-center relative">
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f1a] via-transparent to-transparent rounded-xl z-10" />
+                <div className="bg-[#0a1628] rounded-xl p-8 min-h-[500px] flex items-center justify-center relative">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent rounded-xl z-10" />
                   <div className="absolute top-6 left-6 right-6 opacity-30 z-0">
                     <div className="h-4 bg-white/10 rounded mb-2 w-3/4" />
                     <div className="h-3 bg-white/5 rounded mb-1 w-full" />

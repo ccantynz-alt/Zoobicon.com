@@ -420,7 +420,7 @@ const styles = `@import url('https://fonts.googleapis.com/css2?family=Inter:wght
 :root {
   --color-primary: #d97706;
   --color-primary-light: #f59e0b;
-  --color-bg: #0c0a09;
+  --color-bg: #060e1f;
   --color-surface: #1c1917;
   --color-text: #fafaf9;
   --color-text-muted: #a8a29e;
@@ -494,5 +494,5 @@ export const restaurantTemplate: TemplateSnapshot = {
     "components/Footer.tsx": footer,
     "styles.css": styles,
   },
-  colors: { primary: "#d97706", bg: "#0c0a09", text: "#fafaf9" },
+  colors: { primary: "#d97706", bg: "#060e1f", text: "#fafaf9" },
 };

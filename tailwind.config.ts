@@ -8,10 +8,28 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Navy replaces pure black across the platform.
+        // Deep ocean navy — clearly blue, premium, Stripe-inspired.
+        // `black` is remapped below so every existing bg-black/text-black
+        // usage picks up the new tone without 144 file edits.
+        navy: {
+          50: "#eef2fb",
+          100: "#d8e0f3",
+          200: "#b4c3e5",
+          300: "#8299c9",
+          400: "#4f6eaa",
+          500: "#2d4d8c",
+          600: "#1e3a7a",
+          700: "#152e60",
+          800: "#0f2148",
+          900: "#0a1628",
+          950: "#060e1f",
+        },
+        black: "#060e1f",
         dark: {
-          100: "#16161e",
-          200: "#111118",
-          300: "#0b0b11",
+          100: "#162044",
+          200: "#0f1d3a",
+          300: "#0a1628",
         },
         brand: {
           200: "#bfdbfe",

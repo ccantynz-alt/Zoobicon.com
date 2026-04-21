@@ -236,7 +236,7 @@ export default function ColorPaletteGeneratorPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a14] text-white">
+    <div className="min-h-screen bg-[#060e1f] text-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -418,7 +418,7 @@ export default function ColorPaletteGeneratorPage() {
 
           {exportMode && (
             <div className="relative">
-              <pre className="bg-[#0a0a14] border border-white/[0.06] rounded-xl p-4 text-xs text-stone-300/80 font-mono overflow-x-auto">
+              <pre className="bg-[#060e1f] border border-white/[0.06] rounded-xl p-4 text-xs text-stone-300/80 font-mono overflow-x-auto">
                 {exportMode === "tailwind"
                   ? getTailwindExport()
                   : getCssExport()}

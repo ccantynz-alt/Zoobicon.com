@@ -15,7 +15,7 @@ registerComponent({
     { title: "Resources", links: ["Documentation", "Guides", "Community", "Templates", "Status"] },
   ];
   return (
-    <footer className="bg-gray-950 text-gray-400 pt-20 pb-8 px-6">
+    <footer className="bg-navy-950 text-gray-400 pt-20 pb-8 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           <div className="lg:col-span-2">
@@ -82,7 +82,7 @@ registerComponent({
   tags: ["minimal", "clean", "portfolio", "creative", "designer", "simple", "elegant", "dark", "restaurant", "warm"],
   code: `export default function Footer() {
   return (
-    <footer className="relative bg-gray-950 py-16 px-6 overflow-hidden">
+    <footer className="relative bg-navy-950 py-16 px-6 overflow-hidden">
       {/* Subtle gradient glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-gradient-to-b from-white/[0.02] to-transparent rounded-full blur-3xl" />
 
@@ -145,7 +145,7 @@ registerComponent({
     { title: "Legal", links: [{ name: "Privacy Policy" }, { name: "Terms of Service" }, { name: "Cookie Policy" }, { name: "Security" }, { name: "GDPR" }] },
   ];
   return (
-    <footer className="relative bg-gray-950 text-gray-400 overflow-hidden">
+    <footer className="relative bg-navy-950 text-gray-400 overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
       <div className="max-w-7xl mx-auto px-6 pt-20 pb-8">
         <div className="grid lg:grid-cols-7 gap-12 mb-16">
@@ -225,7 +225,7 @@ registerComponent({
   tags: ["mobile", "app", "startup", "tech", "fitness", "health", "fintech", "social", "modern", "gaming"],
   code: `export default function Footer() {
   return (
-    <footer className="bg-gray-950 text-gray-400">
+    <footer className="bg-navy-950 text-gray-400">
       <div className="max-w-7xl mx-auto px-6">
         <div className="py-16 border-b border-white/[0.06]">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -387,7 +387,7 @@ registerComponent({
   tags: ["saas", "startup", "tech", "software", "platform", "ai", "developer", "api", "modern", "gradient"],
   code: `export default function Footer() {
   return (
-    <footer className="bg-gray-950 text-gray-400">
+    <footer className="bg-navy-950 text-gray-400">
       <div className="max-w-7xl mx-auto px-6">
         <div className="relative py-16 mb-12 rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.12),transparent_60%)]" />

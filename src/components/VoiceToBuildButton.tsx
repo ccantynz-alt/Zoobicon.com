@@ -148,7 +148,7 @@ export default function VoiceToBuildButton({
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[min(640px,calc(100vw-2rem))]"
           >
             <div className="relative rounded-3xl p-[1.5px] bg-gradient-to-r from-stone-500 via-stone-500 to-stone-500 shadow-2xl shadow-stone-900/40">
-              <div className="rounded-3xl bg-slate-950/90 backdrop-blur-xl px-6 py-5">
+              <div className="rounded-3xl bg-navy-950/90 backdrop-blur-xl px-6 py-5">
                 <div className="flex items-center gap-4">
                   <div className="flex items-end gap-1 h-10">
                     {[0, 1, 2, 3, 4].map((i) => (

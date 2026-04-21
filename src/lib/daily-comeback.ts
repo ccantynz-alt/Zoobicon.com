@@ -326,7 +326,7 @@ export function composeEmailSummary(
   const subject = `Zoobicon morning brief: ${siteName} — ${visits} visits, ${leads} leads, ${seoFixes.length} fixes`;
 
   const card = (content: string): string =>
-    `<div style="background:#131520;border:1px solid #232636;border-radius:14px;padding:20px;margin:0 0 16px 0;color:#e6e8ef;font-family:-apple-system,Segoe UI,Roboto,sans-serif;">${content}</div>`;
+    `<div style="background:#0f2148;border:1px solid #232636;border-radius:14px;padding:20px;margin:0 0 16px 0;color:#e6e8ef;font-family:-apple-system,Segoe UI,Roboto,sans-serif;">${content}</div>`;
 
   const statsBlock = stats
     ? card(`

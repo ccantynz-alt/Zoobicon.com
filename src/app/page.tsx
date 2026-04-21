@@ -87,6 +87,63 @@ const AI_FEATURES = [
   },
 ];
 
+// ── Four domains, four superpowers ──
+const DOMAINS = [
+  {
+    name: "zoobicon.com",
+    role: "The platform",
+    desc: "Build, launch, and market your online presence from one login.",
+    cta: "Start building",
+    href: "/builder",
+    color: "indigo" as const,
+    icon: Wand2,
+  },
+  {
+    name: "zoobicon.ai",
+    role: "The AI brain",
+    desc: "Seven agents, Opus 4.6, Fish Audio S1. The model stack we run on.",
+    cta: "See the agents",
+    href: "/ai",
+    color: "violet" as const,
+    icon: Bot,
+  },
+  {
+    name: "zoobicon.io",
+    role: "The developer API",
+    desc: "Sell our pipeline inside your app. One key, every product.",
+    cta: "Read the docs",
+    href: "/developers",
+    color: "cyan" as const,
+    icon: Layers,
+  },
+  {
+    name: "zoobicon.sh",
+    role: "The hosting edge",
+    desc: "One-click deploy. Global CDN, free SSL, custom domain in seconds.",
+    cta: "Deploy a site",
+    href: "/hosting",
+    color: "emerald" as const,
+    icon: Zap,
+  },
+] as const;
+
+const DOMAIN_COLORS: Record<
+  "indigo" | "violet" | "cyan" | "emerald",
+  { border: string; iconBg: string; text: string }
+> = {
+  indigo: { border: "hover:border-indigo-400/40", iconBg: "bg-indigo-500/15", text: "text-indigo-300" },
+  violet: { border: "hover:border-violet-400/40", iconBg: "bg-violet-500/15", text: "text-violet-300" },
+  cyan: { border: "hover:border-cyan-400/40", iconBg: "bg-cyan-500/15", text: "text-cyan-300" },
+  emerald: { border: "hover:border-emerald-400/40", iconBg: "bg-emerald-500/15", text: "text-emerald-300" },
+};
+
+// ── How it works (three steps) ──
+const STEPS = [
+  { num: "01", title: "Describe it", desc: "Type what you want in plain English." },
+  { num: "02", title: "Watch it build", desc: "Seven agents assemble your site live." },
+  { num: "03", title: "Ship it", desc: "One click to deploy with SSL + custom domain." },
+] as const;
+
 // ── Testimonials (real, attributed — never fabricated) ──
 const TESTIMONIALS = [
   {
@@ -121,7 +178,7 @@ const TESTIMONIALS = [
 
 export default function HomePage() {
   return (
-    <div className="bg-[#0a0a14] text-white selection:bg-indigo-500/30 selection:text-white">
+    <div className="bg-[#060e1f] text-white selection:bg-indigo-500/30 selection:text-white">
 
       {/* ── HERO ── built live in the browser via Sandpack.
           Pre-merge the page opened on a <HeroShowcase> slideshow defined
@@ -248,13 +305,15 @@ export default function HomePage() {
                   <div className="text-xs font-bold text-indigo-400 mb-3 tracking-widest uppercase">
                     Step {step.num}
                   </div>
+                  <h3 className="text-2xl font-bold text-white mb-3 tracking-tight">{step.title}</h3>
+                  <p className="text-slate-400 leading-relaxed">{step.desc}</p>
                 </div>
               </div>
             ))}
             </div>
             {/* Fade edges */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050508] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050508] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#060e1f] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#060e1f] to-transparent" />
           </div>
         </section>
 
@@ -572,8 +631,8 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050508] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050508] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#060e1f] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#060e1f] to-transparent" />
           </div>
         </section>
 

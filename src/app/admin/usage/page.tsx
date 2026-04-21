@@ -232,11 +232,11 @@ export default function UsagePage() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#131520]">
+    <div className="relative min-h-screen bg-[#0f2148]">
       <BackgroundEffects preset="admin" />
 
       {/* Nav */}
-      <nav className="border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">

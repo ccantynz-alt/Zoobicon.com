@@ -82,7 +82,7 @@ export default function EmailMarketingPage() {
       description: "Get the latest updates straight to your inbox.",
       buttonText: "Subscribe",
       primaryColor: "#6366f1",
-      bgColor: "#1a1a2e",
+      bgColor: "#0f2148",
       textColor: "#ffffff",
     });
     navigator.clipboard.writeText(code);
@@ -400,7 +400,7 @@ export default function EmailMarketingPage() {
                 ))}
               </div>
               {/* Preview */}
-              <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-8 mb-4">
+              <div className="bg-[#0f2148] border border-white/10 rounded-xl p-8 mb-4">
                 <h4 className="text-lg font-bold mb-1">Stay in the loop</h4>
                 <p className="text-sm text-white/50 mb-4">Get the latest updates straight to your inbox.</p>
                 <div className="flex gap-2">

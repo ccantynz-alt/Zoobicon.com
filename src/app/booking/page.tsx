@@ -173,7 +173,7 @@ export default function BookingPage() {
               {linkCopied ? "Copied!" : "Copy Link"}
             </button>
           </div>
-          <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-4 flex items-center gap-3">
+          <div className="bg-[#0f2148] border border-white/10 rounded-xl p-4 flex items-center gap-3">
             <ExternalLink className="w-4 h-4 text-white/30" />
             <span className="text-sm text-stone-400">https://zoobicon.sh/book/my-business</span>
           </div>

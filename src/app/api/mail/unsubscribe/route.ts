@@ -37,7 +37,7 @@ function unsubscribePage(title: string, message: string): string {
 <style>
   body { font-family: system-ui, -apple-system, sans-serif; background: #0a0a12; color: #e5e5e5;
     display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-  .card { max-width: 440px; text-align: center; padding: 48px 32px; background: #131520;
+  .card { max-width: 440px; text-align: center; padding: 48px 32px; background: #0f2148;
     border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); }
   h1 { font-size: 24px; margin: 0 0 16px; }
   p { color: #999; line-height: 1.6; margin: 0; }

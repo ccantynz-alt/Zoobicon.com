@@ -188,7 +188,7 @@ export default function BlogEnginePage() {
                       onChange={(e) => setTone(e.target.value)}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                     >
-                      {TONES.map((t) => <option key={t} value={t} className="bg-[#1a1a2e]">{t}</option>)}
+                      {TONES.map((t) => <option key={t} value={t} className="bg-[#0f2148]">{t}</option>)}
                     </select>
                   </div>
                   <div>
@@ -198,7 +198,7 @@ export default function BlogEnginePage() {
                       onChange={(e) => setLength(e.target.value)}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                     >
-                      {LENGTHS.map((l) => <option key={l} value={l} className="bg-[#1a1a2e]">{l}</option>)}
+                      {LENGTHS.map((l) => <option key={l} value={l} className="bg-[#0f2148]">{l}</option>)}
                     </select>
                   </div>
                 </div>
