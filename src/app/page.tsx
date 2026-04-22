@@ -27,7 +27,7 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 // ── Trust strip data (verifiable, never inflated) ──
 const TRUST_ITEMS = [
-  { label: "Opus 4.7", sub: "Latest Claude" },
+  { label: "Opus 4.6", sub: "Latest Claude" },
   { label: "Next.js 15", sub: "App Router" },
   { label: "Vercel Edge", sub: "iad1 region" },
   { label: "Stripe Verified", sub: "Live Connect" },
@@ -86,63 +86,6 @@ const AI_FEATURES = [
     href: "/hosting",
   },
 ];
-
-// ── Four domains, four superpowers ──
-const DOMAINS = [
-  {
-    name: "zoobicon.com",
-    role: "The platform",
-    desc: "Build, launch, and market your online presence from one login.",
-    cta: "Start building",
-    href: "/builder",
-    color: "indigo" as const,
-    icon: Wand2,
-  },
-  {
-    name: "zoobicon.ai",
-    role: "The AI brain",
-    desc: "Seven agents, Opus 4.7, Fish Audio S1. The model stack we run on.",
-    cta: "See the agents",
-    href: "/ai",
-    color: "violet" as const,
-    icon: Bot,
-  },
-  {
-    name: "zoobicon.io",
-    role: "The developer API",
-    desc: "Sell our pipeline inside your app. One key, every product.",
-    cta: "Read the docs",
-    href: "/developers",
-    color: "cyan" as const,
-    icon: Layers,
-  },
-  {
-    name: "zoobicon.sh",
-    role: "The hosting edge",
-    desc: "One-click deploy. Global CDN, free SSL, custom domain in seconds.",
-    cta: "Deploy a site",
-    href: "/hosting",
-    color: "emerald" as const,
-    icon: Zap,
-  },
-] as const;
-
-const DOMAIN_COLORS: Record<
-  "indigo" | "violet" | "cyan" | "emerald",
-  { border: string; iconBg: string; text: string }
-> = {
-  indigo: { border: "hover:border-indigo-400/40", iconBg: "bg-indigo-500/15", text: "text-indigo-300" },
-  violet: { border: "hover:border-violet-400/40", iconBg: "bg-violet-500/15", text: "text-violet-300" },
-  cyan: { border: "hover:border-cyan-400/40", iconBg: "bg-cyan-500/15", text: "text-cyan-300" },
-  emerald: { border: "hover:border-emerald-400/40", iconBg: "bg-emerald-500/15", text: "text-emerald-300" },
-};
-
-// ── How it works (three steps) ──
-const STEPS = [
-  { num: "01", title: "Describe it", desc: "Type what you want in plain English." },
-  { num: "02", title: "Watch it build", desc: "Seven agents assemble your site live." },
-  { num: "03", title: "Ship it", desc: "One click to deploy with SSL + custom domain." },
-] as const;
 
 // ── Testimonials (real, attributed — never fabricated) ──
 const TESTIMONIALS = [
@@ -206,32 +149,6 @@ export default function HomePage() {
             <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050508] to-transparent" />
           </div>
         </section>
-    <div className="bg-[#0b1530] text-white selection:bg-indigo-500/30 selection:text-white">
-
-      {/* ── HERO ── built live in the browser via Sandpack.
-          Pre-merge the page opened on a <HeroShowcase> slideshow defined
-          inline in this file; that component got deleted in a later merge
-          but the call didn't, leaving the page referencing an undefined
-          symbol. Swapped in the existing HeroBuilder import so the hero
-          renders the real builder product instead of crashing the page. */}
-      <HeroBuilder />
-
-      {/* ── TRUST STRIP — infrastructure badges marquee ── */}
-      <section className="relative border-y border-white/[0.05] bg-[#050508]">
-        <div className="relative overflow-hidden py-8">
-          <div className="flex gap-10 whitespace-nowrap animate-[marquee_40s_linear_infinite]">
-            {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
-              <div key={`${item.label}-${i}`} className="flex items-center gap-3 shrink-0">
-                <div className="text-[13px] font-semibold text-white">{item.label}</div>
-                <div className="h-3 w-px bg-white/10" />
-                <div className="text-[11px] text-white/40">{item.sub}</div>
-              </div>
-            ))}
-          </div>
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050508] to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050508] to-transparent" />
-        </div>
-      </section>
 
         {/* ── AI FEATURE BENTO — Filmora 2×2 scaled to 2×3 ── */}
         <section className="relative py-32 px-6">
@@ -380,7 +297,7 @@ export default function HomePage() {
                   className="relative overflow-hidden border border-white/[0.08]"
                   style={{
                     borderRadius: "40px",
-                    background: "linear-gradient(180deg, rgba(20,40,95,0.6) 0%, rgba(26,26,36,0.6) 100%)",
+                    background: "linear-gradient(180deg, rgba(17,17,24,0.6) 0%, rgba(26,26,36,0.6) 100%)",
                     boxShadow:
                       "0 60px 120px -30px rgba(0,0,0,0.6), 0 30px 60px -20px rgba(232,212,176,0.15)",
                   }}
@@ -527,7 +444,7 @@ export default function HomePage() {
                     className="h-full rounded-[30px] border border-white/[0.08] p-8"
                     style={{
                       background:
-                        "linear-gradient(180deg, rgba(20,40,95,0.8) 0%, rgba(26,26,36,0.4) 100%)",
+                        "linear-gradient(180deg, rgba(17,17,24,0.8) 0%, rgba(26,26,36,0.4) 100%)",
                       boxShadow: "0 30px 60px -30px rgba(0,0,0,0.5)",
                     }}
                   >
@@ -547,8 +464,8 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#060e1f] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#060e1f] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050508] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050508] to-transparent" />
           </div>
         </section>
 
@@ -723,6 +640,7 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
         </section>
+      </div>
     </div>
   );
 }

@@ -344,10 +344,6 @@ export default function RootLayout({
         />
       </head>
       <body className="fs-grain">
-      <body className="grain fs-grain">
-        {/* Site-wide navy backdrop + dot-grid pattern. Fixed behind all
-            content (z-index: -1) so every page inherits the same chrome
-            without individual pages needing to render <BackgroundEffects />. */}
         <div className="site-backdrop" aria-hidden="true" />
         <ComingSoonBanner />
         <MaintenanceBanner />
