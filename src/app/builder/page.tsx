@@ -66,6 +66,7 @@ function PreviewSwitcher({ useWebContainers, onWebContainersFail, files, reactDe
 }
 import CodePanel from "@/components/CodePanel";
 import ChatPanel from "@/components/ChatPanel";
+import SectionEditor from "@/components/SectionEditor";
 import StatusBar from "@/components/StatusBar";
 import SeoPreview from "@/components/SeoPreview";
 
@@ -148,6 +149,7 @@ import {
   ChevronRight,
   Zap,
   Loader2,
+  Layout,
 } from "lucide-react";
 
 /** Sanitize raw API error messages for user display */
@@ -538,7 +540,11 @@ function BuilderPage() {
   const [domainHookShownForThisBuild, setDomainHookShownForThisBuild] = useState(false);
   const [mcpContext, setMcpContext] = useState("");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
-  // Phase 2: Visual editing
+  // Project persistence
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [projectName, setProjectName] = useState("");
+  const [chatMessages, setChatMessages] = useState<Array<{ id: string; role: "user" | "assistant" | "system"; content: string; timestamp: number; status?: string; changedFiles?: string[]; durationMs?: number }>>([]);
+  const [showSections, setShowSections] = useState(false);
   // Phase 3: Project mode
   const [projectFiles, setProjectFiles] = useState<{ path: string; content: string; language: string; isModified?: boolean }[]>([]);
   const [activeProjectFile, setActiveProjectFile] = useState<string | null>(null);
@@ -866,6 +872,57 @@ function BuilderPage() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generatedCode]);
+
+  // Auto-save project when generation completes or after edits
+  useEffect(() => {
+    if (status !== "complete" || !reactFiles || Object.keys(reactFiles).length === 0) return;
+    if (!userEmail) return;
+
+    const save = async () => {
+      setSaveStatus("saving");
+      try {
+        if (!projectId) {
+          const name = projectName || prompt.slice(0, 60) || "Untitled Project";
+          const res = await fetch("/api/projects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name,
+              email: userEmail,
+              prompt,
+              code: JSON.stringify(reactFiles),
+            }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.id) {
+              setProjectId(data.id);
+              setProjectName(name);
+              await fetch(`/api/projects/${data.id}/versions`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ files: reactFiles, deps: reactDeps, label: "Initial build" }),
+              });
+            }
+          }
+        } else {
+          await fetch(`/api/projects/${projectId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: JSON.stringify(reactFiles) }),
+          });
+        }
+        setSaveStatus("saved");
+        setTimeout(() => setSaveStatus("idle"), 2000);
+      } catch {
+        setSaveStatus("idle");
+      }
+    };
+
+    const t = setTimeout(save, 1000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, reactFiles, userEmail]);
 
   // Show build success modal on first successful generation
   useEffect(() => {
@@ -2111,19 +2168,58 @@ root.render(React.createElement(App));
                 {/* Chat header */}
                 <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-stone-500/10 flex items-center justify-center">
-                      <MessageSquare className="w-3 h-3 text-stone-400" />
+                    <div className="w-5 h-5 rounded-md bg-indigo-500/10 flex items-center justify-center">
+                      <MessageSquare className="w-3 h-3 text-indigo-400" />
                     </div>
-                    <span className="text-xs font-medium text-white/50">Chat</span>
+                    <span className="text-xs font-medium text-white/50">Edit with AI</span>
+                    {saveStatus === "saving" && (
+                      <span className="text-[9px] text-amber-400/60 flex items-center gap-1">
+                        <Loader2 className="w-2.5 h-2.5 animate-spin" />Saving
+                      </span>
+                    )}
+                    {saveStatus === "saved" && (
+                      <span className="text-[9px] text-emerald-400/60">Saved</span>
+                    )}
                   </div>
-                  <button
-                    onClick={handleNewSite}
-                    className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all"
-                  >
-                    <Plus size={12} />
-                    New
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setShowSections(s => !s)}
+                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] transition-all ${
+                        showSections ? "text-indigo-300 bg-indigo-500/10" : "text-white/30 hover:text-white/60 hover:bg-white/[0.05]"
+                      }`}
+                      title="Manage sections"
+                    >
+                      <Layout size={12} />
+                      Sections
+                    </button>
+                    <button
+                      onClick={handleNewSite}
+                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all"
+                    >
+                      <Plus size={12} />
+                      New
+                    </button>
+                  </div>
                 </div>
+
+                {/* Section editor (collapsible) */}
+                {showSections && (
+                  <div className="border-b border-white/[0.06] max-h-[45%] overflow-y-auto">
+                    <SectionEditor
+                      files={reactFiles}
+                      onFilesUpdate={(updatedFiles) => {
+                        setReactFiles(updatedFiles);
+                        setReactSource(updatedFiles);
+                        setStatus("complete");
+                        pendingLabelRef.current = "Section reorder/delete";
+                      }}
+                      onEditSection={(name) => {
+                        setShowSections(false);
+                      }}
+                      isVisible={true}
+                    />
+                  </div>
+                )}
 
                 {/* Chat messages + edit input */}
                 <div className="flex-1 overflow-hidden">
@@ -2133,6 +2229,17 @@ root.render(React.createElement(App));
                       setReactFiles(prev => {
                         const merged = { ...prev, ...changedFiles };
                         setReactSource(merged);
+                        if (projectId) {
+                          fetch(`/api/projects/${projectId}/versions`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              files: merged,
+                              deps: reactDeps,
+                              label: `Edit: ${Object.keys(changedFiles).join(", ")}`,
+                            }),
+                          }).catch(() => {});
+                        }
                         return merged;
                       });
                       setStatus("complete");
@@ -2140,6 +2247,7 @@ root.render(React.createElement(App));
                     }}
                     isVisible={true}
                     isGenerating={status === "generating"}
+                    projectId={projectId}
                   />
                 </div>
               </motion.div>

@@ -138,6 +138,43 @@ export async function initSchema() {
     CREATE INDEX IF NOT EXISTS projects_user_email_idx ON projects (user_email)
   `;
 
+  // Idempotent: add columns for persistent project editing
+  await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS files JSONB DEFAULT '{}'`;
+  await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS deps JSONB DEFAULT '{}'`;
+  await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS current_version INTEGER DEFAULT 0`;
+  await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS sections JSONB DEFAULT '[]'`;
+
+  // ---- Project versions: every edit creates a snapshot ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS project_versions (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      project_id  UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      version     INTEGER NOT NULL DEFAULT 1,
+      files       JSONB NOT NULL DEFAULT '{}',
+      deps        JSONB NOT NULL DEFAULT '{}',
+      label       TEXT NOT NULL DEFAULT '',
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS project_versions_project_id_idx ON project_versions (project_id)`;
+
+  // ---- Project chat messages: persistent conversation history ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS project_messages (
+      id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      project_id    UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      role          TEXT NOT NULL,
+      content       TEXT NOT NULL DEFAULT '',
+      status        TEXT NOT NULL DEFAULT 'complete',
+      changed_files TEXT[] DEFAULT '{}',
+      duration_ms   INTEGER,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS project_messages_project_id_idx ON project_messages (project_id)`;
+
   // ---- Hosting tables ----
 
   await sql`

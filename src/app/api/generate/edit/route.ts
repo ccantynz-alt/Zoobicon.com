@@ -41,14 +41,14 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: { instruction?: string; files?: Record<string, string>; targetFile?: string };
+  let body: { instruction?: string; files?: Record<string, string>; targetFile?: string; conversationContext?: string };
   try {
     body = await req.json();
   } catch {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const { instruction, files, targetFile } = body;
+  const { instruction, files, targetFile, conversationContext } = body;
 
   if (!instruction || !files || Object.keys(files).length === 0) {
     return Response.json({ error: "Instruction and files required" }, { status: 400 });
@@ -136,7 +136,7 @@ RULES:
 - Output the COMPLETE file content for each changed file (not a diff/patch)
 - Do NOT wrap the JSON in markdown code fences
 - Do NOT include any text before or after the JSON object
-- Start your response with { and end with }${flywheelContext}`;
+- Start your response with { and end with }${flywheelContext}${conversationContext ? `\n\nPrevious edits in this session (use this to understand context and maintain consistency):\n${conversationContext}` : ""}`;
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
