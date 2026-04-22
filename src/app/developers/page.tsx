@@ -37,7 +37,7 @@ type Endpoint = {
 
 const endpoints: Endpoint[] = [
   { method: "POST", path: "/api/v1/sites", description: "Generate a complete React site from a single prompt.", snippet: `{ "prompt": "saas landing for a dog walking app" }`, icon: Rocket },
-  { method: "POST", path: "/api/v1/generate", description: "Lower-level generation endpoint with model + agent control.", snippet: `{ "prompt": "...", "model": "claude-opus-4-6" }`, icon: Code },
+  { method: "POST", path: "/api/v1/generate", description: "Lower-level generation endpoint with model + agent control.", snippet: `{ "prompt": "...", "model": "claude-opus-4-7" }`, icon: Code },
   { method: "POST", path: "/api/v1/deploy", description: "Deploy a generated site to a live zoobicon.sh subdomain.", snippet: `{ "siteId": "abc123", "slug": "my-site" }`, icon: Rocket },
   { method: "POST", path: "/api/v1/video/generate", description: "Produce a talking-avatar video from a script. Fish Speech + OmniHuman.", snippet: `{ "script": "Hello world" }`, icon: Video },
   { method: "POST", path: "/api/v1/transcribe", description: "Speech-to-text transcription with speaker diarization.", snippet: `{ "audioUrl": "https://..." }`, icon: Activity },
@@ -110,10 +110,10 @@ const PRICING_TIERS = [
   },
 ];
 
-const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const CARD_BG = "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)";
 const PRIMARY_CTA = {
   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-  color: "#0a0a0f",
+  color: "#0a1628",
   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
 } as const;
 const SERIF: React.CSSProperties = {
@@ -169,7 +169,7 @@ export default function DevelopersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[#0b1530] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
@@ -476,14 +476,14 @@ export default function DevelopersPage() {
                 }`}
                 style={{
                   background: tier.highlighted
-                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(17,17,24,0.85) 100%)"
+                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(20,40,95,0.85) 100%)"
                     : CARD_BG,
                 }}
               >
                 {tier.highlighted && (
                   <div
                     className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
-                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a0a0f" }}
+                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a1628" }}
                   >
                     Most popular
                   </div>

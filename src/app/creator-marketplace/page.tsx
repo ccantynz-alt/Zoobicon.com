@@ -169,7 +169,7 @@ export default function CreatorMarketplacePage() {
                 onChange={(e) => setSort(e.target.value as Sort)}
                 className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none"
               >
-                {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value} className="bg-[#1a1a2e]">{o.label}</option>)}
+                {SORT_OPTIONS.map((o) => <option key={o.value} value={o.value} className="bg-[#0f2148]">{o.label}</option>)}
               </select>
             </div>
 

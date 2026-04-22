@@ -167,10 +167,10 @@ export default function KnowledgeBasePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#0f2148] text-white">
       <BackgroundEffects preset="admin" />
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl">
+      <div className="border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/admin/support" className="p-2 rounded-lg hover:bg-[#111318] transition-colors">

@@ -261,7 +261,7 @@ export default function AiSearchPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white selection:bg-emerald-400/30">
+    <main className="min-h-screen bg-[#0a1628] text-white selection:bg-emerald-400/30">
       {/* ───── Hero ───── */}
       <section className="relative overflow-hidden pt-24 pb-16 sm:pt-32 sm:pb-24">
         {/* Ambient glow */}
@@ -309,7 +309,7 @@ export default function AiSearchPage() {
           <div className="mx-auto mt-12 max-w-3xl">
             <div className="group relative rounded-3xl border border-white/15 bg-white/5 backdrop-blur-xl p-2 transition focus-within:border-emerald-400/50 focus-within:bg-white/8">
               <div className="absolute -inset-px rounded-3xl bg-gradient-to-r from-emerald-400/20 via-cyan-400/20 to-violet-400/20 opacity-0 blur-xl transition group-focus-within:opacity-100" />
-              <div className="relative rounded-[22px] bg-[#0a0a0f]/80 p-6">
+              <div className="relative rounded-[22px] bg-[#0a1628]/80 p-6">
                 <label className="block text-xs font-medium uppercase tracking-widest text-white/50 mb-3">
                   Describe the mission
                 </label>
@@ -388,7 +388,7 @@ export default function AiSearchPage() {
               Watch the engine think.
             </h2>
             <p className="mt-4 mx-auto max-w-xl text-white/60">
-              Six phases. Each phase streams its verdict the moment it's ready — no spinners, no waiting, no mystery.
+              Six phases. Each phase streams its verdict the moment it&apos;s ready — no spinners, no waiting, no mystery.
             </p>
           </div>
 

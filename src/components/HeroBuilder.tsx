@@ -85,7 +85,7 @@ const AGENTS: Stage[] = [
     id: "dev",
     agent: "Developer",
     icon: "⚡",
-    role: "Opus 4.6",
+    role: "Opus 4.7",
     line: "Streaming components into your preview.",
     at: 4600,
   },

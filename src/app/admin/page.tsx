@@ -69,8 +69,9 @@ interface Analytics {
 }
 
 export default function AdminPage() {
-  // userName removed — now displayed by AdminShell sidebar
-  const [isAdmin, setIsAdmin] = useState(false);
+  // AdminShell is the single auth gate — see src/app/admin/AdminShell.tsx.
+  // A duplicated check here used to race against it and flash redirects.
+  const [isAdmin] = useState(true);
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const [copied, setCopied] = useState("");
   const [apiTest, setApiTest] = useState<"idle" | "loading" | "ok" | "error">("idle");
@@ -88,18 +89,6 @@ export default function AdminPage() {
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [editRole, setEditRole] = useState("");
   const [editPlan, setEditPlan] = useState("");
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("zoobicon_user");
-      if (!raw) { window.location.href = "/auth/login"; return; }
-      const user = JSON.parse(raw);
-      if (user.role !== "admin") { window.location.href = "/dashboard"; return; }
-      setIsAdmin(true);
-    } catch {
-      window.location.href = "/auth/login";
-    }
-  }, []);
 
   const copyToClipboard = (text: string, key: string) => {
     navigator.clipboard.writeText(text).catch(() => {});

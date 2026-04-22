@@ -95,7 +95,7 @@ export default function CollaborationBar({
         </button>
 
         {showPanel && (
-          <div className="absolute top-full right-0 mt-2 w-72 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-2xl shadow-black/40 z-50 overflow-hidden">
+          <div className="absolute top-full right-0 mt-2 w-72 bg-[#0f2148] border border-white/10 rounded-xl shadow-2xl shadow-black/40 z-50 overflow-hidden">
             <div className="p-3 border-b border-white/5">
               <h3 className="text-xs font-semibold text-white/70 uppercase tracking-wider">
                 Real-Time Collaboration
@@ -218,7 +218,7 @@ export default function CollaborationBar({
 
       {/* Expanded panel */}
       {showPanel && (
-        <div className="absolute top-full right-0 mt-2 w-72 bg-[#1a1a2e] border border-white/10 rounded-xl shadow-2xl shadow-black/40 z-50 overflow-hidden">
+        <div className="absolute top-full right-0 mt-2 w-72 bg-[#0f2148] border border-white/10 rounded-xl shadow-2xl shadow-black/40 z-50 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-3 border-b border-white/5">
             <div className="flex items-center gap-2">

@@ -75,10 +75,10 @@ const FAQS = [
   { q: "What languages are supported?", a: "50+ languages including English, Spanish, French, German, Portuguese, Italian, Dutch, Japanese, Korean, Mandarin Chinese, Hindi, Arabic, Turkish, Polish, Russian, and many more. Language detection is automatic — just start speaking." },
 ];
 
-const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const CARD_BG = "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)";
 const PRIMARY_CTA = {
   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-  color: "#0a0a0f",
+  color: "#0a1628",
   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
 } as const;
 const SERIF: React.CSSProperties = {
@@ -131,7 +131,7 @@ export default function DictationProductPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[#0b1530] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
@@ -366,14 +366,14 @@ export default function DictationProductPage() {
                 }`}
                 style={{
                   background: p.featured
-                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(17,17,24,0.85) 100%)"
+                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(20,40,95,0.85) 100%)"
                     : CARD_BG,
                 }}
               >
                 {p.featured && (
                   <div
                     className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
-                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a0a0f" }}
+                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a1628" }}
                   >
                     Most popular
                   </div>

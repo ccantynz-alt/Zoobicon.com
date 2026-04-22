@@ -1,7 +1,12 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { authenticateRequest } from "@/lib/auth-guard";
-import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
+import {
+  callLLMWithFailover,
+  describeLLMError,
+  getAvailableProviders,
+  isTransientLLMError,
+} from "@/lib/llm-provider";
 
 export const maxDuration = 120;
 
@@ -71,7 +76,28 @@ export async function POST(req: NextRequest) {
 
   // The Anthropic SDK is the primary path. The failover layer
   // (callLLMWithFailover) handles OpenAI/Gemini if Anthropic is down.
-  const client = new Anthropic({ apiKey: apiKey || "missing", timeout: 60000 });
+  // maxRetries:0 because we do our own classified retry below so we can
+  // distinguish transient TLS flakes from fatal errors and surface them
+  // cleanly (no raw openssl stack traces to Gate Test consumers).
+  const client = new Anthropic({ apiKey: apiKey || "missing", timeout: 60000, maxRetries: 0 });
+
+  // Retry a single SDK call 3x with jitter for transient network/TLS faults.
+  // Non-transient (auth, 400) bubbles up on the first try.
+  const callWithRetry = async <T>(fn: () => Promise<T>, label: string): Promise<T> => {
+    let lastErr: unknown;
+    for (let i = 0; i < 3; i++) {
+      try {
+        return await fn();
+      } catch (err) {
+        lastErr = err;
+        if (!isTransientLLMError(err) || i === 2) throw err;
+        const delay = 400 * Math.pow(2, i) + Math.floor(Math.random() * 250);
+        console.warn(`[edit:${label}] attempt ${i + 1}/3 failed (${describeLLMError(err)}), retrying in ${delay}ms`);
+        await new Promise((r) => setTimeout(r, delay));
+      }
+    }
+    throw lastErr;
+  };
 
   // Build context: show the AI which files exist and their content
   const fileList = Object.keys(files);
@@ -175,12 +201,16 @@ RULES:
         // Pass 1 — Anthropic Haiku via direct SDK (fastest, cheapest)
         if (apiKey) {
           try {
-            const response = await client.messages.create({
-              model: "claude-haiku-4-5-20251001",
-              max_tokens: 16384,
-              system: systemPrompt,
-              messages: [{ role: "user", content: userMessage }],
-            });
+            const response = await callWithRetry(
+              () =>
+                client.messages.create({
+                  model: "claude-haiku-4-5-20251001",
+                  max_tokens: 16384,
+                  system: systemPrompt,
+                  messages: [{ role: "user", content: userMessage }],
+                }),
+              "haiku"
+            );
             const text = response.content.find((b: Anthropic.ContentBlock) => b.type === "text")?.text || "";
             const result = validate(text);
             if (result.ok) {
@@ -197,9 +227,9 @@ RULES:
             errors.push(`Haiku: ${result.reason}`);
             send({ type: "status", message: "Retrying with stronger model..." });
           } catch (err) {
-            const msg = err instanceof Error ? err.message : "Unknown error";
-            errors.push(`Haiku: ${msg}`);
-            console.warn(`[edit] Haiku call failed: ${msg}`);
+            const clean = describeLLMError(err);
+            errors.push(`Haiku: ${clean}`);
+            console.warn(`[edit] Haiku call failed: ${clean}`);
             send({ type: "status", message: "Retrying with fallback provider..." });
           }
         }
@@ -207,12 +237,16 @@ RULES:
         // Pass 2 — Anthropic Sonnet (smarter model, retry path)
         if (apiKey) {
           try {
-            const response = await client.messages.create({
-              model: "claude-sonnet-4-6",
-              max_tokens: 16384,
-              system: systemPrompt,
-              messages: [{ role: "user", content: userMessage }],
-            });
+            const response = await callWithRetry(
+              () =>
+                client.messages.create({
+                  model: "claude-sonnet-4-6",
+                  max_tokens: 16384,
+                  system: systemPrompt,
+                  messages: [{ role: "user", content: userMessage }],
+                }),
+              "sonnet"
+            );
             const text = response.content.find((b: Anthropic.ContentBlock) => b.type === "text")?.text || "";
             const result = validate(text);
             if (result.ok) {
@@ -228,13 +262,14 @@ RULES:
             }
             errors.push(`Sonnet: ${result.reason}`);
           } catch (err) {
-            const msg = err instanceof Error ? err.message : "Unknown error";
-            errors.push(`Sonnet: ${msg}`);
-            console.warn(`[edit] Sonnet call failed: ${msg}`);
+            const clean = describeLLMError(err);
+            errors.push(`Sonnet: ${clean}`);
+            console.warn(`[edit] Sonnet call failed: ${clean}`);
           }
         }
 
-        // Pass 3 — cross-provider failover (OpenAI, Gemini)
+        // Pass 3 — cross-provider failover (OpenAI, Gemini). The failover
+        // layer now wraps each provider call in its own transient-retry.
         try {
           send({ type: "status", message: "Trying alternate AI provider..." });
           const fb = await callLLMWithFailover({
@@ -257,23 +292,37 @@ RULES:
           }
           errors.push(`${fb.model}: ${result.reason}`);
         } catch (err) {
-          const msg = err instanceof Error ? err.message : "Unknown error";
-          errors.push(`Failover: ${msg}`);
-          console.error(`[edit] Cross-provider failover failed: ${msg}`);
+          const clean = describeLLMError(err);
+          errors.push(`Failover: ${clean}`);
+          console.error(`[edit] Cross-provider failover failed: ${clean}`);
         }
 
-        // Every attempt failed — surface the truth, with the actual reasons
+        // Every attempt failed — surface a clean, actionable message.
+        // Consumers like Craig's Gate Test tool echo this verbatim, so it
+        // must NEVER contain raw openssl stack traces or provider internals.
         const summary = errors.length > 0 ? errors.join(" | ") : "No changes detected";
+        const allTransient = errors.length > 0 && errors.every((e) =>
+          /TLS|timed out|reset|overloaded|rate limited|5xx|DNS/i.test(e)
+        );
+        const guidance = allTransient
+          ? "Upstream AI provider is temporarily unavailable. Wait 30-60s and retry — this is a network hiccup, not a problem with the request."
+          : "Try rephrasing your instruction or being more specific about which file to change.";
         send({
           type: "error",
           fatal: true,
-          message: `Edit failed across all providers. ${summary}. Try rephrasing your instruction or being more specific about which file to change.`,
+          retryable: allTransient,
+          message: `Edit failed across all providers. ${summary}. ${guidance}`,
         });
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "Unknown error";
-        console.error(`[edit] Stream handler crashed: ${msg}`);
+        const clean = describeLLMError(err);
+        console.error(`[edit] Stream handler crashed: ${clean}`);
         try {
-          send({ type: "error", fatal: true, message: `Edit failed: ${msg}. Please try again.` });
+          send({
+            type: "error",
+            fatal: true,
+            retryable: isTransientLLMError(err),
+            message: `Edit failed: ${clean}. Please try again.`,
+          });
         } catch { /* controller may already be closed */ }
       } finally {
         try { controller.close(); } catch { /* already closed */ }

@@ -123,7 +123,7 @@ const BRAND_SYSTEM = `You are an elite brand designer. Given a strategy and brie
 
 CRITICAL COLOR RULE: Your palettes must be BOLD and VIBRANT. Never produce dull, washed-out, or generic blue palettes.
 - Primary color must be SATURATED and DISTINCTIVE (not generic blue #2563eb or plain gray)
-- Background should NEVER be plain white (#ffffff) — use tinted whites (#fdf8f4, #fafafa, #f0fdf4) or dark backgrounds (#0f172a, #1a1a2e)
+- Background should NEVER be plain white (#ffffff) — use tinted whites (#fdf8f4, #fafafa, #f0fdf4) or dark backgrounds (#0f172a, #0f2148)
 - BackgroundAlt must be noticeably different from background (not just a shade lighter)
 - Accent color must CONTRAST with primary (complementary or analogous, not the same hue)
 - Every palette needs at least ONE bold, eye-catching color
@@ -134,7 +134,7 @@ Industry color guidance:
 - Real Estate: Navy (#1a365d) + gold (#c9a96e) on warm white (#faf8f5)
 - Healthcare: Teal (#0d9488), sage (#059669) on soft mint (#f0fdf4)
 - E-commerce: Coral (#f43f5e), orange (#f97316), or emerald (#059669) — bold conversion colors
-- Portfolio: Deep charcoal bg (#1a1a2e) with vivid accent (#f43f5e, #8b5cf6, #06b6d4)
+- Portfolio: Deep charcoal bg (#0f2148) with vivid accent (#f43f5e, #8b5cf6, #06b6d4)
 - Legal/Finance: Deep navy (#1e3a5f) or forest (#0f766e) — professional but NOT dull
 
 Output a JSON object:
@@ -407,7 +407,7 @@ Use ALL the copy from the COPY input. Every section must appear with real visibl
 - Mobile hamburger menu in <script>
 - NEVER set opacity:0 on any element
 - Nav should have a colored or dark background — never plain white
-- Footer MUST have a dark background (#1a1a2e, #0f172a, or the dark primary color)
+- Footer MUST have a dark background (#0f2148, #0f172a, or the dark primary color)
 - CTA section MUST have a bold colored or gradient background
 
 ## NEVER DO
@@ -630,7 +630,7 @@ export async function runPipeline(
   // Total: ~95s — well within 300s
   const MODEL_PLANNER = userModel || "claude-haiku-4-5-20251001";   // Fast JSON agents (strategy, brand, copy, architecture)
   const MODEL_BALANCED = userModel || "claude-sonnet-4-6";           // Enhancement agents (SEO, animation)
-  const MODEL_PREMIUM = userModel || "claude-opus-4-6";              // Developer agent — Opus for jaw-dropping output
+  const MODEL_PREMIUM = userModel || "claude-opus-4-7";              // Developer agent — Opus for jaw-dropping output
 
   // Helper: call the right LLM based on user selection
   // Returns { text, stopReason } so we can detect truncation
@@ -647,7 +647,7 @@ export async function runPipeline(
     } else {
       // Direct Anthropic SDK for Claude models
       // Timeout: 60s for planners, 180s for Opus builder, 120s for Sonnet enhancers
-      const timeoutMs = opts.model === "claude-opus-4-6" ? 180_000
+      const timeoutMs = opts.model === "claude-opus-4-7" ? 180_000
         : opts.maxTokens <= 16384 ? 60_000 : 120_000;
       const client = new Anthropic({ apiKey, timeout: timeoutMs });
       const messages: { role: "user" | "assistant"; content: string }[] = [
@@ -684,7 +684,7 @@ export async function runPipeline(
         return await callWithModel(opts.model);
       } catch (err) {
         // If Opus fails, automatically fall back to Sonnet (still good quality)
-        if (opts.model === "claude-opus-4-6") {
+        if (opts.model === "claude-opus-4-7") {
           console.warn(`[Pipeline] Opus failed (${err instanceof Error ? err.message : "unknown"}), falling back to Sonnet`);
           return await callWithModel("claude-sonnet-4-6");
         }

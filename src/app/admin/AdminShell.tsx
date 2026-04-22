@@ -107,7 +107,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   // Don't render anything until auth check completes
   if (checking || !isAdmin) {
     return (
-      <div className="min-h-screen bg-[#131520] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0f2148] flex items-center justify-center">
         <div className="text-white/30 text-sm">Checking permissions...</div>
       </div>
     );

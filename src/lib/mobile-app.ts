@@ -30,7 +30,7 @@ export function generateManifest(): Record<string, unknown> {
     description: "AI Website Builder & Business Platform",
     start_url: "/admin/mobile",
     display: "standalone",
-    background_color: "#0a0a14",
+    background_color: "#060e1f",
     theme_color: "#4f46e5",
     orientation: "any",
     icons: [

@@ -87,19 +87,27 @@ export async function runProbes(ctx: GateTestContext): Promise<GateTestResult> {
   if (isGateTestApiEnabled()) {
     try {
       const snapshot = await snapshotIframe(ctx.iframe);
-      const res = await fetch(process.env.NEXT_PUBLIC_GATE_TEST_API_URL!, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_GATE_TEST_API_KEY!,
-        },
-        body: JSON.stringify({
-          round: ctx.round,
-          snapshot,
-          files: Object.keys(ctx.files),
-        }),
-        signal: AbortSignal.timeout(15_000),
-      });
+      // 3 attempts with exponential backoff + jitter. Matches the LLM retry
+      // profile — transient TLS/network faults (EPROTO, SSL alert 80, socket
+      // hang-up, DNS blip) recover on retry and were previously killing the
+      // gate loop on a single hiccup.
+      const res = await fetchWithRetry(
+        process.env.NEXT_PUBLIC_GATE_TEST_API_URL!,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.NEXT_PUBLIC_GATE_TEST_API_KEY!,
+          },
+          body: JSON.stringify({
+            round: ctx.round,
+            snapshot,
+            files: Object.keys(ctx.files),
+          }),
+          timeoutMs: 15_000,
+          attempts: 3,
+        }
+      );
       if (res.ok) {
         const data = (await res.json()) as { issues: GateTestIssue[] };
         return {
@@ -109,8 +117,9 @@ export async function runProbes(ctx: GateTestContext): Promise<GateTestResult> {
           source: "gate-test-api",
         };
       }
+      console.warn(`[gate-test] external API returned ${res.status}, falling back to builtin`);
     } catch (err) {
-      console.warn("[gate-test] external API failed, falling back to builtin:", err);
+      console.warn(`[gate-test] external API unreachable (${describeNetworkError(err)}), falling back to builtin`);
     }
   }
 
@@ -231,4 +240,62 @@ export function issuesToEditPrompt(issues: GateTestIssue[]): string | null {
     "Automated QA found the following issues — fix them without changing anything else:",
     ...actionable.map((i, idx) => `${idx + 1}. [${i.severity}] ${i.message}\n   Fix: ${i.autoFixPrompt}`),
   ].join("\n\n");
+}
+
+/**
+ * Short, user-safe description of a network-layer failure. Never leaks the
+ * raw openssl stack (e.g. "ssl/record/rec_layer_s3.c:912:SSL alert number 80")
+ * that confused Craig when Gate Test surfaced it verbatim.
+ */
+export function describeNetworkError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (/EPROTO|ssl.*alert|tlsv1|handshake/i.test(msg)) return "upstream TLS connection dropped";
+  if (/timeout|timed?\s*out|abort/i.test(msg)) return "request timed out";
+  if (/ECONNRESET|socket\s*hang.?up|EPIPE/i.test(msg)) return "connection reset";
+  if (/ECONNREFUSED/i.test(msg)) return "connection refused";
+  if (/ENOTFOUND|EAI_AGAIN/i.test(msg)) return "DNS lookup failed";
+  if (/fetch failed|network/i.test(msg)) return "network unreachable";
+  const first = msg.split(/[\n.]/)[0].trim();
+  return first.length > 100 ? first.slice(0, 97) + "..." : first;
+}
+
+/**
+ * Transient-error fetch with exponential backoff + jitter. Retries on
+ * network-layer flakes (EPROTO/SSL/DNS/reset/timeout) and 5xx responses.
+ * Does NOT retry on 4xx — those are caller mistakes, not transient faults.
+ */
+async function fetchWithRetry(
+  url: string,
+  opts: RequestInit & { timeoutMs?: number; attempts?: number }
+): Promise<Response> {
+  const attempts = opts.attempts ?? 3;
+  const timeoutMs = opts.timeoutMs ?? 15_000;
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const { timeoutMs: _t, attempts: _a, ...init } = opts;
+      void _t; void _a;
+      const res = await fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+      if (res.status >= 500 && i < attempts - 1) {
+        console.warn(`[gate-test] ${url} returned ${res.status}, retrying`);
+        await sleep(400 * Math.pow(2, i) + Math.floor(Math.random() * 250));
+        continue;
+      }
+      return res;
+    } catch (err) {
+      lastErr = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      const transient =
+        /EPROTO|ssl.*alert|tlsv1|handshake|timeout|timed?\s*out|abort|ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|EPIPE|socket\s*hang.?up|fetch failed|network/i.test(msg);
+      if (!transient || i === attempts - 1) throw err;
+      const delay = 400 * Math.pow(2, i) + Math.floor(Math.random() * 250);
+      console.warn(`[gate-test] attempt ${i + 1}/${attempts} failed (${describeNetworkError(err)}), retrying in ${delay}ms`);
+      await sleep(delay);
+    }
+  }
+  throw lastErr;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
 }

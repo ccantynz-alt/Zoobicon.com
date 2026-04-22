@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       try {
         const c = new Anthropic({ apiKey, timeout: 30_000 });
         const res = await c.messages.create({
-          model: "claude-opus-4-6",
+          model: "claude-opus-4-7",
           max_tokens: 10,
           messages: [{ role: "user", content: "Say OK" }],
         });

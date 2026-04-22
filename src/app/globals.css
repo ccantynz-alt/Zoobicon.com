@@ -34,7 +34,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #050508;
+  background: #0b1530;
   color: #e8e8ec;
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
@@ -113,16 +113,16 @@ img, video {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0f;
+  background: #0a1628;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1a1a25;
+  background: #162044;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a3a5a;
+  background: #2d4d8c;
 }
 
 /* Scrollbar — Firefox */
@@ -226,14 +226,14 @@ pre code {
    ============================================ */
 
 .cyber-panel {
-  background: #1a1a2e;
+  background: #0f2148;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .cyber-input {
-  background: #0f0f1a;
+  background: #0a1628;
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #f0f0f5;
   font-family: "Inter", system-ui, sans-serif;
@@ -430,9 +430,9 @@ pre code {
   box-shadow: 0 4px 20px rgba(124, 90, 255, 0.15);
 }
 
-/* Black fog page — override background to pure black */
+/* Void page — deep navy canvas */
 .bg-void {
-  background: #050508 !important;
+  background: #0b1530 !important;
 }
 
 /* Crisp white text with subtle glow for black fog pages */
@@ -567,6 +567,61 @@ pre code {
   backdrop-filter: blur(40px) saturate(1.3);
   -webkit-backdrop-filter: blur(40px) saturate(1.3);
   border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ============================================
+   SITE BACKDROP — navy gradient + dot-grid pattern
+   Mounted once at root layout so every page inherits
+   the same dark navy chrome. Kept behind content via
+   z-index: -1 so children render above without needing
+   their own stacking context.
+   ============================================ */
+
+.site-backdrop {
+  position: fixed;
+  inset: 0;
+  /* z-index: 0 (not -1) — a negative z-index would paint below the body's
+     solid navy fill and vanish. 0 keeps it behind later DOM siblings
+     (nav, banners, children) which paint on top in natural order. */
+  z-index: 0;
+  pointer-events: none;
+  /* Richer navy with lifted middle stop — no more near-black. Glows are
+     large, saturated, and positioned so at least one hits view on any
+     viewport (mobile or desktop). The old edge vignette is deleted — it
+     was collapsing the whole thing to black on mobile. */
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 18%, rgba(56, 120, 255, 0.30), transparent 65%),
+    radial-gradient(ellipse 65% 50% at 85% 30%, rgba(168, 85, 247, 0.24), transparent 65%),
+    radial-gradient(ellipse 80% 55% at 50% 92%, rgba(34, 211, 238, 0.16), transparent 70%),
+    linear-gradient(180deg, #0b1530 0%, #142454 50%, #0b1530 100%);
+}
+
+.site-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(180, 200, 255, 0.12) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: 0 0;
+  -webkit-mask-image: radial-gradient(ellipse 95% 80% at 50% 40%, black 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 95% 80% at 50% 40%, black 55%, transparent 100%);
+}
+
+/* Mobile — viewport is narrow so desktop ellipses (positioned at 15% / 85%)
+   land off-screen. Reposition them to the centre, pump saturation, and
+   drop the dot-pattern density so the glows read clearly on small screens. */
+@media (max-width: 768px) {
+  .site-backdrop {
+    background:
+      radial-gradient(ellipse 120% 45% at 50% 12%, rgba(56, 120, 255, 0.40), transparent 65%),
+      radial-gradient(ellipse 120% 45% at 50% 50%, rgba(168, 85, 247, 0.32), transparent 65%),
+      radial-gradient(ellipse 130% 50% at 50% 92%, rgba(34, 211, 238, 0.22), transparent 70%),
+      linear-gradient(180deg, #0b1530 0%, #16285c 50%, #0b1530 100%);
+  }
+  .site-backdrop::before {
+    background-size: 24px 24px;
+    background-image: radial-gradient(rgba(180, 200, 255, 0.14) 1px, transparent 1px);
+  }
 }
 
 /* ============================================
@@ -1757,11 +1812,11 @@ select {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Deep canvas */
-  --fs-bg-0: #050508;           /* page background */
-  --fs-bg-1: #0a0a0f;           /* nav + footer */
-  --fs-bg-2: #111118;           /* cards */
-  --fs-bg-3: #1a1a24;           /* elevated cards */
+  /* Deep navy canvas — replaces pure black, still dark enough for editorial contrast */
+  --fs-bg-0: #060e1f;           /* page background (navy-950) */
+  --fs-bg-1: #0a1628;           /* nav + footer (navy-900) */
+  --fs-bg-2: #0f2148;           /* cards (navy-800) */
+  --fs-bg-3: #152e60;           /* elevated cards (navy-700) */
   --fs-hair: rgba(255,255,255,0.06);
   --fs-hair-strong: rgba(255,255,255,0.12);
 
@@ -1886,7 +1941,7 @@ select {
   border-radius: 999px;
   font-size: 14px;
   font-weight: 600;
-  color: #0a0a0f;
+  color: #060e1f;
   background: var(--fs-accent);
   border: 1px solid rgba(0,0,0,0.1);
   transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1),

@@ -355,9 +355,9 @@ export default function ChallengesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-[#0a1628] text-white">
       {/* ===== NAV ===== */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/[0.06]">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a1628]/80 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
           <div className="flex items-center gap-4">
             <Link
@@ -457,7 +457,7 @@ export default function ChallengesPage() {
           <div
             className={`absolute inset-0 bg-gradient-to-br ${activeChallenge.gradient} opacity-15`}
           />
-          <div className="absolute inset-0 bg-[#0a0a0f]/70 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-[#0a1628]/70 backdrop-blur-sm" />
 
           <div className="relative p-8 sm:p-12">
             <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">

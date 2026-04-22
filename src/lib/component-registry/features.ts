@@ -192,7 +192,7 @@ registerComponent({
     },
   ];
   return (
-    <section id="features" className="py-28 px-6 bg-gray-950">
+    <section id="features" className="py-28 px-6 bg-navy-950">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-sm font-semibold text-cyan-400 uppercase tracking-widest mb-3">Platform</p>
@@ -301,7 +301,7 @@ registerComponent({
   tags: ["modern", "apple", "creative", "design", "premium", "startup", "saas", "portfolio", "agency"],
   code: `export default function Features() {
   return (
-    <section id="features" className="py-28 px-6 bg-gray-950">
+    <section id="features" className="py-28 px-6 bg-navy-950">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-sm font-semibold text-violet-400 uppercase tracking-widest mb-3">Features</p>
@@ -670,7 +670,7 @@ registerComponent({
                 <div className={\`relative \${isReversed ? "lg:order-1" : ""}\`}>
                   <div className={\`absolute inset-0 bg-[radial-gradient(ellipse,rgba(\${f.glow === "violet" ? "139,92,246" : f.glow === "blue" ? "59,130,246" : "217,70,239"},0.1),transparent_70%)] scale-150 pointer-events-none\`} />
                   <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-gray-900/50 backdrop-blur-sm shadow-xl p-1">
-                    <div className="rounded-xl bg-gradient-to-br from-gray-900 to-gray-950 aspect-[4/3] flex items-center justify-center">
+                    <div className="rounded-xl bg-gradient-to-br from-gray-900 to-navy-950 aspect-[4/3] flex items-center justify-center">
                       <div className="text-center p-8">
                         <div className={\`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br \${f.gradient} flex items-center justify-center shadow-lg\`}>
                           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

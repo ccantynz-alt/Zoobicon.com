@@ -81,7 +81,7 @@ export default function AdminRecoverPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-navy-950 via-slate-900 to-navy-950 text-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <Link
           href="/auth/login"
@@ -156,7 +156,7 @@ export default function AdminRecoverPage() {
                     value={token}
                     onChange={(e) => setToken(e.target.value)}
                     placeholder="Paste your recovery token"
-                    className="w-full bg-slate-950/60 border border-slate-700 rounded-lg pl-10 pr-3 py-2.5 text-sm placeholder:text-slate-600 focus:outline-none focus:border-stone-500 focus:ring-1 focus:ring-stone-500/50"
+                    className="w-full bg-navy-950/60 border border-slate-700 rounded-lg pl-10 pr-3 py-2.5 text-sm placeholder:text-slate-600 focus:outline-none focus:border-stone-500 focus:ring-1 focus:ring-stone-500/50"
                     autoComplete="off"
                     spellCheck={false}
                     required

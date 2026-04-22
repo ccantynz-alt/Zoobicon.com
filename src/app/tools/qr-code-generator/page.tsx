@@ -129,7 +129,7 @@ export default function QRCodeGeneratorPage() {
   const [size, setSize] = useState<SizeOption>("medium");
   const [ecLevel, setEcLevel] = useState<ECLevel>("M");
   const [fgColor, setFgColor] = useState("#ffffff");
-  const [bgColor, setBgColor] = useState("#0a0a14");
+  const [bgColor, setBgColor] = useState("#060e1f");
 
   /* --- output --- */
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
@@ -231,9 +231,9 @@ export default function QRCodeGeneratorPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-[#0a0a14] text-white">
+      <div className="min-h-screen bg-[#0b1530] text-white">
         {/* -------- NAV -------- */}
-        <nav className="border-b border-white/10 bg-[#0a0a14]/80 backdrop-blur-md sticky top-0 z-50">
+        <nav className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center text-sm font-black">

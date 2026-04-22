@@ -95,7 +95,7 @@ ${agency_brand.logoUrl ? `- Logo URL: ${agency_brand.logoUrl}` : ""}`;
 
     const userPrompt = style ? `Style: ${style}\n\n${prompt}` : prompt;
 
-    const modelId = model || "claude-opus-4-6";
+    const modelId = model || "claude-opus-4-7";
     const maxTokens = selectedTier === "premium" ? 32000 : 16000;
     const isClaudeModel = !modelId || modelId.startsWith("claude");
 
@@ -119,8 +119,8 @@ ${agency_brand.logoUrl ? `- Logo URL: ${agency_brand.logoUrl}` : ""}`;
       });
 
       html = response.content
-        .filter((block): block is { type: "text"; text: string } => block.type === "text")
-        .map((block) => block.text)
+        .filter((block) => block.type === "text")
+        .map((block) => (block as { type: "text"; text: string }).text)
         .join("");
       tokensUsedRaw = (response.usage?.input_tokens || 0) + (response.usage?.output_tokens || 0);
     } else {

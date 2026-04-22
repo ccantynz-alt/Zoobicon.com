@@ -20,8 +20,11 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [oauthNotice, setOauthNotice] = useState("");
   const [referralCode, setReferralCode] = useState<string | null>(null);
+  // Preserve ?redirect= through the toggle-to-login link so users don't
+  // lose their original destination when switching forms.
+  const [redirectQuery, setRedirectQuery] = useState<string>("");
 
-  // Check URL for ?ref= referral code on load
+  // Check URL for ?ref= referral code on load + capture ?redirect=
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -36,6 +39,10 @@ export default function SignupPage() {
         if (stored && stored.startsWith("ref_")) {
           setReferralCode(stored);
         }
+      }
+      const r = params.get("redirect");
+      if (r && r.startsWith("/") && !r.startsWith("//")) {
+        setRedirectQuery(`?redirect=${encodeURIComponent(r)}`);
       }
     } catch { /* ignore */ }
   }, []);
@@ -84,7 +91,16 @@ export default function SignupPage() {
         // Clear referral code after successful signup
         localStorage.removeItem("zoobicon_referral_code");
       } catch {}
-      window.location.href = "/dashboard";
+      // Honor ?redirect param — /builder and /marketplace both send the user
+      // here with ?redirect=/their-original-path. Ignoring it drops them on
+      // /dashboard and breaks the flow they were in the middle of.
+      // Guard against open-redirects: only same-origin relative paths.
+      let dest = "/dashboard";
+      try {
+        const r = new URLSearchParams(window.location.search).get("redirect");
+        if (r && r.startsWith("/") && !r.startsWith("//")) dest = r;
+      } catch {}
+      window.location.href = dest;
     } catch {
       setAuthError("Network error. Please try again.");
     } finally {
@@ -234,7 +250,7 @@ export default function SignupPage() {
 
           <p className="mt-4 text-center text-sm text-white/50">
             Already have an account?{" "}
-            <Link href="/auth/login" className="text-brand-400 hover:text-brand-300 font-medium">
+            <Link href={`/auth/login${redirectQuery}`} className="text-brand-400 hover:text-brand-300 font-medium">
               Sign in
             </Link>
           </p>

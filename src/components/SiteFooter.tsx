@@ -33,7 +33,7 @@ export default function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative border-t border-white/[0.06] bg-[#050508] overflow-hidden">
+    <footer className="relative border-t border-white/[0.06] bg-[#0b1530] overflow-hidden">
       {/* Ambient warm glow — restrained, just enough to signal depth */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
         <div
@@ -48,7 +48,7 @@ export default function SiteFooter() {
           className="relative mb-20 overflow-hidden rounded-[32px] border border-white/[0.08] p-10 sm:p-14"
           style={{
             background:
-              "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(26,26,36,0.65) 100%)",
+              "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(26,26,36,0.65) 100%)",
           }}
         >
           <div
@@ -85,7 +85,7 @@ export default function SiteFooter() {
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
                 style={{
                   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                  color: "#0a0a0f",
+                  color: "#0a1628",
                   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                 }}
               >
@@ -185,7 +185,7 @@ export default function SiteFooter() {
               links={[
                 { name: "Sign in", href: "/auth/login" },
                 { name: "Create account", href: "/auth/signup" },
-                { name: "Contact", href: "/contact" },
+                { name: "Contact", href: "/support" },
                 { name: "Legal", href: "/disclaimers" },
                 { name: "Privacy", href: "/privacy" },
               ]}
@@ -202,7 +202,7 @@ export default function SiteFooter() {
             </span>
           </div>
           <div className="text-[11px] text-white/35">
-            © {year} Zoobicon Limited. Built on Opus 4.6.
+            © {year} Zoobicon Limited. Built on Opus 4.7.
           </div>
         </div>
       </div>

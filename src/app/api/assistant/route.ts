@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 const MODELS = {
-  opus: "claude-opus-4-6",
+  opus: "claude-opus-4-7",
   sonnet: "claude-sonnet-4-6",
   haiku: "claude-haiku-4-5",
 } as const;
@@ -50,7 +50,7 @@ function authorized(req: NextRequest): boolean {
 function resolveModel(input?: string): string {
   if (!input) return MODELS.sonnet;
   if (input in MODELS) return MODELS[input as ModelKey];
-  return input; // allow explicit model ids like "claude-opus-4-6"
+  return input; // allow explicit model ids like "claude-opus-4-7"
 }
 
 export async function POST(req: NextRequest) {

@@ -329,7 +329,7 @@ export default function AIChatPage() {
       {/* Embed Modal */}
       {showEmbed && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowEmbed(false)}>
-          <div className="bg-[#1a1a2e] border border-white/10 rounded-2xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
+          <div className="bg-[#0f2148] border border-white/10 rounded-2xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-bold mb-4">Embed Your Chatbot</h3>
             <p className="text-sm text-white/50 mb-4">Add this code to any website to embed your AI chatbot:</p>
             <div className="relative">

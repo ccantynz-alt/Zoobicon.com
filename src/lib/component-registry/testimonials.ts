@@ -282,7 +282,7 @@ registerComponent({
     },
   ];
   return (
-    <section className="py-28 px-6 bg-gray-950">
+    <section className="py-28 px-6 bg-navy-950">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-sm font-semibold text-cyan-400 uppercase tracking-widest mb-3">Customer Stories</p>
@@ -434,7 +434,7 @@ registerComponent({
     },
   ];
   return (
-    <section className="py-28 px-6 bg-gray-950">
+    <section className="py-28 px-6 bg-navy-950">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-sm font-semibold text-emerald-400 uppercase tracking-widest mb-3">Proven Results</p>

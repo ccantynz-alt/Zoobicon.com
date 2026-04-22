@@ -346,11 +346,11 @@ support@zoobicon.com`;
   const toggleSelectAll = () => setSelected(selected.size === emails.length ? new Set() : new Set(emails.map((e) => e.id)));
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white relative">
+    <div className="min-h-screen bg-[#0f2148] text-white relative">
       <BackgroundEffects preset="admin" />
 
       {/* Navbar */}
-      <nav className="relative z-20 border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl">
+      <nav className="relative z-20 border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl">
         <div className="max-w-[1440px] mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-lg font-bold tracking-tight">Zoobicon</Link>

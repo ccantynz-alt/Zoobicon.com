@@ -319,7 +319,7 @@ export function buildStylesFile(options?: {
     raw: "#ffffff",
     light: "#ffffff",
     warm: "#FFFBEB",
-    dark: "#0a0a0f",
+    dark: "#0a1628",
   };
 
   const primaryColor = options?.primaryColor || defaultPrimary[theme] || "#4f46e5";
@@ -713,7 +713,7 @@ export function reskinEditorial(code: string): string {
 
 /**
  * Convert every base registry component (which is hardcoded dark —
- * `bg-gray-950`, `text-white`, `border-white/10` etc.) into a bright,
+ * `bg-navy-950`, `text-white`, `border-white/10` etc.) into a bright,
  * airy LIGHT theme. This is the fix for "every site Claude generates
  * comes out dark even when the business is an airport shuttle service."
  *
@@ -724,10 +724,10 @@ export function reskinEditorial(code: string): string {
  *
  * Maps:
  *   - Dark base surfaces (gray-950/900/800, neutral-950, zinc-950,
- *     arbitrary hex like #0a0a0f, #09090f, #131520) → white / stone-50
+ *     arbitrary hex like #0a1628, #09090f, #0f2148) → white / stone-50
  *   - On-dark text (text-white, text-gray-100..300) → text-stone-900/700
  *   - On-dark borders (border-white/10, border-gray-800) → stone-200
- *   - Dark gradients (from-gray-950) → from-stone-50
+ *   - Dark gradients (from-navy-950) → from-stone-50
  *   - Accent-on-dark patterns like text-white/80 → text-stone-700
  *
  * Idempotent: running twice is a no-op because pass 2 finds no dark
@@ -739,11 +739,11 @@ export function reskinLight(code: string): string {
   // 1. Arbitrary hex dark backgrounds — the registry peppers these
   //    throughout heroes/features/testimonials.
   const darkHexes = [
-    "#0a0a0f", "#09090f", "#0a0a12", "#131520", "#0b0b0f", "#050510",
+    "#0a1628", "#09090f", "#0a0a12", "#0f2148", "#0b0b0f", "#050510",
     "#020617", "#030712", "#111111", "#000000",
   ];
   for (const hex of darkHexes) {
-    // bg-[#0a0a0f], from-[#0a0a0f], to-[#0a0a0f], border-[#0a0a0f/..]
+    // bg-[#0a1628], from-[#0a1628], to-[#0a1628], border-[#0a1628/..]
     const re = new RegExp(
       `(bg|from|via|to|border|text|ring)-\\[${hex.replace(/[#]/g, "\\#")}(\\/[\\d.]+)?\\]`,
       "g",
@@ -1036,7 +1036,7 @@ export function buildAppFile(
     editorial: "bg-[#FAF9F6]",
     light: "bg-white",
     warm: "bg-amber-50",
-    dark: "bg-[#0a0a0f]",
+    dark: "bg-[#0a1628]",
     raw: "bg-white",
   };
   const rootClass = `min-h-screen ${rootBg[theme] || "bg-white"}`;

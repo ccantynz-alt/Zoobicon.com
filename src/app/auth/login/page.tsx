@@ -59,7 +59,16 @@ export default function LoginPage() {
 
       if (res.ok) {
         try { localStorage.setItem("zoobicon_user", JSON.stringify(data.user)); } catch {}
-        window.location.href = "/dashboard";
+        // Honor ?redirect param — the builder + marketplace + any gated page
+        // sends users here with their original destination. Dropping them on
+        // /dashboard instead breaks the flow and feels like a loop.
+        // Guard against open-redirects: only same-origin relative paths.
+        let dest = "/dashboard";
+        try {
+          const r = searchParams.get("redirect");
+          if (r && r.startsWith("/") && !r.startsWith("//")) dest = r;
+        } catch {}
+        window.location.href = dest;
         return;
       }
 
@@ -173,7 +182,17 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-white/50">
             Don&apos;t have an account?{" "}
-            <Link href="/auth/signup" className="text-brand-400 hover:text-brand-300 font-medium">
+            <Link
+              href={(() => {
+                // Preserve ?redirect= when toggling to signup so users keep
+                // their original destination across both forms.
+                const r = searchParams.get("redirect");
+                return r && r.startsWith("/") && !r.startsWith("//")
+                  ? `/auth/signup?redirect=${encodeURIComponent(r)}`
+                  : "/auth/signup";
+              })()}
+              className="text-brand-400 hover:text-brand-300 font-medium"
+            >
               Sign up free
             </Link>
           </p>

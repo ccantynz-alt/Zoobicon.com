@@ -43,10 +43,10 @@ const STATS = [
   { value: "0", label: "Manual work required" },
 ];
 
-const CARD_BG = "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const CARD_BG = "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)";
 const PRIMARY_CTA = {
   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-  color: "#0a0a0f",
+  color: "#0a1628",
   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
 } as const;
 const SERIF: React.CSSProperties = {
@@ -79,7 +79,7 @@ export default function SEOAgentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[#0b1530] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
