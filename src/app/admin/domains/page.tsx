@@ -163,17 +163,17 @@ export default function AdminDomainsPage() {
             const isExpiring = days > 0 && days <= 30;
             const isExpired = days <= 0;
             const statusColor = d.status === "active"
-              ? isExpired ? "text-stone-600" : isExpiring ? "text-stone-600" : "text-stone-600"
-              : d.status === "failed" ? "text-stone-600" : "text-stone-600";
+              ? isExpired ? "text-red-700" : isExpiring ? "text-amber-700" : "text-emerald-700"
+              : d.status === "failed" ? "text-red-700" : "text-slate-600";
             const statusBg = d.status === "active"
-              ? isExpired ? "bg-stone-50" : isExpiring ? "bg-stone-50" : "bg-stone-50"
-              : d.status === "failed" ? "bg-stone-50" : "bg-stone-50";
+              ? isExpired ? "bg-red-50" : isExpiring ? "bg-amber-50" : "bg-emerald-50"
+              : d.status === "failed" ? "bg-red-50" : "bg-slate-100";
 
             return (
               <div key={d.id || d.domain} className="rounded-xl bg-white border border-slate-200 p-5 hover:shadow-sm transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className={`w-2.5 h-2.5 rounded-full ${d.status === "active" ? (isExpired ? "bg-stone-500" : isExpiring ? "bg-stone-500" : "bg-stone-500") : d.status === "failed" ? "bg-stone-500" : "bg-stone-500"}`} />
+                    <div className={`w-2.5 h-2.5 rounded-full ${d.status === "active" ? (isExpired ? "bg-red-500" : isExpiring ? "bg-amber-500" : "bg-emerald-500") : d.status === "failed" ? "bg-red-500" : "bg-slate-400"}`} />
                     <h3 className="text-base font-semibold text-slate-800">{d.domain}</h3>
                     <button onClick={() => copyText(d.domain)} className="text-slate-300 hover:text-slate-500">
                       {copied === d.domain ? <Check className="w-3.5 h-3.5 text-stone-500" /> : <Copy className="w-3.5 h-3.5" />}

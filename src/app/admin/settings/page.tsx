@@ -141,7 +141,7 @@ function StatusDot({ set }: { set: boolean }) {
   return (
     <span
       className={`inline-block w-2 h-2 rounded-full ${
-        set ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.5)]" : "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.4)]"
+        set ? "bg-emerald-500" : "bg-red-400"
       }`}
       title={set ? "Key is set" : "Key not set"}
     />

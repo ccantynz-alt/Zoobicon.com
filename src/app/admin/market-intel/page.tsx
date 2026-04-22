@@ -1,10 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import BackgroundEffects from "@/components/BackgroundEffects";
 import {
-  ArrowLeft,
   Radar,
   Loader2,
   RefreshCw,
@@ -79,9 +76,9 @@ const CATEGORY_META: Record<
   string,
   { label: string; icon: typeof Globe; color: string }
 > = {
-  "website-builder": { label: "Website Builders", icon: Globe, color: "text-stone-400" },
-  "video-generator": { label: "Video Generators", icon: Video, color: "text-stone-400" },
-  "code-tool": { label: "Code Tools", icon: Code2, color: "text-stone-400" },
+  "website-builder": { label: "Website Builders", icon: Globe, color: "text-blue-600" },
+  "video-generator": { label: "Video Generators", icon: Video, color: "text-purple-600" },
+  "code-tool": { label: "Code Tools", icon: Code2, color: "text-slate-600" },
 };
 
 // ---------------------------------------------------------------------------
@@ -102,15 +99,15 @@ function timeAgo(dateStr: string): string {
 function severityColor(severity: string): string {
   switch (severity) {
     case "critical":
-      return "bg-stone-500/20 text-stone-400 border-stone-500/30";
+      return "bg-red-50 text-red-600 border-red-200";
     case "error":
-      return "bg-stone-500/15 text-stone-400 border-stone-500/20";
+      return "bg-orange-50 text-orange-600 border-orange-200";
     case "warning":
-      return "bg-stone-500/15 text-stone-400 border-stone-500/20";
+      return "bg-amber-50 text-amber-600 border-amber-200";
     case "info":
-      return "bg-stone-500/15 text-stone-400 border-stone-500/20";
+      return "bg-blue-50 text-blue-600 border-blue-200";
     default:
-      return "bg-gray-500/15 text-gray-400 border-gray-500/20";
+      return "bg-gray-50 text-gray-500 border-gray-200";
   }
 }
 
@@ -205,106 +202,92 @@ export default function MarketIntelPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f2148] text-white">
-      <BackgroundEffects />
-
+    <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="relative z-10 border-b border-white/10 bg-[#0f2148]/80 backdrop-blur-sm">
-        <div className="mx-auto max-w-7xl px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link
-                href="/admin"
-                className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Admin
-              </Link>
-              <div className="h-6 w-px bg-white/10" />
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-stone-500 to-stone-600">
-                  <Radar className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold">Market Intelligence</h1>
-                  <p className="text-xs text-gray-400">
-                    Product features, pricing, and positioning tracker
-                  </p>
-                </div>
-              </div>
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-violet-100 to-violet-200">
+              <Radar className="h-5 w-5 text-violet-600" />
             </div>
-
-            <div className="flex items-center gap-3">
-              {/* Category filter */}
-              <div className="relative">
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value as CategoryFilter)}
-                  className="appearance-none rounded-lg border border-white/10 bg-white/5 px-4 py-2 pr-8 text-sm text-white focus:border-stone-500 focus:outline-none"
-                >
-                  <option value="all">All Categories</option>
-                  <option value="website-builder">Website Builders</option>
-                  <option value="video-generator">Video Generators</option>
-                  <option value="code-tool">Code Tools</option>
-                </select>
-                <Filter className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-              </div>
-
-              {/* Refresh */}
-              <button
-                onClick={loadData}
-                disabled={isLoading}
-                className="rounded-lg border border-white/10 bg-white/5 p-2 text-gray-400 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
-              >
-                <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-              </button>
-
-              {/* Crawl Now */}
-              <button
-                onClick={triggerCrawl}
-                disabled={isCrawling}
-                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600 px-4 py-2 text-sm font-medium text-white hover:from-stone-500 hover:to-stone-500 transition-colors disabled:opacity-50"
-              >
-                {isCrawling ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Crawling...
-                  </>
-                ) : (
-                  <>
-                    <Radar className="h-4 w-4" />
-                    Crawl Now
-                  </>
-                )}
-              </button>
+            <div>
+              <h1 className="text-xl font-bold text-slate-800">Market Intelligence</h1>
+              <p className="text-xs text-slate-500">
+                Product features, pricing, and positioning tracker
+              </p>
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="mt-4 flex gap-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 rounded-t-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? "bg-white/10 text-white"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                }`}
+          <div className="flex items-center gap-3">
+            {/* Category filter */}
+            <div className="relative">
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value as CategoryFilter)}
+                className="appearance-none rounded-lg border border-slate-200 bg-white px-4 py-2 pr-8 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none"
               >
-                <tab.icon className="h-4 w-4" />
-                {tab.label}
-              </button>
-            ))}
+                <option value="all">All Categories</option>
+                <option value="website-builder">Website Builders</option>
+                <option value="video-generator">Video Generators</option>
+                <option value="code-tool">Code Tools</option>
+              </select>
+              <Filter className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            </div>
+
+            {/* Refresh */}
+            <button
+              onClick={loadData}
+              disabled={isLoading}
+              className="rounded-lg border border-slate-200 bg-white p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            </button>
+
+            {/* Crawl Now */}
+            <button
+              onClick={triggerCrawl}
+              disabled={isCrawling}
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-2 text-sm font-medium text-white hover:from-indigo-600 hover:to-indigo-700 transition-colors disabled:opacity-50"
+            >
+              {isCrawling ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Crawling...
+                </>
+              ) : (
+                <>
+                  <Radar className="h-4 w-4" />
+                  Crawl Now
+                </>
+              )}
+            </button>
           </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="mt-4 flex gap-1 border-b border-slate-200">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
+                activeTab === tab.id
+                  ? "border-indigo-500 text-slate-800"
+                  : "border-transparent text-slate-400 hover:text-slate-600"
+              }`}
+            >
+              <tab.icon className="h-4 w-4" />
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 mx-auto max-w-7xl px-6 py-8">
+      <div>
         {/* Error */}
         {error && (
-          <div className="mb-6 flex items-center gap-3 rounded-lg border border-stone-500/20 bg-stone-500/10 px-4 py-3 text-stone-400">
+          <div className="mb-6 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-600">
             <AlertTriangle className="h-5 w-5 flex-shrink-0" />
             <span className="text-sm">{error}</span>
           </div>
@@ -312,15 +295,15 @@ export default function MarketIntelPage() {
 
         {/* Crawl result banner */}
         {crawlResult && (
-          <div className="mb-6 rounded-lg border border-stone-500/20 bg-stone-500/10 p-4">
+          <div className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-stone-400" />
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                 <div>
-                  <p className="text-sm font-medium text-stone-300">
+                  <p className="text-sm font-medium text-emerald-700">
                     Crawl Complete in {((crawlResult.duration || 0) / 1000).toFixed(1)}s
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-slate-500">
                     {crawlResult.tasksCompleted}/{crawlResult.tasksTotal} competitors crawled
                     {crawlResult.tasksFailed > 0 && ` (${crawlResult.tasksFailed} failed)`}
                   </p>
@@ -329,12 +312,12 @@ export default function MarketIntelPage() {
               {(criticalFindings.length > 0 || warningFindings.length > 0) && (
                 <div className="flex items-center gap-2">
                   {criticalFindings.length > 0 && (
-                    <span className="rounded-full bg-stone-500/20 px-3 py-1 text-xs font-medium text-stone-400">
+                    <span className="rounded-full bg-red-50 border border-red-200 px-3 py-1 text-xs font-medium text-red-600">
                       {criticalFindings.length} critical
                     </span>
                   )}
                   {warningFindings.length > 0 && (
-                    <span className="rounded-full bg-stone-500/20 px-3 py-1 text-xs font-medium text-stone-400">
+                    <span className="rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-medium text-amber-600">
                       {warningFindings.length} warnings
                     </span>
                   )}
@@ -364,7 +347,7 @@ export default function MarketIntelPage() {
         {/* Loading */}
         {isLoading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-stone-400" />
+            <Loader2 className="h-8 w-8 animate-spin text-indigo-400" />
           </div>
         )}
 
@@ -413,8 +396,8 @@ export default function MarketIntelPage() {
                 <div key={cat}>
                   <div className="mb-4 flex items-center gap-2">
                     <CatIcon className={`h-5 w-5 ${meta.color}`} />
-                    <h2 className="text-lg font-semibold">{meta.label}</h2>
-                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-gray-400">
+                    <h2 className="text-lg font-semibold text-slate-800">{meta.label}</h2>
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">
                       {items.length}
                     </span>
                   </div>
@@ -441,10 +424,10 @@ export default function MarketIntelPage() {
 
             {/* Empty state */}
             {filteredSnapshots.length === 0 && !isLoading && (
-              <div className="flex flex-col items-center justify-center rounded-lg border border-white/10 bg-white/5 py-20">
-                <Radar className="h-12 w-12 text-gray-500 mb-4" />
-                <p className="text-lg font-medium text-gray-300">No data yet</p>
-                <p className="mt-1 text-sm text-gray-500">
+              <div className="flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white py-20">
+                <Radar className="h-12 w-12 text-slate-300 mb-4" />
+                <p className="text-lg font-medium text-slate-600">No data yet</p>
+                <p className="mt-1 text-sm text-slate-400">
                   Click &quot;Crawl Now&quot; to start monitoring competitors
                 </p>
               </div>
@@ -455,16 +438,16 @@ export default function MarketIntelPage() {
         {/* Changes Tab */}
         {!isLoading && activeTab === "changes" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Change Log</h2>
-            <p className="text-sm text-gray-400">
+            <h2 className="text-lg font-semibold text-slate-800">Change Log</h2>
+            <p className="text-sm text-slate-500">
               Timeline of detected changes across all monitored competitors.
             </p>
 
             {changes.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-lg border border-white/10 bg-white/5 py-16">
-                <TrendingUp className="h-10 w-10 text-gray-500 mb-3" />
-                <p className="text-gray-300">No changes detected yet</p>
-                <p className="mt-1 text-sm text-gray-500">
+              <div className="flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white py-16">
+                <TrendingUp className="h-10 w-10 text-slate-300 mb-3" />
+                <p className="text-slate-600">No changes detected yet</p>
+                <p className="mt-1 text-sm text-slate-400">
                   Changes appear after at least two crawl snapshots exist
                 </p>
               </div>
@@ -481,11 +464,11 @@ export default function MarketIntelPage() {
         {/* Competitors Tab */}
         {!isLoading && activeTab === "competitors" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold">All Competitors</h2>
+            <h2 className="text-lg font-semibold text-slate-800">All Competitors</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/10 text-left text-gray-400">
+                  <tr className="border-b border-slate-200 text-left text-slate-500">
                     <th className="pb-3 pr-4 font-medium">Competitor</th>
                     <th className="pb-3 pr-4 font-medium">Category</th>
                     <th className="pb-3 pr-4 font-medium">Title</th>
@@ -494,15 +477,15 @@ export default function MarketIntelPage() {
                     <th className="pb-3 font-medium">Last Crawl</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-slate-100">
                   {filteredSnapshots.map((snap) => (
-                    <tr key={snap.id} className="hover:bg-white/5">
+                    <tr key={snap.id} className="hover:bg-slate-50">
                       <td className="py-3 pr-4 font-medium">
                         <a
                           href={snap.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 text-stone-400 hover:text-stone-300"
+                          className="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-700"
                         >
                           {snap.competitor_name}
                           <ExternalLink className="h-3 w-3" />
@@ -512,32 +495,32 @@ export default function MarketIntelPage() {
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs ${
                             snap.category === "website-builder"
-                              ? "bg-stone-500/20 text-stone-400"
+                              ? "bg-blue-50 text-blue-600"
                               : snap.category === "video-generator"
-                                ? "bg-stone-500/20 text-stone-400"
-                                : "bg-stone-500/20 text-stone-400"
+                                ? "bg-purple-50 text-purple-600"
+                                : "bg-slate-100 text-slate-600"
                           }`}
                         >
                           {CATEGORY_META[snap.category]?.label || snap.category}
                         </span>
                       </td>
-                      <td className="py-3 pr-4 max-w-[200px] truncate text-gray-300">
+                      <td className="py-3 pr-4 max-w-[200px] truncate text-slate-700">
                         {snap.title || "-"}
                       </td>
                       <td className="py-3 pr-4">
                         {snap.pricing ? (
-                          <span className="flex items-center gap-1 text-stone-400">
+                          <span className="flex items-center gap-1 text-emerald-600">
                             <DollarSign className="h-3 w-3" />
                             <span className="max-w-[180px] truncate">{snap.pricing}</span>
                           </span>
                         ) : (
-                          <span className="text-gray-500">-</span>
+                          <span className="text-slate-400">-</span>
                         )}
                       </td>
                       <td className="py-3 pr-4">
-                        <span className="text-gray-300">{snap.features?.length || 0} detected</span>
+                        <span className="text-slate-600">{snap.features?.length || 0} detected</span>
                       </td>
-                      <td className="py-3 text-gray-400">
+                      <td className="py-3 text-slate-400">
                         {snap.crawled_at ? timeAgo(snap.crawled_at) : "-"}
                       </td>
                     </tr>
@@ -570,16 +553,16 @@ function StatCard({
   isText?: boolean;
 }) {
   const colorMap: Record<string, string> = {
-    violet: "from-stone-500/20 to-stone-600/10 border-stone-500/20",
-    blue: "from-stone-500/20 to-stone-600/10 border-stone-500/20",
-    yellow: "from-stone-500/20 to-stone-600/10 border-stone-500/20",
-    green: "from-stone-500/20 to-stone-600/10 border-stone-500/20",
+    violet: "from-violet-50 to-violet-100/50 border-violet-200",
+    blue: "from-blue-50 to-blue-100/50 border-blue-200",
+    yellow: "from-yellow-50 to-yellow-100/50 border-yellow-200",
+    green: "from-green-50 to-green-100/50 border-green-200",
   };
   const iconColor: Record<string, string> = {
-    violet: "text-stone-400",
-    blue: "text-stone-400",
-    yellow: "text-stone-400",
-    green: "text-stone-400",
+    violet: "text-violet-500",
+    blue: "text-blue-500",
+    yellow: "text-yellow-600",
+    green: "text-green-500",
   };
 
   return (
@@ -587,10 +570,10 @@ function StatCard({
       className={`rounded-xl border bg-gradient-to-br p-5 ${colorMap[color] || colorMap.violet}`}
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-400">{label}</p>
-        <Icon className={`h-5 w-5 ${iconColor[color] || "text-gray-400"}`} />
+        <p className="text-sm text-slate-500">{label}</p>
+        <Icon className={`h-5 w-5 ${iconColor[color] || "text-slate-400"}`} />
       </div>
-      <p className={`mt-2 ${isText ? "text-lg" : "text-3xl"} font-bold`}>{value}</p>
+      <p className={`mt-2 ${isText ? "text-lg" : "text-3xl"} font-bold text-slate-800`}>{value}</p>
     </div>
   );
 }
@@ -607,50 +590,50 @@ function CompetitorCard({
   const meta = CATEGORY_META[snapshot.category];
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
+    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
       <button
         onClick={onToggle}
-        className="flex w-full items-center justify-between p-4 text-left hover:bg-white/5 transition-colors"
+        className="flex w-full items-center justify-between p-4 text-left hover:bg-slate-50 transition-colors"
       >
         <div className="flex items-center gap-3">
           <div
-            className={`flex h-9 w-9 items-center justify-center rounded-lg bg-white/10`}
+            className={`flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100`}
           >
-            {meta ? <meta.icon className={`h-4 w-4 ${meta.color}`} /> : <Globe className="h-4 w-4 text-gray-400" />}
+            {meta ? <meta.icon className={`h-4 w-4 ${meta.color}`} /> : <Globe className="h-4 w-4 text-slate-400" />}
           </div>
           <div>
-            <p className="font-medium">{snapshot.competitor_name}</p>
-            <p className="text-xs text-gray-400">
+            <p className="font-medium text-slate-800">{snapshot.competitor_name}</p>
+            <p className="text-xs text-slate-400">
               {snapshot.crawled_at ? timeAgo(snapshot.crawled_at) : "Not crawled"}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {snapshot.features && snapshot.features.length > 0 && (
-            <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-gray-300">
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
               {snapshot.features.length} features
             </span>
           )}
           {expanded ? (
-            <ChevronDown className="h-4 w-4 text-gray-400" />
+            <ChevronDown className="h-4 w-4 text-slate-400" />
           ) : (
-            <ChevronRight className="h-4 w-4 text-gray-400" />
+            <ChevronRight className="h-4 w-4 text-slate-400" />
           )}
         </div>
       </button>
 
       {expanded && (
-        <div className="border-t border-white/10 p-4 space-y-3">
+        <div className="border-t border-slate-200 p-4 space-y-3">
           {snapshot.title && (
             <div>
-              <p className="text-xs font-medium text-gray-400 uppercase">Page Title</p>
-              <p className="mt-0.5 text-sm text-gray-200">{snapshot.title}</p>
+              <p className="text-xs font-medium text-slate-400 uppercase">Page Title</p>
+              <p className="mt-0.5 text-sm text-slate-700">{snapshot.title}</p>
             </div>
           )}
           {snapshot.description && (
             <div>
-              <p className="text-xs font-medium text-gray-400 uppercase">Description</p>
-              <p className="mt-0.5 text-sm text-gray-300">
+              <p className="text-xs font-medium text-slate-400 uppercase">Description</p>
+              <p className="mt-0.5 text-sm text-slate-600">
                 {snapshot.description.slice(0, 200)}
                 {snapshot.description.length > 200 ? "..." : ""}
               </p>
@@ -658,8 +641,8 @@ function CompetitorCard({
           )}
           {snapshot.pricing && (
             <div>
-              <p className="text-xs font-medium text-gray-400 uppercase">Pricing Detected</p>
-              <p className="mt-0.5 flex items-center gap-1 text-sm text-stone-400">
+              <p className="text-xs font-medium text-slate-400 uppercase">Pricing Detected</p>
+              <p className="mt-0.5 flex items-center gap-1 text-sm text-emerald-600">
                 <DollarSign className="h-3 w-3" />
                 {snapshot.pricing}
               </p>
@@ -667,12 +650,12 @@ function CompetitorCard({
           )}
           {snapshot.features && snapshot.features.length > 0 && (
             <div>
-              <p className="text-xs font-medium text-gray-400 uppercase">Features Detected</p>
+              <p className="text-xs font-medium text-slate-400 uppercase">Features Detected</p>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {snapshot.features.map((f) => (
                   <span
                     key={f}
-                    className="rounded-md bg-white/10 px-2 py-0.5 text-xs text-gray-300"
+                    className="rounded-md bg-slate-100 px-2 py-0.5 text-xs text-slate-600"
                   >
                     {f}
                   </span>
@@ -684,7 +667,7 @@ function CompetitorCard({
             href={snapshot.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-stone-400 hover:text-stone-300"
+            className="inline-flex items-center gap-1 text-xs text-indigo-500 hover:text-indigo-600"
           >
             Visit site
             <ExternalLink className="h-3 w-3" />
@@ -703,24 +686,24 @@ function ChangeCard({ change }: { change: Change }) {
     JSON.stringify(change.prev_features) !== JSON.stringify(change.features);
 
   return (
-    <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+    <div className="rounded-lg border border-slate-200 bg-white p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-500/20">
-            <Zap className="h-4 w-4 text-stone-400" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
+            <Zap className="h-4 w-4 text-amber-500" />
           </div>
           <div>
-            <p className="font-medium">{change.competitor_name}</p>
-            <p className="text-xs text-gray-400">{timeAgo(change.crawled_at)}</p>
+            <p className="font-medium text-slate-800">{change.competitor_name}</p>
+            <p className="text-xs text-slate-400">{timeAgo(change.crawled_at)}</p>
           </div>
         </div>
         <span
           className={`rounded-full px-2 py-0.5 text-xs ${
             change.category === "website-builder"
-              ? "bg-stone-500/20 text-stone-400"
+              ? "bg-blue-50 text-blue-600"
               : change.category === "video-generator"
-                ? "bg-stone-500/20 text-stone-400"
-                : "bg-stone-500/20 text-stone-400"
+                ? "bg-purple-50 text-purple-600"
+                : "bg-slate-100 text-slate-600"
           }`}
         >
           {CATEGORY_META[change.category]?.label || change.category}
@@ -729,25 +712,25 @@ function ChangeCard({ change }: { change: Change }) {
 
       <div className="mt-3 space-y-2">
         {titleChanged && (
-          <div className="rounded-md bg-white/5 p-2 text-xs">
-            <span className="font-medium text-gray-400">Title:</span>{" "}
-            <span className="line-through text-stone-400/70">{change.prev_title}</span>
+          <div className="rounded-md bg-slate-50 p-2 text-xs">
+            <span className="font-medium text-slate-500">Title:</span>{" "}
+            <span className="line-through text-slate-400">{change.prev_title}</span>
             {" -> "}
-            <span className="text-stone-400">{change.title}</span>
+            <span className="text-slate-700">{change.title}</span>
           </div>
         )}
         {pricingChanged && (
-          <div className="rounded-md bg-stone-500/10 border border-stone-500/20 p-2 text-xs">
-            <span className="font-medium text-stone-400">Pricing Change:</span>{" "}
-            <span className="line-through text-stone-400/70">{change.prev_pricing}</span>
+          <div className="rounded-md bg-amber-50 border border-amber-200 p-2 text-xs">
+            <span className="font-medium text-amber-600">Pricing Change:</span>{" "}
+            <span className="line-through text-amber-400">{change.prev_pricing}</span>
             {" -> "}
-            <span className="text-stone-400">{change.pricing}</span>
+            <span className="text-amber-700">{change.pricing}</span>
           </div>
         )}
         {featuresChanged && (
-          <div className="rounded-md bg-stone-500/10 border border-stone-500/20 p-2 text-xs">
-            <span className="font-medium text-stone-400">Feature Change:</span>{" "}
-            <span className="text-gray-300">
+          <div className="rounded-md bg-blue-50 border border-blue-200 p-2 text-xs">
+            <span className="font-medium text-blue-600">Feature Change:</span>{" "}
+            <span className="text-slate-700">
               {change.features?.length || 0} features now (was{" "}
               {change.prev_features?.length || 0})
             </span>

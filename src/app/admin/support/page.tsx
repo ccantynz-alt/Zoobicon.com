@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   ArrowLeft,
   Search,
@@ -15,12 +14,9 @@ import {
   Clock,
   Inbox,
   Bot,
-  ChevronRight,
   Sparkles,
   BookOpen,
-  Filter,
   MessageSquare,
-  Tag,
   User,
   Zap,
 } from "lucide-react";
@@ -187,10 +183,10 @@ export default function AdminSupportPage() {
   };
 
   const priorityColor: Record<string, string> = {
-    urgent: "bg-stone-500/20 text-stone-300 border-stone-500/30",
-    high: "bg-stone-500/20 text-stone-300 border-stone-500/30",
-    medium: "bg-stone-500/20 text-stone-300 border-stone-500/30",
-    low: "bg-stone-500/20 text-stone-300 border-stone-500/30",
+    urgent: "bg-red-50 text-red-700 border-red-200",
+    high: "bg-orange-50 text-orange-700 border-orange-200",
+    medium: "bg-amber-50 text-amber-700 border-amber-200",
+    low: "bg-slate-100 text-slate-600 border-slate-200",
   };
 
   const statusIcon: Record<string, typeof AlertCircle> = {
@@ -221,19 +217,18 @@ export default function AdminSupportPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f2148] text-white">
-      <BackgroundEffects preset="admin" />
+    <div>
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl">
+      <div className="border-b border-slate-200 bg-white/90 backdrop-blur-2xl">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="p-2 rounded-lg hover:bg-[#0f2148] transition-colors">
-              <ArrowLeft className="w-5 h-5 text-white/70" />
+            <Link href="/admin" className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+              <ArrowLeft className="w-5 h-5 text-slate-600" />
             </Link>
-            <MessageSquare className="w-6 h-6 text-stone-400" />
-            <h1 className="text-lg font-semibold">Support Dashboard</h1>
+            <MessageSquare className="w-6 h-6 text-indigo-500" />
+            <h1 className="text-lg font-semibold text-slate-800">Support Dashboard</h1>
             {stats.open > 0 && (
-              <span className="bg-stone-500/20 text-stone-300 text-xs font-bold px-2 py-0.5 rounded-full border border-stone-500/30">
+              <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full border border-blue-200">
                 {stats.open} open
               </span>
             )}
@@ -241,23 +236,23 @@ export default function AdminSupportPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/admin/support/knowledge"
-              className="flex items-center gap-2 text-sm text-white/70 hover:text-white px-3 py-2 rounded-lg hover:bg-[#111318] transition-colors"
+              className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors"
             >
               <BookOpen className="w-4 h-4" />
               Knowledge Base
             </Link>
             <Link
               href="/admin/email"
-              className="flex items-center gap-2 text-sm text-white/70 hover:text-white px-3 py-2 rounded-lg hover:bg-[#111318] transition-colors"
+              className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors"
             >
               <Inbox className="w-4 h-4" />
               Email Inbox
             </Link>
             <button
               onClick={fetchTickets}
-              className="p-2 rounded-lg hover:bg-[#111318] transition-colors"
+              className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
             >
-              <RefreshCw className={`w-5 h-5 text-white/70 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-5 h-5 text-slate-600 ${loading ? "animate-spin" : ""}`} />
             </button>
           </div>
         </div>
@@ -265,11 +260,11 @@ export default function AdminSupportPage() {
 
       <div className="max-w-[1400px] mx-auto flex" style={{ height: "calc(100vh - 60px)" }}>
         {/* Ticket List */}
-        <div className={`border-r border-white/10 flex flex-col ${selectedTicket ? "w-96" : "flex-1 max-w-2xl"}`}>
+        <div className={`border-r border-slate-200 flex flex-col ${selectedTicket ? "w-96" : "flex-1 max-w-2xl"}`}>
           {/* Stats Bar */}
-          <div className="p-3 border-b border-white/10 flex items-center gap-4">
-            <div className="flex items-center gap-1 text-xs text-white/60">
-              <Bot className="w-3.5 h-3.5 text-stone-400" />
+          <div className="p-3 border-b border-slate-200 flex items-center gap-4">
+            <div className="flex items-center gap-1 text-xs text-slate-600">
+              <Bot className="w-3.5 h-3.5 text-indigo-500" />
               <span>{stats.ai_handled} AI-handled</span>
             </div>
           </div>
@@ -285,8 +280,8 @@ export default function AdminSupportPage() {
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   statusFilter === f.key
-                    ? "bg-stone-600/20 text-stone-300 border border-stone-500/30"
-                    : "text-white/60 hover:text-white/85 hover:bg-[#111318] border border-transparent"
+                    ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                    : "text-slate-600 hover:text-slate-800 hover:bg-slate-100 border border-transparent"
                 }`}
               >
                 {f.label} ({f.count})
@@ -297,14 +292,14 @@ export default function AdminSupportPage() {
           {/* Search */}
           <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search tickets..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchTickets()}
-                className="w-full bg-[#111318] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-400"
               />
             </div>
           </div>
@@ -313,10 +308,10 @@ export default function AdminSupportPage() {
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-6 h-6 text-stone-400 animate-spin" />
+                <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
               </div>
             ) : tickets.length === 0 ? (
-              <div className="text-center py-20 text-white/60">
+              <div className="text-center py-20 text-slate-400">
                 <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p>No tickets found</p>
                 <p className="text-sm mt-1">
@@ -330,21 +325,21 @@ export default function AdminSupportPage() {
                   <button
                     key={ticket.id}
                     onClick={() => selectTicket(ticket)}
-                    className={`w-full text-left px-4 py-3 border-b border-white/10/50 hover:bg-[#111318]/50 transition-colors ${
-                      selectedTicket?.id === ticket.id ? "bg-[#111318]/70" : ""
+                    className={`w-full text-left px-4 py-3 border-b border-slate-100 hover:bg-slate-50 transition-colors ${
+                      selectedTicket?.id === ticket.id ? "bg-slate-100" : ""
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <StatusIcon
                         className={`w-3.5 h-3.5 flex-shrink-0 ${
                           ticket.status === "open"
-                            ? "text-stone-400"
+                            ? "text-blue-500"
                             : ticket.status === "pending"
-                            ? "text-stone-400"
-                            : "text-stone-400"
+                            ? "text-amber-500"
+                            : "text-emerald-500"
                         }`}
                       />
-                      <span className="text-xs text-white/60 font-mono">
+                      <span className="text-xs text-slate-400 font-mono">
                         {ticket.ticket_number}
                       </span>
                       <span
@@ -355,24 +350,24 @@ export default function AdminSupportPage() {
                         {ticket.priority}
                       </span>
                       {ticket.ai_auto_replied && (
-                        <Bot className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
+                        <Bot className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
                       )}
-                      <span className="text-xs text-white/50 ml-auto">
+                      <span className="text-xs text-slate-400 ml-auto">
                         {formatDate(ticket.updated_at)}
                       </span>
                     </div>
-                    <p className="text-sm text-white font-medium truncate">
+                    <p className="text-sm text-slate-800 font-medium truncate">
                       {ticket.subject}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-white/60 truncate">
+                      <span className="text-xs text-slate-600 truncate">
                         {ticket.from_name || ticket.from_email}
                       </span>
-                      <span className="text-xs text-white/50">
+                      <span className="text-xs text-slate-400">
                         &bull; {ticket.message_count} msgs
                       </span>
                       {ticket.ai_confidence !== null && (
-                        <span className="text-xs text-white/50 ml-auto">
+                        <span className="text-xs text-slate-400 ml-auto">
                           AI: {Math.round(ticket.ai_confidence * 100)}%
                         </span>
                       )}
@@ -388,10 +383,10 @@ export default function AdminSupportPage() {
         {selectedTicket ? (
           <div className="flex-1 flex flex-col">
             {/* Ticket Header */}
-            <div className="p-4 border-b border-white/10">
+            <div className="p-4 border-b border-slate-200">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-white/60 font-mono">
+                  <span className="text-xs text-slate-400 font-mono">
                     {selectedTicket.ticket_number}
                   </span>
                   <span
@@ -402,7 +397,7 @@ export default function AdminSupportPage() {
                     {selectedTicket.priority}
                   </span>
                   {selectedTicket.ai_auto_replied && (
-                    <span className="flex items-center gap-1 text-xs text-stone-400">
+                    <span className="flex items-center gap-1 text-xs text-indigo-500">
                       <Bot className="w-3 h-3" /> AI replied
                     </span>
                   )}
@@ -416,11 +411,11 @@ export default function AdminSupportPage() {
                       className={`px-2 py-1 text-xs rounded transition-colors ${
                         selectedTicket.status === s
                           ? s === "open"
-                            ? "bg-stone-500/20 text-stone-300"
+                            ? "bg-blue-50 text-blue-700"
                             : s === "pending"
-                            ? "bg-stone-500/20 text-stone-300"
-                            : "bg-stone-500/20 text-stone-300"
-                          : "text-white/60 hover:bg-[#111318]"
+                            ? "bg-amber-50 text-amber-700"
+                            : "bg-emerald-50 text-emerald-700"
+                          : "text-slate-500 hover:bg-slate-100"
                       }`}
                     >
                       {s}
@@ -428,15 +423,15 @@ export default function AdminSupportPage() {
                   ))}
                 </div>
               </div>
-              <h2 className="text-lg font-medium mb-1">{selectedTicket.subject}</h2>
-              <div className="flex items-center gap-2 text-sm text-white/70">
+              <h2 className="text-lg font-medium text-slate-800 mb-1">{selectedTicket.subject}</h2>
+              <div className="flex items-center gap-2 text-sm text-slate-600">
                 <User className="w-3.5 h-3.5" />
                 <span>{selectedTicket.from_name}</span>
-                <span className="text-white/50">&lt;{selectedTicket.from_email}&gt;</span>
+                <span className="text-slate-400">&lt;{selectedTicket.from_email}&gt;</span>
               </div>
               {/* Priority selector */}
               <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs text-white/60">Priority:</span>
+                <span className="text-xs text-slate-500">Priority:</span>
                 {(["low", "medium", "high", "urgent"] as const).map((p) => (
                   <button
                     key={p}
@@ -444,7 +439,7 @@ export default function AdminSupportPage() {
                     className={`text-xs px-2 py-0.5 rounded border transition-colors ${
                       selectedTicket.priority === p
                         ? priorityColor[p]
-                        : "text-white/50 border-white/10 hover:border-white/20"
+                        : "text-slate-400 border-slate-200 hover:border-slate-300"
                     }`}
                   >
                     {p}
@@ -457,7 +452,7 @@ export default function AdminSupportPage() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messagesLoading ? (
                 <div className="flex items-center justify-center py-10">
-                  <Loader2 className="w-5 h-5 text-stone-400 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
                 </div>
               ) : (
                 messages.map((msg) => (
@@ -465,52 +460,52 @@ export default function AdminSupportPage() {
                     key={msg.id}
                     className={`rounded-lg p-4 ${
                       msg.sender === "customer"
-                        ? "bg-[#111318]/50 border border-white/10/50"
+                        ? "bg-slate-50 border border-slate-200"
                         : msg.sender === "ai-draft"
-                        ? "bg-stone-900/20 border border-stone-500/20 ml-8"
+                        ? "bg-indigo-50 border border-indigo-200 ml-8"
                         : msg.sender === "ai"
-                        ? "bg-stone-900/20 border border-stone-500/20 ml-8"
-                        : "bg-stone-900/20 border border-stone-500/20 ml-8"
+                        ? "bg-indigo-50 border border-indigo-200 ml-8"
+                        : "bg-indigo-50 border border-indigo-200 ml-8"
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-2 text-xs">
                       {msg.sender === "customer" ? (
                         <>
-                          <User className="w-3.5 h-3.5 text-white/70" />
-                          <span className="text-white/70">
+                          <User className="w-3.5 h-3.5 text-slate-600" />
+                          <span className="text-slate-600">
                             {selectedTicket.from_name}
                           </span>
                         </>
                       ) : msg.sender === "ai-draft" ? (
                         <>
-                          <Sparkles className="w-3.5 h-3.5 text-stone-400" />
-                          <span className="text-stone-400">AI Draft</span>
-                          <span className="text-white/50">(not sent)</span>
+                          <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                          <span className="text-indigo-600">AI Draft</span>
+                          <span className="text-slate-400">(not sent)</span>
                         </>
                       ) : msg.sender === "ai" ? (
                         <>
-                          <Bot className="w-3.5 h-3.5 text-stone-400" />
-                          <span className="text-stone-400">
+                          <Bot className="w-3.5 h-3.5 text-indigo-500" />
+                          <span className="text-indigo-600">
                             Zoe (AI Auto-reply)
                           </span>
                         </>
                       ) : (
                         <>
-                          <Zap className="w-3.5 h-3.5 text-stone-400" />
-                          <span className="text-stone-400">Agent</span>
+                          <Zap className="w-3.5 h-3.5 text-indigo-500" />
+                          <span className="text-indigo-600">Agent</span>
                         </>
                       )}
-                      <span className="text-white/50 ml-auto">
+                      <span className="text-slate-400 ml-auto">
                         {formatDate(msg.created_at)}
                       </span>
                     </div>
-                    <div className="text-sm text-white/85 whitespace-pre-wrap">
+                    <div className="text-sm text-slate-700 whitespace-pre-wrap">
                       {msg.body_text}
                     </div>
                     {msg.sender === "ai-draft" && (
                       <button
                         onClick={() => setReplyText(msg.body_text || "")}
-                        className="mt-2 text-xs text-stone-400 hover:text-stone-300 transition-colors"
+                        className="mt-2 text-xs text-indigo-500 hover:text-indigo-700 transition-colors"
                       >
                         Use this draft &rarr;
                       </button>
@@ -521,12 +516,12 @@ export default function AdminSupportPage() {
             </div>
 
             {/* Reply Area */}
-            <div className="border-t border-white/10 p-4">
+            <div className="border-t border-slate-200 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <button
                   onClick={generateAIDraft}
                   disabled={generatingDraft}
-                  className="flex items-center gap-1.5 text-xs text-stone-400 hover:text-stone-300 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1.5 text-xs text-indigo-500 hover:text-indigo-700 transition-colors disabled:opacity-50"
                 >
                   {generatingDraft ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -542,12 +537,12 @@ export default function AdminSupportPage() {
                   onChange={(e) => setReplyText(e.target.value)}
                   placeholder="Type your reply..."
                   rows={3}
-                  className="flex-1 bg-[#111318] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500 resize-none"
+                  className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-400 resize-none"
                 />
                 <button
                   onClick={sendReply}
                   disabled={sending || !replyText.trim()}
-                  className="self-end bg-stone-600 hover:bg-stone-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg transition-colors flex items-center gap-2"
+                  className="self-end bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg transition-colors flex items-center gap-2"
                 >
                   {sending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -559,11 +554,11 @@ export default function AdminSupportPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-white/50">
+          <div className="flex-1 flex items-center justify-center text-slate-400">
             <div className="text-center">
               <MessageSquare className="w-16 h-16 mx-auto mb-4 opacity-20" />
               <p>Select a ticket to view</p>
-              <p className="text-sm mt-2 text-white/60">
+              <p className="text-sm mt-2 text-slate-400">
                 Emails to support@zoobicon.com automatically create tickets
                 <br />
                 AI drafts responses and auto-replies when confident

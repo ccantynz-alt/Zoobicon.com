@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import BackgroundEffects from "@/components/BackgroundEffects";
 import {
   ArrowLeft,
   BookOpen,
@@ -167,31 +166,30 @@ export default function KnowledgeBasePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f2148] text-white">
-      <BackgroundEffects preset="admin" />
+    <div>
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl">
+      <div className="border-b border-slate-200 bg-white/90 backdrop-blur-2xl">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/admin/support" className="p-2 rounded-lg hover:bg-[#111318] transition-colors">
-              <ArrowLeft className="w-5 h-5 text-white/70" />
+            <Link href="/admin/support" className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+              <ArrowLeft className="w-5 h-5 text-slate-600" />
             </Link>
-            <BookOpen className="w-6 h-6 text-stone-400" />
-            <h1 className="text-lg font-semibold">Knowledge Base</h1>
-            <span className="text-sm text-white/60">
+            <BookOpen className="w-6 h-6 text-indigo-500" />
+            <h1 className="text-lg font-semibold text-slate-800">Knowledge Base</h1>
+            <span className="text-sm text-slate-500">
               {articles.length} articles
             </span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={startCreate}
-              className="bg-stone-600 hover:bg-stone-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               New Article
             </button>
-            <button onClick={fetchArticles} className="p-2 rounded-lg hover:bg-[#111318] transition-colors">
-              <RefreshCw className={`w-5 h-5 text-white/70 ${loading ? "animate-spin" : ""}`} />
+            <button onClick={fetchArticles} className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
+              <RefreshCw className={`w-5 h-5 text-slate-600 ${loading ? "animate-spin" : ""}`} />
             </button>
           </div>
         </div>
@@ -199,7 +197,7 @@ export default function KnowledgeBasePage() {
 
       <div className="max-w-[1400px] mx-auto flex" style={{ height: "calc(100vh - 60px)" }}>
         {/* Sidebar — Categories */}
-        <div className="w-56 border-r border-white/10 p-3 flex flex-col gap-1">
+        <div className="w-56 border-r border-slate-200 p-3 flex flex-col gap-1">
           <button
             onClick={() => {
               setSelectedCategory(null);
@@ -207,8 +205,8 @@ export default function KnowledgeBasePage() {
             }}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
               !selectedCategory
-                ? "bg-stone-600/20 text-stone-300"
-                : "text-white/70 hover:bg-[#111318]"
+                ? "bg-indigo-50 text-indigo-700"
+                : "text-slate-600 hover:bg-slate-100"
             }`}
           >
             <FolderOpen className="w-4 h-4" />
@@ -225,21 +223,21 @@ export default function KnowledgeBasePage() {
                 }}
                 className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
                   selectedCategory === cat
-                    ? "bg-stone-600/20 text-stone-300"
-                    : "text-white/70 hover:bg-[#111318]"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
                 <span className="capitalize">{cat.replace("-", " ")}</span>
                 {count > 0 && (
-                  <span className="text-xs text-white/50">{count}</span>
+                  <span className="text-xs text-slate-400">{count}</span>
                 )}
               </button>
             );
           })}
 
-          <div className="mt-6 pt-4 border-t border-white/10">
-            <p className="px-3 text-xs text-white/60 mb-2">How it works</p>
-            <p className="px-3 text-xs text-white/60 leading-relaxed">
+          <div className="mt-6 pt-4 border-t border-slate-200">
+            <p className="px-3 text-xs text-slate-500 mb-2">How it works</p>
+            <p className="px-3 text-xs text-slate-400 leading-relaxed">
               Articles you add here are automatically included as context when the AI
               drafts support responses. More articles = smarter AI replies.
             </p>
@@ -249,16 +247,16 @@ export default function KnowledgeBasePage() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
           {/* Search */}
-          <div className="p-3 border-b border-white/10">
+          <div className="p-3 border-b border-slate-200">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search articles..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchArticles()}
-                className="w-full bg-[#111318] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-400"
               />
             </div>
           </div>
@@ -269,20 +267,20 @@ export default function KnowledgeBasePage() {
               /* Editor */
               <div className="max-w-3xl mx-auto p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-medium">
+                  <h2 className="text-lg font-medium text-slate-800">
                     {editing ? "Edit Article" : "New Article"}
                   </h2>
                   <button
                     onClick={cancelEdit}
-                    className="p-2 hover:bg-[#111318] rounded-lg transition-colors"
+                    className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
                   >
-                    <X className="w-5 h-5 text-white/70" />
+                    <X className="w-5 h-5 text-slate-600" />
                   </button>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-white/70 mb-1">Title</label>
+                    <label className="block text-sm text-slate-600 mb-1">Title</label>
                     <input
                       type="text"
                       value={formData.title}
@@ -290,18 +288,18 @@ export default function KnowledgeBasePage() {
                         setFormData((d) => ({ ...d, title: e.target.value }))
                       }
                       placeholder="e.g., How to deploy a website"
-                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-400"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-white/70 mb-1">Category</label>
+                    <label className="block text-sm text-slate-600 mb-1">Category</label>
                     <select
                       value={formData.category}
                       onChange={(e) =>
                         setFormData((d) => ({ ...d, category: e.target.value }))
                       }
-                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-stone-500"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-400"
                     >
                       {CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>
@@ -312,9 +310,9 @@ export default function KnowledgeBasePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm text-white/70 mb-1">
+                    <label className="block text-sm text-slate-600 mb-1">
                       Content{" "}
-                      <span className="text-white/60">
+                      <span className="text-slate-400">
                         — this is what the AI reads when drafting replies
                       </span>
                     </label>
@@ -325,14 +323,14 @@ export default function KnowledgeBasePage() {
                       }
                       placeholder="Write the full answer here. Include step-by-step instructions, URLs, pricing details — anything the AI should know when answering questions about this topic."
                       rows={15}
-                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500 resize-none font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-400 resize-none font-mono"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-white/70 mb-1">
+                    <label className="block text-sm text-slate-600 mb-1">
                       Keywords{" "}
-                      <span className="text-white/60">— comma-separated, helps matching</span>
+                      <span className="text-slate-400">— comma-separated, helps matching</span>
                     </label>
                     <input
                       type="text"
@@ -341,21 +339,21 @@ export default function KnowledgeBasePage() {
                         setFormData((d) => ({ ...d, keywords: e.target.value }))
                       }
                       placeholder="deploy, hosting, custom domain, DNS"
-                      className="w-full bg-[#111318] border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-400"
                     />
                   </div>
 
                   <div className="flex justify-end gap-3 pt-4">
                     <button
                       onClick={cancelEdit}
-                      className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors"
+                      className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSave}
                       disabled={saving || !formData.title.trim() || !formData.content.trim()}
-                      className="bg-stone-600 hover:bg-stone-500 disabled:opacity-50 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                      className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
                     >
                       {saving ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -369,19 +367,19 @@ export default function KnowledgeBasePage() {
               </div>
             ) : loading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-6 h-6 text-stone-400 animate-spin" />
+                <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
               </div>
             ) : articles.length === 0 ? (
-              <div className="text-center py-20 text-white/60">
+              <div className="text-center py-20 text-slate-400">
                 <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-20" />
-                <p className="text-lg mb-2">No articles yet</p>
-                <p className="text-sm text-white/60 mb-6 max-w-md mx-auto">
+                <p className="text-lg mb-2 text-slate-600">No articles yet</p>
+                <p className="text-sm text-slate-400 mb-6 max-w-md mx-auto">
                   Add articles to teach the AI how to respond to common support
                   questions. The more you add, the smarter the AI becomes.
                 </p>
                 <button
                   onClick={startCreate}
-                  className="bg-stone-600 hover:bg-stone-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
                   Create your first article
                 </button>
@@ -393,35 +391,35 @@ export default function KnowledgeBasePage() {
                     key={article.id}
                     className={`rounded-lg border p-4 transition-colors ${
                       article.is_active
-                        ? "bg-[#111318]/50 border-white/10 hover:border-white/10"
-                        : "bg-[#111318]/20 border-white/10/50 opacity-60"
+                        ? "bg-white border-slate-200 hover:border-slate-300"
+                        : "bg-slate-50 border-slate-200 opacity-60"
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-sm truncate">
+                          <h3 className="font-medium text-sm text-slate-800 truncate">
                             {article.title}
                           </h3>
-                          <span className="text-xs px-2 py-0.5 rounded bg-[#111318] text-white/70 capitalize flex-shrink-0">
+                          <span className="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600 capitalize flex-shrink-0">
                             {article.category.replace("-", " ")}
                           </span>
                           {!article.is_active && (
-                            <span className="text-xs text-stone-400 flex-shrink-0">
+                            <span className="text-xs text-amber-600 flex-shrink-0">
                               Disabled
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-white/60 line-clamp-2">
+                        <p className="text-xs text-slate-500 line-clamp-2">
                           {article.content.substring(0, 200)}
                         </p>
                         {article.keywords && (article.keywords as string[]).length > 0 && (
                           <div className="flex items-center gap-1 mt-2">
-                            <Tag className="w-3 h-3 text-white/50" />
+                            <Tag className="w-3 h-3 text-slate-400" />
                             {(article.keywords as string[]).slice(0, 5).map((kw) => (
                               <span
                                 key={kw}
-                                className="text-xs text-white/50 bg-[#111318]/50 px-1.5 py-0.5 rounded"
+                                className="text-xs text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded"
                               >
                                 {kw}
                               </span>
@@ -434,8 +432,8 @@ export default function KnowledgeBasePage() {
                           onClick={() => toggleActive(article)}
                           className={`p-1.5 rounded transition-colors ${
                             article.is_active
-                              ? "text-stone-400 hover:bg-stone-500/10"
-                              : "text-white/50 hover:bg-[#111318]"
+                              ? "text-emerald-500 hover:bg-emerald-50"
+                              : "text-slate-400 hover:bg-slate-100"
                           }`}
                           title={article.is_active ? "Disable" : "Enable"}
                         >
@@ -443,13 +441,13 @@ export default function KnowledgeBasePage() {
                         </button>
                         <button
                           onClick={() => startEdit(article)}
-                          className="p-1.5 rounded text-white/60 hover:text-white hover:bg-[#111318] transition-colors"
+                          className="p-1.5 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => deleteArticle(article.id)}
-                          className="p-1.5 rounded text-white/60 hover:text-stone-400 hover:bg-stone-500/10 transition-colors"
+                          className="p-1.5 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
