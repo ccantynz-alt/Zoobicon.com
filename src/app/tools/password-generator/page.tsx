@@ -215,9 +215,9 @@ export default function PasswordGeneratorPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-[#0a0a14] text-white">
+      <div className="min-h-screen bg-[#0b1530] text-white">
         {/* Nav */}
-        <nav className="border-b border-white/10 bg-[#0a0a14]/80 backdrop-blur-md sticky top-0 z-50">
+        <nav className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
               <Shield className="w-7 h-7 text-stone-400" />
@@ -260,10 +260,10 @@ export default function PasswordGeneratorPage() {
         {/* Main */}
         <main className="max-w-4xl mx-auto px-4 sm:px-6 pb-24 space-y-8">
           {/* Primary password card */}
-          <div className="bg-[#131520] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6">
+          <div className="bg-[#0f2148] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6">
             {/* Top password display */}
             <div className="relative group">
-              <div className="bg-[#0a0a14] border border-white/10 rounded-xl p-4 sm:p-5 flex items-center justify-between gap-3">
+              <div className="bg-[#0b1530] border border-white/10 rounded-xl p-4 sm:p-5 flex items-center justify-between gap-3">
                 <code className="flex-1 text-lg sm:text-xl font-mono break-all select-all text-stone-100">
                   {passwords[0]
                     ? showPasswords
@@ -332,7 +332,7 @@ export default function PasswordGeneratorPage() {
                       const v = Math.max(8, Math.min(128, Number(e.target.value) || 8));
                       setLength(v);
                     }}
-                    className="w-16 bg-[#0a0a14] border border-white/10 rounded-lg px-2 py-1 text-center text-sm text-white focus:outline-none focus:border-stone-500"
+                    className="w-16 bg-[#0b1530] border border-white/10 rounded-lg px-2 py-1 text-center text-sm text-white focus:outline-none focus:border-stone-500"
                   />
                   <span className="text-sm text-gray-500">chars</span>
                 </div>
@@ -370,7 +370,7 @@ export default function PasswordGeneratorPage() {
                   className={`rounded-xl border p-3 text-center transition-all ${
                     options[item.key]
                       ? "border-stone-500/50 bg-stone-500/10 text-white"
-                      : "border-white/10 bg-[#0a0a14] text-gray-500 hover:border-white/20"
+                      : "border-white/10 bg-[#0b1530] text-gray-500 hover:border-white/20"
                   }`}
                 >
                   <span className="block text-lg font-mono font-bold">{item.label}</span>
@@ -390,7 +390,7 @@ export default function PasswordGeneratorPage() {
           </div>
 
           {/* Additional passwords */}
-          <div className="bg-[#131520] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-4">
+          <div className="bg-[#0f2148] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-stone-400" />
               5 Generated Passwords
@@ -399,7 +399,7 @@ export default function PasswordGeneratorPage() {
               {passwords.map((pw, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-3 bg-[#0a0a14] border border-white/10 rounded-xl px-4 py-3 group"
+                  className="flex items-center gap-3 bg-[#0b1530] border border-white/10 rounded-xl px-4 py-3 group"
                 >
                   <span className="text-xs text-gray-600 font-mono w-5 shrink-0">
                     {i + 1}.
@@ -427,7 +427,7 @@ export default function PasswordGeneratorPage() {
           </div>
 
           {/* Password strength tips */}
-          <div className="bg-[#131520] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-5">
+          <div className="bg-[#0f2148] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-5">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <Zap className="w-5 h-5 text-stone-400" />
               Password Strength Tips
@@ -457,7 +457,7 @@ export default function PasswordGeneratorPage() {
               ].map((tip, i) => (
                 <div
                   key={i}
-                  className="bg-[#0a0a14] border border-white/10 rounded-xl p-4 space-y-2"
+                  className="bg-[#0b1530] border border-white/10 rounded-xl p-4 space-y-2"
                 >
                   <div className="flex items-center gap-2 font-semibold text-sm">
                     {tip.icon}
@@ -470,7 +470,7 @@ export default function PasswordGeneratorPage() {
           </div>
 
           {/* FAQ */}
-          <div className="bg-[#131520] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-4">
+          <div className="bg-[#0f2148] border border-white/10 rounded-2xl p-6 sm:p-8 space-y-4">
             <h2 className="text-xl font-bold">Frequently Asked Questions</h2>
             <div className="space-y-3">
               {faqs.map((faq, i) => (

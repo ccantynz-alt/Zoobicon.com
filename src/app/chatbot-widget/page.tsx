@@ -75,7 +75,7 @@ export default function ChatbotWidgetPage() {
   return (
     <div className="min-h-screen bg-[#0b0d17] text-white">
       {/* Header */}
-      <header className="border-b border-white/10 bg-[#131520]">
+      <header className="border-b border-white/10 bg-[#0f2148]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
@@ -112,7 +112,7 @@ export default function ChatbotWidgetPage() {
                 type="text"
                 value={botName}
                 onChange={(e) => setBotName(e.target.value)}
-                className="w-full px-4 py-2.5 bg-[#131520] border border-white/10 rounded-lg focus:outline-none focus:border-[#6d5dfc]"
+                className="w-full px-4 py-2.5 bg-[#0f2148] border border-white/10 rounded-lg focus:outline-none focus:border-[#6d5dfc]"
                 placeholder="Assistant"
               />
               <p className="text-xs text-white/40 mt-1">
@@ -133,7 +133,7 @@ export default function ChatbotWidgetPage() {
                   type="text"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
-                  className="flex-1 px-4 py-2.5 bg-[#131520] border border-white/10 rounded-lg focus:outline-none focus:border-[#6d5dfc] font-mono text-sm"
+                  className="flex-1 px-4 py-2.5 bg-[#0f2148] border border-white/10 rounded-lg focus:outline-none focus:border-[#6d5dfc] font-mono text-sm"
                   placeholder="#6d5dfc"
                 />
               </div>
@@ -148,7 +148,7 @@ export default function ChatbotWidgetPage() {
                 value={context}
                 onChange={(e) => setContext(e.target.value)}
                 rows={8}
-                className="w-full px-4 py-2.5 bg-[#131520] border border-white/10 rounded-lg focus:outline-none focus:border-[#6d5dfc] resize-none"
+                className="w-full px-4 py-2.5 bg-[#0f2148] border border-white/10 rounded-lg focus:outline-none focus:border-[#6d5dfc] resize-none"
                 placeholder="Describe your business, products, hours, policies, FAQ..."
               />
               <p className="text-xs text-white/40 mt-1">
@@ -159,7 +159,7 @@ export default function ChatbotWidgetPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">Site ID</label>
-              <div className="flex items-center gap-2 px-4 py-2.5 bg-[#131520] border border-white/10 rounded-lg">
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-[#0f2148] border border-white/10 rounded-lg">
                 <code className="text-sm text-white/60 font-mono flex-1">{siteId}</code>
               </div>
               <p className="text-xs text-white/40 mt-1">
@@ -172,7 +172,7 @@ export default function ChatbotWidgetPage() {
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium mb-2">Preview</label>
-              <div className="relative rounded-lg border border-white/10 bg-[#131520] h-[320px] overflow-hidden">
+              <div className="relative rounded-lg border border-white/10 bg-[#0f2148] h-[320px] overflow-hidden">
                 <div className="absolute inset-0 p-6 text-white/20 text-sm">
                   <div className="text-xs uppercase tracking-wider mb-2">Your website</div>
                   <div className="h-2 w-48 bg-white/5 rounded mb-2" />
@@ -215,7 +215,7 @@ export default function ChatbotWidgetPage() {
             <div>
               <label className="block text-sm font-medium mb-2">Embed code</label>
               <div className="relative">
-                <pre className="bg-[#131520] border border-white/10 rounded-lg p-4 text-xs font-mono text-white/80 overflow-x-auto whitespace-pre">{embedCode}</pre>
+                <pre className="bg-[#0f2148] border border-white/10 rounded-lg p-4 text-xs font-mono text-white/80 overflow-x-auto whitespace-pre">{embedCode}</pre>
                 <button
                   onClick={handleCopy}
                   className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-xs transition-colors"

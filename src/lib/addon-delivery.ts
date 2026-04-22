@@ -82,7 +82,7 @@ export async function getUserAddons(email: string): Promise<AddonPurchase[]> {
     WHERE email = ${email} AND status = 'active'
     ORDER BY purchased_at DESC
   `;
-  return rows.map((r) => ({
+  return rows.map((r: any) => ({
     id: r.id,
     email: r.email,
     addonId: r.addon_id,
@@ -227,7 +227,7 @@ export function getAddonDelivery(
     style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(124,58,237,0.4);display:flex;align-items:center;justify-content:center;">
     <svg width="24" height="24" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
   </button>
-  <div id="zb-chat-panel" class="hidden" style="position:absolute;bottom:72px;right:0;width:360px;height:480px;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+  <div id="zb-chat-panel" class="hidden" style="position:absolute;bottom:72px;right:0;width:360px;height:480px;background:#0f2148;border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
     <div style="padding:16px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:8px;">
       <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></div>
       <span style="color:white;font-size:14px;font-weight:600;">AI Assistant</span>
@@ -306,7 +306,7 @@ export function getAddonDelivery(
       code: `<!-- Multi-Language i18n -->
 <div id="zb-i18n-widget" style="position:fixed;bottom:24px;left:24px;z-index:9998;">
   <select onchange="document.documentElement.lang=this.value;localStorage.setItem('zb_lang',this.value);"
-    style="background:#1a1a2e;color:white;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;">
+    style="background:#0f2148;color:white;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;">
     <option value="en">English</option>
     <option value="es">Espa\u00f1ol</option>
     <option value="fr">Fran\u00e7ais</option>
@@ -349,7 +349,7 @@ export function getAddonDelivery(
     overlay.id = 'zb-email-popup';
     overlay.innerHTML = \`
       <div style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;">
-        <div style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px;max-width:400px;width:90%;">
+        <div style="background:#0f2148;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px;max-width:400px;width:90%;">
           <h3 style="color:white;font-size:1.25rem;font-weight:700;margin:0 0 8px;">Stay in the loop</h3>
           <p style="color:rgba(255,255,255,0.5);font-size:0.875rem;margin:0 0 16px;">Get updates, tips, and exclusive offers.</p>
           <form onsubmit="event.preventDefault();fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:this.email.value,source:'popup'})});this.innerHTML='<p style=&quot;color:#22c55e;font-weight:600;&quot;>Subscribed!</p>';localStorage.setItem('zb_email_popup_dismissed','1');">
@@ -440,7 +440,7 @@ export function getAddonDelivery(
   .text-gradient { background: linear-gradient(135deg, #7c3aed, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .divider-gradient { height: 1px; background: linear-gradient(90deg, transparent, rgba(124,58,237,0.3), transparent); }
   .avatar-ring { border: 2px solid; border-image: linear-gradient(135deg, #7c3aed, #ec4899) 1; border-radius: 50%; }
-  .tooltip { position: relative; } .tooltip::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; white-space: nowrap; opacity: 0; transition: opacity 0.2s; pointer-events: none; } .tooltip:hover::after { opacity: 1; }
+  .tooltip { position: relative; } .tooltip::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #0f2148; color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; white-space: nowrap; opacity: 0; transition: opacity 0.2s; pointer-events: none; } .tooltip:hover::after { opacity: 1; }
 </style>`,
     }),
 
@@ -466,7 +466,7 @@ export function getAddonDelivery(
       description: "Email support widget",
       code: `<!-- AI Email Support -->
 <div id="zb-support-widget" style="position:fixed;bottom:24px;right:96px;z-index:9998;">
-  <a href="/email-support" style="display:flex;align-items:center;gap:8px;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);color:white;padding:10px 16px;border-radius:12px;text-decoration:none;font-size:13px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+  <a href="/email-support" style="display:flex;align-items:center;gap:8px;background:#0f2148;border:1px solid rgba(255,255,255,0.1);color:white;padding:10px 16px;border-radius:12px;text-decoration:none;font-size:13px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
     <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span>
     Support
   </a>

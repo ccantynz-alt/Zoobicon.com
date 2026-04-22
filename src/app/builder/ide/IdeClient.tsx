@@ -135,7 +135,7 @@ export default function BuilderIDEPage() {
   return (
     <div className="h-screen w-screen flex flex-col bg-[#0b0d17] text-white overflow-hidden">
       {/* Top toolbar */}
-      <header className="h-12 shrink-0 flex items-center justify-between px-4 border-b border-white/10 bg-[#131520]">
+      <header className="h-12 shrink-0 flex items-center justify-between px-4 border-b border-white/10 bg-[#0f2148]">
         <div className="flex items-center gap-3">
           <Link
             href="/builder"
@@ -195,7 +195,7 @@ export default function BuilderIDEPage() {
       {/* Three-pane layout */}
       <div className="flex-1 min-h-0 flex">
         {/* File tree */}
-        <aside className="w-60 shrink-0 border-r border-white/10 bg-[#131520] flex flex-col">
+        <aside className="w-60 shrink-0 border-r border-white/10 bg-[#0f2148] flex flex-col">
           <div className="h-9 shrink-0 px-3 flex items-center text-[11px] font-semibold uppercase tracking-wider text-white/40 border-b border-white/10">
             Files
           </div>
@@ -206,7 +206,7 @@ export default function BuilderIDEPage() {
 
         {/* Editor */}
         <section className="flex-1 min-w-0 flex flex-col border-r border-white/10">
-          <div className="h-9 shrink-0 px-3 flex items-center text-[12px] text-white/60 bg-[#131520] border-b border-white/10">
+          <div className="h-9 shrink-0 px-3 flex items-center text-[12px] text-white/60 bg-[#0f2148] border-b border-white/10">
             {activePath || "Select a file to edit"}
           </div>
           <div className="flex-1 min-h-0 bg-[#1e1e1e]">
@@ -228,10 +228,10 @@ export default function BuilderIDEPage() {
 
         {/* Live preview */}
         <aside className="w-[40%] shrink-0 flex flex-col">
-          <div className="h-9 shrink-0 px-3 flex items-center text-[11px] font-semibold uppercase tracking-wider text-white/40 bg-[#131520] border-b border-white/10">
+          <div className="h-9 shrink-0 px-3 flex items-center text-[11px] font-semibold uppercase tracking-wider text-white/40 bg-[#0f2148] border-b border-white/10">
             Live Preview
           </div>
-          <div className="flex-1 min-h-0 relative bg-[#131520]">
+          <div className="flex-1 min-h-0 relative bg-[#0f2148]">
             <SandpackPreview mode="react" files={files} />
           </div>
         </aside>

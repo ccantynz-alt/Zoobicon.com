@@ -429,7 +429,7 @@ export default function AgencyDashboard() {
   if (!activeAgency && agencies.length === 0) {
     return (
       <div className="min-h-screen bg-[#0a0a12] flex items-center justify-center">
-        <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-8 max-w-md w-full text-center">
+        <div className="bg-[#0f2148] border border-white/10 rounded-xl p-8 max-w-md w-full text-center">
           <Building2 className="text-stone-500 mx-auto mb-4" size={48} />
           <h1 className="text-2xl font-bold text-white mb-2">Create Your Agency</h1>
           <p className="text-white/60 mb-6">
@@ -486,7 +486,7 @@ export default function AgencyDashboard() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="bg-[#1a1a2e] border border-white/10 rounded-xl p-5"
+            className="bg-[#0f2148] border border-white/10 rounded-xl p-5"
           >
             <p className="text-white/50 text-sm mb-1">{stat.label}</p>
             <p className={`text-3xl font-bold ${stat.color}`}>{stat.value}</p>
@@ -501,21 +501,21 @@ export default function AgencyDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
         <button
           onClick={() => { setActiveTab("clients"); setShowAddClient(true); }}
-          className="flex items-center gap-3 bg-[#1a1a2e] border border-white/10 hover:border-stone-500/50 rounded-xl p-4 text-white transition-colors"
+          className="flex items-center gap-3 bg-[#0f2148] border border-white/10 hover:border-stone-500/50 rounded-xl p-4 text-white transition-colors"
         >
           <Plus size={18} className="text-stone-400" />
           <span>Add Client</span>
         </button>
         <button
           onClick={() => router.push("/builder")}
-          className="flex items-center gap-3 bg-[#1a1a2e] border border-white/10 hover:border-stone-500/50 rounded-xl p-4 text-white transition-colors"
+          className="flex items-center gap-3 bg-[#0f2148] border border-white/10 hover:border-stone-500/50 rounded-xl p-4 text-white transition-colors"
         >
           <Globe size={18} className="text-stone-400" />
           <span>Generate Site</span>
         </button>
         <button
           onClick={() => { setActiveTab("team"); setShowInviteMember(true); }}
-          className="flex items-center gap-3 bg-[#1a1a2e] border border-white/10 hover:border-stone-500/50 rounded-xl p-4 text-white transition-colors"
+          className="flex items-center gap-3 bg-[#0f2148] border border-white/10 hover:border-stone-500/50 rounded-xl p-4 text-white transition-colors"
         >
           <UserPlus size={18} className="text-stone-400" />
           <span>Invite Member</span>
@@ -526,7 +526,7 @@ export default function AgencyDashboard() {
       <h3 className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-3">
         Recent Activity
       </h3>
-      <div className="bg-[#1a1a2e] border border-white/10 rounded-xl divide-y divide-white/5">
+      <div className="bg-[#0f2148] border border-white/10 rounded-xl divide-y divide-white/5">
         {clients.length === 0 && members.length <= 1 && sites.length === 0 ? (
           <p className="p-6 text-white/50 text-center">
             No activity yet. Add your first client or generate a site to get started.
@@ -576,7 +576,7 @@ export default function AgencyDashboard() {
 
       {/* Add client form */}
       {showAddClient && (
-        <div className="bg-[#1a1a2e] border border-stone-500/30 rounded-xl p-5 mb-6">
+        <div className="bg-[#0f2148] border border-stone-500/30 rounded-xl p-5 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-white font-semibold">New Client</h3>
             <button onClick={() => setShowAddClient(false)} className="text-white/50 hover:text-white">
@@ -625,14 +625,14 @@ export default function AgencyDashboard() {
 
       {/* Client list */}
       {clients.length === 0 ? (
-        <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-8 text-center">
+        <div className="bg-[#0f2148] border border-white/10 rounded-xl p-8 text-center">
           <Users className="text-white/50 mx-auto mb-3" size={40} />
           <p className="text-white/50">No clients yet. Add your first client to get started.</p>
         </div>
       ) : (
         <div className="space-y-2">
           {clients.map((client) => (
-            <div key={client.id} className="bg-[#1a1a2e] border border-white/10 rounded-xl overflow-hidden">
+            <div key={client.id} className="bg-[#0f2148] border border-white/10 rounded-xl overflow-hidden">
               <div
                 className="flex items-center gap-4 p-4 cursor-pointer hover:bg-white/5 transition-colors"
                 onClick={() => setExpandedClient(expandedClient === client.id ? null : client.id)}
@@ -727,7 +727,7 @@ export default function AgencyDashboard() {
       </div>
 
       {sites.length === 0 ? (
-        <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-8 text-center">
+        <div className="bg-[#0f2148] border border-white/10 rounded-xl p-8 text-center">
           <Globe className="text-white/50 mx-auto mb-3" size={40} />
           <p className="text-white/50">
             No sites yet. Generate sites and assign them to clients.
@@ -738,7 +738,7 @@ export default function AgencyDashboard() {
           {sites.map((site) => (
             <div
               key={site.id}
-              className="bg-[#1a1a2e] border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-colors"
+              className="bg-[#0f2148] border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-colors"
             >
               {/* Thumbnail placeholder */}
               <div className="aspect-video bg-[#12121a] relative">
@@ -849,7 +849,7 @@ export default function AgencyDashboard() {
 
       {/* Invite form */}
       {showInviteMember && (
-        <div className="bg-[#1a1a2e] border border-stone-500/30 rounded-xl p-5 mb-6">
+        <div className="bg-[#0f2148] border border-stone-500/30 rounded-xl p-5 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-white font-semibold">Invite Team Member</h3>
             <button onClick={() => setShowInviteMember(false)} className="text-white/50 hover:text-white">
@@ -892,7 +892,7 @@ export default function AgencyDashboard() {
       )}
 
       {/* Member list */}
-      <div className="bg-[#1a1a2e] border border-white/10 rounded-xl divide-y divide-white/5">
+      <div className="bg-[#0f2148] border border-white/10 rounded-xl divide-y divide-white/5">
         {members.map((member) => (
           <div key={member.id} className="flex items-center gap-4 p-4">
             <div className="w-9 h-9 rounded-full bg-stone-500/20 flex items-center justify-center text-stone-400 text-sm font-bold shrink-0">
@@ -934,7 +934,7 @@ export default function AgencyDashboard() {
     <div>
       <h2 className="text-xl font-bold text-white mb-6">Bulk Generate</h2>
 
-      <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-5 mb-6">
+      <div className="bg-[#0f2148] border border-white/10 rounded-xl p-5 mb-6">
         <h3 className="text-white font-semibold mb-2">Paste Business List</h3>
         <p className="text-white/50 text-sm mb-4">
           Enter one business per line in the format:{" "}
@@ -971,7 +971,7 @@ export default function AgencyDashboard() {
           </h3>
           <div className="space-y-3">
             {bulkJobs.map((job) => (
-              <div key={job.id} className="bg-[#1a1a2e] border border-white/10 rounded-xl p-4">
+              <div key={job.id} className="bg-[#0f2148] border border-white/10 rounded-xl p-4">
                 <div className="flex items-center gap-3 mb-2">
                   {job.status === "completed" ? (
                     <CheckCircle2 size={18} className="text-stone-400" />
@@ -1023,7 +1023,7 @@ export default function AgencyDashboard() {
     <div>
       <h2 className="text-xl font-bold text-white mb-6">White-Label Branding</h2>
 
-      <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-5 mb-6">
+      <div className="bg-[#0f2148] border border-white/10 rounded-xl p-5 mb-6">
         <div className="space-y-4">
           <div>
             <label className="block text-white/60 text-sm mb-1">Agency Display Name</label>
@@ -1111,7 +1111,7 @@ export default function AgencyDashboard() {
       <h3 className="text-sm font-semibold text-white/50 uppercase tracking-wider mb-3">
         Preview
       </h3>
-      <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-5">
+      <div className="bg-[#0f2148] border border-white/10 rounded-xl p-5">
         <div className="flex items-center gap-3 mb-4">
           {brandConfig.logoUrl ? (
             <Image src={brandConfig.logoUrl} alt="Logo" width={32} height={32} className="w-8 h-8 rounded object-cover" unoptimized />
@@ -1161,7 +1161,7 @@ export default function AgencyDashboard() {
     <div>
       <h2 className="text-xl font-bold text-white mb-6">Agency Settings</h2>
 
-      <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-5 mb-6">
+      <div className="bg-[#0f2148] border border-white/10 rounded-xl p-5 mb-6">
         <h3 className="text-white font-semibold mb-4">General</h3>
         <div className="space-y-4">
           <div>
@@ -1196,7 +1196,7 @@ export default function AgencyDashboard() {
       </div>
 
       {/* Danger zone */}
-      <div className="bg-[#1a1a2e] border border-stone-500/20 rounded-xl p-5">
+      <div className="bg-[#0f2148] border border-stone-500/20 rounded-xl p-5">
         <h3 className="text-stone-400 font-semibold mb-2">Danger Zone</h3>
         <p className="text-white/50 text-sm mb-4">
           Deleting your agency will remove all client associations and team members. Sites themselves will not be deleted.
@@ -1292,7 +1292,7 @@ export default function AgencyDashboard() {
       {/* Create agency modal */}
       {showCreateAgency && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-6 max-w-md w-full mx-4">
+          <div className="bg-[#0f2148] border border-white/10 rounded-xl p-6 max-w-md w-full mx-4">
             <h3 className="text-white font-bold text-lg mb-4">Create New Agency</h3>
             <input
               type="text"

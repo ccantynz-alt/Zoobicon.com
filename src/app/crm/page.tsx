@@ -402,7 +402,7 @@ export default function CRMPage() {
       {/* AI Follow-up Modal */}
       {aiFollowUp && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => { setAiFollowUp(null); setGeneratedEmail(''); }}>
-          <div className="bg-[#1a1a2e] border border-white/10 rounded-2xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
+          <div className="bg-[#0f2148] border border-white/10 rounded-2xl p-6 max-w-lg w-full" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-bold mb-2 flex items-center gap-2"><Sparkles className="w-5 h-5 text-stone-400" /> AI Follow-up Email</h3>
             <p className="text-sm text-white/50 mb-4">Generated for {aiFollowUp}</p>
             {generatedEmail ? (

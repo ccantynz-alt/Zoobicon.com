@@ -354,7 +354,7 @@ export default function AnimationEditor({
   );
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0f] text-white">
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0a1628] text-white">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <div className="flex items-center gap-2">

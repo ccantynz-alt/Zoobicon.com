@@ -206,7 +206,7 @@ async function processVideosInBackground(
         script: item.personalizedScript,
         avatarId,
         voiceId: voiceId || "en-US-AriaNeural",
-        background: { type: "color", value: "#1a1a2e" },
+        background: { type: "color", value: "#0f2148" },
         dimension,
         speed: 1.0,
         caption: true,

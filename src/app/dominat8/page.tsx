@@ -174,7 +174,7 @@ export default function Dominat8Page() {
   const [annualBilling, setAnnualBilling] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white relative">
+    <div className="min-h-screen bg-[#0b1530] text-white relative">
       <BackgroundEffects preset="technical" />
       {/* Announcement bar */}
       <div className="relative z-10 bg-gradient-to-r from-stone-600 via-stone-500 to-stone-600 text-white text-center py-2.5 text-xs font-medium">
@@ -185,7 +185,7 @@ export default function Dominat8Page() {
       </div>
 
       {/* Nav */}
-      <nav className="relative sticky top-0 z-50 border-b border-white/[0.10] bg-[#050508]/90 backdrop-blur-xl">
+      <nav className="relative sticky top-0 z-50 border-b border-white/[0.10] bg-[#0b1530]/90 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/dominat8" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-stone-600 to-stone-400 flex items-center justify-center shadow-lg shadow-stone-500/25">
@@ -515,7 +515,7 @@ export default function Dominat8Page() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.06] bg-[#050508]">
+      <footer className="border-t border-white/[0.06] bg-[#0b1530]">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-2.5">

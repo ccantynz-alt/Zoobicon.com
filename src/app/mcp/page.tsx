@@ -197,7 +197,7 @@ export default function McpLandingPage(): JSX.Element {
               </button>
             ))}
           </div>
-          <div className="rounded-xl border border-stone-500/25 bg-[#0a0a14] overflow-hidden">
+          <div className="rounded-xl border border-stone-500/25 bg-[#0b1530] overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-stone-500/20 bg-stone-500/5">
               <code className="text-xs text-stone-300">{CONFIGS[tab].path}</code>
               <button
@@ -225,7 +225,7 @@ export default function McpLandingPage(): JSX.Element {
           <p className="text-sm text-gray-500 mb-6">
             The MCP endpoint speaks JSON-RPC 2.0 over HTTP. Test directly from your terminal.
           </p>
-          <div className="rounded-xl border border-stone-500/25 bg-[#0a0a14] overflow-hidden">
+          <div className="rounded-xl border border-stone-500/25 bg-[#0b1530] overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2.5 border-b border-stone-500/20 bg-stone-500/5">
               <span className="text-xs text-stone-300">shell</span>
               <button

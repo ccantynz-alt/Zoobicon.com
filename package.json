@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "audit": "node scripts/claude-md-audit.js",
+    "audit:deep": "node scripts/claude-md-audit.js --deep"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",

@@ -162,7 +162,7 @@ export async function generateVideo(request: HeyGenVideoRequest): Promise<string
           voice_id: request.voiceId,
           speed: Math.min(1.5, Math.max(0.5, request.speed ?? 1.0)),
         },
-        background: request.background || { type: "color", value: "#1a1a2e" },
+        background: request.background || { type: "color", value: "#0f2148" },
       },
     ],
     dimension: request.dimension || { width: 1920, height: 1080 },

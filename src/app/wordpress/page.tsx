@@ -66,7 +66,7 @@ export default function WordPressPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#050508]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0b1530]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-stone-600 flex items-center justify-center">

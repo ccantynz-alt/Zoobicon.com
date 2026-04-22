@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function MaintenancePage() {
   return (
-    <div className="min-h-screen bg-[#050508] text-white flex items-center justify-center">
+    <div className="min-h-screen bg-[#0b1530] text-white flex items-center justify-center">
       <div className="text-center px-6 max-w-lg">
         <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-stone-600 to-stone-700 mx-auto mb-8 flex items-center justify-center">
           <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">

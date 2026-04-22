@@ -99,7 +99,7 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Input Section */}
-      <div className="rounded-xl border border-white/10 bg-[#0a0a0f] p-6 space-y-4">
+      <div className="rounded-xl border border-white/10 bg-[#0a1628] p-6 space-y-4">
         <div className="flex items-center gap-3 mb-2">
           <div className="p-2 rounded-lg bg-white/5">
             <GitFork className="w-5 h-5 text-white" />
@@ -168,7 +168,7 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
 
       {/* Progress Steps */}
       {isLoading && (
-        <div className="rounded-xl border border-white/10 bg-[#0a0a0f] p-6 space-y-3">
+        <div className="rounded-xl border border-white/10 bg-[#0a1628] p-6 space-y-3">
           {PROGRESS_STEPS.map((step) => {
             const status = getStepStatus(step.key);
             return (
@@ -210,7 +210,7 @@ export default function GitHubImport({ onImport }: GitHubImportProps) {
 
       {/* Results Panel */}
       {result && (
-        <div className="rounded-xl border border-white/10 bg-[#0a0a0f] p-6 space-y-5">
+        <div className="rounded-xl border border-white/10 bg-[#0a1628] p-6 space-y-5">
           <h4 className="text-lg font-semibold text-white">Import Complete</h4>
 
           {/* Files Analyzed */}

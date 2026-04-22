@@ -349,7 +349,7 @@ export default function WaitlistPage() {
               </button>
             </div>
             <div className="p-1 rounded-2xl bg-gradient-to-r from-stone-500/20 to-stone-500/20">
-              <div className="bg-[#0f0f1a] rounded-xl p-8 min-h-[500px] flex items-center justify-center">
+              <div className="bg-[#0a1628] rounded-xl p-8 min-h-[500px] flex items-center justify-center">
                 <div className="text-center max-w-md">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-stone-600 to-stone-600 mx-auto mb-6 flex items-center justify-center">
                     <Zap className="w-8 h-8" />

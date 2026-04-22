@@ -68,7 +68,7 @@ const THEMES = [
   {
     id: "luxury-dark",
     label: "Luxury Dark",
-    colors: ["#0a0a0a", "#1a1a2e", "#d4af37"],
+    colors: ["#0a0a0a", "#0f2148", "#d4af37"],
     description: "Dark backgrounds, gold accents, premium feel",
   },
   {

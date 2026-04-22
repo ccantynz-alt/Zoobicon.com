@@ -26,7 +26,7 @@ const TOOLS = [
 
 export default function ToolsPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a14] text-white">
+    <div className="min-h-screen bg-[#0b1530] text-white">
       <nav className="border-b border-white/[0.06] bg-[#0a0a12]/90 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between h-14">
           <Link href="/" className="flex items-center gap-2">

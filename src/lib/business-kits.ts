@@ -43,7 +43,7 @@ export const BUSINESS_KITS: BusinessKit[] = [
       { name: "Social Templates", type: "content-calendar", description: "Instagram-ready post templates for portfolio pieces", autoConfig: { platforms: ["instagram", "tiktok"], postTypes: ["portfolio", "behind-the-scenes", "testimonial"] } },
     ],
     websitePrompt: "A stunning photography portfolio website with a full-bleed hero image, masonry gallery grid showing different categories (weddings, portraits, events, landscapes), an about section with photographer bio, pricing packages, and a contact/booking form. Clean, minimal design that lets the images speak.",
-    brandDefaults: { font1: "Playfair Display", font2: "Inter", colors: { primary: "#1a1a2e", bg: "#ffffff", accent: "#b8860b" }, tone: "elegant" },
+    brandDefaults: { font1: "Playfair Display", font2: "Inter", colors: { primary: "#0f2148", bg: "#ffffff", accent: "#b8860b" }, tone: "elegant" },
   },
   {
     id: "restaurant",

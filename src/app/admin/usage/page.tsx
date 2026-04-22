@@ -46,7 +46,7 @@ const API_KEYS_DEMO = [
 ];
 
 const ACTIVITY_TYPES = ["generate", "deploy", "edit"] as const;
-const MODELS = ["claude-opus-4-6", "claude-sonnet-4-20250514", "gpt-4o", "gemini-2.5-pro"];
+const MODELS = ["claude-opus-4-7", "claude-sonnet-4-20250514", "gpt-4o", "gemini-2.5-pro"];
 const STATUSES = ["success", "success", "success", "success", "error"] as const;
 
 function generateActivity(): {
@@ -188,7 +188,7 @@ export default function UsagePage() {
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      transition: { delay: i * 0.08, duration: 0.4, ease: "easeOut" },
+      transition: { delay: i * 0.08, duration: 0.4, ease: "easeOut" as const },
     }),
   };
 
@@ -232,11 +232,11 @@ export default function UsagePage() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-[#131520]">
+    <div className="relative min-h-screen bg-[#0f2148]">
       <BackgroundEffects preset="admin" />
 
       {/* Nav */}
-      <nav className="border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">

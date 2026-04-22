@@ -387,7 +387,7 @@ export default function SeoScorePanel({
     : 0;
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0f] text-white">
+    <div className="flex flex-col h-full bg-[#0a1628] text-white">
       {/* ---- Header ---- */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <div className="flex items-center gap-2">

@@ -127,7 +127,7 @@ const FAQS = [
   },
   {
     q: "What AI models power the builder?",
-    a: "Every plan uses Claude Opus 4.6 for the core developer agent, the most powerful AI model available. We also use Claude Haiku for planning and Sonnet for enhancements. Same quality across all tiers.",
+    a: "Every plan uses Claude Opus 4.7 for the core developer agent, the most powerful AI model available. We also use Claude Haiku for planning and Sonnet for enhancements. Same quality across all tiers.",
   },
   {
     q: "Do you offer refunds?",
@@ -168,7 +168,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050508] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
+    <div className="relative min-h-screen bg-[#0b1530] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
       {/* ── structured data ── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -300,8 +300,8 @@ export default function PricingPage() {
                       style={{
                         borderColor: plan.featured ? "rgba(232,212,176,0.35)" : "rgba(255,255,255,0.08)",
                         background: plan.featured
-                          ? "linear-gradient(180deg, rgba(232,212,176,0.07) 0%, rgba(17,17,24,0.85) 60%)"
-                          : "linear-gradient(180deg, rgba(17,17,24,0.6) 0%, rgba(10,10,15,0.4) 100%)",
+                          ? "linear-gradient(180deg, rgba(232,212,176,0.07) 0%, rgba(20,40,95,0.85) 60%)"
+                          : "linear-gradient(180deg, rgba(20,40,95,0.6) 0%, rgba(10,10,15,0.4) 100%)",
                         boxShadow: plan.featured
                           ? "0 1px 0 rgba(232,212,176,0.15) inset, 0 32px 80px -32px rgba(232,212,176,0.45)"
                           : "0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 50px -30px rgba(0,0,0,0.6)",
@@ -314,7 +314,7 @@ export default function PricingPage() {
                             className="whitespace-nowrap rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em]"
                             style={{
                               background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                              color: "#0a0a0f",
+                              color: "#0a1628",
                               boxShadow: "0 10px 24px -10px rgba(232,212,176,0.55)",
                             }}
                           >
@@ -402,7 +402,7 @@ export default function PricingPage() {
                           className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
                           style={plan.featured ? {
                             background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                            color: "#0a0a0f",
+                            color: "#0a1628",
                             boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
                           } : {
                             background: "rgba(255,255,255,0.03)",
@@ -497,8 +497,8 @@ export default function PricingPage() {
                       style={{
                         borderColor: isOpen ? "rgba(232,212,176,0.25)" : "rgba(255,255,255,0.08)",
                         background: isOpen
-                          ? "linear-gradient(135deg, rgba(232,212,176,0.05) 0%, rgba(17,17,24,0.6) 100%)"
-                          : "linear-gradient(135deg, rgba(17,17,24,0.6) 0%, rgba(10,10,15,0.4) 100%)",
+                          ? "linear-gradient(135deg, rgba(232,212,176,0.05) 0%, rgba(20,40,95,0.6) 100%)"
+                          : "linear-gradient(135deg, rgba(20,40,95,0.6) 0%, rgba(10,10,15,0.4) 100%)",
                         boxShadow: isOpen
                           ? "0 1px 0 rgba(232,212,176,0.12) inset, 0 20px 50px -28px rgba(232,212,176,0.3)"
                           : "0 1px 0 rgba(255,255,255,0.03) inset",
@@ -555,7 +555,7 @@ export default function PricingPage() {
             <div
               className="relative overflow-hidden rounded-[40px] border border-white/[0.08] p-12 sm:p-16 text-center"
               style={{
-                background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(26,26,36,0.65) 100%)",
+                background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(26,26,36,0.65) 100%)",
                 boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset, 0 40px 100px -40px rgba(0,0,0,0.8)",
               }}
             >
@@ -583,7 +583,7 @@ export default function PricingPage() {
                     className="group inline-flex items-center gap-2 rounded-full px-7 py-4 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
                     style={{
                       background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                      color: "#0a0a0f",
+                      color: "#0a1628",
                       boxShadow: "0 18px 48px -18px rgba(232,212,176,0.55)",
                     }}
                   >

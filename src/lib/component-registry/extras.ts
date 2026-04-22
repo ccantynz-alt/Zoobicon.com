@@ -727,7 +727,7 @@ registerComponent({
     { value: "50", label: "Data Center Regions", suffix: "+" },
   ];
   return (
-    <section className="py-28 px-6 bg-gray-950 relative overflow-hidden">
+    <section className="py-28 px-6 bg-navy-950 relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px]" />
       <div className="relative max-w-7xl mx-auto">
         <div className="text-center mb-16">
@@ -1017,7 +1017,7 @@ registerComponent({
     Legal: ["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR", "Security"],
   };
   return (
-    <footer className="bg-gray-950 text-gray-400 pt-20 pb-8 px-6 relative overflow-hidden">
+    <footer className="bg-navy-950 text-gray-400 pt-20 pb-8 px-6 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
       <div className="max-w-7xl mx-auto relative">
         <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-12 mb-16">
@@ -1206,7 +1206,7 @@ registerComponent({
     { title: "Seamless Integrations", desc: "Connect with 200+ tools your team already uses.", icon: "M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1", span: "col-span-2", accent: "from-rose-500 to-pink-500" },
   ];
   return (
-    <section className="py-24 px-6 bg-gray-950" id="features">
+    <section className="py-24 px-6 bg-navy-950" id="features">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-white/5 text-gray-300 text-xs font-semibold px-4 py-1.5 rounded-full border border-white/10 mb-6">
@@ -1269,7 +1269,7 @@ registerComponent({
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-6 pt-24 pb-16 overflow-hidden bg-gray-950">
+    <section className="relative min-h-screen flex items-center justify-center px-6 pt-24 pb-16 overflow-hidden bg-navy-950">
       {/* Animated gradient orbs */}
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-to-r from-violet-600/15 to-transparent rounded-full blur-[120px] animate-pulse" style={{ animationDuration: "4s" }} />
       <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-gradient-to-l from-cyan-600/10 to-transparent rounded-full blur-[100px] animate-pulse" style={{ animationDuration: "6s" }} />
@@ -1421,7 +1421,7 @@ registerComponent({
   const accentRgb = "232,212,176";
 
   return (
-    <section className="py-24 px-6 bg-gray-950" id="features">
+    <section className="py-24 px-6 bg-navy-950" id="features">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
@@ -1517,7 +1517,7 @@ registerComponent({
   }, [visible]);
 
   return (
-    <section ref={ref} className="relative py-24 px-6 bg-gray-950 overflow-hidden">
+    <section ref={ref} className="relative py-24 px-6 bg-navy-950 overflow-hidden">
       {/* Background glow */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.06),transparent_60%)]" />
 
@@ -1558,7 +1558,7 @@ registerComponent({
   tags: ["cta", "gradient", "border", "animated", "premium", "saas", "tech", "startup", "modern", "conversion", "advanced", "cutting-edge"],
   code: `export default function CTA() {
   return (
-    <section className="py-24 px-6 bg-gray-950">
+    <section className="py-24 px-6 bg-navy-950">
       <div className="max-w-4xl mx-auto">
         <div className="relative rounded-2xl p-px overflow-hidden">
           {/* Animated gradient border */}
@@ -1568,7 +1568,7 @@ registerComponent({
           }} />
 
           {/* Inner card */}
-          <div className="relative bg-gray-950 rounded-[15px] p-12 md:p-16 text-center">
+          <div className="relative bg-navy-950 rounded-[15px] p-12 md:p-16 text-center">
             {/* Background glow */}
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(124,58,237,0.08),transparent_60%)] rounded-[15px]" />
 

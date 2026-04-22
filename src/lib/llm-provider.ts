@@ -19,7 +19,7 @@ export interface LLMModel {
 export const AVAILABLE_MODELS: LLMModel[] = [
   // Claude (Anthropic)
   { provider: "claude", id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6", maxTokens: 64000, tier: "balanced" },
-  { provider: "claude", id: "claude-opus-4-6", label: "Claude Opus 4.6", maxTokens: 64000, tier: "premium" },
+  { provider: "claude", id: "claude-opus-4-7", label: "Claude Opus 4.7", maxTokens: 64000, tier: "premium" },
   { provider: "claude", id: "claude-haiku-4-5-20251001", label: "Claude Haiku 4.5", maxTokens: 8192, tier: "fast" },
   // OpenAI
   { provider: "openai", id: "gpt-4o", label: "GPT-4o", maxTokens: 16384, tier: "balanced" },
@@ -54,18 +54,92 @@ function getProviderForModel(modelId: string): LLMProvider {
   return "claude"; // default
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Transient error classification + retry
+//
+// Root cause of the "Failed to fix X: write EPROTO ... SSL alert number 80"
+// storm: a flaky TLS connection between us and the upstream LLM. A single
+// ssl3_read_bytes internal_error (alert 80) kills one provider attempt, the
+// failover layer previously did not class EPROTO/SSL as retryable, so every
+// file in a Gate Test batch inherited the same upstream hiccup and the user
+// saw the raw openssl stack. The fix: tight per-call retry with jitter +
+// clean classification of what's retryable vs fatal.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Classify an error as transient (worth retrying) vs fatal (e.g. bad key).
+ * Covers Anthropic SDK failures, node-fetch/undici network errors, DNS,
+ * socket hangups, and raw OpenSSL alert 80 (internal_error) EPROTO faults.
+ */
+export function isTransientLLMError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return /rate.?limit|overloaded|529|too.many|5\d\d|timeout|timed?\s*out|abort|ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|EPIPE|EPROTO|socket\s*hang.?up|fetch failed|network.*error|ssl.*alert|tlsv1|handshake|internal.error/i.test(msg);
+}
+
+/**
+ * Convert any upstream error into a short, human-safe sentence.
+ * Never leaks openssl file paths, alert numbers, or TLS internals to users.
+ */
+export function describeLLMError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (/EPROTO|ssl.*alert|tlsv1|handshake/i.test(msg)) return "upstream TLS connection dropped";
+  if (/rate.?limit|too.many|429/i.test(msg)) return "rate limited";
+  if (/overloaded|529/i.test(msg)) return "provider overloaded";
+  if (/timeout|timed?\s*out|abort/i.test(msg)) return "request timed out";
+  if (/ECONNRESET|socket\s*hang.?up|EPIPE/i.test(msg)) return "connection reset";
+  if (/ECONNREFUSED/i.test(msg)) return "connection refused";
+  if (/ENOTFOUND|EAI_AGAIN/i.test(msg)) return "DNS lookup failed";
+  if (/5\d\d/i.test(msg)) return "provider 5xx error";
+  if (/401|unauthorized|invalid.api.key/i.test(msg)) return "invalid API key";
+  if (/400|invalid.request/i.test(msg)) return "bad request";
+  // Last resort: first sentence only, capped at 120 chars. Never the stack.
+  const first = msg.split(/[\n.]/)[0].trim();
+  return first.length > 120 ? first.slice(0, 117) + "..." : first;
+}
+
+/**
+ * Retry a zero-arg async operation with exponential backoff + jitter.
+ * Only retries transient errors (see isTransientLLMError). Fatal errors
+ * (auth, 400, malformed payload) throw immediately so we don't waste time.
+ */
+async function retryTransient<T>(
+  fn: () => Promise<T>,
+  opts: { attempts?: number; baseMs?: number; label: string } = { label: "llm" }
+): Promise<T> {
+  const attempts = opts.attempts ?? 3;
+  const baseMs = opts.baseMs ?? 400;
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (!isTransientLLMError(err) || i === attempts - 1) throw err;
+      const delay = baseMs * Math.pow(2, i) + Math.floor(Math.random() * 250);
+      console.warn(`[llm-retry:${opts.label}] attempt ${i + 1}/${attempts} failed (${describeLLMError(err)}), retrying in ${delay}ms`);
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  throw lastErr;
+}
+
 async function callClaude(req: LLMRequest): Promise<LLMResponse> {
   const Anthropic = (await import("@anthropic-ai/sdk")).default;
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("AI service is temporarily unavailable.");
 
-  const client = new Anthropic({ apiKey });
-  const res = await client.messages.create({
-    model: req.model,
-    max_tokens: req.maxTokens || 64000,
-    system: req.system,
-    messages: [{ role: "user", content: req.userMessage }],
-  });
+  // SDK has its own maxRetries, but it doesn't retry EPROTO/SSL — wrap it.
+  const client = new Anthropic({ apiKey, timeout: 60000, maxRetries: 0 });
+  const res = await retryTransient(
+    () =>
+      client.messages.create({
+        model: req.model,
+        max_tokens: req.maxTokens || 64000,
+        system: req.system,
+        messages: [{ role: "user", content: req.userMessage }],
+      }),
+    { label: `claude:${req.model}` }
+  );
 
   const text = res.content.find((b) => b.type === "text")?.text || "";
   return {
@@ -81,29 +155,37 @@ async function callOpenAI(req: LLMRequest): Promise<LLMResponse> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("AI service is temporarily unavailable.");
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+  const data = await retryTransient(
+    async () => {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: req.model,
+          max_completion_tokens: req.maxTokens || 16384,
+          messages: [
+            { role: "system", content: req.system },
+            { role: "user", content: req.userMessage },
+          ],
+        }),
+        signal: AbortSignal.timeout(60000),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`OpenAI ${res.status}: ${err?.error?.message || res.statusText}`);
+      }
+      return (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+        usage?: { prompt_tokens?: number; completion_tokens?: number };
+      };
     },
-    body: JSON.stringify({
-      model: req.model,
-      max_completion_tokens: req.maxTokens || 16384,
-      messages: [
-        { role: "system", content: req.system },
-        { role: "user", content: req.userMessage },
-      ],
-    }),
-    signal: AbortSignal.timeout(60000),
-  });
+    { label: `openai:${req.model}` }
+  );
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`OpenAI API error: ${err?.error?.message || res.statusText}`);
-  }
-
-  const data = await res.json();
   const text = data.choices?.[0]?.message?.content || "";
   return {
     text,
@@ -120,25 +202,33 @@ async function callGemini(req: LLMRequest): Promise<LLMResponse> {
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${req.model}:generateContent?key=${apiKey}`;
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: req.system }] },
-      contents: [{ parts: [{ text: req.userMessage }] }],
-      generationConfig: {
-        maxOutputTokens: req.maxTokens || 65536,
-      },
-    }),
-    signal: AbortSignal.timeout(60000),
-  });
+  const data = await retryTransient(
+    async () => {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: req.system }] },
+          contents: [{ parts: [{ text: req.userMessage }] }],
+          generationConfig: {
+            maxOutputTokens: req.maxTokens || 65536,
+          },
+        }),
+        signal: AbortSignal.timeout(60000),
+      });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Gemini API error: ${err?.error?.message || res.statusText}`);
-  }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`Gemini ${res.status}: ${err?.error?.message || res.statusText}`);
+      }
+      return (await res.json()) as {
+        candidates?: { content?: { parts?: { text?: string }[] } }[];
+        usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number };
+      };
+    },
+    { label: `gemini:${req.model}` }
+  );
 
-  const data = await res.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
   return {
     text,
@@ -186,16 +276,14 @@ export async function callLLMWithFailover(
     );
   }
 
-  // Try primary model first
+  // Try primary model first. callLLM now has its own intra-provider retry
+  // for transient TLS/network flakes, so if it still throws, we either
+  // exhausted retries (genuine outage) or hit a fatal error (auth, 400).
   try {
     return await callLLM(req);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    const isRetryable =
-      /rate.limit|overloaded|529|too many|503|500|timeout|timed?\s*out|ECONNRESET|ENOTFOUND|fetch failed|AbortError/i.test(msg);
-    if (!isRetryable) throw err; // Non-retryable errors (auth, bad request) — don't failover
-
-    console.warn(`[LLM Failover] ${req.model} failed: ${msg}`);
+    if (!isTransientLLMError(err)) throw err; // Auth / bad request — don't failover
+    console.warn(`[LLM Failover] ${req.model} unavailable: ${describeLLMError(err)}`);
   }
 
   // Build fallback order: try other providers with their best available model
@@ -229,7 +317,7 @@ export async function callLLMWithFailover(
         maxTokens: Math.min(req.maxTokens || fb.maxTokens, fb.maxTokens),
       });
     } catch (fbErr) {
-      console.warn(`[LLM Failover] ${fb.model} also failed: ${fbErr instanceof Error ? fbErr.message : fbErr}`);
+      console.warn(`[LLM Failover] ${fb.model} also failed: ${describeLLMError(fbErr)}`);
     }
   }
 

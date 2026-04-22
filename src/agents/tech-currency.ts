@@ -83,7 +83,7 @@ const LATEST_VERSIONS: Record<string, { latest: string; category: DepStatus["cat
 };
 
 const LATEST_AI_MODELS: Record<string, string> = {
-  "claude-opus": "claude-opus-4-6",
+  "claude-opus": "claude-opus-4-7",
   "claude-sonnet": "claude-sonnet-4-6",
   "claude-haiku": "claude-haiku-4-5-20251001",
   "gpt-4": "gpt-4o",

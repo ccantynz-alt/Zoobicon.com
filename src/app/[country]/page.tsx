@@ -211,9 +211,9 @@ export default async function CountryPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-[#0a0a0f] text-white">
+      <div className="min-h-screen bg-[#0a1628] text-white">
         {/* Navigation */}
-        <nav className="border-b border-white/10 bg-[#0a0a0f]/80 backdrop-blur-xl sticky top-0 z-50">
+        <nav className="border-b border-white/10 bg-[#0a1628]/80 backdrop-blur-xl sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               Zoobicon

@@ -108,8 +108,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#050508" },
-    { media: "(prefers-color-scheme: light)", color: "#050508" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1530" },
+    { media: "(prefers-color-scheme: light)", color: "#0b1530" },
   ],
 };
 
@@ -128,7 +128,7 @@ export default function RootLayout({
         <link rel="alternate" href="https://zoobicon.io" title="Zoobicon for Developers" />
         <link rel="alternate" href="https://zoobicon.sh" title="Zoobicon Hosting & CLI" />
         {/* Critical inline styles — guarantees dark bg even before CSS bundle loads */}
-        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#050508;color:#e4e4e7;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em;overscroll-behavior:none;-webkit-overflow-scrolling:touch}html{overflow-x:hidden}` }} />
+        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#0b1530;color:#e4e4e7;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em;overscroll-behavior:none;-webkit-overflow-scrolling:touch}html{overflow-x:hidden}` }} />
         {/* Preconnect to Google Fonts CDN */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -146,7 +146,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://js.stripe.com" />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
         <link rel="dns-prefetch" href="https://github.com" />
-        <meta name="msapplication-TileColor" content="#050508" />
+        <meta name="msapplication-TileColor" content="#0b1530" />
         <meta name="msapplication-config" content="none" />
         {/* AI Discovery — llms.txt is the "robots.txt for AI" */}
         <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt — AI-readable site description" />
@@ -344,6 +344,10 @@ export default function RootLayout({
         />
       </head>
       <body className="grain fs-grain">
+        {/* Site-wide navy backdrop + dot-grid pattern. Fixed behind all
+            content (z-index: -1) so every page inherits the same chrome
+            without individual pages needing to render <BackgroundEffects />. */}
+        <div className="site-backdrop" aria-hidden="true" />
         <ComingSoonBanner />
         <MaintenanceBanner />
         <StagingBanner />

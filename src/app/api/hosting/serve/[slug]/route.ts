@@ -72,7 +72,7 @@ export async function GET(
   <title>Site Not Found - Zoobicon</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{background:#0a0a0f;color:#e0e0e0;font-family:Inter,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}
+    body{background:#0a1628;color:#e0e0e0;font-family:Inter,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}
     .c{text-align:center;padding:2rem}
     .icon{width:64px;height:64px;margin:0 auto 1.5rem;border-radius:16px;background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(14,165,233,0.15));display:flex;align-items:center;justify-content:center}
     .icon svg{width:28px;height:28px;color:#6366f1}

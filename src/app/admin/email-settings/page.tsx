@@ -158,7 +158,7 @@ export default function AdminEmailSettingsPage() {
           to: targetEmail,
           subject: "[Zoobicon] Test Email - Configuration Verified",
           text: "This is a test email from your Zoobicon admin panel. If you received this, your Mailgun configuration is working correctly.",
-          html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;background:#131520;color:#fff;border-radius:16px">
+          html: `<div style="font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;background:#0f2148;color:#fff;border-radius:16px">
             <h1 style="font-size:22px;font-weight:800;margin:0 0 16px">Email Configuration Test</h1>
             <p style="color:rgba(255,255,255,0.7);line-height:1.6">This is a test email from your Zoobicon admin panel. Your Mailgun configuration is working correctly.</p>
             <p style="color:rgba(255,255,255,0.4);font-size:12px;margin-top:24px">Sent at ${new Date().toISOString()}</p>
@@ -197,11 +197,11 @@ ADMIN_NOTIFICATION_EMAIL=${config.notificationEmail || config.adminEmail || "adm
   const inputClass = "w-full bg-white/[0.06] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/50 focus:outline-none focus:border-stone-500/50 transition-colors";
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#0f2148] text-white">
       <BackgroundEffects preset="admin" />
 
       {/* Navbar */}
-      <nav className="relative z-20 border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl">
+      <nav className="relative z-20 border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/admin" className="flex items-center gap-2 text-white/60 hover:text-white transition-colors">

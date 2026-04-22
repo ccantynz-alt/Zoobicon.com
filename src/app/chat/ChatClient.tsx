@@ -37,7 +37,7 @@ interface Conversation {
 type ModelKey = "opus" | "sonnet" | "haiku";
 
 const MODEL_LABEL: Record<ModelKey, { name: string; desc: string; icon: typeof Sparkles }> = {
-  opus: { name: "Opus 4.6", desc: "Deepest reasoning. Slowest + priciest.", icon: Brain },
+  opus: { name: "Opus 4.7", desc: "Deepest reasoning. Slowest + priciest.", icon: Brain },
   sonnet: { name: "Sonnet 4.6", desc: "Best all-round. Default.", icon: Sparkles },
   haiku: { name: "Haiku 4.5", desc: "Fast + cheap. Quick answers.", icon: Zap },
 };
@@ -464,7 +464,7 @@ export default function ChatClient() {
     <div className="h-screen w-screen flex bg-[#0b0d17] text-white overflow-hidden">
       {/* Sidebar */}
       <aside
-        className={`shrink-0 border-r border-white/10 bg-[#131520] flex flex-col transition-all duration-200 ${
+        className={`shrink-0 border-r border-white/10 bg-[#0f2148] flex flex-col transition-all duration-200 ${
           sidebarOpen ? "w-64" : "w-0"
         } overflow-hidden`}
       >
@@ -565,7 +565,7 @@ export default function ChatClient() {
 
         {/* Settings panel */}
         {showSettings && (
-          <div className="shrink-0 border-b border-white/10 bg-[#131520] px-6 py-4">
+          <div className="shrink-0 border-b border-white/10 bg-[#0f2148] px-6 py-4">
             <div className="max-w-2xl mx-auto">
               <label className="flex items-center gap-2 text-xs font-medium text-white/70 mb-2">
                 <KeyRound className="w-3.5 h-3.5" />
@@ -634,7 +634,7 @@ export default function ChatClient() {
         {/* Composer */}
         <div className="shrink-0 border-t border-white/10 bg-[#0f111c] px-6 py-4">
           <div className="max-w-3xl mx-auto">
-            <div className="relative flex items-end gap-2 bg-[#131520] border border-white/10 rounded-2xl px-4 py-3 focus-within:border-amber-500/40 transition-colors">
+            <div className="relative flex items-end gap-2 bg-[#0f2148] border border-white/10 rounded-2xl px-4 py-3 focus-within:border-amber-500/40 transition-colors">
               <textarea
                 ref={textareaRef}
                 value={input}

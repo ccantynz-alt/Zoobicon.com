@@ -205,7 +205,7 @@ export default function DomainHookModal({
           onClick={handleClose}
         >
           <motion.div
-            className="relative w-full max-w-2xl rounded-2xl bg-gradient-to-b from-gray-900 to-gray-950 border border-white/10 shadow-2xl overflow-hidden"
+            className="relative w-full max-w-2xl rounded-2xl bg-gradient-to-b from-gray-900 to-navy-950 border border-white/10 shadow-2xl overflow-hidden"
             initial={{ scale: 0.95, y: 20, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 20, opacity: 0 }}

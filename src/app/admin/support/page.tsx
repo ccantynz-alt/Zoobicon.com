@@ -221,13 +221,13 @@ export default function AdminSupportPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#131520] text-white">
+    <div className="min-h-screen bg-[#0f2148] text-white">
       <BackgroundEffects preset="admin" />
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#131520]/90 backdrop-blur-2xl">
+      <div className="border-b border-white/10 bg-[#0f2148]/90 backdrop-blur-2xl">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="p-2 rounded-lg hover:bg-[#131520] transition-colors">
+            <Link href="/admin" className="p-2 rounded-lg hover:bg-[#0f2148] transition-colors">
               <ArrowLeft className="w-5 h-5 text-white/70" />
             </Link>
             <MessageSquare className="w-6 h-6 text-stone-400" />

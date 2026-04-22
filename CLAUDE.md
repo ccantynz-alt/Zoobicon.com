@@ -10,6 +10,22 @@
 > **If what you are about to do violates THE IRON LAW, STOP.**
 > **No exceptions. No "this one time." No "it's faster if I just…".**
 
+## 0A. CLAUDE.md IS A SNAPSHOT, NOT A CEILING
+
+> **This rule sits above everything. It is the kill-switch for stagnation.**
+
+CLAUDE.md is a static file. The AI landscape is not. Models ship weekly. Competitors ship daily. Dependencies age. **If CLAUDE.md contradicts current reality, reality wins.** The correct response to a stale section is not "follow the stale rule" — it is "update the bible in this session, then proceed."
+
+**Procedure, not a value (values get ignored):**
+1. **Every session opens with `npm run audit`.** The script (`scripts/claude-md-audit.js`) traffic-lights model pins, "Last updated" stamps, competitor-section freshness, and — with `npm run audit:deep` — npm majors behind stable.
+2. **Every finding gets triaged before code is written.** 🔴 = must fix this session (update CLAUDE.md, then act on the finding). 🟠 = fix this session if time. 🟢 = clear.
+3. **Upgrading a pin is Claude's job, not Craig's.** If the audit says "claude-opus-4-6 is stale — canonical is claude-opus-4-7," Claude updates the rule and every code reference to it in the same commit. No asking. No flip-flop. Reality wins.
+4. **CLAUDE.md updates ship alongside feature commits.** When a session ends, if the bible hasn't been touched, something was probably missed. At minimum the "Last updated" stamp on LIVE REPO STATUS gets bumped.
+
+**Exception:** the §2 authorization list still applies. Claude doesn't silently swap Anthropic → OpenAI as the primary provider just because a new model shipped. Model *pins within the Anthropic family* (Opus 4.6 → 4.7) are a Claude update. Strategy-level reversals ("drop Claude") are Craig's call.
+
+The quality bar is not "match what CLAUDE.md says." The quality bar is "be the most advanced on earth." CLAUDE.md is the record of that target — not the cap on it.
+
 ## 0. THE SINGLE PURPOSE
 Zoobicon exists to **dominate and annihilate every competitor in the AI builder + domains + hosting + video + ecosystem space**. Not "compete with." Not "be comparable to." **Dominate. Annihilate.** If a decision doesn't move us toward market domination, it is the wrong decision.
 
@@ -334,7 +350,7 @@ These are never allowed under any circumstance without Craig explicitly saying "
 ---
 
 # LIVE REPO STATUS — READ THIS FIRST
-## Last updated: 2026-04-05 | Build: PASSING (463 pages) | Branch: main
+## Last updated: 2026-04-21 | Build: PASSING (470+ pages) | Branch: claude/audit-and-update-colors-2M9ta
 
 ### QUICK FACTS
 - **141 pages** | **223 API routes** | **74 layouts** | **130 lib files**
@@ -758,7 +774,7 @@ npm run lint     # ESLint
 1. **No styled-jsx** — Removed. Use Tailwind only. Adding back causes build errors.
 2. **No duplicate Next config** — Only `next.config.js`. Never create a second.
 3. **ESLint/TS ignored in builds** — Intentional. Lint separately.
-4. **Model routing — Opus for builds** — Developer agent MUST use `claude-opus-4-6`. NEVER downgrade to Sonnet. Noticeably worse output.
+4. **Model routing — Opus for builds** — Developer agent MUST use `claude-opus-4-7` (upgraded from 4-6 on 2026-04-21 per claude-md-audit). NEVER downgrade to Sonnet or to an older Opus. Noticeably worse output.
 5. **Multi-LLM** — Three providers: `ANTHROPIC_API_KEY`, `GOOGLE_AI_API_KEY`, `OPENAI_API_KEY`.
 6. **Component library injection — MANDATORY** — Every generated site gets it. Without it buttons are invisible. Do not remove.
 7. **Email is Mailgun-only — NO Google Workspace** — One service, one API key. No exceptions.

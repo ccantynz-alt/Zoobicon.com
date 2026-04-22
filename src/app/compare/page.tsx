@@ -99,7 +99,7 @@ export default function ComparePage() {
                 "name": "Is Zoobicon better than Bolt.new?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Zoobicon and Bolt.new have different strengths. Zoobicon offers higher output quality (powered by Claude Opus 4.6), 43 specialized generators, full-stack app generation with database and API, e-commerce storefronts, and agency white-label tools. Bolt.new offers faster preview via WebContainers (in-browser Node.js) and broader framework support. Zoobicon generates complete sites in 60-95 seconds; Bolt shows previews in 3-5 seconds but requires more manual assembly."
+                  "text": "Zoobicon and Bolt.new have different strengths. Zoobicon offers higher output quality (powered by Claude Opus 4.7), 43 specialized generators, full-stack app generation with database and API, e-commerce storefronts, and agency white-label tools. Bolt.new offers faster preview via WebContainers (in-browser Node.js) and broader framework support. Zoobicon generates complete sites in 60-95 seconds; Bolt shows previews in 3-5 seconds but requires more manual assembly."
                 }
               },
               {

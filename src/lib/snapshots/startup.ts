@@ -395,7 +395,7 @@ const footer = `import React from "react";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-950 border-t border-gray-800 pt-16 pb-8 px-6">
+    <footer className="bg-navy-950 border-t border-gray-800 pt-16 pb-8 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div className="md:col-span-2">

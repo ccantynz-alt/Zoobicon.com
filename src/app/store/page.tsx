@@ -254,7 +254,7 @@ export default function StorePage() {
             <motion.div variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <h3 className="text-lg font-semibold mb-2">Your Storefront</h3>
               <p className="text-sm text-white/40 mb-4">Preview and share your digital product store.</p>
-              <div className="bg-[#1a1a2e] border border-white/10 rounded-xl p-4 flex items-center justify-between mb-4">
+              <div className="bg-[#0f2148] border border-white/10 rounded-xl p-4 flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <ExternalLink className="w-4 h-4 text-white/30" />
                   <span className="text-sm text-stone-400">{getStorefrontUrl("mystore")}</span>

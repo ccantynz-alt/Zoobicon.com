@@ -228,7 +228,7 @@ export default function ApiDocsPage() {
         id: 'gen_' + Math.random().toString(36).slice(2, 10),
         url: 'https://cyber-shield.zoobicon.sh',
         html: '<!DOCTYPE html>...',
-        metadata: { generator: 'landing-page', tier: 'premium', model: 'claude-opus-4-6', tokens_used: 28450, generation_time_ms: 12340 }
+        metadata: { generator: 'landing-page', tier: 'premium', model: 'claude-opus-4-7', tokens_used: 28450, generation_time_ms: 12340 }
       }, null, 2));
       setSending(false);
     }, 2000);

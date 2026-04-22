@@ -1,5 +1,9 @@
 "use client";
 
+/* Web Speech API — use any for browser APIs not in default TS lib */
+// eslint-disable-next-line
+type SpeechRecognitionAny = any;
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Mic,
@@ -89,7 +93,7 @@ export default function DictationPage() {
   const [continuousRestart, setContinuousRestart] = useState(true);
 
   // Refs
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionAny | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -181,7 +185,7 @@ export default function DictationPage() {
     recognition.lang = language;
     recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: SpeechRecognitionAny) => {
       let interim = "";
       let finalTranscript = "";
 
@@ -234,7 +238,7 @@ export default function DictationPage() {
       }
     };
 
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+    recognition.onerror = (event: SpeechRecognitionAny) => {
       if (event.error === "not-allowed") {
         alert("Microphone access denied. Please allow mic access.");
         setIsListening(false);
@@ -525,9 +529,9 @@ export default function DictationPage() {
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white flex flex-col">
+    <div className="min-h-screen bg-[#0a1628] text-white flex flex-col">
       {/* Top Bar */}
-      <header className="border-b border-white/10 bg-[#0a0a0f]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[#0a1628]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center">

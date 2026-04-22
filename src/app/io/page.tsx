@@ -348,6 +348,8 @@ const PRICING = [
     price: "$0",
     period: "/mo",
     description: "For personal projects",
+    generations: "1,000 emails/month",
+    rateLimit: "10 req/min",
     features: [
       "1,000 emails/month",
       "1 domain",
@@ -363,6 +365,8 @@ const PRICING = [
     price: "$25",
     period: "/mo",
     description: "For growing businesses",
+    generations: "50,000 emails/month",
+    rateLimit: "100 req/min",
     features: [
       "50,000 emails/month",
       "10 domains",
@@ -380,6 +384,8 @@ const PRICING = [
     price: "$99",
     period: "/mo",
     description: "For high-volume senders",
+    generations: "500,000 emails/month",
+    rateLimit: "Unlimited",
     features: [
       "500,000 emails/month",
       "Unlimited domains",
@@ -478,7 +484,7 @@ export default function ZoobiconIOPage() {
   const [activeLang, setActiveLang] = useState<"curl" | "javascript" | "python">("curl");
 
   return (
-    <div className="min-h-screen bg-[#050508] text-white overflow-hidden relative">
+    <div className="min-h-screen bg-[#0b1530] text-white overflow-hidden relative">
       <BackgroundEffects preset="technical" />
       <CursorGlowTracker />
 

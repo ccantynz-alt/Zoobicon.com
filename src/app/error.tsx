@@ -42,7 +42,7 @@ export default function GlobalError({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0a0a0f",
+          background: "#0a1628",
           color: "#e0e0e0",
           fontFamily: '"Inter", system-ui, sans-serif',
         }}
@@ -76,7 +76,7 @@ export default function GlobalError({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0a0a0f",
+        background: "#0a1628",
         color: "#e0e0e0",
         fontFamily: '"Inter", system-ui, sans-serif',
         padding: "24px",

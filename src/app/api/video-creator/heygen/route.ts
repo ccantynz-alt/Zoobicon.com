@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       script: script.trim(),
       avatarId,
       voiceId,
-      background: background || { type: "color", value: "#1a1a2e" },
+      background: background || { type: "color", value: "#0f2148" },
       dimension,
       speed: speed || 1.0,
       caption: caption !== false,

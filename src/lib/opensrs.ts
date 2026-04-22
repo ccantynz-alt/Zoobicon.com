@@ -199,69 +199,122 @@ function setCached(domain: string, result: boolean | null) {
   }
 }
 
+// Per-TLD authoritative RDAP endpoints. Going direct to the registry is
+// strictly more reliable than rdap.org's third-party bootstrap — rdap.org
+// will happily 404 when its upstream is flaky, and our old code treated
+// that 404 as "available." These endpoints are the ones the registries
+// themselves publish via the IANA bootstrap file, hardcoded for the
+// majors to avoid a second round-trip and to remove rdap.org as a single
+// point of failure for our most-searched TLDs.
+const AUTHORITATIVE_RDAP: Record<string, string> = {
+  com: "https://rdap.verisign.com/com/v1/domain/",
+  net: "https://rdap.verisign.com/net/v1/domain/",
+  org: "https://rdap.publicinterestregistry.org/rdap/domain/",
+  io: "https://rdap.identitydigital.services/rdap/domain/",
+  info: "https://rdap.identitydigital.services/rdap/domain/",
+  me: "https://rdap.identitydigital.services/rdap/domain/",
+  co: "https://rdap.nic.co/domain/",
+  ai: "https://rdap.nic.ai/domain/",
+  sh: "https://rdap.nic.sh/domain/",
+  app: "https://rdap.nic.google/domain/",
+  dev: "https://rdap.nic.google/domain/",
+  xyz: "https://rdap.centralnic.com/xyz/domain/",
+  us: "https://rdap.nic.us/domain/",
+};
+
+function extractTld(domain: string): string {
+  const parts = domain.toLowerCase().split(".");
+  return parts[parts.length - 1] || "";
+}
+
 /**
- * RDAP authoritative check — tight timeout, full body validation.
+ * Interpret an RDAP response body.
  *
- * Status code alone is NOT trustworthy: rdap.org sometimes returns 200 with
- * a JSON error body (RFC 9083 errorResponse), which previously caused every
- * domain to be reported as TAKEN even when it was genuinely available.
+ * Status 404 → available. 200 with an error body (RFC 9083) → derive from
+ * errorCode. 200 with a real domain record → taken. Anything else → null.
+ */
+async function interpretRdap(res: Response): Promise<boolean | null> {
+  if (res.status === 404) return true;
+  if (res.status === 200) {
+    try {
+      const body = (await res.json()) as {
+        objectClassName?: string;
+        ldhName?: string;
+        errorCode?: number;
+      };
+      if (body && typeof body.errorCode === "number" && body.errorCode === 404) return true;
+      if (
+        body &&
+        body.objectClassName === "domain" &&
+        typeof body.ldhName === "string" &&
+        body.ldhName.length > 0
+      ) {
+        return false;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+async function fetchRdap(url: string): Promise<Response | null> {
+  try {
+    return await fetch(url, {
+      signal: AbortSignal.timeout(4000),
+      headers: { Accept: "application/rdap+json" },
+      redirect: "follow",
+    });
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * RDAP availability check — authoritative registry first, rdap.org as
+ * fallback only when the registry is unreachable.
+ *
+ * The old single-source rdap.org path caused `auromax.com` to render as
+ * AVAILABLE on our UI while Cloudflare's registrar check confirmed it was
+ * registered — rdap.org had 404'd the bootstrap and we trusted the 404.
+ * Per-TLD authoritative endpoints eliminate that class of bug because they
+ * are the registry itself.
  *
  * Rules:
- *   - 404 → available (true)
- *   - 200 + valid domain record (objectClassName === "domain") → taken (false)
- *   - 200 + errorCode === 404 → available (true)  [RFC 9083 error response]
- *   - 200 + unrecognised body → uncertain (null) — fall through to DNS
- *   - 429 → retry once with jitter
- *   - anything else → null (uncertain)
+ *   - If an authoritative endpoint exists, hit it first. Trust its verdict.
+ *   - On any uncertainty from the authoritative endpoint (network error,
+ *     unparseable body), fall back to rdap.org with one 429 retry.
+ *   - Any non-null answer is returned; otherwise null (uncertain).
  */
 async function rdapCheck(domain: string, attempt = 0): Promise<boolean | null> {
+  const tld = extractTld(domain);
+  const authoritative = AUTHORITATIVE_RDAP[tld];
+
+  if (authoritative) {
+    const res = await fetchRdap(`${authoritative}${domain}`);
+    if (res) {
+      const verdict = await interpretRdap(res);
+      if (verdict !== null) return verdict;
+    }
+    // Authoritative endpoint was unreachable or ambiguous — fall through
+    // to rdap.org rather than returning null immediately. Giving up on one
+    // registry hiccup would hurt availability more than it helps accuracy.
+  }
+
   try {
-    const rdapRes = await fetch(`https://rdap.org/domain/${domain}`, {
+    const res = await fetch(`https://rdap.org/domain/${domain}`, {
       signal: AbortSignal.timeout(4000),
       headers: { Accept: "application/rdap+json" },
       redirect: "follow",
     });
 
-    if (rdapRes.status === 404) return true;
-
-    if (rdapRes.status === 429 && attempt === 0) {
+    if (res.status === 429 && attempt === 0) {
       await new Promise((r) => setTimeout(r, 300 + Math.random() * 200));
       return rdapCheck(domain, 1);
     }
 
-    if (rdapRes.status === 200) {
-      try {
-        const body = (await rdapRes.json()) as {
-          objectClassName?: string;
-          ldhName?: string;
-          errorCode?: number;
-          title?: string;
-        };
-
-        // RFC 9083 error-response with 200 HTTP wrapper: treat as available
-        if (body && typeof body.errorCode === "number" && body.errorCode === 404) {
-          return true;
-        }
-
-        // Valid RDAP domain record: registered
-        if (
-          body &&
-          body.objectClassName === "domain" &&
-          typeof body.ldhName === "string" &&
-          body.ldhName.length > 0
-        ) {
-          return false;
-        }
-
-        // 200 but body isn't a domain record — uncertain, let DNS decide
-        return null;
-      } catch {
-        // Malformed JSON — treat as uncertain
-        return null;
-      }
-    }
-
-    return null;
+    return interpretRdap(res);
   } catch {
     return null;
   }
@@ -312,37 +365,63 @@ async function dnsCheck(domain: string): Promise<boolean | null> {
 }
 
 /**
- * Race multiple availability probes in parallel.
+ * Require consensus before claiming a domain is available.
  *
- * Resolves as soon as ANY probe returns a definitive true/false answer.
- * If all probes return null, resolves to null. This halves worst-case
- * latency vs. sequential RDAP → DNS fallback.
+ * - ANY probe returning `false` (taken) settles immediately as taken.
+ * - Claiming `true` (available) requires EVERY probe to return `true`.
+ *   If a single probe is uncertain (null), the overall result is null.
+ *
+ * Why: rdap.org is a third-party bootstrap service and has been seen
+ * returning 404 for domains that are actually registered (e.g. auromax.com
+ * returned AVAILABLE on our UI while Cloudflare's registrar check confirmed
+ * it was taken). Trusting a single 404 as authoritative means every time
+ * rdap.org fails to reach the real TLD registry, we show a for-sale banner
+ * on a domain the user cannot actually buy — a credibility killer. Requiring
+ * consensus from an independent DNS probe catches this cleanly.
  */
-function firstAuthoritative(
+function consensusAvailability(
   probes: Array<Promise<boolean | null>>,
 ): Promise<boolean | null> {
   return new Promise((resolve) => {
-    let pending = probes.length;
+    const results: (boolean | null)[] = new Array(probes.length).fill(undefined);
+    let completed = 0;
     let settled = false;
-    probes.forEach((p) => {
-      p.then((v) => {
-        if (settled) return;
-        if (v !== null) {
-          settled = true;
-          resolve(v);
-          return;
-        }
-        if (--pending === 0) {
-          settled = true;
-          resolve(null);
-        }
-      }).catch(() => {
-        if (settled) return;
-        if (--pending === 0) {
-          settled = true;
-          resolve(null);
-        }
-      });
+
+    const finish = (value: boolean | null) => {
+      if (settled) return;
+      settled = true;
+      resolve(value);
+    };
+
+    probes.forEach((p, i) => {
+      p.then(
+        (v) => {
+          if (settled) return;
+          results[i] = v;
+          completed++;
+          if (v === false) {
+            finish(false);
+            return;
+          }
+          if (completed === probes.length) {
+            const anyTrue = results.some((r) => r === true);
+            const anyNull = results.some((r) => r === null);
+            // Available only if at least one probe said `true` and no probe
+            // was uncertain. Any null = downstream (OpenSRS) must decide.
+            finish(anyTrue && !anyNull ? true : null);
+          }
+        },
+        () => {
+          if (settled) return;
+          results[i] = null;
+          completed++;
+          if (completed === probes.length) {
+            const anyTrue = results.some((r) => r === true);
+            const anyNull = results.some((r) => r === null);
+            finish(anyTrue && !anyNull ? true : null);
+          }
+        },
+      );
     });
   });
 }
@@ -352,8 +431,8 @@ export async function checkWithFallback(domain: string): Promise<boolean | null>
   const cached = getCached(domain);
   if (cached !== undefined) return cached;
 
-  // ── 1. Race RDAP + DNS in parallel (first authoritative answer wins) ─────
-  const raced = await firstAuthoritative([rdapCheck(domain), dnsCheck(domain)]);
+  // ── 1. Consensus of RDAP + DNS (false wins on sight; true needs agreement) ─
+  const raced = await consensusAvailability([rdapCheck(domain), dnsCheck(domain)]);
   if (raced !== null) {
     setCached(domain, raced);
     return raced;
