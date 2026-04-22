@@ -22,7 +22,6 @@ import {
   Smartphone,
   Wifi,
   Calendar,
-  Link2,
   Settings,
 } from "lucide-react";
 
@@ -47,6 +46,7 @@ const SIDEBAR_SECTIONS = [
     label: "PRODUCTS",
     items: [
       { name: "My Domains", href: "/my-domains", icon: Globe },
+      { name: "Domain Admin", href: "/admin/domains", icon: Globe },
       { name: "Register Domain", href: "/domains", icon: Globe },
       { name: "eSIM", href: "/admin/esim", icon: Wifi },
       { name: "Booking", href: "/admin/booking", icon: Calendar },
@@ -107,8 +107,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   // Don't render anything until auth check completes
   if (checking || !isAdmin) {
     return (
-      <div className="min-h-screen bg-[#0f2148] flex items-center justify-center">
-        <div className="text-white/30 text-sm">Checking permissions...</div>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-slate-400 text-sm">Checking permissions...</div>
       </div>
     );
   }

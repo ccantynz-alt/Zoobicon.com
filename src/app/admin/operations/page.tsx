@@ -11,7 +11,6 @@ import {
   CheckCircle,
   ChevronRight,
   Clock,
-  CreditCard,
   Globe,
   Heart,
   Loader2,
@@ -21,10 +20,7 @@ import {
   Server,
   Shield,
   TrendingUp,
-  Users,
   Zap,
-  XCircle,
-  BarChart3,
 } from "lucide-react";
 
 // ── Types ──
@@ -74,15 +70,15 @@ function formatInterval(ms: number): string {
 
 function StatusDot({ status }: { status: string }) {
   const colors: Record<string, string> = {
-    running: "bg-stone-400 animate-pulse",
-    idle: "bg-stone-400",
-    error: "bg-stone-400",
-    paused: "bg-gray-500",
-    healthy: "bg-stone-400",
-    degraded: "bg-stone-400",
-    unhealthy: "bg-stone-400",
+    running: "bg-emerald-400 animate-pulse",
+    idle: "bg-slate-400",
+    error: "bg-red-400",
+    paused: "bg-slate-300",
+    healthy: "bg-emerald-400",
+    degraded: "bg-amber-400",
+    unhealthy: "bg-red-400",
   };
-  return <div className={`w-2.5 h-2.5 rounded-full ${colors[status] || "bg-gray-500"}`} />;
+  return <div className={`w-2.5 h-2.5 rounded-full ${colors[status] || "bg-slate-400"}`} />;
 }
 
 // ── Main Component ──
@@ -167,28 +163,36 @@ export default function OperationsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0f2148] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-stone-400 animate-spin" />
+      <div className="flex items-center justify-center py-32">
+        <Loader2 className="w-8 h-8 text-slate-400 animate-spin" />
       </div>
     );
   }
 
   const healthStatus = health?.status || "unknown";
-  const healthColor = healthStatus === "healthy" ? "emerald" : healthStatus === "degraded" ? "yellow" : "red";
+
+  const metricIconColorMap: Record<string, string> = {
+    indigo: "text-indigo-500",
+    slate: "text-slate-500",
+    red: "text-red-500",
+    emerald: "text-emerald-500",
+    cyan: "text-cyan-500",
+    yellow: "text-amber-500",
+  };
 
   return (
-    <div className="min-h-screen bg-[#0f2148] text-white p-4 md:p-8">
+    <div className="p-4 md:p-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Operations Dashboard</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Operations Dashboard</h1>
           <p className="text-sm text-slate-400 mt-1">Last updated: {lastRefresh.toLocaleTimeString()}</p>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={fetchData} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+          <button onClick={fetchData} className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
             <RefreshCw className="w-4 h-4 text-slate-400" />
           </button>
-          <Link href="/admin" className="text-sm text-slate-400 hover:text-white flex items-center gap-1">
+          <Link href="/admin" className="text-sm text-slate-400 hover:text-slate-700 flex items-center gap-1">
             Admin <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
@@ -196,16 +200,16 @@ export default function OperationsPage() {
 
       {/* Health Banner */}
       <div className={`rounded-xl border p-4 mb-6 flex items-center justify-between ${
-        healthColor === "emerald" ? "bg-stone-500/10 border-stone-500/20" :
-        healthColor === "yellow" ? "bg-stone-500/10 border-stone-500/20" :
-        "bg-stone-500/10 border-stone-500/20"
+        healthStatus === "healthy" ? "bg-emerald-50 border-emerald-200" :
+        healthStatus === "degraded" ? "bg-amber-50 border-amber-200" :
+        "bg-red-50 border-red-200"
       }`}>
         <div className="flex items-center gap-3">
           <StatusDot status={healthStatus === "healthy" ? "healthy" : healthStatus === "degraded" ? "degraded" : "unhealthy"} />
           <div>
             <span className={`font-semibold ${
-              healthColor === "emerald" ? "text-stone-400" :
-              healthColor === "yellow" ? "text-stone-400" : "text-stone-400"
+              healthStatus === "healthy" ? "text-emerald-700" :
+              healthStatus === "degraded" ? "text-amber-700" : "text-red-700"
             }`}>
               {healthStatus === "healthy" ? "All Systems Operational" :
                healthStatus === "degraded" ? "Performance Degraded" : "Issues Detected"}
@@ -215,7 +219,7 @@ export default function OperationsPage() {
             )}
           </div>
         </div>
-        <button onClick={runHealthCheck} className="text-xs px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+        <button onClick={runHealthCheck} className="text-xs px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 transition-colors">
           Run Check
         </button>
       </div>
@@ -228,14 +232,14 @@ export default function OperationsPage() {
           { label: "Errors (24h)", value: agents.filter(a => a.lastError).length, icon: AlertTriangle, color: "red" },
           { label: "Success Rate", value: agents.length > 0 ? `${Math.round(agents.reduce((s, a) => s + (a.successRate || 0), 0) / Math.max(agents.length, 1) * 100)}%` : "—", icon: TrendingUp, color: "emerald" },
           { label: "Activity (15m)", value: activity.length, icon: Activity, color: "cyan" },
-          { label: "Health", value: healthStatus === "healthy" ? "OK" : healthStatus, icon: Heart, color: healthColor },
+          { label: "Health", value: healthStatus === "healthy" ? "OK" : healthStatus, icon: Heart, color: healthStatus === "healthy" ? "emerald" : healthStatus === "degraded" ? "yellow" : "red" },
         ].map((m, i) => (
-          <div key={i} className="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+          <div key={i} className="bg-white border border-slate-200 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <m.icon className={`w-4 h-4 text-${m.color}-400`} />
-              <span className="text-xs text-slate-400">{m.label}</span>
+              <m.icon className={`w-4 h-4 ${metricIconColorMap[m.color] || "text-slate-500"}`} />
+              <span className="text-xs text-slate-500">{m.label}</span>
             </div>
-            <div className="text-2xl font-bold">{m.value}</div>
+            <div className="text-2xl font-bold text-slate-800">{m.value}</div>
           </div>
         ))}
       </div>
@@ -244,11 +248,11 @@ export default function OperationsPage() {
         {/* Agent Control Panel */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold flex items-center gap-2"><Bot className="w-5 h-5 text-stone-400" /> Agent Control</h2>
+            <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2"><Bot className="w-5 h-5 text-indigo-500" /> Agent Control</h2>
             <button
               onClick={runAllAgents}
               disabled={runningAgent === "all"}
-              className="text-xs px-3 py-1.5 rounded-lg bg-stone-600 hover:bg-stone-500 transition-colors disabled:opacity-50 flex items-center gap-1"
+              className="text-xs px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors disabled:opacity-50 flex items-center gap-1"
             >
               {runningAgent === "all" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
               Run All
@@ -256,22 +260,22 @@ export default function OperationsPage() {
           </div>
           <div className="space-y-2">
             {agents.length === 0 ? (
-              <div className="bg-white/[0.03] border border-white/10 rounded-xl p-8 text-center text-slate-400">
+              <div className="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-400">
                 No agents registered. Check /api/agents endpoint.
               </div>
             ) : agents.map(agent => (
-              <div key={agent.id} className="bg-white/[0.03] border border-white/10 rounded-xl p-3 flex items-center justify-between">
+              <div key={agent.id} className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between">
                 <div className="flex items-center gap-3 min-w-0">
                   <StatusDot status={agent.status} />
                   <div className="min-w-0">
-                    <div className="font-medium text-sm truncate">{agent.name}</div>
+                    <div className="font-medium text-sm text-slate-800 truncate">{agent.name}</div>
                     <div className="text-xs text-slate-500 flex items-center gap-2">
                       {agent.scheduleInterval && <span>Every {formatInterval(agent.scheduleInterval)}</span>}
                       {agent.lastRun && <span>Last: {timeAgo(agent.lastRun)}</span>}
                       {agent.successRate !== undefined && <span>{Math.round(agent.successRate * 100)}% success</span>}
                     </div>
                     {agent.lastError && (
-                      <div className="text-xs text-stone-400 truncate mt-0.5">{agent.lastError}</div>
+                      <div className="text-xs text-red-500 truncate mt-0.5">{agent.lastError}</div>
                     )}
                   </div>
                 </div>
@@ -279,7 +283,7 @@ export default function OperationsPage() {
                   <button
                     onClick={() => togglePause(agent.id)}
                     className={`p-1.5 rounded-lg transition-colors ${
-                      pausedAgents.has(agent.id) ? "bg-stone-500/20 text-stone-400" : "bg-white/5 text-slate-400 hover:bg-white/10"
+                      pausedAgents.has(agent.id) ? "bg-amber-50 text-amber-600" : "bg-slate-50 text-slate-400 hover:bg-slate-100"
                     }`}
                     title={pausedAgents.has(agent.id) ? "Resume" : "Pause"}
                   >
@@ -288,7 +292,7 @@ export default function OperationsPage() {
                   <button
                     onClick={() => runAgent(agent.id)}
                     disabled={runningAgent === agent.id}
-                    className="p-1.5 rounded-lg bg-white/5 text-slate-400 hover:bg-stone-500/20 hover:text-stone-400 transition-colors disabled:opacity-50"
+                    className="p-1.5 rounded-lg bg-slate-50 text-slate-400 hover:bg-indigo-50 hover:text-indigo-500 transition-colors disabled:opacity-50"
                     title="Run Now"
                   >
                     {runningAgent === agent.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
@@ -303,7 +307,7 @@ export default function OperationsPage() {
         <div className="space-y-6">
           {/* Quick Actions */}
           <div>
-            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2"><Zap className="w-5 h-5 text-stone-400" /> Quick Actions</h2>
+            <h2 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2"><Zap className="w-5 h-5 text-indigo-500" /> Quick Actions</h2>
             <div className="grid grid-cols-2 gap-2">
               {[
                 { label: "Health Check", action: runHealthCheck, icon: Heart },
@@ -314,7 +318,7 @@ export default function OperationsPage() {
                 <button
                   key={i}
                   onClick={btn.action}
-                  className="flex items-center gap-2 p-2.5 rounded-lg bg-white/[0.03] border border-white/10 hover:bg-white/[0.06] transition-colors text-sm"
+                  className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-sm text-slate-700"
                 >
                   <btn.icon className="w-4 h-4 text-slate-400" />
                   {btn.label}
@@ -322,10 +326,10 @@ export default function OperationsPage() {
               ))}
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2">
-              <Link href="/admin/pre-launch" className="flex items-center gap-2 p-2.5 rounded-lg bg-white/[0.03] border border-white/10 hover:bg-white/[0.06] transition-colors text-sm">
+              <Link href="/admin/pre-launch" className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-sm text-slate-700">
                 <CheckCircle className="w-4 h-4 text-slate-400" /> Pre-Launch
               </Link>
-              <Link href="/email-support" className="flex items-center gap-2 p-2.5 rounded-lg bg-white/[0.03] border border-white/10 hover:bg-white/[0.06] transition-colors text-sm">
+              <Link href="/email-support" className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-sm text-slate-700">
                 <Bell className="w-4 h-4 text-slate-400" /> Tickets
               </Link>
             </div>
@@ -333,15 +337,15 @@ export default function OperationsPage() {
 
           {/* Activity Feed */}
           <div>
-            <h2 className="text-lg font-semibold mb-3 flex items-center gap-2"><Activity className="w-5 h-5 text-stone-400" /> Live Activity</h2>
+            <h2 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2"><Activity className="w-5 h-5 text-indigo-500" /> Live Activity</h2>
             <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
               {activity.length === 0 ? (
                 <div className="text-sm text-slate-500 p-4 text-center">No recent activity</div>
               ) : activity.map((item, i) => (
-                <div key={item.id || i} className="bg-white/[0.02] rounded-lg p-2.5 text-sm">
+                <div key={item.id || i} className="bg-slate-50 rounded-lg p-2.5 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-300 truncate">{item.description || item.type}</span>
-                    <span className="text-xs text-slate-500 flex-shrink-0 ml-2">
+                    <span className="text-slate-700 truncate">{item.description || item.type}</span>
+                    <span className="text-xs text-slate-400 flex-shrink-0 ml-2">
                       {item.created_at ? timeAgo(item.created_at) : ""}
                     </span>
                   </div>
@@ -354,12 +358,12 @@ export default function OperationsPage() {
       </div>
 
       {/* Footer Links */}
-      <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap gap-4 text-sm text-slate-500">
-        <Link href="/admin" className="hover:text-white transition-colors flex items-center gap-1">Admin Dashboard <ArrowRight className="w-3 h-3" /></Link>
-        <Link href="/admin/health" className="hover:text-white transition-colors flex items-center gap-1">Health Details <ArrowRight className="w-3 h-3" /></Link>
-        <Link href="/admin/intel" className="hover:text-white transition-colors flex items-center gap-1">Competitive Intel <ArrowRight className="w-3 h-3" /></Link>
-        <Link href="/admin/usage" className="hover:text-white transition-colors flex items-center gap-1">Usage Analytics <ArrowRight className="w-3 h-3" /></Link>
-        <Link href="/admin/email-settings" className="hover:text-white transition-colors flex items-center gap-1">Email Settings <ArrowRight className="w-3 h-3" /></Link>
+      <div className="mt-8 pt-6 border-t border-slate-200 flex flex-wrap gap-4 text-sm text-slate-400">
+        <Link href="/admin" className="hover:text-slate-700 transition-colors flex items-center gap-1">Admin Dashboard <ArrowRight className="w-3 h-3" /></Link>
+        <Link href="/admin/health" className="hover:text-slate-700 transition-colors flex items-center gap-1">Health Details <ArrowRight className="w-3 h-3" /></Link>
+        <Link href="/admin/intel" className="hover:text-slate-700 transition-colors flex items-center gap-1">Competitive Intel <ArrowRight className="w-3 h-3" /></Link>
+        <Link href="/admin/usage" className="hover:text-slate-700 transition-colors flex items-center gap-1">Usage Analytics <ArrowRight className="w-3 h-3" /></Link>
+        <Link href="/admin/email-settings" className="hover:text-slate-700 transition-colors flex items-center gap-1">Email Settings <ArrowRight className="w-3 h-3" /></Link>
       </div>
     </div>
   );
