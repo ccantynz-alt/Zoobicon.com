@@ -122,44 +122,7 @@ const TESTIMONIALS = [
 export default function HomePage() {
   return (
     <div className="bg-[#0a0a14] text-white selection:bg-indigo-500/30 selection:text-white">
-
-      {/* ── HERO SLIDESHOW ── */}
-      <HeroShowcase />
-
-      {/* ── STATS STRIP ── */}
-      <section className="relative border-y border-white/[0.06] bg-white/[0.02]">
-        <div className="max-w-5xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          {STATS.map((s) => (
-            <div key={s.label}>
-              <div className="text-3xl md:text-4xl font-black text-white tracking-tight">
-                {typeof s.value === "string" && s.value.match(/^\d+/)
-                  ? <><Counter end={parseInt(s.value)} suffix={s.value.replace(/^\d+/, "")} /></>
-                  : s.value}
-              </div>
-              <div className="text-sm text-slate-400 mt-1">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── FOUR DOMAINS ── */}
-      <section className="py-28 md:py-36 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-sm font-semibold tracking-widest uppercase text-indigo-400 mb-4">
-              One Platform, Four Domains
-            </p>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-5">
-              Every domain, a different superpower
-            </h2>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-              Your all-in-one AI platform for building websites, marketing, and scaling online.
-            </p>
-          </div>
-
-      {/* Clear the fixed 72px nav */}
       <div className="pt-[72px]">
-        {/* ── THE HERO IS THE PRODUCT ── */}
         <HeroBuilder />
 
         {/* ── Trust strip — infinite marquee, Filmora pattern ── */}
@@ -177,51 +140,11 @@ export default function HomePage() {
                   key={`${item.label}-${i}`}
                   className="flex items-center gap-3 px-5 py-2 rounded-full border border-white/[0.06] bg-white/[0.02] backdrop-blur flex-shrink-0"
                 >
-                  <div className="flex items-center gap-1">
-                    {[0, 1, 2, 3, 4].map((j) => (
-                      <Star key={j} className="h-3 w-3 fill-[#E8D4B0] text-[#E8D4B0]" />
-                    ))}
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-1">{d.name}</h3>
-                  <p className={`text-sm font-semibold ${c.text} mb-3`}>{d.role}</p>
-                  <p className="text-[15px] text-slate-400 leading-relaxed mb-5">{d.desc}</p>
-                  <span className={`text-sm font-semibold ${c.text} inline-flex items-center gap-1 group-hover:gap-2 transition-all`}>
-                    {d.cta} <ArrowRight className="w-3 h-3" />
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS — lighter background band ── */}
-      <section className="relative py-28 md:py-36 px-4 sm:px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/20 via-slate-900/30 to-transparent" />
-        <div className="relative max-w-5xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-5">
-              Describe it. We build it.
-            </h2>
-            <p className="text-xl text-slate-300 max-w-lg mx-auto">
-              Three steps. No code. No templates. No compromise.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {STEPS.map((step, i) => (
-              <div key={step.num} className="relative">
-                <div className="text-[80px] font-black text-white/[0.04] leading-none absolute -top-4 -left-2 select-none pointer-events-none">
-                  {step.num}
-                </div>
-                <div className="relative pt-6">
-                  <div className="text-xs font-bold text-indigo-400 mb-3 tracking-widest uppercase">
-                    Step {step.num}
-                  </div>
+                  <span className="text-[13px] font-semibold text-white/90">{item.label}</span>
+                  <span className="text-[11px] text-white/40">{item.sub}</span>
                 </div>
               ))}
             </div>
-            {/* Fade edges */}
             <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050508] to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050508] to-transparent" />
           </div>

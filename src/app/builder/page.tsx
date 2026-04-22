@@ -967,17 +967,6 @@ function BuilderPage() {
     return html;
   }, []);
 
-  // streamGenerate removed — all generation now uses /api/generate/react SSE stream
-  // via handleGenerate (new builds) and handleEdit (edits)
-
-  const clearWatchdog = useCallback(() => {
-    if (watchdogSlowRef.current) clearTimeout(watchdogSlowRef.current);
-    if (watchdogStuckRef.current) clearTimeout(watchdogStuckRef.current);
-    watchdogSlowRef.current = null;
-    watchdogStuckRef.current = null;
-    setStreamWarning(null);
-  }, []);
-
   // Update timeline based on section state transitions
   const upsertSection = useCallback((section: string, status: "scaffolding" | "customizing" | "done") => {
     if (!section) return;

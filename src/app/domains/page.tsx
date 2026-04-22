@@ -96,14 +96,14 @@ export default function DomainsPage() {
   const [userEmail, setUserEmail] = useState("");
   const [generating, setGenerating] = useState(false);
   const [pendingGenerate, setPendingGenerate] = useState(false);
-  const [generating, setGenerating] = useState(false);
-  const [generatedNames, setGeneratedNames] = useState<Array<{ name: string; tagline: string; domains: Array<{ domain: string; tld: string; available: boolean | null; price: number; checking: boolean }> }>>([]);
+  const [generatedNames, setGeneratedNames] = useState<GeneratedName[]>([]);
   const [autoExpandedTlds, setAutoExpandedTlds] = useState(false);
   const [autoGenerating, setAutoGenerating] = useState(false);
   const [genDescription, setGenDescription] = useState("");
   const [genStyle, setGenStyle] = useState<string>("modern");
-  const [generatedNames, setGeneratedNames] = useState<GeneratedName[]>([]);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [genExclusions, setGenExclusions] = useState<string[]>([]);
+  const [genRefinement, setGenRefinement] = useState("");
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [contactInfo, setContactInfo] = useState({
     firstName: "",
@@ -847,24 +847,41 @@ export default function DomainsPage() {
             </div>
           )}
 
-              {/* Generate button */}
-              <button
-                onClick={handleGenerate}
-                disabled={generating || genDescription.trim().length < 3 || selectedTlds.size === 0}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-40 transition-all hover:shadow-lg hover:shadow-purple-500/20"
-              >
-                {generating ? (
-                  <><Loader2 className="w-5 h-5 animate-spin" /> Generating names...</>
-                ) : (
-                  <><Wand2 className="w-5 h-5" /> Generate {GEN_NAME_COUNT} Name Ideas</>
-                )}
-              </button>
+          {/* ── GENERATE MODE ── */}
+          {mode === "generate" && (
+            <div className="max-w-3xl mx-auto text-left">
+              <div className="rounded-[28px] border border-white/[0.08] p-6 md:p-8 backdrop-blur-xl" style={{ background: "linear-gradient(135deg, rgba(17,17,24,0.85) 0%, rgba(10,10,15,0.7) 100%)" }}>
+                <label className="block text-sm font-medium text-white/60 mb-2">Describe your business</label>
+                <textarea
+                  value={genDescription}
+                  onChange={(e) => setGenDescription(e.target.value)}
+                  placeholder="e.g. A modern coffee roastery in Auckland focused on single-origin beans..."
+                  rows={3}
+                  className="w-full rounded-2xl border border-white/[0.08] bg-white/[0.03] px-5 py-4 text-white placeholder-white/30 focus:outline-none focus:border-[#E8D4B0]/40 transition-all mb-5 resize-none"
+                />
+                <button
+                  onClick={handleGenerate}
+                  disabled={generating || genDescription.trim().length < 3 || selectedTlds.size === 0}
+                  className="w-full py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 disabled:opacity-40 transition-all duration-500 hover:-translate-y-0.5"
+                  style={{
+                    background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                    color: "#0a0a0f",
+                    boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+                  }}
+                >
+                  {generating ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Generating names...</>
+                  ) : (
+                    <><Wand2 className="w-5 h-5" /> Generate {GEN_NAME_COUNT} Name Ideas</>
+                  )}
+                </button>
 
-              {generatorError && (
-                <div className="mt-4 p-3 rounded-xl border border-red-500/20 bg-red-500/[0.05] text-sm text-red-300">
-                  {generatorError}
-                </div>
-              )}
+                {generatorError && (
+                  <div className="mt-4 p-3 rounded-xl border border-red-500/20 bg-red-500/[0.05] text-sm text-red-300">
+                    {generatorError}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
