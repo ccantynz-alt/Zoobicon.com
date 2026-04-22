@@ -9,7 +9,7 @@ export const maxDuration = 60;
  * Conversational AI video assistant. User describes what they want,
  * AI figures out the video type, writes scripts, suggests revisions.
  *
- * Body: { messages: Array<{ role: "user" | "assistant", content: string }> }
+ * Body: { messages: Array<{ role: "user" | "assistant", content: string }>, conversationId?: string }
  * Returns: SSE stream of assistant response
  */
 export async function POST(req: NextRequest) {
@@ -19,10 +19,29 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { messages } = body;
+  const { messages, conversationId } = body;
 
   if (!messages || !Array.isArray(messages) || messages.length === 0) {
     return Response.json({ error: "Messages required" }, { status: 400 });
+  }
+
+  // --- Flywheel: load brand/context memories to enrich system prompt ---
+  let memoryBlock = "";
+  try {
+    const { getMemories } = await import("@/lib/flywheel");
+    const [brandMems, contextMems] = await Promise.all([
+      getMemories("brand"),
+      getMemories("context"),
+    ]);
+    const combined = [...brandMems, ...contextMems]
+      .slice(0, 10)
+      .map((m) => m.content)
+      .join("; ");
+    if (combined) {
+      memoryBlock = `\n\nPlatform memory (use to personalize scripts): ${combined.slice(0, 500)}`;
+    }
+  } catch {
+    // Flywheel unavailable — proceed without memory
   }
 
   const systemPrompt = `You are Zoobicon's AI Video Director. You write broadcast-quality short-form video scripts for Captions/HeyGen-grade output. Your scripts must read like a senior creative director wrote them, not an AI.
@@ -79,11 +98,14 @@ RULES:
 - NEVER ask more than 1 question before writing drafts
 - After the first message, ALWAYS include at least 2 script drafts
 - Keep responses SHORT — drafts only, minimal commentary
-- Label drafts as **Draft 1** and **Draft 2**`;
+- Label drafts as **Draft 1** and **Draft 2**${memoryBlock}`;
 
   const client = new Anthropic({ apiKey, timeout: 60000 });
 
   const encoder = new TextEncoder();
+  const convoId = conversationId || `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+  let assistantResponse = "";
+
   const stream = new ReadableStream({
     async start(controller) {
       try {
@@ -98,11 +120,36 @@ RULES:
         });
 
         apiStream.on("text", (text) => {
+          assistantResponse += text;
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "text", content: text })}\n\n`));
         });
 
         await apiStream.finalMessage();
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`));
+
+        // --- Flywheel: persist conversation after successful response ---
+        try {
+          const { saveConversation } = await import("@/lib/flywheel");
+          const now = Date.now();
+          const firstUserMsg = messages.find((m: { role: string }) => m.role === "user")?.content || "Video chat";
+          await saveConversation({
+            id: convoId,
+            title: firstUserMsg.slice(0, 50),
+            messages: [
+              ...messages.map((m: { role: string; content: string }) => ({
+                role: m.role as "user" | "assistant",
+                content: m.content,
+                timestamp: now - 1000,
+              })),
+              { role: "assistant" as const, content: assistantResponse, timestamp: now },
+            ],
+            model: "claude-haiku-4-5-20251001",
+            createdAt: now,
+            updatedAt: now,
+          });
+        } catch {
+          // Flywheel save failed — non-fatal
+        }
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Chat failed";
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "error", fatal: true, message: msg })}\n\n`));

@@ -20,6 +20,7 @@ export const maxDuration = 120;
  * Returns SSE: { files: Record<string,string> } — only the CHANGED files
  */
 export async function POST(req: NextRequest) {
+  const editStartedAt = Date.now();
   const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
   if (auth.error) return auth.error;
 
@@ -46,6 +47,26 @@ export async function POST(req: NextRequest) {
 
   if (!instruction || !files || Object.keys(files).length === 0) {
     return Response.json({ error: "Instruction and files required" }, { status: 400 });
+  }
+
+  // ── FLYWHEEL: load accumulated context from previous builds ──
+  let flywheelContext = "";
+  try {
+    const { getMemories } = await import("@/lib/flywheel");
+    const memories = await getMemories();
+    const relevant = memories
+      .filter((m) => m.type === "preference" || m.type === "brand" || m.type === "context")
+      .slice(0, 10);
+    if (relevant.length > 0) {
+      const lines = relevant.map((m) => `- [${m.type}] ${m.content}`);
+      let joined = lines.join("\n");
+      if (joined.length > 500) {
+        joined = joined.slice(0, 497) + "...";
+      }
+      flywheelContext = `\n\nContext from previous builds:\n${joined}\n`;
+    }
+  } catch (flywheelErr) {
+    console.warn("[edit] Flywheel context load skipped:", flywheelErr);
   }
 
   // The Anthropic SDK is the primary path. The failover layer
@@ -89,13 +110,30 @@ RULES:
 - Output the COMPLETE file content for each changed file (not a diff/patch)
 - Do NOT wrap the JSON in markdown code fences
 - Do NOT include any text before or after the JSON object
-- Start your response with { and end with }`;
+- Start your response with { and end with }${flywheelContext}`;
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
       const send = (data: Record<string, unknown>) => {
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+      };
+
+      // Helper: record a successful edit in the flywheel (non-blocking, non-fatal)
+      const recordEditInFlywheel = async (modelUsed: string) => {
+        try {
+          const { saveBuild } = await import("@/lib/flywheel");
+          await saveBuild({
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+            prompt: `[edit] ${instruction}`,
+            siteName: targetFile || "Untitled",
+            model: modelUsed,
+            durationMs: Date.now() - editStartedAt,
+            createdAt: Date.now(),
+          });
+        } catch (flywheelErr) {
+          console.warn("[edit] Flywheel build save skipped:", flywheelErr);
+        }
       };
 
       try {
@@ -152,6 +190,7 @@ RULES:
                 changedCount: Object.keys(result.files).length,
                 modelUsed: "claude-haiku-4-5",
               });
+              await recordEditInFlywheel("claude-haiku-4-5");
               controller.close();
               return;
             }
@@ -183,6 +222,7 @@ RULES:
                 changedCount: Object.keys(result.files).length,
                 modelUsed: "claude-sonnet-4-6",
               });
+              await recordEditInFlywheel("claude-sonnet-4-6");
               controller.close();
               return;
             }
@@ -211,6 +251,7 @@ RULES:
               changedCount: Object.keys(result.files).length,
               modelUsed: fb.model,
             });
+            await recordEditInFlywheel(fb.model || "unknown");
             controller.close();
             return;
           }

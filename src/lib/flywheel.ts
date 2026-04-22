@@ -387,3 +387,250 @@ export async function getBuilds(limit = 50): Promise<BuildRecord[]> {
   const all: BuildRecord[] = JSON.parse(localStorage.getItem("zbk_builds") || "[]");
   return all.sort((a, b) => b.createdAt - a.createdAt).slice(0, limit);
 }
+
+// ---------------------------------------------------------------------------
+// Intelligence Accumulation — Auto-extract learnable facts from interactions
+// ---------------------------------------------------------------------------
+
+interface ExtractionPattern {
+  /** RegExp to test against the combined text (case-insensitive). */
+  regex: RegExp;
+  /** Memory type to assign. */
+  type: MemoryEntry["type"];
+  /** Function that turns RegExp match groups into a normalized fact string. */
+  normalize: (match: RegExpExecArray) => string;
+}
+
+/**
+ * Extraction rules — ordered list of patterns that pull learnable facts out of
+ * free-form user messages. Each rule produces a short, normalized memory string
+ * (e.g. "Brand color: blue") so downstream prompt injection stays compact.
+ *
+ * Only the *user* message is scanned — the assistant response is intentionally
+ * ignored to avoid feeding our own outputs back in as "user preferences."
+ */
+const EXTRACTION_PATTERNS: ExtractionPattern[] = [
+  // ── Brand facts ─────────────────────────────────────────────────────────
+  {
+    regex: /(?:my|our)\s+(?:brand|company|business)\s+(?:name\s+is|is\s+called|is)\s+["']?([A-Za-z0-9][\w\s&.'-]{0,60})["']?/i,
+    type: "brand",
+    normalize: (m) => `Company name: ${m[1].trim()}`,
+  },
+  {
+    regex: /(?:my|our)\s+(?:brand|primary|main|accent)?\s*colou?r\s+(?:is|should be|=)\s+["']?(#?[A-Za-z0-9]+(?:\s?[A-Za-z]*)?)["']?/i,
+    type: "brand",
+    normalize: (m) => `Brand color: ${m[1].trim()}`,
+  },
+  {
+    regex: /(?:we|I)\s+use\s+(?:the\s+)?(?:font|typeface)\s+["']?([A-Za-z][\w\s-]{0,40})["']?/i,
+    type: "brand",
+    normalize: (m) => `Font: ${m[1].trim()}`,
+  },
+  {
+    regex: /(?:my|our)\s+(?:brand\s+)?(?:font|typeface)\s+is\s+["']?([A-Za-z][\w\s-]{0,40})["']?/i,
+    type: "brand",
+    normalize: (m) => `Font: ${m[1].trim()}`,
+  },
+  {
+    regex: /(?:my|our)\s+(?:logo|brand\s+logo)\s+(?:is|looks like|shows|features)\s+(.{3,80})/i,
+    type: "brand",
+    normalize: (m) => `Logo: ${m[1].trim().replace(/[.!]+$/, "")}`,
+  },
+  {
+    regex: /(?:my|our)\s+(?:tagline|slogan|motto)\s+is\s+["'](.{3,100})["']/i,
+    type: "brand",
+    normalize: (m) => `Tagline: ${m[1].trim()}`,
+  },
+
+  // ── Style / design preferences ──────────────────────────────────────────
+  {
+    regex: /I\s+(?:prefer|like|want|love)\s+(?:a\s+)?(?:the\s+)?(dark\s*(?:mode|theme)?|light\s*(?:mode|theme)?|minimalist?|modern|professional|playful|corporate|elegant|bold|clean|luxury|vintage|retro)\s/i,
+    type: "preference",
+    normalize: (m) => `Style: ${m[1].trim().toLowerCase()}`,
+  },
+  {
+    regex: /(?:my|our)\s+(?:website|site|design|style)\s+(?:should|needs?\s+to|must)\s+(?:be|have|look|feel)\s+(.{3,80})/i,
+    type: "preference",
+    normalize: (m) => `Design preference: ${m[1].trim().replace(/[.!]+$/, "")}`,
+  },
+  {
+    regex: /(?:prefer|want|like)\s+(?:a\s+)?(serif|sans-serif|monospace)\s/i,
+    type: "preference",
+    normalize: (m) => `Typography preference: ${m[1].trim().toLowerCase()}`,
+  },
+  {
+    regex: /(?:prefer|want|like)\s+(?:a\s+)?(single[- ]page|multi[- ]page|one[- ]page|landing\s+page)\s/i,
+    type: "preference",
+    normalize: (m) => `Layout preference: ${m[1].trim().toLowerCase()}`,
+  },
+
+  // ── Industry / business context ─────────────────────────────────────────
+  {
+    regex: /I\s+(?:run|own|manage|operate|have)\s+(?:a|an|the)\s+([A-Za-z][\w\s&'-]{2,60}?)(?:\s+(?:business|company|shop|store|clinic|firm|agency|studio|practice|restaurant|cafe|salon))/i,
+    type: "context",
+    normalize: (m) => {
+      const industry = m[0].replace(/^I\s+(?:run|own|manage|operate|have)\s+(?:a|an|the)\s+/i, "").trim().replace(/[.!]+$/, "");
+      return `Business: ${industry}`;
+    },
+  },
+  {
+    regex: /(?:we(?:'re| are)|I(?:'m| am))\s+(?:a|an)\s+(SaaS|e-?commerce|fintech|health\s*tech|ed-?tech|real\s+estate|marketing|consulting|freelanc(?:e|ing)|design|dental|medical|legal|accounting|fitness|photography|construction|retail|wholesale|nonprofit)(?:\s+(?:startup|company|business|agency|firm|platform))?/i,
+    type: "context",
+    normalize: (m) => `Industry: ${m[1].trim().toLowerCase()}`,
+  },
+
+  // ── Location context ────────────────────────────────────────────────────
+  {
+    regex: /(?:we(?:'re| are)|I(?:'m| am)|we're|I'm)\s+(?:based|located|headquartered)\s+in\s+([A-Za-z][\w\s,'-]{2,60})/i,
+    type: "context",
+    normalize: (m) => `Location: ${m[1].trim().replace(/[.!]+$/, "")}`,
+  },
+  {
+    regex: /(?:my|our)\s+(?:business|company|office|shop|store)\s+is\s+in\s+([A-Za-z][\w\s,'-]{2,60})/i,
+    type: "context",
+    normalize: (m) => `Location: ${m[1].trim().replace(/[.!]+$/, "")}`,
+  },
+
+  // ── Target audience context ─────────────────────────────────────────────
+  {
+    regex: /(?:my|our)\s+(?:target\s+)?(?:audience|customers?|clients?|users?)\s+(?:are|is)\s+(.{3,80})/i,
+    type: "context",
+    normalize: (m) => `Audience: ${m[1].trim().replace(/[.!]+$/, "")}`,
+  },
+];
+
+/**
+ * Check whether a candidate fact is already stored (simple case-insensitive
+ * substring match). Returns true if a duplicate exists.
+ */
+function isDuplicate(candidate: string, existing: MemoryEntry[]): boolean {
+  const lower = candidate.toLowerCase();
+  return existing.some((m) => {
+    const existingLower = m.content.toLowerCase();
+    // Exact match
+    if (existingLower === lower) return true;
+    // The new fact is a substring of an existing memory or vice-versa
+    if (existingLower.includes(lower) || lower.includes(existingLower)) return true;
+    // Same prefix key (e.g. both start with "Brand color:")
+    const colonIdx = lower.indexOf(":");
+    if (colonIdx > 0) {
+      const prefix = lower.slice(0, colonIdx + 1);
+      if (existingLower.startsWith(prefix)) return true;
+    }
+    return false;
+  });
+}
+
+/**
+ * Analyze a user message for learnable facts and store unique ones as
+ * MemoryEntry records. Designed to be called on every interaction — it uses
+ * fast regex matching (no AI call) and deduplicates against existing memories.
+ *
+ * @param userMessage   The raw user message from the current interaction.
+ * @param _assistantResponse  The assistant response (reserved for future use;
+ *                            currently unused to avoid self-referential loops).
+ * @returns Promise that resolves once all extracted memories have been stored.
+ */
+export async function extractAndStoreMemories(
+  userMessage: string,
+  _assistantResponse: string
+): Promise<void> {
+  if (!userMessage || userMessage.trim().length < 8) return;
+
+  // Fetch existing memories once to check for duplicates
+  const existing = await getMemories();
+
+  const candidates: Array<{ type: MemoryEntry["type"]; content: string }> = [];
+
+  for (const pattern of EXTRACTION_PATTERNS) {
+    const match = pattern.regex.exec(userMessage);
+    if (!match) continue;
+
+    let fact: string;
+    try {
+      fact = pattern.normalize(match);
+    } catch {
+      continue;
+    }
+
+    // Sanity-check: skip empty or extremely long facts
+    if (!fact || fact.length < 5 || fact.length > 200) continue;
+
+    // Deduplicate against existing memories AND against other candidates from
+    // this same extraction pass
+    const allExisting = [
+      ...existing,
+      ...candidates.map((c) => ({ id: "", type: c.type, content: c.content, createdAt: 0 })),
+    ];
+
+    if (isDuplicate(fact, allExisting)) continue;
+
+    candidates.push({ type: pattern.type, content: fact });
+
+    // Hard cap: max 3 new memories per interaction
+    if (candidates.length >= 3) break;
+  }
+
+  // Store all candidates
+  for (const c of candidates) {
+    await addMemory(c.type, c.content);
+  }
+}
+
+/**
+ * Build a concise context string from all stored memories, suitable for
+ * injection into AI system prompts. Groups facts by type and caps total
+ * length at 500 characters.
+ *
+ * @returns A formatted context block, or empty string if no memories exist.
+ *
+ * Example output:
+ *   "Brand: Company name: Acme Corp; Brand color: #E8D4B0.
+ *    Preferences: Style: dark mode; Typography preference: sans-serif.
+ *    Context: Industry: saas; Location: Auckland, NZ."
+ */
+export async function getFlywheelContext(): Promise<string> {
+  const memories = await getMemories();
+  if (memories.length === 0) return "";
+
+  const MAX_LENGTH = 500;
+
+  const groups: Record<string, string[]> = {
+    brand: [],
+    preference: [],
+    instruction: [],
+    context: [],
+  };
+
+  for (const m of memories) {
+    if (groups[m.type]) {
+      groups[m.type].push(m.content);
+    }
+  }
+
+  // Human-readable labels for each group
+  const labels: Record<string, string> = {
+    brand: "Brand",
+    preference: "Preferences",
+    instruction: "Instructions",
+    context: "Context",
+  };
+
+  const sections: string[] = [];
+  for (const key of ["brand", "preference", "instruction", "context"]) {
+    const items = groups[key];
+    if (items.length === 0) continue;
+    sections.push(`${labels[key]}: ${items.join("; ")}.`);
+  }
+
+  let result = sections.join(" ");
+
+  // Truncate at word boundary if over limit
+  if (result.length > MAX_LENGTH) {
+    const truncated = result.slice(0, MAX_LENGTH);
+    const lastSpace = truncated.lastIndexOf(" ");
+    result = (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + "...";
+  }
+
+  return result;
+}

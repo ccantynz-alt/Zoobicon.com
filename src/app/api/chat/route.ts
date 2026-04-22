@@ -233,6 +233,18 @@ export async function POST(request: NextRequest) {
 
     const model = "claude-sonnet-4-6";
 
+    // --- Flywheel: inject platform memory into system prompt ---
+    try {
+      const { getMemories } = await import("@/lib/flywheel");
+      const mems = await getMemories("brand");
+      const memStr = mems.slice(0, 8).map((m) => m.content).join("; ");
+      if (memStr) {
+        systemPrompt += `\n\nPlatform memory: ${memStr.slice(0, 500)}`;
+      }
+    } catch {
+      // Flywheel unavailable — proceed without memory
+    }
+
     let stream;
     try {
       stream = await getClient().messages.stream({
@@ -263,6 +275,8 @@ export async function POST(request: NextRequest) {
       sectionName: editClass.mode === "targeted" ? editClass.section?.sectionName : undefined,
     });
 
+    let accumulatedResponse = "";
+
     const readable = new ReadableStream({
       async start(controller) {
         try {
@@ -274,6 +288,7 @@ export async function POST(request: NextRequest) {
               event.type === "content_block_delta" &&
               event.delta.type === "text_delta"
             ) {
+              accumulatedResponse += event.delta.text;
               controller.enqueue(
                 encoder.encode(`data: ${JSON.stringify({ type: "chunk", content: event.delta.text })}\n\n`)
               );
@@ -282,6 +297,27 @@ export async function POST(request: NextRequest) {
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
           );
+
+          // --- Flywheel: persist conversation after successful edit ---
+          try {
+            const { saveConversation } = await import("@/lib/flywheel");
+            const now = Date.now();
+            const convoId = `${now}-${Math.random().toString(36).slice(2, 11)}`;
+            await saveConversation({
+              id: convoId,
+              title: (instruction || "Site edit").slice(0, 50),
+              messages: [
+                { role: "user" as const, content: instruction, timestamp: now - 1000 },
+                { role: "assistant" as const, content: accumulatedResponse.slice(0, 2000), timestamp: now },
+              ],
+              model,
+              createdAt: now,
+              updatedAt: now,
+            });
+          } catch {
+            // Flywheel save failed — non-fatal
+          }
+
           controller.close();
         } catch (err) {
           const message = err instanceof Error ? err.message : "Stream error";

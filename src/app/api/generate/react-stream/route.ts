@@ -594,6 +594,29 @@ export async function POST(req: NextRequest): Promise<Response> {
     async start(controller) {
       const writer = makeWriter(controller);
       try {
+        // ── FLYWHEEL: load accumulated context from previous builds ──
+        let flywheelContext = "";
+        try {
+          const { getMemories } = await import("@/lib/flywheel");
+          const memories = await getMemories();
+          // Filter to preference, brand, and context types only
+          const relevant = memories
+            .filter((m) => m.type === "preference" || m.type === "brand" || m.type === "context")
+            .slice(0, 10);
+          if (relevant.length > 0) {
+            const lines = relevant.map((m) => `- [${m.type}] ${m.content}`);
+            // Cap at ~500 chars to keep the injection concise
+            let joined = lines.join("\n");
+            if (joined.length > 500) {
+              joined = joined.slice(0, 497) + "...";
+            }
+            flywheelContext = `\n\nContext from previous builds:\n${joined}\n`;
+          }
+        } catch (flywheelErr) {
+          // Flywheel is a bonus — never break the build pipeline
+          console.warn("[react-stream] Flywheel context load skipped:", flywheelErr);
+        }
+
         // ── PHASE 1: planning ──
         writer.send("phase", {
           phase: "planning",
@@ -630,7 +653,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           message: "Picking best components for each section…",
         });
         const { components, brandName, primaryColor, bgColor } =
-          await planComponents(prompt);
+          await planComponents(prompt + flywheelContext);
 
         // Detect industry from the prompt once — drives imagery selection
         // for every component in this build (restaurants get warm hand/craft
@@ -710,7 +733,7 @@ export async function POST(req: NextRequest): Promise<Response> {
               brandName,
               category: comp.category,
               variant: comp.variant,
-              prompt,
+              prompt: prompt + flywheelContext,
               primaryColor,
               model: customiserModel,
               theme,
@@ -983,6 +1006,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           phase: "done",
           message: "Build complete.",
         });
+        const durationMs = Date.now() - startedAt;
         writer.send("done", {
           // Client listens for `event.files` on the done event — it sets
           // receivedFiles = true and updates Sandpack's source. The previous
@@ -991,10 +1015,27 @@ export async function POST(req: NextRequest): Promise<Response> {
           // the post-build file replacement in premium critique mode.
           files: finalFiles,
           score: finalScore,
-          durationMs: Date.now() - startedAt,
+          durationMs,
           failedSections,
           ...(supabaseResult ? { supabase: supabaseResult } : {}),
         });
+
+        // ── FLYWHEEL: record this build for future context ──
+        try {
+          const { saveBuild } = await import("@/lib/flywheel");
+          await saveBuild({
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+            prompt,
+            siteName: brandName || inferBrandName(prompt),
+            model: mode === "premium" ? MODEL_SONNET : MODEL_HAIKU,
+            durationMs,
+            createdAt: Date.now(),
+          });
+        } catch (flywheelErr) {
+          // Flywheel save is non-critical — log and move on
+          console.warn("[react-stream] Flywheel build save skipped:", flywheelErr);
+        }
+
         writer.close();
       } catch (err) {
         try {
