@@ -126,6 +126,22 @@ export default function HomePage() {
       {/* ── HERO SLIDESHOW ── */}
       <HeroShowcase />
 
+      {/* ── STATS STRIP ── */}
+      <section className="relative border-y border-white/[0.06] bg-white/[0.02]">
+        <div className="max-w-5xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          {STATS.map((s) => (
+            <div key={s.label}>
+              <div className="text-3xl md:text-4xl font-black text-white tracking-tight">
+                {typeof s.value === "string" && s.value.match(/^\d+/)
+                  ? <><Counter end={parseInt(s.value)} suffix={s.value.replace(/^\d+/, "")} /></>
+                  : s.value}
+              </div>
+              <div className="text-sm text-slate-400 mt-1">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ── FOUR DOMAINS ── */}
       <section className="py-28 md:py-36 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
@@ -133,58 +149,13 @@ export default function HomePage() {
             <p className="text-sm font-semibold tracking-widest uppercase text-indigo-400 mb-4">
               One Platform, Four Domains
             </p>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-5">
               Every domain, a different superpower
             </h2>
+            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+              Your all-in-one AI platform for building websites, marketing, and scaling online.
+            </p>
           </div>
-        </div>
-      </section>
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden min-h-screen flex items-center pt-16">
-        {/* Rich gradient mesh background */}
-        <div className="absolute inset-0 pointer-events-none">
-          {/* Primary gradient blobs — layered for depth */}
-          <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-blue-600/[0.07] blur-[120px]" />
-          <div className="absolute top-[10%] right-[-5%] w-[50%] h-[60%] rounded-full bg-indigo-600/[0.06] blur-[100px]" />
-          <div className="absolute bottom-[-10%] left-[20%] w-[45%] h-[50%] rounded-full bg-cyan-600/[0.04] blur-[120px]" />
-          <div className="absolute top-[40%] left-[40%] w-[30%] h-[30%] rounded-full bg-blue-500/[0.05] blur-[80px]" />
-          {/* Subtle dot pattern overlay with radial fade */}
-          <div
-            className="absolute inset-0 opacity-[0.35]"
-            style={{
-              backgroundImage: "radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px)",
-              backgroundSize: "32px 32px",
-              maskImage: "radial-gradient(ellipse 70% 60% at 50% 40%, black 10%, transparent 70%)",
-              WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 40%, black 10%, transparent 70%)",
-            }}
-          />
-          {/* Top edge highlight — subtle light bleed from above */}
-          <div className="absolute top-0 left-[15%] right-[15%] h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10 py-20 lg:py-28">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left — Text */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider mb-8">
-                AI-POWERED PLATFORM
-              </div>
-
-              <h1 className="text-[2.75rem] sm:text-[3.5rem] lg:text-[4.5rem] font-black tracking-[-0.03em] leading-[1.05] mb-6 text-white">
-                Build, deploy, grow{" "}
-                <span className="block text-white/50">your online presence</span>
-              </h1>
-
-              <p className="text-lg text-white/45 leading-relaxed mb-8 max-w-lg">
-                Your all-in-one AI platform for building websites, marketing, and scaling online.
-                10 AI agents work together to create production-ready sites in seconds.
-              </p>
-            </motion.div>
 
       {/* Clear the fixed 72px nav */}
       <div className="pt-[72px]">
@@ -220,7 +191,6 @@ export default function HomePage() {
                 </Link>
               );
             })}
-          </div>
           </div>
         </div>
       </section>
