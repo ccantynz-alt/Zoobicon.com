@@ -45,6 +45,7 @@ const PROJECT_TYPE_GUIDANCE: Record<string, string> = {
 };
 
 export async function POST(request: Request) {
+  const generateStart = Date.now();
   try {
     const body: GenerateRequest = await request.json();
     const { projectType, script, style, platform, duration, music, brandSettings } = body;
@@ -60,6 +61,19 @@ export async function POST(request: Request) {
     const brandFontStr = brandSettings?.font || "Inter";
 
     const sceneCount = Math.max(4, Math.min(10, Math.ceil(duration / 10)));
+
+    // --- Flywheel: load brand memories for storyboard personalization ---
+    let memoryContext = "";
+    try {
+      const { getMemories } = await import("@/lib/flywheel");
+      const brandMems = await getMemories("brand");
+      const memStr = brandMems.slice(0, 8).map((m) => m.content).join("; ");
+      if (memStr) {
+        memoryContext = `\n\nPlatform memory (use to inform brand direction): ${memStr.slice(0, 500)}`;
+      }
+    } catch {
+      // Flywheel unavailable — proceed without memory
+    }
 
     const systemPrompt = `You are a world-class video director who creates visually stunning, emotionally compelling storyboards. Think David Fincher meets TikTok — cinematic quality optimized for short attention spans.
 
@@ -100,7 +114,7 @@ PACING RULES:
 - Scene 1 is the HOOK — must be visually arresting in the first frame. No slow builds.
 - Alternate between tight close-ups and wider establishing shots for visual variety
 - The second-to-last scene should be the emotional peak (the "money shot")
-- Final scene should feel like a resolution — calm, confident, clear CTA`;
+- Final scene should feel like a resolution — calm, confident, clear CTA${memoryContext}`;
 
     const userMessage = `Create a ${duration}-second ${projectType.replace(/-/g, " ")} video storyboard.
 
@@ -192,6 +206,22 @@ Generate the complete storyboard as JSON.`;
       script: parsed.script || script || "",
       musicCues: Array.isArray(parsed.musicCues) ? parsed.musicCues : [],
     };
+
+    // --- Flywheel: track storyboard generation as a build ---
+    try {
+      const { saveBuild } = await import("@/lib/flywheel");
+      const now = Date.now();
+      await saveBuild({
+        id: `vid-gen-${now}-${Math.random().toString(36).slice(2, 11)}`,
+        prompt: (script || `${projectType} ${style} ${platform}`).slice(0, 500),
+        siteName: `video-${projectType}`,
+        model: response.model || "claude-sonnet-4-6",
+        durationMs: now - generateStart,
+        createdAt: now,
+      });
+    } catch {
+      // Flywheel save failed — non-fatal
+    }
 
     return Response.json(result);
   } catch (err) {

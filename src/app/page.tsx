@@ -178,6 +178,34 @@ const TESTIMONIALS = [
 
 export default function HomePage() {
   return (
+    <div className="bg-[#0a0a14] text-white selection:bg-indigo-500/30 selection:text-white">
+      <div className="pt-[72px]">
+        <HeroBuilder />
+
+        {/* ── Trust strip — infinite marquee, Filmora pattern ── */}
+        <section
+          className="relative border-y border-white/[0.05]"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.012) 0%, rgba(255,255,255,0.002) 100%)",
+          }}
+        >
+          <div className="relative py-8 overflow-hidden fs-marquee-paused">
+            <div className="fs-marquee">
+              {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
+                <div
+                  key={`${item.label}-${i}`}
+                  className="flex items-center gap-3 px-5 py-2 rounded-full border border-white/[0.06] bg-white/[0.02] backdrop-blur flex-shrink-0"
+                >
+                  <span className="text-[13px] font-semibold text-white/90">{item.label}</span>
+                  <span className="text-[11px] text-white/40">{item.sub}</span>
+                </div>
+              ))}
+            </div>
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050508] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050508] to-transparent" />
+          </div>
+        </section>
     <div className="bg-[#0b1530] text-white selection:bg-indigo-500/30 selection:text-white">
 
       {/* ── HERO ── built live in the browser via Sandpack.

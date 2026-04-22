@@ -18,6 +18,12 @@ export {
   type ComponentCategory,
 } from "./store";
 
+export {
+  detectIndustry,
+  detectTheme,
+  swapImagesForIndustry,
+} from "./images";
+
 import { REGISTRY, type RegistryComponent, type ComponentCategory } from "./store";
 
 // ── Query Functions ──

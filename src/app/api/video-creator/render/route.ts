@@ -35,6 +35,7 @@ export const maxDuration = 120;
  * Returns: { jobId, jobs, status, totalScenes, completedScenes }
  */
 export async function POST(req: NextRequest) {
+  const renderStart = Date.now();
   try {
     const body = await req.json();
     const { scenes, style, platform, provider, email, plan, hasAddon } = body;
@@ -138,6 +139,22 @@ export async function POST(req: NextRequest) {
     if (email && startedJobs > 0) {
       await incrementVideoUsage(email, "render", startedJobs);
       await consumeOverageIfNeeded(email, plan, hasAddon, "render", startedJobs);
+    }
+
+    // --- Flywheel: track video render as a build ---
+    try {
+      const { saveBuild } = await import("@/lib/flywheel");
+      const now = Date.now();
+      await saveBuild({
+        id: `vid-render-${now}-${Math.random().toString(36).slice(2, 11)}`,
+        prompt: `Render ${scenes.length} scene(s), style: ${style}, platform: ${platform || "youtube"}`,
+        siteName: `video-render-${activeProvider}`,
+        model: activeProvider,
+        durationMs: now - renderStart,
+        createdAt: now,
+      });
+    } catch {
+      // Flywheel save failed — non-fatal
     }
 
     return Response.json({ ...result, quotaCharged: startedJobs });

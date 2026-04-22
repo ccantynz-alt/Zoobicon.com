@@ -105,6 +105,28 @@ Rules:
       | undefined;
     const reply = textBlock?.text || "I'm sorry, I didn't quite catch that. Could you rephrase?";
 
+    // --- Flywheel: persist widget conversation ---
+    try {
+      const { saveConversation } = await import("@/lib/flywheel");
+      const now = Date.now();
+      const convoId = `widget-${siteId || "anon"}-${now}-${Math.random().toString(36).slice(2, 11)}`;
+      const allMessages = [
+        ...safeHistory.map((m) => ({ role: m.role as "user" | "assistant", content: m.content, timestamp: now - 2000 })),
+        { role: "user" as const, content: message, timestamp: now - 1000 },
+        { role: "assistant" as const, content: reply, timestamp: now },
+      ];
+      await saveConversation({
+        id: convoId,
+        title: (message as string).slice(0, 50),
+        messages: allMessages,
+        model: "claude-haiku-4-5-20251001",
+        createdAt: now,
+        updatedAt: now,
+      });
+    } catch {
+      // Flywheel save failed — non-fatal
+    }
+
     return NextResponse.json(
       {
         reply,

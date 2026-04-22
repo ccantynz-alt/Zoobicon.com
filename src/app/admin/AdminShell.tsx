@@ -23,6 +23,7 @@ import {
   Wifi,
   Calendar,
   Link2,
+  Settings,
 } from "lucide-react";
 
 const SIDEBAR_SECTIONS = [
@@ -63,6 +64,7 @@ const SIDEBAR_SECTIONS = [
     items: [
       { name: "Pre-Launch Checklist", href: "/admin/pre-launch", icon: CheckCircle },
       { name: "Integrations", href: "/admin/integrations", icon: Puzzle },
+      { name: "Settings", href: "/admin/settings", icon: Settings },
     ],
   },
   {
