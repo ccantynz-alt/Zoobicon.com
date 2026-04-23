@@ -1272,7 +1272,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       {
         id: "featuredIntegrations",
         label: "Featured Integrations",
-        placeholder: "List top integrations (e.g. Salesforce, Hash, Stripe, HubSpot — one per line)",
+        placeholder: "List top integrations (e.g. Salesforce, Slack, Stripe, HubSpot — one per line)",
         type: "textarea",
       },
       {

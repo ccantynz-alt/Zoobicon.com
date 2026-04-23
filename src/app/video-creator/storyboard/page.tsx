@@ -300,7 +300,7 @@ export default function VideoCreatorDashboard() {
       (window as unknown as Record<string, unknown>).SpeechRecognition ||
       (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
     if (!SpeechRecognitionCtor) {
-      setError("Voice input is not supported in this browser. Try Globe2 or Edge.");
+      setError("Voice input is not supported in this browser. Try Chrome or Edge.");
       return;
     }
 
@@ -1447,17 +1447,17 @@ export default function VideoCreatorDashboard() {
 
   if (!authChecked) {
     return (
-      <div className="min-h-screen bg-[#06080f] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-stone-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen bg-[#06080f] text-white antialiased">
+    <div className="relative min-h-screen text-white antialiased">
       <BackgroundEffects preset="technical" />
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#06080f]/80 backdrop-blur-2xl saturate-150">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0b1530]/80 backdrop-blur-2xl saturate-150">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5">

@@ -108,7 +108,7 @@ export default function ClientPortal() {
   // Preview mode — full-screen iframe
   if (previewSite) {
     return (
-      <div className="min-h-screen bg-[#0a0a12] flex flex-col">
+      <div className="min-h-screen bg-transparent flex flex-col">
         <header className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06] bg-[#12121a]/80 backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <nav className="flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
@@ -150,7 +150,7 @@ export default function ClientPortal() {
   // Login screen
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-[#0a0a12] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             {agencyBrand?.logoUrl ? (
@@ -210,7 +210,7 @@ export default function ClientPortal() {
 
   // Sites list
   return (
-    <div className="min-h-screen bg-[#0a0a12]">
+    <div className="min-h-screen bg-transparent">
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] bg-[#12121a]/80 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           {agencyBrand?.logoUrl ? (

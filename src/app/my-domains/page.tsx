@@ -91,9 +91,9 @@ export default function MyDomainsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a12] text-white">
+    <div className="min-h-screen text-white">
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
+      <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0b1530]/80 backdrop-blur-2xl">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between h-14">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">

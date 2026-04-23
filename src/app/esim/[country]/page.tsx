@@ -384,7 +384,7 @@ export default function EsimCountryPage({ params }: { params: { country: string 
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a12] text-white">
+      <div className="min-h-screen flex items-center justify-center text-white">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Country not found</h1>
           <p className="text-white/40">Check our <a href="/products/esim" className="text-stone-400 underline">full eSIM coverage list</a>.</p>
@@ -404,11 +404,11 @@ export default function EsimCountryPage({ params }: { params: { country: string 
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a12] text-white">
+    <div className="min-h-screen text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Header */}
-      <nav className="border-b border-white/[0.06] bg-[#0a0a12]/90 backdrop-blur-xl">
+      <nav className="border-b border-white/[0.06] bg-[#0b1530]/90 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between h-14">
           <a href="/" className="text-sm font-bold">Zoobicon</a>
           <div className="flex gap-4 text-xs text-white/40">

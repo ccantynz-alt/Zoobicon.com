@@ -173,10 +173,10 @@ export default function SettingsPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#050507] relative">
+    <div className="min-h-screen bg-transparent relative">
       <BackgroundEffects preset="calm" />
       {/* Nav */}
-      <nav className="border-b border-white/[0.04] bg-[#050507]/80 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/[0.04] bg-[#0b1530]/80 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="text-white/50 hover:text-white/60 transition-colors">

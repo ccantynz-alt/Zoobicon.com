@@ -82,10 +82,10 @@ const INTEGRATIONS = [
   { id: 21, name: 'Notion', desc: 'Documentation and knowledge base', category: 'pm', connected: false, popular: true, color: '#000000' },
   { id: 22, name: 'Asana', desc: 'Task and project management', category: 'pm', connected: false, popular: false, color: '#F06A6A' },
   // Social
-  { id: 23, name: 'MessageCircle/X', desc: 'Auto-post deployments to X', category: 'social', connected: false, popular: true, color: '#1DA1F2' },
+  { id: 23, name: 'Twitter/X', desc: 'Auto-post deployments to X', category: 'social', connected: false, popular: true, color: '#1DA1F2' },
   { id: 24, name: 'LinkedIn', desc: 'Share professional updates', category: 'social', connected: false, popular: false, color: '#0A66C2' },
-  { id: 25, name: 'Camera', desc: 'Auto-generate social images', category: 'social', connected: false, popular: false, color: '#E4405F' },
-  { id: 26, name: 'ThumbsUp', desc: 'Page updates and marketing', category: 'social', connected: false, popular: false, color: '#1877F2' },
+  { id: 25, name: 'Instagram', desc: 'Auto-generate social images', category: 'social', connected: false, popular: false, color: '#E4405F' },
+  { id: 26, name: 'Facebook', desc: 'Page updates and marketing', category: 'social', connected: false, popular: false, color: '#1877F2' },
   // Analytics
   { id: 27, name: 'Google Analytics', desc: 'Website traffic analytics', category: 'analytics', connected: true, popular: true, color: '#E37400' },
   { id: 28, name: 'Plausible', desc: 'Privacy-friendly analytics', category: 'analytics', connected: false, popular: false, color: '#5850EC' },
@@ -142,8 +142,8 @@ export default function IntegrationsHubPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a12] text-white">
-      <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-xl sticky top-0 z-50">
+    <div className="min-h-screen text-white">
+      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>

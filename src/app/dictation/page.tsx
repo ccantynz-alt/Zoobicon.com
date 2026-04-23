@@ -174,7 +174,7 @@ export default function DictationPage() {
       window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert(
-        "Speech recognition not supported in this browser. Use Globe2 or Edge."
+        "Speech recognition not supported in this browser. Use Chrome or Edge."
       );
       return;
     }
