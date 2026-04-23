@@ -640,7 +640,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         // instead of being overridden by "No components generated".
         const registry = await getRegistry();
         const files: Record<string, string> = {
-          "package.json": buildPackageJson({ withSupabase: wantsSupabase }),
+          "package.json": buildPackageJson({ withSupabase: supabaseAvailable }),
           "tailwind.config.js": buildTailwindConfig(),
           "styles.css": registry.buildStylesFile({ primaryColor: "#1c1917", bgColor: "#FAF9F6" }),
           "App.tsx": registry.buildShellAppFile(prompt),
@@ -674,11 +674,11 @@ export async function POST(req: NextRequest): Promise<Response> {
         // Update styles with the real brand colours now that planning succeeded.
         files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor, theme });
 
-        // ── Pre-inject Supabase client BEFORE customisation so generated
-        // components can import from "./lib/supabase" without breaking
-        // Sandpack while Phase 3.5 provisioning is still running. The
-        // placeholder is overwritten with real credentials after provision.
-        if (wantsSupabase) {
+        // ── Pre-inject Supabase client ONLY when SUPABASE_ACCESS_TOKEN is
+        // configured. Without it, no supabase files are emitted and the AI
+        // prompt never mentions supabase imports — preventing the
+        // "Could not find module './lib/supabase'" Sandpack error.
+        if (supabaseAvailable) {
           files["lib/supabase.ts"] = generateSupabaseClient(
             "https://YOUR_PROJECT.supabase.co",
             "YOUR_ANON_KEY",
@@ -700,13 +700,11 @@ export async function POST(req: NextRequest): Promise<Response> {
         const customiserModel =
           mode === "premium" ? MODEL_SONNET : MODEL_HAIKU;
 
-        // Supabase brief passed to customiser when the project has
-        // full-stack needs — we include it whether provisioning has
-        // actually run yet or not. If provisioning later fails the
-        // placeholder client is still injected and the code still
-        // compiles (the calls will error at runtime with a clear
-        // message, not fail the build).
-        const customiserSupabase = wantsSupabase
+        // Supabase brief only passed to customiser when Supabase is
+        // actually configured. Without this gate, the AI adds
+        // `import { supabase } from "./lib/supabase"` to every
+        // component — but the file doesn't exist in Sandpack.
+        const customiserSupabase = supabaseAvailable
           ? {
               needsAuth: supabaseNeeds.needsAuth,
               needsDatabase: supabaseNeeds.needsDatabase,
