@@ -26,11 +26,9 @@ import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
 import {
   detectSupabaseNeeds,
   needsSupabase,
-  generateSupabaseClient,
-  generateAuthProvider,
 } from "@/lib/supabase-detect";
-import type { SupabaseNeeds, SupabaseProvisionResult } from "@/lib/supabase-detect";
-import { isConfigured as isSupabaseConfigured } from "@/lib/supabase-provisioner";
+import type { SupabaseNeeds } from "@/lib/supabase-detect";
+import { generateZoobiconClient, generateZoobiconAuthProvider } from "@/lib/zoobicon-client";
 // Component registry is imported lazily inside POST to avoid circular dependency
 // at module load time (the registry's side-effect imports cause a TDZ error in webpack).
 import type { RegistryComponent, ComponentCategory } from "@/lib/component-registry";
@@ -375,25 +373,24 @@ function buildSupabaseBrief(needs: {
 }): string {
   const lines: string[] = [
     "",
-    "BACKEND — SUPABASE IS WIRED",
-    "This project has a live Supabase client at ./lib/supabase.ts. If this",
+    "BACKEND — ZOOBICON IS WIRED",
+    "This project has a live Zoobicon client at ./lib/zoobicon.ts. If this",
     "component has ANY interactive elements, wire them to the real client",
     "using the patterns below. Do NOT leave dead buttons.",
     "",
-    'Import the client with: import { supabase } from "../lib/supabase";',
+    'Import with: import { signUp, signIn, signOut, getUser, insert, query } from "../lib/zoobicon";',
   ];
 
   if (needs.needsAuth) {
     lines.push(
       "",
       "AUTH (available):",
-      "- Sign In buttons → onClick: await supabase.auth.signInWithPassword({ email, password })",
-      "- Sign Up buttons → onClick: await supabase.auth.signUp({ email, password })",
-      "- Sign Out → onClick: await supabase.auth.signOut()",
-      "- OAuth (Google/GitHub) → await supabase.auth.signInWithOAuth({ provider: \"google\" })",
+      "- Sign In buttons → onClick: const { user } = await signIn(email, password)",
+      "- Sign Up buttons → onClick: const { user } = await signUp(email, password)",
+      "- Sign Out → onClick: await signOut()",
       "- Use React useState for email/password inputs. Show error messages on failure.",
       "- For navbars: show 'Sign In' / 'Sign Up' when signed out, 'Sign Out' when signed in",
-      "  (use useEffect + supabase.auth.getSession() + supabase.auth.onAuthStateChange).",
+      "  (use useEffect + getUser() on mount to check session).",
     );
   }
 
@@ -401,9 +398,9 @@ function buildSupabaseBrief(needs: {
     lines.push(
       "",
       "DATABASE (available):",
-      "- Contact forms → await supabase.from(\"messages\").insert({ name, email, message })",
-      "- Bookings → await supabase.from(\"bookings\").insert({ ... })",
-      "- Profile reads → await supabase.from(\"profiles\").select(\"*\").eq(\"user_id\", userId).single()",
+      "- Contact forms → await insert(\"messages\", { name, email, message })",
+      "- Bookings → await insert(\"bookings\", { name, date, time, email })",
+      "- Profile reads → const rows = await query(\"profiles\", { user_id: userId })",
       "- Wire real submit handlers. Show success / error states with useState.",
     );
   }
@@ -412,15 +409,15 @@ function buildSupabaseBrief(needs: {
     lines.push(
       "",
       "STORAGE (available):",
-      "- File uploads → await supabase.storage.from(\"uploads\").upload(path, file)",
-      "- Public URLs → supabase.storage.from(\"uploads\").getPublicUrl(path)",
+      "- File uploads → use a standard <input type=\"file\"> and POST to /api/v1/storage/upload",
+      "- Show upload progress with useState. Store the returned URL via insert(\"files\", { url, name })",
     );
   }
 
   lines.push(
     "",
-    "Still keep imports minimal. Only add `import { supabase } from \"../lib/supabase\"`",
-    "if this component actually needs it. Preserve the editorial design system.",
+    "Still keep imports minimal. Only import `{ signUp, signIn, signOut, getUser, insert, query }`",
+    "from \"../lib/zoobicon\" when this component actually needs them. Preserve the design system.",
     "",
   );
 
@@ -502,14 +499,11 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
   };
 }
 
-function buildPackageJson(opts?: { withSupabase?: boolean }): string {
+function buildPackageJson(): string {
   const deps: Record<string, string> = {
     react: "^18.3.1",
     "react-dom": "^18.3.1",
   };
-  if (opts?.withSupabase) {
-    deps["@supabase/supabase-js"] = "^2.45.0";
-  }
   return JSON.stringify(
     {
       name: "zoobicon-generated-site",
@@ -625,8 +619,10 @@ export async function POST(req: NextRequest): Promise<Response> {
 
         // Detect full-stack intent (auth, database, storage needs)
         const supabaseNeeds = detectSupabaseNeeds(prompt);
-        const wantsSupabase = needsSupabase(supabaseNeeds);
-        const supabaseAvailable = wantsSupabase && isSupabaseConfigured();
+        const wantsBackend = needsSupabase(supabaseNeeds);
+        // Generate a stable project ID for this build — embedded in the Zoobicon
+        // client so all data operations are automatically scoped to this site.
+        const projectId = crypto.randomUUID();
 
         // ── FLOOR: emit a CINEMATIC INSTANT SHELL immediately. The shell is
         // a self-contained animated skeleton (hero + nav + features strip)
@@ -640,7 +636,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         // instead of being overridden by "No components generated".
         const registry = await getRegistry();
         const files: Record<string, string> = {
-          "package.json": buildPackageJson({ withSupabase: supabaseAvailable }),
+          "package.json": buildPackageJson(),
           "tailwind.config.js": buildTailwindConfig(),
           "styles.css": registry.buildStylesFile({ primaryColor: "#1c1917", bgColor: "#FAF9F6" }),
           "App.tsx": registry.buildShellAppFile(prompt),
@@ -674,19 +670,14 @@ export async function POST(req: NextRequest): Promise<Response> {
         // Update styles with the real brand colours now that planning succeeded.
         files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor, theme });
 
-        // ── Pre-inject Supabase client ONLY when SUPABASE_ACCESS_TOKEN is
-        // configured. Without it, no supabase files are emitted and the AI
-        // prompt never mentions supabase imports — preventing the
-        // "Could not find module './lib/supabase'" Sandpack error.
-        if (supabaseAvailable) {
-          files["lib/supabase.ts"] = generateSupabaseClient(
-            "https://YOUR_PROJECT.supabase.co",
-            "YOUR_ANON_KEY",
-          );
+        // Pre-inject Zoobicon client whenever the prompt needs backend features.
+        // Unlike Supabase, no external token is required — Zoobicon's own API
+        // is always available, so wantsBackend is the only gate.
+        if (wantsBackend) {
+          files["lib/zoobicon.ts"] = generateZoobiconClient(projectId);
           if (supabaseNeeds.needsAuth) {
-            files["lib/AuthProvider.tsx"] = generateAuthProvider();
+            files["lib/AuthProvider.tsx"] = generateZoobiconAuthProvider();
           }
-          files["package.json"] = buildPackageJson({ withSupabase: true });
         }
 
         writer.send("files", { files, fileCount: 0, totalComponents: components.length });
@@ -700,11 +691,10 @@ export async function POST(req: NextRequest): Promise<Response> {
         const customiserModel =
           mode === "premium" ? MODEL_SONNET : MODEL_HAIKU;
 
-        // Supabase brief only passed to customiser when Supabase is
-        // actually configured. Without this gate, the AI adds
-        // `import { supabase } from "./lib/supabase"` to every
-        // component — but the file doesn't exist in Sandpack.
-        const customiserSupabase = supabaseAvailable
+        // Backend brief only passed to the customiser when the prompt actually
+        // needs backend features. Without this gate, the AI adds zoobicon
+        // imports to purely static components that don't need them.
+        const customiserSupabase = wantsBackend
           ? {
               needsAuth: supabaseNeeds.needsAuth,
               needsDatabase: supabaseNeeds.needsDatabase,
@@ -839,120 +829,20 @@ export async function POST(req: NextRequest): Promise<Response> {
 
         writer.send("files", { files });
 
-        // ── PHASE 3.5: Supabase auto-provisioning (if full-stack detected) ──
-        let supabaseResult: SupabaseProvisionResult | null = null;
-
-        if (wantsSupabase) {
-          if (supabaseAvailable) {
-            // Supabase env vars are set — provision a real project
-            try {
-              writer.send("phase", {
-                phase: "provisioning",
-                message: "Setting up your database and auth…",
-              });
-
-              // Lazy-import provisioner (only loaded when needed)
-              const provisioner = await import("@/lib/supabase-provisioner");
-
-              const projectName = `zbk-${brandName.toLowerCase().replace(/[^a-z0-9]/g, "-").slice(0, 30)}-${Date.now().toString(36)}`;
-
-              const provision = await provisioner.provisionFullStack({
-                name: projectName,
-                region: "us-east-1",
-                schema: supabaseNeeds.needsDatabase
-                  ? {
-                      profiles: {
-                        columns: [
-                          { name: "id", type: "uuid", primary: true, default: "gen_random_uuid()" },
-                          { name: "user_id", type: "uuid", nullable: false },
-                          { name: "display_name", type: "text" },
-                          { name: "avatar_url", type: "text" },
-                          { name: "created_at", type: "timestamptz", default: "now()" },
-                          { name: "updated_at", type: "timestamptz", default: "now()" },
-                        ],
-                        rls: "owner",
-                      },
-                    }
-                  : undefined,
-                auth: supabaseNeeds.needsAuth ? ["email"] : undefined,
-                buckets: supabaseNeeds.needsStorage
-                  ? [{ name: "uploads", public: true }]
-                  : undefined,
-              });
-
-              const projectUrl = provision.envVars.NEXT_PUBLIC_SUPABASE_URL;
-              const anonKey = provision.envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-              // Inject Supabase client files into the generated project
-              files["lib/supabase.ts"] = generateSupabaseClient(projectUrl, anonKey);
-              if (supabaseNeeds.needsAuth) {
-                files["lib/AuthProvider.tsx"] = generateAuthProvider();
-              }
-              files["package.json"] = buildPackageJson({ withSupabase: true });
-
-              supabaseResult = {
-                projectUrl,
-                anonKey,
-                projectRef: provision.project.projectRef,
-                needsAuth: supabaseNeeds.needsAuth,
-                needsDatabase: supabaseNeeds.needsDatabase,
-                needsStorage: supabaseNeeds.needsStorage,
-                tables: provision.tables,
-                authProviders: provision.auth,
-                buckets: provision.buckets.map((b) => b.name),
-              };
-
-              writer.send("supabase", supabaseResult);
-              writer.send("files", { files });
-
-              writer.send("phase", {
-                phase: "provisioned",
-                message: `Database ready — ${provision.tables.length} table(s), ${provision.auth.length > 0 ? "auth enabled" : "no auth"}, ${provision.buckets.length} bucket(s)`,
-              });
-            } catch (err) {
-              // Supabase provisioning failure is non-fatal — site still works without it.
-              // Use fatal:false so the client treats this as a warning, not a build abort.
-              // The JWT / token-expired path lives here (SUPABASE_ACCESS_TOKEN invalid in prod
-              // would otherwise surface as "Something went wrong / JWT could not be decoded"
-              // and kill the entire build even though it's non-fatal).
-              const msg = err instanceof Error ? err.message : String(err);
-              writer.send("error", {
-                fatal: false,
-                message: `Supabase provisioning skipped: ${msg}`,
-                hint: "The site will still work but without a live database. You can connect Supabase manually later.",
-              });
-
-              // Still inject client stub with placeholder values so the code compiles
-              files["lib/supabase.ts"] = generateSupabaseClient(
-                "https://YOUR_PROJECT.supabase.co",
-                "YOUR_ANON_KEY",
-              );
-              if (supabaseNeeds.needsAuth) {
-                files["lib/AuthProvider.tsx"] = generateAuthProvider();
-              }
-              writer.send("files", { files });
-            }
-          } else {
-            // Supabase env vars not set — inject placeholder client so code compiles
-            writer.send("phase", {
-              phase: "provisioning",
-              message: "Full-stack features detected — injecting Supabase client (connect your project to go live)…",
-            });
-
-            files["lib/supabase.ts"] = generateSupabaseClient(
-              "https://YOUR_PROJECT.supabase.co",
-              "YOUR_ANON_KEY",
-            );
-            if (supabaseNeeds.needsAuth) {
-              files["lib/AuthProvider.tsx"] = generateAuthProvider();
-            }
-            writer.send("files", { files });
-
-            writer.send("phase", {
-              phase: "provisioned",
-              message: "Supabase client injected with placeholders — set SUPABASE_ACCESS_TOKEN to auto-provision real projects.",
-            });
+        // ── PHASE 3.5: Backend wiring (Zoobicon's own API — no provisioning needed) ──
+        if (wantsBackend) {
+          // Zoobicon's backend is always available — no external token required.
+          // The client files were already pre-injected above. Here we just
+          // emit the confirmation event so the UI can show "Backend ready".
+          files["lib/zoobicon.ts"] = generateZoobiconClient(projectId);
+          if (supabaseNeeds.needsAuth) {
+            files["lib/AuthProvider.tsx"] = generateZoobiconAuthProvider();
           }
+          writer.send("files", { files });
+          writer.send("phase", {
+            phase: "provisioned",
+            message: `Backend ready — powered by Zoobicon${supabaseNeeds.needsAuth ? " · auth enabled" : ""}${supabaseNeeds.needsDatabase ? " · data storage enabled" : ""}`,
+          });
         }
 
         // ── PHASE 4: critique loop (premium only) ──
@@ -1015,7 +905,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           score: finalScore,
           durationMs,
           failedSections,
-          ...(supabaseResult ? { supabase: supabaseResult } : {}),
+          ...(wantsBackend ? { backend: { projectId } } : {}),
         });
 
         // ── FLYWHEEL: record this build for future context ──
