@@ -297,7 +297,7 @@ export default function AdminPage() {
           <p className="text-sm text-slate-600 mt-1">System health, configuration, and platform management</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/builder" className="text-xs text-slate-700 hover:text-slate-700 px-3 py-1.5 rounded-xl bg-white/60 border border-slate-200 hover:border-stone-300 hover:bg-white/80 backdrop-blur-sm transition-all shadow-sm">
+          <Link href="/builder" className="text-xs text-slate-700 hover:text-slate-700 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-stone-300 hover:bg-white backdrop-blur-sm transition-all shadow-sm">
             Builder
           </Link>
           <Link href="/dashboard" className="text-xs text-white px-3 py-1.5 rounded-xl bg-gradient-to-r from-stone-500 to-stone-600 hover:from-stone-400 hover:to-stone-500 shadow-md shadow-stone-500/20 transition-all">
@@ -356,7 +356,7 @@ export default function AdminPage() {
                     <Link
                       href={a.href}
                       target={(a as { external?: boolean }).external ? "_blank" : undefined}
-                      className="group relative overflow-hidden rounded-2xl border border-slate-200/80 hover:border-stone-300 bg-white/70 hover:bg-white/90 backdrop-blur-xl p-5 flex items-start gap-4 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-stone-100/50 hover:scale-[1.02]"
+                      className="group relative overflow-hidden rounded-2xl border border-slate-200/80 hover:border-stone-300 bg-white hover:bg-white backdrop-blur-xl p-5 flex items-start gap-4 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-stone-100/50 hover:scale-[1.02]"
                     >
                       <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${a.gradient} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform`}>
                         <a.icon className="w-5 h-5 text-white" />
@@ -384,7 +384,7 @@ export default function AdminPage() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + i * 0.1 }}
-                  className="rounded-2xl p-6 bg-white/60 border border-slate-200/80 backdrop-blur-xl shadow-sm hover:shadow-lg hover:shadow-stone-100/30 hover:border-stone-200 hover:scale-[1.02] transition-all duration-300"
+                  className="rounded-2xl p-6 bg-white border border-slate-200/80 backdrop-blur-xl shadow-sm hover:shadow-lg hover:shadow-stone-100/30 hover:border-stone-200 hover:scale-[1.02] transition-all duration-300"
                 >
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.iconGradient} flex items-center justify-center mb-4 shadow-lg`}>
                     <f.icon className="w-6 h-6 text-white" />
@@ -401,7 +401,7 @@ export default function AdminPage() {
                 initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="rounded-2xl border border-stone-200 bg-white/70 backdrop-blur-xl p-6 shadow-sm"
+                className="rounded-2xl border border-stone-200 bg-white backdrop-blur-xl p-6 shadow-sm"
               >
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="text-base font-bold flex items-center gap-2 text-slate-700">
@@ -455,7 +455,7 @@ export default function AdminPage() {
                 initial={{ opacity: 0, x: 15 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-6 shadow-sm"
+                className="rounded-2xl border border-slate-200/80 bg-white backdrop-blur-xl p-6 shadow-sm"
               >
                 <h2 className="text-base font-bold mb-1 flex items-center gap-2 text-slate-700">
                   <Database className="w-4 h-4 text-stone-500" />
@@ -533,7 +533,7 @@ export default function AdminPage() {
               </div>
               <div className="grid md:grid-cols-2 gap-2.5">
                 {launchChecklist.map((item, i) => (
-                  <div key={i} className={`flex items-center gap-3 py-2 px-3 rounded-xl ${item.done ? "bg-stone-50/80" : "bg-slate-50/60"}`}>
+                  <div key={i} className={`flex items-center gap-3 py-2 px-3 rounded-xl ${item.done ? "bg-stone-50" : "bg-slate-50"}`}>
                     {item.done
                       ? <CheckCircle2 className="w-4 h-4 text-stone-500 flex-shrink-0" />
                       : <div className="w-4 h-4 rounded-full border-2 border-slate-200 flex-shrink-0" />
@@ -549,7 +549,7 @@ export default function AdminPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-xl p-6 shadow-sm"
+              className="rounded-2xl border border-slate-200/80 bg-white backdrop-blur-xl p-6 shadow-sm"
             >
               <h2 className="text-base font-bold mb-5 flex items-center gap-2 text-slate-700">
                 <Server className="w-4 h-4 text-stone-500" />
@@ -596,7 +596,7 @@ export default function AdminPage() {
                   key={s.label}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="rounded-2xl p-5 bg-white/70 border border-slate-200/80 backdrop-blur-xl shadow-sm hover:shadow-lg hover:shadow-stone-100/30 hover:scale-[1.03] transition-all duration-300"
+                  className="rounded-2xl p-5 bg-white border border-slate-200/80 backdrop-blur-xl shadow-sm hover:shadow-lg hover:shadow-stone-100/30 hover:scale-[1.03] transition-all duration-300"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.iconGradient} flex items-center justify-center shadow-lg`}>
@@ -611,7 +611,7 @@ export default function AdminPage() {
 
             <div className="grid lg:grid-cols-2 gap-6">
               {/* Plan Distribution */}
-              <div className="rounded-2xl p-6 border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-sm">
+              <div className="rounded-2xl p-6 border border-slate-200/80 bg-white backdrop-blur-xl shadow-sm">
                 <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-slate-700">
                   <Crown className="w-4 h-4 text-stone-500" />
                   Plan Distribution
@@ -637,7 +637,7 @@ export default function AdminPage() {
               </div>
 
               {/* Recent signups */}
-              <div className="rounded-2xl p-6 border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-sm">
+              <div className="rounded-2xl p-6 border border-slate-200/80 bg-white backdrop-blur-xl shadow-sm">
                 <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-slate-700">
                   <UserPlus className="w-4 h-4 text-stone-500" />
                   Recent Signups
@@ -663,7 +663,7 @@ export default function AdminPage() {
             </div>
 
             {/* Recent projects */}
-            <div className="rounded-2xl p-6 border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-sm">
+            <div className="rounded-2xl p-6 border border-slate-200/80 bg-white backdrop-blur-xl shadow-sm">
               <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-slate-700">
                 <FolderOpen className="w-4 h-4 text-stone-500" />
                 Recent Projects
@@ -671,7 +671,7 @@ export default function AdminPage() {
               {analytics?.recentProjects && analytics.recentProjects.length > 0 ? (
                 <div className="grid md:grid-cols-2 gap-3">
                   {analytics.recentProjects.map((p, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/60 border border-slate-200/80 hover:bg-stone-50/30 hover:border-stone-200 transition-all">
+                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200/80 hover:bg-stone-50 hover:border-stone-200 transition-all">
                       <div>
                         <div className="text-xs font-semibold text-slate-700">{p.name}</div>
                         <div className="text-xs text-slate-600">{p.user_email}</div>
@@ -704,11 +704,11 @@ export default function AdminPage() {
             </div>
 
             {users.length > 0 ? (
-              <div className="rounded-2xl border border-slate-200/80 bg-white/70 overflow-hidden backdrop-blur-xl shadow-sm">
+              <div className="rounded-2xl border border-slate-200/80 bg-white overflow-hidden backdrop-blur-xl shadow-sm">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50/50">
+                      <tr className="border-b border-slate-100 bg-slate-50">
                         <th className="text-left text-xs uppercase tracking-wider text-slate-600 px-4 py-3 font-bold">User</th>
                         <th className="text-left text-xs uppercase tracking-wider text-slate-600 px-4 py-3 font-bold">Role</th>
                         <th className="text-left text-xs uppercase tracking-wider text-slate-600 px-4 py-3 font-bold">Plan</th>
@@ -719,7 +719,7 @@ export default function AdminPage() {
                     </thead>
                     <tbody>
                       {users.map((user) => (
-                        <tr key={user.id} className="border-b border-slate-100 hover:bg-stone-50/30 transition-colors">
+                        <tr key={user.id} className="border-b border-slate-100 hover:bg-stone-50 transition-colors">
                           <td className="px-4 py-3">
                             <div className="text-sm font-semibold text-slate-700">{user.name || "—"}</div>
                             <div className="text-xs text-slate-600">{user.email}</div>
@@ -794,7 +794,7 @@ export default function AdminPage() {
                 </div>
               </div>
             ) : (
-              <div className="rounded-2xl border border-slate-200 bg-white/60 p-12 text-center">
+              <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
                 <Users className="w-14 h-14 text-slate-200 mx-auto mb-4" />
                 <h3 className="text-sm font-bold mb-1 text-slate-600">No users yet</h3>
                 <p className="text-xs text-slate-600">
@@ -826,7 +826,7 @@ export default function AdminPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.03 }}
-                  className="rounded-2xl p-5 border border-slate-200/80 bg-white/70 hover:bg-white/90 hover:border-stone-200 backdrop-blur-xl transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-stone-100/30"
+                  className="rounded-2xl p-5 border border-slate-200/80 bg-white hover:bg-white hover:border-stone-200 backdrop-blur-xl transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-stone-100/30"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
@@ -870,7 +870,7 @@ export default function AdminPage() {
             </div>
 
             {templates.length === 0 && !templatesLoading && (
-              <div className="rounded-2xl border border-slate-200 bg-white/60 p-12 text-center">
+              <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
                 <Layout className="w-14 h-14 text-slate-200 mx-auto mb-4" />
                 <h3 className="text-sm font-bold mb-1 text-slate-600">Loading templates...</h3>
               </div>

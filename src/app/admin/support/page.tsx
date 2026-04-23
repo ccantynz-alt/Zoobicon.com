@@ -219,7 +219,7 @@ export default function AdminSupportPage() {
   return (
     <div>
       {/* Header */}
-      <div className="border-b border-slate-200 bg-white/90 backdrop-blur-2xl">
+      <div className="border-b border-slate-200 bg-white backdrop-blur-2xl">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/admin" className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
