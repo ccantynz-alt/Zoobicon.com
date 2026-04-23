@@ -337,15 +337,15 @@ export default function AdminPage() {
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {[
-                  { icon: Mail, label: "Email Inbox", href: "/admin/email", desc: "Read & manage email", gradient: "from-blue-500 to-blue-600" },
-                  { icon: Inbox, label: "Mailboxes", href: "/admin/mailboxes", desc: "Manage mailboxes & routing", gradient: "from-indigo-500 to-indigo-600" },
+                  { icon: Mail, label: "Email Inbox", href: "/admin/email", desc: "Read & manage email", gradient: "from-slate-700 to-slate-800" },
+                  { icon: Inbox, label: "Mailboxes", href: "/admin/mailboxes", desc: "Manage mailboxes & routing", gradient: "from-slate-600 to-slate-700" },
                   { icon: Settings, label: "Email Settings", href: "/admin/email-settings", desc: "Configure admin email", gradient: "from-slate-500 to-slate-600" },
-                  { icon: HeadphonesIcon, label: "Support", href: "/admin/support", desc: "Support tickets & knowledge", gradient: "from-violet-500 to-violet-600" },
-                  { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness", gradient: "from-amber-500 to-amber-600" },
-                  { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder", gradient: "from-emerald-500 to-emerald-600" },
-                  { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", gradient: "from-cyan-500 to-cyan-600", external: true },
-                  { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Account settings", gradient: "from-slate-500 to-zinc-600" },
-                  { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard", gradient: "from-stone-500 to-stone-600" },
+                  { icon: HeadphonesIcon, label: "Support", href: "/admin/support", desc: "Support tickets & knowledge", gradient: "from-slate-700 to-slate-800" },
+                  { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness", gradient: "from-slate-600 to-slate-700" },
+                  { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder", gradient: "from-slate-800 to-slate-900" },
+                  { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", gradient: "from-slate-500 to-slate-600", external: true },
+                  { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Account settings", gradient: "from-slate-600 to-slate-700" },
+                  { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard", gradient: "from-slate-700 to-slate-800" },
                 ].map((a, i) => (
                   <motion.div
                     key={a.label}
@@ -375,9 +375,9 @@ export default function AdminPage() {
             {/* ── Feature Highlights ── */}
             <div className="grid md:grid-cols-3 gap-4">
               {[
-                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers.", iconGradient: "from-indigo-500 to-violet-500" },
-                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Contextual AI images.", iconGradient: "from-emerald-500 to-teal-500" },
-                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium site.", iconGradient: "from-cyan-500 to-blue-500" },
+                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers.", iconGradient: "from-slate-700 to-slate-900" },
+                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Contextual AI images.", iconGradient: "from-slate-600 to-slate-800" },
+                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium site.", iconGradient: "from-slate-700 to-slate-800" },
               ].map((f, i) => (
                 <motion.div
                   key={f.title}
@@ -528,7 +528,7 @@ export default function AdminPage() {
                 </div>
               </div>
               <div className="h-3 bg-slate-100 rounded-full mb-6 overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-indigo-400 via-indigo-500 to-violet-500 rounded-full transition-all duration-700"
+                <div className="h-full bg-gradient-to-r from-slate-500 via-slate-600 to-slate-700 rounded-full transition-all duration-700"
                   style={{ width: `${(launchChecklist.filter((i) => i.done).length / launchChecklist.length) * 100}%` }} />
               </div>
               <div className="grid md:grid-cols-2 gap-2.5">
@@ -587,10 +587,10 @@ export default function AdminPage() {
             {/* Stat cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, iconGradient: "from-blue-500 to-indigo-500" },
-                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, iconGradient: "from-violet-500 to-purple-500" },
-                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, iconGradient: "from-emerald-500 to-teal-500" },
-                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, iconGradient: "from-amber-500 to-orange-500" },
+                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, iconGradient: "from-slate-700 to-slate-900" },
+                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, iconGradient: "from-slate-600 to-slate-800" },
+                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, iconGradient: "from-slate-700 to-slate-800" },
+                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, iconGradient: "from-slate-600 to-slate-700" },
               ].map((s) => (
                 <motion.div
                   key={s.label}
@@ -625,7 +625,7 @@ export default function AdminPage() {
                           <span className="text-slate-600">{p.count} users</span>
                         </div>
                         <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-indigo-400 to-violet-500 rounded-full"
+                          <div className="h-full bg-gradient-to-r from-slate-500 to-slate-700 rounded-full"
                             style={{ width: `${Math.max(5, (p.count / (analytics.stats.totalUsers || 1)) * 100)}%` }} />
                         </div>
                       </div>
