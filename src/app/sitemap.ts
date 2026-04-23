@@ -1,5 +1,25 @@
 import { MetadataRoute } from 'next'
 
+// All eSIM country slugs — kept in sync with /esim/[country]/page.tsx COUNTRIES constant
+const ESIM_COUNTRY_SLUGS = [
+  'new-zealand','australia','fiji','samoa','tonga','vanuatu','cook-islands',
+  'papua-new-guinea','new-caledonia','french-polynesia',
+  'thailand','indonesia','vietnam','philippines','malaysia','singapore',
+  'cambodia','myanmar','laos',
+  'japan','south-korea','taiwan','hong-kong','china',
+  'india','sri-lanka','nepal',
+  'uae','turkey','qatar','saudi-arabia','israel',
+  'france','germany','spain','italy','portugal','netherlands','greece',
+  'croatia','iceland','switzerland',
+  'united-states','canada','mexico','brazil','colombia','argentina','peru',
+  'chile','costa-rica',
+  'south-africa','kenya','morocco','egypt','tanzania',
+  'united-kingdom',
+]
+
+// Domain TLD pages
+const DOMAIN_TLDS = ['ai', 'io', 'com', 'sh', 'dev', 'app', 'co', 'net', 'org', 'store', 'online', 'tech', 'site']
+
 // Try to fetch deployed sites for dynamic sitemap entries
 async function getDeployedSites(): Promise<{ slug: string; updatedAt: string }[]> {
   try {
@@ -158,6 +178,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route.priority,
   }))
 
+  // eSIM country pages — 56 countries, high-value SEO targets
+  const esimEntries: MetadataRoute.Sitemap = ESIM_COUNTRY_SLUGS.map((slug) => ({
+    url: `${baseUrl}/esim/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+
+  // Domain TLD pages — capture "buy .ai domain" search intent
+  const tldEntries: MetadataRoute.Sitemap = DOMAIN_TLDS.map((tld) => ({
+    url: `${baseUrl}/domains/${tld}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }))
+
   // Add deployed zoobicon.sh sites to sitemap
   const deployedSites = await getDeployedSites()
   const deployedEntries: MetadataRoute.Sitemap = deployedSites.map((site) => ({
@@ -167,5 +203,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticEntries, ...deployedEntries]
+  return [...staticEntries, ...esimEntries, ...tldEntries, ...deployedEntries]
 }

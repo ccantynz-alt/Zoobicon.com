@@ -12,6 +12,14 @@ export const metadata: Metadata = {
     siteName: "Zoobicon",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    site: "@zoobicon",
+    title: "AI Video Creator — Zoobicon",
+    description:
+      "Create TikTok, YouTube, and Instagram videos with AI. Storyboard, scene images, video rendering, voiceover, and subtitles.",
+    images: ["https://zoobicon.com/og-image.png"],
+  },
   alternates: { canonical: "https://zoobicon.com/video-creator" },
 };
 
