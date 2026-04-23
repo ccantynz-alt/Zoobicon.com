@@ -380,7 +380,7 @@ function buildSupabaseBrief(needs: {
     "component has ANY interactive elements, wire them to the real client",
     "using the patterns below. Do NOT leave dead buttons.",
     "",
-    'Import the client with: import { supabase } from "./lib/supabase";',
+    'Import the client with: import { supabase } from "../lib/supabase";',
   ];
 
   if (needs.needsAuth) {
@@ -419,7 +419,7 @@ function buildSupabaseBrief(needs: {
 
   lines.push(
     "",
-    "Still keep imports minimal. Only add `import { supabase } from \"./lib/supabase\"`",
+    "Still keep imports minimal. Only add `import { supabase } from \"../lib/supabase\"`",
     "if this component actually needs it. Preserve the editorial design system.",
     "",
   );
