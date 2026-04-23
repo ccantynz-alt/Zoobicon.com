@@ -46,15 +46,37 @@ export type GateTestSeverity = "critical" | "warning" | "info";
 
 export interface GateTestIssue {
   severity: GateTestSeverity;
-  category: "console" | "a11y" | "layout" | "interaction" | "link" | "runtime";
+  category: "console" | "a11y" | "layout" | "interaction" | "link" | "runtime" | "syntax" | "security" | "performance" | "seo";
   message: string;
   selector?: string;
+  file?: string;
+  line?: number;
   autoFixPrompt?: string;
+}
+
+export interface GateTestModule {
+  name: string;
+  status: "passed" | "failed" | "warning";
+  checks: number;
+  issues: number;
+  details?: string[];
+}
+
+export interface GateTestApiResponse {
+  status: "complete" | "error";
+  repo_url?: string;
+  tier?: string;
+  totalModules: number;
+  totalIssues: number;
+  duration: number;
+  modules: GateTestModule[];
 }
 
 export interface GateTestResult {
   passed: boolean;
   issues: GateTestIssue[];
+  totalModules: number;
+  totalChecks: number;
   runMs: number;
   source: "builtin" | "gate-test-api";
 }
@@ -87,10 +109,6 @@ export async function runProbes(ctx: GateTestContext): Promise<GateTestResult> {
   if (isGateTestApiEnabled()) {
     try {
       const snapshot = await snapshotIframe(ctx.iframe);
-      // 3 attempts with exponential backoff + jitter. Matches the LLM retry
-      // profile — transient TLS/network faults (EPROTO, SSL alert 80, socket
-      // hang-up, DNS blip) recover on retry and were previously killing the
-      // gate loop on a single hiccup.
       const res = await fetchWithRetry(
         process.env.NEXT_PUBLIC_GATE_TEST_API_URL!,
         {
@@ -100,19 +118,25 @@ export async function runProbes(ctx: GateTestContext): Promise<GateTestResult> {
             "x-api-key": process.env.NEXT_PUBLIC_GATE_TEST_API_KEY!,
           },
           body: JSON.stringify({
+            repo_url: typeof window !== "undefined" ? window.location.origin : "",
+            tier: "full",
             round: ctx.round,
             snapshot,
-            files: Object.keys(ctx.files),
+            files: ctx.files,
           }),
-          timeoutMs: 15_000,
+          timeoutMs: 30_000,
           attempts: 3,
         }
       );
       if (res.ok) {
-        const data = (await res.json()) as { issues: GateTestIssue[] };
+        const data = (await res.json()) as GateTestApiResponse;
+        const issues = parseModuleIssues(data.modules);
+        const totalChecks = data.modules.reduce((sum, m) => sum + m.checks, 0);
         return {
-          passed: data.issues.length === 0,
-          issues: data.issues,
+          passed: data.totalIssues === 0,
+          issues,
+          totalModules: data.totalModules,
+          totalChecks,
           runMs: performance.now() - start,
           source: "gate-test-api",
         };
@@ -204,9 +228,60 @@ export async function runProbes(ctx: GateTestContext): Promise<GateTestResult> {
   return {
     passed: issues.filter((i) => i.severity === "critical").length === 0,
     issues,
+    totalModules: 5,
+    totalChecks: issues.length > 0 ? 5 : 5,
     runMs: performance.now() - start,
     source: "builtin",
   };
+}
+
+/**
+ * Convert Gate Test module-based response into actionable GateTestIssues.
+ * Each module detail string (e.g. "src/auth.ts:14: eval() usage") becomes
+ * a typed issue with file, line, severity, and an auto-fix prompt.
+ */
+function parseModuleIssues(modules: GateTestModule[]): GateTestIssue[] {
+  const issues: GateTestIssue[] = [];
+
+  const severityMap: Record<string, GateTestSeverity> = {
+    security: "critical",
+    syntax: "critical",
+    a11y: "warning",
+    accessibility: "warning",
+    performance: "warning",
+    seo: "info",
+    style: "info",
+  };
+
+  const autoFixMap: Record<string, string> = {
+    security: "Fix the security vulnerability described above. Never use eval(), sanitize all inputs, escape outputs.",
+    syntax: "Fix the syntax error so the code compiles and runs correctly.",
+    a11y: "Fix the accessibility issue — add missing alt text, labels, ARIA attributes, or correct heading hierarchy.",
+    accessibility: "Fix the accessibility issue — add missing alt text, labels, ARIA attributes, or correct heading hierarchy.",
+    performance: "Optimize the performance issue — reduce bundle size, lazy load, or fix the render bottleneck.",
+    seo: "Fix the SEO issue — add missing meta tags, structured data, or semantic HTML.",
+  };
+
+  for (const mod of modules) {
+    if (mod.status === "passed" || !mod.details || mod.details.length === 0) continue;
+
+    const category = mod.name.toLowerCase() as GateTestIssue["category"];
+    const severity = severityMap[mod.name.toLowerCase()] ?? "warning";
+
+    for (const detail of mod.details) {
+      const fileMatch = detail.match(/^([^:]+):(\d+):\s*(.+)$/);
+      issues.push({
+        severity,
+        category,
+        message: fileMatch ? fileMatch[3] : detail,
+        file: fileMatch ? fileMatch[1] : undefined,
+        line: fileMatch ? parseInt(fileMatch[2], 10) : undefined,
+        autoFixPrompt: autoFixMap[mod.name.toLowerCase()] ?? `Fix this ${mod.name} issue: ${detail}`,
+      });
+    }
+  }
+
+  return issues;
 }
 
 /**
