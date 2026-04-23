@@ -133,8 +133,8 @@ export default function ABTestingPage() {
   const avgImprovement = DEMO_EXPERIMENTS.filter(e => e.improvement).reduce((a, e) => a + (e.improvement || 0), 0) / DEMO_EXPERIMENTS.filter(e => e.improvement).length;
 
   return (
-    <div className="min-h-screen bg-[#0a0a12] text-white">
-      <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-md sticky top-0 z-50">
+    <div className="min-h-screen text-white">
+      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>

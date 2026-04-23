@@ -118,7 +118,7 @@ function scanFile(filePath) {
 
   // Check for blank/empty pages
   if (isPage) {
-    const hasReturn = content.includes("return (") || content.includes("return(");
+    const hasReturn = content.includes("return (") || content.includes("return(") || content.includes("return <") || content.includes("redirect(");
     if (!hasReturn) {
       issue("error", relPath, 0, "Page has no return statement — will render blank");
     }

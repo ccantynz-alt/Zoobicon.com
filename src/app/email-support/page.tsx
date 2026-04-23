@@ -977,7 +977,7 @@ export default function EmailSupportDashboard() {
 
   if (!authChecked) {
     return (
-      <div className="min-h-screen bg-[#09090f] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-stone-500 animate-spin" />
       </div>
     );
@@ -986,7 +986,7 @@ export default function EmailSupportDashboard() {
   const visibleTickets = filteredTickets();
 
   return (
-    <div className="relative min-h-screen bg-[#09090f] text-white flex flex-col">
+    <div className="relative min-h-screen text-white flex flex-col">
       <BackgroundEffects preset="technical" />
       {/* Top Nav */}
       <nav className="h-14 border-b border-white/[0.08] bg-gray-900/80 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 z-50">

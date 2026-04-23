@@ -109,8 +109,8 @@ export default function RoadmapPage() {
   const columns: KanbanColumn[] = ['backlog', 'planned', 'in-progress', 'beta', 'shipped'];
 
   return (
-    <div className="min-h-screen bg-[#0a0a12] text-white">
-      <header className="border-b border-white/10 bg-[#0a0a12]/80 backdrop-blur-md sticky top-0 z-50">
+    <div className="min-h-screen text-white">
+      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
@@ -170,7 +170,7 @@ export default function RoadmapPage() {
                     {colItems.map(item => {
                       const voted = votedIds.has(item.id);
                       return (
-                        <div key={item.id} className="p-3 rounded-lg bg-[#0a0a12] border border-white/10 hover:border-white/20 transition-colors">
+                        <div key={item.id} className="p-3 rounded-lg border border-white/10 hover:border-white/20 transition-colors">
                           <h4 className="text-sm font-medium mb-1">{item.title}</h4>
                           <p className="text-xs text-gray-400 mb-2 line-clamp-2">{item.description}</p>
                           <div className="flex items-center gap-2 flex-wrap mb-2">
@@ -212,7 +212,7 @@ export default function RoadmapPage() {
                       const voted = votedIds.has(item.id);
                       return (
                         <div key={item.id} className="relative">
-                          <div className="absolute -left-[25px] top-3 w-4 h-4 rounded-full border-2 border-stone-500 bg-[#0a0a12]" />
+                          <div className="absolute -left-[25px] top-3 w-4 h-4 rounded-full border-2 border-stone-500" />
                           <div className="p-4 rounded-xl border border-white/10 bg-white/5 hover:border-white/20 transition-colors">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                               <h4 className="font-medium text-sm">{item.title}</h4>

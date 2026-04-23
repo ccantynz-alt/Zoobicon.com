@@ -441,7 +441,7 @@ export default function AgencyDashboard() {
             value={newAgencyName}
             onChange={(e) => setNewAgencyName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && createAgency()}
-            className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 mb-4 focus:outline-none focus:border-stone-500"
+            className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 mb-4 focus:outline-none focus:border-stone-500"
           />
           <button
             onClick={createAgency}
@@ -589,28 +589,28 @@ export default function AgencyDashboard() {
               placeholder="Client name *"
               value={newClient.name}
               onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
+              className="bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
             <input
               type="email"
               placeholder="Email"
               value={newClient.email}
               onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
+              className="bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
             <input
               type="text"
               placeholder="Company"
               value={newClient.company}
               onChange={(e) => setNewClient({ ...newClient, company: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
+              className="bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
             <input
               type="text"
               placeholder="Notes"
               value={newClient.notes}
               onChange={(e) => setNewClient({ ...newClient, notes: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
+              className="bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
           </div>
           <button
@@ -683,7 +683,7 @@ export default function AgencyDashboard() {
                         .map((site) => (
                           <div
                             key={site.id}
-                            className="flex items-center gap-3 bg-[#0a0a12] rounded-lg p-3"
+                            className="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"
                           >
                             <Globe size={14} className="text-stone-400" />
                             <span className="text-white/80 text-sm flex-1">{site.name}</span>
@@ -862,19 +862,19 @@ export default function AgencyDashboard() {
               placeholder="Email *"
               value={newMember.email}
               onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
+              className="bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
             <input
               type="text"
               placeholder="Name"
               value={newMember.name}
               onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
+              className="bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
             <select
               value={newMember.role}
               onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
-              className="bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
+              className="bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
             >
               <option value="admin">Admin</option>
               <option value="designer">Designer</option>
@@ -947,7 +947,7 @@ export default function AgencyDashboard() {
           onChange={(e) => setBulkInput(e.target.value)}
           placeholder={`Acme Coffee, Coffee Shop, Artisan coffee shop in downtown Portland\nBright Dental, Dentistry, Family dental practice with modern equipment\nPeak Fitness, Gym, 24/7 fitness center with personal training`}
           rows={8}
-          className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 text-sm font-mono focus:outline-none focus:border-stone-500 resize-y"
+          className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 text-sm font-mono focus:outline-none focus:border-stone-500 resize-y"
         />
         <div className="flex items-center justify-between mt-4">
           <span className="text-white/50 text-sm">
@@ -1032,7 +1032,7 @@ export default function AgencyDashboard() {
               value={brandConfig.agencyName}
               onChange={(e) => setBrandConfig({ ...brandConfig, agencyName: e.target.value })}
               placeholder="Your Agency Name"
-              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
+              className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
           </div>
           <div>
@@ -1042,7 +1042,7 @@ export default function AgencyDashboard() {
               value={brandConfig.logoUrl}
               onChange={(e) => setBrandConfig({ ...brandConfig, logoUrl: e.target.value })}
               placeholder="https://example.com/logo.png"
-              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
+              className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white placeholder-white/50 text-sm focus:outline-none focus:border-stone-500"
             />
           </div>
           <div className="grid grid-cols-3 gap-4">
@@ -1059,7 +1059,7 @@ export default function AgencyDashboard() {
                   type="text"
                   value={brandConfig.primaryColor}
                   onChange={(e) => setBrandConfig({ ...brandConfig, primaryColor: e.target.value })}
-                  className="flex-1 bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
+                  className="flex-1 bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
                 />
               </div>
             </div>
@@ -1076,7 +1076,7 @@ export default function AgencyDashboard() {
                   type="text"
                   value={brandConfig.secondaryColor}
                   onChange={(e) => setBrandConfig({ ...brandConfig, secondaryColor: e.target.value })}
-                  className="flex-1 bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
+                  className="flex-1 bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
                 />
               </div>
             </div>
@@ -1093,7 +1093,7 @@ export default function AgencyDashboard() {
                   type="text"
                   value={brandConfig.accentColor}
                   onChange={(e) => setBrandConfig({ ...brandConfig, accentColor: e.target.value })}
-                  className="flex-1 bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
+                  className="flex-1 bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
                 />
               </div>
             </div>
@@ -1170,7 +1170,7 @@ export default function AgencyDashboard() {
               type="text"
               value={activeAgency?.name || ""}
               readOnly
-              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white/60 text-sm"
+              className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white/60 text-sm"
             />
           </div>
           <div>
@@ -1179,7 +1179,7 @@ export default function AgencyDashboard() {
               type="text"
               value={activeAgency?.slug || ""}
               readOnly
-              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white/60 text-sm"
+              className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white/60 text-sm"
             />
           </div>
           <div>
@@ -1239,7 +1239,7 @@ export default function AgencyDashboard() {
                 const id = e.target.value;
                 if (id) loadAgencyDetails(id);
               }}
-              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
+              className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-stone-500"
             >
               {agencies.map((a) => (
                 <option key={a.id} value={a.id}>
@@ -1300,7 +1300,7 @@ export default function AgencyDashboard() {
               value={newAgencyName}
               onChange={(e) => setNewAgencyName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && createAgency()}
-              className="w-full bg-[#0a0a12] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 mb-4 focus:outline-none focus:border-stone-500"
+              className="w-full bg-white/[0.03] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/50 mb-4 focus:outline-none focus:border-stone-500"
               autoFocus
             />
             <div className="flex justify-end gap-3">
