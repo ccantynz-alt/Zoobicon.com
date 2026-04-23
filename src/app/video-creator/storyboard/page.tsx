@@ -300,7 +300,7 @@ export default function VideoCreatorDashboard() {
       (window as unknown as Record<string, unknown>).SpeechRecognition ||
       (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
     if (!SpeechRecognitionCtor) {
-      setError("Voice input is not supported in this browser. Try Globe2 or Edge.");
+      setError("Voice input is not supported in this browser. Try Chrome or Edge.");
       return;
     }
 

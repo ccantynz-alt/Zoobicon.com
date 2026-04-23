@@ -107,7 +107,7 @@ export default function InstantOnboardingPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#0a0b14] text-white overflow-hidden">
+    <div className="relative min-h-screen bg-transparent text-white overflow-hidden">
       <BackgroundEffects />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-16 sm:py-24">

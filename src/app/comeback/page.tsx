@@ -155,7 +155,7 @@ export default function ComebackDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0b14] text-white">
+    <div className="min-h-screen bg-transparent text-white">
       <div className="mx-auto max-w-7xl px-6 py-12">
         <motion.header
           initial={{ opacity: 0, y: -12 }}

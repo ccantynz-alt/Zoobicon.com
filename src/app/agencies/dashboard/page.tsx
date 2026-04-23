@@ -420,7 +420,7 @@ export default function AgencyDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a12] flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <Loader2 className="animate-spin text-stone-500" size={32} />
       </div>
     );
@@ -428,7 +428,7 @@ export default function AgencyDashboard() {
 
   if (!activeAgency && agencies.length === 0) {
     return (
-      <div className="min-h-screen bg-[#0a0a12] flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="bg-[#0f2148] border border-white/10 rounded-xl p-8 max-w-md w-full text-center">
           <Building2 className="text-stone-500 mx-auto mb-4" size={48} />
           <h1 className="text-2xl font-bold text-white mb-2">Create Your Agency</h1>
@@ -1224,7 +1224,7 @@ export default function AgencyDashboard() {
   // ─── Main layout ────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#0a0a12] flex">
+    <div className="min-h-screen bg-transparent flex">
       {/* Sidebar */}
       <aside className="w-64 bg-[#12121a] border-r border-white/10 flex flex-col shrink-0">
         <div className="p-5 border-b border-white/10">

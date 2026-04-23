@@ -121,7 +121,7 @@ const TESTIMONIALS = [
 
 export default function HomePage() {
   return (
-    <div className="bg-[#0a0a14] text-white selection:bg-indigo-500/30 selection:text-white">
+    <div className="text-white selection:bg-indigo-500/30 selection:text-white">
       <div className="pt-[72px]">
         <HeroBuilder />
 
@@ -145,8 +145,8 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050508] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050508] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#0b1530] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#0b1530] to-transparent" />
           </div>
         </section>
 
@@ -464,8 +464,8 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#050508] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#050508] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#0b1530] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#0b1530] to-transparent" />
           </div>
         </section>
 

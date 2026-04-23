@@ -461,7 +461,7 @@ export default function DashboardPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {liveSites.map((site) => (
                   <div key={site.id} className="gradient-border card-hover rounded-xl overflow-hidden group">
-                    <div className="h-40 bg-[#0a0c12] border-b border-white/10 relative overflow-hidden">
+                    <div className="h-40 bg-white/[0.02] border-b border-white/10 relative overflow-hidden">
                       <iframe
                         src={`/api/hosting/serve/${site.slug}`}
                         title={site.name}
@@ -573,7 +573,7 @@ export default function DashboardPage() {
             {filteredProjects.map((project) => (
               <div key={project.id} className="gradient-border card-hover rounded-xl overflow-hidden group">
                 {/* Thumbnail */}
-                <div className="h-40 bg-[#0a0c12] border-b border-white/10 relative overflow-hidden">
+                <div className="h-40 bg-white/[0.02] border-b border-white/10 relative overflow-hidden">
                   <iframe
                     srcDoc={project.code}
                     title={project.name}
@@ -620,7 +620,7 @@ export default function DashboardPage() {
             {filteredProjects.map((project) => (
               <div key={project.id} className="gradient-border card-hover p-4 rounded-xl flex items-center gap-4 group">
                 {/* Mini thumbnail */}
-                <div className="w-20 h-14 bg-[#0a0c12] rounded-lg overflow-hidden flex-shrink-0 border border-white/[0.15]">
+                <div className="w-20 h-14 bg-white/[0.02] rounded-lg overflow-hidden flex-shrink-0 border border-white/[0.15]">
                   <iframe
                     srcDoc={project.code}
                     title={project.name}

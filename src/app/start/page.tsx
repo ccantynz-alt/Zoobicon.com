@@ -164,7 +164,7 @@ export default function StartPage(): JSX.Element {
   }, [payload, businessName]);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#07070b] text-white">
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/2 top-0 h-[640px] w-[640px] -translate-x-1/2 rounded-full bg-stone-500/20 blur-3xl" />
         <div className="absolute right-0 top-40 h-[420px] w-[420px] rounded-full bg-stone-400/15 blur-3xl" />
