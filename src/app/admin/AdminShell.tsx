@@ -128,7 +128,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-slate-200/80">
+      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-slate-200">
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center shadow-lg shadow-stone-500/25 group-hover:shadow-stone-500/40 transition-shadow">
             <Zap className="w-4 h-4 text-white" />
@@ -172,7 +172,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       </nav>
 
       {/* User / Logout */}
-      <div className="border-t border-slate-200/80 px-3 py-3">
+      <div className="border-t border-slate-200 px-3 py-3">
         <div className="flex items-center gap-2.5 px-2.5 py-2 mb-1">
           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-stone-400 to-stone-500 flex items-center justify-center text-xs font-bold text-white shadow-sm">
             {userName ? userName.charAt(0).toUpperCase() : "A"}
@@ -194,23 +194,23 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-stone-50/30 text-slate-800 flex">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex relative z-10">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-60 lg:fixed lg:inset-y-0 bg-white/80 backdrop-blur-xl border-r border-slate-200/80 z-40 shadow-xl shadow-slate-200/50">
+      <aside className="hidden lg:flex lg:flex-col lg:w-60 lg:fixed lg:inset-y-0 bg-white border-r border-slate-200 z-40 shadow-sm">
         {sidebarContent}
       </aside>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-slate-900/30 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Mobile sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 w-60 bg-white/95 backdrop-blur-xl border-r border-slate-200 z-50 flex flex-col transform transition-transform duration-200 ease-in-out lg:hidden shadow-2xl ${
+        className={`fixed inset-y-0 left-0 w-60 bg-white border-r border-slate-200 z-50 flex flex-col transform transition-transform duration-200 ease-in-out lg:hidden shadow-2xl ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -226,7 +226,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       {/* Main content */}
       <div className="flex-1 lg:pl-60 min-h-screen flex flex-col">
         {/* Mobile top bar */}
-        <header className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl lg:hidden shadow-sm">
+        <header className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 border-b border-slate-200 bg-white lg:hidden shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-lg text-slate-600 hover:text-slate-700 hover:bg-slate-100 transition-colors"
