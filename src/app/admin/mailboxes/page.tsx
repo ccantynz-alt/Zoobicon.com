@@ -286,7 +286,7 @@ export default function AdminMailboxesPage() {
           </div>
 
           <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-600" />
             <input
               type="text"
               placeholder="Search by address or name..."
@@ -306,7 +306,7 @@ export default function AdminMailboxesPage() {
 
         {/* Empty state */}
         {!loading && filtered.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+          <div className="flex flex-col items-center justify-center py-20 text-slate-600">
             <Mail className="h-10 w-10 mb-3" />
             <p className="text-sm">No mailboxes found</p>
           </div>
@@ -333,19 +333,19 @@ export default function AdminMailboxesPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-slate-800">{m.address}</p>
-                        <p className="truncate text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                        <p className="truncate text-xs text-slate-600 flex items-center gap-1 mt-0.5">
                           <User className="h-3 w-3" />
                           {m.displayName}
                         </p>
                       </div>
-                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${st.bg} ${st.text}`}>
+                      <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${st.bg} ${st.text}`}>
                         {st.label}
                       </span>
                     </div>
 
                     {/* Storage bar */}
                     <div>
-                      <div className="mb-1 flex items-center justify-between text-[11px] text-slate-400">
+                      <div className="mb-1 flex items-center justify-between text-xs text-slate-600">
                         <span className="flex items-center gap-1"><HardDrive className="h-3 w-3" /> Storage</span>
                         <span>{m.storageUsedMb} / {m.storageLimitMb} MB</span>
                       </div>
@@ -360,7 +360,7 @@ export default function AdminMailboxesPage() {
                     </div>
 
                     {/* Meta */}
-                    <div className="space-y-1 text-[11px] text-slate-400">
+                    <div className="space-y-1 text-xs text-slate-600">
                       {m.forwardTo && (
                         <p className="flex items-center gap-1 truncate">
                           <ArrowRight className="h-3 w-3 text-indigo-500" />
@@ -434,7 +434,7 @@ export default function AdminMailboxesPage() {
             >
               <div className="mb-5 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-slate-800">Create Mailbox</h2>
-                <button onClick={() => setCreateOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                <button onClick={() => setCreateOpen(false)} className="text-slate-600 hover:text-slate-600 transition-colors">
                   <X className="h-5 w-5" />
                 </button>
               </div>
@@ -451,7 +451,7 @@ export default function AdminMailboxesPage() {
                       onChange={(e) => setCreateForm((f) => ({ ...f, localPart: e.target.value.replace(/[^a-z0-9._-]/gi, "").toLowerCase() }))}
                       className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-indigo-500"
                     />
-                    <span className="flex items-center text-sm text-slate-400">@</span>
+                    <span className="flex items-center text-sm text-slate-600">@</span>
                     <select
                       value={createForm.domain}
                       onChange={(e) => setCreateForm((f) => ({ ...f, domain: e.target.value }))}
@@ -492,7 +492,7 @@ export default function AdminMailboxesPage() {
               <div className="mt-6 flex justify-end gap-2">
                 <button
                   onClick={() => setCreateOpen(false)}
-                  className="rounded-lg px-4 py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors"
+                  className="rounded-lg px-4 py-2 text-sm text-slate-600 hover:text-slate-600 transition-colors"
                 >
                   Cancel
                 </button>
@@ -535,9 +535,9 @@ export default function AdminMailboxesPage() {
               <div className="mb-5 flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-800">Edit Mailbox</h2>
-                  <p className="text-xs text-slate-400 mt-0.5">{editTarget.address}</p>
+                  <p className="text-xs text-slate-600 mt-0.5">{editTarget.address}</p>
                 </div>
-                <button onClick={() => setEditTarget(null)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                <button onClick={() => setEditTarget(null)} className="text-slate-600 hover:text-slate-600 transition-colors">
                   <X className="h-5 w-5" />
                 </button>
               </div>
@@ -592,7 +592,7 @@ export default function AdminMailboxesPage() {
               <div className="mt-6 flex justify-end gap-2">
                 <button
                   onClick={() => setEditTarget(null)}
-                  className="rounded-lg px-4 py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors"
+                  className="rounded-lg px-4 py-2 text-sm text-slate-600 hover:text-slate-600 transition-colors"
                 >
                   Cancel
                 </button>
@@ -638,7 +638,7 @@ export default function AdminMailboxesPage() {
                 </div>
                 <div>
                   <h2 className="text-base font-semibold text-slate-800">Delete Mailbox</h2>
-                  <p className="text-xs text-slate-400">This action cannot be undone</p>
+                  <p className="text-xs text-slate-600">This action cannot be undone</p>
                 </div>
               </div>
 
@@ -651,7 +651,7 @@ export default function AdminMailboxesPage() {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setDeleteTarget(null)}
-                  className="rounded-lg px-4 py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors"
+                  className="rounded-lg px-4 py-2 text-sm text-slate-600 hover:text-slate-600 transition-colors"
                 >
                   Cancel
                 </button>

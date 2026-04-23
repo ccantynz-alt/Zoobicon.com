@@ -176,7 +176,7 @@ export default function KnowledgeBasePage() {
             </Link>
             <BookOpen className="w-6 h-6 text-indigo-500" />
             <h1 className="text-lg font-semibold text-slate-800">Knowledge Base</h1>
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-slate-700">
               {articles.length} articles
             </span>
           </div>
@@ -229,15 +229,15 @@ export default function KnowledgeBasePage() {
               >
                 <span className="capitalize">{cat.replace("-", " ")}</span>
                 {count > 0 && (
-                  <span className="text-xs text-slate-400">{count}</span>
+                  <span className="text-xs text-slate-600">{count}</span>
                 )}
               </button>
             );
           })}
 
           <div className="mt-6 pt-4 border-t border-slate-200">
-            <p className="px-3 text-xs text-slate-500 mb-2">How it works</p>
-            <p className="px-3 text-xs text-slate-400 leading-relaxed">
+            <p className="px-3 text-xs text-slate-700 mb-2">How it works</p>
+            <p className="px-3 text-xs text-slate-600 leading-relaxed">
               Articles you add here are automatically included as context when the AI
               drafts support responses. More articles = smarter AI replies.
             </p>
@@ -249,7 +249,7 @@ export default function KnowledgeBasePage() {
           {/* Search */}
           <div className="p-3 border-b border-slate-200">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
               <input
                 type="text"
                 placeholder="Search articles..."
@@ -312,7 +312,7 @@ export default function KnowledgeBasePage() {
                   <div>
                     <label className="block text-sm text-slate-600 mb-1">
                       Content{" "}
-                      <span className="text-slate-400">
+                      <span className="text-slate-600">
                         — this is what the AI reads when drafting replies
                       </span>
                     </label>
@@ -330,7 +330,7 @@ export default function KnowledgeBasePage() {
                   <div>
                     <label className="block text-sm text-slate-600 mb-1">
                       Keywords{" "}
-                      <span className="text-slate-400">— comma-separated, helps matching</span>
+                      <span className="text-slate-600">— comma-separated, helps matching</span>
                     </label>
                     <input
                       type="text"
@@ -370,10 +370,10 @@ export default function KnowledgeBasePage() {
                 <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
               </div>
             ) : articles.length === 0 ? (
-              <div className="text-center py-20 text-slate-400">
+              <div className="text-center py-20 text-slate-600">
                 <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-20" />
                 <p className="text-lg mb-2 text-slate-600">No articles yet</p>
-                <p className="text-sm text-slate-400 mb-6 max-w-md mx-auto">
+                <p className="text-sm text-slate-600 mb-6 max-w-md mx-auto">
                   Add articles to teach the AI how to respond to common support
                   questions. The more you add, the smarter the AI becomes.
                 </p>
@@ -410,16 +410,16 @@ export default function KnowledgeBasePage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-500 line-clamp-2">
+                        <p className="text-xs text-slate-700 line-clamp-2">
                           {article.content.substring(0, 200)}
                         </p>
                         {article.keywords && (article.keywords as string[]).length > 0 && (
                           <div className="flex items-center gap-1 mt-2">
-                            <Tag className="w-3 h-3 text-slate-400" />
+                            <Tag className="w-3 h-3 text-slate-600" />
                             {(article.keywords as string[]).slice(0, 5).map((kw) => (
                               <span
                                 key={kw}
-                                className="text-xs text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded"
+                                className="text-xs text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded"
                               >
                                 {kw}
                               </span>
@@ -433,7 +433,7 @@ export default function KnowledgeBasePage() {
                           className={`p-1.5 rounded transition-colors ${
                             article.is_active
                               ? "text-emerald-500 hover:bg-emerald-50"
-                              : "text-slate-400 hover:bg-slate-100"
+                              : "text-slate-600 hover:bg-slate-100"
                           }`}
                           title={article.is_active ? "Disable" : "Enable"}
                         >
@@ -441,13 +441,13 @@ export default function KnowledgeBasePage() {
                         </button>
                         <button
                           onClick={() => startEdit(article)}
-                          className="p-1.5 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                          className="p-1.5 rounded text-slate-600 hover:text-slate-700 hover:bg-slate-100 transition-colors"
                         >
                           <Edit3 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => deleteArticle(article.id)}
-                          className="p-1.5 rounded text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                          className="p-1.5 rounded text-slate-600 hover:text-red-500 hover:bg-red-50 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

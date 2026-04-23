@@ -77,7 +77,7 @@ export default function AdminDomainsPage() {
             <Globe className="w-6 h-6 text-stone-500" />
             Domain Management
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-700 mt-1">
             All registered domains across all customers
           </p>
         </div>
@@ -102,25 +102,25 @@ export default function AdminDomainsPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <div className="rounded-xl bg-white border border-slate-200 p-4">
           <div className="text-2xl font-bold text-slate-800">{domains.length}</div>
-          <div className="text-xs text-slate-500">Total Domains</div>
+          <div className="text-xs text-slate-700">Total Domains</div>
         </div>
         <div className="rounded-xl bg-white border border-slate-200 p-4">
           <div className="text-2xl font-bold text-stone-600">{active}</div>
-          <div className="text-xs text-slate-500">Active</div>
+          <div className="text-xs text-slate-700">Active</div>
         </div>
         <div className="rounded-xl bg-white border border-slate-200 p-4">
           <div className="text-2xl font-bold text-stone-600">{pending}</div>
-          <div className="text-xs text-slate-500">Pending</div>
+          <div className="text-xs text-slate-700">Pending</div>
         </div>
         <div className="rounded-xl bg-white border border-slate-200 p-4">
           <div className="text-2xl font-bold text-stone-600">{failed}</div>
-          <div className="text-xs text-slate-500">Failed</div>
+          <div className="text-xs text-slate-700">Failed</div>
         </div>
       </div>
 
       {/* Search */}
       <div className="relative mb-6">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
         <input
           type="text"
           value={filter}
@@ -147,7 +147,7 @@ export default function AdminDomainsPage() {
           <h2 className="text-lg font-semibold text-slate-600 mb-2">
             {domains.length === 0 ? "No domains registered yet" : "No domains match your search"}
           </h2>
-          <p className="text-sm text-slate-400 mb-6">
+          <p className="text-sm text-slate-600 mb-6">
             {domains.length === 0 ? "Domains purchased through the platform will appear here." : "Try a different search term."}
           </p>
           {domains.length === 0 && (
@@ -182,40 +182,40 @@ export default function AdminDomainsPage() {
                       {d.status === "active" ? (isExpired ? "Expired" : isExpiring ? `Expires ${days}d` : "Active") : d.status === "failed" ? "Failed" : "Pending"}
                     </span>
                   </div>
-                  <a href={`https://${d.domain}`} target="_blank" rel="noopener noreferrer" className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1">
+                  <a href={`https://${d.domain}`} target="_blank" rel="noopener noreferrer" className="text-xs text-slate-600 hover:text-slate-600 flex items-center gap-1">
                     Visit <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
                   <div>
-                    <span className="text-slate-400">Customer</span>
+                    <span className="text-slate-600">Customer</span>
                     <div className="font-medium text-slate-700 truncate">{d.user_email}</div>
                   </div>
                   <div>
-                    <span className="text-slate-400">Registered</span>
+                    <span className="text-slate-600">Registered</span>
                     <div className="text-slate-600">{d.registered_at ? new Date(d.registered_at).toLocaleDateString() : "—"}</div>
                   </div>
                   <div>
-                    <span className="text-slate-400">Expires</span>
+                    <span className="text-slate-600">Expires</span>
                     <div className="text-slate-600">{d.expires_at ? new Date(d.expires_at).toLocaleDateString() : "—"}</div>
                   </div>
                   <div>
-                    <span className="text-slate-400">Privacy</span>
+                    <span className="text-slate-600">Privacy</span>
                     <div className="flex items-center gap-1">
-                      {d.privacy_protection ? <><Shield className="w-3 h-3 text-stone-500" /> <span className="text-stone-600">On</span></> : <span className="text-slate-500">Off</span>}
+                      {d.privacy_protection ? <><Shield className="w-3 h-3 text-stone-500" /> <span className="text-stone-600">On</span></> : <span className="text-slate-700">Off</span>}
                     </div>
                   </div>
                   <div>
-                    <span className="text-slate-400">Auto-renew</span>
+                    <span className="text-slate-600">Auto-renew</span>
                     <div className="flex items-center gap-1">
-                      {d.auto_renew ? <><Clock className="w-3 h-3 text-stone-500" /> <span className="text-stone-600">On</span></> : <span className="text-slate-500">Off</span>}
+                      {d.auto_renew ? <><Clock className="w-3 h-3 text-stone-500" /> <span className="text-stone-600">On</span></> : <span className="text-slate-700">Off</span>}
                     </div>
                   </div>
                 </div>
 
                 {d.cloudflare_zone_id && (
-                  <div className="mt-2 text-xs text-slate-400">
+                  <div className="mt-2 text-xs text-slate-600">
                     Cloudflare Zone: {d.cloudflare_zone_id}
                   </div>
                 )}

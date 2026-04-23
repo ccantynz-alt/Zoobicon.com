@@ -212,7 +212,7 @@ export default function MarketIntelPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-800">Market Intelligence</h1>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-700">
                 Product features, pricing, and positioning tracker
               </p>
             </div>
@@ -231,14 +231,14 @@ export default function MarketIntelPage() {
                 <option value="video-generator">Video Generators</option>
                 <option value="code-tool">Code Tools</option>
               </select>
-              <Filter className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Filter className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-600" />
             </div>
 
             {/* Refresh */}
             <button
               onClick={loadData}
               disabled={isLoading}
-              className="rounded-lg border border-slate-200 bg-white p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors disabled:opacity-50"
+              className="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50 hover:text-slate-600 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
             </button>
@@ -273,7 +273,7 @@ export default function MarketIntelPage() {
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === tab.id
                   ? "border-indigo-500 text-slate-800"
-                  : "border-transparent text-slate-400 hover:text-slate-600"
+                  : "border-transparent text-slate-600 hover:text-slate-600"
               }`}
             >
               <tab.icon className="h-4 w-4" />
@@ -303,7 +303,7 @@ export default function MarketIntelPage() {
                   <p className="text-sm font-medium text-emerald-700">
                     Crawl Complete in {((crawlResult.duration || 0) / 1000).toFixed(1)}s
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-700">
                     {crawlResult.tasksCompleted}/{crawlResult.tasksTotal} competitors crawled
                     {crawlResult.tasksFailed > 0 && ` (${crawlResult.tasksFailed} failed)`}
                   </p>
@@ -397,7 +397,7 @@ export default function MarketIntelPage() {
                   <div className="mb-4 flex items-center gap-2">
                     <CatIcon className={`h-5 w-5 ${meta.color}`} />
                     <h2 className="text-lg font-semibold text-slate-800">{meta.label}</h2>
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
                       {items.length}
                     </span>
                   </div>
@@ -427,7 +427,7 @@ export default function MarketIntelPage() {
               <div className="flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white py-20">
                 <Radar className="h-12 w-12 text-slate-300 mb-4" />
                 <p className="text-lg font-medium text-slate-600">No data yet</p>
-                <p className="mt-1 text-sm text-slate-400">
+                <p className="mt-1 text-sm text-slate-600">
                   Click &quot;Crawl Now&quot; to start monitoring competitors
                 </p>
               </div>
@@ -439,7 +439,7 @@ export default function MarketIntelPage() {
         {!isLoading && activeTab === "changes" && (
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-slate-800">Change Log</h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-700">
               Timeline of detected changes across all monitored competitors.
             </p>
 
@@ -447,7 +447,7 @@ export default function MarketIntelPage() {
               <div className="flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white py-16">
                 <TrendingUp className="h-10 w-10 text-slate-300 mb-3" />
                 <p className="text-slate-600">No changes detected yet</p>
-                <p className="mt-1 text-sm text-slate-400">
+                <p className="mt-1 text-sm text-slate-600">
                   Changes appear after at least two crawl snapshots exist
                 </p>
               </div>
@@ -468,7 +468,7 @@ export default function MarketIntelPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-left text-slate-500">
+                  <tr className="border-b border-slate-200 text-left text-slate-700">
                     <th className="pb-3 pr-4 font-medium">Competitor</th>
                     <th className="pb-3 pr-4 font-medium">Category</th>
                     <th className="pb-3 pr-4 font-medium">Title</th>
@@ -514,13 +514,13 @@ export default function MarketIntelPage() {
                             <span className="max-w-[180px] truncate">{snap.pricing}</span>
                           </span>
                         ) : (
-                          <span className="text-slate-400">-</span>
+                          <span className="text-slate-600">-</span>
                         )}
                       </td>
                       <td className="py-3 pr-4">
                         <span className="text-slate-600">{snap.features?.length || 0} detected</span>
                       </td>
-                      <td className="py-3 text-slate-400">
+                      <td className="py-3 text-slate-600">
                         {snap.crawled_at ? timeAgo(snap.crawled_at) : "-"}
                       </td>
                     </tr>
@@ -570,8 +570,8 @@ function StatCard({
       className={`rounded-xl border bg-gradient-to-br p-5 ${colorMap[color] || colorMap.violet}`}
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500">{label}</p>
-        <Icon className={`h-5 w-5 ${iconColor[color] || "text-slate-400"}`} />
+        <p className="text-sm text-slate-700">{label}</p>
+        <Icon className={`h-5 w-5 ${iconColor[color] || "text-slate-600"}`} />
       </div>
       <p className={`mt-2 ${isText ? "text-lg" : "text-3xl"} font-bold text-slate-800`}>{value}</p>
     </div>
@@ -599,11 +599,11 @@ function CompetitorCard({
           <div
             className={`flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100`}
           >
-            {meta ? <meta.icon className={`h-4 w-4 ${meta.color}`} /> : <Globe className="h-4 w-4 text-slate-400" />}
+            {meta ? <meta.icon className={`h-4 w-4 ${meta.color}`} /> : <Globe className="h-4 w-4 text-slate-600" />}
           </div>
           <div>
             <p className="font-medium text-slate-800">{snapshot.competitor_name}</p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-600">
               {snapshot.crawled_at ? timeAgo(snapshot.crawled_at) : "Not crawled"}
             </p>
           </div>
@@ -615,9 +615,9 @@ function CompetitorCard({
             </span>
           )}
           {expanded ? (
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="h-4 w-4 text-slate-600" />
           ) : (
-            <ChevronRight className="h-4 w-4 text-slate-400" />
+            <ChevronRight className="h-4 w-4 text-slate-600" />
           )}
         </div>
       </button>
@@ -626,13 +626,13 @@ function CompetitorCard({
         <div className="border-t border-slate-200 p-4 space-y-3">
           {snapshot.title && (
             <div>
-              <p className="text-xs font-medium text-slate-400 uppercase">Page Title</p>
+              <p className="text-xs font-medium text-slate-600 uppercase">Page Title</p>
               <p className="mt-0.5 text-sm text-slate-700">{snapshot.title}</p>
             </div>
           )}
           {snapshot.description && (
             <div>
-              <p className="text-xs font-medium text-slate-400 uppercase">Description</p>
+              <p className="text-xs font-medium text-slate-600 uppercase">Description</p>
               <p className="mt-0.5 text-sm text-slate-600">
                 {snapshot.description.slice(0, 200)}
                 {snapshot.description.length > 200 ? "..." : ""}
@@ -641,7 +641,7 @@ function CompetitorCard({
           )}
           {snapshot.pricing && (
             <div>
-              <p className="text-xs font-medium text-slate-400 uppercase">Pricing Detected</p>
+              <p className="text-xs font-medium text-slate-600 uppercase">Pricing Detected</p>
               <p className="mt-0.5 flex items-center gap-1 text-sm text-emerald-600">
                 <DollarSign className="h-3 w-3" />
                 {snapshot.pricing}
@@ -650,7 +650,7 @@ function CompetitorCard({
           )}
           {snapshot.features && snapshot.features.length > 0 && (
             <div>
-              <p className="text-xs font-medium text-slate-400 uppercase">Features Detected</p>
+              <p className="text-xs font-medium text-slate-600 uppercase">Features Detected</p>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {snapshot.features.map((f) => (
                   <span
@@ -694,7 +694,7 @@ function ChangeCard({ change }: { change: Change }) {
           </div>
           <div>
             <p className="font-medium text-slate-800">{change.competitor_name}</p>
-            <p className="text-xs text-slate-400">{timeAgo(change.crawled_at)}</p>
+            <p className="text-xs text-slate-600">{timeAgo(change.crawled_at)}</p>
           </div>
         </div>
         <span
@@ -713,8 +713,8 @@ function ChangeCard({ change }: { change: Change }) {
       <div className="mt-3 space-y-2">
         {titleChanged && (
           <div className="rounded-md bg-slate-50 p-2 text-xs">
-            <span className="font-medium text-slate-500">Title:</span>{" "}
-            <span className="line-through text-slate-400">{change.prev_title}</span>
+            <span className="font-medium text-slate-700">Title:</span>{" "}
+            <span className="line-through text-slate-600">{change.prev_title}</span>
             {" -> "}
             <span className="text-slate-700">{change.title}</span>
           </div>

@@ -164,7 +164,7 @@ function SectionHeader({
       </div>
       <div>
         <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
-        <p className="text-sm text-slate-400 mt-0.5">{subtitle}</p>
+        <p className="text-sm text-slate-600 mt-0.5">{subtitle}</p>
       </div>
     </div>
   );
@@ -216,7 +216,7 @@ function ApiKeyRow({
           <StatusDot set={isSet} />
           <span className="text-sm font-medium text-slate-700">{config.label}</span>
           {config.required && (
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-amber-600 bg-amber-50 border border-amber-200/60 rounded px-1.5 py-0.5">
+            <span className="text-xs uppercase tracking-wider font-semibold text-amber-600 bg-amber-50 border border-amber-200/60 rounded px-1.5 py-0.5">
               Required
             </span>
           )}
@@ -226,18 +226,18 @@ function ApiKeyRow({
             </span>
           )}
         </div>
-        <code className="text-[11px] text-slate-400 font-mono">{config.envVar}</code>
+        <code className="text-xs text-slate-600 font-mono">{config.envVar}</code>
       </div>
-      <p className="text-xs text-slate-400 mb-3">{config.description}</p>
+      <p className="text-xs text-slate-600 mb-3">{config.description}</p>
 
       {isSet && !editing ? (
         <div className="flex items-center gap-2">
-          <div className="flex-1 bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-2 font-mono text-sm text-slate-500 tracking-widest">
+          <div className="flex-1 bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-2 font-mono text-sm text-slate-700 tracking-widest">
             {visible ? value : "●●●●●●●●●●●●"}
           </div>
           <button
             onClick={() => setVisible(!visible)}
-            className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-lg text-slate-600 hover:text-slate-600 hover:bg-slate-100 transition-colors"
             title={visible ? "Hide" : "Show"}
           >
             {visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -278,7 +278,7 @@ function ApiKeyRow({
           />
           <button
             onClick={() => setVisible(!visible)}
-            className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-lg text-slate-600 hover:text-slate-600 hover:bg-slate-100 transition-colors"
           >
             {visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -296,7 +296,7 @@ function ApiKeyRow({
                 setEditing(false);
                 setDraft("");
               }}
-              className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              className="p-2 rounded-lg text-slate-600 hover:text-slate-600 hover:bg-slate-100 transition-colors"
               title="Cancel"
             >
               <X className="w-4 h-4" />
@@ -411,7 +411,7 @@ export default function AdminSettingsPage() {
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Settings</h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-slate-600 mt-1">
           Manage API keys, AI memory, and review build history.
         </p>
       </div>
@@ -457,7 +457,7 @@ export default function AdminSettingsPage() {
           subtitle="Persistent AI context injected into every interaction."
         />
 
-        <p className="text-xs text-slate-400 mb-5 leading-relaxed">
+        <p className="text-xs text-slate-600 mb-5 leading-relaxed">
           These memories are injected into every AI interaction, making each
           conversation smarter than the last. Add brand guidelines, style
           preferences, or recurring instructions so the AI remembers them across
@@ -468,7 +468,7 @@ export default function AdminSettingsPage() {
         {showMemoryForm ? (
           <div className="bg-slate-50 rounded-xl border border-slate-200/80 p-4 mb-5 space-y-3">
             <div className="flex items-center gap-3">
-              <label className="text-xs font-medium text-slate-500 whitespace-nowrap">Type</label>
+              <label className="text-xs font-medium text-slate-700 whitespace-nowrap">Type</label>
               <div className="relative">
                 <select
                   value={newMemoryType}
@@ -481,7 +481,7 @@ export default function AdminSettingsPage() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-600 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
             <textarea
@@ -497,14 +497,14 @@ export default function AdminSettingsPage() {
               }}
             />
             <div className="flex items-center justify-between">
-              <span className="text-[11px] text-slate-400">Ctrl+Enter to save</span>
+              <span className="text-xs text-slate-600">Ctrl+Enter to save</span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
                     setShowMemoryForm(false);
                     setNewMemoryContent("");
                   }}
-                  className="px-3 py-1.5 rounded-lg text-xs text-slate-500 hover:bg-slate-100 transition-colors"
+                  className="px-3 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-slate-100 transition-colors"
                 >
                   Cancel
                 </button>
@@ -533,8 +533,8 @@ export default function AdminSettingsPage() {
         {memories.length === 0 ? (
           <div className="text-center py-10 text-slate-300">
             <Brain className="w-10 h-10 mx-auto mb-3 opacity-40" />
-            <p className="text-sm font-medium text-slate-400">No memories yet</p>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-sm font-medium text-slate-600">No memories yet</p>
+            <p className="text-xs text-slate-600 mt-1">
               Add preferences, brand info, or instructions above.
             </p>
           </div>
@@ -548,7 +548,7 @@ export default function AdminSettingsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span
-                      className={`text-[10px] uppercase tracking-wider font-semibold rounded px-1.5 py-0.5 ${
+                      className={`text-xs uppercase tracking-wider font-semibold rounded px-1.5 py-0.5 ${
                         mem.type === "preference"
                           ? "text-blue-600 bg-blue-50 border border-blue-200/60"
                           : mem.type === "brand"
@@ -562,11 +562,11 @@ export default function AdminSettingsPage() {
                     >
                       {mem.type}
                     </span>
-                    <span className="text-[11px] text-slate-300">{formatDate(mem.timestamp)}</span>
+                    <span className="text-xs text-slate-300">{formatDate(mem.timestamp)}</span>
                   </div>
                   <p className="text-sm text-slate-600 leading-relaxed">{mem.content}</p>
                   {mem.source && mem.source !== "admin-manual" && (
-                    <p className="text-[11px] text-slate-300 mt-1">Source: {mem.source}</p>
+                    <p className="text-xs text-slate-300 mt-1">Source: {mem.source}</p>
                   )}
                 </div>
                 <button
@@ -595,8 +595,8 @@ export default function AdminSettingsPage() {
         {builds.length === 0 ? (
           <div className="text-center py-10 text-slate-300">
             <History className="w-10 h-10 mx-auto mb-3 opacity-40" />
-            <p className="text-sm font-medium text-slate-400">No builds recorded</p>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-sm font-medium text-slate-600">No builds recorded</p>
+            <p className="text-xs text-slate-600 mt-1">
               Build history will appear here after your first AI generation.
             </p>
           </div>
@@ -605,19 +605,19 @@ export default function AdminSettingsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100">
-                  <th className="text-left text-[11px] uppercase tracking-wider text-slate-400 font-semibold px-6 py-2.5">
+                  <th className="text-left text-xs uppercase tracking-wider text-slate-600 font-semibold px-6 py-2.5">
                     Prompt
                   </th>
-                  <th className="text-left text-[11px] uppercase tracking-wider text-slate-400 font-semibold px-4 py-2.5 hidden sm:table-cell">
+                  <th className="text-left text-xs uppercase tracking-wider text-slate-600 font-semibold px-4 py-2.5 hidden sm:table-cell">
                     Model
                   </th>
-                  <th className="text-left text-[11px] uppercase tracking-wider text-slate-400 font-semibold px-4 py-2.5 hidden md:table-cell">
+                  <th className="text-left text-xs uppercase tracking-wider text-slate-600 font-semibold px-4 py-2.5 hidden md:table-cell">
                     Duration
                   </th>
-                  <th className="text-left text-[11px] uppercase tracking-wider text-slate-400 font-semibold px-4 py-2.5">
+                  <th className="text-left text-xs uppercase tracking-wider text-slate-600 font-semibold px-4 py-2.5">
                     Status
                   </th>
-                  <th className="text-left text-[11px] uppercase tracking-wider text-slate-400 font-semibold px-6 py-2.5 hidden lg:table-cell">
+                  <th className="text-left text-xs uppercase tracking-wider text-slate-600 font-semibold px-6 py-2.5 hidden lg:table-cell">
                     Date
                   </th>
                 </tr>
@@ -636,18 +636,18 @@ export default function AdminSettingsPage() {
                           {isExpanded ? build.prompt : truncate(build.prompt, 50)}
                         </span>
                         {build.filesGenerated !== undefined && (
-                          <span className="ml-2 text-[11px] text-slate-400">
+                          <span className="ml-2 text-xs text-slate-600">
                             {build.filesGenerated} file{build.filesGenerated !== 1 ? "s" : ""}
                           </span>
                         )}
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell">
-                        <code className="text-xs text-slate-500 font-mono bg-slate-50 px-1.5 py-0.5 rounded">
+                        <code className="text-xs text-slate-700 font-mono bg-slate-50 px-1.5 py-0.5 rounded">
                           {build.model}
                         </code>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
-                        <span className="text-xs text-slate-500">
+                        <span className="text-xs text-slate-700">
                           {build.duration < 1000
                             ? `${build.duration}ms`
                             : `${(build.duration / 1000).toFixed(1)}s`}
@@ -669,7 +669,7 @@ export default function AdminSettingsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-3 hidden lg:table-cell">
-                        <span className="text-xs text-slate-400">{formatDate(build.timestamp)}</span>
+                        <span className="text-xs text-slate-600">{formatDate(build.timestamp)}</span>
                       </td>
                     </tr>
                   );
@@ -677,7 +677,7 @@ export default function AdminSettingsPage() {
               </tbody>
             </table>
             {builds.length > 50 && (
-              <p className="text-center text-xs text-slate-400 py-3">
+              <p className="text-center text-xs text-slate-600 py-3">
                 Showing 50 of {builds.length} builds
               </p>
             )}

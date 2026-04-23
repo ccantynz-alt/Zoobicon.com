@@ -111,7 +111,7 @@ export default function MobileAdminDashboard() {
             </div>
             <div>
               <h1 className="text-sm font-bold text-slate-800">Zoobicon</h1>
-              <p className="text-[10px] text-slate-400">Command Centre</p>
+              <p className="text-xs text-slate-600">Command Centre</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -120,15 +120,15 @@ export default function MobileAdminDashboard() {
               disabled={refreshing}
               className="p-2 rounded-lg bg-slate-50 active:bg-slate-100 transition-colors"
             >
-              <RefreshCw className={`w-4 h-4 text-slate-500 ${refreshing ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-4 h-4 text-slate-700 ${refreshing ? "animate-spin" : ""}`} />
             </button>
             <Link href="/admin" className="p-2 rounded-lg bg-slate-50 active:bg-slate-100 transition-colors">
-              <LayoutDashboard className="w-4 h-4 text-slate-500" />
+              <LayoutDashboard className="w-4 h-4 text-slate-700" />
             </Link>
           </div>
         </div>
         {lastRefresh && (
-          <div className="px-4 pb-2 text-[10px] text-slate-400">
+          <div className="px-4 pb-2 text-xs text-slate-600">
             Updated {lastRefresh.toLocaleTimeString()}
           </div>
         )}
@@ -156,7 +156,7 @@ export default function MobileAdminDashboard() {
                 ) : overallHealth === "degraded" ? (
                   <AlertCircle className="w-5 h-5 text-amber-500" />
                 ) : (
-                  <Activity className="w-5 h-5 text-slate-400" />
+                  <Activity className="w-5 h-5 text-slate-600" />
                 )}
                 <div>
                   <p className={`text-sm font-semibold ${
@@ -168,13 +168,13 @@ export default function MobileAdminDashboard() {
                      overallHealth === "degraded" ? "Some Systems Degraded" :
                      "Status Unknown"}
                   </p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-600 mt-0.5">
                     {health?.checks ? `${Object.keys(health.checks).length} services monitored` : "Checking..."}
                   </p>
                 </div>
               </div>
               <Link href="/admin/health" className="p-1.5 rounded-lg active:bg-slate-100">
-                <ChevronRight className="w-4 h-4 text-slate-400" />
+                <ChevronRight className="w-4 h-4 text-slate-600" />
               </Link>
             </div>
 
@@ -184,7 +184,7 @@ export default function MobileAdminDashboard() {
                 {Object.entries(health.checks).map(([name, check]) => (
                   <span
                     key={name}
-                    className={`text-[10px] px-2 py-0.5 rounded-full ${
+                    className={`text-xs px-2 py-0.5 rounded-full ${
                       check.status === "healthy"
                         ? "bg-emerald-100 text-emerald-700"
                         : "bg-red-100 text-red-700"
@@ -231,7 +231,7 @@ export default function MobileAdminDashboard() {
                   <UserPlus className="w-4 h-4 text-indigo-500" />
                   <span className="text-xs font-semibold text-slate-700">Recent Signups</span>
                 </div>
-                <Link href="/admin" className="text-[10px] text-indigo-500 active:opacity-70">
+                <Link href="/admin" className="text-xs text-indigo-500 active:opacity-70">
                   View all <ArrowUpRight className="w-3 h-3 inline" />
                 </Link>
               </div>
@@ -240,16 +240,16 @@ export default function MobileAdminDashboard() {
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-slate-800 truncate">{user.name || "—"}</p>
-                      <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                      <p className="text-xs text-slate-600 truncate">{user.email}</p>
                     </div>
                     <div className="text-right ml-3 shrink-0">
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
                         user.plan === "pro" ? "bg-indigo-50 text-indigo-600" :
                         user.plan === "agency" ? "bg-purple-50 text-purple-600" :
                         user.plan === "creator" ? "bg-emerald-50 text-emerald-600" :
-                        "bg-slate-100 text-slate-500"
+                        "bg-slate-100 text-slate-700"
                       }`}>{user.plan || "free"}</span>
-                      <p className="text-[10px] text-slate-400 mt-0.5">{timeAgo(user.created_at)}</p>
+                      <p className="text-xs text-slate-600 mt-0.5">{timeAgo(user.created_at)}</p>
                     </div>
                   </div>
                 ))}
@@ -271,9 +271,9 @@ export default function MobileAdminDashboard() {
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-slate-800 truncate">{proj.name}</p>
-                      <p className="text-[11px] text-slate-400 truncate">{proj.user_email}</p>
+                      <p className="text-xs text-slate-600 truncate">{proj.user_email}</p>
                     </div>
-                    <span className="text-[10px] text-slate-400 ml-3 shrink-0">{timeAgo(proj.created_at)}</span>
+                    <span className="text-xs text-slate-600 ml-3 shrink-0">{timeAgo(proj.created_at)}</span>
                   </div>
                 ))}
               </div>
@@ -283,7 +283,7 @@ export default function MobileAdminDashboard() {
           {/* Quick Links */}
           <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden">
             <div className="px-4 py-3 border-b border-slate-100">
-              <span className="text-xs font-semibold text-slate-500">Quick Actions</span>
+              <span className="text-xs font-semibold text-slate-700">Quick Actions</span>
             </div>
             <div className="divide-y divide-slate-100">
               <QuickLink href="/admin" icon={LayoutDashboard} label="Full Admin Panel" />
@@ -297,13 +297,13 @@ export default function MobileAdminDashboard() {
 
           {/* Footer */}
           <div className="text-center py-6">
-            <p className="text-[10px] text-slate-400">zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh</p>
+            <p className="text-xs text-slate-600">zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh</p>
             <button
               onClick={() => {
                 try { localStorage.removeItem("zoobicon_user"); } catch {}
                 window.location.href = "/auth/login";
               }}
-              className="mt-3 text-xs text-slate-400 active:text-slate-600 flex items-center gap-1 mx-auto"
+              className="mt-3 text-xs text-slate-600 active:text-slate-600 flex items-center gap-1 mx-auto"
             >
               <LogOut className="w-3 h-3" /> Sign out
             </button>
@@ -334,7 +334,7 @@ function StatCard({ icon: Icon, label, value, color }: {
     <div className={`rounded-2xl bg-gradient-to-br ${colorMap[color]} border p-4`}>
       <Icon className={`w-5 h-5 ${iconMap[color]} mb-2`} />
       <p className="text-2xl font-bold text-slate-800">{value.toLocaleString()}</p>
-      <p className="text-[11px] text-slate-500 mt-0.5">{label}</p>
+      <p className="text-xs text-slate-700 mt-0.5">{label}</p>
     </div>
   );
 }
@@ -343,7 +343,7 @@ function QuickLink({ href, icon: Icon, label }: { href: string; icon: React.Elem
   return (
     <Link href={href} className="flex items-center justify-between px-4 py-3.5 active:bg-slate-50 transition-colors">
       <div className="flex items-center gap-3">
-        <Icon className="w-4 h-4 text-slate-400" />
+        <Icon className="w-4 h-4 text-slate-600" />
         <span className="text-sm text-slate-700">{label}</span>
       </div>
       <ChevronRight className="w-4 h-4 text-slate-300" />
