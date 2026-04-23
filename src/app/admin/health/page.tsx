@@ -178,7 +178,7 @@ export default function AdminHealthPage() {
       </div>
 
       {isLoading && (
-        <div className="flex items-center gap-3 py-8 justify-center text-slate-500">
+        <div className="flex items-center gap-3 py-8 justify-center text-slate-700">
           <RefreshCw className="w-5 h-5 animate-spin" />
           <span>Running checks...</span>
         </div>
@@ -194,7 +194,7 @@ export default function AdminHealthPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-slate-800">{check.name}</span>
                     {check.durationMs > 0 && (
-                      <span className="text-[10px] text-slate-400">{(check.durationMs / 1000).toFixed(1)}s</span>
+                      <span className="text-xs text-slate-600">{(check.durationMs / 1000).toFixed(1)}s</span>
                     )}
                   </div>
                   <p className="text-xs text-slate-600 mt-0.5 break-words">{check.message}</p>
@@ -202,7 +202,7 @@ export default function AdminHealthPage() {
               </div>
             ))}
           </div>
-          <div className="text-[10px] text-slate-400 flex items-center justify-between">
+          <div className="text-xs text-slate-600 flex items-center justify-between">
             <span>Total: {(result.totalDurationMs / 1000).toFixed(1)}s</span>
             <span>{new Date(result.timestamp).toLocaleString()}</span>
           </div>
@@ -210,7 +210,7 @@ export default function AdminHealthPage() {
       )}
 
       {!isLoading && !result && (
-        <p className="text-sm text-slate-400 py-4 text-center">Click a button below to run</p>
+        <p className="text-sm text-slate-600 py-4 text-center">Click a button below to run</p>
       )}
     </div>
   );
@@ -250,7 +250,7 @@ export default function AdminHealthPage() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-slate-800">Live Dependency Status</h2>
-                <p className="text-xs text-slate-500">Every external provider, pinged in parallel</p>
+                <p className="text-xs text-slate-700">Every external provider, pinged in parallel</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -288,7 +288,7 @@ export default function AdminHealthPage() {
             <>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
                 <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                  <div className="text-xs text-slate-500">Total</div>
+                  <div className="text-xs text-slate-700">Total</div>
                   <div className="text-xl font-semibold text-slate-800">{depResult.summary.total}</div>
                 </div>
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
@@ -304,7 +304,7 @@ export default function AdminHealthPage() {
                   <div className="text-xl font-semibold text-red-700">{depResult.summary.failures}</div>
                 </div>
                 <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                  <div className="text-xs text-slate-500">Required fails</div>
+                  <div className="text-xs text-slate-700">Required fails</div>
                   <div className={`text-xl font-semibold ${depResult.summary.requiredFailures > 0 ? "text-red-700" : "text-emerald-700"}`}>
                     {depResult.summary.requiredFailures}
                   </div>
@@ -321,7 +321,7 @@ export default function AdminHealthPage() {
               <div className="space-y-5">
                 {Object.entries(depResult.byCategory).map(([cat, items]) => (
                   <div key={cat}>
-                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    <div className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
                       {CATEGORY_LABELS[cat] || cat}
                     </div>
                     <div className="grid gap-2">
@@ -343,10 +343,10 @@ export default function AdminHealthPage() {
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-sm font-semibold text-slate-800">{c.name}</span>
                               {c.required && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200">REQUIRED</span>
+                                <span className="text-xs px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200">REQUIRED</span>
                               )}
                               {c.circuitState && c.circuitState !== "closed" && (
-                                <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                                <span className={`text-xs px-1.5 py-0.5 rounded border ${
                                   c.circuitState === "open"
                                     ? "bg-red-50 text-red-700 border-red-200"
                                     : "bg-amber-50 text-amber-700 border-amber-200"
@@ -355,12 +355,12 @@ export default function AdminHealthPage() {
                                 </span>
                               )}
                               {c.latencyMs > 0 && (
-                                <span className="text-[10px] text-slate-400">{c.latencyMs}ms</span>
+                                <span className="text-xs text-slate-600">{c.latencyMs}ms</span>
                               )}
                             </div>
                             <p className="text-xs text-slate-600 mt-0.5 break-words">{c.message}</p>
                             {c.envVar && c.status !== "pass" && (
-                              <p className="text-[10px] text-slate-400 mt-1 font-mono">env: {c.envVar}</p>
+                              <p className="text-xs text-slate-600 mt-1 font-mono">env: {c.envVar}</p>
                             )}
                           </div>
                         </div>
@@ -370,7 +370,7 @@ export default function AdminHealthPage() {
                 ))}
               </div>
 
-              <div className="text-[10px] text-slate-400 mt-4 flex items-center justify-between">
+              <div className="text-xs text-slate-600 mt-4 flex items-center justify-between">
                 <span>Total: {(depResult.totalDurationMs / 1000).toFixed(1)}s</span>
                 <span>{new Date(depResult.timestamp).toLocaleString()}</span>
               </div>
@@ -378,7 +378,7 @@ export default function AdminHealthPage() {
           )}
 
           {depLoading && !depResult && (
-            <div className="flex items-center gap-3 py-8 justify-center text-slate-500">
+            <div className="flex items-center gap-3 py-8 justify-center text-slate-700">
               <RefreshCw className="w-5 h-5 animate-spin" />
               <span>Pinging every provider...</span>
             </div>

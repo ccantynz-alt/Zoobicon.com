@@ -119,7 +119,7 @@ export default function AdminBookingPage() {
             <Calendar className="w-6 h-6 text-indigo-500" />
             Booking Management
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-700 mt-1">
             Provider:{" "}
             <span
               className={`font-mono ${
@@ -129,7 +129,7 @@ export default function AdminBookingPage() {
               {provider || "detecting..."}
             </span>
             {provider === "mock" && (
-              <span className="ml-2 text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">
+              <span className="ml-2 text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">
                 Mock Mode — add CALCOM_API_KEY to go live
               </span>
             )}
@@ -175,7 +175,7 @@ export default function AdminBookingPage() {
 
       {/* Search */}
       <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
         <input
           type="text"
           value={searchFilter}
@@ -197,13 +197,13 @@ export default function AdminBookingPage() {
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-slate-800">
               <Calendar className="w-5 h-5 text-indigo-500" />
               Appointments
-              <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full ml-2">
+              <span className="text-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full ml-2">
                 {filteredAppointments.length} total
               </span>
             </h2>
 
             {filteredAppointments.length === 0 ? (
-              <div className="text-center py-12 text-slate-400 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="text-center py-12 text-slate-600 rounded-2xl bg-slate-50 border border-slate-200">
                 <Calendar className="w-8 h-8 mx-auto mb-3 opacity-50" />
                 <p>No appointments found</p>
               </div>
@@ -211,7 +211,7 @@ export default function AdminBookingPage() {
               <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-[11px] text-slate-400 uppercase tracking-wider border-b border-slate-200">
+                    <tr className="text-xs text-slate-600 uppercase tracking-wider border-b border-slate-200">
                       <th className="text-left px-5 py-3">Client</th>
                       <th className="text-left px-3 py-3">Service</th>
                       <th className="text-left px-3 py-3">Date & Time</th>
@@ -226,12 +226,12 @@ export default function AdminBookingPage() {
                         <tr key={appt.id} className="hover:bg-slate-50/60">
                           <td className="px-5 py-3">
                             <p className="text-sm font-medium text-slate-800">{appt.clientName}</p>
-                            <p className="text-[10px] text-slate-400">{appt.clientEmail}</p>
+                            <p className="text-xs text-slate-600">{appt.clientEmail}</p>
                           </td>
                           <td className="px-3 py-3 text-sm text-slate-600">
                             {svc?.name || appt.bookingTypeId || "—"}
                           </td>
-                          <td className="px-3 py-3 text-sm text-slate-500">
+                          <td className="px-3 py-3 text-sm text-slate-700">
                             {new Date(appt.dateTime).toLocaleDateString("en-US", {
                               month: "short",
                               day: "numeric",
@@ -252,7 +252,7 @@ export default function AdminBookingPage() {
                               {appt.status}
                             </span>
                           </td>
-                          <td className="px-5 py-3 text-sm text-slate-500 max-w-xs truncate">
+                          <td className="px-5 py-3 text-sm text-slate-700 max-w-xs truncate">
                             {appt.notes || "—"}
                           </td>
                         </tr>
@@ -269,13 +269,13 @@ export default function AdminBookingPage() {
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-slate-800">
               <DollarSign className="w-5 h-5 text-indigo-500" />
               Services
-              <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full ml-2">
+              <span className="text-xs text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full ml-2">
                 {services.length} total
               </span>
             </h2>
 
             {services.length === 0 ? (
-              <div className="text-center py-12 text-slate-400 rounded-2xl bg-slate-50 border border-slate-200">
+              <div className="text-center py-12 text-slate-600 rounded-2xl bg-slate-50 border border-slate-200">
                 <DollarSign className="w-8 h-8 mx-auto mb-3 opacity-50" />
                 <p>No services configured</p>
               </div>
@@ -301,26 +301,26 @@ export default function AdminBookingPage() {
                         />
                         <span className="font-medium text-slate-800">{svc.name}</span>
                         <span
-                          className={`text-[10px] px-2 py-0.5 rounded-full ${
+                          className={`text-xs px-2 py-0.5 rounded-full ${
                             svc.enabled
                               ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : "bg-slate-100 text-slate-500 border border-slate-200"
+                              : "bg-slate-100 text-slate-700 border border-slate-200"
                           }`}
                         >
                           {svc.enabled ? "Active" : "Disabled"}
                         </span>
                       </div>
                       <div className="flex items-center gap-4">
-                        <span className="text-sm text-slate-500">
+                        <span className="text-sm text-slate-700">
                           {svc.duration} min
                         </span>
                         <span className="text-sm font-mono text-slate-700">
                           {svc.price === 0 ? "Free" : `$${svc.price}`}
                         </span>
                         {expandedService === svc.id ? (
-                          <ChevronDown className="w-4 h-4 text-slate-400" />
+                          <ChevronDown className="w-4 h-4 text-slate-600" />
                         ) : (
-                          <ChevronRight className="w-4 h-4 text-slate-400" />
+                          <ChevronRight className="w-4 h-4 text-slate-600" />
                         )}
                       </div>
                     </button>
@@ -329,7 +329,7 @@ export default function AdminBookingPage() {
                       <div className="border-t border-slate-200 px-5 py-4 bg-slate-50/50">
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
-                            <p className="text-slate-400 text-xs mb-1">
+                            <p className="text-slate-600 text-xs mb-1">
                               Description
                             </p>
                             <p className="text-slate-600">
@@ -337,7 +337,7 @@ export default function AdminBookingPage() {
                             </p>
                           </div>
                           <div>
-                            <p className="text-slate-400 text-xs mb-1">
+                            <p className="text-slate-600 text-xs mb-1">
                               Location
                             </p>
                             <p className="text-slate-600 capitalize">
@@ -345,14 +345,14 @@ export default function AdminBookingPage() {
                             </p>
                           </div>
                           <div>
-                            <p className="text-slate-400 text-xs mb-1">
+                            <p className="text-slate-600 text-xs mb-1">
                               Currency
                             </p>
                             <p className="text-slate-600">{svc.currency}</p>
                           </div>
                           <div>
-                            <p className="text-slate-400 text-xs mb-1">ID</p>
-                            <p className="text-slate-400 font-mono text-[10px]">
+                            <p className="text-slate-600 text-xs mb-1">ID</p>
+                            <p className="text-slate-600 font-mono text-xs">
                               {svc.id}
                             </p>
                           </div>
@@ -397,7 +397,7 @@ function StatCard({
     <div className={`rounded-2xl bg-gradient-to-br ${colorMap[color]} border p-4`}>
       <Icon className={`w-5 h-5 ${iconMap[color]} mb-2`} />
       <p className="text-xl font-bold text-slate-800">{value}</p>
-      <p className="text-[11px] text-slate-500 mt-0.5">{label}</p>
+      <p className="text-xs text-slate-700 mt-0.5">{label}</p>
     </div>
   );
 }

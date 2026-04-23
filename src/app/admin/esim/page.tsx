@@ -116,10 +116,10 @@ export default function AdminEsimPage() {
             <Wifi className="w-6 h-6 text-cyan-500" />
             eSIM Management
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-700 mt-1">
             Provider: <span className={`font-mono ${provider === "mock" ? "text-amber-600" : "text-emerald-600"}`}>{provider}</span>
             {provider === "mock" && (
-              <span className="ml-2 text-[10px] bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full">
+              <span className="ml-2 text-xs bg-amber-50 text-amber-600 border border-amber-200 px-2 py-0.5 rounded-full">
                 Mock Mode — add CELITECH_API_KEY to go live
               </span>
             )}
@@ -145,7 +145,7 @@ export default function AdminEsimPage() {
 
       {/* Search */}
       <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
         <input
           type="text"
           value={searchFilter}
@@ -162,7 +162,7 @@ export default function AdminEsimPage() {
           <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin" />
         </div>
       ) : filteredRegions.length === 0 ? (
-        <div className="text-center py-12 text-slate-400">
+        <div className="text-center py-12 text-slate-600">
           <Globe className="w-8 h-8 mx-auto mb-3 opacity-50" />
           <p>No plans found</p>
         </div>
@@ -177,13 +177,13 @@ export default function AdminEsimPage() {
                 <div className="flex items-center gap-3">
                   <Globe className="w-4 h-4 text-cyan-500" />
                   <span className="font-medium text-slate-800">{region}</span>
-                  <span className="text-xs text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                  <span className="text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
                     {regionPlans.length} plan{regionPlans.length !== 1 ? "s" : ""}
                   </span>
                 </div>
                 {expandedRegion === region
-                  ? <ChevronDown className="w-4 h-4 text-slate-400" />
-                  : <ChevronRight className="w-4 h-4 text-slate-400" />
+                  ? <ChevronDown className="w-4 h-4 text-slate-600" />
+                  : <ChevronRight className="w-4 h-4 text-slate-600" />
                 }
               </button>
 
@@ -191,7 +191,7 @@ export default function AdminEsimPage() {
                 <div className="border-t border-slate-200">
                   <table className="w-full">
                     <thead>
-                      <tr className="text-[11px] text-slate-400 uppercase tracking-wider">
+                      <tr className="text-xs text-slate-600 uppercase tracking-wider">
                         <th className="text-left px-5 py-2">Plan</th>
                         <th className="text-left px-3 py-2">Data</th>
                         <th className="text-left px-3 py-2">Validity</th>
@@ -205,15 +205,15 @@ export default function AdminEsimPage() {
                         <tr key={plan.id} className="hover:bg-slate-50/50">
                           <td className="px-5 py-3">
                             <p className="text-sm font-medium">{plan.name}</p>
-                            <p className="text-[10px] text-slate-400 font-mono">{plan.id}</p>
+                            <p className="text-xs text-slate-600 font-mono">{plan.id}</p>
                           </td>
                           <td className="px-3 py-3 text-sm">{plan.dataGB} GB</td>
                           <td className="px-3 py-3 text-sm text-slate-600">{plan.validityDays}d</td>
                           <td className="px-3 py-3">
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${
                               plan.networkType.includes("5G")
                                 ? "bg-cyan-50 text-cyan-600 border border-cyan-200"
-                                : "bg-slate-100 text-slate-500"
+                                : "bg-slate-100 text-slate-700"
                             }`}>{plan.networkType}</span>
                           </td>
                           <td className="px-3 py-3 text-sm text-right font-mono text-emerald-600">
@@ -223,7 +223,7 @@ export default function AdminEsimPage() {
                             <button
                               onClick={() => handleTestPurchase(plan.id)}
                               disabled={testPurchase.status === "loading"}
-                              className="text-[10px] px-3 py-1 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 transition-colors disabled:opacity-50"
+                              className="text-xs px-3 py-1 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 transition-colors disabled:opacity-50"
                             >
                               Test Purchase
                             </button>
@@ -268,7 +268,7 @@ export default function AdminEsimPage() {
           )}
           <button
             onClick={() => setTestPurchase({ status: "idle" })}
-            className="mt-3 text-xs text-slate-400 hover:text-slate-500"
+            className="mt-3 text-xs text-slate-600 hover:text-slate-500"
           >
             Dismiss
           </button>
@@ -297,7 +297,7 @@ function StatCard({ icon: Icon, label, value, color }: {
     <div className={`rounded-2xl bg-gradient-to-br ${colorMap[color]} border p-4`}>
       <Icon className={`w-5 h-5 ${iconMap[color]} mb-2`} />
       <p className="text-xl font-bold text-slate-800">{value}</p>
-      <p className="text-[11px] text-slate-500 mt-0.5">{label}</p>
+      <p className="text-xs text-slate-700 mt-0.5">{label}</p>
     </div>
   );
 }

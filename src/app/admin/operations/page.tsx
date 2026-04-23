@@ -164,7 +164,7 @@ export default function OperationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <Loader2 className="w-8 h-8 text-slate-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-slate-600 animate-spin" />
       </div>
     );
   }
@@ -173,7 +173,7 @@ export default function OperationsPage() {
 
   const metricIconColorMap: Record<string, string> = {
     indigo: "text-indigo-500",
-    slate: "text-slate-500",
+    slate: "text-slate-700",
     red: "text-red-500",
     emerald: "text-emerald-500",
     cyan: "text-cyan-500",
@@ -186,13 +186,13 @@ export default function OperationsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Operations Dashboard</h1>
-          <p className="text-sm text-slate-400 mt-1">Last updated: {lastRefresh.toLocaleTimeString()}</p>
+          <p className="text-sm text-slate-600 mt-1">Last updated: {lastRefresh.toLocaleTimeString()}</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={fetchData} className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-            <RefreshCw className="w-4 h-4 text-slate-400" />
+            <RefreshCw className="w-4 h-4 text-slate-600" />
           </button>
-          <Link href="/admin" className="text-sm text-slate-400 hover:text-slate-700 flex items-center gap-1">
+          <Link href="/admin" className="text-sm text-slate-600 hover:text-slate-700 flex items-center gap-1">
             Admin <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
@@ -215,7 +215,7 @@ export default function OperationsPage() {
                healthStatus === "degraded" ? "Performance Degraded" : "Issues Detected"}
             </span>
             {health?.timestamp && (
-              <span className="text-xs text-slate-500 ml-2">Checked {timeAgo(health.timestamp)}</span>
+              <span className="text-xs text-slate-700 ml-2">Checked {timeAgo(health.timestamp)}</span>
             )}
           </div>
         </div>
@@ -236,8 +236,8 @@ export default function OperationsPage() {
         ].map((m, i) => (
           <div key={i} className="bg-white border border-slate-200 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <m.icon className={`w-4 h-4 ${metricIconColorMap[m.color] || "text-slate-500"}`} />
-              <span className="text-xs text-slate-500">{m.label}</span>
+              <m.icon className={`w-4 h-4 ${metricIconColorMap[m.color] || "text-slate-700"}`} />
+              <span className="text-xs text-slate-700">{m.label}</span>
             </div>
             <div className="text-2xl font-bold text-slate-800">{m.value}</div>
           </div>
@@ -260,7 +260,7 @@ export default function OperationsPage() {
           </div>
           <div className="space-y-2">
             {agents.length === 0 ? (
-              <div className="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-400">
+              <div className="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-600">
                 No agents registered. Check /api/agents endpoint.
               </div>
             ) : agents.map(agent => (
@@ -269,7 +269,7 @@ export default function OperationsPage() {
                   <StatusDot status={agent.status} />
                   <div className="min-w-0">
                     <div className="font-medium text-sm text-slate-800 truncate">{agent.name}</div>
-                    <div className="text-xs text-slate-500 flex items-center gap-2">
+                    <div className="text-xs text-slate-700 flex items-center gap-2">
                       {agent.scheduleInterval && <span>Every {formatInterval(agent.scheduleInterval)}</span>}
                       {agent.lastRun && <span>Last: {timeAgo(agent.lastRun)}</span>}
                       {agent.successRate !== undefined && <span>{Math.round(agent.successRate * 100)}% success</span>}
@@ -283,7 +283,7 @@ export default function OperationsPage() {
                   <button
                     onClick={() => togglePause(agent.id)}
                     className={`p-1.5 rounded-lg transition-colors ${
-                      pausedAgents.has(agent.id) ? "bg-amber-50 text-amber-600" : "bg-slate-50 text-slate-400 hover:bg-slate-100"
+                      pausedAgents.has(agent.id) ? "bg-amber-50 text-amber-600" : "bg-slate-50 text-slate-600 hover:bg-slate-100"
                     }`}
                     title={pausedAgents.has(agent.id) ? "Resume" : "Pause"}
                   >
@@ -292,7 +292,7 @@ export default function OperationsPage() {
                   <button
                     onClick={() => runAgent(agent.id)}
                     disabled={runningAgent === agent.id}
-                    className="p-1.5 rounded-lg bg-slate-50 text-slate-400 hover:bg-indigo-50 hover:text-indigo-500 transition-colors disabled:opacity-50"
+                    className="p-1.5 rounded-lg bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-500 transition-colors disabled:opacity-50"
                     title="Run Now"
                   >
                     {runningAgent === agent.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
@@ -320,17 +320,17 @@ export default function OperationsPage() {
                   onClick={btn.action}
                   className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-sm text-slate-700"
                 >
-                  <btn.icon className="w-4 h-4 text-slate-400" />
+                  <btn.icon className="w-4 h-4 text-slate-600" />
                   {btn.label}
                 </button>
               ))}
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2">
               <Link href="/admin/pre-launch" className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-sm text-slate-700">
-                <CheckCircle className="w-4 h-4 text-slate-400" /> Pre-Launch
+                <CheckCircle className="w-4 h-4 text-slate-600" /> Pre-Launch
               </Link>
               <Link href="/email-support" className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-sm text-slate-700">
-                <Bell className="w-4 h-4 text-slate-400" /> Tickets
+                <Bell className="w-4 h-4 text-slate-600" /> Tickets
               </Link>
             </div>
           </div>
@@ -340,16 +340,16 @@ export default function OperationsPage() {
             <h2 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2"><Activity className="w-5 h-5 text-indigo-500" /> Live Activity</h2>
             <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
               {activity.length === 0 ? (
-                <div className="text-sm text-slate-500 p-4 text-center">No recent activity</div>
+                <div className="text-sm text-slate-700 p-4 text-center">No recent activity</div>
               ) : activity.map((item, i) => (
                 <div key={item.id || i} className="bg-slate-50 rounded-lg p-2.5 text-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-700 truncate">{item.description || item.type}</span>
-                    <span className="text-xs text-slate-400 flex-shrink-0 ml-2">
+                    <span className="text-xs text-slate-600 flex-shrink-0 ml-2">
                       {item.created_at ? timeAgo(item.created_at) : ""}
                     </span>
                   </div>
-                  {item.user_name && <div className="text-xs text-slate-500 mt-0.5">{item.user_name}</div>}
+                  {item.user_name && <div className="text-xs text-slate-700 mt-0.5">{item.user_name}</div>}
                 </div>
               ))}
             </div>
@@ -358,7 +358,7 @@ export default function OperationsPage() {
       </div>
 
       {/* Footer Links */}
-      <div className="mt-8 pt-6 border-t border-slate-200 flex flex-wrap gap-4 text-sm text-slate-400">
+      <div className="mt-8 pt-6 border-t border-slate-200 flex flex-wrap gap-4 text-sm text-slate-600">
         <Link href="/admin" className="hover:text-slate-700 transition-colors flex items-center gap-1">Admin Dashboard <ArrowRight className="w-3 h-3" /></Link>
         <Link href="/admin/health" className="hover:text-slate-700 transition-colors flex items-center gap-1">Health Details <ArrowRight className="w-3 h-3" /></Link>
         <Link href="/admin/intel" className="hover:text-slate-700 transition-colors flex items-center gap-1">Competitive Intel <ArrowRight className="w-3 h-3" /></Link>

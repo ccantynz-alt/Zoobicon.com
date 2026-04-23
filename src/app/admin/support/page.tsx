@@ -292,7 +292,7 @@ export default function AdminSupportPage() {
           {/* Search */}
           <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
               <input
                 type="text"
                 placeholder="Search tickets..."
@@ -311,7 +311,7 @@ export default function AdminSupportPage() {
                 <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
               </div>
             ) : tickets.length === 0 ? (
-              <div className="text-center py-20 text-slate-400">
+              <div className="text-center py-20 text-slate-600">
                 <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p>No tickets found</p>
                 <p className="text-sm mt-1">
@@ -339,7 +339,7 @@ export default function AdminSupportPage() {
                             : "text-emerald-500"
                         }`}
                       />
-                      <span className="text-xs text-slate-400 font-mono">
+                      <span className="text-xs text-slate-600 font-mono">
                         {ticket.ticket_number}
                       </span>
                       <span
@@ -352,7 +352,7 @@ export default function AdminSupportPage() {
                       {ticket.ai_auto_replied && (
                         <Bot className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
                       )}
-                      <span className="text-xs text-slate-400 ml-auto">
+                      <span className="text-xs text-slate-600 ml-auto">
                         {formatDate(ticket.updated_at)}
                       </span>
                     </div>
@@ -363,11 +363,11 @@ export default function AdminSupportPage() {
                       <span className="text-xs text-slate-600 truncate">
                         {ticket.from_name || ticket.from_email}
                       </span>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-slate-600">
                         &bull; {ticket.message_count} msgs
                       </span>
                       {ticket.ai_confidence !== null && (
-                        <span className="text-xs text-slate-400 ml-auto">
+                        <span className="text-xs text-slate-600 ml-auto">
                           AI: {Math.round(ticket.ai_confidence * 100)}%
                         </span>
                       )}
@@ -386,7 +386,7 @@ export default function AdminSupportPage() {
             <div className="p-4 border-b border-slate-200">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-400 font-mono">
+                  <span className="text-xs text-slate-600 font-mono">
                     {selectedTicket.ticket_number}
                   </span>
                   <span
@@ -415,7 +415,7 @@ export default function AdminSupportPage() {
                             : s === "pending"
                             ? "bg-amber-50 text-amber-700"
                             : "bg-emerald-50 text-emerald-700"
-                          : "text-slate-500 hover:bg-slate-100"
+                          : "text-slate-700 hover:bg-slate-100"
                       }`}
                     >
                       {s}
@@ -427,11 +427,11 @@ export default function AdminSupportPage() {
               <div className="flex items-center gap-2 text-sm text-slate-600">
                 <User className="w-3.5 h-3.5" />
                 <span>{selectedTicket.from_name}</span>
-                <span className="text-slate-400">&lt;{selectedTicket.from_email}&gt;</span>
+                <span className="text-slate-600">&lt;{selectedTicket.from_email}&gt;</span>
               </div>
               {/* Priority selector */}
               <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs text-slate-500">Priority:</span>
+                <span className="text-xs text-slate-700">Priority:</span>
                 {(["low", "medium", "high", "urgent"] as const).map((p) => (
                   <button
                     key={p}
@@ -439,7 +439,7 @@ export default function AdminSupportPage() {
                     className={`text-xs px-2 py-0.5 rounded border transition-colors ${
                       selectedTicket.priority === p
                         ? priorityColor[p]
-                        : "text-slate-400 border-slate-200 hover:border-slate-300"
+                        : "text-slate-600 border-slate-200 hover:border-slate-300"
                     }`}
                   >
                     {p}
@@ -480,7 +480,7 @@ export default function AdminSupportPage() {
                         <>
                           <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
                           <span className="text-indigo-600">AI Draft</span>
-                          <span className="text-slate-400">(not sent)</span>
+                          <span className="text-slate-600">(not sent)</span>
                         </>
                       ) : msg.sender === "ai" ? (
                         <>
@@ -495,7 +495,7 @@ export default function AdminSupportPage() {
                           <span className="text-indigo-600">Agent</span>
                         </>
                       )}
-                      <span className="text-slate-400 ml-auto">
+                      <span className="text-slate-600 ml-auto">
                         {formatDate(msg.created_at)}
                       </span>
                     </div>
@@ -554,11 +554,11 @@ export default function AdminSupportPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-slate-400">
+          <div className="flex-1 flex items-center justify-center text-slate-600">
             <div className="text-center">
               <MessageSquare className="w-16 h-16 mx-auto mb-4 opacity-20" />
               <p>Select a ticket to view</p>
-              <p className="text-sm mt-2 text-slate-400">
+              <p className="text-sm mt-2 text-slate-600">
                 Emails to support@zoobicon.com automatically create tickets
                 <br />
                 AI drafts responses and auto-replies when confident

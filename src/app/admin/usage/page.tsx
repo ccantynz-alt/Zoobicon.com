@@ -245,7 +245,7 @@ export default function UsagePage() {
                 )}
               </div>
               <div className="text-2xl font-black text-slate-800">{card.value}</div>
-              <div className="text-xs text-slate-400 mt-1">{card.sub}</div>
+              <div className="text-xs text-slate-600 mt-1">{card.sub}</div>
             </motion.div>
           ))}
         </div>
@@ -260,7 +260,7 @@ export default function UsagePage() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-base font-bold text-slate-800">Daily Generations</h2>
-              <p className="text-xs text-slate-400">Last 30 days</p>
+              <p className="text-xs text-slate-600">Last 30 days</p>
             </div>
             <div className="text-right">
               <div className="text-lg font-bold text-slate-800">{totalMonth.toLocaleString()}</div>
@@ -280,14 +280,14 @@ export default function UsagePage() {
                     style={{ height: `${heightPct}%` }}
                   />
                   {/* Tooltip */}
-                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 border border-slate-700 text-[10px] text-white px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 border border-slate-700 text-xs text-white px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                     {d.day}: {d.count}
                   </div>
                 </div>
               );
             })}
           </div>
-          <div className="flex justify-between mt-2 text-[10px] text-slate-400">
+          <div className="flex justify-between mt-2 text-xs text-slate-600">
             <span>{dailyData[0]?.day}</span>
             <span>{dailyData[14]?.day}</span>
             <span>{dailyData[29]?.day}</span>
@@ -310,7 +310,7 @@ export default function UsagePage() {
             {/* Big number */}
             <div className="flex flex-col items-center justify-center bg-slate-50 rounded-xl p-6 border border-slate-200">
               <div className="text-5xl font-black text-slate-800 mb-1">{stats.creditsRemaining.toLocaleString()}</div>
-              <div className="text-sm text-slate-400">credits remaining</div>
+              <div className="text-sm text-slate-600">credits remaining</div>
             </div>
 
             {/* Plan + limits */}
@@ -328,15 +328,15 @@ export default function UsagePage() {
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Generations</span>
+                  <span className="text-slate-600">Generations</span>
                   <span className="text-slate-800 font-medium">{currentLimits.generations}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">API Rate</span>
+                  <span className="text-slate-600">API Rate</span>
                   <span className="text-slate-800 font-medium">{currentLimits.apiRate}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Storage</span>
+                  <span className="text-slate-600">Storage</span>
                   <span className="text-slate-800 font-medium">{currentLimits.storage}</span>
                 </div>
               </div>
@@ -346,7 +346,7 @@ export default function UsagePage() {
             <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-slate-400">Used this period</span>
+                  <span className="text-slate-600">Used this period</span>
                   <span className="text-slate-800 font-medium">{stats.creditsUsed.toLocaleString()} / {stats.creditsTotal.toLocaleString()}</span>
                 </div>
                 <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
@@ -357,7 +357,7 @@ export default function UsagePage() {
                     style={{ width: `${creditPct}%` }}
                   />
                 </div>
-                <div className="text-xs text-slate-400 mt-1">{creditPct}% consumed</div>
+                <div className="text-xs text-slate-600 mt-1">{creditPct}% consumed</div>
               </div>
               <Link
                 href="/pricing"
@@ -386,12 +386,12 @@ export default function UsagePage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Key</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Label</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Today</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">This Month</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Rate Limit</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Key</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Label</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Today</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">This Month</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Rate Limit</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -401,12 +401,12 @@ export default function UsagePage() {
                     <td className="py-3 px-4 text-slate-600">{key.label}</td>
                     <td className="py-3 px-4 text-right text-slate-800 font-medium">{key.requestsToday.toLocaleString()}</td>
                     <td className="py-3 px-4 text-right text-slate-800 font-medium">{key.requestsMonth.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-right text-slate-400">{key.rateLimit} req/min</td>
+                    <td className="py-3 px-4 text-right text-slate-600">{key.rateLimit} req/min</td>
                     <td className="py-3 px-4 text-center">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
                         key.status === "active"
                           ? "bg-emerald-50 text-emerald-700"
-                          : "bg-slate-100 text-slate-400"
+                          : "bg-slate-100 text-slate-600"
                       }`}>
                         {key.status}
                       </span>
@@ -437,7 +437,7 @@ export default function UsagePage() {
                 className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-slate-50 transition-colors"
               >
                 {/* Type badge */}
-                <span className={`flex-shrink-0 w-20 text-center px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
+                <span className={`flex-shrink-0 w-20 text-center px-2 py-1 rounded text-xs font-bold uppercase tracking-wider ${
                   item.type === "generate"
                     ? "bg-indigo-50 text-indigo-700"
                     : item.type === "deploy"
@@ -451,7 +451,7 @@ export default function UsagePage() {
                 <span className="flex-1 text-sm text-slate-600 truncate">{item.description}</span>
 
                 {/* Model */}
-                <span className="hidden md:block text-xs text-slate-400 font-mono w-36 text-right truncate">
+                <span className="hidden md:block text-xs text-slate-600 font-mono w-36 text-right truncate">
                   {item.model}
                 </span>
 
@@ -461,7 +461,7 @@ export default function UsagePage() {
                 }`} />
 
                 {/* Timestamp */}
-                <span className="flex-shrink-0 flex items-center gap-1 text-xs text-slate-400 w-20 justify-end">
+                <span className="flex-shrink-0 flex items-center gap-1 text-xs text-slate-600 w-20 justify-end">
                   <Clock className="w-3 h-3" />
                   {formatRelative(item.timestamp)}
                 </span>

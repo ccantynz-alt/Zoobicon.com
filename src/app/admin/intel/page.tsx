@@ -217,7 +217,7 @@ export default function IntelPage() {
       case "critical": return "text-red-600 bg-red-50 border-red-200";
       case "warning": return "text-amber-600 bg-amber-50 border-amber-200";
       case "info": return "text-blue-600 bg-blue-50 border-blue-200";
-      default: return "text-slate-500 bg-slate-50 border-slate-200";
+      default: return "text-slate-700 bg-slate-50 border-slate-200";
     }
   };
 
@@ -246,7 +246,7 @@ export default function IntelPage() {
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-800">Competitive Intelligence</h1>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-700">
               Always-on monitoring. {lastCrawlTime ? `Last crawl: ${new Date(lastCrawlTime).toLocaleString()}` : "Auto-crawl: daily at midnight UTC"}
             </p>
           </div>
@@ -281,13 +281,13 @@ export default function IntelPage() {
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === tab.id
                   ? "border-indigo-500 text-slate-800"
-                  : "border-transparent text-slate-400 hover:text-slate-600"
+                  : "border-transparent text-slate-600 hover:text-slate-600"
               }`}
             >
               {tab.icon}
               {tab.label}
               {tab.badge ? (
-                <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-red-50 text-red-600 rounded-full">
+                <span className="ml-1 px-1.5 py-0.5 text-xs bg-red-50 text-red-600 rounded-full">
                   {tab.badge}
                 </span>
               ) : null}
@@ -311,19 +311,19 @@ export default function IntelPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-5 rounded-xl bg-white border border-slate-200">
                 <div className="text-2xl font-bold text-indigo-600">{zoobiconFeatureCount}/{FEATURE_MATRIX.length}</div>
-                <div className="text-xs text-slate-500 mt-1">Features (leading)</div>
+                <div className="text-xs text-slate-700 mt-1">Features (leading)</div>
               </div>
               <div className="p-5 rounded-xl bg-white border border-slate-200">
                 <div className="text-2xl font-bold text-blue-600">7</div>
-                <div className="text-xs text-slate-500 mt-1">Competitors tracked</div>
+                <div className="text-xs text-slate-700 mt-1">Competitors tracked</div>
               </div>
               <div className="p-5 rounded-xl bg-white border border-slate-200">
                 <div className="text-2xl font-bold text-amber-600">{alerts.filter((a) => !a.acknowledged).length}</div>
-                <div className="text-xs text-slate-500 mt-1">Unread alerts</div>
+                <div className="text-xs text-slate-700 mt-1">Unread alerts</div>
               </div>
               <div className="p-5 rounded-xl bg-white border border-slate-200">
                 <div className="text-2xl font-bold text-emerald-600">{trends.length}</div>
-                <div className="text-xs text-slate-500 mt-1">Market trends (7d)</div>
+                <div className="text-xs text-slate-700 mt-1">Market trends (7d)</div>
               </div>
             </div>
 
@@ -348,10 +348,10 @@ export default function IntelPage() {
                       }`}
                     >
                       <div className="text-sm font-semibold text-slate-700 mb-2">{name}</div>
-                      <div className={`text-3xl font-bold mb-1 ${isUs ? "text-indigo-600" : "text-slate-500"}`}>
+                      <div className={`text-3xl font-bold mb-1 ${isUs ? "text-indigo-600" : "text-slate-700"}`}>
                         {count}
                       </div>
-                      <div className="text-[10px] text-slate-400">features</div>
+                      <div className="text-xs text-slate-600">features</div>
                       <div className="w-full bg-slate-200 rounded-full h-1.5 mt-3">
                         <div
                           className={`h-1.5 rounded-full ${isUs ? "bg-indigo-500" : "bg-slate-400"}`}
@@ -389,9 +389,9 @@ export default function IntelPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-slate-200">
-                      <th className="text-left py-3 px-4 text-slate-500 font-medium">Tier</th>
+                      <th className="text-left py-3 px-4 text-slate-700 font-medium">Tier</th>
                       {competitorNames.map((name) => (
-                        <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-indigo-600" : "text-slate-500"}`}>
+                        <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-indigo-600" : "text-slate-700"}`}>
                           {name}
                         </th>
                       ))}
@@ -402,10 +402,10 @@ export default function IntelPage() {
                       <tr key={row.tier} className="border-b border-slate-100">
                         <td className="py-3 px-4 text-slate-700">{row.tier}</td>
                         <td className="py-3 px-4 text-center text-indigo-600 font-semibold">{row.zoobicon}</td>
-                        <td className="py-3 px-4 text-center text-slate-500">{row.lovable}</td>
-                        <td className="py-3 px-4 text-center text-slate-500">{row.bolt}</td>
-                        <td className="py-3 px-4 text-center text-slate-500">{row.v0}</td>
-                        <td className="py-3 px-4 text-center text-slate-500">{row.emergent}</td>
+                        <td className="py-3 px-4 text-center text-slate-700">{row.lovable}</td>
+                        <td className="py-3 px-4 text-center text-slate-700">{row.bolt}</td>
+                        <td className="py-3 px-4 text-center text-slate-700">{row.v0}</td>
+                        <td className="py-3 px-4 text-center text-slate-700">{row.emergent}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -434,18 +434,18 @@ export default function IntelPage() {
                     }`}
                   >
                     <div className="text-sm font-semibold text-slate-700 mb-1">{c.name}</div>
-                    <div className="text-[10px] text-slate-400">{c.domain}</div>
+                    <div className="text-xs text-slate-600">{c.domain}</div>
                     <div className={`text-[9px] mt-2 px-2 py-0.5 rounded-full inline-block ${
                       c.category === "direct" ? "text-red-600 bg-red-50"
                         : c.category === "emerging" ? "text-amber-600 bg-amber-50"
-                        : "text-slate-500 bg-slate-100"
+                        : "text-slate-700 bg-slate-100"
                     }`}>
                       {c.category}
                     </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); runCrawl(c.name); }}
                       disabled={isCrawling}
-                      className="mt-2 text-[10px] text-indigo-400 hover:text-indigo-600 transition-colors block"
+                      className="mt-2 text-xs text-indigo-400 hover:text-indigo-600 transition-colors block"
                     >
                       Crawl now
                     </button>
@@ -467,9 +467,9 @@ export default function IntelPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200">
-                    <th className="text-left py-3 px-4 text-slate-500 font-medium">Feature</th>
+                    <th className="text-left py-3 px-4 text-slate-700 font-medium">Feature</th>
                     {competitorNames.map((name) => (
-                      <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-indigo-600" : "text-slate-500"}`}>
+                      <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-indigo-600" : "text-slate-700"}`}>
                         {name}
                       </th>
                     ))}
@@ -485,7 +485,7 @@ export default function IntelPage() {
                         return (
                           <td key={name} className="py-2.5 px-4 text-center">
                             {has ? (
-                              <Check size={16} className={name === "Zoobicon" ? "text-emerald-500 mx-auto" : "text-slate-400 mx-auto"} />
+                              <Check size={16} className={name === "Zoobicon" ? "text-emerald-500 mx-auto" : "text-slate-600 mx-auto"} />
                             ) : (
                               <span className="text-slate-200">—</span>
                             )}
@@ -504,7 +504,7 @@ export default function IntelPage() {
                         return f[key];
                       }).length;
                       return (
-                        <td key={name} className={`py-3 px-4 text-center font-bold ${name === "Zoobicon" ? "text-indigo-600" : "text-slate-500"}`}>
+                        <td key={name} className={`py-3 px-4 text-center font-bold ${name === "Zoobicon" ? "text-indigo-600" : "text-slate-700"}`}>
                           {count}
                         </td>
                       );
@@ -524,7 +524,7 @@ export default function IntelPage() {
                 <Bell size={16} />
                 Intelligence Alerts
               </h3>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-slate-600">
                 {alerts.filter((a) => !a.acknowledged).length} unread
               </span>
             </div>
@@ -532,8 +532,8 @@ export default function IntelPage() {
             {alerts.length === 0 ? (
               <div className="text-center py-16">
                 <Bell className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                <p className="text-slate-500 mb-2">No alerts yet</p>
-                <p className="text-xs text-slate-400">
+                <p className="text-slate-700 mb-2">No alerts yet</p>
+                <p className="text-xs text-slate-600">
                   Run an intel sweep to detect competitor changes.
                 </p>
               </div>
@@ -549,24 +549,24 @@ export default function IntelPage() {
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                          <span className={`text-xs px-2 py-0.5 rounded-full uppercase tracking-wider ${
                             alert.severity === "critical" ? "bg-red-50 text-red-600"
                               : alert.severity === "warning" ? "bg-amber-50 text-amber-600"
                               : "bg-blue-50 text-blue-600"
                           }`}>
                             {alert.severity}
                           </span>
-                          <span className="text-xs text-slate-500">{alert.competitor_name}</span>
-                          <span className="text-xs text-slate-400">
+                          <span className="text-xs text-slate-700">{alert.competitor_name}</span>
+                          <span className="text-xs text-slate-600">
                             {alert.alert_type.replace(/_/g, " ")}
                           </span>
                         </div>
                         <h4 className="text-sm font-semibold text-slate-800">{alert.title}</h4>
                         {alert.details && (
-                          <p className="text-xs text-slate-500 mt-1">{alert.details}</p>
+                          <p className="text-xs text-slate-700 mt-1">{alert.details}</p>
                         )}
                       </div>
-                      <span className="text-[10px] text-slate-400 shrink-0 ml-4">
+                      <span className="text-xs text-slate-600 shrink-0 ml-4">
                         {new Date(alert.created_at).toLocaleDateString()}
                       </span>
                     </div>
@@ -590,8 +590,8 @@ export default function IntelPage() {
             {trends.length === 0 ? (
               <div className="text-center py-16">
                 <TrendingUp className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                <p className="text-slate-500 mb-2">No trends detected yet</p>
-                <p className="text-xs text-slate-400">
+                <p className="text-slate-700 mb-2">No trends detected yet</p>
+                <p className="text-xs text-slate-600">
                   The intel engine scans Product Hunt and Hacker News daily for relevant AI builder trends.
                 </p>
                 <button
@@ -612,27 +612,27 @@ export default function IntelPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 uppercase tracking-wider">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 uppercase tracking-wider">
                             {trend.source}
                           </span>
                           {trend.category && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">
                               {trend.category}
                             </span>
                           )}
                           {trend.relevance_score > 0.7 && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">
                               High relevance
                             </span>
                           )}
                         </div>
                         <h4 className="text-sm font-semibold text-slate-800">{trend.title}</h4>
                         {trend.summary && (
-                          <p className="text-xs text-slate-500 mt-1 line-clamp-2">{trend.summary}</p>
+                          <p className="text-xs text-slate-700 mt-1 line-clamp-2">{trend.summary}</p>
                         )}
                       </div>
                       <div className="flex items-center gap-2 ml-4 shrink-0">
-                        <span className="text-[10px] text-slate-400">
+                        <span className="text-xs text-slate-600">
                           {new Date(trend.detected_at).toLocaleDateString()}
                         </span>
                         {trend.url && (
@@ -662,7 +662,7 @@ export default function IntelPage() {
               <button
                 onClick={() => setSelectedCompetitor(null)}
                 className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
-                  !selectedCompetitor ? "bg-indigo-50 text-indigo-600 border border-indigo-200" : "bg-slate-100 text-slate-500 hover:text-slate-700"
+                  !selectedCompetitor ? "bg-indigo-50 text-indigo-600 border border-indigo-200" : "bg-slate-100 text-slate-700 hover:text-slate-700"
                 }`}
               >
                 All
@@ -674,7 +674,7 @@ export default function IntelPage() {
                   className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
                     selectedCompetitor === c.name
                       ? "bg-indigo-50 text-indigo-600 border border-indigo-200"
-                      : "bg-slate-100 text-slate-500 hover:text-slate-700"
+                      : "bg-slate-100 text-slate-700 hover:text-slate-700"
                   }`}
                 >
                   {c.name}
@@ -691,7 +691,7 @@ export default function IntelPage() {
                     Crawl Results ({filteredResults.length})
                   </h3>
                   {report?.generatedAt && (
-                    <span className="text-[10px] text-slate-400">
+                    <span className="text-xs text-slate-600">
                       {new Date(report.generatedAt).toLocaleString()}
                     </span>
                   )}
@@ -728,7 +728,7 @@ export default function IntelPage() {
                           </a>
                         </div>
                         {result.rawTextLength && (
-                          <span className="text-[10px] text-slate-400">
+                          <span className="text-xs text-slate-600">
                             {result.rawTextLength.toLocaleString()} chars
                           </span>
                         )}
@@ -736,24 +736,24 @@ export default function IntelPage() {
 
                       {result.title && (
                         <div className="mb-2">
-                          <span className="text-[10px] uppercase tracking-wider text-slate-400">Title</span>
+                          <span className="text-xs uppercase tracking-wider text-slate-600">Title</span>
                           <p className="text-sm text-slate-700">{result.title}</p>
                         </div>
                       )}
 
                       {result.pricing && (
                         <div className="mb-2">
-                          <span className="text-[10px] uppercase tracking-wider text-slate-400">Pricing</span>
+                          <span className="text-xs uppercase tracking-wider text-slate-600">Pricing</span>
                           <p className="text-sm text-slate-700">{result.pricing}</p>
                         </div>
                       )}
 
                       {result.features && result.features.length > 0 && (
                         <div className="mb-2">
-                          <span className="text-[10px] uppercase tracking-wider text-slate-400">Features</span>
+                          <span className="text-xs uppercase tracking-wider text-slate-600">Features</span>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {result.features.map((f, j) => (
-                              <span key={j} className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">{f}</span>
+                              <span key={j} className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">{f}</span>
                             ))}
                           </div>
                         </div>
@@ -761,10 +761,10 @@ export default function IntelPage() {
 
                       {result.techStack && result.techStack.length > 0 && (
                         <div className="mb-2">
-                          <span className="text-[10px] uppercase tracking-wider text-slate-400">Tech</span>
+                          <span className="text-xs uppercase tracking-wider text-slate-600">Tech</span>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {result.techStack.map((t, j) => (
-                              <span key={j} className="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-600">{t}</span>
+                              <span key={j} className="text-xs px-2 py-0.5 rounded-full bg-purple-50 text-purple-600">{t}</span>
                             ))}
                           </div>
                         </div>
@@ -772,7 +772,7 @@ export default function IntelPage() {
 
                       {result.keyChanges && result.keyChanges.length > 0 && (
                         <div>
-                          <span className="text-[10px] uppercase tracking-wider text-slate-400">Key Changes</span>
+                          <span className="text-xs uppercase tracking-wider text-slate-600">Key Changes</span>
                           <ul className="mt-1 space-y-1">
                             {result.keyChanges.map((change, j) => (
                               <li key={j} className="text-xs text-slate-600 flex items-start gap-2">
@@ -794,8 +794,8 @@ export default function IntelPage() {
             ) : (
               <div className="text-center py-16">
                 <Radar className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                <p className="text-slate-500 mb-2">No crawl data yet</p>
-                <p className="text-xs text-slate-400 mb-6">
+                <p className="text-slate-700 mb-2">No crawl data yet</p>
+                <p className="text-xs text-slate-600 mb-6">
                   Click &quot;Crawl All&quot; to run a competitive intelligence sweep.
                 </p>
                 <button
