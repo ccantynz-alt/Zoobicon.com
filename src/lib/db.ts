@@ -658,4 +658,36 @@ export async function initSchema() {
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS usage_tracking_email_idx ON usage_tracking (email)`;
+
+  // ---- Generated-site users (end-users of AI-built sites, not Zoobicon users) ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_users (
+      id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      project_id    TEXT NOT NULL,
+      email         TEXT NOT NULL,
+      password_hash TEXT NOT NULL,
+      metadata      JSONB,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_seen     TIMESTAMPTZ,
+      UNIQUE (project_id, email)
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS site_users_project_idx ON site_users (project_id)`;
+
+  // ---- Generated-site data (contact forms, bookings, records, etc.) ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_data (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      project_id  TEXT NOT NULL,
+      collection  TEXT NOT NULL,
+      data        JSONB NOT NULL,
+      user_id     UUID REFERENCES site_users(id) ON DELETE SET NULL,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS site_data_project_collection_idx ON site_data (project_id, collection)`;
 }

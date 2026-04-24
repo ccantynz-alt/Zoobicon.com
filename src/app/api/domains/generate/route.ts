@@ -68,25 +68,27 @@ export async function POST(req: NextRequest) {
 
     const client = new Anthropic({ apiKey });
 
-    const system = `You are a brand naming expert. Generate ${count} unique, memorable business names in the "${style}" style for this business:
+    const system = `You are a world-class brand strategist and naming expert. Generate ${count} extraordinary, highly original business names in the "${style}" style for this business:
 
 "${description}"
 
-Rules:
-- Each name must be 1-2 words, 4-18 characters, pronounceable, brandable
-- No hyphens, numbers, or special characters
-- Avoid generic words (Global, Solutions, Services, Systems)
-- Each name must be DISTINCT from the others (different letters, vibe, length)
-- Include a short 4-8 word tagline for each
+Naming rules (strictly enforced):
+- 1-2 words, 4-18 characters total, no spaces, pronounceable, instantly brandable
+- No hyphens, numbers, or special characters — letters only
+- Avoid tired generics: Global, Solutions, Services, Systems, Tech, Digital, AI, Smart, Pro, Plus
+- Every name must feel DISTINCT — wildly different letters, syllable count, energy, and vibe
+- Favour invented portmanteaus, evocative metaphors, and unexpected word combinations
+- Aim for names that feel premium, modern, and memorable — the kind a $10M startup would register
+- Include a punchy 5-8 word tagline for each
 
-Return ONLY a JSON array, no markdown, no explanation:
-[{"name":"Lumenpath","tagline":"Illuminate your next journey"}, ...]`;
+Return ONLY a JSON array — no markdown, no preamble, no explanation:
+[{"name":"Lumenpath","tagline":"Where brilliant ideas find the light"}, ...]`;
 
     const message = await client.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 2048,
+      model: "claude-sonnet-4-6",
+      max_tokens: 3000,
       system,
-      messages: [{ role: "user", content: `Generate ${count} names now. JSON array only.` }],
+      messages: [{ role: "user", content: `Generate ${count} extraordinary names now. JSON array only.` }],
     });
 
     const textBlock = message.content.find((b) => b.type === "text") as
