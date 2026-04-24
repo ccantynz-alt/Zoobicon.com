@@ -3,6 +3,7 @@ import {
   generateSpokespersonVideo,
   isCustomPipelineAvailable,
   getVideoPipelineInfo,
+  AVATAR_PRESETS,
   type VideoGenerationRequest,
 } from "@/lib/video-pipeline";
 
@@ -69,7 +70,8 @@ export async function POST(req: NextRequest) {
         const result = await generateSpokespersonVideo(
           {
             script: body.script.trim(),
-            avatarDescription: body.avatarDescription || "beautiful professional woman, mid-30s, warm smile, friendly expression, business attire",
+            avatarPresetId: body.avatarPresetId as string | undefined,
+            avatarDescription: body.avatarDescription,
             avatarImageUrl: body.avatarImageUrl,
             voiceStyle: (body.voiceStyle as VideoGenerationRequest["voiceStyle"]) || "professional",
             voiceGender: (body.voiceGender as VideoGenerationRequest["voiceGender"]) || "female",
@@ -124,10 +126,12 @@ export async function GET() {
     available: info.available,
     provider: info.provider,
     models: info.models,
+    avatarPresets: AVATAR_PRESETS,
     capabilities: {
       spokesperson: true,
       voiceCloning: info.available,
       customAvatars: info.available,
+      elevenLabsVoice: Boolean(process.env.ELEVENLABS_API_KEY),
       formats: ["landscape", "portrait", "square"],
       maxScriptLength: 5000,
       estimatedCostPerMinute: "$0.10-0.20",

@@ -258,7 +258,7 @@ export default function VideoCreatorDashboard() {
   const [editedScript, setEditedScript] = useState("");
 
   // Step 3: Produce
-  const [presenterGender, setPresenterGender] = useState<"female" | "male">("female");
+  const [selectedAvatarId, setSelectedAvatarId] = useState("emma");
   const [format, setFormat] = useState<"landscape" | "portrait" | "square">("landscape");
   const [generating, setGenerating] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -387,10 +387,8 @@ SCRIPT_2:
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           script: editedScript.trim(),
-          avatarDescription: presenterGender === "female"
-            ? "Beautiful professional woman, mid-30s, warm confident smile, friendly expression, business casual attire, looking at camera"
-            : "Professional man, mid-30s, confident smile, business casual attire, looking at camera",
-          voiceGender: presenterGender,
+          avatarPresetId: selectedAvatarId,
+          voiceGender: (["james", "michael", "david"].includes(selectedAvatarId) ? "male" : "female") as "female" | "male",
           voiceStyle: "professional",
           background: "#0f172a",
           format,
@@ -820,60 +818,70 @@ SCRIPT_2:
                   <div className="text-[13px] text-white/50 leading-relaxed whitespace-pre-wrap max-h-24 overflow-y-auto">{editedScript}</div>
                 </div>
 
-                {/* Presenter + Format row */}
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {/* Presenter */}
-                  <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl">
-                    <label className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 block">Presenter</label>
-                    <div className="grid grid-cols-2 gap-2">
+                {/* Presenter picker — real photos for authentic lip-sync */}
+                <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl">
+                  <label className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4 block">Choose Your Presenter</label>
+                  <div className="grid grid-cols-6 gap-2.5">
+                    {[
+                      { id: "emma",    name: "Emma",    thumb: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&h=120&fit=crop&crop=face&q=80" },
+                      { id: "sarah",   name: "Sarah",   thumb: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&h=120&fit=crop&crop=face&q=80" },
+                      { id: "jessica", name: "Jessica", thumb: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&h=120&fit=crop&crop=face&q=80" },
+                      { id: "james",   name: "James",   thumb: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face&q=80" },
+                      { id: "michael", name: "Michael", thumb: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&h=120&fit=crop&crop=face&q=80" },
+                      { id: "david",   name: "David",   thumb: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&h=120&fit=crop&crop=face&q=80" },
+                    ].map((avatar) => (
                       <button
-                        onClick={() => setPresenterGender("female")}
-                        className={`p-3 rounded-xl border text-center transition-all duration-300 ${
-                          presenterGender === "female"
-                            ? "border-stone-500/40 bg-stone-500/[0.08]"
-                            : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
+                        key={avatar.id}
+                        onClick={() => setSelectedAvatarId(avatar.id)}
+                        className={`relative rounded-xl overflow-hidden border-2 transition-all duration-300 aspect-square ${
+                          selectedAvatarId === avatar.id
+                            ? "border-amber-400/80 shadow-lg shadow-amber-400/20 scale-105"
+                            : "border-white/[0.06] hover:border-white/20 hover:scale-102"
                         }`}
                       >
-                        <div className={`text-sm font-semibold transition-colors ${presenterGender === "female" ? "text-white" : "text-white/50"}`}>Female</div>
-                        <div className="text-[11px] text-white/25 mt-0.5">Warm, professional</div>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={avatar.thumb}
+                          alt={avatar.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-center pb-1.5 transition-opacity duration-200 ${selectedAvatarId === avatar.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+                          <span className="text-[10px] font-semibold text-white">{avatar.name}</span>
+                        </div>
+                        {selectedAvatarId === avatar.id && (
+                          <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-amber-400 flex items-center justify-center">
+                            <Check className="w-2.5 h-2.5 text-black" />
+                          </div>
+                        )}
                       </button>
-                      <button
-                        onClick={() => setPresenterGender("male")}
-                        className={`p-3 rounded-xl border text-center transition-all duration-300 ${
-                          presenterGender === "male"
-                            ? "border-stone-500/40 bg-stone-500/[0.08]"
-                            : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
-                        }`}
-                      >
-                        <div className={`text-sm font-semibold transition-colors ${presenterGender === "male" ? "text-white" : "text-white/50"}`}>Male</div>
-                        <div className="text-[11px] text-white/25 mt-0.5">Confident, clear</div>
-                      </button>
-                    </div>
+                    ))}
                   </div>
+                  <p className="text-[11px] text-white/30 mt-3">Real professional presenters — authentic lip-sync quality</p>
+                </div>
 
-                  {/* Format */}
-                  <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl">
-                    <label className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 block">Format</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {([
-                        { id: "landscape" as const, icon: Monitor, label: "16:9" },
-                        { id: "portrait" as const, icon: Smartphone, label: "9:16" },
-                        { id: "square" as const, icon: Square, label: "1:1" },
-                      ]).map((f) => (
-                        <button
-                          key={f.id}
-                          onClick={() => setFormat(f.id)}
-                          className={`p-2.5 rounded-xl border text-center transition-all duration-300 ${
-                            format === f.id
-                              ? "border-stone-500/40 bg-stone-500/[0.08]"
-                              : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
-                          }`}
-                        >
-                          <f.icon className={`w-4 h-4 mx-auto mb-1 transition-colors ${format === f.id ? "text-stone-400" : "text-white/30"}`} />
-                          <div className={`text-[11px] font-medium transition-colors ${format === f.id ? "text-white/80" : "text-white/30"}`}>{f.label}</div>
-                        </button>
-                      ))}
-                    </div>
+                {/* Format */}
+                <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl">
+                  <label className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-3 block">Format</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {([
+                      { id: "landscape" as const, icon: Monitor, label: "16:9", desc: "YouTube / LinkedIn" },
+                      { id: "portrait" as const, icon: Smartphone, label: "9:16", desc: "TikTok / Reels" },
+                      { id: "square" as const, icon: Square, label: "1:1", desc: "Instagram" },
+                    ]).map((f) => (
+                      <button
+                        key={f.id}
+                        onClick={() => setFormat(f.id)}
+                        className={`p-3 rounded-xl border text-center transition-all duration-300 ${
+                          format === f.id
+                            ? "border-amber-400/40 bg-amber-400/[0.06]"
+                            : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
+                        }`}
+                      >
+                        <f.icon className={`w-4 h-4 mx-auto mb-1.5 transition-colors ${format === f.id ? "text-amber-400" : "text-white/30"}`} />
+                        <div className={`text-xs font-semibold transition-colors ${format === f.id ? "text-white" : "text-white/40"}`}>{f.label}</div>
+                        <div className="text-[10px] text-white/20 mt-0.5">{f.desc}</div>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
