@@ -555,6 +555,7 @@ function BuilderPage() {
   const [showTour, setShowTour] = useState(false);
   const [showBuildSuccess, setShowBuildSuccess] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [crontechAvailable, setCrontechAvailable] = useState(false);
 
   // Recording mode — ?record=1 hides all chrome for clean screen captures
   const [recordingMode, setRecordingMode] = useState(false);
@@ -569,6 +570,14 @@ function BuilderPage() {
   const [advancedMode, setAdvancedMode] = useState(false);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [previewRect, setPreviewRect] = useState<DOMRect | null>(null);
+
+  // Check CronTech availability on mount
+  useEffect(() => {
+    fetch("/api/hosting/deploy-crontech")
+      .then(r => r.json())
+      .then(d => setCrontechAvailable(Boolean(d.available)))
+      .catch(() => {});
+  }, []);
 
   // Show welcome modal on first visit
   useEffect(() => {
@@ -1521,7 +1530,7 @@ root.render(React.createElement(App));
   }, [generatedCode, reactFiles]);
 
   /** Called by DeployModal when user confirms deploy */
-  const handleDeployWithName = useCallback(async (siteName: string): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
+  const handleDeployWithName = useCallback(async (siteName: string, provider: "zoobicon" | "crontech" = "zoobicon"): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
     const deployCode = buildDeployCode(siteName);
     if (!deployCode) throw new Error("No code to deploy");
 
@@ -1533,10 +1542,18 @@ root.render(React.createElement(App));
       const user = userStr ? JSON.parse(userStr) : null;
       const email = user?.email || "anonymous@zoobicon.com";
 
-      const res = await fetch("/api/hosting/deploy", {
+      const endpoint = provider === "crontech"
+        ? "/api/hosting/deploy-crontech"
+        : "/api/hosting/deploy";
+
+      const body = provider === "crontech"
+        ? { name: siteName, code: deployCode, files: reactFiles ?? undefined, dependencies: reactDeps }
+        : { name: siteName, email, code: deployCode };
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: siteName, email, code: deployCode }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {
@@ -1548,11 +1565,10 @@ root.render(React.createElement(App));
       setDeployUrl(data.url);
       setDeployStatus("deployed");
 
-      // Track deploy achievement + send notification
       trackEvent("deploy");
       notifyDeploy(siteName, data.url);
 
-      return { url: data.url, slug: data.siteSlug, deployTimeMs: data.deployTimeMs };
+      return { url: data.url, slug: data.slug ?? data.siteSlug, deployTimeMs: data.deployTimeMs };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deploy failed");
       setDeployStatus("error");
@@ -1560,7 +1576,7 @@ root.render(React.createElement(App));
     } finally {
       setIsDeploying(false);
     }
-  }, [buildDeployCode]);
+  }, [buildDeployCode, reactFiles, reactDeps]);
 
   /** Quick deploy handler for inline button and BuildSuccessModal */
   const handleDeploy = useCallback(() => {
@@ -1891,7 +1907,7 @@ root.render(React.createElement(App));
   }
 
   return (
-    <div className="flex flex-col h-screen bg-zinc-950 relative overflow-hidden">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-[#0a0f1e] via-[#0f172a] to-[#111827] relative overflow-hidden">
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />
@@ -1920,10 +1936,10 @@ root.render(React.createElement(App));
       <BuilderBackground isGenerating={status === "generating"} />
 
       {/* ── Top Bar ── minimal, dark, premium */}
-      <div className="relative z-10 flex items-center h-12 border-b border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl px-3 gap-3">
+      <div className="relative z-10 flex items-center h-12 border-b border-white/[0.06] bg-[#0a0f1e]/80 backdrop-blur-xl px-3 gap-3">
         {/* Logo + branding */}
         <Link href="/" className="flex items-center gap-2 mr-2 group">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-stone-600 to-stone-600 flex items-center justify-center shadow-lg shadow-stone-500/20 group-hover:shadow-stone-500/40 transition-shadow">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
             <Sparkles className="w-3.5 h-3.5 text-white" />
           </div>
           <span className="text-sm font-semibold text-white/80 hidden sm:inline">Zoobicon</span>
@@ -2043,8 +2059,8 @@ root.render(React.createElement(App));
                 title={advancedMode ? "Switch to simple mode" : "Show advanced tools"}
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
                   advancedMode
-                    ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
-                    : "bg-white/[0.04] text-white/40 hover:text-white/60 hover:bg-white/[0.07] border-white/[0.06]"
+                    ? "bg-gradient-to-r from-purple-500/15 to-indigo-500/15 text-purple-300 border-purple-500/30 shadow-sm shadow-purple-500/10"
+                    : "bg-white/[0.04] text-white/40 hover:text-white/60 hover:bg-white/[0.07] border-white/[0.08] hover:border-purple-500/20"
                 }`}
               >
                 <Wand2 size={13} />
@@ -2055,8 +2071,8 @@ root.render(React.createElement(App));
                 disabled={isDeploying}
                 className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
                   isDeploying
-                    ? "bg-stone-500/10 text-stone-300/50 cursor-wait border border-stone-500/20"
-                    : "bg-gradient-to-r from-stone-600 to-stone-600 text-white hover:from-stone-500 hover:to-stone-500 shadow-lg shadow-stone-500/25 hover:shadow-stone-500/40 border border-stone-400/20"
+                    ? "bg-purple-500/10 text-purple-300/50 cursor-wait border border-purple-500/20"
+                    : "bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 border border-purple-400/20"
                 }`}
               >
                 <Rocket size={13} className={isDeploying ? "animate-pulse" : ""} />
@@ -2081,7 +2097,7 @@ root.render(React.createElement(App));
 
       <div className="flex flex-1 overflow-hidden relative z-10">
         {/* ── Left Panel — Chat / Prompt ── */}
-        <div className="w-[380px] min-w-[320px] flex flex-col border-r border-white/[0.06] bg-zinc-950/60 backdrop-blur-xl">
+        <div className="w-[380px] min-w-[320px] flex flex-col border-r border-white/[0.06] border-l border-purple-500/10 bg-[#0d1321]/60 backdrop-blur-xl">
           <AnimatePresence mode="wait">
             {!hasCode ? (
               <motion.div
@@ -2222,8 +2238,8 @@ root.render(React.createElement(App));
                       title={advancedMode ? "Hide advanced tools" : "Show advanced tools"}
                       className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] transition-all border ${
                         advancedMode
-                          ? "text-amber-300 bg-amber-500/10 border-amber-500/20"
-                          : "text-white/30 hover:text-white/60 bg-white/[0.03] hover:bg-white/[0.06] border-white/[0.06]"
+                          ? "text-purple-300 bg-gradient-to-r from-purple-500/15 to-indigo-500/15 border-purple-500/30"
+                          : "text-white/30 hover:text-white/60 bg-white/[0.03] hover:bg-white/[0.06] border-white/[0.06] hover:border-purple-500/20"
                       }`}
                     >
                       <Wand2 size={11} />
@@ -2286,9 +2302,9 @@ root.render(React.createElement(App));
         </div>
 
         {/* ── Center Panel — Preview / Code / SEO ── */}
-        <div className="flex-1 flex flex-col bg-zinc-950/40 backdrop-blur-sm min-w-0">
+        <div className="flex-1 flex flex-col bg-white/[0.03] backdrop-blur-sm min-w-0 ring-1 ring-white/[0.06]">
           {/* Tab bar — clean, minimal */}
-          <div className="flex items-center h-10 border-b border-white/[0.06] px-2 bg-zinc-900/30">
+          <div className="flex items-center h-10 border-b border-white/[0.06] px-2 bg-white/[0.03] backdrop-blur-sm">
             <div className="flex items-center gap-0.5">
               {(["preview", "code", ...(hasCode ? ["seo"] : [])] as const).map(tab => (
                 <button
@@ -2335,7 +2351,7 @@ root.render(React.createElement(App));
             */}
             <div
               ref={previewContainerRef}
-              className="absolute inset-0 bg-zinc-950"
+              className="absolute inset-0 bg-[#0a0f1e]"
               style={{
                 visibility: activeTab === "preview" ? "visible" : "hidden",
                 zIndex: activeTab === "preview" ? 1 : 0,
@@ -2465,7 +2481,7 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-20 flex items-center justify-center bg-zinc-950"
+                  className="absolute inset-0 z-20 flex items-center justify-center bg-[#0a0f1e]"
                 >
                   <div className="max-w-md text-center px-8">
                     <div className="w-14 h-14 rounded-2xl bg-stone-500/10 border border-stone-500/15 flex items-center justify-center mx-auto mb-5">
@@ -2489,20 +2505,20 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-950/95 backdrop-blur-sm overflow-hidden"
+                  className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0a0f1e]/95 backdrop-blur-sm overflow-hidden"
                 >
                   <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-stone-600/[0.04] blur-[120px] animate-pulse" />
-                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full bg-stone-600/[0.03] blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-purple-600/[0.06] blur-[120px] animate-pulse" />
+                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full bg-indigo-600/[0.04] blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
                   </div>
 
                   <div className="relative z-10 text-center px-6">
                     <div className="relative w-20 h-20 mx-auto mb-8">
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-stone-600 to-stone-700 animate-pulse shadow-2xl shadow-stone-500/30" />
-                      <div className="absolute inset-[3px] rounded-[13px] bg-zinc-950 flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 text-stone-400 animate-spin" />
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 animate-pulse shadow-2xl shadow-purple-500/30" />
+                      <div className="absolute inset-[3px] rounded-[13px] bg-[#0a0f1e] flex items-center justify-center">
+                        <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
                       </div>
-                      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-stone-500/20 via-transparent to-stone-500/20 animate-spin" style={{ animationDuration: "3s" }} />
+                      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-purple-500/20 via-transparent to-blue-500/20 animate-spin" style={{ animationDuration: "3s" }} />
                     </div>
 
                     <h3 className="text-xl font-semibold text-white/90 mb-2">Building your website</h3>
@@ -2555,20 +2571,21 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-10 overflow-hidden bg-zinc-950/95 backdrop-blur-sm"
+                  className="absolute inset-0 z-10 overflow-hidden bg-[#0a0f1e]/95 backdrop-blur-sm"
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-stone-600/[0.025] blur-[150px]" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-purple-600/[0.06] blur-[150px]" />
+                      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-blue-600/[0.04] blur-[120px]" />
                     </div>
 
                     <div className="relative z-10 text-center px-6 max-w-xl">
                       <h1 className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight">
-                        <span className="bg-gradient-to-b from-white via-white/90 to-white/50 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-300 bg-clip-text text-transparent">
                           What do you want to build?
                         </span>
                       </h1>
-                      <p className="text-white/30 text-sm mb-10 leading-relaxed max-w-md mx-auto">
+                      <p className="text-white/40 text-sm mb-10 leading-relaxed max-w-md mx-auto">
                         Describe your vision and our AI will generate a complete, production-ready React application.
                       </p>
 
@@ -2584,17 +2601,17 @@ root.render(React.createElement(App));
                           <button
                             key={chip.label}
                             onClick={() => setPrompt(chip.label.toLowerCase())}
-                            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-[11px] text-white/35 hover:text-white/60 hover:bg-white/[0.06] hover:border-white/[0.10] transition-all"
+                            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] text-white/40 hover:text-white/70 hover:bg-purple-500/[0.08] hover:border-purple-500/[0.20] transition-all"
                           >
-                            <span className="text-white/20 group-hover:text-stone-400 transition-colors">{chip.icon}</span>
+                            <span className="text-white/25 group-hover:text-purple-400 transition-colors">{chip.icon}</span>
                             {chip.label}
-                            <ChevronRight size={10} className="text-white/15 group-hover:text-white/30 transition-colors" />
+                            <ChevronRight size={10} className="text-white/15 group-hover:text-purple-300/40 transition-colors" />
                           </button>
                         ))}
                       </div>
 
-                      <div className="inline-flex items-center gap-2 text-[10px] text-white/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-stone-400/60 animate-pulse" />
+                      <div className="inline-flex items-center gap-2 text-[10px] text-white/25">
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400/60 animate-pulse" />
                         {useWebContainers ? "Runtime pre-warmed" : "Sandbox ready"}
                       </div>
                     </div>
@@ -2625,7 +2642,7 @@ root.render(React.createElement(App));
               animate={{ width: 380, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="flex flex-col border-l border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl overflow-hidden"
+              className="flex flex-col border-l border-white/[0.06] bg-white/[0.03] backdrop-blur-xl overflow-hidden"
             >
               <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06] min-w-[380px]">
                 <span className="text-[11px] font-medium text-white/40">
@@ -2645,7 +2662,7 @@ root.render(React.createElement(App));
 
         {/* ── Right Toolbar — Tool Icons (advanced mode only) ── */}
         {advancedMode && (
-          <div className="w-11 flex flex-col items-center py-2 gap-0.5 border-l border-white/[0.06] bg-zinc-950/60 backdrop-blur-xl overflow-y-auto">
+          <div className="w-11 flex flex-col items-center py-2 gap-0.5 border-l border-white/[0.06] bg-white/[0.03] backdrop-blur-sm overflow-y-auto">
             {TOOLS.map((tool) => (
               <button
                 key={tool.id}
@@ -2696,13 +2713,13 @@ root.render(React.createElement(App));
         isOpen={showDeployModal}
         onClose={() => {
           setShowDeployModal(false);
-          // If deploy succeeded, show share modal
           if (deployStatus === "deployed" && deployUrl) {
             setShowShareModal(true);
           }
         }}
         onDeploy={handleDeployWithName}
         defaultName={prompt.trim().slice(0, 50) || "My Site"}
+        crontechAvailable={crontechAvailable}
       />
     </div>
   );
