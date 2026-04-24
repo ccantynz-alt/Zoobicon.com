@@ -555,6 +555,7 @@ function BuilderPage() {
   const [showTour, setShowTour] = useState(false);
   const [showBuildSuccess, setShowBuildSuccess] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [crontechAvailable, setCrontechAvailable] = useState(false);
 
   // Recording mode — ?record=1 hides all chrome for clean screen captures
   const [recordingMode, setRecordingMode] = useState(false);
@@ -569,6 +570,14 @@ function BuilderPage() {
   const [advancedMode, setAdvancedMode] = useState(false);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [previewRect, setPreviewRect] = useState<DOMRect | null>(null);
+
+  // Check CronTech availability on mount
+  useEffect(() => {
+    fetch("/api/hosting/deploy-crontech")
+      .then(r => r.json())
+      .then(d => setCrontechAvailable(Boolean(d.available)))
+      .catch(() => {});
+  }, []);
 
   // Show welcome modal on first visit
   useEffect(() => {
@@ -1521,7 +1530,7 @@ root.render(React.createElement(App));
   }, [generatedCode, reactFiles]);
 
   /** Called by DeployModal when user confirms deploy */
-  const handleDeployWithName = useCallback(async (siteName: string): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
+  const handleDeployWithName = useCallback(async (siteName: string, provider: "zoobicon" | "crontech" = "zoobicon"): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
     const deployCode = buildDeployCode(siteName);
     if (!deployCode) throw new Error("No code to deploy");
 
@@ -1533,10 +1542,18 @@ root.render(React.createElement(App));
       const user = userStr ? JSON.parse(userStr) : null;
       const email = user?.email || "anonymous@zoobicon.com";
 
-      const res = await fetch("/api/hosting/deploy", {
+      const endpoint = provider === "crontech"
+        ? "/api/hosting/deploy-crontech"
+        : "/api/hosting/deploy";
+
+      const body = provider === "crontech"
+        ? { name: siteName, code: deployCode, files: reactFiles ?? undefined, dependencies: reactDeps }
+        : { name: siteName, email, code: deployCode };
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: siteName, email, code: deployCode }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {
@@ -1548,11 +1565,10 @@ root.render(React.createElement(App));
       setDeployUrl(data.url);
       setDeployStatus("deployed");
 
-      // Track deploy achievement + send notification
       trackEvent("deploy");
       notifyDeploy(siteName, data.url);
 
-      return { url: data.url, slug: data.siteSlug, deployTimeMs: data.deployTimeMs };
+      return { url: data.url, slug: data.slug ?? data.siteSlug, deployTimeMs: data.deployTimeMs };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deploy failed");
       setDeployStatus("error");
@@ -1560,7 +1576,7 @@ root.render(React.createElement(App));
     } finally {
       setIsDeploying(false);
     }
-  }, [buildDeployCode]);
+  }, [buildDeployCode, reactFiles, reactDeps]);
 
   /** Quick deploy handler for inline button and BuildSuccessModal */
   const handleDeploy = useCallback(() => {
@@ -2697,13 +2713,13 @@ root.render(React.createElement(App));
         isOpen={showDeployModal}
         onClose={() => {
           setShowDeployModal(false);
-          // If deploy succeeded, show share modal
           if (deployStatus === "deployed" && deployUrl) {
             setShowShareModal(true);
           }
         }}
         onDeploy={handleDeployWithName}
         defaultName={prompt.trim().slice(0, 50) || "My Site"}
+        crontechAvailable={crontechAvailable}
       />
     </div>
   );
