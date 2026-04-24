@@ -272,48 +272,38 @@ async function fetchRdap(url: string): Promise<Response | null> {
 }
 
 /**
- * RDAP availability check — authoritative registry first, rdap.org as
- * fallback only when the registry is unreachable.
- *
- * The old single-source rdap.org path caused `auromax.com` to render as
- * AVAILABLE on our UI while Cloudflare's registrar check confirmed it was
- * registered — rdap.org had 404'd the bootstrap and we trusted the 404.
- * Per-TLD authoritative endpoints eliminate that class of bug because they
- * are the registry itself.
- *
- * Rules:
- *   - If an authoritative endpoint exists, hit it first. Trust its verdict.
- *   - On any uncertainty from the authoritative endpoint (network error,
- *     unparseable body), fall back to rdap.org with one 429 retry.
- *   - Any non-null answer is returned; otherwise null (uncertain).
+ * RDAP availability check via authoritative registry endpoint only.
+ * Returns null if the endpoint is unreachable or returns an ambiguous body.
+ * This function does NOT fall back to rdap.org — callers that want the full
+ * fallback chain should use checkWithFallback().
  */
-async function rdapCheck(domain: string, attempt = 0): Promise<boolean | null> {
+async function rdapAuthoritativeCheck(domain: string): Promise<boolean | null> {
   const tld = extractTld(domain);
   const authoritative = AUTHORITATIVE_RDAP[tld];
+  if (!authoritative) return null;
 
-  if (authoritative) {
-    const res = await fetchRdap(`${authoritative}${domain}`);
-    if (res) {
-      const verdict = await interpretRdap(res);
-      if (verdict !== null) return verdict;
-    }
-    // Authoritative endpoint was unreachable or ambiguous — fall through
-    // to rdap.org rather than returning null immediately. Giving up on one
-    // registry hiccup would hurt availability more than it helps accuracy.
-  }
+  const res = await fetchRdap(`${authoritative}${domain}`);
+  if (!res) return null;
+  return interpretRdap(res);
+}
 
+/**
+ * RDAP availability check via rdap.org (third-party relay) only.
+ * rdap.org has been observed returning false 404s for registered domains —
+ * always pair this with a DNS check (consensusAvailability) to guard against
+ * those false positives.
+ */
+async function rdapOrgCheck(domain: string, attempt = 0): Promise<boolean | null> {
   try {
     const res = await fetch(`https://rdap.org/domain/${domain}`, {
       signal: AbortSignal.timeout(4000),
       headers: { Accept: "application/rdap+json" },
       redirect: "follow",
     });
-
     if (res.status === 429 && attempt === 0) {
       await new Promise((r) => setTimeout(r, 300 + Math.random() * 200));
-      return rdapCheck(domain, 1);
+      return rdapOrgCheck(domain, 1);
     }
-
     return interpretRdap(res);
   } catch {
     return null;
@@ -431,14 +421,28 @@ export async function checkWithFallback(domain: string): Promise<boolean | null>
   const cached = getCached(domain);
   if (cached !== undefined) return cached;
 
-  // ── 1. Consensus of RDAP + DNS (false wins on sight; true needs agreement) ─
-  const raced = await consensusAvailability([rdapCheck(domain), dnsCheck(domain)]);
+  // ── 1. Authoritative registry — trust its verdict directly ───────────────
+  // These are the actual TLD registries (Verisign for .com, nic.ai for .ai,
+  // etc.). Their response is ground truth — we do NOT require DNS consensus
+  // to confirm it. The auromax.com false-positive bug was caused by rdap.org
+  // (a third-party relay) returning a false 404; it cannot happen here.
+  const authoritativeResult = await rdapAuthoritativeCheck(domain);
+  if (authoritativeResult !== null) {
+    setCached(domain, authoritativeResult);
+    return authoritativeResult;
+  }
+
+  // ── 2. rdap.org + DNS consensus (unreliable rdap.org needs confirmation) ──
+  // Only reached when the authoritative endpoint was unreachable or returned
+  // an ambiguous body (e.g. a TLD with no authoritative entry, or a transient
+  // network failure). Consensus guards against rdap.org's known false-404s.
+  const raced = await consensusAvailability([rdapOrgCheck(domain), dnsCheck(domain)]);
   if (raced !== null) {
     setCached(domain, raced);
     return raced;
   }
 
-  // ── 2. OpenSRS (LIVE mode only — test/horizon endpoint lies) ──────────────
+  // ── 3. OpenSRS (LIVE mode only — test/horizon endpoint lies) ──────────────
   if (isOpenSRSConfigured() && OPENSRS_ENV() === "live") {
     const result = await checkDomainAvailability(domain);
     if (result.status === "available") {
