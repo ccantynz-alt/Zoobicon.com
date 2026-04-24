@@ -12,6 +12,14 @@ export const metadata: Metadata = {
     siteName: "Zoobicon",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    site: "@zoobicon",
+    title: "AI Email Support — Smart Ticketing System | Zoobicon",
+    description:
+      "AI-powered email support with automatic ticket routing, CSAT tracking, canned responses, SLA monitoring, and smart auto-replies. Handle support 10x faster.",
+    images: ["https://zoobicon.com/og-image.png"],
+  },
   alternates: { canonical: "https://zoobicon.com/products/email-support" },
 };
 

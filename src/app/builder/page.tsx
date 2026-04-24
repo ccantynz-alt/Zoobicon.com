@@ -564,6 +564,9 @@ function BuilderPage() {
   const [agencyId, setAgencyId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("");
+  // Advanced mode — hidden by default so novices see only Chat + Preview + Deploy.
+  // Power users click the toggle to reveal all 23 tools.
+  const [advancedMode, setAdvancedMode] = useState(false);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [previewRect, setPreviewRect] = useState<DOMRect | null>(null);
 
@@ -2034,6 +2037,19 @@ root.render(React.createElement(App));
                 {saveStatus === "saved" ? <Check size={13} className="text-stone-400" /> : <Save size={13} />}
                 <span className="hidden sm:inline">{saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}</span>
               </button>
+              {/* Advanced mode toggle in top bar — visible before and after build */}
+              <button
+                onClick={() => setAdvancedMode(m => !m)}
+                title={advancedMode ? "Switch to simple mode" : "Show advanced tools"}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
+                  advancedMode
+                    ? "bg-amber-500/10 text-amber-300 border-amber-500/20"
+                    : "bg-white/[0.04] text-white/40 hover:text-white/60 hover:bg-white/[0.07] border-white/[0.06]"
+                }`}
+              >
+                <Wand2 size={13} />
+                <span className="hidden sm:inline">{advancedMode ? "Simple" : "Advanced"}</span>
+              </button>
               <button
                 onClick={() => setShowDeployModal(true)}
                 disabled={isDeploying}
@@ -2153,6 +2169,7 @@ root.render(React.createElement(App));
                     onGenerationModeChange={setGenerationMode}
                     fullStack={fullStack}
                     onFullStackChange={setFullStack}
+                    showAdvanced={advancedMode}
                   />
                 </div>
               </motion.div>
@@ -2168,10 +2185,10 @@ root.render(React.createElement(App));
                 {/* Chat header */}
                 <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-indigo-500/10 flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-md bg-indigo-500/20 flex items-center justify-center">
                       <MessageSquare className="w-3 h-3 text-indigo-400" />
                     </div>
-                    <span className="text-xs font-medium text-white/50">Edit with AI</span>
+                    <span className="text-xs font-semibold text-white/70">Edit with AI</span>
                     {saveStatus === "saving" && (
                       <span className="text-[9px] text-amber-400/60 flex items-center gap-1">
                         <Loader2 className="w-2.5 h-2.5 animate-spin" />Saving
@@ -2198,6 +2215,19 @@ root.render(React.createElement(App));
                     >
                       <Plus size={12} />
                       New
+                    </button>
+                    {/* Advanced tools toggle — keeps novice view clean */}
+                    <button
+                      onClick={() => setAdvancedMode(m => !m)}
+                      title={advancedMode ? "Hide advanced tools" : "Show advanced tools"}
+                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] transition-all border ${
+                        advancedMode
+                          ? "text-amber-300 bg-amber-500/10 border-amber-500/20"
+                          : "text-white/30 hover:text-white/60 bg-white/[0.03] hover:bg-white/[0.06] border-white/[0.06]"
+                      }`}
+                    >
+                      <Wand2 size={11} />
+                      {advancedMode ? "Simple" : "Advanced"}
                     </button>
                   </div>
                 </div>
@@ -2613,23 +2643,25 @@ root.render(React.createElement(App));
           )}
         </AnimatePresence>
 
-        {/* ── Right Toolbar — Tool Icons ── */}
-        <div className="w-11 flex flex-col items-center py-2 gap-0.5 border-l border-white/[0.06] bg-zinc-950/60 backdrop-blur-xl overflow-y-auto">
-          {TOOLS.map((tool) => (
-            <button
-              key={tool.id}
-              onClick={() => toggleTool(tool.id)}
-              title={tool.label}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150 ${
-                activeTool === tool.id
-                  ? "bg-stone-500/15 text-stone-400"
-                  : "text-white/25 hover:text-white/50 hover:bg-white/[0.04]"
-              }`}
-            >
-              {tool.icon}
-            </button>
-          ))}
-        </div>
+        {/* ── Right Toolbar — Tool Icons (advanced mode only) ── */}
+        {advancedMode && (
+          <div className="w-11 flex flex-col items-center py-2 gap-0.5 border-l border-white/[0.06] bg-zinc-950/60 backdrop-blur-xl overflow-y-auto">
+            {TOOLS.map((tool) => (
+              <button
+                key={tool.id}
+                onClick={() => toggleTool(tool.id)}
+                title={tool.label}
+                className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150 ${
+                  activeTool === tool.id
+                    ? "bg-stone-500/15 text-stone-400"
+                    : "text-white/25 hover:text-white/50 hover:bg-white/[0.04]"
+                }`}
+              >
+                {tool.icon}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Status bar at bottom — minimal */}

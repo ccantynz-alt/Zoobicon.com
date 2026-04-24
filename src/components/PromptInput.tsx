@@ -73,6 +73,8 @@ interface PromptInputProps {
   onGenerationModeChange?: (mode: GenerationMode) => void;
   fullStack?: boolean;
   onFullStackChange?: (enabled: boolean) => void;
+  /** When false (default), hides model picker and customization panel for novice users */
+  showAdvanced?: boolean;
 }
 
 const EXAMPLE_PROMPTS = [
@@ -108,6 +110,7 @@ export default function PromptInput({
   onGenerationModeChange,
   fullStack,
   onFullStackChange,
+  showAdvanced = false,
 }: PromptInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const editInputRef = useRef<HTMLTextAreaElement>(null);
@@ -326,8 +329,8 @@ export default function PromptInput({
         }
       `}</style>
 
-      {/* Model selector */}
-      {availableModels && availableModels.length > 0 && onModelChange && (
+      {/* Model selector — advanced only (too technical for novices) */}
+      {showAdvanced && availableModels && availableModels.length > 0 && onModelChange && (
         <div className="relative">
           <button
             onClick={() => setShowModelPicker(!showModelPicker)}
@@ -380,8 +383,8 @@ export default function PromptInput({
         </div>
       )}
 
-      {/* Customization toggle + panel */}
-      {!hasExistingCode && (
+      {/* Customization toggle + panel — advanced only */}
+      {showAdvanced && !hasExistingCode && (
         <>
           <button
             onClick={() => setShowCustomization(!showCustomization)}
