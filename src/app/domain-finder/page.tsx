@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Search,
   Check,
@@ -9,165 +9,52 @@ import {
   Sparkles,
   Globe,
   Copy,
+  ChevronDown,
+  Zap,
+  ArrowRight,
 } from "lucide-react";
 
-interface DomainResult {
-  domain: string;
-  available: boolean | null;
-  checking: boolean;
-  error?: string;
+interface GeneratedName {
+  name: string;
+  slug: string;
+  tagline: string;
 }
 
-// AI-generated name suggestions for accounting/automation/AI software
-const ACCOUNTING_AI_KEYWORDS = [
-  // Core concepts
-  "ledger", "audit", "fiscal", "tally", "debit", "credit", "balance",
-  "margin", "equity", "asset", "capital", "yield", "profit", "revenue",
-  // AI/Tech modifiers
-  "auto", "smart", "neural", "quantum", "flux", "sync", "pulse", "wave",
-  "bolt", "spark", "apex", "peak", "prime", "core", "nexus", "vertex",
-  // Combinations
-  "autoledger", "smartaudit", "ailedger", "neuralbooks", "fiscalai",
-  "tallybot", "debitflow", "creditpulse", "balanceai", "marginsync",
-  "equityflux", "assetprime", "capitalwave", "yieldai", "profitpulse",
-  "revenuebolt", "auditbot", "ledgerspark", "bookkeeperai", "taxflow",
-  "financecore", "accountai", "numbersai", "booksync", "payrollpulse",
-  "invoiceai", "expensebot", "budgetai", "cashflowai", "finbolt",
-  "quickledger", "autobooks", "smarttally", "aicounting", "countbot",
-  "pennypulse", "centflow", "dollarwave", "fundflux", "wealthsync",
-  "vaultai", "safekeep", "trustledger", "clearbooks", "truecount",
+interface TldResult {
+  domain: string;
+  available: boolean | null;
+  price: number;
+}
+
+interface DomainResult {
+  name: string;
+  slug: string;
+  tagline: string;
+  comAvailable: boolean | null;
+  comChecked: boolean;
+  price: number | null;
+  otherTlds: TldResult[];
+  expandedTlds: boolean;
+  checkingTlds: boolean;
+}
+
+const EXAMPLES = [
+  "AI scheduling tool for dentists",
+  "sustainable fashion marketplace",
+  "dog training app",
+  "remote team analytics platform",
 ];
 
-const TLDS = [".ai", ".com", ".io", ".app", ".co", ".sh", ".dev", ".tech"];
-
 export default function DomainFinderPage() {
-  const [keyword, setKeyword] = useState("accounting ai automation");
+  const [description, setDescription] = useState("");
+  const [phase, setPhase] = useState<"idle" | "generating" | "checking" | "done">("idle");
   const [results, setResults] = useState<DomainResult[]>([]);
-  const [checking, setChecking] = useState(false);
+  const [checkedCount, setCheckedCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [filter, setFilter] = useState<"available" | "all">("available");
   const [copied, setCopied] = useState("");
-
-  const generateDomainIdeas = (input: string): string[] => {
-    const words = input.toLowerCase().split(/\s+/).filter(Boolean);
-    const ideas: string[] = [];
-
-    // Direct combinations
-    for (const tld of TLDS) {
-      // Full phrase joined
-      ideas.push(words.join("") + tld);
-      ideas.push(words.join("-") + tld);
-      // First + last word
-      if (words.length > 1) {
-        ideas.push(words[0] + words[words.length - 1] + tld);
-      }
-      // Each word solo
-      for (const w of words) {
-        if (w.length >= 3) ideas.push(w + tld);
-      }
-    }
-
-    // AI-powered combinations from keyword bank
-    const relevantKeywords = ACCOUNTING_AI_KEYWORDS.filter(kw =>
-      words.some(w => kw.includes(w) || w.includes(kw.slice(0, 4)))
-    );
-
-    for (const kw of relevantKeywords.slice(0, 15)) {
-      for (const tld of TLDS.slice(0, 3)) { // .ai, .com, .io
-        ideas.push(kw + tld);
-      }
-    }
-
-    // Creative combinations
-    const prefixes = ["get", "use", "try", "go", "my", "the", "hey", "run"];
-    const suffixes = ["hq", "app", "hub", "lab", "pro", "now", "io"];
-
-    for (const w of words.slice(0, 2)) {
-      for (const p of prefixes.slice(0, 3)) {
-        ideas.push(p + w + ".ai");
-        ideas.push(p + w + ".com");
-      }
-      for (const s of suffixes.slice(0, 3)) {
-        ideas.push(w + s + ".ai");
-        ideas.push(w + s + ".com");
-      }
-    }
-
-    // Deduplicate and limit
-    return [...new Set(ideas)].slice(0, 50);
-  };
-
-  const checkAvailability = async (domain: string): Promise<boolean | null> => {
-    try {
-      // Extract name and tld from full domain string (e.g. "mybiz.ai" -> q=mybiz, tlds=ai)
-      const dotIdx = domain.lastIndexOf(".");
-      if (dotIdx < 1) return null;
-      const name = domain.slice(0, dotIdx);
-      const tld = domain.slice(dotIdx + 1);
-
-      const res = await fetch(`/api/domains/search?q=${encodeURIComponent(name)}&tlds=${encodeURIComponent(tld)}`);
-      if (!res.ok) return null;
-      const data = await res.json();
-
-      // The API returns { results: [{ domain, available, ... }] }
-      const match = data.results?.find((r: { domain: string }) => r.domain === domain);
-      if (match) return match.available;
-      return null;
-    } catch {
-      return null; // Can't determine
-    }
-  };
-
-  const handleSearch = async () => {
-    setChecking(true);
-    const domains = generateDomainIdeas(keyword);
-
-    // Initialize all as checking
-    setResults(domains.map(d => ({ domain: d, available: null, checking: true })));
-
-    // Group domains by base name so we can batch TLDs into a single API call
-    // e.g. { "mybiz": ["ai", "com", "io"], "getmybiz": ["ai", "com"] }
-    const grouped = new Map<string, string[]>();
-    for (const d of domains) {
-      const dotIdx = d.lastIndexOf(".");
-      if (dotIdx < 1) continue;
-      const name = d.slice(0, dotIdx);
-      const tld = d.slice(dotIdx + 1);
-      if (!grouped.has(name)) grouped.set(name, []);
-      grouped.get(name)!.push(tld);
-    }
-
-    // Process groups in batches of 3 (each group can have multiple TLDs)
-    const groups = Array.from(grouped.entries());
-    for (let i = 0; i < groups.length; i += 3) {
-      const batch = groups.slice(i, i + 3);
-      const batchPromises = batch.map(async ([name, tlds]) => {
-        try {
-          const res = await fetch(
-            `/api/domains/search?q=${encodeURIComponent(name)}&tlds=${encodeURIComponent(tlds.join(","))}`,
-          );
-          if (!res.ok) return tlds.map(tld => ({ domain: `${name}.${tld}`, available: null as boolean | null, checking: false }));
-          const data = await res.json();
-          return (data.results || []).map((r: { domain: string; available: boolean | null }) => ({
-            domain: r.domain,
-            available: r.available,
-            checking: false,
-          }));
-        } catch {
-          return tlds.map(tld => ({ domain: `${name}.${tld}`, available: null as boolean | null, checking: false }));
-        }
-      });
-
-      const batchResults = (await Promise.all(batchPromises)).flat();
-
-      setResults(prev =>
-        prev.map(r => {
-          const updated = batchResults.find((br: { domain: string }) => br.domain === r.domain);
-          return updated || r;
-        })
-      );
-    }
-
-    setChecking(false);
-  };
+  const [errorMsg, setErrorMsg] = useState("");
+  const abortRef = useRef<AbortController | null>(null);
 
   const copyDomain = (domain: string) => {
     navigator.clipboard.writeText(domain);
@@ -175,112 +62,463 @@ export default function DomainFinderPage() {
     setTimeout(() => setCopied(""), 2000);
   };
 
-  const availableCount = results.filter(r => r.available === true).length;
+  const handleSearch = async () => {
+    if (!description.trim() || phase === "generating" || phase === "checking") return;
+
+    if (abortRef.current) abortRef.current.abort();
+    abortRef.current = new AbortController();
+
+    setResults([]);
+    setCheckedCount(0);
+    setTotalCount(0);
+    setErrorMsg("");
+    setFilter("available");
+    setPhase("generating");
+
+    // Step 1 — AI generates 25 brandable name ideas
+    let names: GeneratedName[] = [];
+    try {
+      const res = await fetch("/api/domains/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: description.trim(), count: 25 }),
+        signal: abortRef.current.signal,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Name generation failed");
+      }
+      const data = await res.json();
+      names = (data.names || []) as GeneratedName[];
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return;
+      setErrorMsg((err as Error).message || "Failed to generate names. Check ANTHROPIC_API_KEY.");
+      setPhase("idle");
+      return;
+    }
+
+    if (names.length === 0) {
+      setErrorMsg("No names were generated. Try a more detailed description.");
+      setPhase("idle");
+      return;
+    }
+
+    setTotalCount(names.length);
+    setPhase("checking");
+
+    // Seed the result list so the UI shows pending rows immediately
+    setResults(
+      names.map((n) => ({
+        name: n.name,
+        slug: n.slug,
+        tagline: n.tagline,
+        comAvailable: null,
+        comChecked: false,
+        price: null,
+        otherTlds: [],
+        expandedTlds: false,
+        checkingTlds: false,
+      })),
+    );
+
+    // Step 2 — Check .com availability for each name, 5 at a time
+    const CONCURRENCY = 5;
+    let cursor = 0;
+
+    const worker = async () => {
+      while (true) {
+        const idx = cursor++;
+        if (idx >= names.length) return;
+        const n = names[idx];
+
+        try {
+          const res = await fetch(
+            `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=com&mode=com-priority`,
+            { signal: abortRef.current?.signal },
+          );
+          if (!res.ok) throw new Error("search failed");
+          const data = await res.json();
+          const comResult = (data.results || []).find(
+            (r: { tld: string }) => r.tld === "com",
+          ) as { available: boolean | null; price: number } | undefined;
+
+          setResults((prev) =>
+            prev.map((r, i) =>
+              i === idx
+                ? {
+                    ...r,
+                    comAvailable: comResult?.available ?? null,
+                    comChecked: true,
+                    price: comResult?.price ?? null,
+                  }
+                : r,
+            ),
+          );
+        } catch (err) {
+          if ((err as Error).name === "AbortError") return;
+          setResults((prev) =>
+            prev.map((r, i) => (i === idx ? { ...r, comChecked: true, comAvailable: null } : r)),
+          );
+        }
+
+        setCheckedCount((prev) => prev + 1);
+      }
+    };
+
+    await Promise.all(Array.from({ length: Math.min(CONCURRENCY, names.length) }, worker));
+    setPhase("done");
+  };
+
+  const expandTlds = async (idx: number, slug: string) => {
+    setResults((prev) =>
+      prev.map((r, i) => (i === idx ? { ...r, checkingTlds: true, expandedTlds: true } : r)),
+    );
+    try {
+      const res = await fetch(
+        `/api/domains/search?q=${encodeURIComponent(slug)}&tlds=io,ai,dev,app,co`,
+      );
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const tlds: TldResult[] = (data.results || []).map(
+        (r: { domain: string; available: boolean | null; price: number }) => ({
+          domain: r.domain,
+          available: r.available,
+          price: r.price,
+        }),
+      );
+      setResults((prev) =>
+        prev.map((r, i) =>
+          i === idx ? { ...r, checkingTlds: false, otherTlds: tlds } : r,
+        ),
+      );
+    } catch {
+      setResults((prev) =>
+        prev.map((r, i) => (i === idx ? { ...r, checkingTlds: false } : r)),
+      );
+    }
+  };
+
+  const sortedResults = [...results].sort((a, b) => {
+    const score = (r: DomainResult) =>
+      r.comAvailable === true ? 0 : !r.comChecked ? 1 : 2;
+    return score(a) - score(b);
+  });
+
+  const visibleResults =
+    filter === "available"
+      ? sortedResults.filter((r) => r.comAvailable === true || !r.comChecked)
+      : sortedResults;
+
+  const availableCount = results.filter((r) => r.comAvailable === true).length;
+  const checkedAll = results.length > 0 && results.every((r) => r.comChecked);
+  const isRunning = phase === "generating" || phase === "checking";
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-            <Sparkles className="w-8 h-8 text-stone-400" />
-            AI Domain Finder
-          </h1>
-          <p className="text-slate-400">Describe your business and find available domains instantly.</p>
+    <div className="min-h-screen bg-[#0a0f1e] text-white">
+      {/* Hero */}
+      <div className="relative overflow-hidden pb-12 pt-16 px-4">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-violet-600/15 rounded-full blur-[100px]" />
         </div>
 
-        {/* Search */}
-        <div className="flex gap-3 mb-8">
-          <input
-            type="text"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="e.g., accounting ai automation software"
-            className="flex-1 px-4 py-3 bg-[#1e293b] border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stone-500"
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          />
-          <button
-            onClick={handleSearch}
-            disabled={checking || !keyword.trim()}
-            className="px-6 py-3 bg-stone-600 hover:bg-stone-500 rounded-xl font-semibold flex items-center gap-2 disabled:opacity-50 transition-colors"
-          >
-            {checking ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
-            Find Domains
-          </button>
-        </div>
-
-        {/* Results */}
-        {results.length > 0 && (
-          <>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">
-                {checking ? "Checking..." : `${availableCount} available domains found`}
-              </h2>
-              <span className="text-sm text-slate-400">{results.length} checked</span>
-            </div>
-
-            {/* Available first */}
-            <div className="space-y-2">
-              {results
-                .sort((a, b) => {
-                  if (a.available === true && b.available !== true) return -1;
-                  if (a.available !== true && b.available === true) return 1;
-                  return 0;
-                })
-                .map((r) => (
-                  <div
-                    key={r.domain}
-                    className={`flex items-center justify-between p-3 rounded-xl border ${
-                      r.available === true
-                        ? "bg-stone-500/10 border-stone-500/20"
-                        : r.available === false
-                        ? "bg-white/[0.02] border-white/5 opacity-50"
-                        : "bg-white/[0.02] border-white/5"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {r.checking ? (
-                        <Loader2 className="w-4 h-4 text-slate-400 animate-spin" />
-                      ) : r.available === true ? (
-                        <Check className="w-4 h-4 text-stone-400" />
-                      ) : r.available === false ? (
-                        <X className="w-4 h-4 text-stone-400/50" />
-                      ) : (
-                        <Globe className="w-4 h-4 text-stone-400" />
-                      )}
-                      <span className={`font-mono text-sm ${r.available === true ? "text-stone-300 font-semibold" : "text-slate-400"}`}>
-                        {r.domain}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-500">
-                        {r.checking ? "checking..." : r.available === true ? "AVAILABLE" : r.available === false ? "taken" : "unknown"}
-                      </span>
-                      {r.available === true && (
-                        <button
-                          onClick={() => copyDomain(r.domain)}
-                          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                          title="Copy domain"
-                        >
-                          {copied === r.domain ? <Check className="w-3.5 h-3.5 text-stone-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </>
-        )}
-
-        {/* Help text */}
-        {results.length === 0 && (
-          <div className="text-center py-16 text-slate-500">
-            <Globe className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p>Enter keywords describing your business to find available .ai, .com, .io domains</p>
-            <p className="text-sm mt-2">Checks 50 domain combinations across 8 TLDs</p>
+        <div className="relative max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-violet-500/10 border border-violet-500/20 rounded-full text-violet-300 text-sm font-medium mb-6">
+            <Sparkles className="w-3.5 h-3.5" />
+            AI-Powered Domain Discovery
           </div>
-        )}
+
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+            Find your perfect{" "}
+            <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+              .com domain
+            </span>
+          </h1>
+          <p className="text-slate-400 text-lg mb-8 max-w-xl mx-auto">
+            Describe your business and AI generates 25 brandable names — then we instantly
+            check which .com domains are actually available.
+          </p>
+
+          {/* Search input */}
+          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              placeholder="e.g., AI scheduling tool for dentists"
+              className="flex-1 px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all"
+            />
+            <button
+              onClick={handleSearch}
+              disabled={!description.trim() || isRunning}
+              className="px-6 py-3.5 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50 transition-all whitespace-nowrap"
+            >
+              {isRunning ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                <>
+                  <Zap className="w-4 h-4" />
+                  Find Domains
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Error */}
+          {errorMsg && (
+            <p className="mt-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 max-w-2xl mx-auto text-left">
+              {errorMsg}
+            </p>
+          )}
+        </div>
       </div>
+
+      {/* Progress bar */}
+      {isRunning && (
+        <div className="max-w-3xl mx-auto px-4 mb-8">
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-slate-300 flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-violet-400" />
+                {phase === "generating"
+                  ? "AI is generating 25 brandable names..."
+                  : `Checking .com availability — ${checkedCount} of ${totalCount} done`}
+              </span>
+              {phase === "checking" && checkedCount > 0 && (
+                <span className="text-xs text-emerald-400 font-mono">
+                  {availableCount} available so far
+                </span>
+              )}
+            </div>
+            {phase === "checking" && totalCount > 0 && (
+              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full transition-all duration-300"
+                  style={{ width: `${(checkedCount / totalCount) * 100}%` }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Results */}
+      {results.length > 0 && (
+        <div className="max-w-3xl mx-auto px-4 pb-20">
+          {/* Results header */}
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="font-bold text-xl">
+                {checkedAll
+                  ? `${availableCount} available .com domain${availableCount !== 1 ? "s" : ""} found`
+                  : "Checking availability…"}
+              </h2>
+              <p className="text-sm text-slate-500 mt-0.5">
+                {results.length} names generated for &ldquo;{description}&rdquo;
+              </p>
+            </div>
+            <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1">
+              <button
+                onClick={() => setFilter("available")}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  filter === "available"
+                    ? "bg-violet-600 text-white"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Available
+              </button>
+              <button
+                onClick={() => setFilter("all")}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  filter === "all"
+                    ? "bg-violet-600 text-white"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                All ({results.length})
+              </button>
+            </div>
+          </div>
+
+          {/* Domain cards */}
+          <div className="space-y-3">
+            {visibleResults.map((r) => {
+              const idx = results.indexOf(r);
+              const isAvailable = r.comAvailable === true;
+              const isTaken = r.comAvailable === false;
+              const isPending = !r.comChecked;
+
+              return (
+                <div
+                  key={r.slug}
+                  className={`rounded-xl border transition-all duration-300 ${
+                    isAvailable
+                      ? "bg-gradient-to-r from-violet-500/10 to-cyan-500/10 border-violet-500/30"
+                      : isTaken
+                      ? "bg-white/[0.02] border-white/5 opacity-60"
+                      : "bg-white/[0.03] border-white/10"
+                  }`}
+                >
+                  <div className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      {/* Left: status icon + name + tagline */}
+                      <div className="flex items-start gap-3 min-w-0">
+                        <div
+                          className={`mt-0.5 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            isAvailable
+                              ? "bg-emerald-500/20"
+                              : isTaken
+                              ? "bg-red-500/10"
+                              : "bg-white/5"
+                          }`}
+                        >
+                          {isPending ? (
+                            <Loader2 className="w-3.5 h-3.5 text-slate-400 animate-spin" />
+                          ) : isAvailable ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          ) : isTaken ? (
+                            <X className="w-3.5 h-3.5 text-slate-500" />
+                          ) : (
+                            <Globe className="w-3.5 h-3.5 text-slate-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center flex-wrap gap-2">
+                            <span
+                              className={`font-bold text-lg tracking-tight ${
+                                isAvailable ? "text-white" : "text-slate-400"
+                              }`}
+                            >
+                              {r.slug}.com
+                            </span>
+                            {isAvailable && r.price !== null && (
+                              <span className="text-xs px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-full font-medium">
+                                ${r.price}/yr
+                              </span>
+                            )}
+                            {isTaken && (
+                              <span className="text-xs text-slate-600">taken</span>
+                            )}
+                            {isPending && (
+                              <span className="text-xs text-slate-600">checking…</span>
+                            )}
+                          </div>
+                          <p className="text-sm text-slate-500 mt-0.5 truncate">{r.tagline}</p>
+                        </div>
+                      </div>
+
+                      {/* Right: copy + register */}
+                      {isAvailable && (
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <button
+                            onClick={() => copyDomain(`${r.slug}.com`)}
+                            title="Copy domain"
+                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                          >
+                            {copied === `${r.slug}.com` ? (
+                              <Check className="w-4 h-4 text-emerald-400" />
+                            ) : (
+                              <Copy className="w-4 h-4 text-slate-400" />
+                            )}
+                          </button>
+                          <a
+                            href={`/domains?q=${encodeURIComponent(r.slug)}`}
+                            className="px-4 py-2 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-all"
+                          >
+                            Register <ArrowRight className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Expand other TLDs */}
+                    {(isAvailable || r.comAvailable === null) && (
+                      <div className="mt-3 pt-3 border-t border-white/5">
+                        {!r.expandedTlds ? (
+                          <button
+                            onClick={() => expandTlds(idx, r.slug)}
+                            className="text-xs text-slate-500 hover:text-violet-400 flex items-center gap-1 transition-colors"
+                          >
+                            <ChevronDown className="w-3.5 h-3.5" />
+                            Check .io, .ai, .dev, .app, .co
+                          </button>
+                        ) : r.checkingTlds ? (
+                          <div className="flex items-center gap-2 text-xs text-slate-500">
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            Checking other TLDs…
+                          </div>
+                        ) : r.otherTlds.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {r.otherTlds.map((t) => (
+                              <span
+                                key={t.domain}
+                                className={`text-xs px-2.5 py-1 rounded-full border ${
+                                  t.available === true
+                                    ? "bg-violet-500/10 border-violet-500/20 text-violet-300"
+                                    : "bg-white/5 border-white/10 text-slate-500"
+                                }`}
+                              >
+                                {t.domain}
+                                {t.available === true && (
+                                  <span className="ml-1 opacity-60">${t.price}</span>
+                                )}
+                              </span>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* No available .com state */}
+          {checkedAll && availableCount === 0 && filter === "available" && (
+            <div className="text-center py-12">
+              <Globe className="w-12 h-12 mx-auto mb-4 text-slate-600" />
+              <p className="font-semibold text-slate-300">No .com domains available</p>
+              <p className="text-sm text-slate-500 mt-1">
+                Every name was taken on .com — try a more specific or creative description, or
+                check other TLDs below.
+              </p>
+              <button
+                onClick={() => setFilter("all")}
+                className="mt-4 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm transition-colors"
+              >
+                Show all results with other TLDs
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Empty / example state */}
+      {results.length === 0 && phase === "idle" && (
+        <div className="max-w-3xl mx-auto px-4 pb-20">
+          <p className="text-slate-500 text-sm text-center mb-4">Try an example:</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {EXAMPLES.map((ex) => (
+              <button
+                key={ex}
+                onClick={() => setDescription(ex)}
+                className="p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-violet-500/30 rounded-xl text-sm text-slate-400 hover:text-white text-left transition-all flex items-center gap-3"
+              >
+                <Search className="w-4 h-4 text-slate-600 flex-shrink-0" />
+                {ex}
+              </button>
+            ))}
+          </div>
+          <p className="text-slate-600 text-xs text-center mt-6">
+            AI generates 25 brand-name ideas, then checks each .com in real time
+          </p>
+        </div>
+      )}
     </div>
   );
 }
