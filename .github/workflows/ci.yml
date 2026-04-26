@@ -27,6 +27,9 @@ jobs:
       - name: Quality Gate
         run: node scripts/quality-gate.js
 
+      - name: Model Routing Guard (rule 4 — Opus for builds)
+        run: node scripts/check-models.js
+
       - name: Lint
         run: npm run lint
 

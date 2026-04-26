@@ -125,8 +125,15 @@ function makeWriter(controller: ReadableStreamDefaultController<Uint8Array>): SS
   };
 }
 
-const MODEL_HAIKU = "claude-haiku-4-5";
-const MODEL_SONNET = "claude-sonnet-4-6";
+// Model routing — rule 4 (Opus for builds, non-negotiable).
+// PLANNER: Haiku is fine — pure JSON classification of which registry components to pick.
+// DEVELOPER: Opus 4.7 for the customiser. This is what makes the output beat Lovable / Bolt.
+//            Bumping from Haiku → Opus on 12 parallel calls slows wall-clock by ~3-5s
+//            but jumps the quality floor by an order of magnitude. Worth every second.
+// PREMIUM: Opus 4.7 (same as default — there is no "even better" for a paying customer).
+const MODEL_PLANNER = "claude-haiku-4-5";
+const MODEL_DEVELOPER = "claude-opus-4-7";
+const MODEL_PREMIUM = "claude-opus-4-7";
 
 /** Build the cacheable registry catalog the planner sees. */
 async function buildRegistryCatalog(): Promise<string> {
@@ -223,7 +230,7 @@ async function planComponents(prompt: string): Promise<PlanResult> {
     const plannerSystem =
       "Return only JSON matching the schema.\n\n" + (await getPlannerSystemCacheable());
     const res = await callLLMWithFailover({
-      model: MODEL_HAIKU,
+      model: MODEL_PLANNER,
       system: plannerSystem,
       userMessage: `User prompt: ${prompt}`,
       maxTokens: 1500,
@@ -688,8 +695,10 @@ export async function POST(req: NextRequest): Promise<Response> {
           message: `Customising ${components.length} components for ${brandName}…`,
         });
 
+        // Customiser = the developer agent. Rule 4: Opus 4.7, non-negotiable.
+        // Both default and premium ship Opus. Quality floor > speed floor.
         const customiserModel =
-          mode === "premium" ? MODEL_SONNET : MODEL_HAIKU;
+          mode === "premium" ? MODEL_PREMIUM : MODEL_DEVELOPER;
 
         // Backend brief only passed to the customiser when the prompt actually
         // needs backend features. Without this gate, the AI adds zoobicon
@@ -915,7 +924,7 @@ export async function POST(req: NextRequest): Promise<Response> {
             id: `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
             prompt,
             siteName: brandName || inferBrandName(prompt),
-            model: mode === "premium" ? MODEL_SONNET : MODEL_HAIKU,
+            model: mode === "premium" ? MODEL_PREMIUM : MODEL_DEVELOPER,
             durationMs,
             createdAt: Date.now(),
           });

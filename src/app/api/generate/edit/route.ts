@@ -198,43 +198,11 @@ RULES:
 
         const errors: string[] = [];
 
-        // Pass 1 — Anthropic Haiku via direct SDK (fastest, cheapest)
-        if (apiKey) {
-          try {
-            const response = await callWithRetry(
-              () =>
-                client.messages.create({
-                  model: "claude-haiku-4-5-20251001",
-                  max_tokens: 16384,
-                  system: systemPrompt,
-                  messages: [{ role: "user", content: userMessage }],
-                }),
-              "haiku"
-            );
-            const text = response.content.find((b: Anthropic.ContentBlock) => b.type === "text")?.text || "";
-            const result = validate(text);
-            if (result.ok) {
-              send({
-                type: "done",
-                files: result.files,
-                changedCount: Object.keys(result.files).length,
-                modelUsed: "claude-haiku-4-5",
-              });
-              await recordEditInFlywheel("claude-haiku-4-5");
-              controller.close();
-              return;
-            }
-            errors.push(`Haiku: ${result.reason}`);
-            send({ type: "status", message: "Retrying with stronger model..." });
-          } catch (err) {
-            const clean = describeLLMError(err);
-            errors.push(`Haiku: ${clean}`);
-            console.warn(`[edit] Haiku call failed: ${clean}`);
-            send({ type: "status", message: "Retrying with fallback provider..." });
-          }
-        }
-
-        // Pass 2 — Anthropic Sonnet (smarter model, retry path)
+        // Pass 1 — Sonnet 4.6 (default for diff edits — fast enough for 2-5s
+        // tweaks, smart enough to keep the file structure intact). Rule 4
+        // mandates Opus for the developer agent (full builds); diff edits are
+        // surgical patches where Sonnet is the right tool. Haiku is forbidden
+        // here — it routinely produced broken JSX on multi-section edits.
         if (apiKey) {
           try {
             const response = await callWithRetry(
@@ -261,10 +229,47 @@ RULES:
               return;
             }
             errors.push(`Sonnet: ${result.reason}`);
+            send({ type: "status", message: "Retrying with Opus 4.7..." });
           } catch (err) {
             const clean = describeLLMError(err);
             errors.push(`Sonnet: ${clean}`);
             console.warn(`[edit] Sonnet call failed: ${clean}`);
+            send({ type: "status", message: "Retrying with Opus 4.7..." });
+          }
+        }
+
+        // Pass 2 — Opus 4.7 (developer agent — same model used for full builds).
+        // Slower but unmatched on complex multi-file edits.
+        if (apiKey) {
+          try {
+            const response = await callWithRetry(
+              () =>
+                client.messages.create({
+                  model: "claude-opus-4-7",
+                  max_tokens: 16384,
+                  system: systemPrompt,
+                  messages: [{ role: "user", content: userMessage }],
+                }),
+              "opus"
+            );
+            const text = response.content.find((b: Anthropic.ContentBlock) => b.type === "text")?.text || "";
+            const result = validate(text);
+            if (result.ok) {
+              send({
+                type: "done",
+                files: result.files,
+                changedCount: Object.keys(result.files).length,
+                modelUsed: "claude-opus-4-7",
+              });
+              await recordEditInFlywheel("claude-opus-4-7");
+              controller.close();
+              return;
+            }
+            errors.push(`Opus: ${result.reason}`);
+          } catch (err) {
+            const clean = describeLLMError(err);
+            errors.push(`Opus: ${clean}`);
+            console.warn(`[edit] Opus call failed: ${clean}`);
           }
         }
 

@@ -154,7 +154,10 @@ export async function POST(req: NextRequest) {
 
     const isPremium = tier === "premium";
     const fullStack = requestFullStack === true;
-    const model = requestedModel || (isPremium ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001");
+    // Rule 4: developer agent = Opus 4.7. No Haiku for builds.
+    // Both tiers ship Opus; premium tier exists for future differentiation (longer
+    // context, more agents, post-build critique pass) — never for a worse model.
+    const model = requestedModel || "claude-opus-4-7";
     const maxTokens = 32000;
 
     // If full-stack requested AND Supabase is configured, add database integration

@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/check-icons.js && node scripts/check-models.js",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "check:models": "node scripts/check-models.js",
     "audit": "node scripts/claude-md-audit.js",
     "audit:deep": "node scripts/claude-md-audit.js --deep"
   },
