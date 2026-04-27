@@ -136,6 +136,7 @@ export async function callClaude(
     method: "POST",
     headers: headers(),
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(90_000),
   });
 
   if (!res.ok) {
@@ -180,10 +181,18 @@ export async function* streamClaude(
 ): AsyncGenerator<StreamDelta, void, unknown> {
   const body = buildBody({ ...opts, stream: true });
 
+  // Hard ceiling on the entire stream — when Anthropic stalls mid-stream
+  // (or never sends the first byte) the abort fires so the caller's
+  // failover loop in callLLMWithFailover gets a thrown error instead of
+  // a forever-pending promise. Without this the whole builder hangs.
+  const ac = new AbortController();
+  const ceiling = setTimeout(() => ac.abort(new Error("anthropic stream timeout")), 120_000);
+
   const res = await fetch(ANTHROPIC_URL, {
     method: "POST",
     headers: headers(),
     body: JSON.stringify(body),
+    signal: ac.signal,
   });
 
   if (!res.ok || !res.body) {
@@ -236,6 +245,7 @@ export async function* streamClaude(
       }
     }
   } finally {
+    clearTimeout(ceiling);
     reader.releaseLock();
   }
 }
