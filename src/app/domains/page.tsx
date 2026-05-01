@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -85,6 +85,35 @@ export default function DomainsPage() {
   });
 
   const resultsRef = useRef<HTMLDivElement>(null);
+
+  // Bulk-handoff from /domain-finder — when this page loads with
+  // ?cart=name1,name2 we pre-populate the cart with each slug as a .com,
+  // pop the checkout modal open, and remove the param from the URL so a
+  // refresh doesn't re-add them.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const cartParam = params.get("cart");
+    if (!cartParam) return;
+    const slugs = cartParam
+      .split(",")
+      .map((s) => s.trim().toLowerCase().replace(/[^a-z0-9-]/g, ""))
+      .filter(Boolean);
+    if (slugs.length === 0) return;
+    const items: DomainResult[] = slugs.map((slug) => ({
+      domain: `${slug}.com`,
+      tld: "com",
+      available: true,
+      price: TLD_PRICES.com ?? 12.99,
+      checking: false,
+    }));
+    setCart(items);
+    setShowCheckout(true);
+    // Strip the ?cart= param so a back+forward navigation doesn't re-add
+    const url = new URL(window.location.href);
+    url.searchParams.delete("cart");
+    window.history.replaceState({}, "", url.toString());
+  }, []);
 
   const searchName = useCallback(async (rawName: string) => {
     const cleanName = rawName.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
