@@ -227,7 +227,7 @@ export default function DomainsPage() {
   const cleanQuery = query.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white">
+    <div className="relative z-10 min-h-screen bg-[#0b1530] text-white">
 
       {/* ── CHECKOUT MODAL ── */}
       {showCheckout && (

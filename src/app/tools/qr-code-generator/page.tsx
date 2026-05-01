@@ -231,7 +231,7 @@ export default function QRCodeGeneratorPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-[#0b1530] text-white pt-[72px]">
+      <div className="relative z-10 min-h-screen bg-[#0b1530] text-white pt-[72px]">
         {/* -------- HERO -------- */}
         <header className="pt-16 pb-10 text-center px-4">
           <div className="inline-flex items-center gap-2 bg-stone-500/10 border border-stone-500/20 rounded-full px-4 py-1.5 text-sm text-stone-300 mb-6">

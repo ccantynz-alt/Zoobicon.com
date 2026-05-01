@@ -309,7 +309,7 @@ export default function PrivacyPolicyGeneratorPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white pt-[72px]">
+    <div className="relative z-10 min-h-screen bg-[#0b1530] text-white pt-[72px]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

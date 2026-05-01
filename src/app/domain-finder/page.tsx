@@ -243,7 +243,7 @@ export default function DomainFinderPage() {
   const allUnverified = checkedAll && results.length > 0 && verifiedCount === 0;
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-white">
+    <div className="relative z-10 min-h-screen bg-[#0a0f1e] text-white">
       {/* Hero */}
       <div className="relative overflow-hidden pb-12 pt-32 md:pt-36 px-4">
         <div className="absolute inset-0 pointer-events-none">
@@ -308,7 +308,7 @@ export default function DomainFinderPage() {
       {/* Progress bar */}
       {isRunning && (
         <div className="max-w-3xl mx-auto px-4 mb-8">
-          <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+          <div className="bg-[#101a35]/85 backdrop-blur-sm border border-white/[0.12] rounded-xl p-4 shadow-[0_4px_16px_-8px_rgba(0,0,0,0.4)]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-slate-300 flex items-center gap-2">
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-violet-400" />
@@ -384,12 +384,12 @@ export default function DomainFinderPage() {
               return (
                 <div
                   key={r.slug}
-                  className={`rounded-xl border transition-all duration-300 ${
+                  className={`rounded-xl border backdrop-blur-sm transition-all duration-300 ${
                     isAvailable
-                      ? "bg-gradient-to-r from-violet-500/10 to-cyan-500/10 border-violet-500/30"
+                      ? "bg-gradient-to-r from-violet-500/20 to-cyan-500/15 border-violet-400/40 shadow-[0_8px_32px_-12px_rgba(139,92,246,0.35)]"
                       : isTaken
-                      ? "bg-white/[0.02] border-white/5 opacity-60"
-                      : "bg-white/[0.03] border-white/10"
+                      ? "bg-[#0f1830]/85 border-white/[0.08] opacity-70"
+                      : "bg-[#101a35]/85 border-white/[0.12] shadow-[0_4px_16px_-8px_rgba(0,0,0,0.4)]"
                   }`}
                 >
                   <div className="p-4">
@@ -555,7 +555,7 @@ export default function DomainFinderPage() {
               <button
                 key={ex}
                 onClick={() => setDescription(ex)}
-                className="p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-violet-500/30 rounded-xl text-sm text-slate-400 hover:text-white text-left transition-all flex items-center gap-3"
+                className="p-4 bg-[#101a35]/80 backdrop-blur-sm hover:bg-[#142046]/85 border border-white/[0.1] hover:border-violet-500/40 rounded-xl text-sm text-slate-300 hover:text-white text-left transition-all flex items-center gap-3"
               >
                 <Search className="w-4 h-4 text-slate-600 flex-shrink-0" />
                 {ex}
