@@ -215,7 +215,7 @@ export default function PasswordGeneratorPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-[#0b1530] text-white pt-[72px]">
+      <div className="relative z-10 min-h-screen bg-[#0b1530] text-white pt-[72px]">
 
         {/* Hero */}
         <header className="pt-16 pb-10 text-center px-4">

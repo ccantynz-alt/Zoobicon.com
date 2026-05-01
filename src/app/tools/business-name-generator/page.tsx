@@ -193,7 +193,7 @@ export default function BusinessNameGeneratorPage() {
     Object.values(n.domains).filter(d => d.available === true).length;
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white pt-[72px]">
+    <div className="relative z-10 min-h-screen bg-[#0b1530] text-white pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <div className="max-w-4xl mx-auto px-6 py-16">
