@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkWithFallback } from "@/lib/opensrs";
 
+// Give ourselves comfortable headroom over Vercel's default 10s function
+// timeout. The internal budget below is 7s; Vercel kills at 15s so a stuck
+// downstream cannot freeze the response and leave the UI spinning.
+export const maxDuration = 15;
+
 // ---------------------------------------------------------------------------
 // GET /api/domains/search?q=domainname&tlds=com,io,ai&mode=com-priority
 // Searches domain availability via RDAP (authoritative) with OpenSRS + DNS
@@ -116,29 +121,36 @@ export async function GET(req: NextRequest) {
     // is returned as `null` (uncertain) — the UI renders those as "unknown"
     // rather than silently timing out.
     const MAX_CONCURRENT = 6;
-    const TOTAL_BUDGET_MS = 9000;
+    const TOTAL_BUDGET_MS = 7000;
+    const startedAt = Date.now();
     const checks: Array<{ domain: string; tld: string; available: boolean | null }> = tlds.map(
       (tld) => ({ domain: `${sanitized}.${tld}`, tld, available: null }),
     );
-    let cursor = 0;
-    const runPool = Promise.all(
-      Array.from({ length: Math.min(MAX_CONCURRENT, tlds.length) }, async () => {
-        while (true) {
-          const idx = cursor++;
-          if (idx >= tlds.length) return;
+    // Pre-partitioned workers — each owns a strided slice of the index range
+    // so there is no shared cursor to coordinate. Promise.allSettled means a
+    // single worker throwing can never collapse the pool and leave indices
+    // unfilled (which presented to the UI as a spinner that never cleared).
+    // Each worker also re-checks the wall-clock budget before every request
+    // so a slow registry can't burn the whole window on one TLD.
+    const workerCount = Math.min(MAX_CONCURRENT, tlds.length);
+    const workers = Array.from({ length: workerCount }, (_, workerId) =>
+      (async () => {
+        for (let idx = workerId; idx < tlds.length; idx += workerCount) {
+          if (Date.now() - startedAt > TOTAL_BUDGET_MS) return;
           const tld = tlds[idx];
           const domain = `${sanitized}.${tld}`;
           try {
             const available = await checkWithFallback(domain);
             checks[idx] = { domain, tld, available };
-          } catch {
+          } catch (err) {
+            console.error(`[Domain check] ${domain} failed:`, err instanceof Error ? err.message : err);
             checks[idx] = { domain, tld, available: null };
           }
         }
-      }),
+      })(),
     );
     const budget = new Promise<void>((resolve) => setTimeout(resolve, TOTAL_BUDGET_MS));
-    await Promise.race([runPool, budget]);
+    await Promise.race([Promise.allSettled(workers), budget]);
 
     const { tags, premium: premiumName } = classifyName(sanitized);
     const results = checks.map(({ domain, tld, available }) => {
