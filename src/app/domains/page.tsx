@@ -107,7 +107,10 @@ export default function DomainsPage() {
 
     try {
       const url = `/api/domains/search?q=${encodeURIComponent(cleanName)}&tlds=${ALL_TLDS.join(",")}`;
-      const res = await fetch(url, { signal: AbortSignal.timeout(14000) });
+      // Backend caps itself at 7s of registry work and Vercel kills the
+      // function at 15s — anything beyond that means the response was lost
+      // in transit, which the catch block surfaces as a clear error.
+      const res = await fetch(url, { signal: AbortSignal.timeout(16000) });
       if (res.ok) {
         const data = await res.json();
         const apiResults: Array<{ domain: string; available: boolean | null; price?: number }> = data.results || [];

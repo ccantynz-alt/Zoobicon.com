@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
+// The Anthropic call below is bounded to 25s. Give Vercel enough room above
+// that so the function isn't killed mid-response (which would surface to the
+// UI as an indefinite spinner instead of a clean error).
+export const maxDuration = 30;
+
 /**
  * AI domain/business name generator.
  * POST { description, style?, count?, tlds? }
@@ -84,12 +89,27 @@ Naming rules (strictly enforced):
 Return ONLY a JSON array — no markdown, no preamble, no explanation:
 [{"name":"Lumenpath","tagline":"Where brilliant ideas find the light"}, ...]`;
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 3000,
-      system,
-      messages: [{ role: "user", content: `Generate ${count} extraordinary names now. JSON array only.` }],
-    });
+    // Hard cap the Anthropic call so a slow/hung upstream cannot leave the
+    // /domain-finder UI spinning. On timeout we serve the deterministic
+    // fallback names instead of a failed request.
+    let message;
+    try {
+      message = await client.messages.create(
+        {
+          model: "claude-sonnet-4-6",
+          max_tokens: 3000,
+          system,
+          messages: [{ role: "user", content: `Generate ${count} extraordinary names now. JSON array only.` }],
+        },
+        { signal: AbortSignal.timeout(25000) },
+      );
+    } catch (err) {
+      console.warn(
+        "[domains/generate] Anthropic call failed:",
+        err instanceof Error ? err.message : err,
+      );
+      return NextResponse.json({ names: fallbackNames(description, count), source: "fallback-anthropic-error" });
+    }
 
     const textBlock = message.content.find((b) => b.type === "text") as
       | { type: "text"; text: string }

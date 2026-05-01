@@ -78,11 +78,14 @@ export default function DomainFinderPage() {
     // Step 1 — AI generates 25 brandable name ideas
     let names: GeneratedName[] = [];
     try {
+      const generateSignal = abortRef.current
+        ? AbortSignal.any([abortRef.current.signal, AbortSignal.timeout(28000)])
+        : AbortSignal.timeout(28000);
       const res = await fetch("/api/domains/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ description: description.trim(), count: 25 }),
-        signal: abortRef.current.signal,
+        signal: generateSignal,
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -91,8 +94,14 @@ export default function DomainFinderPage() {
       const data = await res.json();
       names = (data.names || []) as GeneratedName[];
     } catch (err) {
-      if ((err as Error).name === "AbortError") return;
-      setErrorMsg((err as Error).message || "Failed to generate names. Check ANTHROPIC_API_KEY.");
+      const e = err as Error;
+      if (e.name === "AbortError" && abortRef.current?.signal.aborted) return;
+      const isTimeout = e.name === "TimeoutError" || e.name === "AbortError";
+      setErrorMsg(
+        isTimeout
+          ? "Name generation timed out. The AI service is slow right now — please try again."
+          : e.message || "Failed to generate names. Check ANTHROPIC_API_KEY.",
+      );
       setPhase("idle");
       return;
     }
@@ -125,6 +134,8 @@ export default function DomainFinderPage() {
     const CONCURRENCY = 5;
     let cursor = 0;
 
+    const userAbortFired = () => abortRef.current?.signal.aborted === true;
+
     const worker = async () => {
       while (true) {
         const idx = cursor++;
@@ -132,9 +143,18 @@ export default function DomainFinderPage() {
         const n = names[idx];
 
         try {
+          // Combine the user-cancellation signal with a 14s per-name timeout.
+          // The /api/domains/search route caps itself at 7s of registry work
+          // + Vercel maxDuration of 15s, so any fetch outliving 14s is a sign
+          // the response was lost in transit and the row must be marked
+          // unverified rather than spin forever.
+          const userSignal = abortRef.current?.signal;
+          const fetchSignal = userSignal
+            ? AbortSignal.any([userSignal, AbortSignal.timeout(14000)])
+            : AbortSignal.timeout(14000);
           const res = await fetch(
             `/api/domains/search?q=${encodeURIComponent(n.slug)}&tlds=com&mode=com-priority`,
-            { signal: abortRef.current?.signal },
+            { signal: fetchSignal },
           );
           if (!res.ok) throw new Error("search failed");
           const data = await res.json();
@@ -155,7 +175,11 @@ export default function DomainFinderPage() {
             ),
           );
         } catch (err) {
-          if ((err as Error).name === "AbortError") return;
+          // User cancelled the whole search — bail without flipping rows.
+          if ((err as Error).name === "AbortError" && userAbortFired()) return;
+          // Timeout or network error — mark row as checked-but-unverified
+          // so the spinner clears and the UI shows the row in "uncertain"
+          // state instead of hanging.
           setResults((prev) =>
             prev.map((r, i) => (i === idx ? { ...r, comChecked: true, comAvailable: null } : r)),
           );
@@ -210,8 +234,13 @@ export default function DomainFinderPage() {
       : sortedResults;
 
   const availableCount = results.filter((r) => r.comAvailable === true).length;
+  const verifiedCount = results.filter((r) => r.comChecked && r.comAvailable !== null).length;
   const checkedAll = results.length > 0 && results.every((r) => r.comChecked);
   const isRunning = phase === "generating" || phase === "checking";
+  // If we finished checking but every single .com came back null the
+  // registry was unreachable — surface a clear retry path instead of an
+  // empty "0 available" state that hides the real problem.
+  const allUnverified = checkedAll && results.length > 0 && verifiedCount === 0;
 
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white">
@@ -478,8 +507,27 @@ export default function DomainFinderPage() {
             })}
           </div>
 
+          {/* Registry unreachable — every check returned null */}
+          {allUnverified && (
+            <div className="text-center py-12 rounded-2xl border border-amber-500/20 bg-amber-500/[0.04]">
+              <Globe className="w-12 h-12 mx-auto mb-4 text-amber-400/60" />
+              <p className="font-semibold text-amber-200">Registry temporarily unreachable</p>
+              <p className="text-sm text-slate-400 mt-1 max-w-md mx-auto">
+                We couldn&apos;t verify availability for any of these names — the .com registry
+                rate-limited or is slow right now. Please try again in a few seconds.
+              </p>
+              <button
+                onClick={handleSearch}
+                className="mt-5 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 rounded-lg text-sm font-semibold inline-flex items-center gap-2"
+              >
+                <Loader2 className="w-3.5 h-3.5" />
+                Try again
+              </button>
+            </div>
+          )}
+
           {/* No available .com state */}
-          {checkedAll && availableCount === 0 && filter === "available" && (
+          {checkedAll && !allUnverified && availableCount === 0 && filter === "available" && (
             <div className="text-center py-12">
               <Globe className="w-12 h-12 mx-auto mb-4 text-slate-600" />
               <p className="font-semibold text-slate-300">No .com domains available</p>
