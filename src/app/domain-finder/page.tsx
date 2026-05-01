@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Zap,
   ArrowRight,
+  Crown,
 } from "lucide-react";
 
 interface GeneratedName {
@@ -38,6 +39,18 @@ interface DomainResult {
   checkingTlds: boolean;
 }
 
+type CountChoice = 25 | 50 | 100;
+type WordCountChoice = 1 | 2 | "either";
+type LengthChoice = "short" | "any";
+type WordTypeChoice = "real" | "invented" | "either";
+
+const COUNT_OPTIONS: CountChoice[] = [25, 50, 100];
+
+// TLDs we automatically check in the background for every available .com so
+// the user sees a complete picture without clicking expand. Kept short to
+// avoid hammering RDAP — additional TLDs still available behind the dropdown.
+const AUTO_TLDS = ["io", "ai", "dev", "app", "co"];
+
 const EXAMPLES = [
   "AI scheduling tool for dentists",
   "sustainable fashion marketplace",
@@ -54,6 +67,13 @@ export default function DomainFinderPage() {
   const [filter, setFilter] = useState<"available" | "all">("available");
   const [copied, setCopied] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+
+  // Filters: count batch size, word count, length, real-vs-invented
+  const [count, setCount] = useState<CountChoice>(25);
+  const [wordCount, setWordCount] = useState<WordCountChoice>("either");
+  const [length, setLength] = useState<LengthChoice>("any");
+  const [wordType, setWordType] = useState<WordTypeChoice>("either");
+
   const abortRef = useRef<AbortController | null>(null);
 
   const copyDomain = (domain: string) => {
@@ -75,16 +95,25 @@ export default function DomainFinderPage() {
     setFilter("available");
     setPhase("generating");
 
-    // Step 1 — AI generates 25 brandable name ideas
+    // Step 1 — AI generates `count` brandable name ideas, shaped by filters
     let names: GeneratedName[] = [];
     try {
+      // Bigger batches need longer timeout — Sonnet emits ~80 tok/sec and 100
+      // names is roughly 9000 tokens of output.
+      const generateTimeout = count >= 100 ? 50000 : count >= 50 ? 38000 : 28000;
       const generateSignal = abortRef.current
-        ? AbortSignal.any([abortRef.current.signal, AbortSignal.timeout(28000)])
-        : AbortSignal.timeout(28000);
+        ? AbortSignal.any([abortRef.current.signal, AbortSignal.timeout(generateTimeout)])
+        : AbortSignal.timeout(generateTimeout);
       const res = await fetch("/api/domains/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: description.trim(), count: 25 }),
+        body: JSON.stringify({
+          description: description.trim(),
+          count,
+          wordCount,
+          length,
+          wordType,
+        }),
         signal: generateSignal,
       });
       if (!res.ok) {
@@ -130,11 +159,49 @@ export default function DomainFinderPage() {
       })),
     );
 
-    // Step 2 — Check .com availability for each name, 5 at a time
-    const CONCURRENCY = 5;
+    // Step 2 — Check .com availability for each name. Concurrency scales
+    // gently with batch size so 100-name searches don't open 30 sockets at
+    // once but still finish quickly.
+    const CONCURRENCY = count >= 100 ? 8 : count >= 50 ? 6 : 5;
     let cursor = 0;
 
     const userAbortFired = () => abortRef.current?.signal.aborted === true;
+
+    // Fire-and-forget: when a .com comes back available, kick off the
+    // alt-TLD check in the background so the user gets a complete picture
+    // without having to click "expand". We do NOT await this — main worker
+    // continues and the row updates whenever the alt-TLD response lands.
+    const fanOutAltTlds = (idx: number, slug: string) => {
+      void (async () => {
+        try {
+          const userSignal = abortRef.current?.signal;
+          const fetchSignal = userSignal
+            ? AbortSignal.any([userSignal, AbortSignal.timeout(16000)])
+            : AbortSignal.timeout(16000);
+          const res = await fetch(
+            `/api/domains/search?q=${encodeURIComponent(slug)}&tlds=${AUTO_TLDS.join(",")}`,
+            { signal: fetchSignal },
+          );
+          if (!res.ok) return;
+          const data = await res.json();
+          const tlds: TldResult[] = (data.results || []).map(
+            (r: { domain: string; available: boolean | null; price: number }) => ({
+              domain: r.domain,
+              available: r.available,
+              price: r.price,
+            }),
+          );
+          setResults((prev) =>
+            prev.map((r, i) =>
+              i === idx ? { ...r, otherTlds: tlds, expandedTlds: true, checkingTlds: false } : r,
+            ),
+          );
+        } catch {
+          // Silent — alt-TLD check is supplemental, not critical. The "Check
+          // .io, .ai, ..." dropdown still works as a manual fallback.
+        }
+      })();
+    };
 
     const worker = async () => {
       while (true) {
@@ -162,18 +229,26 @@ export default function DomainFinderPage() {
             (r: { tld: string }) => r.tld === "com",
           ) as { available: boolean | null; price: number } | undefined;
 
+          const comAvailable = comResult?.available ?? null;
+
           setResults((prev) =>
             prev.map((r, i) =>
               i === idx
                 ? {
                     ...r,
-                    comAvailable: comResult?.available ?? null,
+                    comAvailable,
                     comChecked: true,
                     price: comResult?.price ?? null,
+                    // Mark as already auto-expanding so the inline "Check more
+                    // TLDs" link doesn't duplicate work.
+                    checkingTlds: comAvailable === true,
                   }
                 : r,
             ),
           );
+
+          // Available .com → fan out alt-TLD check in the background.
+          if (comAvailable === true) fanOutAltTlds(idx, n.slug);
         } catch (err) {
           // User cancelled the whole search — bail without flipping rows.
           if ((err as Error).name === "AbortError" && userAbortFired()) return;
@@ -263,8 +338,8 @@ export default function DomainFinderPage() {
             </span>
           </h1>
           <p className="text-slate-400 text-lg mb-8 max-w-xl mx-auto">
-            Describe your business and AI generates 25 brandable names — then we instantly
-            check which .com domains are actually available.
+            Describe your business and AI generates up to 100 brandable names — then we
+            instantly check which .com domains are actually available.
           </p>
 
           {/* Search input */}
@@ -294,6 +369,79 @@ export default function DomainFinderPage() {
                 </>
               )}
             </button>
+          </div>
+
+          {/* Filter chips — count, word count, length, real vs invented */}
+          <div className="mt-5 flex flex-col items-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl">
+              <span className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold pr-1">Show</span>
+              {COUNT_OPTIONS.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setCount(c)}
+                  disabled={isRunning}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                    count === c
+                      ? "bg-violet-500/20 border-violet-400/40 text-violet-200"
+                      : "bg-white/[0.04] border-white/[0.08] text-slate-400 hover:border-violet-400/30 hover:text-slate-200"
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {c} names
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl">
+              <span className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold pr-1">Style</span>
+              {([
+                { v: "either" as WordCountChoice, label: "Any words" },
+                { v: 1 as WordCountChoice, label: "1 word only" },
+                { v: 2 as WordCountChoice, label: "2 words" },
+              ]).map((opt) => (
+                <button
+                  key={String(opt.v)}
+                  onClick={() => setWordCount(opt.v)}
+                  disabled={isRunning}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                    wordCount === opt.v
+                      ? "bg-cyan-500/15 border-cyan-400/40 text-cyan-200"
+                      : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:border-cyan-400/30 hover:text-slate-200"
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+              <span className="w-px h-4 bg-white/10 mx-1" />
+              <button
+                onClick={() => setLength(length === "short" ? "any" : "short")}
+                disabled={isRunning}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                  length === "short"
+                    ? "bg-amber-500/15 border-amber-400/40 text-amber-200"
+                    : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:border-amber-400/30 hover:text-slate-200"
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                Short ≤6 chars
+              </button>
+              <span className="w-px h-4 bg-white/10 mx-1" />
+              {([
+                { v: "either" as WordTypeChoice, label: "Any" },
+                { v: "real" as WordTypeChoice, label: "Real words" },
+                { v: "invented" as WordTypeChoice, label: "Invented" },
+              ]).map((opt) => (
+                <button
+                  key={opt.v}
+                  onClick={() => setWordType(opt.v)}
+                  disabled={isRunning}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                    wordType === opt.v
+                      ? "bg-emerald-500/15 border-emerald-400/40 text-emerald-200"
+                      : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:border-emerald-400/30 hover:text-slate-200"
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Error */}
@@ -380,6 +528,9 @@ export default function DomainFinderPage() {
               const isAvailable = r.comAvailable === true;
               const isTaken = r.comAvailable === false;
               const isPending = !r.comChecked;
+              // Premium = short, pronounceable, available. ≤6 chars is the
+              // Notion/Stripe/Loom tier — these are the keepers.
+              const isPremium = isAvailable && r.slug.length <= 6;
 
               return (
                 <div
@@ -424,6 +575,12 @@ export default function DomainFinderPage() {
                             >
                               {r.slug}.com
                             </span>
+                            {isPremium && (
+                              <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full font-bold bg-gradient-to-r from-amber-500/20 to-amber-500/10 border border-amber-400/40 text-amber-300 inline-flex items-center gap-1">
+                                <Crown className="w-3 h-3" />
+                                Premium
+                              </span>
+                            )}
                             {isAvailable && r.price !== null && (
                               <span className="text-xs px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-full font-medium">
                                 ${r.price}/yr
