@@ -215,30 +215,7 @@ export default function PasswordGeneratorPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-[#0b1530] text-white">
-        {/* Nav */}
-        <nav className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-md sticky top-0 z-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
-              <Shield className="w-7 h-7 text-stone-400" />
-              <span>Zoobicon</span>
-            </Link>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/tools"
-                className="text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                All Tools
-              </Link>
-              <Link
-                href="/auth/signup"
-                className="text-sm bg-stone-500 hover:bg-stone-400 text-black font-semibold px-4 py-2 rounded-lg transition-colors"
-              >
-                Sign Up Free
-              </Link>
-            </div>
-          </div>
-        </nav>
+      <div className="min-h-screen bg-[#0b1530] text-white pt-[72px]">
 
         {/* Hero */}
         <header className="pt-16 pb-10 text-center px-4">

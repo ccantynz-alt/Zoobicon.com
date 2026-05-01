@@ -245,7 +245,7 @@ export default function DomainFinderPage() {
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white">
       {/* Hero */}
-      <div className="relative overflow-hidden pb-12 pt-16 px-4">
+      <div className="relative overflow-hidden pb-12 pt-32 md:pt-36 px-4">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-violet-600/15 rounded-full blur-[100px]" />
         </div>

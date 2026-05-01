@@ -138,7 +138,7 @@ export default function InvoiceGeneratorPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white">
+    <div className="min-h-screen bg-[#0b1530] text-white pt-[72px]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -167,18 +167,6 @@ export default function InvoiceGeneratorPage() {
           .print-invoice .inv-notes { border-top: 1px solid #e5e7eb !important; }
         }
       `}</style>
-
-      {/* Nav */}
-      <nav className="border-b border-white/5 px-6 py-4 no-print">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold tracking-tight">
-            <span className="text-stone-400">Zoo</span>bicon
-          </Link>
-          <Link href="/tools" className="text-sm text-white/50 hover:text-white transition-colors">
-            All Tools
-          </Link>
-        </div>
-      </nav>
 
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Header */}
