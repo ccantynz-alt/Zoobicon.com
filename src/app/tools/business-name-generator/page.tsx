@@ -193,25 +193,8 @@ export default function BusinessNameGeneratorPage() {
     Object.values(n.domains).filter(d => d.available === true).length;
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white">
+    <div className="min-h-screen bg-[#0b1530] text-white pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
-      {/* Nav */}
-      <nav className="border-b border-white/[0.06] bg-[#0b1530]/90 backdrop-blur-xl">
-        <div className="max-w-5xl mx-auto px-6 flex items-center justify-between h-14">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
-              <Zap className="w-3.5 h-3.5 text-white" />
-            </div>
-            <span className="text-sm font-bold">Zoobicon</span>
-          </Link>
-          <div className="flex gap-3 text-xs text-white/40">
-            <Link href="/domains" className="hover:text-white/60">Domain Search</Link>
-            <Link href="/builder" className="hover:text-white/60">Website Builder</Link>
-            <Link href="/auth/signup" className="text-brand-400 hover:text-brand-300">Get Started</Link>
-          </div>
-        </div>
-      </nav>
 
       <div className="max-w-4xl mx-auto px-6 py-16">
 
