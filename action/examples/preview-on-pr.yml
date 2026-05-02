@@ -1,0 +1,45 @@
+# Spin up a unique preview at pr-<N>.zoobicon.sh for every pull request,
+# and post a sticky comment on the PR with the URL.
+#
+# Usage:
+#   1. Save your zbk_live_… key as a repo secret called ZOOBICON_API_KEY
+#   2. Drop this file in .github/workflows/preview.yml
+
+name: PR preview
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy preview
+        id: deploy
+        uses: zoobicon/zoobicon-action@v1
+        with:
+          api-key: ${{ secrets.ZOOBICON_API_KEY }}
+          path: ./build
+          slug: pr-${{ github.event.number }}
+          site-name: PR #${{ github.event.number }} preview
+
+      - name: Comment on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: zoobicon-preview
+          message: |
+            ### 🔗 Zoobicon preview ready
+
+            **${{ steps.deploy.outputs.url }}**
+
+            Latest commit: `${{ github.event.pull_request.head.sha }}`
+            (re-deployed on every push)

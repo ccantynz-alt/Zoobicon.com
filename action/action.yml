@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+name: Zoobicon
+author: Zoobicon
+description: >
+  Deploy AI-generated websites and full-stack apps from any GitHub workflow.
+  Wraps the zoobicon CLI — generate from a prompt, deploy a directory, or
+  spin up a fresh marketing site straight from your README on every push.
+
+# Marketplace metadata — these drive the listing card on github.com/marketplace
+branding:
+  icon: zap
+  color: purple
+
+inputs:
+  api-key:
+    description: >
+      Zoobicon API key (zbk_live_…). Create one at
+      https://zoobicon.com/admin/api-keys and store it as an Actions secret.
+    required: true
+
+  mode:
+    description: >
+      What this run should do.
+        deploy   — ship the existing `path` directory to <slug>.zoobicon.sh
+        generate — AI-build a fresh site from `prompt` and deploy it
+        new      — AI-build only; do not deploy (useful for previewing files)
+    required: false
+    default: deploy
+
+  path:
+    description: >
+      Directory to deploy when mode=deploy (or write generated files into when
+      mode=new). Defaults to the workspace root.
+    required: false
+    default: .
+
+  prompt:
+    description: >
+      Required when mode=generate or mode=new. Natural-language description
+      of the site you want built.
+    required: false
+
+  slug:
+    description: Custom subdomain slug (defaults to a generated one).
+    required: false
+
+  site-name:
+    description: Friendly site name shown in your Zoobicon dashboard.
+    required: false
+
+  cli-version:
+    description: >
+      npm-tagged version of the zoobicon CLI to install. `latest` tracks
+      the published release; pin to a specific version (e.g. 0.1.0) for
+      reproducible builds.
+    required: false
+    default: latest
+
+outputs:
+  url:
+    description: The deployed URL (e.g. https://my-app.zoobicon.sh).
+    value: ${{ steps.run.outputs.url }}
+  slug:
+    description: The assigned subdomain slug.
+    value: ${{ steps.run.outputs.slug }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Node 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+
+    - name: Install zoobicon CLI
+      shell: bash
+      run: npm i -g zoobicon@${{ inputs.cli-version }}
+
+    - name: Deploy / generate
+      id: run
+      shell: bash
+      env:
+        ZOOBICON_API_KEY: ${{ inputs.api-key }}
+        ZBK_MODE: ${{ inputs.mode }}
+        ZBK_PATH: ${{ inputs.path }}
+        ZBK_PROMPT: ${{ inputs.prompt }}
+        ZBK_SLUG: ${{ inputs.slug }}
+        ZBK_NAME: ${{ inputs.site-name }}
+      run: |
+        set -euo pipefail
+
+        SLUG_FLAG=""
+        if [ -n "${ZBK_SLUG:-}" ]; then SLUG_FLAG="--slug ${ZBK_SLUG}"; fi
+        NAME_FLAG=""
+        if [ -n "${ZBK_NAME:-}" ]; then NAME_FLAG="--name \"${ZBK_NAME}\""; fi
+
+        case "${ZBK_MODE}" in
+          deploy)
+            echo "::group::Deploying ${ZBK_PATH} to zoobicon.sh"
+            OUTPUT=$(eval zoobicon deploy "${ZBK_PATH}" ${SLUG_FLAG} ${NAME_FLAG} | tee /dev/stderr)
+            echo "::endgroup::"
+            ;;
+
+          generate)
+            if [ -z "${ZBK_PROMPT:-}" ]; then
+              echo "::error::mode=generate requires the 'prompt' input."
+              exit 1
+            fi
+            echo "::group::Generating site from prompt"
+            zoobicon new "${ZBK_PROMPT}" --out ./.zoobicon-build --force
+            echo "::endgroup::"
+            echo "::group::Deploying generated site"
+            OUTPUT=$(eval zoobicon deploy ./.zoobicon-build ${SLUG_FLAG} ${NAME_FLAG} | tee /dev/stderr)
+            echo "::endgroup::"
+            ;;
+
+          new)
+            if [ -z "${ZBK_PROMPT:-}" ]; then
+              echo "::error::mode=new requires the 'prompt' input."
+              exit 1
+            fi
+            echo "::group::Generating site (no deploy)"
+            zoobicon new "${ZBK_PROMPT}" --out "${ZBK_PATH}" --force
+            echo "::endgroup::"
+            OUTPUT=""
+            ;;
+
+          *)
+            echo "::error::Unknown mode '${ZBK_MODE}'. Use deploy, generate, or new."
+            exit 1
+            ;;
+        esac
+
+        # Extract the deploy URL from the CLI output. The CLI prints
+        # "✓ Deployed: https://<slug>.zoobicon.sh" — we grep that for the
+        # URL and the slug so downstream steps can reference it as an
+        # output.
+        if [ -n "${OUTPUT:-}" ]; then
+          URL=$(printf '%s\n' "${OUTPUT}" | grep -Eo 'https://[a-z0-9.-]+\.zoobicon\.sh' | head -n1 || true)
+          if [ -n "${URL}" ]; then
+            SLUG=$(printf '%s' "${URL}" | sed -E 's|https://([^.]+)\.zoobicon\.sh|\1|')
+            echo "url=${URL}" >> "${GITHUB_OUTPUT}"
+            echo "slug=${SLUG}" >> "${GITHUB_OUTPUT}"
+            echo "### Zoobicon deploy" >> "${GITHUB_STEP_SUMMARY}"
+            echo "" >> "${GITHUB_STEP_SUMMARY}"
+            echo "🔗 [${URL}](${URL})" >> "${GITHUB_STEP_SUMMARY}"
+          else
+            echo "::warning::Could not parse a deploy URL from the CLI output."
+          fi
+        fi

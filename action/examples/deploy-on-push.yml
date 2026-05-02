@@ -1,0 +1,31 @@
+# Deploy your built site to <slug>.zoobicon.sh on every push to main.
+#
+# Usage:
+#   1. Save your zbk_live_… key as a repo secret called ZOOBICON_API_KEY
+#   2. Drop this file in .github/workflows/deploy.yml
+#   3. Push — the action installs the zoobicon CLI, deploys ./build,
+#      and writes the live URL to the job summary.
+
+name: Deploy to Zoobicon
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy
+        uses: zoobicon/zoobicon-action@v1
+        with:
+          api-key: ${{ secrets.ZOOBICON_API_KEY }}
+          path: ./build
+          slug: my-app
+          site-name: My App (production)

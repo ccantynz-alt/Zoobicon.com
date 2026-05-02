@@ -1,0 +1,45 @@
+# The killer Marketplace use case: AI-build a marketing site from your
+# repo's README on every push to main, then deploy it. No build script
+# required, no React knowledge, no manual content writing.
+#
+# Output: <repo-name>-docs.zoobicon.sh — a polished landing page that
+# updates itself every time you edit README.md.
+#
+# Usage:
+#   1. Save your zbk_live_… key as a repo secret called ZOOBICON_API_KEY
+#   2. Drop this file in .github/workflows/marketing.yml
+
+name: Marketing site from README
+on:
+  push:
+    branches: [main]
+    paths:
+      - "README.md"
+      - ".github/workflows/marketing.yml"
+
+jobs:
+  build-and-ship:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build prompt from README
+        id: prompt
+        run: |
+          # Take the first 80 lines so we stay well under the prompt cap.
+          {
+            echo "prompt<<ZBKEOF"
+            head -n 80 README.md
+            echo ""
+            echo "Build a polished marketing landing page for this project."
+            echo "ZBKEOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Generate + deploy
+        uses: zoobicon/zoobicon-action@v1
+        with:
+          api-key: ${{ secrets.ZOOBICON_API_KEY }}
+          mode: generate
+          prompt: ${{ steps.prompt.outputs.prompt }}
+          slug: ${{ github.event.repository.name }}-docs
+          site-name: ${{ github.event.repository.name }} — docs
