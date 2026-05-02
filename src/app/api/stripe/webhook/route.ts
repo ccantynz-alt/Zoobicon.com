@@ -372,142 +372,17 @@ export async function POST(request: NextRequest) {
   try {
     switch (event.type) {
       case "checkout.session.completed": {
+        // Single source of truth — handleCheckoutCompleted handles all four
+        // paths (video overage, addon, domain registration, plain plan
+        // upgrade) and runs the user-table upsert that sets `plan` and
+        // `subscription_status`. Previously this case body had inline
+        // copies of the overage and domain branches but skipped the plain
+        // plan upsert entirely — meaning a regular subscription checkout
+        // never wrote `plan = 'pro'` to the users table, so the customer
+        // stayed on the free-tier watermark even after paying. Fixed by
+        // delegating to the canonical handler.
         const session = event.data.object as Stripe.Checkout.Session;
-        const email = (session.metadata?.email ?? session.customer_email) as string;
-        if (!email) break;
-
-        const customerId = session.customer as string;
-        const subscriptionId = session.subscription as string;
-        const plan = session.metadata?.plan || "pro";
-        if (!session.metadata?.plan) {
-          console.warn(`[webhook] checkout.session.completed: missing plan metadata for session ${session.id}, defaulting to 'pro'`);
-        }
-
-        // Check if this is a marketplace add-on purchase
-        const addonId = session.metadata?.addonId;
-        const addonName = session.metadata?.addonName;
-
-        // Video overage credit pack purchase
-        if (session.metadata?.type === "video_overage") {
-          const packId = session.metadata?.packId;
-          const pack = OVERAGE_PACKS.find((p) => p.id === packId);
-          if (pack) {
-            await addOverageCredits(email, pack, session.id);
-            console.log(`[webhook] Video credits fulfilled: ${pack.name} for ${email}`);
-          }
-          break;
-        }
-
-        // Domain registration purchase — MUST actually register with OpenSRS
-        if (session.metadata?.type === "domain_registration" || session.metadata?.domains) {
-          const rawDomains = session.metadata?.domains || "";
-          let domainList: string[] = [];
-          try {
-            const parsed = JSON.parse(rawDomains);
-            domainList = Array.isArray(parsed) ? parsed : rawDomains.split(",").filter(Boolean);
-          } catch {
-            domainList = rawDomains.split(",").filter(Boolean);
-          }
-
-          const registrantEmail = session.metadata?.registrantEmail || email;
-          const years = parseInt(session.metadata?.years || "1", 10);
-          const expiresAt = new Date();
-          expiresAt.setFullYear(expiresAt.getFullYear() + years);
-
-          let registrant = {
-            firstName: session.metadata?.firstName || "Domain",
-            lastName: session.metadata?.lastName || "Owner",
-            email: registrantEmail,
-            phone: session.metadata?.phone || "+64.000000000",
-            address1: session.metadata?.address1 || "Not provided",
-            city: session.metadata?.city || "Auckland",
-            state: session.metadata?.state || "Auckland",
-            postalCode: session.metadata?.postalCode || "0000",
-            country: session.metadata?.country || "NZ",
-            organization: session.metadata?.organization || "",
-          };
-          try {
-            if (session.metadata?.registrantInfo) {
-              registrant = { ...registrant, ...JSON.parse(session.metadata.registrantInfo) };
-            }
-          } catch { /* use defaults */ }
-
-          const { registerDomain, hasOpenSRSConfig } = await import("@/lib/domain-reseller");
-          const registeredDomains: string[] = [];
-          const failedDomains: string[] = [];
-
-          for (const domain of domainList) {
-            const trimmed = domain.trim();
-            if (!trimmed) continue;
-
-            try {
-              if (hasOpenSRSConfig()) {
-                const result = await registerDomain({
-                  domain: trimmed,
-                  period: years,
-                  registrant,
-                  nameservers: ["ns1.zoobicon.io", "ns2.zoobicon.io"],
-                  autoRenew: true,
-                  privacyProtection: true,
-                });
-
-                if (result.success) {
-                  registeredDomains.push(trimmed);
-                  console.log(`[webhook] Domain REGISTERED with OpenSRS: ${trimmed} (order: ${result.orderId})`);
-                } else {
-                  failedDomains.push(trimmed);
-                  console.error(`[webhook] OpenSRS registration FAILED for ${trimmed}: ${result.error}`);
-                }
-              } else {
-                console.warn(`[webhook] OpenSRS NOT CONFIGURED — domain ${trimmed} saved locally but NOT registered with registrar`);
-                registeredDomains.push(trimmed);
-              }
-            } catch (err) {
-              failedDomains.push(trimmed);
-              console.error(`[webhook] Domain registration error for ${trimmed}:`, err);
-            }
-          }
-
-          for (const domain of registeredDomains) {
-            try {
-              const existing = (await sql`
-                SELECT status FROM registered_domains WHERE domain = ${domain} LIMIT 1
-              `) as Array<{ status: string }>;
-              if (existing[0]?.status === "active") {
-                console.log(`[webhook] ${domain} already active — skipping duplicate registration`);
-              }
-
-              await sql`
-                INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection)
-                VALUES (${domain}, ${registrantEmail}, ${hasOpenSRSConfig() ? 'active' : 'pending_registration'}, ${expiresAt.toISOString()}, true, true)
-                ON CONFLICT (domain) DO UPDATE SET
-                  status = ${hasOpenSRSConfig() ? 'active' : 'pending_registration'},
-                  expires_at = ${expiresAt.toISOString()},
-                  user_email = ${registrantEmail}
-              `;
-            } catch (err) {
-              console.error(`[webhook] Failed to save domain ${domain} to DB:`, err);
-            }
-          }
-
-          if (failedDomains.length > 0) {
-            console.error(`[webhook] ${failedDomains.length} domains FAILED registration: ${failedDomains.join(", ")}`);
-            for (const domain of failedDomains) {
-              try {
-                await sql`
-                  INSERT INTO registered_domains (domain, user_email, status, expires_at)
-                  VALUES (${domain}, ${registrantEmail}, 'failed', ${expiresAt.toISOString()})
-                  ON CONFLICT (domain) DO UPDATE SET status = 'failed', user_email = ${registrantEmail}
-                `;
-              } catch { /* best effort */ }
-            }
-          }
-
-          console.log(`[webhook] Domain registration complete: ${registeredDomains.length} succeeded, ${failedDomains.length} failed for ${registrantEmail}`);
-          handled = true;
-          break;
-        }
-
+        await handleCheckoutCompleted(session);
         handled = true;
         break;
       }
