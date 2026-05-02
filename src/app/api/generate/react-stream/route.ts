@@ -23,6 +23,7 @@ import { NextRequest } from "next/server";
 import { callClaude, streamClaude } from "@/lib/anthropic-cached";
 import { runQualityLoop } from "@/lib/builder-critique";
 import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
+import { getPlanFromRequest, shouldWatermark } from "@/lib/user-plan";
 import {
   detectSupabaseNeeds,
   needsSupabase,
@@ -584,6 +585,11 @@ export async function POST(req: NextRequest): Promise<Response> {
     );
   }
 
+  // Plan resolution drives the watermark + (later) feature gates. Single
+  // source of truth lives in /lib/user-plan.ts.
+  const plan = getPlanFromRequest(req);
+  const showWatermark = shouldWatermark(plan);
+
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const writer = makeWriter(controller);
@@ -792,7 +798,7 @@ export async function POST(req: NextRequest): Promise<Response> {
               const done = completedByIndex.get(j);
               if (done) ordered.push(done);
             }
-            files["App.tsx"] = registry.buildAppFile(ordered, { theme });
+            files["App.tsx"] = registry.buildAppFile(ordered, { theme, showWatermark });
 
             writer.send("component", {
               name: comp.id,

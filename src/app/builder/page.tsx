@@ -7,6 +7,8 @@ import { getGeneratorDef } from "@/lib/generator-prompts";
 // TopBar replaced with inline custom top bar for builder chrome
 import PromptInput from "@/components/PromptInput";
 import type { Tier, AIModel, GenerationMode } from "@/components/PromptInput";
+import { getClientPlan, isPaidPlan, planLabel } from "@/lib/user-plan";
+import type { Plan } from "@/lib/user-plan";
 import DomainHookModal from "@/components/DomainHookModal";
 import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 import dynamic from "next/dynamic";
@@ -497,6 +499,18 @@ function BuilderPage() {
   const [tier, setTier] = useState<Tier>("premium");
   const [isAdmin, setIsAdmin] = useState(false);
   const [useWebContainers, setUseWebContainers] = useState<boolean>(true);
+  const [userPlan, setUserPlan] = useState<Plan>("free");
+
+  // Resolve the user's plan from localStorage so the UI knows whether to
+  // surface the watermark / upgrade banner. Re-runs on storage events so
+  // a sign-in or upgrade in another tab updates instantly.
+  useEffect(() => {
+    setUserPlan(getClientPlan());
+    const refresh = () => setUserPlan(getClientPlan());
+    window.addEventListener("storage", refresh);
+    return () => window.removeEventListener("storage", refresh);
+  }, []);
+  const isFreePlan = !isPaidPlan(userPlan);
 
   // Detect unsupported browsers and pre-warm WebContainers on supported ones
   useEffect(() => {
@@ -682,6 +696,10 @@ function BuilderPage() {
         const parsed = JSON.parse(u);
         if (parsed.email) headers["x-user-email"] = parsed.email;
         if (parsed.role === "admin" || parsed.plan === "unlimited") headers["x-admin"] = "1";
+        // Pass the plan to the API so it can decide whether to inject the
+        // free-tier watermark into generated App.tsx. Falls back to "free"
+        // server-side if absent.
+        if (typeof parsed.plan === "string") headers["x-zoobicon-plan"] = parsed.plan;
       }
     } catch { /* ignore */ }
     return headers;
@@ -2152,6 +2170,40 @@ root.render(React.createElement(App));
                       <ExternalLink size={10} />
                       Import from GitHub, Figma, or URL
                     </button>
+                  </div>
+                )}
+
+                {/* Free-tier upgrade banner — collapses to nothing for paid
+                    users. Watermark gets injected by the API; this banner is
+                    purely the conversion lever that explains why and offers
+                    the fix. */}
+                {isFreePlan && (
+                  <div className="mx-4 mt-3 mb-1 rounded-xl border border-[#E8D4B0]/25 bg-gradient-to-r from-[#E8D4B0]/[0.07] to-transparent px-3.5 py-2.5 flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] text-white/85">
+                        <span className="font-semibold text-[#E8D4B0]">Free plan</span>
+                        <span className="text-white/50"> · sites you build include a small &ldquo;Built with Zoobicon&rdquo; badge.</span>
+                      </p>
+                    </div>
+                    <Link
+                      href="/pricing"
+                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#0a1628] hover:brightness-110 transition-all whitespace-nowrap"
+                      style={{
+                        background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                        boxShadow: "0 4px 14px -4px rgba(232,212,176,0.45)",
+                      }}
+                    >
+                      Remove badge
+                    </Link>
+                  </div>
+                )}
+                {!isFreePlan && (
+                  <div className="mx-4 mt-3 mb-1 rounded-xl border border-emerald-400/25 bg-emerald-500/[0.06] px-3.5 py-2 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <p className="text-[11px] text-emerald-200/85">
+                      <span className="font-semibold">{planLabel(userPlan)} plan</span>
+                      <span className="text-emerald-200/55"> · no watermark, custom domains, full feature set.</span>
+                    </p>
                   </div>
                 )}
 
