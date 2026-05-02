@@ -27,6 +27,14 @@ interface GeneratedName {
   name: string;
   slug: string;
   tagline: string;
+  // 0-100 brand quality score from Claude — memorability + distinctiveness +
+  // pronounceability + brandability rolled into one. UI surfaces this as a
+  // tiny meter so power users can scan winners at a glance.
+  score?: number;
+  // Language safety: list of language codes where the name has a known
+  // negative or off-colour meaning. Empty = clean across the panel of
+  // languages we asked Claude to vet.
+  flags?: string[];
 }
 
 type WordCount = 1 | 2 | "either";
@@ -150,8 +158,12 @@ Naming rules (strictly enforced):
 ${systemBullets.map((b) => `- ${b}`).join("\n")}
 - Include a punchy 5-8 word tagline for each name
 
+For EVERY name also produce:
+- score: integer 0-100 rating brand quality (memorability + distinctiveness + pronounceability + brandability). Reserve 90+ for exceptional names a top-tier startup would actually buy. 70-89 = strong. 50-69 = decent. <50 should not appear in your output at all.
+- flags: array of ISO language codes where this name has a known negative, vulgar, or unfortunate meaning. Check Spanish (es), French (fr), German (de), Italian (it), Portuguese (pt), Mandarin (zh), Japanese (ja), Korean (ko), Hindi (hi), Arabic (ar), Russian (ru), Dutch (nl). Empty array if clean. Be conservative — only flag meanings you are CONFIDENT about.
+
 Return ONLY a JSON array — no markdown, no preamble, no explanation:
-[{"name":"Quill","tagline":"Write the future of email"}, ...]`;
+[{"name":"Quill","tagline":"Write the future of email","score":92,"flags":[]}, ...]`;
 
     // For higher counts request more output tokens. Each row is roughly 60-90
     // tokens so 100 names ≈ 9000 tokens of output. Cap at 12000 for safety.
@@ -194,7 +206,7 @@ Return ONLY a JSON array — no markdown, no preamble, no explanation:
       return NextResponse.json({ names: fallbackNames(description, count), source: "fallback-parse" });
     }
 
-    let parsed: Array<{ name: string; tagline?: string }> = [];
+    let parsed: Array<{ name: string; tagline?: string; score?: number; flags?: string[] }> = [];
     try {
       parsed = JSON.parse(text.slice(start, end + 1));
     } catch {
@@ -211,9 +223,26 @@ Return ONLY a JSON array — no markdown, no preamble, no explanation:
       const slug = slugify(cleaned);
       if (!slug || seen.has(slug)) continue;
       seen.add(slug);
+      // Coerce + clamp the AI-supplied score so a malformed value (e.g.
+      // string, NaN, out-of-range) can't corrupt the UI meter.
+      const rawScore = typeof n.score === "number" ? n.score : Number(n.score);
+      const score = Number.isFinite(rawScore)
+        ? Math.max(0, Math.min(100, Math.round(rawScore)))
+        : undefined;
+      // Sanitise flags: only short ISO-like codes, capped at 6 entries so a
+      // hallucinated long list can't overwhelm the row UI.
+      const flags = Array.isArray(n.flags)
+        ? n.flags
+            .filter((f): f is string => typeof f === "string")
+            .map((f) => f.toLowerCase().trim())
+            .filter((f) => /^[a-z]{2,3}$/.test(f))
+            .slice(0, 6)
+        : undefined;
       names.push({
         name: cleaned,
         slug,
+        score,
+        flags,
         tagline: (n.tagline || "").toString().slice(0, 100) || "Build something remarkable",
       });
       if (names.length >= count) break;

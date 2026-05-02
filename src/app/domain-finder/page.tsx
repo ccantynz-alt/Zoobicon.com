@@ -18,12 +18,18 @@ import {
   ExternalLink,
   ShoppingCart,
   Shield,
+  Download,
 } from "lucide-react";
 
 interface GeneratedName {
   name: string;
   slug: string;
   tagline: string;
+  // 0-100 brand quality score from Claude. Optional because older clients +
+  // fallback paths may omit it.
+  score?: number;
+  // ISO codes of languages where the name has a known unfortunate meaning.
+  flags?: string[];
 }
 
 interface TldResult {
@@ -43,10 +49,20 @@ interface VariantResult {
   price: number | null;
 }
 
+// Per-row social handle availability — null = unknown / rate-limited.
+interface HandleResults {
+  github: boolean | null;
+  x: boolean | null;
+  instagram: boolean | null;
+  tiktok: boolean | null;
+}
+
 interface DomainResult {
   name: string;
   slug: string;
   tagline: string;
+  score?: number;
+  flags?: string[];
   comAvailable: boolean | null;
   comChecked: boolean;
   price: number | null;
@@ -55,6 +71,8 @@ interface DomainResult {
   checkingTlds: boolean;
   variants: VariantResult[];
   variantsChecked: boolean;
+  handles: HandleResults | null;
+  handlesChecked: boolean;
 }
 
 type CountChoice = 25 | 50 | 100;
@@ -88,6 +106,30 @@ const EXAMPLES = [
   "sustainable fashion marketplace",
   "dog training app",
   "remote team analytics platform",
+];
+
+// Industry preset prompts — one tap to seed a category-specific search.
+// Designed to cover the most common verticals founders search for and to
+// surface naming territory the user might not have thought of (e.g. someone
+// vaguely "in AI" gets directed to a more specific bucket).
+interface IndustryPreset {
+  id: string;
+  label: string;
+  emoji: string;
+  prompt: string;
+  recommendedWordType: WordTypeChoice;
+  recommendedLength: LengthChoice;
+}
+
+const INDUSTRY_PRESETS: IndustryPreset[] = [
+  { id: "ai-saas", label: "AI / SaaS", emoji: "✨", prompt: "AI-native SaaS product for modern teams — fast, focused, premium feel", recommendedWordType: "either", recommendedLength: "short" },
+  { id: "ai-email", label: "AI email client", emoji: "✉️", prompt: "AI email client that drafts replies, summarises threads, and triages inboxes", recommendedWordType: "real", recommendedLength: "short" },
+  { id: "fintech", label: "Fintech", emoji: "💳", prompt: "modern fintech app for payments, banking, and personal finance — trustworthy, premium", recommendedWordType: "real", recommendedLength: "short" },
+  { id: "health", label: "Health / wellness", emoji: "🩺", prompt: "digital health and wellness platform — calm, trustworthy, human", recommendedWordType: "real", recommendedLength: "any" },
+  { id: "ecommerce", label: "E-commerce", emoji: "🛍️", prompt: "direct-to-consumer e-commerce brand with a distinctive personality", recommendedWordType: "either", recommendedLength: "any" },
+  { id: "creator", label: "Creator tools", emoji: "🎬", prompt: "creator-economy tools for video, audio, and writing — playful but premium", recommendedWordType: "either", recommendedLength: "short" },
+  { id: "developer", label: "Developer tools", emoji: "⚡", prompt: "developer tooling and infrastructure — technical, fast, terminal-first", recommendedWordType: "invented", recommendedLength: "short" },
+  { id: "agency", label: "Agency / studio", emoji: "🏛️", prompt: "creative agency, design studio, or consultancy — distinctive, editorial, timeless", recommendedWordType: "real", recommendedLength: "any" },
 ];
 
 export default function DomainFinderPage() {
@@ -168,6 +210,15 @@ export default function DomainFinderPage() {
     setTimeout(() => setCopied(""), 2000);
   };
 
+  // Industry preset — seeds the description and snaps the filter chips to
+  // the recommended values for that vertical. Doesn't auto-fire the search;
+  // user can still tweak before hitting "Find Domains".
+  const applyPreset = (preset: IndustryPreset) => {
+    setDescription(preset.prompt);
+    setWordType(preset.recommendedWordType);
+    setLength(preset.recommendedLength);
+  };
+
   const handleSearch = async () => {
     if (!description.trim() || phase === "generating" || phase === "checking") return;
 
@@ -245,6 +296,8 @@ export default function DomainFinderPage() {
         name: n.name,
         slug: n.slug,
         tagline: n.tagline,
+        score: n.score,
+        flags: n.flags,
         comAvailable: null,
         comChecked: false,
         price: null,
@@ -253,6 +306,8 @@ export default function DomainFinderPage() {
         checkingTlds: false,
         variants: [],
         variantsChecked: false,
+        handles: null,
+        handlesChecked: false,
       })),
     );
 
@@ -263,6 +318,44 @@ export default function DomainFinderPage() {
     let cursor = 0;
 
     const userAbortFired = () => abortRef.current?.signal.aborted === true;
+
+    // Fire-and-forget: when a .com comes back available, kick off the
+    // social-handle check too. Independent of TLD fan-out so a slow social
+    // platform never blocks the alt-TLD chips from rendering.
+    const fanOutHandles = (idx: number, slug: string) => {
+      void (async () => {
+        try {
+          const userSignal = abortRef.current?.signal;
+          const fetchSignal = userSignal
+            ? AbortSignal.any([userSignal, AbortSignal.timeout(12000)])
+            : AbortSignal.timeout(12000);
+          const res = await fetch(`/api/handles/check?slug=${encodeURIComponent(slug)}`, {
+            signal: fetchSignal,
+          });
+          if (!res.ok) return;
+          const data = (await res.json()) as HandleResults;
+          setResults((prev) =>
+            prev.map((r, i) =>
+              i === idx
+                ? {
+                    ...r,
+                    handles: {
+                      github: data.github ?? null,
+                      x: data.x ?? null,
+                      instagram: data.instagram ?? null,
+                      tiktok: data.tiktok ?? null,
+                    },
+                    handlesChecked: true,
+                  }
+                : r,
+            ),
+          );
+        } catch {
+          // Silent — handles are supplemental and the row still renders fine
+          // without them.
+        }
+      })();
+    };
 
     // Fire-and-forget: when a .com comes back available, kick off the
     // alt-TLD check in the background so the user gets a complete picture
@@ -344,8 +437,13 @@ export default function DomainFinderPage() {
             ),
           );
 
-          // Available .com → fan out alt-TLD check in the background.
-          if (comAvailable === true) fanOutAltTlds(idx, n.slug);
+          // Available .com → fan out alt-TLD + social handle checks in the
+          // background. Both are fire-and-forget so the main sweep keeps
+          // moving even if a social platform challenges or rate-limits us.
+          if (comAvailable === true) {
+            fanOutAltTlds(idx, n.slug);
+            fanOutHandles(idx, n.slug);
+          }
         } catch (err) {
           // User cancelled the whole search — bail without flipping rows.
           if ((err as Error).name === "AbortError" && userAbortFired()) return;
@@ -501,6 +599,63 @@ export default function DomainFinderPage() {
     window.location.href = `/domains?cart=${encodeURIComponent(list)}`;
   };
 
+  // CSV export — power-user feature for agencies vetting hundreds of
+  // candidate names at once. Dumps every row in the current sort+filter view
+  // with score, status, price, language flags, alt-TLD availability, social
+  // handles, and variant suggestions. Generated client-side so there's no
+  // round-trip and no privacy concern.
+  const exportCsv = () => {
+    if (results.length === 0) return;
+    const escape = (v: unknown): string => {
+      const s = v === null || v === undefined ? "" : String(v);
+      if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+      return s;
+    };
+    const headers = [
+      "domain", "status", "score", "price_usd", "tagline", "language_flags",
+      "alt_tlds_available", "variants_available",
+      "github", "x", "instagram", "tiktok",
+    ];
+    const rows = visibleResults.map((r) => {
+      const status =
+        r.comAvailable === true ? "available"
+        : r.comAvailable === false ? "taken"
+        : !r.comChecked ? "checking" : "unverified";
+      const altTlds = r.otherTlds
+        .filter((t) => t.available === true)
+        .map((t) => t.domain)
+        .join(" ");
+      const variantsAvail = r.variants
+        .filter((v) => v.available === true)
+        .map((v) => v.domain)
+        .join(" ");
+      const h = r.handles;
+      return [
+        `${r.slug}.com`,
+        status,
+        r.score ?? "",
+        r.price ?? "",
+        r.tagline,
+        (r.flags || []).join(" "),
+        altTlds,
+        variantsAvail,
+        h ? (h.github === true ? "available" : h.github === false ? "taken" : "unknown") : "",
+        h ? (h.x === true ? "available" : h.x === false ? "taken" : "unknown") : "",
+        h ? (h.instagram === true ? "available" : h.instagram === false ? "taken" : "unknown") : "",
+        h ? (h.tiktok === true ? "available" : h.tiktok === false ? "taken" : "unknown") : "",
+      ];
+    });
+    const csv = [headers, ...rows].map((row) => row.map(escape).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const safeFile = description.trim().slice(0, 40).replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "domains";
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `zoobicon-${safeFile}-${Date.now()}.csv`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
   const expandTlds = async (idx: number, slug: string) => {
     setResults((prev) =>
       prev.map((r, i) => (i === idx ? { ...r, checkingTlds: true, expandedTlds: true } : r)),
@@ -531,12 +686,16 @@ export default function DomainFinderPage() {
   };
 
   const sortedResults = [...results].sort((a, b) => {
-    const score = (r: DomainResult) =>
+    const status = (r: DomainResult) =>
       r.comAvailable === true ? 0 : !r.comChecked ? 1 : 2;
-    const sa = score(a);
-    const sb = score(b);
+    const sa = status(a);
+    const sb = status(b);
     if (sa !== sb) return sa - sb;
-    // Within the same status group, premium short names rise.
+    // Within the same status group, prefer higher AI brand score, then
+    // shorter slugs — both proxies for "the keepers."
+    const scoreA = typeof a.score === "number" ? a.score : -1;
+    const scoreB = typeof b.score === "number" ? b.score : -1;
+    if (scoreA !== scoreB) return scoreB - scoreA;
     return a.slug.length - b.slug.length;
   });
 
@@ -578,10 +737,26 @@ export default function DomainFinderPage() {
               .com domain
             </span>
           </h1>
-          <p className="text-slate-400 text-lg mb-8 max-w-xl mx-auto">
+          <p className="text-slate-400 text-lg mb-6 max-w-xl mx-auto">
             Describe your business and AI generates up to 100 brandable names — then we
             instantly check which .com domains are actually available.
           </p>
+
+          {/* Industry presets — one tap to seed prompt + best filter combo */}
+          <div className="mb-6 flex flex-wrap items-center justify-center gap-2 max-w-2xl mx-auto">
+            {INDUSTRY_PRESETS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => applyPreset(p)}
+                disabled={isRunning}
+                className="px-3 py-1.5 rounded-full text-xs font-medium border bg-white/[0.03] border-white/[0.08] text-slate-300 hover:border-violet-400/40 hover:bg-violet-500/10 hover:text-violet-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+                title={p.prompt}
+              >
+                <span className="text-sm">{p.emoji}</span>
+                {p.label}
+              </button>
+            ))}
+          </div>
 
           {/* Search input */}
           <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
@@ -738,37 +913,46 @@ export default function DomainFinderPage() {
                 {results.length} names generated for &ldquo;{description}&rdquo;
               </p>
             </div>
-            <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1">
+                <button
+                  onClick={() => setFilter("available")}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    filter === "available"
+                      ? "bg-violet-600 text-white"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  Available
+                </button>
+                <button
+                  onClick={() => setFilter("saved")}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
+                    filter === "saved"
+                      ? "bg-violet-600 text-white"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Heart className={`w-3.5 h-3.5 ${savedCount > 0 ? "fill-current" : ""}`} />
+                  Saved ({savedCount})
+                </button>
+                <button
+                  onClick={() => setFilter("all")}
+                  className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    filter === "all"
+                      ? "bg-violet-600 text-white"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  All ({results.length})
+                </button>
+              </div>
               <button
-                onClick={() => setFilter("available")}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  filter === "available"
-                    ? "bg-violet-600 text-white"
-                    : "text-slate-400 hover:text-white"
-                }`}
+                onClick={exportCsv}
+                title="Export the current view to CSV"
+                className="p-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 hover:border-cyan-400/30 hover:text-cyan-200 transition-colors"
               >
-                Available
-              </button>
-              <button
-                onClick={() => setFilter("saved")}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
-                  filter === "saved"
-                    ? "bg-violet-600 text-white"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                <Heart className={`w-3.5 h-3.5 ${savedCount > 0 ? "fill-current" : ""}`} />
-                Saved ({savedCount})
-              </button>
-              <button
-                onClick={() => setFilter("all")}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  filter === "all"
-                    ? "bg-violet-600 text-white"
-                    : "text-slate-400 hover:text-white"
-                }`}
-              >
-                All ({results.length})
+                <Download className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -836,6 +1020,38 @@ export default function DomainFinderPage() {
                             {isAvailable && r.price !== null && (
                               <span className="text-xs px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-full font-medium">
                                 ${r.price}/yr
+                              </span>
+                            )}
+                            {/* Brand-quality score meter — only render when
+                                Claude actually scored this row. Colour ramps
+                                from slate → cyan → violet → amber as score
+                                rises so winners catch the eye. */}
+                            {typeof r.score === "number" && isAvailable && (
+                              <span
+                                className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full font-bold border inline-flex items-center gap-1 ${
+                                  r.score >= 90
+                                    ? "bg-amber-500/15 border-amber-400/40 text-amber-200"
+                                    : r.score >= 75
+                                    ? "bg-violet-500/15 border-violet-400/40 text-violet-200"
+                                    : r.score >= 60
+                                    ? "bg-cyan-500/15 border-cyan-400/30 text-cyan-200"
+                                    : "bg-slate-500/15 border-slate-400/20 text-slate-300"
+                                }`}
+                                title={`AI brand-quality score (memorability + distinctiveness + pronounceability)`}
+                              >
+                                {r.score}
+                              </span>
+                            )}
+                            {/* Language-safety flag — taken or available, if
+                                Claude flagged this name in any language we
+                                surface it as a small warning chip with the
+                                language codes in the title. */}
+                            {r.flags && r.flags.length > 0 && (
+                              <span
+                                className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full font-bold bg-rose-500/10 border border-rose-400/30 text-rose-300 inline-flex items-center gap-1"
+                                title={`Possible negative meaning in: ${r.flags.join(", ").toUpperCase()}`}
+                              >
+                                ⚠ {r.flags.length}{r.flags.length === 1 ? " lang" : " langs"}
                               </span>
                             )}
                             {isTaken && (
@@ -948,6 +1164,64 @@ export default function DomainFinderPage() {
                           </div>
                         ) : null}
                       </div>
+                    )}
+
+                    {/* Social-handle availability — only on rows where .com
+                        was found available. ✓ = handle is free, • = taken,
+                        ? = couldn't tell (rate-limit / anti-bot challenge).
+                        Each chip is a deep link so the user can instantly
+                        verify or claim. */}
+                    {isAvailable && (
+                      r.handlesChecked && r.handles ? (
+                        <div className="mt-3 pt-3 border-t border-white/5">
+                          <p className="text-[10px] uppercase tracking-widest font-semibold text-slate-500 mb-1.5">
+                            Social handles
+                          </p>
+                          <div className="flex flex-wrap gap-1.5 text-[11px]">
+                            {(
+                              [
+                                { key: "github" as const, label: "GitHub", href: `https://github.com/${r.slug}` },
+                                { key: "x" as const, label: "X", href: `https://x.com/${r.slug}` },
+                                { key: "instagram" as const, label: "Instagram", href: `https://instagram.com/${r.slug}` },
+                                { key: "tiktok" as const, label: "TikTok", href: `https://tiktok.com/@${r.slug}` },
+                              ]
+                            ).map((p) => {
+                              const v = r.handles?.[p.key] ?? null;
+                              const cls =
+                                v === true
+                                  ? "bg-emerald-500/10 border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/20"
+                                  : v === false
+                                  ? "bg-white/[0.03] border-white/[0.08] text-slate-500"
+                                  : "bg-white/[0.03] border-white/[0.08] text-slate-500";
+                              const symbol = v === true ? "✓" : v === false ? "•" : "?";
+                              return (
+                                <a
+                                  key={p.key}
+                                  href={p.href}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`px-2 py-0.5 rounded-full border inline-flex items-center gap-1 transition-colors ${cls}`}
+                                  title={
+                                    v === true
+                                      ? `@${r.slug} appears available on ${p.label}`
+                                      : v === false
+                                      ? `@${r.slug} is taken on ${p.label}`
+                                      : `Couldn't verify on ${p.label} — click to check manually`
+                                  }
+                                >
+                                  <span className="font-mono text-[10px] opacity-80">{symbol}</span>
+                                  {p.label}
+                                </a>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-3 pt-3 border-t border-white/5 flex items-center gap-2 text-[11px] text-slate-600">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          Checking GitHub / X / Instagram / TikTok…
+                        </div>
+                      )
                     )}
 
                     {/* Taken row — show variants + marketplace + trademark */}
