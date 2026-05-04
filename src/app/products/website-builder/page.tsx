@@ -218,7 +218,7 @@ export default function WebsiteBuilderPage() {
                 key={step.num}
                 className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
                 style={{
-                  background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+                  background: "var(--paper-elevated)",
                 }}
               >
                 <div
@@ -269,7 +269,7 @@ export default function WebsiteBuilderPage() {
                 key={f.title}
                 className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
                 style={{
-                  background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+                  background: "var(--paper-elevated)",
                 }}
               >
                 <div
@@ -316,7 +316,7 @@ export default function WebsiteBuilderPage() {
           <div
             className="overflow-hidden rounded-[28px] border border-white/[0.08]"
             style={{
-              background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)",
+              background: "var(--paper-elevated)",
             }}
           >
             <div className="grid grid-cols-4 px-6 py-4 border-b border-white/[0.08] text-[11px] uppercase tracking-[0.15em] font-semibold text-white/55">
