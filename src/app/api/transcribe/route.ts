@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// OpenAI Whisper API caps audio uploads at 25MB. Enforcing the limit
+// before we forward the request stops a malicious client from billing
+// us for oversized payloads (the API would still reject them, but we
+// pay for the bandwidth on the way through).
+const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
+
 export async function POST(request: NextRequest) {
   try {
     const apiKey = process.env.OPENAI_API_KEY;
@@ -18,6 +24,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "No audio file provided" },
         { status: 400 }
+      );
+    }
+    if (file.size > MAX_AUDIO_BYTES) {
+      return NextResponse.json(
+        { error: `Audio file too large (${file.size} bytes). Whisper accepts max ${MAX_AUDIO_BYTES} bytes.` },
+        { status: 413 }
       );
     }
 

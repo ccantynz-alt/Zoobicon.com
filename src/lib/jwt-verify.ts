@@ -83,7 +83,15 @@ export async function verifyJwtHS256(
     );
     const data = new TextEncoder().encode(`${encodedHeader}.${encodedPayload}`);
     const signature = base64UrlDecode(encodedSignature);
-    signatureValid = await crypto.subtle.verify("HMAC", key, signature, data);
+    // Cast to BufferSource — Web Crypto accepts Uint8Array at runtime, but
+    // TypeScript's @types/node typing tightened in 22.x to reject the
+    // ArrayBufferLike variant returned by atob(). The cast is safe.
+    signatureValid = await crypto.subtle.verify(
+      "HMAC",
+      key,
+      signature as unknown as BufferSource,
+      data as unknown as BufferSource,
+    );
   } catch {
     return null;
   }

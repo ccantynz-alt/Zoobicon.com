@@ -70,12 +70,14 @@ async function claimEvent(eventId: string): Promise<DedupResult> {
       const message = err instanceof Error ? err.message : String(err);
       console.error(
         `[stripe-webhook] Upstash SET NX failed for ${eventId}: ${message}. ` +
-          `Returning 503 so Stripe retries; falling back to in-memory dedup for this instance.`
+          `Returning 503 so Stripe retries.`
       );
-      // Still mark in-memory so a same-instance retry within this process
-      // short-circuits, but the 503 will force Stripe to retry → next attempt
-      // either hits a healthy Upstash or another hot instance.
-      markProcessedInMemory(eventId);
+      // Do NOT mark in-memory here. We previously did, on the theory that a
+      // same-instance retry would short-circuit — but the 503 is the
+      // correct signal to Stripe AND another instance might successfully
+      // process the next attempt. Marking in-memory created a race where a
+      // duplicate from a different instance could slip through if Upstash
+      // came back online and a fresh delivery hit the same hot box.
       return { status: "error", message };
     }
   }

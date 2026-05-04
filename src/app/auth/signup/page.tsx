@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import { safeRedirect } from "@/lib/safe-redirect";
 import {
   Zap,
   Eye,
@@ -94,13 +95,13 @@ export default function SignupPage() {
       // Honor ?redirect param — /builder and /marketplace both send the user
       // here with ?redirect=/their-original-path. Ignoring it drops them on
       // /dashboard and breaks the flow they were in the middle of.
-      // Guard against open-redirects: only same-origin relative paths.
-      let dest = "/dashboard";
+      // safeRedirect blocks every known open-redirect bypass and falls back
+      // to /dashboard when the value can't be trusted.
+      let raw: string | null = null;
       try {
-        const r = new URLSearchParams(window.location.search).get("redirect");
-        if (r && r.startsWith("/") && !r.startsWith("//")) dest = r;
-      } catch {}
-      window.location.href = dest;
+        raw = new URLSearchParams(window.location.search).get("redirect");
+      } catch { /* ignore */ }
+      window.location.href = safeRedirect(raw);
     } catch {
       setAuthError("Network error. Please try again.");
     } finally {
