@@ -127,70 +127,66 @@ export class PostgresAgentStore implements AgentStore {
   private async ensureTables(): Promise<void> {
     if (this.tablesCreated) return;
 
-    try {
-      await this.sql`
-        CREATE TABLE IF NOT EXISTS agent_configs (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL,
-          description TEXT,
-          version TEXT DEFAULT '1.0.0',
-          auto_execute BOOLEAN DEFAULT false,
-          confidence_threshold REAL DEFAULT 0.85,
-          schedule_interval_sec INT DEFAULT 0,
-          max_concurrency INT DEFAULT 1,
-          max_retries INT DEFAULT 3,
-          retry_base_delay_ms INT DEFAULT 1000,
-          task_timeout_ms INT DEFAULT 300000,
-          model TEXT,
-          settings JSONB DEFAULT '{}',
-          tags TEXT[] DEFAULT '{}',
-          enabled BOOLEAN DEFAULT true,
-          created_at TIMESTAMPTZ DEFAULT NOW(),
-          updated_at TIMESTAMPTZ DEFAULT NOW()
-        )
-      `;
+    await this.sql`
+      CREATE TABLE IF NOT EXISTS agent_configs (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        version TEXT DEFAULT '1.0.0',
+        auto_execute BOOLEAN DEFAULT false,
+        confidence_threshold REAL DEFAULT 0.85,
+        schedule_interval_sec INT DEFAULT 0,
+        max_concurrency INT DEFAULT 1,
+        max_retries INT DEFAULT 3,
+        retry_base_delay_ms INT DEFAULT 1000,
+        task_timeout_ms INT DEFAULT 300000,
+        model TEXT,
+        settings JSONB DEFAULT '{}',
+        tags TEXT[] DEFAULT '{}',
+        enabled BOOLEAN DEFAULT true,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
 
-      await this.sql`
-        CREATE TABLE IF NOT EXISTS agent_runs (
-          id TEXT PRIMARY KEY,
-          agent_id TEXT NOT NULL,
-          status TEXT NOT NULL DEFAULT 'running',
-          tasks_total INT DEFAULT 0,
-          tasks_completed INT DEFAULT 0,
-          tasks_failed INT DEFAULT 0,
-          started_at TIMESTAMPTZ NOT NULL,
-          completed_at TIMESTAMPTZ,
-          duration INT,
-          findings JSONB DEFAULT '[]',
-          metadata JSONB DEFAULT '{}',
-          created_at TIMESTAMPTZ DEFAULT NOW()
-        )
-      `;
+    await this.sql`
+      CREATE TABLE IF NOT EXISTS agent_runs (
+        id TEXT PRIMARY KEY,
+        agent_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'running',
+        tasks_total INT DEFAULT 0,
+        tasks_completed INT DEFAULT 0,
+        tasks_failed INT DEFAULT 0,
+        started_at TIMESTAMPTZ NOT NULL,
+        completed_at TIMESTAMPTZ,
+        duration INT,
+        findings JSONB DEFAULT '[]',
+        metadata JSONB DEFAULT '{}',
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `;
 
-      await this.sql`
-        CREATE TABLE IF NOT EXISTS agent_tasks (
-          id TEXT PRIMARY KEY,
-          agent_id TEXT NOT NULL,
-          status TEXT NOT NULL DEFAULT 'pending',
-          input JSONB,
-          output JSONB,
-          error TEXT,
-          confidence REAL,
-          retry_count INT DEFAULT 0,
-          created_at TIMESTAMPTZ NOT NULL,
-          started_at TIMESTAMPTZ,
-          completed_at TIMESTAMPTZ,
-          metadata JSONB DEFAULT '{}'
-        )
-      `;
+    await this.sql`
+      CREATE TABLE IF NOT EXISTS agent_tasks (
+        id TEXT PRIMARY KEY,
+        agent_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        input JSONB,
+        output JSONB,
+        error TEXT,
+        confidence REAL,
+        retry_count INT DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL,
+        started_at TIMESTAMPTZ,
+        completed_at TIMESTAMPTZ,
+        metadata JSONB DEFAULT '{}'
+      )
+    `;
 
-      await this.sql`CREATE INDEX IF NOT EXISTS idx_agent_runs_agent_id ON agent_runs(agent_id, started_at DESC)`;
-      await this.sql`CREATE INDEX IF NOT EXISTS idx_agent_tasks_agent_id ON agent_tasks(agent_id, status)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_agent_runs_agent_id ON agent_runs(agent_id, started_at DESC)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_agent_tasks_agent_id ON agent_tasks(agent_id, status)`;
 
-      this.tablesCreated = true;
-    } catch (err) {
-      console.error("[PostgresAgentStore] Table creation failed:", err);
-    }
+    this.tablesCreated = true;
   }
 
   async saveRun(run: AgentRun): Promise<void> {
