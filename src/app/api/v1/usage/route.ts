@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUsage } from "@/lib/api-keys";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  if (!req.headers.get("x-admin")) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const denied = requireAdmin(req);
+  if (denied) return denied;
 
   const customerId = req.nextUrl.searchParams.get("customerId")?.trim();
   const daysParam = req.nextUrl.searchParams.get("days");

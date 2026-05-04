@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAppointment, getAppointments, cancelAppointment, getProviderName } from "@/lib/booking-provider";
+import { requireApiKey, isAuthenticated } from "@/lib/v1-auth";
 
 export async function GET(req: NextRequest) {
+  const auth = await requireApiKey(req);
+  if (!isAuthenticated(auth)) return auth;
+
   try {
-    const businessId = req.nextUrl.searchParams.get("businessId") || "default";
+    // Scope to the authenticated key's owner so one customer can never
+    // read another customer's appointments.
+    const businessId = auth.ownerEmail;
     const from = req.nextUrl.searchParams.get("from") || undefined;
     const to = req.nextUrl.searchParams.get("to") || undefined;
     const appointments = await getAppointments(businessId, from, to);
@@ -15,13 +21,16 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireApiKey(req);
+  if (!isAuthenticated(auth)) return auth;
+
   try {
     const body = await req.json();
     if (!body.serviceId || !body.customerName || !body.customerEmail || !body.start || !body.end) {
       return NextResponse.json({ error: "serviceId, customerName, customerEmail, start, and end are required" }, { status: 400 });
     }
     const appointment = await createAppointment({
-      businessId: body.businessId || "default",
+      businessId: auth.ownerEmail,
       serviceId: body.serviceId,
       serviceName: body.serviceName || "",
       staffId: body.staffId || "",
@@ -45,6 +54,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const auth = await requireApiKey(req);
+  if (!isAuthenticated(auth)) return auth;
+
   try {
     const id = req.nextUrl.searchParams.get("id");
     const reason = req.nextUrl.searchParams.get("reason") || undefined;

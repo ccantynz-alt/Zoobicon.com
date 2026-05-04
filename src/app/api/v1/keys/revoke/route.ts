@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revokeApiKey } from "@/lib/api-keys";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,9 +11,8 @@ interface RevokeBody {
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  if (!req.headers.get("x-admin")) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const denied = requireAdmin(req);
+  if (denied) return denied;
 
   let body: RevokeBody;
   try {
