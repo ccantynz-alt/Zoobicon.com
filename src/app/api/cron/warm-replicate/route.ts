@@ -69,6 +69,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const authHeader = req.headers.get('authorization');
 
   let devWarning: string | undefined;
+  // Production MUST set CRON_SECRET. If it's missing in prod, refuse to run
+  // — anyone hitting this endpoint can spin paid Replicate workloads,
+  // racking up the bill. Dev/preview is allowed to skip the bearer check
+  // so local testing stays painless.
+  const isProd = process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === 'production';
   if (cronSecret) {
     if (authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json(
@@ -76,6 +81,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         { status: 401 }
       );
     }
+  } else if (isProd) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          'CRON_SECRET is not configured. The warm-replicate cron requires a secret in production so anyone with the URL cannot spin paid Replicate jobs. Set CRON_SECRET in Vercel → Project → Environment Variables and redeploy.',
+      },
+      { status: 503 }
+    );
   } else {
     devWarning = 'CRON_SECRET not set — running in dev mode with no auth';
   }

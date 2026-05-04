@@ -1864,7 +1864,9 @@ export default function VideoCreatorDashboard() {
                                 }`}
                               >
                                 {avatar.preview_image_url ? (
-                                  <img src={avatar.preview_image_url} alt={avatar.name} className="w-8 h-8 rounded-full mx-auto mb-1 object-cover" />
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  // — avatar URLs come from HeyGen/Hedra and aren't on a host we whitelist in next.config.
+                                  <img src={avatar.preview_image_url} alt={avatar.name} className="w-8 h-8 rounded-full mx-auto mb-1 object-cover" loading="lazy" />
                                 ) : (
                                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-stone-400 to-stone-400 mx-auto mb-1 flex items-center justify-center text-white text-[10px] font-bold">
                                     {avatar.name[0]}
@@ -2281,9 +2283,12 @@ export default function VideoCreatorDashboard() {
                         >
                           {/* Show AI-generated scene image if available */}
                           {sceneImages.find((img) => img.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber) && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            // — scene image URLs are signed Replicate outputs, not on a host we whitelist in next.config.
                             <img
                               src={sceneImages.find((img) => img.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber)?.imageUrl}
                               alt={`Scene ${storyboard.storyboard[activeScene]?.sceneNumber}`}
+                              loading="lazy"
                               className="absolute inset-0 w-full h-full object-cover"
                             />
                           )}

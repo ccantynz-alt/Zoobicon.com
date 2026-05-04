@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import DemoDataBanner from "@/components/DemoDataBanner";
 import {
   Mail,
   Users,
@@ -166,6 +167,7 @@ export default function EmailMarketingPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-10 space-y-10">
+        <DemoDataBanner entity="campaigns" ctaHref="/email-marketing/new" ctaLabel="Compose your first campaign" />
         {/* ── Stats ── */}
         <motion.div variants={stagger} initial="hidden" animate="visible" className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {STAT_CARDS.map((s) => (

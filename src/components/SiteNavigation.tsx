@@ -174,26 +174,29 @@ export default function SiteNavigation() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-[#0b1530]/85 backdrop-blur-2xl border-b border-white/[0.08] shadow-[0_8px_32px_-16px_rgba(0,0,0,0.6)]"
-          : "bg-[#0b1530]/40 backdrop-blur-xl border-b border-white/[0.03]"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+      style={{
+        background: scrolled ? "rgba(250,250,247,0.92)" : "rgba(250,250,247,0.7)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderBottom: scrolled ? "1px solid var(--rule)" : "1px solid transparent",
+        boxShadow: scrolled ? "var(--shadow-1)" : "none",
+      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-[72px]">
-          {/* Logo — editorial warm mark + word mark */}
+          {/* Logo — editorial mark on bone */}
           <Link href="/" className="group flex items-center gap-2.5 flex-shrink-0">
             <div
               className="relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-500 group-hover:scale-[1.04]"
               style={{
-                background: "linear-gradient(135deg, #E8D4B0 0%, #F7C8A0 60%, #E08BB0 100%)",
-                boxShadow: "0 10px 30px -12px rgba(232,212,176,0.55)",
+                background: "var(--ink)",
+                boxShadow: "var(--shadow-1)",
               }}
             >
-              <span className="text-black font-black text-[15px] tracking-tight">Z</span>
+              <span className="font-black text-[15px] tracking-tight" style={{ color: "var(--gold)" }}>Z</span>
             </div>
-            <span className="hidden sm:block text-white font-semibold text-[17px] tracking-[-0.02em]">
+            <span className="hidden sm:block font-semibold text-[17px] tracking-[-0.02em]" style={{ color: "var(--ink)" }}>
               Zoobicon
             </span>
           </Link>
@@ -214,25 +217,19 @@ export default function SiteNavigation() {
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${megaOpen ? "rotate-180 text-[#E8D4B0]" : ""}`} />
               </button>
 
-              {/* Mega Menu Panel — FULL WIDTH 6 columns, cinematic treatment */}
+              {/* Mega Menu Panel — FULL WIDTH 6 columns, editorial bone treatment */}
               {megaOpen && (
                 <div
                   data-mega-menu
-                  className="fixed top-[72px] left-0 right-0 border-b border-white/[0.08] shadow-[0_40px_80px_-24px_rgba(0,0,0,0.8)]"
+                  className="fixed top-[72px] left-0 right-0"
                   style={{
-                    background:
-                      "linear-gradient(180deg, rgba(10,10,15,0.98) 0%, rgba(20,40,95,0.98) 100%)",
+                    background: "rgba(250,250,247,0.98)",
                     backdropFilter: "blur(24px)",
+                    WebkitBackdropFilter: "blur(24px)",
+                    borderBottom: "1px solid var(--rule)",
+                    boxShadow: "var(--shadow-2)",
                   }}
                 >
-                  {/* Ambient warm glow */}
-                  <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                    <div
-                      className="absolute left-1/2 top-0 h-[400px] w-[900px] -translate-x-1/2 rounded-full blur-[120px]"
-                      style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.08), transparent 70%)" }}
-                    />
-                  </div>
-
                   <div className="relative max-w-7xl mx-auto px-6 py-10">
                     <div className="grid grid-cols-6 gap-8">
                       {PRODUCT_SECTIONS.map((section) => (
@@ -360,11 +357,11 @@ export default function SiteNavigation() {
             )}
             <Link
               href="/builder"
-              className="group inline-flex items-center gap-1.5 px-5 py-2.5 text-[13px] font-semibold rounded-full transition-all duration-500 hover:-translate-y-0.5"
+              className="group inline-flex items-center gap-1.5 px-5 py-2.5 text-[13px] font-semibold rounded-full transition-all duration-300 hover:-translate-y-0.5"
               style={{
-                background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                color: "#0a1628",
-                boxShadow: "0 10px 30px -12px rgba(232,212,176,0.45)",
+                background: "var(--ink)",
+                color: "var(--paper)",
+                boxShadow: "0 10px 30px -12px rgba(10,10,11,0.35)",
               }}
             >
               <Rocket className="w-3.5 h-3.5 transition-transform group-hover:rotate-[-8deg]" />
@@ -383,13 +380,15 @@ export default function SiteNavigation() {
         </div>
       </div>
 
-      {/* Mobile Menu — full-screen cinematic overlay */}
+      {/* Mobile Menu — full-screen editorial overlay */}
       {mobileOpen && (
         <div
-          className="lg:hidden border-t border-white/[0.06] max-h-[85vh] overflow-y-auto"
+          className="lg:hidden max-h-[85vh] overflow-y-auto"
           style={{
-            background: "linear-gradient(180deg, rgba(5,5,8,0.98) 0%, rgba(10,10,15,0.98) 100%)",
+            background: "rgba(250,250,247,0.98)",
             backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+            borderTop: "1px solid var(--rule)",
           }}
         >
           <div className="px-4 py-4 space-y-5">
@@ -438,7 +437,8 @@ export default function SiteNavigation() {
               <Link
                 href="/builder"
                 onClick={() => setMobileOpen(false)}
-                className="block p-3 text-center text-sm font-semibold bg-stone-600 text-white rounded-lg"
+                className="block p-3 text-center text-sm font-semibold rounded-lg"
+                style={{ background: "var(--ink)", color: "var(--paper)" }}
               >
                 Start Building
               </Link>

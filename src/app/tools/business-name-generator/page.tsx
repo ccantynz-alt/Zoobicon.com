@@ -216,7 +216,7 @@ export default function BusinessNameGeneratorPage() {
         {/* Canonical banner — point power users to the unified search */}
         <div
           className="mb-8 rounded-2xl border border-[#E8D4B0]/20 p-4 sm:p-5 flex items-start sm:items-center justify-between gap-4 flex-wrap"
-          style={{ background: "linear-gradient(135deg, rgba(232,212,176,0.06) 0%, rgba(20,40,95,0.7) 100%)" }}
+          style={{ background: "var(--paper-elevated)" }}
         >
           <div className="flex items-start gap-3 min-w-0">
             <div
