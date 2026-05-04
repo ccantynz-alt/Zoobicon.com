@@ -128,34 +128,38 @@ const scheduledReporter = createAgent<MetricSource, MetricResult>({
   },
 });
 
+function buildReport(result: { duration: number; findings: AgentFinding[] }): string {
+  const lines: string[] = [];
+  lines.push(`\n===== DAILY METRICS REPORT =====`);
+  lines.push(`Date: ${new Date().toISOString().split("T")[0]}`);
+  lines.push(`Duration: ${result.duration}ms\n`);
+
+  if (result.findings.length === 0) {
+    lines.push("All metrics within normal ranges.");
+  } else {
+    lines.push(`${result.findings.length} item(s) need attention:\n`);
+    for (const f of result.findings) {
+      const icon = f.severity === "error" ? "!!" : f.severity === "warning" ? "!" : "-";
+      lines.push(`  [${icon}] ${f.title}`);
+      lines.push(`      ${f.description}`);
+    }
+  }
+
+  lines.push(`\n================================`);
+  return lines.join("\n");
+}
+
 // Listen for events
 const unsub = onAgentEvent((event) => {
   if (event.type === "started") {
-    console.log(`[${new Date().toISOString()}] Report generation started...`);
+    process.stdout.write(`[${new Date().toISOString()}] Report generation started...\n`);
   }
   if (event.type === "completed") {
-    console.log(`[${new Date().toISOString()}] Report generation completed.`);
+    process.stdout.write(`[${new Date().toISOString()}] Report generation completed.\n`);
   }
 });
 
 scheduledReporter.run().then((result) => {
-  console.log(`\n===== DAILY METRICS REPORT =====`);
-  console.log(`Date: ${new Date().toISOString().split("T")[0]}`);
-  console.log(`Duration: ${result.duration}ms\n`);
-
-  // The tasks contain the output in metadata — in real usage you'd
-  // collect outputs from the run or store. Here we print findings.
-  if (result.findings.length === 0) {
-    console.log("All metrics within normal ranges.");
-  } else {
-    console.log(`${result.findings.length} item(s) need attention:\n`);
-    for (const f of result.findings) {
-      const icon = f.severity === "error" ? "!!" : f.severity === "warning" ? "!" : "-";
-      console.log(`  [${icon}] ${f.title}`);
-      console.log(`      ${f.description}`);
-    }
-  }
-
-  console.log(`\n================================`);
+  process.stdout.write(buildReport(result) + "\n");
   unsub(); // Cleanup event listener
 });
