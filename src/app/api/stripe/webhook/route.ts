@@ -5,7 +5,7 @@ import { sql } from "@/lib/db";
 import { getRedis } from "@/lib/redis";
 import { recordPurchase } from "@/lib/addon-delivery";
 import { OVERAGE_PACKS, addOverageCredits } from "@/lib/video-usage";
-import { registerDomain, type ContactInfo } from "@/lib/domain-reseller";
+import { registerWithFallback, type ContactInfo } from "@/lib/registrar";
 import { auditLog } from "@/lib/audit-middleware";
 
 /**
@@ -202,7 +202,7 @@ async function handleDomainRegistration(session: Stripe.Checkout.Session) {
     `);
 
     try {
-      const result = await registerDomain({
+      const result = await registerWithFallback({
         domain: trimmedDomain,
         period: years,
         registrant,
@@ -215,19 +215,21 @@ async function handleDomainRegistration(session: Stripe.Checkout.Session) {
           UPDATE registered_domains SET status = 'active', opensrs_order_id = ${result.orderId || null}, registration_error = NULL
           WHERE domain = ${trimmedDomain}
         `);
-        console.log(`[stripe-webhook] Domain registered: ${trimmedDomain} (order: ${result.orderId})`);
+        console.log(`[stripe-webhook] ${trimmedDomain} registered via ${result.source} order=${result.orderId || "?"}`);
         successCount++;
       } else {
+        const summary = result.attempts.map((a) => `${a.provider}=${a.error || "?"}`).join(" · ");
+        const errorText = `${result.error || "Unknown error"} [attempts: ${summary || "none"}]`;
         await safeDb("update domain failed", () => sql`
-          UPDATE registered_domains SET status = 'registration_failed', registration_error = ${result.error || "Unknown error"}
+          UPDATE registered_domains SET status = 'registration_failed', registration_error = ${errorText}
           WHERE domain = ${trimmedDomain}
         `);
-        console.error(`[stripe-webhook] OpenSRS registration FAILED for ${trimmedDomain}: ${result.error}`);
+        console.error(`[stripe-webhook] registrar chain FAILED for ${trimmedDomain}: ${errorText}`);
         failCount++;
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Unknown error";
-      console.error(`[stripe-webhook] OpenSRS registration ERROR for ${trimmedDomain}:`, msg);
+      console.error(`[stripe-webhook] registrar chain threw for ${trimmedDomain}:`, msg);
       await safeDb("update domain error", () => sql`
         UPDATE registered_domains SET status = 'registration_failed', registration_error = ${msg}
         WHERE domain = ${trimmedDomain}
