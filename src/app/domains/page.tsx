@@ -68,15 +68,39 @@ interface GeneratedName {
   recommendedTlds?: Array<{ tld: string; reason: string }>;
 }
 
+// One smart finder, one input. We classify whether the user is asking
+// us to look up a literal name (single short alphanumeric word like
+// "stardust") or describe what they want ("a sustainable clothing brand
+// for outdoor adventurers"). The classifier is conservative — anything
+// that has a space, punctuation other than a hyphen, or runs longer than
+// a typical brand stem routes to AI mode so users don't end up searching
+// for "a sustainable clothing brand" as if it were a domain label.
+function classifyIntent(raw: string): "empty" | "literal" | "ai" {
+  const trimmed = raw.trim();
+  if (trimmed.length < 2) return "empty";
+  // Has a space or any punctuation beyond a single hyphen → description
+  if (/\s/.test(trimmed)) return "ai";
+  if (/[^a-z0-9-]/i.test(trimmed)) return "ai";
+  // Single token: 2-20 chars, alphanumeric (with optional hyphen) → literal
+  if (trimmed.length <= 20) return "literal";
+  return "ai";
+}
+
+type FinderMode = "literal" | "ai";
+
 export default function DomainsPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<DomainResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  // Active result mode — set when the user submits, drives which result
+  // section renders below. Default to literal so the empty-state TLD
+  // grid at the bottom of the page still feels like the canonical one.
+  const [mode, setMode] = useState<FinderMode>("literal");
 
-  // AI name generator
-  const [aiDesc, setAiDesc] = useState("");
+  // AI generator state lives alongside literal-search state — both
+  // populate from the same hero input via classifyIntent above.
   const [generating, setGenerating] = useState(false);
   const [generatedNames, setGeneratedNames] = useState<GeneratedName[]>([]);
   const [genError, setGenError] = useState<string | null>(null);
@@ -143,44 +167,68 @@ export default function DomainsPage() {
     setSearching(false);
   }, []);
 
-  const handleSearch = () => {
-    if (query.trim().length >= 2) searchName(query);
-  };
+  // The single submit path. Classifies the query, runs the right
+  // backend, and switches result rendering between literal and AI mode.
+  // Everything in the hero — Enter key, Search button, suggestion chips —
+  // funnels through here so the user never has to think about which mode
+  // they're in.
+  const handleSubmit = useCallback(
+    async (rawQuery?: string) => {
+      const next = (rawQuery ?? query).trim();
+      if (!next) return;
+      const intent = classifyIntent(next);
+      if (intent === "empty") return;
 
-  const handleGenerateNames = async () => {
-    if (!aiDesc.trim() || generating) return;
-    setGenerating(true);
-    setGenError(null);
-    setGeneratedNames([]);
-    try {
-      // /api/domains/ai-find generates names AND checks availability across
-      // .com / .ai / .io in a single round-trip, so each card already knows
-      // which TLDs are buyable. Previously the AI endpoint only returned
-      // names — the user had to click each one to discover what was free.
-      const res = await fetch("/api/domains/ai-find", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: aiDesc.trim(), count: 12, tlds: ["com", "ai", "io"] }),
-        signal: AbortSignal.timeout(45_000),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setGeneratedNames((data.names || []).slice(0, 12));
-      } else {
-        const errBody = await res.json().catch(() => ({}));
-        setGenError(errBody.error || "Could not generate names. Please try again.");
+      setHasSearched(true);
+      setSearchError(null);
+      setGenError(null);
+
+      if (intent === "literal") {
+        setMode("literal");
+        setGeneratedNames([]);
+        await searchName(next);
+        return;
       }
-    } catch (err) {
-      setGenError(
-        err instanceof Error && err.name === "AbortError"
-          ? "Request timed out. The AI took too long to respond — please try again."
-          : err instanceof Error
-            ? err.message
-            : "Network error while generating names."
+
+      // AI mode
+      setMode("ai");
+      setResults([]);
+      setGenerating(true);
+      setGeneratedNames([]);
+      setTimeout(
+        () => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        100,
       );
-    }
-    setGenerating(false);
-  };
+      try {
+        // /api/domains/ai-find generates names AND checks availability across
+        // .com / .ai / .io in a single round-trip, so each card already knows
+        // which TLDs are buyable.
+        const res = await fetch("/api/domains/ai-find", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ description: next, count: 12, tlds: ["com", "ai", "io"] }),
+          signal: AbortSignal.timeout(45_000),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setGeneratedNames((data.names || []).slice(0, 12));
+        } else {
+          const errBody = await res.json().catch(() => ({}));
+          setGenError(errBody.error || "Could not generate names. Please try again.");
+        }
+      } catch (err) {
+        setGenError(
+          err instanceof Error && err.name === "AbortError"
+            ? "Request timed out. The AI took too long to respond — please try again."
+            : err instanceof Error
+              ? err.message
+              : "Network error while generating names.",
+        );
+      }
+      setGenerating(false);
+    },
+    [query, searchName],
+  );
 
   const addToCart = (result: DomainResult) => {
     if (!cart.some(c => c.domain === result.domain)) {
@@ -371,61 +419,140 @@ export default function DomainsPage() {
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.05] px-4 py-1.5 text-[11px] font-semibold text-[#E8D4B0] tracking-widest uppercase mb-8">
+          <div
+            className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-semibold tracking-widest uppercase mb-8"
+            style={{
+              border: "1px solid var(--rule)",
+              background: "var(--paper-elevated)",
+              color: "var(--gold-deep)",
+            }}
+          >
             <BadgeCheck className="w-3 h-3" />
-            Real-time registry · Tucows / OpenSRS · 25M+ domains registered
+            AI-powered · Real-time registry · Tucows / OpenSRS
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-[-0.03em] leading-[1.05] mb-6">
+          <h1
+            className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-[-0.03em] leading-[1.05] mb-6"
+            style={{ color: "var(--ink)" }}
+          >
             Find your perfect{" "}
-            <span style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", fontWeight: 400, color: "#E8D4B0" }}>
+            <span className="display-italic font-normal" style={{ color: "var(--gold-deep)" }}>
               domain.
             </span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-white/50 mb-3 max-w-2xl mx-auto leading-relaxed">
-            Type a name and we check all 13 extensions live against the real registry.
-            No cached data. No guessing. Just the truth.
+          <p
+            className="text-lg sm:text-xl mb-3 max-w-2xl mx-auto leading-relaxed"
+            style={{ color: "var(--ink-secondary)" }}
+          >
+            Type a name to check 13 extensions live, or describe your business
+            and let AI generate brandable names with availability already verified.
+            One input, one click.
           </p>
-          <p className="text-[13px] text-white/30 mb-12 font-mono">
-            From <span className="text-white/60">$2.99/yr</span> · .com <span className="text-white/60">$12.99</span> · .ai <span className="text-white/60">$69.99</span> · .io <span className="text-white/60">$39.99</span> · Free SSL &amp; WHOIS privacy
+          <p className="text-[13px] mb-12 font-mono" style={{ color: "var(--ink-muted)" }}>
+            From <span style={{ color: "var(--ink-secondary)" }}>$2.99/yr</span>
+            {" · "}.com <span style={{ color: "var(--ink-secondary)" }}>$12.99</span>
+            {" · "}.ai <span style={{ color: "var(--ink-secondary)" }}>$69.99</span>
+            {" · "}.io <span style={{ color: "var(--ink-secondary)" }}>$39.99</span>
+            {" · "}Free SSL &amp; WHOIS privacy
           </p>
 
-          {/* Search bar */}
+          {/* Search bar — single AI-powered finder, classifies intent on submit */}
           <div className="relative max-w-2xl mx-auto">
             <div
-              className="flex items-center gap-0 rounded-2xl border overflow-hidden transition-all focus-within:shadow-[0_0_0_2px_rgba(232,212,176,0.3)]"
-              style={{ background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.12)", backdropFilter: "blur(12px)" }}
+              className="flex items-center gap-0 rounded-2xl overflow-hidden transition-all"
+              style={{
+                background: "var(--paper)",
+                border: "1px solid var(--rule-strong)",
+                boxShadow: "var(--shadow-1)",
+              }}
             >
-              <Search className="ml-5 w-5 h-5 text-white/35 flex-shrink-0" />
+              <Search
+                className="ml-5 w-5 h-5 flex-shrink-0"
+                style={{ color: "var(--ink-muted)" }}
+              />
               <input
                 type="text"
                 value={query}
-                onChange={e => setQuery(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") handleSearch(); }}
-                placeholder="yourbrand"
-                className="flex-1 px-4 py-5 bg-transparent text-white text-[17px] placeholder-white/25 focus:outline-none"
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSubmit();
+                }}
+                placeholder="yourbrand   or   a sustainable clothing brand for outdoor adventurers"
+                className="flex-1 px-4 py-5 bg-transparent text-[17px] focus:outline-none"
+                style={{ color: "var(--ink)" }}
                 autoFocus
               />
-              <span className="text-white/20 text-[15px] pr-2 hidden sm:block">.com .ai .io ...</span>
               <button
-                onClick={handleSearch}
-                disabled={searching || query.trim().length < 2}
-                className="m-2 px-6 py-3 rounded-xl font-semibold text-[15px] text-[#0a1628] transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 flex-shrink-0"
-                style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", boxShadow: "0 8px 24px -8px rgba(232,212,176,0.4)" }}
+                onClick={() => handleSubmit()}
+                disabled={(searching || generating) || query.trim().length < 2}
+                className="m-2 px-6 py-3 rounded-xl font-semibold text-[15px] transition-all hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 flex-shrink-0"
+                style={{
+                  background: "var(--ink)",
+                  color: "var(--paper)",
+                  boxShadow: "0 8px 24px -8px rgba(10,10,11,0.35)",
+                }}
               >
-                {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                <span className="hidden sm:inline">Search</span>
+                {searching || generating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : query.trim().length > 0 && classifyIntent(query) === "ai" ? (
+                  <Sparkles className="w-4 h-4" />
+                ) : (
+                  <Search className="w-4 h-4" />
+                )}
+                <span className="hidden sm:inline">
+                  {query.trim().length > 0 && classifyIntent(query) === "ai"
+                    ? "Generate"
+                    : "Search"}
+                </span>
               </button>
             </div>
 
-            {/* Quick suggestion chips */}
+            {/* Smart-mode hint — tells the user which lane the input is in */}
+            {query.trim().length >= 2 && !searching && !generating && (
+              <div
+                className="mt-3 text-[12px] flex items-center gap-1.5 justify-center"
+                style={{ color: "var(--ink-muted)" }}
+              >
+                {classifyIntent(query) === "ai" ? (
+                  <>
+                    <Sparkles className="w-3 h-3" style={{ color: "var(--gold-deep)" }} />
+                    Looks like a description — Claude will propose 12 brandable names
+                  </>
+                ) : (
+                  <>
+                    <Search className="w-3 h-3" />
+                    Looks like a brand stem — we&apos;ll check all 13 extensions live
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Quick suggestions — mix of literal stems and descriptions so the
+                user discovers both modes without us labelling them */}
             {!hasSearched && (
-              <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
-                {["zoobicon", "launchpad", "stardust", "vaultly"].map(s => (
-                  <button key={s} onClick={() => { setQuery(s); searchName(s); }}
-                    className="text-[12px] text-white/35 hover:text-white/70 transition-colors px-3 py-1 rounded-full border border-white/[0.06] hover:border-white/20">
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-5">
+                {[
+                  "zoobicon",
+                  "stardust",
+                  "ai for plumbers",
+                  "minimalist coffee shop",
+                  "luxury italian eyewear",
+                ].map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => {
+                      setQuery(s);
+                      handleSubmit(s);
+                    }}
+                    className="text-[12px] transition-colors px-3 py-1 rounded-full"
+                    style={{
+                      color: "var(--ink-muted)",
+                      border: "1px solid var(--rule)",
+                      background: "var(--paper)",
+                    }}
+                  >
                     {s}
                   </button>
                 ))}
@@ -445,10 +572,27 @@ export default function DomainsPage() {
           </div>
         )}
 
-        {hasSearched && (
+        {genError && (
+          <div
+            className="mb-6 p-4 rounded-2xl text-[14px] flex items-start gap-3"
+            style={{
+              border: "1px solid rgba(185,28,28,0.25)",
+              background: "rgba(185,28,28,0.06)",
+              color: "rgb(153, 27, 27)",
+            }}
+          >
+            <X className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <span>{genError}</span>
+          </div>
+        )}
+
+        {hasSearched && mode === "literal" && (
           <>
             {isChecking && (
-              <div className="flex items-center gap-3 text-[13px] text-white/45 mb-5">
+              <div
+                className="flex items-center gap-3 text-[13px] mb-5"
+                style={{ color: "var(--ink-muted)" }}
+              >
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Checking all 13 extensions against the live registry...
               </div>
@@ -571,79 +715,60 @@ export default function DomainsPage() {
             )}
           </>
         )}
-      </div>
 
-      {/* ── AI NAME GENERATOR ── */}
-      <section className="max-w-3xl mx-auto px-4 sm:px-6 pb-16">
-        <div
-          className="rounded-3xl border border-white/[0.08] p-7 sm:p-9 relative overflow-hidden"
-          style={{
-            background: "linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.06) 50%, rgba(16,24,40,0.95) 100%)",
-          }}
-        >
-          {/* Background glow */}
-          <div className="pointer-events-none absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px]" aria-hidden
-            style={{ background: "radial-gradient(closest-side, rgba(139,92,246,0.12), transparent)" }} />
-
-          <div className="relative">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}>
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h2 className="text-[20px] font-semibold text-white leading-tight">AI Domain Finder</h2>
-                <p className="text-[13px] text-white/45 mt-1">
-                  Describe your business — Claude proposes brandable names and we check .com / .ai / .io
-                  against the live registry before showing you the list.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 mb-2">
-              <input
-                type="text"
-                value={aiDesc}
-                onChange={e => setAiDesc(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") handleGenerateNames(); }}
-                placeholder="e.g. a sustainable clothing brand for outdoor adventurers"
-                className="flex-1 px-4 py-3.5 rounded-xl border border-white/[0.1] bg-white/[0.04] text-white text-[14px] placeholder-white/25 focus:outline-none focus:border-violet-500/40 focus:bg-white/[0.06] transition-all"
-              />
-              <button
-                onClick={handleGenerateNames}
-                disabled={generating || aiDesc.trim().length < 5}
-                className="px-6 py-3.5 rounded-xl font-semibold text-[14px] transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
-                style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", boxShadow: "0 8px 24px -8px rgba(99,102,241,0.4)" }}
-              >
-                {generating ? <><Loader2 className="w-4 h-4 animate-spin" />Generating...</> : <><Sparkles className="w-4 h-4" />Generate names</>}
-              </button>
-            </div>
-            <p className="text-[11px] text-white/25 mb-5">Each idea ships with live .com / .ai / .io availability and price. One click adds an available extension to your cart.</p>
-
-            {genError && (
-              <div className="p-4 rounded-xl border border-red-500/25 bg-red-500/[0.07] text-red-300 text-[13px] flex items-start gap-2">
-                <X className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span>{genError}</span>
-              </div>
-            )}
-
+        {hasSearched && mode === "ai" && (
+          <>
             {generating && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02] animate-pulse">
-                    <div className="h-4 bg-white/[0.08] rounded w-2/3 mb-2" />
-                    <div className="h-3 bg-white/[0.05] rounded w-full" />
-                  </div>
-                ))}
-              </div>
+              <>
+                <div
+                  className="flex items-center gap-3 text-[13px] mb-5"
+                  style={{ color: "var(--ink-muted)" }}
+                >
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Generating brandable names and checking availability live…
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="p-4 rounded-2xl animate-pulse"
+                      style={{
+                        background: "var(--paper-elevated)",
+                        border: "1px solid var(--rule)",
+                      }}
+                    >
+                      <div
+                        className="h-4 rounded w-2/3 mb-2"
+                        style={{ background: "var(--rule-strong)" }}
+                      />
+                      <div
+                        className="h-3 rounded w-full"
+                        style={{ background: "var(--rule)" }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
 
-            {generatedNames.length > 0 && (
+            {!generating && generatedNames.length > 0 && (
               <div>
-                <p className="text-[11px] uppercase tracking-widest font-semibold text-white/35 mb-3 flex items-center gap-2">
-                  <Sparkles className="w-3 h-3 text-violet-400" />
-                  {generatedNames.length} ideas — availability checked live against the registry
-                </p>
+                <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
+                  <p
+                    className="text-[11px] uppercase tracking-widest font-semibold flex items-center gap-2"
+                    style={{ color: "var(--gold-deep)" }}
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    {generatedNames.length} ideas — availability verified live
+                  </p>
+                  <button
+                    onClick={() => handleSubmit(query)}
+                    className="text-[11px] uppercase tracking-widest font-semibold transition-colors flex items-center gap-1"
+                    style={{ color: "var(--ink-muted)" }}
+                  >
+                    <RefreshCw className="w-3 h-3" /> Regenerate
+                  </button>
+                </div>
                 <div className="space-y-2.5">
                   {generatedNames.map((gn, i) => {
                     const tldsToShow = gn.availability ? Object.keys(gn.availability) : [];
@@ -651,19 +776,27 @@ export default function DomainsPage() {
                     return (
                       <div
                         key={i}
-                        className="p-4 rounded-2xl border transition-colors"
+                        className="p-4 rounded-2xl transition-colors"
                         style={{
-                          background: anyBuyable
-                            ? "linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(255,255,255,0.025) 100%)"
-                            : "rgba(255,255,255,0.02)",
-                          borderColor: anyBuyable ? "rgba(139,92,246,0.18)" : "rgba(255,255,255,0.07)",
+                          background: "var(--paper-elevated)",
+                          border: anyBuyable
+                            ? "1px solid var(--gold)"
+                            : "1px solid var(--rule)",
+                          boxShadow: anyBuyable ? "var(--shadow-1)" : "none",
                         }}
                       >
                         <div className="flex items-start gap-3">
                           <div className="flex-1 min-w-0">
-                            <div className="font-semibold text-white text-[15px]">{gn.name}</div>
+                            <div className="font-semibold text-[15px]" style={{ color: "var(--ink)" }}>
+                              {gn.name}
+                            </div>
                             {gn.tagline && (
-                              <div className="text-[12px] text-white/45 mt-0.5 leading-snug">{gn.tagline}</div>
+                              <div
+                                className="text-[12px] mt-0.5 leading-snug"
+                                style={{ color: "var(--ink-secondary)" }}
+                              >
+                                {gn.tagline}
+                              </div>
                             )}
                           </div>
                           {!anyBuyable && tldsToShow.length > 0 && (
@@ -671,10 +804,10 @@ export default function DomainsPage() {
                               onClick={() => {
                                 const slug = gn.name.toLowerCase().replace(/[^a-z0-9-]/g, "");
                                 setQuery(slug);
-                                searchName(slug);
-                                resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                                handleSubmit(slug);
                               }}
-                              className="text-[11px] uppercase tracking-widest font-semibold text-white/35 hover:text-white/70 underline underline-offset-2 transition-colors whitespace-nowrap"
+                              className="text-[11px] uppercase tracking-widest font-semibold underline underline-offset-2 transition-colors whitespace-nowrap"
+                              style={{ color: "var(--ink-muted)" }}
                             >
                               Try other TLDs
                             </button>
@@ -698,16 +831,16 @@ export default function DomainsPage() {
                                   <button
                                     key={tld}
                                     onClick={() => (inCart ? removeFromCart(a.domain) : addToCart(result))}
-                                    className={`group flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
-                                      inCart
-                                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/35 hover:bg-red-500/15 hover:text-red-300 hover:border-red-500/30"
-                                        : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 hover:bg-emerald-500/20 hover:border-emerald-500/40"
-                                    }`}
+                                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
+                                    style={{
+                                      background: inCart ? "var(--ink)" : "var(--gold)",
+                                      color: inCart ? "var(--paper)" : "var(--ink)",
+                                      border: "1px solid var(--gold-deep)",
+                                    }}
                                   >
-                                    <Check className="w-3 h-3" />
-                                    .{tld}
-                                    <span className="text-emerald-400/80 font-mono ml-1">${a.price.toFixed(2)}</span>
-                                    <span className="text-[9px] uppercase tracking-wider ml-1 opacity-70">
+                                    <Check className="w-3 h-3" />.{tld}
+                                    <span className="font-mono ml-1">${a.price.toFixed(2)}</span>
+                                    <span className="text-[9px] uppercase tracking-wider ml-1 opacity-80">
                                       {inCart ? "Added" : "Add"}
                                     </span>
                                   </button>
@@ -717,10 +850,13 @@ export default function DomainsPage() {
                                 return (
                                   <span
                                     key={tld}
-                                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-white/[0.06] text-white/30"
+                                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium"
+                                    style={{
+                                      border: "1px solid var(--rule)",
+                                      color: "var(--ink-muted)",
+                                    }}
                                   >
-                                    <X className="w-3 h-3" />
-                                    .{tld}
+                                    <X className="w-3 h-3" />.{tld}
                                     <span className="line-through opacity-70 ml-0.5">taken</span>
                                   </span>
                                 );
@@ -728,11 +864,15 @@ export default function DomainsPage() {
                               return (
                                 <span
                                   key={tld}
-                                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-amber-500/15 bg-amber-500/[0.05] text-amber-300/70"
-                                  title="Registry unreachable — click 'Try other TLDs' to retry"
+                                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium"
+                                  style={{
+                                    border: "1px solid rgba(184, 134, 11, 0.25)",
+                                    background: "rgba(184, 134, 11, 0.05)",
+                                    color: "rgb(146, 64, 14)",
+                                  }}
+                                  title="Registry unreachable — click 'Regenerate' to retry"
                                 >
-                                  <RefreshCw className="w-3 h-3" />
-                                  .{tld}
+                                  <RefreshCw className="w-3 h-3" />.{tld}
                                 </span>
                               );
                             })}
@@ -744,9 +884,22 @@ export default function DomainsPage() {
                 </div>
               </div>
             )}
-          </div>
-        </div>
-      </section>
+
+            {!generating && generatedNames.length === 0 && !genError && (
+              <div
+                className="p-5 rounded-2xl text-center"
+                style={{
+                  border: "1px solid var(--rule)",
+                  background: "var(--paper-elevated)",
+                  color: "var(--ink-muted)",
+                }}
+              >
+                No names returned. Try refining your description.
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
       {/* ── TLD GRID ── */}
       <section className="max-w-3xl mx-auto px-4 sm:px-6 pb-16">
