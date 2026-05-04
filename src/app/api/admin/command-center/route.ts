@@ -1,26 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCommandCenterSnapshot } from "@/lib/command-center";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function isAuthorized(req: NextRequest): boolean {
-  if (req.headers.get("x-admin")) return true;
-  const cookie = req.cookies.get("admin")?.value;
-  return cookie === "1";
-}
-
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  if (!isAuthorized(req)) {
-    return NextResponse.json(
-      {
-        error: "unauthorized",
-        message:
-          "Admin access required. Send header 'x-admin: 1' or set cookie 'admin=1'.",
-      },
-      { status: 401, headers: { "Cache-Control": "no-store" } }
-    );
-  }
+  const denied = requireAdmin(req);
+  if (denied) return denied;
 
   try {
     const snapshot = await getCommandCenterSnapshot();

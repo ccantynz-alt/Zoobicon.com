@@ -354,7 +354,6 @@ function getBaseUrl(req: NextRequest): string {
   return `${url.protocol}//${url.host}`;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- internal fan-out returns arbitrary JSON
 async function fetchJsonWithTimeout(url: string, init: RequestInit = {}): Promise<any> {
   const res = await fetch(url, {
     ...init,
@@ -388,7 +387,6 @@ function isLaunchPlanLike(v: unknown): boolean {
   if (!v || typeof v !== "object") return false;
   // any-cast is intentional — we've verified it's an object, and we're about to
   // check the fields we depend on downstream.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = v as any;
   return (
     typeof p.concept === "string" &&

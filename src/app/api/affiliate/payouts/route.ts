@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPayoutQueue, markPaid } from "@/lib/affiliate-program";
-
-function isAdmin(req: NextRequest): boolean {
-  return req.headers.get("x-admin") === "true" || req.headers.get("x-admin-key") != null;
-}
+import { requireAdmin } from "@/lib/admin-auth";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  if (!isAdmin(req)) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const queue = await getPayoutQueue();
     return NextResponse.json({ queue });
@@ -19,9 +15,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  if (!isAdmin(req)) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const denied = requireAdmin(req);
+  if (denied) return denied;
   try {
     const body = (await req.json()) as { conversionIds?: number[] };
     if (!Array.isArray(body.conversionIds)) {

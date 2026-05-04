@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import { safeRedirect } from "@/lib/safe-redirect";
 import {
   Zap,
   Eye,
@@ -62,13 +63,9 @@ export default function LoginPage() {
         // Honor ?redirect param — the builder + marketplace + any gated page
         // sends users here with their original destination. Dropping them on
         // /dashboard instead breaks the flow and feels like a loop.
-        // Guard against open-redirects: only same-origin relative paths.
-        let dest = "/dashboard";
-        try {
-          const r = searchParams.get("redirect");
-          if (r && r.startsWith("/") && !r.startsWith("//")) dest = r;
-        } catch {}
-        window.location.href = dest;
+        // safeRedirect blocks open-redirect phishing (//evil.com, /\evil.com,
+        // /%2f%2fevil.com, etc.) and falls back to /dashboard when unsafe.
+        window.location.href = safeRedirect(searchParams.get("redirect"));
         return;
       }
 

@@ -78,7 +78,7 @@ const FAQS = [
   { q: "Can I use eSIM for calls and texts?", a: "Our eSIM plans are data-only, which is what most travelers need. For calls and texts, use your existing SIM or apps like WhatsApp, FaceTime, or Send over the eSIM data connection — this is usually cheaper than international calling anyway." },
 ];
 
-const CARD_BG = "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const CARD_BG = "var(--paper-elevated)";
 const PRIMARY_CTA = {
   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
   color: "#0a1628",
@@ -416,7 +416,7 @@ export default function EsimProductPage() {
                 }`}
                 style={{
                   background: p.featured
-                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(20,40,95,0.85) 100%)"
+                    ? "var(--paper-elevated)"
                     : CARD_BG,
                 }}
               >

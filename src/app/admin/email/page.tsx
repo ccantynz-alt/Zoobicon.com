@@ -480,7 +480,18 @@ support@zoobicon.com`;
               <div className="flex-1 overflow-y-auto p-6">
                 <div className="bg-white rounded-xl p-6 shadow-sm">
                   {selectedEmail.html_body ? (
-                    <div className="prose prose-sm max-w-none prose-p:text-gray-800 prose-a:text-blue-600 prose-headings:text-gray-900" dangerouslySetInnerHTML={{ __html: selectedEmail.html_body }} />
+                    // Inbound email HTML is untrusted. Rendering it via
+                    // dangerouslySetInnerHTML let any sender execute JS in
+                    // the admin's session (XSS). A sandboxed iframe with
+                    // empty sandbox attribute disables scripts, forms,
+                    // popups, and same-origin access — the gold-standard
+                    // pattern Gmail/Fastmail use for untrusted email HTML.
+                    <iframe
+                      title="Email body"
+                      sandbox=""
+                      srcDoc={selectedEmail.html_body}
+                      className="w-full min-h-[400px] border-0"
+                    />
                   ) : (
                     <pre className="whitespace-pre-wrap text-sm text-gray-800 font-sans leading-relaxed">{selectedEmail.text_body}</pre>
                   )}

@@ -120,41 +120,81 @@ export async function runNightlyJob(
 
   const stepPromises: Array<Promise<StepResult>> = [
     safeCall<DailyStats>("analytics", async () => {
-      const mod = (await import("@/lib/analytics-engine")) as {
-        getDailyStats: (args: { siteId: string }) => Promise<DailyStats>;
+      // analytics-engine exposes getStats(siteId, days) returning { pageviews,
+      // uniqueVisitors, topPaths, ... }. We adapt to the DailyStats shape used
+      // by the email composer; "leads" and "bounceRate" aren't tracked yet so
+      // they default to 0 (the morning email skips zero-value rows).
+      const mod = await import("@/lib/analytics-engine");
+      const stats = await mod.getStats(siteId, 1);
+      return {
+        visits: stats.pageviews ?? 0,
+        uniqueVisitors: stats.uniqueVisitors ?? 0,
+        leads: 0,
+        bounceRate: 0,
+        topPages: (stats.topPaths ?? []).slice(0, 5).map((p) => ({
+          path: p.path,
+          views: p.count,
+        })),
       };
-      return mod.getDailyStats({ siteId });
     }),
     safeCall<{ fixes: SeoFix[] }>("seo", async () => {
-      const mod = (await import("@/lib/seo-agent")) as {
-        auditSite: (args: { siteId: string }) => Promise<{ issues: SeoFix[] }>;
-        autoFix: (args: {
-          siteId: string;
-          issues: SeoFix[];
-        }) => Promise<{ fixes: SeoFix[] }>;
-      };
-      const audit = await mod.auditSite({ siteId });
-      const blockers = audit.issues.filter(
-        (i) => i.severity === "blocker" || i.severity === "high"
-      );
-      return mod.autoFix({ siteId, issues: blockers });
+      // The SEO module exposes auditSite() but NOT autoFix() — auto-fixing
+      // touches the live site DB and needs human approval per Bible Law 8.
+      // The nightly job logs critical/warning issues so the morning email
+      // surfaces them with an "approve fix" link.
+      const mod = await import("@/lib/seo-agent");
+      const audit = await mod.auditSite({
+        url: `https://${siteId}.zoobicon.sh`,
+      });
+      const fixes: SeoFix[] = audit.issues
+        .filter((i) => i.severity === "critical" || i.severity === "warning")
+        .map((i) => ({
+          issue: i.message,
+          fix: i.fix,
+          severity: i.severity === "critical" ? "blocker" : "high",
+        }));
+      return { fixes };
     }),
     safeCall<BlogDraft>("blog", async () => {
-      const mod = (await import("@/lib/blog-generator")) as {
-        draftPost: (args: {
-          siteId: string;
-          ownerId: string;
-        }) => Promise<BlogDraft>;
+      const mod = await import("@/lib/blog-generator");
+      const post = await mod.generateBlogPost({
+        topic: `Daily comeback for site ${siteId}`,
+        tone: "professional",
+        length: "medium",
+      });
+      return {
+        // generateBlogPost returns slug + title rather than a DB id; the slug
+        // is the durable identifier the approve URL routes against.
+        id: post.slug,
+        title: post.title,
+        excerpt: post.excerpt || post.metaDescription || "",
+        approveUrl: `/blog/draft/${post.slug}`,
       };
-      return mod.draftPost({ siteId, ownerId });
     }),
     safeCall<{ changes: CompetitorChange[] }>("competitors", async () => {
-      const mod = (await import("@/lib/competitor-monitor")) as {
-        diffCompetitors: (args: {
-          siteId: string;
-        }) => Promise<{ changes: CompetitorChange[] }>;
-      };
-      return mod.diffCompetitors({ siteId });
+      // competitor-monitor exposes listCompetitors(userId) + diffCompetitor(id)
+      // (singular). We fan out one diff per tracked competitor and collect
+      // material changes into the shape the email composer expects.
+      const mod = await import("@/lib/competitor-monitor");
+      const competitors = await mod.listCompetitors(ownerId);
+      const diffs = await Promise.allSettled(
+        competitors.map((c) => mod.diffCompetitor(c.id)),
+      );
+      const changes: CompetitorChange[] = [];
+      diffs.forEach((d, i) => {
+        if (d.status !== "fulfilled" || !d.value) return;
+        const competitorUrl = competitors[i]?.url ?? "unknown";
+        for (const item of d.value.added) {
+          changes.push({ competitor: competitorUrl, change: `added: ${item}`, url: competitorUrl });
+        }
+        for (const item of d.value.removed) {
+          changes.push({ competitor: competitorUrl, change: `removed: ${item}`, url: competitorUrl });
+        }
+        for (const item of d.value.changed) {
+          changes.push({ competitor: competitorUrl, change: `changed: ${item}`, url: competitorUrl });
+        }
+      });
+      return { changes };
     }),
   ];
 

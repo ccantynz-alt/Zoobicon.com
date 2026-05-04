@@ -39,10 +39,22 @@ async function handle(req: NextRequest): Promise<NextResponse> {
   if (unauth) return unauth;
 
   try {
-    const mod = (await import("@/lib/daily-comeback")) as {
-      runAllNightly: () => Promise<NightlySummary>;
+    // runAllNightly returns RunNightlyJobResult[] (one row per site). The
+    // cron response shape is { processed, successes, failures } so we
+    // aggregate here. Previous code cast the module to a non-existent
+    // `runAllNightly: () => Promise<NightlySummary>` shape that would
+    // throw at runtime.
+    const mod = await import("@/lib/daily-comeback");
+    const results = await mod.runAllNightly();
+    const successes = results.filter((r) =>
+      r.steps.every((s) => s.status === "ok" || s.status === "skipped"),
+    ).length;
+    const summary: NightlySummary = {
+      processed: results.length,
+      successes,
+      failures: results.length - successes,
+      details: results,
     };
-    const summary = await mod.runAllNightly();
     return NextResponse.json({
       ok: true,
       processed: summary.processed,

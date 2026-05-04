@@ -2,6 +2,15 @@
   "name": "zoobicon",
   "version": "0.1.0",
   "private": true,
+  "description": "Zoobicon application built with Next.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zoobicon/zoobicon.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -13,11 +22,11 @@
     "audit:deep": "node scripts/claude-md-audit.js --deep"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.80.0",
+    "@anthropic-ai/sdk": "^0.39.0",
     "@codesandbox/sandpack-client": "^2.19.8",
     "@codesandbox/sandpack-react": "^2.20.0",
     "@monaco-editor/react": "^4.7.0",
-    "@neondatabase/serverless": "^1.0.2",
+    "@neondatabase/serverless": "^1.1.0",
     "@types/qrcode": "^1.5.6",
     "@upstash/qstash": "^2.10.1",
     "@upstash/redis": "^1.37.0",
@@ -25,10 +34,10 @@
     "framer-motion": "^12.38.0",
     "imapflow": "^1.2.18",
     "lucide-react": "^1.7.0",
-    "next": "^14.2.0",
+    "next": "^16.2.4",
     "qrcode": "^1.5.4",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "replicate": "^1.4.0",
     "stripe": "^21.0.1"
   },
@@ -38,14 +47,14 @@
     "@testing-library/react": "^16.3.2",
     "@types/node": "20.19.37",
     "@types/react": "18.3.28",
-    "@types/react-dom": "^18.3.0",
-    "autoprefixer": "^10.4.0",
-    "eslint": "^8.57.1",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.5.0",
+    "eslint": "^10.3.0",
     "eslint-config-next": "^14.2.35",
     "jsdom": "^28.1.0",
-    "postcss": "^8.4.0",
-    "tailwindcss": "^3.4.0",
-    "typescript": "5.9.3",
+    "postcss": "^8.5.13",
+    "tailwindcss": "^4.2.4",
+    "typescript": "6.0.3",
     "vitest": "^4.1.2"
   }
 }
