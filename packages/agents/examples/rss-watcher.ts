@@ -86,10 +86,13 @@ const rssWatcher = createAgent<FeedConfig, FeedResult>({
 });
 
 rssWatcher.run().then((result) => {
-  process.stdout.write(`\nRSS check complete:\n`);
-  process.stdout.write(`  ${result.tasksCompleted} feeds checked\n`);
+  const lines: string[] = [
+    `\nRSS check complete:`,
+    `  ${result.tasksCompleted} feeds checked`,
+  ];
   for (const f of result.findings) {
-    process.stdout.write(`  [${f.severity.toUpperCase()}] ${f.title}\n`);
-    if (f.description) process.stdout.write(`    ${f.description.split("\n")[0]}\n`);
+    lines.push(`  [${f.severity.toUpperCase()}] ${f.title}`);
+    if (f.description) lines.push(`    ${f.description.split("\n")[0]}`);
   }
+  process.stdout.write(lines.join("\n") + "\n");
 });
