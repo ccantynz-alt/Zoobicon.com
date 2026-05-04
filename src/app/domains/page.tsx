@@ -901,9 +901,57 @@ export default function DomainsPage() {
         )}
       </div>
 
+      {/* ── BROWSE ALL CTA ── Pre-crawled available-list, alphabetical */}
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 pb-12">
+        <Link
+          href="/domains/available"
+          className="group block rounded-3xl p-6 sm:p-8 transition-all hover:-translate-y-0.5"
+          style={{
+            background: "var(--paper-elevated)",
+            border: "1px solid var(--rule)",
+            boxShadow: "var(--shadow-1)",
+          }}
+        >
+          <div className="flex items-center justify-between gap-6 flex-wrap">
+            <div className="min-w-0">
+              <div
+                className="text-[10px] uppercase tracking-[0.2em] font-semibold mb-2"
+                style={{ color: "var(--gold-deep)" }}
+              >
+                Pre-crawled · alphabetical
+              </div>
+              <div
+                className="text-[20px] sm:text-[24px] font-semibold leading-tight tracking-[-0.02em]"
+                style={{ color: "var(--ink)" }}
+              >
+                Browse every available .com, .ai, and .io.
+              </div>
+              <p
+                className="text-[13px] mt-1.5 leading-relaxed max-w-md"
+                style={{ color: "var(--ink-secondary)" }}
+              >
+                Filter by length, starting letter, ending letter. The crawler
+                walks the registry around the clock so the list serves
+                instantly — no wait, no spinner.
+              </p>
+            </div>
+            <div
+              className="inline-flex items-center gap-1.5 text-[13px] font-semibold whitespace-nowrap transition-transform group-hover:translate-x-1"
+              style={{ color: "var(--ink)" }}
+            >
+              Open the list
+              <ArrowRight className="w-4 h-4" />
+            </div>
+          </div>
+        </Link>
+      </section>
+
       {/* ── TLD GRID ── */}
       <section className="max-w-3xl mx-auto px-4 sm:px-6 pb-16">
-        <h3 className="text-[11px] uppercase tracking-[0.2em] font-semibold text-white/35 mb-5 text-center">
+        <h3
+          className="text-[11px] uppercase tracking-[0.2em] font-semibold mb-5 text-center"
+          style={{ color: "var(--ink-muted)" }}
+        >
           13 extensions · All include free SSL &amp; WHOIS privacy
         </h3>
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
