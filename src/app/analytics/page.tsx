@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
 import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
+import DemoDataBanner from "@/components/DemoDataBanner";
 import {
   Zap,
   BarChart3,
@@ -214,6 +215,7 @@ export default function AnalyticsPage() {
       <CursorGlowTracker />
 
       <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        <DemoDataBanner entity="sites" ctaHref="/builder" ctaLabel="Connect your first site" />
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-3">

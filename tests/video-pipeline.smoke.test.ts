@@ -224,7 +224,10 @@ describe("video-pipeline full E2E flow (mocked)", () => {
     expect(result.avatarUrl).toBeTruthy();
     expect(result.duration).toBeGreaterThan(0);
     expect(result.cost).toBeGreaterThan(0);
-    expect(result.pipeline).toBe("zoobicon-v1");
+    // The pipeline label tracks which provider chain produced the video
+    // (`zoobicon-v2-elevenlabs` when ELEVENLABS_API_KEY is set, otherwise
+    // the Replicate chain). Either v2 variant satisfies the smoke test.
+    expect(result.pipeline).toMatch(/^zoobicon-v(1|2)/);
 
     // Must have reported progress
     expect(progressMessages.length).toBeGreaterThan(0);

@@ -58,7 +58,13 @@ const ALL_TLDS = Object.keys(TLD_PRICES);
 interface GeneratedName {
   name: string;
   tagline: string;
-  score?: number;
+  /** Per-TLD availability returned by /api/domains/ai-find */
+  availability?: Record<
+    string,
+    { domain: string; available: boolean | null; price: number }
+  >;
+  /** TLDs confirmed available — populated by /api/domains/ai-find */
+  buyableTlds?: string[];
   recommendedTlds?: Array<{ tld: string; reason: string }>;
 }
 
@@ -147,11 +153,15 @@ export default function DomainsPage() {
     setGenError(null);
     setGeneratedNames([]);
     try {
-      const res = await fetch("/api/tools/business-names", {
+      // /api/domains/ai-find generates names AND checks availability across
+      // .com / .ai / .io in a single round-trip, so each card already knows
+      // which TLDs are buyable. Previously the AI endpoint only returned
+      // names — the user had to click each one to discover what was free.
+      const res = await fetch("/api/domains/ai-find", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: aiDesc.trim(), count: 12 }),
-        signal: AbortSignal.timeout(25000),
+        body: JSON.stringify({ description: aiDesc.trim(), count: 12, tlds: ["com", "ai", "io"] }),
+        signal: AbortSignal.timeout(45_000),
       });
       if (res.ok) {
         const data = await res.json();
@@ -160,8 +170,14 @@ export default function DomainsPage() {
         const errBody = await res.json().catch(() => ({}));
         setGenError(errBody.error || "Could not generate names. Please try again.");
       }
-    } catch {
-      setGenError("Request timed out. Please try again.");
+    } catch (err) {
+      setGenError(
+        err instanceof Error && err.name === "AbortError"
+          ? "Request timed out. The AI took too long to respond — please try again."
+          : err instanceof Error
+            ? err.message
+            : "Network error while generating names."
+      );
     }
     setGenerating(false);
   };
@@ -227,7 +243,7 @@ export default function DomainsPage() {
   const cleanQuery = query.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
 
   return (
-    <div className="relative z-10 min-h-screen bg-[#0b1530] text-white">
+    <div className="relative z-10 min-h-screen" style={{ background: "var(--paper)", color: "var(--ink)" }}>
 
       {/* ── CHECKOUT MODAL ── */}
       {showCheckout && (
@@ -235,8 +251,9 @@ export default function DomainsPage() {
           <div
             className="rounded-[28px] border border-white/[0.08] w-full max-w-lg max-h-[90vh] overflow-y-auto p-7 sm:p-8 backdrop-blur-xl"
             style={{
-              background: "linear-gradient(135deg, rgba(20,40,95,0.97) 0%, rgba(10,10,15,0.95) 100%)",
-              boxShadow: "0 50px 120px -40px rgba(0,0,0,0.8), 0 30px 80px -30px rgba(232,212,176,0.15)",
+              background: "var(--paper)",
+              border: "1px solid var(--rule)",
+              boxShadow: "0 50px 120px -40px rgba(10,10,11,0.18), var(--shadow-2)",
             }}
           >
             <div className="flex items-center justify-between mb-6">
@@ -331,7 +348,7 @@ export default function DomainsPage() {
                 onClick={handleSubmitRegistration}
                 disabled={registering || !contactInfo.firstName || !contactInfo.lastName || !contactInfo.email}
                 className="w-full py-3.5 mt-3 rounded-2xl font-semibold text-[14px] transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a1628", boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)" }}
+                style={{ background: "var(--ink)", color: "var(--paper)", boxShadow: "0 14px 40px -16px rgba(10,10,11,0.4)" }}
               >
                 {registering ? <><Loader2 className="w-5 h-5 animate-spin" />Processing...</> : <>Pay ${cartTotal.toFixed(2)} &amp; register</>}
               </button>
@@ -575,9 +592,10 @@ export default function DomainsPage() {
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-[20px] font-semibold text-white leading-tight">AI Name Generator</h2>
+                <h2 className="text-[20px] font-semibold text-white leading-tight">AI Domain Finder</h2>
                 <p className="text-[13px] text-white/45 mt-1">
-                  Describe your business — AI creates brandable names and checks what&apos;s available
+                  Describe your business — Claude proposes brandable names and we check .com / .ai / .io
+                  against the live registry before showing you the list.
                 </p>
               </div>
             </div>
@@ -600,7 +618,7 @@ export default function DomainsPage() {
                 {generating ? <><Loader2 className="w-4 h-4 animate-spin" />Generating...</> : <><Sparkles className="w-4 h-4" />Generate names</>}
               </button>
             </div>
-            <p className="text-[11px] text-white/25 mb-5">Powered by Claude — names are screened for .com availability before being shown</p>
+            <p className="text-[11px] text-white/25 mb-5">Each idea ships with live .com / .ai / .io availability and price. One click adds an available extension to your cart.</p>
 
             {genError && (
               <div className="p-4 rounded-xl border border-red-500/25 bg-red-500/[0.07] text-red-300 text-[13px] flex items-start gap-2">
@@ -622,34 +640,107 @@ export default function DomainsPage() {
 
             {generatedNames.length > 0 && (
               <div>
-                <p className="text-[11px] uppercase tracking-widest font-semibold text-white/35 mb-3">
-                  {generatedNames.length} name ideas — click any to check availability
+                <p className="text-[11px] uppercase tracking-widest font-semibold text-white/35 mb-3 flex items-center gap-2">
+                  <Sparkles className="w-3 h-3 text-violet-400" />
+                  {generatedNames.length} ideas — availability checked live against the registry
                 </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {generatedNames.map((gn, i) => (
-                    <button
-                      key={i}
-                      onClick={() => {
-                        const slug = gn.name.toLowerCase().replace(/[^a-z0-9-]/g, "");
-                        setQuery(slug);
-                        searchName(slug);
-                        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                      }}
-                      className="text-left p-3.5 rounded-xl border border-white/[0.07] bg-white/[0.03] hover:bg-white/[0.07] hover:border-violet-500/30 transition-all group"
-                    >
-                      <div className="font-semibold text-white text-[14px] group-hover:text-violet-300 transition-colors">{gn.name}</div>
-                      {gn.tagline && <div className="text-[11px] text-white/35 mt-1 leading-snug line-clamp-2">{gn.tagline}</div>}
-                      {gn.recommendedTlds && gn.recommendedTlds.length > 0 && (
-                        <div className="flex gap-1 mt-2 flex-wrap">
-                          {gn.recommendedTlds.slice(0, 2).map(rt => (
-                            <span key={rt.tld} className="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-violet-500/15 text-violet-400 border border-violet-500/20">
-                              .{rt.tld}
-                            </span>
-                          ))}
+                <div className="space-y-2.5">
+                  {generatedNames.map((gn, i) => {
+                    const tldsToShow = gn.availability ? Object.keys(gn.availability) : [];
+                    const anyBuyable = (gn.buyableTlds?.length ?? 0) > 0;
+                    return (
+                      <div
+                        key={i}
+                        className="p-4 rounded-2xl border transition-colors"
+                        style={{
+                          background: anyBuyable
+                            ? "linear-gradient(135deg, rgba(99,102,241,0.06) 0%, rgba(255,255,255,0.025) 100%)"
+                            : "rgba(255,255,255,0.02)",
+                          borderColor: anyBuyable ? "rgba(139,92,246,0.18)" : "rgba(255,255,255,0.07)",
+                        }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-white text-[15px]">{gn.name}</div>
+                            {gn.tagline && (
+                              <div className="text-[12px] text-white/45 mt-0.5 leading-snug">{gn.tagline}</div>
+                            )}
+                          </div>
+                          {!anyBuyable && tldsToShow.length > 0 && (
+                            <button
+                              onClick={() => {
+                                const slug = gn.name.toLowerCase().replace(/[^a-z0-9-]/g, "");
+                                setQuery(slug);
+                                searchName(slug);
+                                resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                              }}
+                              className="text-[11px] uppercase tracking-widest font-semibold text-white/35 hover:text-white/70 underline underline-offset-2 transition-colors whitespace-nowrap"
+                            >
+                              Try other TLDs
+                            </button>
+                          )}
                         </div>
-                      )}
-                    </button>
-                  ))}
+
+                        {tldsToShow.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {tldsToShow.map((tld) => {
+                              const a = gn.availability![tld];
+                              const result: DomainResult = {
+                                domain: a.domain,
+                                tld,
+                                available: a.available,
+                                price: a.price,
+                                checking: false,
+                              };
+                              const inCart = cart.some((c) => c.domain === a.domain);
+                              if (a.available === true) {
+                                return (
+                                  <button
+                                    key={tld}
+                                    onClick={() => (inCart ? removeFromCart(a.domain) : addToCart(result))}
+                                    className={`group flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
+                                      inCart
+                                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/35 hover:bg-red-500/15 hover:text-red-300 hover:border-red-500/30"
+                                        : "bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 hover:bg-emerald-500/20 hover:border-emerald-500/40"
+                                    }`}
+                                  >
+                                    <Check className="w-3 h-3" />
+                                    .{tld}
+                                    <span className="text-emerald-400/80 font-mono ml-1">${a.price.toFixed(2)}</span>
+                                    <span className="text-[9px] uppercase tracking-wider ml-1 opacity-70">
+                                      {inCart ? "Added" : "Add"}
+                                    </span>
+                                  </button>
+                                );
+                              }
+                              if (a.available === false) {
+                                return (
+                                  <span
+                                    key={tld}
+                                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-white/[0.06] text-white/30"
+                                  >
+                                    <X className="w-3 h-3" />
+                                    .{tld}
+                                    <span className="line-through opacity-70 ml-0.5">taken</span>
+                                  </span>
+                                );
+                              }
+                              return (
+                                <span
+                                  key={tld}
+                                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium border border-amber-500/15 bg-amber-500/[0.05] text-amber-300/70"
+                                  title="Registry unreachable — click 'Try other TLDs' to retry"
+                                >
+                                  <RefreshCw className="w-3 h-3" />
+                                  .{tld}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -714,7 +805,7 @@ export default function DomainsPage() {
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4">
           <div
             className="flex items-center justify-between gap-4 px-5 py-3.5 rounded-2xl border border-white/[0.12] backdrop-blur-xl"
-            style={{ background: "linear-gradient(135deg, rgba(20,40,95,0.96) 0%, rgba(10,15,30,0.96) 100%)", boxShadow: "0 25px 60px -15px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)" }}
+            style={{ background: "var(--paper)", border: "1px solid var(--rule-strong)", boxShadow: "0 25px 60px -15px rgba(10,10,11,0.2), var(--shadow-2)" }}
           >
             <div className="flex items-center gap-3">
               <div className="relative">

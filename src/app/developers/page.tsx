@@ -110,7 +110,7 @@ const PRICING_TIERS = [
   },
 ];
 
-const CARD_BG = "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const CARD_BG = "var(--paper-elevated)";
 const PRIMARY_CTA = {
   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
   color: "#0a1628",
@@ -380,7 +380,7 @@ export default function DevelopersPage() {
                   <div
                     key={item.label}
                     className="rounded-[16px] border border-white/[0.08] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/25"
-                    style={{ background: "rgba(10,10,15,0.6)" }}
+                    style={{ background: "var(--paper-elevated)" }}
                   >
                     <div className="font-mono text-2xl font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>
                       {item.price}
@@ -476,7 +476,7 @@ export default function DevelopersPage() {
                 }`}
                 style={{
                   background: tier.highlighted
-                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(20,40,95,0.85) 100%)"
+                    ? "var(--paper-elevated)"
                     : CARD_BG,
                 }}
               >

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { registerDomain, type ContactInfo } from "@/lib/domain-reseller";
+import { registerWithFallback, type ContactInfo } from "@/lib/registrar";
 
 /**
  * POST /api/domains/verify-purchase
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
           }
           // Pending >30s or failed: safe to retry
           if (row.status === "pending_registration" || row.status === "registration_failed") {
-            await tryRegisterWithOpenSRS(trimmed, registrantEmail, years, session, sql);
+            await tryRegisterWithChain(trimmed, registrantEmail, years, session, sql);
           }
         } else {
           // Webhook hasn't saved this domain yet — save and register
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
             INSERT INTO registered_domains (domain, user_email, status, expires_at, auto_renew, privacy_protection)
             VALUES (${trimmed}, ${registrantEmail}, ${"pending_registration"}, ${expiresAt.toISOString()}, true, true)
           `;
-          await tryRegisterWithOpenSRS(trimmed, registrantEmail, years, session, sql);
+          await tryRegisterWithChain(trimmed, registrantEmail, years, session, sql);
           saved.push(trimmed);
         }
       } catch (err) {
@@ -136,51 +136,90 @@ export async function POST(req: NextRequest) {
 }
 
 /**
- * Attempt to register a domain with OpenSRS and update DB status.
+ * Attempt to register a domain via the registrar chain (OpenSRS → CentralNic).
+ *
+ * Two important safety rails:
+ *  - Refuses to register if any ICANN-required registrant field is missing
+ *    or obviously placeholder. Previously we filled gaps with "TBD" /
+ *    "+1.0000000000" / "unknown@..." and OpenSRS rejected the registration —
+ *    the customer was charged but the domain was never registered.
+ *  - Persists the chain's per-provider attempts list to registration_error
+ *    so the admin can see exactly which providers were tried and why each
+ *    failed.
  */
-async function tryRegisterWithOpenSRS(domain: string, email: string, years: number, session: any, sql: any) {
+async function tryRegisterWithChain(
+  domain: string,
+  email: string,
+  years: number,
+  session: { metadata?: Record<string, string | null | undefined> | null },
+  sql: typeof import("@/lib/db").sql,
+) {
+  const m = session.metadata || {};
+
+  // ICANN requires non-placeholder data. Same validation gate the Stripe
+  // webhook uses — keep them consistent so a row that passes one path
+  // doesn't get rejected by the other.
+  const required: Array<[string, string | null | undefined]> = [
+    ["registrantFirstName", m.registrantFirstName],
+    ["registrantLastName", m.registrantLastName],
+    ["email", email],
+    ["registrantPhone", m.registrantPhone],
+    ["registrantAddress", m.registrantAddress],
+    ["registrantCity", m.registrantCity],
+    ["registrantCountry", m.registrantCountry],
+  ];
+  const missing = required.filter(([, v]) => !v || !String(v).trim()).map(([k]) => k);
+  const looksValidEmail = email && /@/.test(email) && !email.startsWith("unknown@");
+  if (missing.length > 0 || !looksValidEmail) {
+    const detail = `Missing ICANN-required fields: ${missing.join(", ") || "(invalid email)"}`;
+    console.error(`[verify-purchase] BLOCKED — ${detail} for ${domain}. Customer paid but registration cannot proceed.`);
+    await sql`
+      UPDATE registered_domains
+      SET status = 'missing_registrant_info', registration_error = ${detail}
+      WHERE domain = ${domain}
+    `;
+    return;
+  }
+
   const registrant: ContactInfo = {
-    firstName: session.metadata?.registrantFirstName || "Domain",
-    lastName: session.metadata?.registrantLastName || "Owner",
+    firstName: m.registrantFirstName!,
+    lastName: m.registrantLastName!,
     email,
-    phone: session.metadata?.registrantPhone || "+1.0000000000",
-    address1: session.metadata?.registrantAddress || "TBD",
-    city: session.metadata?.registrantCity || "TBD",
-    state: session.metadata?.registrantState || "NA",
-    postalCode: session.metadata?.registrantZip || "00000",
-    country: session.metadata?.registrantCountry || "US",
+    phone: m.registrantPhone!,
+    address1: m.registrantAddress!,
+    city: m.registrantCity!,
+    state: m.registrantState || "",
+    postalCode: m.registrantZip || "",
+    country: m.registrantCountry!,
   };
 
-  try {
-    const result = await registerDomain({
-      domain,
-      period: years,
-      registrant,
-      autoRenew: true,
-      privacyProtection: true,
-    });
+  const result = await registerWithFallback({
+    domain,
+    period: years,
+    registrant,
+    autoRenew: true,
+    privacyProtection: true,
+  });
 
-    if (result.success) {
-      await sql`
-        UPDATE registered_domains SET status = 'active', opensrs_order_id = ${result.orderId || null}
-        WHERE domain = ${domain}
-      `;
-      console.log(`[verify-purchase] Domain registered with OpenSRS: ${domain}`);
-    } else {
-      await sql`
-        UPDATE registered_domains SET status = 'registration_failed', registration_error = ${result.error || 'Unknown'}
-        WHERE domain = ${domain}
-      `;
-      console.error(`[verify-purchase] OpenSRS registration failed for ${domain}: ${result.error}`);
-    }
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown error";
-    console.error(`[verify-purchase] OpenSRS error for ${domain}:`, msg);
-    try {
-      await sql`
-        UPDATE registered_domains SET status = 'registration_failed', registration_error = ${msg}
-        WHERE domain = ${domain}
-      `;
-    } catch { /* logged above */ }
+  if (result.success) {
+    await sql`
+      UPDATE registered_domains
+      SET status = 'active',
+          opensrs_order_id = ${result.orderId || null},
+          registration_error = NULL
+      WHERE domain = ${domain}
+    `;
+    console.log(`[verify-purchase] ${domain} registered via ${result.source} order=${result.orderId || "?"}`);
+  } else {
+    const summary = result.attempts
+      .map((a) => `${a.provider}=${a.error || "unknown"}`)
+      .join(" · ");
+    const errorText = `${result.error || "Unknown"} [attempts: ${summary || "none"}]`;
+    await sql`
+      UPDATE registered_domains
+      SET status = 'registration_failed', registration_error = ${errorText}
+      WHERE domain = ${domain}
+    `;
+    console.error(`[verify-purchase] ${domain} chain failed: ${errorText}`);
   }
 }

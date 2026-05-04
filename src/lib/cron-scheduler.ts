@@ -145,24 +145,21 @@ export async function getDueJobs(now: Date = new Date()): Promise<CronJob[]> {
 }
 
 async function dispatchWebhook(payload: Record<string, unknown>): Promise<string> {
+  // The DB-tracked deliverWebhook(webhookId, eventType, payload) in
+  // lib/webhook-delivery is a different concept — it sends an event to
+  // every subscriber registered against a webhook *id*. The scheduler
+  // dispatches arbitrary user-defined URL+body webhooks, so a raw fetch
+  // is the correct path. Previously this file dynamically imported
+  // deliverWebhook with the wrong arity and silently dropped through to
+  // the fetch fallback every time.
   const url = String(payload.url ?? "");
   if (!url) throw new Error("webhook payload missing url");
   const body = payload.body ?? {};
-  try {
-    const mod = (await import("@/lib/webhook-delivery")) as {
-      deliverWebhook?: (url: string, body: unknown) => Promise<unknown>;
-    };
-    if (typeof mod.deliverWebhook === "function") {
-      const result = await mod.deliverWebhook(url, body);
-      return JSON.stringify(result).slice(0, 1000);
-    }
-  } catch {
-    // fall through to raw fetch
-  }
   const res = await fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(15_000),
   });
   return `status=${res.status}`;
 }
