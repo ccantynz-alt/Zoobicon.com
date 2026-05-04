@@ -106,10 +106,10 @@ const contentModerator = createAgent<ModerationInput, ModerationResult>({
 });
 
 contentModerator.run().then((result) => {
-  console.log(`\nModeration complete:`);
-  console.log(`  ${result.tasksCompleted} items scanned`);
-  console.log(`  ${result.findings.length} issues detected`);
+  process.stdout.write(`\nModeration complete:\n`);
+  process.stdout.write(`  ${result.tasksCompleted} items scanned\n`);
+  process.stdout.write(`  ${result.findings.length} issues detected\n`);
   for (const f of result.findings) {
-    console.log(`  [${f.severity.toUpperCase()}] ${f.title}`);
+    process.stdout.write(`  [${f.severity.toUpperCase()}] ${f.title}\n`);
   }
 });
