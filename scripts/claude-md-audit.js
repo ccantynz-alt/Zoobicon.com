@@ -209,7 +209,7 @@ function formatReport(findings) {
 function main() {
   const content = readClaudeMd();
   if (content === null) {
-    console.log("[claude-md-audit] CLAUDE.md not found at repo root — skipping");
+    process.stdout.write("[claude-md-audit] CLAUDE.md not found at repo root — skipping\n");
     process.exit(0);
   }
   const deep = process.argv.includes("--deep");
@@ -219,7 +219,7 @@ function main() {
     ...checkCompetitorSection(content),
     ...(deep ? checkNpmMajors() : []),
   ];
-  console.log(formatReport(findings));
+  process.stdout.write(formatReport(findings) + "\n");
   process.exit(0);
 }
 
