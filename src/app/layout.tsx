@@ -127,17 +127,19 @@ export default function RootLayout({
         <link rel="alternate" href="https://zoobicon.ai" title="Zoobicon AI" />
         <link rel="alternate" href="https://zoobicon.io" title="Zoobicon for Developers" />
         <link rel="alternate" href="https://zoobicon.sh" title="Zoobicon Hosting & CLI" />
-        {/* Critical inline styles — guarantees dark bg even before CSS bundle loads */}
-        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#0b1530;color:#e4e4e7;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em;overscroll-behavior:none;-webkit-overflow-scrolling:touch}html{overflow-x:hidden}` }} />
+        {/* Critical inline styles — paints the warm bone palette before the CSS bundle loads */}
+        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#fafaf7;color:#0a0a0b;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em;overscroll-behavior:none;-webkit-overflow-scrolling:touch}html{overflow-x:hidden}` }} />
         {/* Preconnect to Google Fonts CDN */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Async font loading — never blocks rendering. Subset to Latin to reduce download. */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400&family=Inter:opsz,wght@14..32,400..900&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap&subset=latin';document.head.appendChild(l)})()` }} />
+        {/* Async font loading — never blocks rendering. Subset to Latin to reduce download.
+            Playfair Display (italic + roman) is the editorial display face used in
+            holdenmercer.com; we keep Fraunces too as a fallback for any legacy uses. */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,700&family=Fraunces:ital,opsz,wght@1,9..144,400&family=Inter:opsz,wght@14..32,400..900&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap&subset=latin';document.head.appendChild(l)})()` }} />
         {/* Fallback for users with JS disabled */}
         <noscript>
           <link
-            href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400&family=Inter:opsz,wght@14..32,400..900&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap&subset=latin"
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,700&family=Fraunces:ital,opsz,wght@1,9..144,400&family=Inter:opsz,wght@14..32,400..900&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap&subset=latin"
             rel="stylesheet"
           />
         </noscript>
@@ -146,7 +148,8 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://js.stripe.com" />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
         <link rel="dns-prefetch" href="https://github.com" />
-        <meta name="msapplication-TileColor" content="#0b1530" />
+        <meta name="msapplication-TileColor" content="#fafaf7" />
+        <meta name="theme-color" content="#fafaf7" />
         <meta name="msapplication-config" content="none" />
         {/* AI Discovery — llms.txt is the "robots.txt for AI" */}
         <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt — AI-readable site description" />

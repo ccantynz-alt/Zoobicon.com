@@ -243,7 +243,7 @@ export default function DomainsPage() {
   const cleanQuery = query.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
 
   return (
-    <div className="relative z-10 min-h-screen bg-[#0b1530] text-white">
+    <div className="relative z-10 min-h-screen" style={{ background: "var(--paper)", color: "var(--ink)" }}>
 
       {/* ── CHECKOUT MODAL ── */}
       {showCheckout && (
@@ -251,8 +251,9 @@ export default function DomainsPage() {
           <div
             className="rounded-[28px] border border-white/[0.08] w-full max-w-lg max-h-[90vh] overflow-y-auto p-7 sm:p-8 backdrop-blur-xl"
             style={{
-              background: "linear-gradient(135deg, rgba(20,40,95,0.97) 0%, rgba(10,10,15,0.95) 100%)",
-              boxShadow: "0 50px 120px -40px rgba(0,0,0,0.8), 0 30px 80px -30px rgba(232,212,176,0.15)",
+              background: "var(--paper)",
+              border: "1px solid var(--rule)",
+              boxShadow: "0 50px 120px -40px rgba(10,10,11,0.18), var(--shadow-2)",
             }}
           >
             <div className="flex items-center justify-between mb-6">
@@ -347,7 +348,7 @@ export default function DomainsPage() {
                 onClick={handleSubmitRegistration}
                 disabled={registering || !contactInfo.firstName || !contactInfo.lastName || !contactInfo.email}
                 className="w-full py-3.5 mt-3 rounded-2xl font-semibold text-[14px] transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a1628", boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)" }}
+                style={{ background: "var(--ink)", color: "var(--paper)", boxShadow: "0 14px 40px -16px rgba(10,10,11,0.4)" }}
               >
                 {registering ? <><Loader2 className="w-5 h-5 animate-spin" />Processing...</> : <>Pay ${cartTotal.toFixed(2)} &amp; register</>}
               </button>
@@ -804,7 +805,7 @@ export default function DomainsPage() {
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4">
           <div
             className="flex items-center justify-between gap-4 px-5 py-3.5 rounded-2xl border border-white/[0.12] backdrop-blur-xl"
-            style={{ background: "linear-gradient(135deg, rgba(20,40,95,0.96) 0%, rgba(10,15,30,0.96) 100%)", boxShadow: "0 25px 60px -15px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)" }}
+            style={{ background: "var(--paper)", border: "1px solid var(--rule-strong)", boxShadow: "0 25px 60px -15px rgba(10,10,11,0.2), var(--shadow-2)" }}
           >
             <div className="flex items-center gap-3">
               <div className="relative">

@@ -121,16 +121,17 @@ const TESTIMONIALS = [
 
 export default function HomePage() {
   return (
-    <div className="text-white selection:bg-indigo-500/30 selection:text-white">
+    <div style={{ color: "var(--ink)" }}>
       <div className="pt-[72px]">
         <HeroBuilder />
 
-        {/* ── Trust strip — infinite marquee, Filmora pattern ── */}
+        {/* ── Trust strip — infinite marquee, editorial pattern ── */}
         <section
-          className="relative border-y border-white/[0.05]"
+          className="relative"
           style={{
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.012) 0%, rgba(255,255,255,0.002) 100%)",
+            background: "var(--paper-elevated)",
+            borderTop: "1px solid var(--rule)",
+            borderBottom: "1px solid var(--rule)",
           }}
         >
           <div className="relative py-8 overflow-hidden fs-marquee-paused">

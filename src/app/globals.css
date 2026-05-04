@@ -5,21 +5,41 @@
 /* Fonts loaded via <link> in layout.tsx with display=swap to prevent FOIT */
 
 :root {
-  /* Editorial palette — retired brand-500/brand-600/accent-cyan/accent-purple/
-     accent-pink/zoo-400/zoo-500/zoo-600 now alias to the warm accent so
-     every derived gradient/border/shadow in this file lands on the editorial
-     register without rewriting 1,700 lines of legacy CSS. */
-  --brand-500: #E8D4B0;
-  --brand-600: #D4B887;
-  --accent-cyan: #E8D4B0;
-  --accent-purple: #E8D4B0;
-  --accent-pink: #E8D4B0;
-  --zoo-400: #E8D4B0;
-  --zoo-500: #D4B887;
-  --zoo-600: #B89B64;
-  --zoo-glow: rgba(232, 212, 176, 0.2);
-  --editorial-ink: #1c1917;
-  --editorial-paper: #FAF9F6;
+  /* ─── Editorial-light palette (rule 29 — reversed from dark Filmora 2026-05-04) ───
+   *
+   * Reference: holdenmercer.com. Warm bone surfaces, near-black text,
+   * deep champagne accent. Inverts the previous midnight-blue dark theme
+   * everywhere via the override layer at the bottom of this file.
+   */
+  --paper: #fafaf7;          /* primary background (warm off-white / bone) */
+  --paper-elevated: #f4f3ed; /* cards, elevated surfaces */
+  --paper-input: #faf9f4;    /* input fields */
+  --ink: #0a0a0b;            /* primary text — near-black, not pure black */
+  --ink-secondary: #3a3a40;  /* secondary text */
+  --ink-muted: #8a8a90;      /* muted text, captions, helper copy */
+  --rule: #e8e6dc;           /* hairline border, warm light grey */
+  --rule-strong: #d4d1c2;    /* stronger border, used for hover affordances */
+  --gold: #c9a961;           /* warm champagne accent */
+  --gold-soft: rgba(201, 169, 97, 0.12);
+  --gold-glow: rgba(201, 169, 97, 0.35);
+  --gold-deep: #a8893f;      /* deeper gold for hover / dense use */
+  --shadow-1: 0 1px 2px rgba(10, 10, 11, 0.04), 0 0 0 1px rgba(10, 10, 11, 0.04);
+  --shadow-2: 0 4px 12px rgba(10, 10, 11, 0.06), 0 0 0 1px rgba(10, 10, 11, 0.05);
+
+  /* Legacy aliases — retained so the 1,700 lines of legacy CSS below
+   * keep compiling. They now resolve to the warm palette instead of
+   * the dark champagne so derived components don't look wrong. */
+  --brand-500: var(--gold);
+  --brand-600: var(--gold-deep);
+  --accent-cyan: var(--gold);
+  --accent-purple: var(--gold);
+  --accent-pink: var(--gold);
+  --zoo-400: var(--gold);
+  --zoo-500: var(--gold);
+  --zoo-600: var(--gold-deep);
+  --zoo-glow: var(--gold-glow);
+  --editorial-ink: var(--ink);
+  --editorial-paper: var(--paper);
 }
 
 * {
@@ -34,8 +54,8 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #0b1530;
-  color: #e8e8ec;
+  background: var(--paper);
+  color: var(--ink);
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
   overscroll-behavior-y: none;
@@ -2050,3 +2070,230 @@ select {
   .fs-marquee { animation: none; }
   .fs-card:hover { transform: none; }
 }
+
+/* ───────────────────────────────────────────────────────────────────────
+ * EDITORIAL-LIGHT OVERRIDE LAYER (rule 29 reversal — 2026-05-04)
+ * ───────────────────────────────────────────────────────────────────────
+ *
+ * The codebase contains 2000+ inline references to the dark Filmora palette
+ * (`bg-[#0b1530]`, `bg-gray-900`, `bg-gray-950`, `text-white`, `text-white/55`,
+ * `border-white/[0.06]`, etc.). Migrating every page individually would take
+ * many sessions; this override layer flips all of them to the warm-bone
+ * editorial palette in one place so every surface picks up the new look
+ * immediately — even pages we haven't rewritten yet. Pages we DO rewrite
+ * use `var(--paper)` / `var(--ink)` directly and don't hit these rules.
+ *
+ * Specificity: tailwind-jit emits these classes at low specificity
+ * (one class selector). We match the same specificity with `:where(...)`
+ * and rely on stylesheet order (this block ships AFTER tailwind utilities)
+ * to win.
+ *
+ * Site-wide ambient glows / gradient orbs (`radial-gradient(...232,212,176...)`,
+ * `linear-gradient(...rgba(20,40,95,...))`) live as inline styles inside
+ * components and aren't covered here — those will look slightly off until
+ * each page is migrated. Acceptable trade-off for "every page light today".
+ */
+
+/* Backgrounds — every dark surface routes to a warm bone variant.
+ * The opacity-suffixed variants (`bg-[#0b1530]/80`, `bg-[#0b1530]/40`) emit
+ * the colour as `rgb(...) / 0.8` so we override with rgba on the warm tone
+ * to keep the translucent-glass look while flipping the underlying hue. */
+.bg-\[\#0b1530\],
+.bg-\[\#0a1628\],
+.bg-\[\#131520\],
+.bg-\[\#0a0f1f\],
+.bg-\[\#0b1027\],
+.bg-\[\#06070b\],
+.bg-\[\#0a0a0f\],
+.bg-\[\#0a0a14\],
+.bg-gray-900,
+.bg-gray-950,
+.bg-zinc-900,
+.bg-zinc-950,
+.bg-slate-900,
+.bg-slate-950,
+.bg-neutral-900,
+.bg-neutral-950 {
+  background-color: var(--paper) !important;
+}
+
+.bg-\[\#0b1530\]\/40,
+.bg-\[\#0b1530\]\/60,
+.bg-\[\#0b1530\]\/70,
+.bg-\[\#0b1530\]\/80,
+.bg-\[\#0b1530\]\/85,
+.bg-\[\#0b1530\]\/90,
+.bg-\[\#0b1530\]\/95,
+.bg-\[\#0a1628\]\/80,
+.bg-\[\#0a1628\]\/90,
+.bg-\[\#131520\]\/80 {
+  background-color: rgba(250, 250, 247, 0.92) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Gradient stops — `from-[#0b1530]` / `to-[#0b1530]` are used as edge fades
+ * around marquees and cinematic strips. Switch them to bone fades. */
+.from-\[\#0b1530\],
+.from-\[\#0a1628\],
+.from-\[\#131520\] {
+  --tw-gradient-from: #fafaf7 var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(250 250 247 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+.to-\[\#0b1530\],
+.to-\[\#0a1628\],
+.to-\[\#131520\] {
+  --tw-gradient-to: #fafaf7 var(--tw-gradient-to-position) !important;
+}
+.via-\[\#0b1530\],
+.via-\[\#0a1628\],
+.via-\[\#131520\] {
+  --tw-gradient-via: #fafaf7 !important;
+  --tw-gradient-via-stops: var(--tw-gradient-position, ), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-via-stops) !important;
+}
+
+.bg-\[\#11131c\],
+.bg-\[\#162044\],
+.bg-\[\#1a1a24\],
+.bg-gray-800,
+.bg-zinc-800,
+.bg-slate-800,
+.bg-neutral-800 {
+  background-color: var(--paper-elevated) !important;
+}
+
+/* Text — invert the dark-mode foreground */
+.text-white,
+.text-zinc-50,
+.text-zinc-100,
+.text-gray-50,
+.text-gray-100,
+.text-slate-50,
+.text-slate-100,
+.text-neutral-50,
+.text-neutral-100 {
+  color: var(--ink) !important;
+}
+
+.text-white\/90,
+.text-zinc-200,
+.text-gray-200,
+.text-slate-200,
+.text-neutral-200 {
+  color: var(--ink-secondary) !important;
+}
+
+.text-white\/80,
+.text-white\/70,
+.text-white\/65,
+.text-zinc-300,
+.text-zinc-400,
+.text-gray-300,
+.text-gray-400,
+.text-slate-300,
+.text-slate-400,
+.text-neutral-300,
+.text-neutral-400 {
+  color: var(--ink-secondary) !important;
+}
+
+.text-white\/60,
+.text-white\/55,
+.text-white\/50,
+.text-white\/45,
+.text-white\/40,
+.text-white\/35,
+.text-white\/30,
+.text-white\/25,
+.text-white\/20,
+.text-zinc-500,
+.text-zinc-600,
+.text-gray-500,
+.text-gray-600,
+.text-slate-500,
+.text-slate-600,
+.text-neutral-500,
+.text-neutral-600 {
+  color: var(--ink-muted) !important;
+}
+
+/* Borders — warm hairline replaces `border-white/[0.06]` and friends */
+.border-white\/\[0\.04\],
+.border-white\/\[0\.05\],
+.border-white\/\[0\.06\],
+.border-white\/\[0\.07\],
+.border-white\/\[0\.08\],
+.border-white\/\[0\.1\],
+.border-white\/\[0\.12\],
+.border-white\/10,
+.border-white\/15,
+.border-white\/20,
+.border-zinc-700,
+.border-zinc-800,
+.border-zinc-900,
+.border-gray-700,
+.border-gray-800,
+.border-gray-900,
+.border-slate-700,
+.border-slate-800,
+.border-slate-900,
+.border-neutral-700,
+.border-neutral-800,
+.border-neutral-900 {
+  border-color: var(--rule) !important;
+}
+
+/* Glassy "white/[0.03]" panels become elevated bone surfaces */
+.bg-white\/\[0\.02\],
+.bg-white\/\[0\.03\],
+.bg-white\/\[0\.04\],
+.bg-white\/\[0\.05\],
+.bg-white\/\[0\.06\],
+.bg-white\/5,
+.bg-white\/10 {
+  background-color: var(--paper-elevated) !important;
+}
+
+/* Placeholder text — readable on bone */
+.placeholder\:text-white\/25::placeholder,
+.placeholder\:text-white\/30::placeholder,
+.placeholder\:text-white\/35::placeholder,
+.placeholder\:text-white\/40::placeholder,
+.placeholder-white\/25::placeholder,
+.placeholder-white\/30::placeholder,
+.placeholder-white\/35::placeholder,
+.placeholder-white\/40::placeholder {
+  color: var(--ink-muted) !important;
+}
+
+/* Critical-path overrides for body & html (these fight the inline
+ * critical CSS in layout.tsx until that bundle reverts). */
+html, body {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* Selection — warm gold, not cyan */
+::selection { background: var(--gold-soft); color: var(--ink); }
+::-moz-selection { background: var(--gold-soft); color: var(--ink); }
+
+/* Scrollbar — light variant */
+::-webkit-scrollbar-track { background: var(--paper) !important; }
+::-webkit-scrollbar-thumb { background: var(--rule-strong) !important; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-deep) !important; }
+
+/* Editorial display headlines — opt-in via .display utility */
+.display {
+  font-family: "Playfair Display", "Fraunces", ui-serif, Georgia, serif;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "dlig" 1;
+  letter-spacing: -0.02em;
+}
+.display-italic {
+  font-family: "Playfair Display", "Fraunces", ui-serif, Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
