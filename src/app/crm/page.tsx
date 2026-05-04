@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import DemoDataBanner from '@/components/DemoDataBanner';
 import Link from 'next/link';
 import {
   Users,
@@ -173,6 +174,7 @@ export default function CRMPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        <DemoDataBanner entity="deals" ctaHref="/crm?tab=contacts" ctaLabel="Add your first contact" />
         {/* Dashboard */}
         {tab === 'dashboard' && (
           <div>

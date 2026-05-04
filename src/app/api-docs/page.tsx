@@ -270,13 +270,17 @@ export default function ApiDocsPage() {
                 <h4 className="text-xs font-medium text-white/40 mb-2 uppercase tracking-wider">Quick Links</h4>
                 <div className="space-y-1.5">
                   {[
-                    { label: 'Authentication', icon: Lock },
-                    { label: 'Rate Limits', icon: Clock },
-                    { label: 'Error Codes', icon: AlertTriangle },
+                    { label: 'Authentication', icon: Lock, anchor: 'authentication' },
+                    { label: 'Rate Limits', icon: Clock, anchor: 'rate-limits' },
+                    { label: 'Error Codes', icon: AlertTriangle, anchor: 'error-codes' },
                   ].map((link) => (
-                    <button key={link.label} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition">
+                    <a
+                      key={link.label}
+                      href={`#${link.anchor}`}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition"
+                    >
                       <link.icon className="w-4 h-4" /> {link.label}
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>

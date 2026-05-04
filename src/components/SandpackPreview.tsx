@@ -177,17 +177,22 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
   const { showEditor = false } = props;
   const mode = props.mode || "html";
 
+  // Extract the mode-specific input into a stable value so the useMemo
+  // dependency arrays below can be statically checked. The previous inline
+  // ternaries triggered react-hooks/exhaustive-deps because eslint can't
+  // statically prove the discriminated-union narrowing.
+  const htmlInput = mode === "html" ? (props as SandpackPreviewPropsHTML).html : "";
+  const reactFilesInput = mode === "react" ? (props as SandpackPreviewPropsReact).files : null;
+
   const htmlFiles = useMemo(() => {
     if (mode !== "html") return {};
-    const html = (props as SandpackPreviewPropsHTML).html || "";
-    return extractSandpackFiles(html);
-  }, [mode, mode === "html" ? (props as SandpackPreviewPropsHTML).html : ""]);
+    return extractSandpackFiles(htmlInput || "");
+  }, [mode, htmlInput]);
 
   const reactFiles = useMemo(() => {
     if (mode !== "react") return {};
-    const files = (props as SandpackPreviewPropsReact).files || {};
-    return buildReactSandpackFiles(files);
-  }, [mode, mode === "react" ? (props as SandpackPreviewPropsReact).files : null]);
+    return buildReactSandpackFiles(reactFilesInput || {});
+  }, [mode, reactFilesInput]);
 
   const dependencies = mode === "react" ? (props as SandpackPreviewPropsReact).dependencies : undefined;
 
