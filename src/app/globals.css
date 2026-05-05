@@ -598,50 +598,28 @@ pre code {
    ============================================ */
 
 .site-backdrop {
+  /* Editorial-light reversal (rule 29 — 2026-05-05).
+   * The original Filmora dark backdrop painted a navy + purple + cyan
+   * radial-gradient stack behind every page. On the bone palette it
+   * showed through every section that didn't have its own opaque
+   * background, which is why the homepage hero, builder, and several
+   * product pages still read as "dark blue" after the override layer
+   * landed. Neutralised to transparent so the body's `var(--paper)`
+   * shows through cleanly. The JSX `<div className="site-backdrop" />`
+   * in layout.tsx is left in place so any third-party scripts that
+   * target the selector don't crash, but it now paints nothing. */
   position: fixed;
   inset: 0;
-  /* z-index: 0 (not -1) — a negative z-index would paint below the body's
-     solid navy fill and vanish. 0 keeps it behind later DOM siblings
-     (nav, banners, children) which paint on top in natural order. */
-  z-index: 0;
+  z-index: -1;
   pointer-events: none;
-  /* Richer navy with lifted middle stop — no more near-black. Glows are
-     large, saturated, and positioned so at least one hits view on any
-     viewport (mobile or desktop). The old edge vignette is deleted — it
-     was collapsing the whole thing to black on mobile. */
-  background:
-    radial-gradient(ellipse 70% 55% at 15% 18%, rgba(56, 120, 255, 0.30), transparent 65%),
-    radial-gradient(ellipse 65% 50% at 85% 30%, rgba(168, 85, 247, 0.24), transparent 65%),
-    radial-gradient(ellipse 80% 55% at 50% 92%, rgba(34, 211, 238, 0.16), transparent 70%),
-    linear-gradient(180deg, #0b1530 0%, #142454 50%, #0b1530 100%);
+  background: transparent;
 }
 
-.site-backdrop::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(180, 200, 255, 0.12) 1px, transparent 1px);
-  background-size: 32px 32px;
-  background-position: 0 0;
-  -webkit-mask-image: radial-gradient(ellipse 95% 80% at 50% 40%, black 55%, transparent 100%);
-  mask-image: radial-gradient(ellipse 95% 80% at 50% 40%, black 55%, transparent 100%);
-}
+.site-backdrop::before { content: none; }
 
-/* Mobile — viewport is narrow so desktop ellipses (positioned at 15% / 85%)
-   land off-screen. Reposition them to the centre, pump saturation, and
-   drop the dot-pattern density so the glows read clearly on small screens. */
 @media (max-width: 768px) {
-  .site-backdrop {
-    background:
-      radial-gradient(ellipse 120% 45% at 50% 12%, rgba(56, 120, 255, 0.40), transparent 65%),
-      radial-gradient(ellipse 120% 45% at 50% 50%, rgba(168, 85, 247, 0.32), transparent 65%),
-      radial-gradient(ellipse 130% 50% at 50% 92%, rgba(34, 211, 238, 0.22), transparent 70%),
-      linear-gradient(180deg, #0b1530 0%, #16285c 50%, #0b1530 100%);
-  }
-  .site-backdrop::before {
-    background-size: 24px 24px;
-    background-image: radial-gradient(rgba(180, 200, 255, 0.14) 1px, transparent 1px);
-  }
+  .site-backdrop { background: transparent; }
+  .site-backdrop::before { content: none; }
 }
 
 /* ============================================
@@ -2178,6 +2156,68 @@ select {
   background-color: rgba(250, 250, 247, 0.92) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * BLUE/INDIGO/VIOLET/CYAN/SKY VIVID CLASSES (third sweep — 2026-05-05)
+ * ──────────────────────────────────────────────────────────────────────
+ *
+ * The first two override passes handled dark hex literals and `*-900/950`
+ * neutrals. They missed the *vivid* Tailwind colour ramps (`bg-blue-600`,
+ * `from-violet-500`, etc) used as panel backgrounds across the homepage
+ * hero, builder preview, video creator, and several admin pages. These
+ * read as solid-coloured blue/purple surfaces on the editorial-light
+ * palette and were the source of Craig's "still seeing blue" report.
+ *
+ * Saturated 400-900 shades route to bone. The 50/100/200 light shades
+ * are kept (they're already pale enough to read fine on a bone page).
+ * ────────────────────────────────────────────────────────────────────── */
+.bg-blue-400, .bg-blue-500, .bg-blue-600, .bg-blue-700, .bg-blue-800, .bg-blue-900,
+.bg-indigo-400, .bg-indigo-500, .bg-indigo-600, .bg-indigo-700, .bg-indigo-800, .bg-indigo-900,
+.bg-violet-400, .bg-violet-500, .bg-violet-600, .bg-violet-700, .bg-violet-800, .bg-violet-900,
+.bg-cyan-400, .bg-cyan-500, .bg-cyan-600, .bg-cyan-700, .bg-cyan-800, .bg-cyan-900,
+.bg-sky-400, .bg-sky-500, .bg-sky-600, .bg-sky-700, .bg-sky-800, .bg-sky-900,
+.bg-purple-400, .bg-purple-500, .bg-purple-600, .bg-purple-700, .bg-purple-800, .bg-purple-900,
+.bg-fuchsia-400, .bg-fuchsia-500, .bg-fuchsia-600, .bg-fuchsia-700, .bg-fuchsia-800, .bg-fuchsia-900 {
+  background-color: var(--paper-elevated) !important;
+}
+
+/* Gradient stops on the vivid ramps — `from-blue-500 to-violet-700` and
+ * friends were producing big purple gradient panels. Flip every stop to
+ * bone so the gradient effectively flattens to elevated cream. */
+[class*="from-blue-"], [class*="from-indigo-"], [class*="from-violet-"],
+[class*="from-cyan-"], [class*="from-sky-"], [class*="from-purple-"], [class*="from-fuchsia-"] {
+  --tw-gradient-from: var(--paper-elevated) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(244 243 237 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+[class*="via-blue-"], [class*="via-indigo-"], [class*="via-violet-"],
+[class*="via-cyan-"], [class*="via-sky-"], [class*="via-purple-"], [class*="via-fuchsia-"] {
+  --tw-gradient-via: var(--paper-elevated) !important;
+  --tw-gradient-via-stops: var(--tw-gradient-position, ), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-via-stops) !important;
+}
+[class*="to-blue-"], [class*="to-indigo-"], [class*="to-violet-"],
+[class*="to-cyan-"], [class*="to-sky-"], [class*="to-purple-"], [class*="to-fuchsia-"] {
+  --tw-gradient-to: var(--paper-elevated) var(--tw-gradient-to-position) !important;
+}
+
+/* Gradient FROM/TO arbitrary hex variants — anything starting with cool
+ * channel-dominant blues should flatten to bone too. `from-[#3b82f6]`
+ * (tailwind blue-500), `from-[#6366f1]` (indigo-500), `from-[#8b5cf6]`
+ * (violet-500), `from-[#0ea5e9]` (sky-500) — all common literals seen
+ * in the codebase. */
+.from-\[\#3b82f6\], .from-\[\#6366f1\], .from-\[\#8b5cf6\], .from-\[\#0ea5e9\],
+.from-\[\#2563eb\], .from-\[\#1d4ed8\], .from-\[\#7c3aed\], .from-\[\#a855f7\],
+.from-\[\#ec4899\] {
+  --tw-gradient-from: var(--paper-elevated) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(244 243 237 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+.to-\[\#3b82f6\], .to-\[\#6366f1\], .to-\[\#8b5cf6\], .to-\[\#0ea5e9\],
+.to-\[\#2563eb\], .to-\[\#1d4ed8\], .to-\[\#7c3aed\], .to-\[\#a855f7\],
+.to-\[\#ec4899\] {
+  --tw-gradient-to: var(--paper-elevated) var(--tw-gradient-to-position) !important;
 }
 
 /* Gradient stops — `from-[#0b1530]` / `to-[#0b1530]` are used as edge fades
