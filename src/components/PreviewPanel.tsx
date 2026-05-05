@@ -106,7 +106,9 @@ function IdleAtmosphere() {
       <div
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse at 50% 100%, #0c1a30 0%, #080c18 40%, #0a1628 70%)",
+          // Editorial-light idle backdrop — subtle warm radial on bone
+          // (was the deep navy aurora; rule 29 forbids dark surfaces).
+          background: "radial-gradient(ellipse at 50% 100%, #f4f3ed 0%, #fafaf7 60%, #ffffff 100%)",
         }}
       />
 
@@ -205,7 +207,10 @@ function GeneratingAtmosphere() {
       <div
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse at 50% 50%, #0d1f3c 0%, #080e1e 50%, #0a1628 80%)",
+          // Editorial-light "generating" backdrop — same warm radial,
+          // slightly brighter so the gold aurora sweeps below feel alive
+          // without the original dark navy floor.
+          background: "radial-gradient(ellipse at 50% 50%, #f4f3ed 0%, #fafaf7 50%, #ffffff 90%)",
         }}
       />
 

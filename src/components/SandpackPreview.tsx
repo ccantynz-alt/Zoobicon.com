@@ -241,8 +241,8 @@ export default function App() {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "#0f2148",
-      color: "rgba(255,255,255,0.4)",
+      background: "#fafaf7",
+      color: "rgba(10,10,11,0.55)",
       fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
       fontSize: "14px",
     }}>
