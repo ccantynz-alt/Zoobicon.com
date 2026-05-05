@@ -1133,6 +1133,7 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 | 2026-03-28 | Admin dashboard = Phase 1 | Craig runs 24/7 physical business alongside build. Needs mobile command centre urgently. |
 | 2026-03-28 | Single CLAUDE.md | Two files = confusion. One file = source of truth. Technical + business merged. |
 | 2026-05-04 | Sandbox runtime: keep Sandpack, wait for Crontech | Don't license WebContainers ($2-10k/mo), don't onboard e2b/Modal. Keep `@codesandbox/sandpack-react` as the in-browser preview and use Crontech as the production sandbox once its API is delivered. `src/lib/webcontainers-adapter.ts` and any e2b/Modal adapters are NOT to be wired without Craig's explicit override. |
+| 2026-05-05 | E2E tooling: GateTest only, no Playwright in CI | Craig: "Playwright is our competition — we own GateTest, we use our own product." `.github/workflows/e2e.yml` and the `playwright-e2e` job in `post-deploy.yml` were replaced with GateTest invocations against `GATE_TEST_API_URL` (same pattern as the existing `gatetest` job in `ci.yml`). `@playwright/test` stays in devDependencies for local-dev convenience but **CI must never use it**. New e2e coverage goes through GateTest. Set repo secrets `GATE_TEST_API_URL` + `GATE_TEST_API_KEY` to enable. |
 
 ---
 
