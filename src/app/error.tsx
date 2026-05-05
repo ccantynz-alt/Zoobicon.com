@@ -42,8 +42,8 @@ export default function GlobalError({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0a1628",
-          color: "#e0e0e0",
+          background: "#fafaf7",
+          color: "#0a0a0b",
           fontFamily: '"Inter", system-ui, sans-serif',
         }}
       >
@@ -59,7 +59,7 @@ export default function GlobalError({
               margin: "0 auto 16px",
             }}
           />
-          <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>
+          <p style={{ fontSize: "14px", color: "rgba(10,10,11,0.55)" }}>
             Recovering... (attempt {retryCount + 1}/{maxAutoRetries})
           </p>
           <style dangerouslySetInnerHTML={{ __html: `@keyframes spin{to{transform:rotate(360deg)}}` }} />
@@ -76,8 +76,8 @@ export default function GlobalError({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0a1628",
-        color: "#e0e0e0",
+        background: "#fafaf7",
+        color: "#0a0a0b",
         fontFamily: '"Inter", system-ui, sans-serif',
         padding: "24px",
       }}
@@ -110,7 +110,7 @@ export default function GlobalError({
         <p
           style={{
             fontSize: "14px",
-            color: "rgba(255,255,255,0.4)",
+            color: "rgba(10,10,11,0.55)",
             lineHeight: 1.6,
             marginBottom: "24px",
           }}
