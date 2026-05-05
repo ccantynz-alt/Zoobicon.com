@@ -5,26 +5,33 @@
 /* Fonts loaded via <link> in layout.tsx with display=swap to prevent FOIT */
 
 :root {
-  /* ─── Editorial-light palette (rule 29 — reversed from dark Filmora 2026-05-04) ───
+  /* ─── Editorial-light palette v2 (rule 29 — tightened 2026-05-05) ───
    *
-   * Reference: holdenmercer.com. Warm bone surfaces, near-black text,
-   * deep champagne accent. Inverts the previous midnight-blue dark theme
-   * everywhere via the override layer at the bottom of this file.
+   * Reference: holdenmercer.com, evolved with Craig's "more definition,
+   * more contrast" feedback. The first cut was too dull — every surface
+   * was within 8% luminance of every other and borders read as ghosts.
+   * This pass increases:
+   *   - Paper-to-elevated separation (4% → 6% luminance gap)
+   *   - Border visibility (rule + rule-strong both pulled darker)
+   *   - Text contrast (secondary + muted both darker — ink stays)
+   *   - Gold saturation (richer champagne, deeper bronze for hover)
+   *   - Shadow weight (soft 6% → 10% so cards lift cleanly)
+   * Net effect: same warm-bone vibe, real visual hierarchy.
    */
-  --paper: #fafaf7;          /* primary background (warm off-white / bone) */
-  --paper-elevated: #f4f3ed; /* cards, elevated surfaces */
-  --paper-input: #faf9f4;    /* input fields */
+  --paper: #f7f5ee;          /* primary background — warmer than old #fafaf7, gives surface body */
+  --paper-elevated: #ecebe1; /* cards, elevated surfaces — 6% luminance below paper, real separation */
+  --paper-input: #fcfbf6;    /* input fields — slightly brighter than paper so they read as recessed */
   --ink: #0a0a0b;            /* primary text — near-black, not pure black */
-  --ink-secondary: #3a3a40;  /* secondary text */
-  --ink-muted: #8a8a90;      /* muted text, captions, helper copy */
-  --rule: #e8e6dc;           /* hairline border, warm light grey */
-  --rule-strong: #d4d1c2;    /* stronger border, used for hover affordances */
-  --gold: #c9a961;           /* warm champagne accent */
-  --gold-soft: rgba(201, 169, 97, 0.12);
-  --gold-glow: rgba(201, 169, 97, 0.35);
-  --gold-deep: #a8893f;      /* deeper gold for hover / dense use */
-  --shadow-1: 0 1px 2px rgba(10, 10, 11, 0.04), 0 0 0 1px rgba(10, 10, 11, 0.04);
-  --shadow-2: 0 4px 12px rgba(10, 10, 11, 0.06), 0 0 0 1px rgba(10, 10, 11, 0.05);
+  --ink-secondary: #2a2a30;  /* secondary text — darkened from #3a3a40 for body-copy readability */
+  --ink-muted: #76767e;      /* muted text, captions — darkened from #8a8a90 so labels stop blending */
+  --rule: #dad6c4;           /* hairline border — warmer + visible, was #e8e6dc (too pale) */
+  --rule-strong: #b8b3a0;    /* primary border for cards/buttons — real edge, not a whisper */
+  --gold: #b8923f;           /* champagne accent — deeper than #c9a961, richer on bone */
+  --gold-soft: rgba(184, 146, 63, 0.14);
+  --gold-glow: rgba(184, 146, 63, 0.40);
+  --gold-deep: #8c6b25;      /* bronze — for text + hover. Real WCAG AA on paper. */
+  --shadow-1: 0 1px 2px rgba(10, 10, 11, 0.06), 0 0 0 1px rgba(10, 10, 11, 0.06);
+  --shadow-2: 0 8px 24px rgba(10, 10, 11, 0.10), 0 2px 6px rgba(10, 10, 11, 0.06);
 
   /* Legacy aliases — retained so the 1,700 lines of legacy CSS below
    * keep compiling. They now resolve to the warm palette instead of
@@ -57,7 +64,12 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow-x: hidden;
+  /* overflow-x: hidden is intentionally NOT applied here — applying it
+   * to <html> blocks the page's native vertical scroll in Chrome 124+
+   * (Craig's report 2026-05-05: "I can't seem to scroll with my mouse
+   * or cursor keys and there's no scroll bar"). The body-only variant
+   * below contains horizontal overflow without trapping vertical
+   * scroll. */
   overscroll-behavior-y: none;
   min-height: 100vh;
   min-height: 100dvh;
@@ -70,6 +82,11 @@ body {
   font-optical-sizing: auto;
   letter-spacing: -0.011em;
   line-height: 1.5;
+}
+
+body {
+  /* Horizontal overflow contained on body only — see explanation above */
+  overflow-x: hidden;
 }
 
 /* --- Apple-grade typography refinements --- */
