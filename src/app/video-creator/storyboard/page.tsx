@@ -10,6 +10,7 @@ import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import SocialPublishPanel from "@/components/SocialPublishPanel";
 import VideoSeriesPanel from "@/components/VideoSeriesPanel";
 import BatchVideosPanel from "@/components/BatchVideosPanel";
+import DubPanel from "@/components/DubPanel";
 import type { VideoSeriesEpisode } from "@/lib/video-social-publish";
 import {
   Video,
@@ -2171,6 +2172,23 @@ export default function VideoCreatorDashboard() {
                       </motion.div>
                     )}
                   </AnimatePresence>
+                </motion.div>
+              )}
+
+              {/* ── One-click multi-language dub (Fish Audio S1 + Hedra) ── */}
+              {spokespersonVideoUrl && script.trim() && (
+                <motion.div initial="hidden" animate="visible" variants={fadeIn}>
+                  <DubPanel
+                    sourceScript={script}
+                    sourceVideoUrl={spokespersonVideoUrl}
+                    sourceImageUrl={
+                      heygenAvatars.find((a) => a.id === spokespersonAvatarId)?.preview_image_url
+                    }
+                    sourceLabel={
+                      heygenAvatars.find((a) => a.id === spokespersonAvatarId)?.name ||
+                      "Spokesperson video"
+                    }
+                  />
                 </motion.div>
               )}
 

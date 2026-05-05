@@ -1132,6 +1132,7 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 | 2026-03-28 | zoobicon.app registered | Mobile admin dashboard. Craig needs full command centre on iPhone/iPad now. |
 | 2026-03-28 | Admin dashboard = Phase 1 | Craig runs 24/7 physical business alongside build. Needs mobile command centre urgently. |
 | 2026-03-28 | Single CLAUDE.md | Two files = confusion. One file = source of truth. Technical + business merged. |
+| 2026-05-04 | Sandbox runtime: keep Sandpack, wait for Crontech | Don't license WebContainers ($2-10k/mo), don't onboard e2b/Modal. Keep `@codesandbox/sandpack-react` as the in-browser preview and use Crontech as the production sandbox once its API is delivered. `src/lib/webcontainers-adapter.ts` and any e2b/Modal adapters are NOT to be wired without Craig's explicit override. |
 
 ---
 

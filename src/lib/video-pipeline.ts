@@ -180,6 +180,12 @@ export interface VideoGenerationRequest {
   voiceGender?: "female" | "male";
   background?: string;
   format?: "landscape" | "portrait" | "square";
+  /**
+   * Opt-out for the auto-burned captions step. Default: false (captions ON).
+   * Captions match CapCut's burned-in style (white text, black outline, bottom)
+   * via burnInCaptions in src/lib/video-assembler.ts.
+   */
+  disableCaptions?: boolean;
 }
 
 export interface SpokespersonVideoResult {
@@ -354,8 +360,17 @@ export async function generateVoiceElevenLabs(
 /**
  * Generate natural speech from text.
  *
- * Uses a 5-model fallback chain. As of April 2026 the following Replicate
- * models are publicly available and verified working:
+ * Tier 0 (primary, when FISH_AUDIO_API_KEY is set):
+ *   • Fish Audio S1 — #1 TTS on TTS-Arena2 (April 2026), beats ElevenLabs,
+ *     supports 50+ languages, 48 emotion tags, $15/1M chars (≈80% cheaper
+ *     than ElevenLabs Turbo). See src/lib/fish-audio.ts.
+ *
+ * Tier 1 (broadcast fallback, when ELEVENLABS_API_KEY is set):
+ *   • ElevenLabs — handled by generateVoiceElevenLabs (called by the
+ *     spokesperson orchestrator above; not invoked from this function to
+ *     keep the existing signature stable).
+ *
+ * Tier 2 (Replicate 5-model fallback chain — verified April 2026):
  *   1. Kokoro 82M  (jaaari/kokoro-82m)        — fast, high quality, voice presets
  *   2. XTTS v2     (lucataco/xtts-v2)         — multilingual, voice cloning
  *   3. Bark        (suno-ai/bark)             — most expressive
@@ -363,6 +378,8 @@ export async function generateVoiceElevenLabs(
  *   5. Seamless    (cjwbw/seamless_communication) — multilingual fallback
  *
  * Per LAW 9: never depend on a single model. Per LAW 8: surface real errors.
+ *
+ * The signature is preserved exactly so existing callers keep working.
  */
 export async function generateVoice(
   text: string,
@@ -373,9 +390,55 @@ export async function generateVoice(
     onProgress?: (msg: string) => void;
   }
 ): Promise<{ audioUrl: string; duration: number }> {
+  const gender = options?.gender || "female";
+
+  // Tier 0 — Fish Audio S1 (primary). Skipped silently when key is unset;
+  // returns null on failure so we fall through to the Replicate chain. We
+  // only consume the returned audioUrl when it's a real http(s) URL because
+  // Replicate downstream stages cannot fetch base64 data URLs (Fish falls
+  // back to data URL when Vercel Blob token is missing).
+  if (process.env.FISH_AUDIO_API_KEY || process.env.FISH_API_KEY || process.env.FISHAUDIO_API_KEY) {
+    try {
+      options?.onProgress?.("Generating voice with Fish Audio S1…");
+      const { generateFishAudioS1 } = await import("@/lib/fish-audio");
+      const fishResult = await generateFishAudioS1({
+        text,
+        // Map our binary "professional/warm/energetic/calm" style hint into a
+        // Fish emotion. Default neutral.
+        emotion:
+          options?.style === "energetic"
+            ? "happy"
+            : options?.style === "calm"
+              ? "neutral"
+              : "neutral",
+        format: "mp3",
+      });
+      if (fishResult && /^https?:\/\//i.test(fishResult.audioUrl)) {
+        options?.onProgress?.("Voice ready — Fish Audio S1");
+        return {
+          audioUrl: fishResult.audioUrl,
+          duration: fishResult.durationSec || estimateDuration(text),
+        };
+      }
+      if (fishResult) {
+        // Fish succeeded but returned a data URL — Replicate lip-sync can't
+        // fetch data URLs, so we ignore it and fall through to a Replicate
+        // TTS that produces a hosted URL. Surfaces a clear log per Law 8.
+        console.warn(
+          "[video-pipeline] Fish Audio S1 returned a data URL (no BLOB_READ_WRITE_TOKEN). Falling through to Replicate TTS so downstream stages get a fetchable URL."
+        );
+      }
+    } catch (err) {
+      console.warn(
+        "[video-pipeline] Fish Audio S1 import or call failed:",
+        err instanceof Error ? err.message : err
+      );
+    }
+  }
+
+  // Tier 2 — Replicate fallback chain.
   const token = getReplicateToken();
   const speed = options?.speed || 1.0;
-  const gender = options?.gender || "female";
 
   // Kokoro voice IDs (verified): af_bella, af_sarah, am_adam, am_michael
   const kokoroVoice = gender === "male" ? "am_michael" : "af_bella";
@@ -466,6 +529,7 @@ export async function generatePremiumSpokespersonVideo(
     voiceId: req.voiceGender === "male" ? "male-1" : "female-1",
     avatarImageUrl: req.avatarImageUrl,
     captions: true,
+    disableCaptions: req.disableCaptions === true,
     tier: "standard",
   });
   onProgress?.({ step: "done", progress: 100, message: "Video ready" });
@@ -639,23 +703,62 @@ export interface CaptionCue {
 /**
  * Generate a talking-head video by syncing audio to a face image.
  *
- * 5-model fallback chain (per LAW 9, never depend on a single model).
- * Updated April 2026 — verified working public Replicate slugs only:
+ * Tier 0 (primary, when HEDRA_API_KEY is set):
+ *   • Hedra Character-3 — sub-100ms TTFB, $0.05/min (15× cheaper than HeyGen),
+ *     #1 quality benchmark for spokesperson talking-head. See src/lib/hedra.ts.
  *
+ * Tier 1 (Replicate 5-model fallback chain — verified April 2026):
  *   1. SadTalker  (cjwbw/sadtalker)              — most reliable, well-known
  *   2. video-retalking (cjwbw/video-retalking)   — better lip-sync quality
  *   3. video-retalking (lucataco/video-retalking) — secondary copy
  *   4. wav2lip (cudanexus/wav2lip)               — fast, lower quality
  *   5. wav2lip (devxpy/cog-wav2lip)              — final fallback
  *
- * The previous chain depended on `bytedance/omni-human` (does not exist on
- * public Replicate) and `lucataco/sadtalker` (does not exist). Removed.
+ * Per LAW 9: never depend on a single model. The Replicate chain remains the
+ * backstop and ships without HEDRA_API_KEY. The previous chain depended on
+ * `bytedance/omni-human` (does not exist on public Replicate) and
+ * `lucataco/sadtalker` (does not exist). Removed.
+ *
+ * Signature preserved exactly so existing callers keep working.
  */
 export async function generateLipSync(
   faceImageUrl: string,
   audioUrl: string,
   options?: { enhanceFace?: boolean; onProgress?: (msg: string) => void }
 ): Promise<{ videoUrl: string }> {
+  // Tier 0 — Hedra Character-3 (primary). Only attempted when key is set; on
+  // any failure (no key, network error, non-2xx, timeout, no video URL)
+  // generateHedraCharacter3 returns null with a logged reason and we fall
+  // through to the Replicate chain.
+  //
+  // We also require both inputs to be real http(s) URLs because Hedra's REST
+  // endpoint pulls the assets server-side and cannot fetch base64 data URLs.
+  if (
+    process.env.HEDRA_API_KEY &&
+    /^https?:\/\//i.test(faceImageUrl) &&
+    /^https?:\/\//i.test(audioUrl)
+  ) {
+    try {
+      options?.onProgress?.("Trying Hedra Character-3 for lip-sync…");
+      const { generateHedraCharacter3 } = await import("@/lib/hedra");
+      const hedraResult = await generateHedraCharacter3({
+        audioUrl,
+        imageUrl: faceImageUrl,
+        resolution: "720p",
+      });
+      if (hedraResult?.videoUrl) {
+        console.log(`[video-pipeline] Hedra Character-3 succeeded → ${hedraResult.videoUrl}`);
+        options?.onProgress?.("Animated with Hedra Character-3");
+        return { videoUrl: hedraResult.videoUrl };
+      }
+    } catch (err) {
+      console.warn(
+        "[video-pipeline] Hedra Character-3 import or call failed:",
+        err instanceof Error ? err.message : err
+      );
+    }
+  }
+
   const token = getReplicateToken();
   const enhancer = options?.enhanceFace !== false ? "gfpgan" : "none";
 
@@ -983,6 +1086,13 @@ interface PipelineSpec {
   voiceId?: string;
   avatarImageUrl?: string;
   captions?: boolean;
+  /**
+   * Opt-out for the auto-burned captions step. Default: false (captions ON
+   * whenever `captions` is also true / undefined). When true, the pipeline
+   * returns the un-captioned lip-sync video as the final result. Lets API
+   * customers ship "raw" footage when they intend to overlay their own captions.
+   */
+  disableCaptions?: boolean;
   tier?: "standard" | "premium";
   brollPrompts?: string[];
   musicDescription?: string;
@@ -1116,7 +1226,10 @@ export async function generatePremiumVideo(spec: PipelineSpec): Promise<Pipeline
   const totalDurationSec =
     (avatar?.durationSec ?? 0) + brolls.reduce((s, b) => s + b.durationSec, 0);
 
-  // ---------- WAVE 3: captions via whisper ----------
+  // ---------- WAVE 3a: caption cue extraction via fal whisper (metadata) ----------
+  // This populates the `captions` field on the result so customers can pull
+  // SRT/ASS or render their own overlay. Only runs when fal is available;
+  // burn-in (3b) does NOT depend on this — it has its own transcription chain.
   if (spec.captions && falMod) {
     try {
       const out = await (falMod as {
@@ -1146,8 +1259,63 @@ export async function generatePremiumVideo(spec: PipelineSpec): Promise<Pipeline
     }
   }
 
+  // ---------- WAVE 3b: AUTO-BURNED CAPTIONS ----------
+  // Match CapCut's standard (300M MAU): every video ships with burned-in
+  // captions unless the customer explicitly opts out via spec.disableCaptions.
+  //
+  // Pipeline:
+  //   1. transcribeAudio(tts.audioUrl) → 4-model whisper chain (fal + Replicate)
+  //      from src/lib/video-captions.ts. Reuses the audio we already paid to
+  //      generate, so this never fails for "missing input" reasons.
+  //   2. burnInCaptions(primary, srt) → tries fictions-ai/autocaption first
+  //      (purpose-built model), then meta/ffmpeg, fofr/toolkit, lucataco/
+  //      ffmpeg-concat as fallbacks. Implementation in
+  //      src/lib/video-assembler.ts.
+  //
+  // Decision: we use `fictions-ai/autocaption` as the primary burn-in model
+  // (NOT lucataco/ffmpeg-concat as the brief tentatively suggested) because
+  // ffmpeg-concat is a video-stitcher, not a subtitle burner. The autocaption
+  // model is purpose-built, ships with sane defaults (white text + black
+  // outline + bottom-center), and lucataco/ffmpeg-concat is retained as the
+  // 4th-tier fallback inside burnInCaptions for the rare case the others fail.
+  //
+  // FAILURE POLICY (per Bible Law 8 + the brief): if captioning fails for any
+  // reason we log + push a warning and return the un-captioned `primary` —
+  // we do NOT fail the whole pipeline. Captions are an enhancement; losing
+  // them must not lose the customer's video.
+  let captionedVideoUrl: string | null = null;
+  const shouldBurnCaptions =
+    spec.captions !== false && spec.disableCaptions !== true && !!primary;
+  if (shouldBurnCaptions) {
+    try {
+      const { transcribeAudio } = await import("@/lib/video-captions");
+      const { burnInCaptions } = await import("@/lib/video-assembler");
+      const transcript = await transcribeAudio(tts.audioUrl);
+      if (transcript.srt && transcript.srt.trim().length > 0) {
+        const burned = await burnInCaptions(primary, transcript.srt);
+        if (burned && burned !== primary) {
+          captionedVideoUrl = burned;
+          modelsUsed.push(`captions-burn:fictions-ai/autocaption`);
+          // ~$0.01-0.03/30s clip on Replicate; rolled into music flat for now.
+          costUsd += COST.captionsPerMin * (totalDurationSec / 60);
+        }
+      } else {
+        warnings.push(
+          "[captions-burn] transcript empty — shipping un-captioned video"
+        );
+      }
+    } catch (e) {
+      // Per Bible Law 8: surface the real reason so /admin/health can show it.
+      warnings.push(
+        `[captions-burn] failed (returning un-captioned video): ${errMessage(e)}`
+      );
+    }
+  }
+
   // ---------- WAVE 4: premium upscale ----------
-  let finalVideoUrl = primary;
+  // Upscale runs against the captioned video (when present) so the burned-in
+  // text gets the same quality treatment as the rest of the frame.
+  let finalVideoUrl = captionedVideoUrl ?? primary;
   if (spec.tier === "premium" && falMod) {
     try {
       const out = await (falMod as {
@@ -1162,7 +1330,9 @@ export async function generatePremiumVideo(spec: PipelineSpec): Promise<Pipeline
           "fal-ai/esrgan-video",
           "fal-ai/realesrgan-video",
         ],
-        { video_url: primary, scale: 2, target_fps: 60 }
+        // Upscale the captioned video when present (so burned-in text gets the
+        // same quality lift), else upscale the raw primary.
+        { video_url: finalVideoUrl, scale: 2, target_fps: 60 }
       );
       finalVideoUrl = out.data.video.url;
       modelsUsed.push(`upscale:${out.model}`);

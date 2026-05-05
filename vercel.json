@@ -3,9 +3,9 @@
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-
-  "regions": ["iad1"],
-
+  "regions": [
+    "iad1"
+  ],
   "crons": [
     {
       "path": "/api/cron/warmup",
@@ -46,9 +46,12 @@
     {
       "path": "/api/cron/daily-comeback",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/domain-crawl",
+      "schedule": "*/5 * * * *"
     }
   ],
-
   "functions": {
     "src/app/api/health/route.ts": {
       "maxDuration": 120,
@@ -113,42 +116,76 @@
     "src/app/api/video-creator/render/route.ts": {
       "maxDuration": 120,
       "memory": 1024
+    },
+    "src/app/api/generate/launch-video/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/video-creator/dub/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
     }
   },
-
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-DNS-Prefetch-Control", "value": "on" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        {
+          "key": "X-DNS-Prefetch-Control",
+          "value": "on"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
       ]
     },
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store" }
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
       ]
     },
     {
       "source": "/_next/static/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
       "source": "/fonts/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
       "source": "/images/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
       ]
     }
   ]
