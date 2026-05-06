@@ -41,7 +41,7 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[var(--paper)] flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
         <div className="bg-[#1e293b] rounded-2xl p-8 shadow-2xl border border-white/10">
           {expired ? (
@@ -68,7 +68,7 @@ export default function VerifyEmailPage() {
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
               placeholder="your@email.com"
-              className="w-full px-4 py-3 bg-[#0f172a] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stone-500"
+              className="w-full px-4 py-3 bg-[var(--paper)] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stone-500"
             />
 
             <button
@@ -85,7 +85,7 @@ export default function VerifyEmailPage() {
             </button>
 
             {resendMessage && (
-              <div className="flex items-center gap-2 text-sm text-slate-300 bg-[#0f172a] rounded-lg p-3">
+              <div className="flex items-center gap-2 text-sm text-slate-300 bg-[var(--paper)] rounded-lg p-3">
                 <CheckCircle className="w-4 h-4 text-stone-400 flex-shrink-0" />
                 {resendMessage}
               </div>

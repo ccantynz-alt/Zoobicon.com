@@ -208,7 +208,7 @@ export default function GeneratorsPage() {
   const isFiltering = Boolean(selectedCategory || searchQuery);
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[var(--paper)] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(generatorsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 

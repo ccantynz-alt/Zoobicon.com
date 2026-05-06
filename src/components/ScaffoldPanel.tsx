@@ -245,7 +245,7 @@ export default function ScaffoldPanel({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-[#0a1628] border border-white/10 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
+      <div className="bg-[var(--paper-elevated)] border border-white/10 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <div className="flex items-center gap-3">
@@ -341,7 +341,7 @@ export default function ScaffoldPanel({
                 <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3">
                   SQL Schema
                 </h3>
-                <pre className="bg-[#06060a] border border-white/5 rounded-lg p-4 overflow-x-auto text-xs text-stone-300/80 font-mono leading-relaxed max-h-60 overflow-y-auto">
+                <pre className="bg-[var(--paper-input)] border border-white/5 rounded-lg p-4 overflow-x-auto text-xs text-stone-300/80 font-mono leading-relaxed max-h-60 overflow-y-auto">
                   <code>{result.schema}</code>
                 </pre>
               </div>
@@ -351,7 +351,7 @@ export default function ScaffoldPanel({
                 <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3">
                   API Endpoints
                 </h3>
-                <div className="bg-[#06060a] border border-white/5 rounded-lg overflow-hidden">
+                <div className="bg-[var(--paper-input)] border border-white/5 rounded-lg overflow-hidden">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-white/5">

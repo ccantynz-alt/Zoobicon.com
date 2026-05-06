@@ -5,31 +5,27 @@
 /* Fonts loaded via <link> in layout.tsx with display=swap to prevent FOIT */
 
 :root {
-  /* ─── Editorial-light palette v2 (rule 29 — tightened 2026-05-05) ───
+  /* ─── Editorial-light palette v4 (rule 29 — pure white 2026-05-06) ───
    *
-   * Reference: holdenmercer.com, evolved with Craig's "more definition,
-   * more contrast" feedback. The first cut was too dull — every surface
-   * was within 8% luminance of every other and borders read as ghosts.
-   * This pass increases:
-   *   - Paper-to-elevated separation (4% → 6% luminance gap)
-   *   - Border visibility (rule + rule-strong both pulled darker)
-   *   - Text contrast (secondary + muted both darker — ink stays)
-   *   - Gold saturation (richer champagne, deeper bronze for hover)
-   *   - Shadow weight (soft 6% → 10% so cards lift cleanly)
-   * Net effect: same warm-bone vibe, real visual hierarchy.
+   * Reference: holdenmercer.com (which IS pure white #ffffff for bg-base
+   * — earlier sessions misread it as off-white). Craig's final call:
+   * "the backdrop should be white or really really white, gives good
+   * contrast." v4 makes the page itself pure white. Cards stay warm
+   * cream so they have maximum contrast against white. Same ink colour
+   * stack — readability is unchanged.
    */
-  --paper: #f7f5ee;          /* primary background — warmer than old #fafaf7, gives surface body */
-  --paper-elevated: #ecebe1; /* cards, elevated surfaces — 6% luminance below paper, real separation */
-  --paper-input: #fcfbf6;    /* input fields — slightly brighter than paper so they read as recessed */
-  --ink: #0a0a0b;            /* primary text — near-black, not pure black */
-  --ink-secondary: #2a2a30;  /* secondary text — darkened from #3a3a40 for body-copy readability */
-  --ink-muted: #76767e;      /* muted text, captions — darkened from #8a8a90 so labels stop blending */
-  --rule: #dad6c4;           /* hairline border — warmer + visible, was #e8e6dc (too pale) */
-  --rule-strong: #b8b3a0;    /* primary border for cards/buttons — real edge, not a whisper */
-  --gold: #b8923f;           /* champagne accent — deeper than #c9a961, richer on bone */
+  --paper: #ffffff;          /* PURE WHITE page background */
+  --paper-elevated: #f4f1e6; /* warm cream cards — strong contrast against white */
+  --paper-input: #fafaf6;    /* pale cream inputs — subtle recess on white */
+  --ink: #0a0a0b;            /* primary text — near-black */
+  --ink-secondary: #2a2a30;  /* secondary text */
+  --ink-muted: #76767e;      /* muted text, captions */
+  --rule: #d8d3c0;           /* hairline border */
+  --rule-strong: #a8a392;    /* primary border */
+  --gold: #b8923f;           /* champagne accent */
   --gold-soft: rgba(184, 146, 63, 0.14);
   --gold-glow: rgba(184, 146, 63, 0.40);
-  --gold-deep: #8c6b25;      /* bronze — for text + hover. Real WCAG AA on paper. */
+  --gold-deep: #8c6b25;      /* bronze for text + hover */
   --shadow-1: 0 1px 2px rgba(10, 10, 11, 0.06), 0 0 0 1px rgba(10, 10, 11, 0.06);
   --shadow-2: 0 8px 24px rgba(10, 10, 11, 0.10), 0 2px 6px rgba(10, 10, 11, 0.06);
 
@@ -150,7 +146,7 @@ img, video {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a1628;
+  background: var(--paper);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -270,9 +266,9 @@ pre code {
 }
 
 .cyber-input {
-  background: #0a1628;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #f0f0f5;
+  background: var(--paper-input);
+  border: 1px solid var(--rule);
+  color: var(--ink);
   font-family: "Inter", system-ui, sans-serif;
   font-size: 14px;
   padding: 12px 16px;
@@ -467,9 +463,9 @@ pre code {
   box-shadow: 0 4px 20px rgba(124, 90, 255, 0.15);
 }
 
-/* Void page — deep navy canvas */
+/* Void page — was deep navy canvas, now bone (rule 29 reversal) */
 .bg-void {
-  background: #0b1530 !important;
+  background: var(--paper) !important;
 }
 
 /* Crisp white text with subtle glow for black fog pages */
@@ -1827,13 +1823,19 @@ select {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Deep navy canvas — replaces pure black, still dark enough for editorial contrast */
-  --fs-bg-0: #060e1f;           /* page background (navy-950) */
-  --fs-bg-1: #0a1628;           /* nav + footer (navy-900) */
-  --fs-bg-2: #0f2148;           /* cards (navy-800) */
-  --fs-bg-3: #152e60;           /* elevated cards (navy-700) */
-  --fs-hair: rgba(255,255,255,0.06);
-  --fs-hair-strong: rgba(255,255,255,0.12);
+  /* Editorial-light surfaces (rule 29 reversal — 2026-05-06).
+   * Was Filmora navy (#060e1f / #0a1628 / #0f2148 / #152e60). The
+   * Filmora vars persist as aliases so any component using `.fs-card`
+   * or `var(--fs-bg-*)` directly now paints on the editorial palette
+   * without touching every consumer. Hairline tokens flipped from
+   * white-on-navy translucent to ink-on-paper translucent so borders
+   * remain visible against the new bone surfaces. */
+  --fs-bg-0: var(--paper);          /* page background — pure white */
+  --fs-bg-1: var(--paper-elevated); /* nav + footer — warm cream */
+  --fs-bg-2: var(--paper-elevated); /* cards — warm cream */
+  --fs-bg-3: #ffffff;               /* elevated cards — pure white pop on cream pages */
+  --fs-hair: rgba(10, 10, 11, 0.08);
+  --fs-hair-strong: rgba(10, 10, 11, 0.16);
 
   /* Display typography scale (Filmora uses 204px for final CTA) */
   --fs-display-2xl: clamp(4rem, 11vw, 11rem);     /* ~176px */

@@ -169,7 +169,7 @@ const jsonLd = {
 
 export default function DomainSearchPage() {
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white">
+    <div className="min-h-screen bg-[var(--paper)] text-white">
       {/* JSON-LD */}
       <script
         type="application/ld+json"

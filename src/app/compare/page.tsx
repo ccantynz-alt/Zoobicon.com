@@ -62,7 +62,7 @@ function CellValue({ value }: { value: string | boolean }) {
 
 export default function ComparePage() {
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white">
+    <div className="min-h-screen bg-[var(--paper)] text-white">
       {/* Schema */}
       <script
         type="application/ld+json"

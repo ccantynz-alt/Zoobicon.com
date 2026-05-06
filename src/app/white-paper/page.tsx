@@ -85,7 +85,7 @@ export default function WhitePaperPage() {
 
   return (
     <div className="min-h-screen text-white">
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
@@ -369,7 +369,7 @@ export default function WhitePaperPage() {
             {/* Gate Preview */}
             <div className="sticky top-24">
               <div className="p-1 rounded-2xl bg-gradient-to-r from-stone-500/20 to-stone-500/20">
-                <div className="bg-[#0a1628] rounded-xl p-8 min-h-[500px] flex items-center justify-center relative">
+                <div className="bg-[var(--paper)] rounded-xl p-8 min-h-[500px] flex items-center justify-center relative">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-transparent rounded-xl z-10" />
                   <div className="absolute top-6 left-6 right-6 opacity-30 z-0">
                     <div className="h-4 bg-white/10 rounded mb-2 w-3/4" />

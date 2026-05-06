@@ -98,7 +98,7 @@ export default function WaitlistPage() {
 
   return (
     <div className="min-h-screen bg-transparent text-white">
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
@@ -349,7 +349,7 @@ export default function WaitlistPage() {
               </button>
             </div>
             <div className="p-1 rounded-2xl bg-gradient-to-r from-stone-500/20 to-stone-500/20">
-              <div className="bg-[#0a1628] rounded-xl p-8 min-h-[500px] flex items-center justify-center">
+              <div className="bg-[var(--paper)] rounded-xl p-8 min-h-[500px] flex items-center justify-center">
                 <div className="text-center max-w-md">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-r from-stone-600 to-stone-600 mx-auto mb-6 flex items-center justify-center">
                     <Zap className="w-8 h-8" />

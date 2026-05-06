@@ -1994,7 +1994,7 @@ root.render(React.createElement(App));
   /* ─── Recording Mode: fullscreen preview only ─── */
   if (recordingMode) {
     return (
-      <div className="h-screen w-screen bg-[#0b1530] relative overflow-hidden">
+      <div className="h-screen w-screen bg-[var(--paper)] relative overflow-hidden">
         {/* Minimal recording chrome — press Escape to exit */}
         <div className="absolute top-3 right-3 z-50 flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-500/20 border border-stone-500/40 text-stone-400 text-xs font-semibold animate-pulse">
@@ -2848,21 +2848,35 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-10 overflow-hidden bg-[#0a0f1e]/95 backdrop-blur-sm"
+                  className="absolute inset-0 z-10 overflow-hidden"
+                  style={{ background: "var(--paper)" }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-purple-600/[0.06] blur-[150px]" />
-                      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-blue-600/[0.04] blur-[120px]" />
+                      {/* Editorial-light ambient — subtle warm glow on white */}
+                      <div
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full blur-[150px]"
+                        style={{ background: "var(--gold-soft)" }}
+                      />
                     </div>
 
                     <div className="relative z-10 text-center px-6 max-w-xl">
-                      <h1 className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight">
-                        <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-300 bg-clip-text text-transparent">
-                          What do you want to build?
+                      <h1
+                        className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight"
+                        style={{ color: "var(--ink)" }}
+                      >
+                        What do you want to{" "}
+                        <span
+                          className="display-italic font-normal"
+                          style={{ color: "var(--gold-deep)" }}
+                        >
+                          build?
                         </span>
                       </h1>
-                      <p className="text-white/40 text-sm mb-10 leading-relaxed max-w-md mx-auto">
+                      <p
+                        className="text-sm mb-10 leading-relaxed max-w-md mx-auto"
+                        style={{ color: "var(--ink-secondary)" }}
+                      >
                         Describe your vision and our AI will generate a complete, production-ready React application.
                       </p>
 
@@ -2878,17 +2892,38 @@ root.render(React.createElement(App));
                           <button
                             key={chip.label}
                             onClick={() => setPrompt(chip.label.toLowerCase())}
-                            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] text-white/40 hover:text-white/70 hover:bg-purple-500/[0.08] hover:border-purple-500/[0.20] transition-all"
+                            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] transition-all"
+                            style={{
+                              background: "var(--paper-elevated)",
+                              border: "1px solid var(--rule)",
+                              color: "var(--ink-secondary)",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.borderColor = "var(--gold)";
+                              e.currentTarget.style.background = "var(--gold-soft)";
+                              e.currentTarget.style.color = "var(--gold-deep)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.borderColor = "var(--rule)";
+                              e.currentTarget.style.background = "var(--paper-elevated)";
+                              e.currentTarget.style.color = "var(--ink-secondary)";
+                            }}
                           >
-                            <span className="text-white/25 group-hover:text-purple-400 transition-colors">{chip.icon}</span>
+                            <span style={{ color: "var(--ink-muted)" }}>{chip.icon}</span>
                             {chip.label}
-                            <ChevronRight size={10} className="text-white/15 group-hover:text-purple-300/40 transition-colors" />
+                            <ChevronRight size={10} style={{ color: "var(--ink-muted)" }} />
                           </button>
                         ))}
                       </div>
 
-                      <div className="inline-flex items-center gap-2 text-[10px] text-white/25">
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400/60 animate-pulse" />
+                      <div
+                        className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-semibold"
+                        style={{ color: "var(--gold-deep)" }}
+                      >
+                        <span
+                          className="w-1.5 h-1.5 rounded-full animate-pulse"
+                          style={{ background: "var(--gold)" }}
+                        />
                         {useWebContainers ? "Runtime pre-warmed" : "Sandbox ready"}
                       </div>
                     </div>

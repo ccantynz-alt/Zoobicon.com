@@ -73,7 +73,7 @@ export default function ChatbotWidgetPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0d17] text-white">
+    <div className="min-h-screen bg-[var(--paper)] text-white">
       {/* Header */}
       <header className="border-b border-white/10 bg-[#0f2148]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">

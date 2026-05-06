@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function DisclaimersPage() {
   return (
     <div className="min-h-screen text-white">
-      <nav className="border-b border-white/[0.06] bg-[#0b1530]/90 backdrop-blur-xl">
+      <nav className="border-b border-white/[0.06] bg-[var(--paper)]/90 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 flex items-center justify-between h-14">
           <Link href="/" className="text-sm font-bold">Zoobicon</Link>
           <div className="flex gap-4 text-xs text-white/40">

@@ -585,7 +585,7 @@ export default function HeroBuilder() {
             </div>
 
             {/* rendered fake site — editorial, not cyberpunk */}
-            <div className="relative h-[460px] overflow-hidden bg-[#0a0a0c]">
+            <div className="relative h-[460px] overflow-hidden bg-[var(--paper-elevated)]">
               <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[#E8D4B0]/[0.08] blur-[90px]" />
 
               <div className="relative flex h-full flex-col">

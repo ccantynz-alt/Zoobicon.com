@@ -175,7 +175,7 @@ export default function DeployModal({
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
           <motion.div
-            className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a12] shadow-2xl"
+            className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-[var(--paper-elevated)] shadow-2xl"
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
