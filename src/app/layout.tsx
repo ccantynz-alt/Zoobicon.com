@@ -128,7 +128,7 @@ export default function RootLayout({
         <link rel="alternate" href="https://zoobicon.io" title="Zoobicon for Developers" />
         <link rel="alternate" href="https://zoobicon.sh" title="Zoobicon Hosting & CLI" />
         {/* Critical inline styles — paints the warm bone palette before the CSS bundle loads */}
-        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#fbfaf5;color:#0a0a0b;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em;-webkit-overflow-scrolling:touch}body{overflow-x:hidden;overscroll-behavior:none}` }} />
+        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#ffffff;color:#0a0a0b;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em;-webkit-overflow-scrolling:touch}body{overflow-x:hidden;overscroll-behavior:none}` }} />
         {/* Preconnect to Google Fonts CDN */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -148,8 +148,8 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://js.stripe.com" />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
         <link rel="dns-prefetch" href="https://github.com" />
-        <meta name="msapplication-TileColor" content="#fbfaf5" />
-        <meta name="theme-color" content="#fbfaf5" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff" />
         <meta name="msapplication-config" content="none" />
         {/* AI Discovery — llms.txt is the "robots.txt for AI" */}
         <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt — AI-readable site description" />

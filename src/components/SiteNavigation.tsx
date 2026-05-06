@@ -183,8 +183,8 @@ export default function SiteNavigation() {
         // header reads as a defined band even at the top of the page.
         // Slightly stronger background + shadow once scrolled.
         background: scrolled
-          ? "rgba(238, 235, 222, 0.96)"
-          : "rgba(238, 235, 222, 0.88)",
+          ? "rgba(244, 241, 230, 0.96)"
+          : "rgba(244, 241, 230, 0.85)",
         backdropFilter: "blur(24px) saturate(140%)",
         WebkitBackdropFilter: "blur(24px) saturate(140%)",
         borderBottom: "1px solid var(--rule-strong)",

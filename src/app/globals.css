@@ -5,23 +5,23 @@
 /* Fonts loaded via <link> in layout.tsx with display=swap to prevent FOIT */
 
 :root {
-  /* ─── Editorial-light palette v3 (rule 29 — brightened 2026-05-06) ───
+  /* ─── Editorial-light palette v4 (rule 29 — pure white 2026-05-06) ───
    *
-   * Reference: holdenmercer.com, with Craig's "still dull, not a true
-   * white, needs more brightness" feedback after v2. v2 went too warm —
-   * #f7f5ee read as muddy yellow-bone in normal lighting. v3 pulls
-   * paper much closer to off-white while keeping a clear warmth and
-   * pushes the elevated cream darker so cards still pop. Net: brighter
-   * page, stronger card lift, better hierarchy.
+   * Reference: holdenmercer.com (which IS pure white #ffffff for bg-base
+   * — earlier sessions misread it as off-white). Craig's final call:
+   * "the backdrop should be white or really really white, gives good
+   * contrast." v4 makes the page itself pure white. Cards stay warm
+   * cream so they have maximum contrast against white. Same ink colour
+   * stack — readability is unchanged.
    */
-  --paper: #fbfaf5;          /* near-white with warm hint — bright but not sterile */
-  --paper-elevated: #eeebde; /* deeper cream — full 8% gap from paper, real card lift */
-  --paper-input: #ffffff;    /* pure white inputs — read as clean recessed surfaces */
+  --paper: #ffffff;          /* PURE WHITE page background */
+  --paper-elevated: #f4f1e6; /* warm cream cards — strong contrast against white */
+  --paper-input: #fafaf6;    /* pale cream inputs — subtle recess on white */
   --ink: #0a0a0b;            /* primary text — near-black */
   --ink-secondary: #2a2a30;  /* secondary text */
   --ink-muted: #76767e;      /* muted text, captions */
-  --rule: #d8d3c0;           /* hairline border — visible, warm */
-  --rule-strong: #a8a392;    /* primary border for cards/buttons */
+  --rule: #d8d3c0;           /* hairline border */
+  --rule-strong: #a8a392;    /* primary border */
   --gold: #b8923f;           /* champagne accent */
   --gold-soft: rgba(184, 146, 63, 0.14);
   --gold-glow: rgba(184, 146, 63, 0.40);
