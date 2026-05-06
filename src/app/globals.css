@@ -2265,8 +2265,36 @@ select {
 .bg-gray-800,
 .bg-zinc-800,
 .bg-slate-800,
-.bg-neutral-800 {
+.bg-neutral-800,
+.bg-stone-800,
+.bg-gray-900,
+.bg-zinc-900,
+.bg-slate-900,
+.bg-neutral-900,
+.bg-stone-900,
+.bg-gray-950,
+.bg-zinc-950,
+.bg-slate-950,
+.bg-neutral-950,
+.bg-stone-950 {
   background-color: var(--paper-elevated) !important;
+  color: var(--ink) !important;
+}
+
+/* Same classes with /opacity suffixes — `bg-zinc-900/80`, `bg-slate-900/60`,
+ * `bg-black/40` etc were used as overlays. On a bone canvas a dark overlay
+ * makes the page look bruised — flip them to a soft cream wash. */
+.bg-gray-900\/40, .bg-gray-900\/50, .bg-gray-900\/60, .bg-gray-900\/70, .bg-gray-900\/80, .bg-gray-900\/90,
+.bg-zinc-900\/40, .bg-zinc-900\/50, .bg-zinc-900\/60, .bg-zinc-900\/70, .bg-zinc-900\/80, .bg-zinc-900\/90,
+.bg-slate-900\/40, .bg-slate-900\/50, .bg-slate-900\/60, .bg-slate-900\/70, .bg-slate-900\/80, .bg-slate-900\/90,
+.bg-neutral-900\/40, .bg-neutral-900\/50, .bg-neutral-900\/60, .bg-neutral-900\/70, .bg-neutral-900\/80, .bg-neutral-900\/90,
+.bg-gray-950\/40, .bg-gray-950\/50, .bg-gray-950\/60, .bg-gray-950\/70, .bg-gray-950\/80, .bg-gray-950\/90,
+.bg-zinc-950\/40, .bg-zinc-950\/50, .bg-zinc-950\/60, .bg-zinc-950\/70, .bg-zinc-950\/80, .bg-zinc-950\/90,
+.bg-slate-950\/40, .bg-slate-950\/50, .bg-slate-950\/60, .bg-slate-950\/70, .bg-slate-950\/80, .bg-slate-950\/90 {
+  background-color: rgba(236, 235, 225, 0.92) !important;
+  color: var(--ink) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
 }
 
 /* Text — invert the dark-mode foreground */
@@ -2424,4 +2452,287 @@ html, body {
   font-weight: 500;
   letter-spacing: -0.015em;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * RULE-29 CLOSE-OUT SWEEP — 2026-05-06 (Craig: "the colours throughout
+ * the site are way off … please go through the whole site from start to
+ * finish.")
+ *
+ * The audit revealed that `bg-[#0b1530]` is used as the page wrapper on
+ * 131 routes. The previous override layer only caught it inside
+ * gradients (`from-[#0b1530]`/`to-[#0b1530]`) — never as a flat
+ * background. That's why the homepage looked right but every product
+ * page, builder, video-creator, /domains, /tools, /agencies, /pricing
+ * etc still rendered dark navy. Same story for the Filmora-tier
+ * `--fs-bg-*` tokens (lines 1830-1834) — those are still `#060e1f` /
+ * `#0a1628` / `#0f2148` / `#152e60`, dragging every `.fs-card`,
+ * `.fs-grain`, `.fs-marquee` surface into the navy era.
+ *
+ * Separately, admin/share routes use pure `bg-white` and `bg-slate-50`
+ * which Craig flagged as "too light" — they read pure-white against the
+ * warm bone of the homepage, which makes the site feel inconsistent.
+ *
+ * This block does FOUR things:
+ *   1. Maps every dark hex literal used as a `bg-[#…]` to `var(--paper)`
+ *   2. Remaps the `--fs-bg-*` tokens to bone palette (so .fs-* classes
+ *      automatically inherit the editorial-light look)
+ *   3. Maps pure `bg-white` / `bg-slate-50` / `bg-gray-50` and friends
+ *      to `var(--paper)` so admin matches the homepage warmth
+ *   4. Neutralises the dark `.fs-grain` texture overlay so it doesn't
+ *      stamp a dark film over the warm canvas
+ *
+ * Once this lands, the editorial-light theme covers the entire site
+ * without touching individual page files. Page-level cleanups can
+ * follow but the BIG visual flip happens here.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+/* (1) Dark hex backgrounds — flatten to paper. Covers wrappers and panels
+ *     across products/, builder/, video-creator/, tools/, domains/, admin/,
+ *     starter-kits/, agencies/, ai/, generators/, and ~120 other routes. */
+.bg-\[\#0b1530\],
+.bg-\[\#0a1628\],
+.bg-\[\#0f2148\],
+.bg-\[\#152e60\],
+.bg-\[\#060e1f\],
+.bg-\[\#131520\],
+.bg-\[\#0b0d17\],
+.bg-\[\#0e0e1a\],
+.bg-\[\#0a0a12\],
+.bg-\[\#0a0f1e\],
+.bg-\[\#0f172a\],
+.bg-\[\#111a2e\],
+.bg-\[\#12121a\],
+.bg-\[\#1e1e1e\],
+.bg-\[\#1e1e2e\],
+.bg-\[\#1a1a24\],
+.bg-\[\#162044\],
+.bg-\[\#11131c\],
+.bg-\[\#0d0d12\],
+.bg-\[\#1f2937\] {
+  background-color: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* Same dark hexes used with /opacity suffixes — `bg-[#0b1530]/40` etc.
+ * Tailwind compiles these to a different class name. Catch the common
+ * variants used in the codebase. */
+.bg-\[\#0b1530\]\/40, .bg-\[\#0b1530\]\/50, .bg-\[\#0b1530\]\/60, .bg-\[\#0b1530\]\/70, .bg-\[\#0b1530\]\/80, .bg-\[\#0b1530\]\/90, .bg-\[\#0b1530\]\/95,
+.bg-\[\#0a1628\]\/40, .bg-\[\#0a1628\]\/50, .bg-\[\#0a1628\]\/60, .bg-\[\#0a1628\]\/70, .bg-\[\#0a1628\]\/80, .bg-\[\#0a1628\]\/90,
+.bg-\[\#0f2148\]\/40, .bg-\[\#0f2148\]\/50, .bg-\[\#0f2148\]\/60, .bg-\[\#0f2148\]\/70, .bg-\[\#0f2148\]\/80, .bg-\[\#0f2148\]\/90,
+.bg-\[\#131520\]\/60, .bg-\[\#131520\]\/70, .bg-\[\#131520\]\/80, .bg-\[\#131520\]\/90,
+.bg-black\/40, .bg-black\/50, .bg-black\/60, .bg-black\/70, .bg-black\/80, .bg-black\/90 {
+  background-color: rgba(247, 245, 238, 0.92) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  color: var(--ink) !important;
+}
+
+/* `bg-black` flat — used in modals, IDE chrome, video-creator overlays */
+.bg-black {
+  background-color: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* (2) Filmora-tier token re-bind — every `.fs-card`, `.fs-grain`,
+ *     `.fs-marquee`, `.fs-btn-primary`, `.fs-text-gradient` etc reads
+ *     these variables. Flipping them here re-skins the whole Filmora
+ *     subsystem to editorial-light without touching the original
+ *     definitions above. */
+:root {
+  --fs-bg-0: var(--paper) !important;
+  --fs-bg-1: var(--paper) !important;
+  --fs-bg-2: var(--paper-elevated) !important;
+  --fs-bg-3: var(--paper-elevated) !important;
+  --fs-hair: var(--rule) !important;
+  --fs-hair-strong: var(--rule-strong) !important;
+  --fs-accent: var(--gold) !important;
+  --fs-accent-hover: var(--gold-deep) !important;
+  --fs-accent-ring: var(--gold-glow) !important;
+  --fs-shadow-card: var(--shadow-1) !important;
+  --fs-shadow-hover: var(--shadow-2) !important;
+  --fs-shadow-warm: 0 24px 72px -32px rgba(184, 146, 63, 0.30) !important;
+  --fs-gradient-text: linear-gradient(135deg, var(--ink) 0%, var(--gold-deep) 50%, var(--gold) 100%) !important;
+  --fs-gradient-cinema: linear-gradient(135deg, var(--ink) 0%, var(--gold-deep) 50%, var(--gold) 100%) !important;
+  --fs-gradient-primary: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 100%) !important;
+  --fs-gradient-magenta: linear-gradient(135deg, var(--gold-deep) 0%, var(--gold) 100%) !important;
+}
+
+/* `.fs-card` previously emitted a near-transparent white-on-dark surface.
+ * On bone canvas that becomes invisible — washing the page out. Force
+ * proper elevation. */
+.fs-card {
+  background: var(--paper-elevated) !important;
+  border-color: var(--rule-strong) !important;
+  color: var(--ink) !important;
+}
+.fs-card:hover {
+  border-color: var(--gold) !important;
+}
+
+/* `.fs-eyebrow` was rgba(255,255,255,0.45) — invisible on bone */
+.fs-eyebrow {
+  color: var(--ink-muted) !important;
+}
+
+/* `.fs-serif-italic` keeps the gold accent — stays correct on bone */
+
+/* `.fs-btn-primary` had #060e1f text on cream — keep ink */
+.fs-btn-primary {
+  color: var(--ink) !important;
+  background: var(--gold) !important;
+  border-color: var(--gold-deep) !important;
+}
+.fs-btn-primary:hover {
+  background: var(--gold-deep) !important;
+  color: var(--paper) !important;
+}
+
+/* (3) Pure white & pale neutrals — the "too light" complaint. Admin and
+ *     share pages used `bg-white` and `bg-slate-50` directly which read
+ *     as cold and washed-out next to the warm bone of the rest of the
+ *     site. Route them all to `--paper`. The opacity-suffixed
+ *     `bg-white/[0.0X]` forms above are intentionally kept on
+ *     `--paper-elevated` so cards still elevate. */
+/* Pure `bg-white` is overwhelmingly used for cards, badges, sidebars and
+ * elevated panels (admin, share-token, builder ChatPanel, etc). Route it
+ * to the elevated cream so cards lift cleanly off the bone page. */
+.bg-white {
+  background-color: var(--paper-elevated) !important;
+  color: var(--ink) !important;
+}
+
+/* Pale neutral wrappers — route to base paper. These are typically page
+ * backgrounds (admin shell uses bg-slate-50). */
+.bg-slate-50,
+.bg-slate-100,
+.bg-gray-50,
+.bg-gray-100,
+.bg-zinc-50,
+.bg-zinc-100,
+.bg-neutral-50,
+.bg-neutral-100,
+.bg-stone-50,
+.bg-stone-100 {
+  background-color: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* Admin uses `border-slate-200` and friends as hairlines — replace with
+ * the warm rule so borders match the rest of the site. */
+.border-slate-100,
+.border-slate-200,
+.border-slate-300,
+.border-gray-100,
+.border-gray-200,
+.border-gray-300,
+.border-zinc-100,
+.border-zinc-200,
+.border-zinc-300,
+.border-neutral-100,
+.border-neutral-200,
+.border-neutral-300,
+.border-stone-100,
+.border-stone-200,
+.border-stone-300 {
+  border-color: var(--rule) !important;
+}
+
+/* Admin slate text — flatten to ink scale so admin matches site copy */
+.text-slate-700, .text-slate-800, .text-slate-900,
+.text-gray-700, .text-gray-800, .text-gray-900,
+.text-zinc-700, .text-zinc-800, .text-zinc-900,
+.text-neutral-700, .text-neutral-800, .text-neutral-900,
+.text-stone-700, .text-stone-800, .text-stone-900,
+.text-black {
+  color: var(--ink) !important;
+}
+
+/* (4) `.fs-grain` — Filmora-style noise overlay. The original
+ *     definition stamps a low-opacity dark texture across the whole
+ *     viewport (it was designed for a navy canvas). On bone it just
+ *     muddies the page. Switch to a warm grain that adds tooth without
+ *     darkening. */
+.fs-grain {
+  position: relative;
+}
+.fs-grain::before,
+.fs-grain::after {
+  /* Disable any legacy dark texture pseudo-elements */
+  background-image: none !important;
+  background-color: transparent !important;
+  opacity: 0 !important;
+}
+
+/* Inline-style backgrounds — pages that hard-code `style={{background:
+ * "#0b1530"}}` can't be reached by class selectors. Catch the most
+ * common ones via attribute selector. (Inline style still wins over
+ * stylesheet declarations, but the attribute selector with !important
+ * matches Tailwind's specificity model and lands the override.) */
+[style*="background: #0b1530"],
+[style*="background:#0b1530"],
+[style*="background-color: #0b1530"],
+[style*="background-color:#0b1530"],
+[style*="background: #0a1628"],
+[style*="background:#0a1628"],
+[style*="background: #0f2148"],
+[style*="background:#0f2148"],
+[style*="background: #060e1f"],
+[style*="background:#060e1f"] {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* Headings + paragraph color fallback — many legacy pages still set
+ * `text-white` on bare h1/h2 with no class on the parent. The text-white
+ * override above catches `text-white` directly; this catches inline-styled
+ * white text via attribute selector for the rare cases where it slipped in. */
+[style*="color: #fff"],
+[style*="color:#fff"],
+[style*="color: white"],
+[style*="color:white"],
+[style*="color: #ffffff"],
+[style*="color:#ffffff"] {
+  color: var(--ink) !important;
+}
+
+/* Global placeholder + selection — re-state at end of file so the
+ * editorial-light values win against the dark defaults declared at
+ * line ~118-138. */
+::placeholder { color: var(--ink-muted) !important; opacity: 0.7 !important; }
+::-webkit-input-placeholder { color: var(--ink-muted) !important; opacity: 0.7 !important; }
+::-moz-placeholder { color: var(--ink-muted) !important; opacity: 0.7 !important; }
+:-ms-input-placeholder { color: var(--ink-muted) !important; opacity: 0.7 !important; }
+
+/* :focus-visible was a fuzzy cyan ring — switch to gold so it matches the
+ * editorial palette. */
+:focus-visible {
+  outline: 2px solid var(--gold) !important;
+  outline-offset: 2px !important;
+}
+
+/* `.cyber-input` was the dark-form primitive used in tools/* and
+ * generators/* — it baked a dark navy fill, white text, cyan focus ring.
+ * Re-skin to bone. */
+.cyber-input,
+input.cyber-input,
+textarea.cyber-input,
+select.cyber-input {
+  background-color: var(--paper-input) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--rule-strong) !important;
+  caret-color: var(--ink) !important;
+}
+.cyber-input:focus,
+input.cyber-input:focus,
+textarea.cyber-input:focus,
+select.cyber-input:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px var(--gold-soft) !important;
+  outline: none !important;
+}
+.cyber-input::placeholder { color: var(--ink-muted) !important; }
+
+/* Marquee fade gradients that read `from-[#0b1530]` were already routed
+ * to bone above, so the marquee fade on the homepage trust strip will
+ * fade to bone — which is exactly what we want. No further action. */
 
