@@ -5,31 +5,27 @@
 /* Fonts loaded via <link> in layout.tsx with display=swap to prevent FOIT */
 
 :root {
-  /* ─── Editorial-light palette v2 (rule 29 — tightened 2026-05-05) ───
+  /* ─── Editorial-light palette v3 (rule 29 — brightened 2026-05-06) ───
    *
-   * Reference: holdenmercer.com, evolved with Craig's "more definition,
-   * more contrast" feedback. The first cut was too dull — every surface
-   * was within 8% luminance of every other and borders read as ghosts.
-   * This pass increases:
-   *   - Paper-to-elevated separation (4% → 6% luminance gap)
-   *   - Border visibility (rule + rule-strong both pulled darker)
-   *   - Text contrast (secondary + muted both darker — ink stays)
-   *   - Gold saturation (richer champagne, deeper bronze for hover)
-   *   - Shadow weight (soft 6% → 10% so cards lift cleanly)
-   * Net effect: same warm-bone vibe, real visual hierarchy.
+   * Reference: holdenmercer.com, with Craig's "still dull, not a true
+   * white, needs more brightness" feedback after v2. v2 went too warm —
+   * #f7f5ee read as muddy yellow-bone in normal lighting. v3 pulls
+   * paper much closer to off-white while keeping a clear warmth and
+   * pushes the elevated cream darker so cards still pop. Net: brighter
+   * page, stronger card lift, better hierarchy.
    */
-  --paper: #f7f5ee;          /* primary background — warmer than old #fafaf7, gives surface body */
-  --paper-elevated: #ecebe1; /* cards, elevated surfaces — 6% luminance below paper, real separation */
-  --paper-input: #fcfbf6;    /* input fields — slightly brighter than paper so they read as recessed */
-  --ink: #0a0a0b;            /* primary text — near-black, not pure black */
-  --ink-secondary: #2a2a30;  /* secondary text — darkened from #3a3a40 for body-copy readability */
-  --ink-muted: #76767e;      /* muted text, captions — darkened from #8a8a90 so labels stop blending */
-  --rule: #dad6c4;           /* hairline border — warmer + visible, was #e8e6dc (too pale) */
-  --rule-strong: #b8b3a0;    /* primary border for cards/buttons — real edge, not a whisper */
-  --gold: #b8923f;           /* champagne accent — deeper than #c9a961, richer on bone */
+  --paper: #fbfaf5;          /* near-white with warm hint — bright but not sterile */
+  --paper-elevated: #eeebde; /* deeper cream — full 8% gap from paper, real card lift */
+  --paper-input: #ffffff;    /* pure white inputs — read as clean recessed surfaces */
+  --ink: #0a0a0b;            /* primary text — near-black */
+  --ink-secondary: #2a2a30;  /* secondary text */
+  --ink-muted: #76767e;      /* muted text, captions */
+  --rule: #d8d3c0;           /* hairline border — visible, warm */
+  --rule-strong: #a8a392;    /* primary border for cards/buttons */
+  --gold: #b8923f;           /* champagne accent */
   --gold-soft: rgba(184, 146, 63, 0.14);
   --gold-glow: rgba(184, 146, 63, 0.40);
-  --gold-deep: #8c6b25;      /* bronze — for text + hover. Real WCAG AA on paper. */
+  --gold-deep: #8c6b25;      /* bronze for text + hover */
   --shadow-1: 0 1px 2px rgba(10, 10, 11, 0.06), 0 0 0 1px rgba(10, 10, 11, 0.06);
   --shadow-2: 0 8px 24px rgba(10, 10, 11, 0.10), 0 2px 6px rgba(10, 10, 11, 0.06);
 

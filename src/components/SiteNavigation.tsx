@@ -114,7 +114,9 @@ export default function SiteNavigation() {
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Admin role is intentionally NOT surfaced in the public nav per
+  // Craig's directive — admin access is URL-only (/admin). The
+  // localStorage payload still includes role for downstream guards.
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const megaRef = useRef<HTMLDivElement>(null);
@@ -125,9 +127,10 @@ export default function SiteNavigation() {
     try {
       const raw = localStorage.getItem("zoobicon_user");
       if (raw) {
-        const user = JSON.parse(raw);
+        // Parse just to validate the payload shape; role intentionally
+        // not surfaced in nav per Craig's directive (admin via URL only).
+        JSON.parse(raw);
         setIsLoggedIn(true);
-        setIsAdmin(user.role === "admin");
       }
     } catch { /* ignore */ }
   }, []);
@@ -180,8 +183,8 @@ export default function SiteNavigation() {
         // header reads as a defined band even at the top of the page.
         // Slightly stronger background + shadow once scrolled.
         background: scrolled
-          ? "rgba(236, 235, 225, 0.96)"
-          : "rgba(236, 235, 225, 0.88)",
+          ? "rgba(238, 235, 222, 0.96)"
+          : "rgba(238, 235, 222, 0.88)",
         backdropFilter: "blur(24px) saturate(140%)",
         WebkitBackdropFilter: "blur(24px) saturate(140%)",
         borderBottom: "1px solid var(--rule-strong)",
@@ -247,17 +250,23 @@ export default function SiteNavigation() {
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${megaOpen ? "rotate-180 text-[#E8D4B0]" : ""}`} />
               </button>
 
-              {/* Mega Menu Panel — FULL WIDTH 6 columns, editorial bone treatment */}
+              {/* Mega Menu Panel — FULL WIDTH 6 columns, editorial bright treatment.
+                  Background sits at near-paper-input white (very bright) with a
+                  strong rule + shadow so it reads as a defined drop-down panel
+                  on top of the cream header. Item text below uses explicit ink
+                  colours instead of relying on the override layer's mapping —
+                  the override pulls text-white/X down to muted grey which read
+                  as dull. */}
               {megaOpen && (
                 <div
                   data-mega-menu
-                  className="fixed top-[72px] left-0 right-0"
+                  className="fixed top-[76px] left-0 right-0"
                   style={{
-                    background: "rgba(250,250,247,0.98)",
-                    backdropFilter: "blur(24px)",
-                    WebkitBackdropFilter: "blur(24px)",
-                    borderBottom: "1px solid var(--rule)",
-                    boxShadow: "var(--shadow-2)",
+                    background: "rgba(255, 254, 250, 0.99)",
+                    backdropFilter: "blur(28px) saturate(140%)",
+                    WebkitBackdropFilter: "blur(28px) saturate(140%)",
+                    borderBottom: "1px solid var(--rule-strong)",
+                    boxShadow: "0 16px 48px -12px rgba(10,10,11,0.18), 0 4px 12px -4px rgba(10,10,11,0.08)",
                   }}
                 >
                   <div className="relative max-w-7xl mx-auto px-6 py-10">
@@ -265,8 +274,8 @@ export default function SiteNavigation() {
                       {PRODUCT_SECTIONS.map((section) => (
                         <div key={section.label}>
                           <h3
-                            className="mb-4 text-[10px] uppercase tracking-[0.2em] font-semibold"
-                            style={{ color: "rgba(232,212,176,0.75)" }}
+                            className="mb-4 text-[10px] uppercase tracking-[0.22em] font-semibold"
+                            style={{ color: "var(--gold-deep)" }}
                           >
                             {section.label}
                           </h3>
@@ -275,27 +284,45 @@ export default function SiteNavigation() {
                               <Link
                                 key={item.href}
                                 href={item.href}
-                                className="group flex items-start gap-2.5 p-2.5 rounded-xl transition-all duration-300 hover:bg-white/[0.04] hover:translate-x-0.5"
+                                className="group flex items-start gap-2.5 p-2.5 rounded-xl transition-all duration-200 hover:translate-x-0.5"
+                                style={{ background: "transparent" }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = "var(--paper-elevated)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = "transparent";
+                                }}
                                 onClick={() => setMegaOpen(false)}
                               >
-                                <item.icon className="w-4 h-4 text-white/40 group-hover:text-[#E8D4B0] transition-colors mt-0.5 flex-shrink-0" />
+                                <item.icon
+                                  className="w-4 h-4 group-hover:text-[var(--gold-deep)] transition-colors mt-0.5 flex-shrink-0"
+                                  style={{ color: "var(--ink-muted)" }}
+                                />
                                 <div className="min-w-0">
-                                  <div className="text-[13px] text-white/85 group-hover:text-white font-medium flex items-center gap-1.5">
+                                  <div
+                                    className="text-[13px] font-semibold flex items-center gap-1.5"
+                                    style={{ color: "var(--ink)" }}
+                                  >
                                     <span className="truncate">{item.name}</span>
                                     {item.badge && (
                                       <span
-                                        className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
+                                        className="text-[9px] px-1.5 py-0.5 rounded-full font-bold flex-shrink-0 uppercase tracking-wider"
                                         style={{
-                                          background: "rgba(232,212,176,0.14)",
-                                          color: "#F0DCB8",
-                                          border: "1px solid rgba(232,212,176,0.3)",
+                                          background: "var(--gold-soft)",
+                                          color: "var(--gold-deep)",
+                                          border: "1px solid var(--gold)",
                                         }}
                                       >
                                         {item.badge}
                                       </span>
                                     )}
                                   </div>
-                                  <div className="text-[11px] text-white/40 mt-0.5 leading-relaxed">{item.desc}</div>
+                                  <div
+                                    className="text-[11px] mt-0.5 leading-relaxed"
+                                    style={{ color: "var(--ink-secondary)" }}
+                                  >
+                                    {item.desc}
+                                  </div>
                                 </div>
                               </Link>
                             ))}
@@ -303,15 +330,21 @@ export default function SiteNavigation() {
                         </div>
                       ))}
                     </div>
-                    <div className="mt-8 pt-6 border-t border-white/[0.06] flex items-center justify-between">
-                      <span className="text-[12px] text-white/45">
+                    <div
+                      className="mt-8 pt-6 flex items-center justify-between"
+                      style={{ borderTop: "1px solid var(--rule)" }}
+                    >
+                      <span className="text-[12px]" style={{ color: "var(--ink-secondary)" }}>
                         75+ products bundled.{" "}
-                        <span className="text-white/65">Replaces $923/mo in SaaS subscriptions.</span>
+                        <span style={{ color: "var(--ink)", fontWeight: 600 }}>
+                          Replaces $923/mo in SaaS subscriptions.
+                        </span>
                       </span>
                       <div className="flex items-center gap-5">
                         <Link
                           href="/domains"
-                          className="group text-[12px] text-white/60 hover:text-[#E8D4B0] flex items-center gap-1.5 transition-colors"
+                          className="group text-[12px] flex items-center gap-1.5 transition-colors"
+                          style={{ color: "var(--ink-secondary)" }}
                           onClick={() => setMegaOpen(false)}
                         >
                           Search domains
@@ -361,14 +394,9 @@ export default function SiteNavigation() {
                 >
                   <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
                 </Link>
-                {isAdmin && (
-                  <Link
-                    href="/admin"
-                    className="px-3.5 py-2 text-[13px] text-[#E8D4B0]/70 hover:text-[#E8D4B0] rounded-full hover:bg-[#E8D4B0]/[0.06] transition-colors"
-                  >
-                    Admin
-                  </Link>
-                )}
+                {/* Admin link intentionally hidden from the public nav.
+                    Craig accesses /admin by typing it in the address
+                    bar so customers never see it. (2026-05-06) */}
                 <button
                   onClick={handleLogout}
                   className="p-2 text-white/40 hover:text-white/70 rounded-full hover:bg-white/[0.04] transition-colors"
@@ -484,7 +512,8 @@ export default function SiteNavigation() {
               {isLoggedIn ? (
                 <>
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]">Dashboard</Link>
-                  {isAdmin && <Link href="/admin" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-stone-400 rounded-lg hover:bg-stone-500/10">Admin Panel</Link>}
+                  {/* Admin link intentionally hidden from mobile nav too —
+                      access /admin by URL only. */}
                 </>
               ) : (
                 <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]">Sign in</Link>
