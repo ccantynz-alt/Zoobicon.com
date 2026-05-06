@@ -176,18 +176,21 @@ export default function SiteNavigation() {
     <nav
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        // Always-on cream layer — sits above the bone page surface so the
-        // header reads as a defined band even at the top of the page.
-        // Slightly stronger background + shadow once scrolled.
+        // Soft-lift header — barely brighter than the bone page, defined
+        // mostly by the hairline bottom + soft shadow rather than by being
+        // a darker band. Craig: "the header is a little dark — lighten it
+        // a little bit so it's not so dark." Switched from paper-elevated
+        // (#ecebe1) to paper-bright (#faf9f4 ≈ paper +3%) so the bar reads
+        // as a lift, not a separate stratum.
         background: scrolled
-          ? "rgba(236, 235, 225, 0.96)"
-          : "rgba(236, 235, 225, 0.88)",
+          ? "rgba(250, 249, 244, 0.94)"
+          : "rgba(250, 249, 244, 0.82)",
         backdropFilter: "blur(24px) saturate(140%)",
         WebkitBackdropFilter: "blur(24px) saturate(140%)",
-        borderBottom: "1px solid var(--rule-strong)",
+        borderBottom: "1px solid var(--rule)",
         boxShadow: scrolled
-          ? "0 4px 16px -4px rgba(10,10,11,0.08), 0 1px 0 0 rgba(184,179,160,0.4)"
-          : "0 1px 0 0 rgba(184,179,160,0.3)",
+          ? "0 4px 16px -6px rgba(10,10,11,0.06), 0 1px 0 0 rgba(184,179,160,0.28)"
+          : "0 1px 0 0 rgba(184,179,160,0.22)",
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -389,24 +392,25 @@ export default function SiteNavigation() {
               href="/builder"
               className="group inline-flex items-center gap-2 px-5 py-2.5 text-[13px] rounded-full transition-all duration-300 hover:-translate-y-0.5"
               style={{
-                // Champagne fill on bone — Sotheby's-catalogue CTA, not a
-                // tech-startup pill. Deep ink text for AA contrast. Thin
-                // gold-deep border + soft warm shadow gives the button real
-                // edge without looking heavy.
-                background: "var(--gold)",
-                color: "var(--ink)",
-                border: "1px solid var(--gold-deep)",
-                boxShadow: "0 6px 18px -8px rgba(140,107,37,0.45), inset 0 1px 0 0 rgba(255,255,255,0.25)",
+                // Bright champagne gradient with crisp white text — Craig:
+                // "the gold is nice but doesn't seem to work — the writing
+                // should be white." A subtle gradient (soft champagne →
+                // deeper champagne) keeps the gold feel while giving the
+                // button enough body for white text to land cleanly. Inner
+                // highlight + soft warm shadow finish the polish.
+                background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)",
+                color: "#ffffff",
+                border: "1px solid #a47d2c",
+                boxShadow: "0 6px 18px -8px rgba(140,107,37,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
                 fontWeight: 600,
                 letterSpacing: "0.01em",
+                textShadow: "0 1px 1px rgba(80,55,15,0.35)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "var(--gold-deep)";
-                e.currentTarget.style.color = "var(--paper)";
+                e.currentTarget.style.background = "linear-gradient(135deg, #b8923f 0%, #8c6b25 100%)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "var(--gold)";
-                e.currentTarget.style.color = "var(--ink)";
+                e.currentTarget.style.background = "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)";
               }}
             >
               <span>Start Building</span>
@@ -494,12 +498,13 @@ export default function SiteNavigation() {
                 onClick={() => setMobileOpen(false)}
                 className="block p-3 text-center text-sm rounded-lg transition-colors"
                 style={{
-                  background: "var(--gold)",
-                  color: "var(--ink)",
-                  border: "1px solid var(--gold-deep)",
+                  background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)",
+                  color: "#ffffff",
+                  border: "1px solid #a47d2c",
                   fontWeight: 600,
                   letterSpacing: "0.01em",
-                  boxShadow: "0 4px 12px -4px rgba(140,107,37,0.4), inset 0 1px 0 0 rgba(255,255,255,0.25)",
+                  boxShadow: "0 4px 12px -4px rgba(140,107,37,0.45), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                  textShadow: "0 1px 1px rgba(80,55,15,0.35)",
                 }}
               >
                 Start Building →
