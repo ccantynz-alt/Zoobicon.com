@@ -174,29 +174,59 @@ export default function SiteNavigation() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled ? "rgba(250,250,247,0.92)" : "rgba(250,250,247,0.7)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        borderBottom: scrolled ? "1px solid var(--rule)" : "1px solid transparent",
-        boxShadow: scrolled ? "var(--shadow-1)" : "none",
+        // Always-on cream layer — sits above the bone page surface so the
+        // header reads as a defined band even at the top of the page.
+        // Slightly stronger background + shadow once scrolled.
+        background: scrolled
+          ? "rgba(236, 235, 225, 0.96)"
+          : "rgba(236, 235, 225, 0.88)",
+        backdropFilter: "blur(24px) saturate(140%)",
+        WebkitBackdropFilter: "blur(24px) saturate(140%)",
+        borderBottom: "1px solid var(--rule-strong)",
+        boxShadow: scrolled
+          ? "0 4px 16px -4px rgba(10,10,11,0.08), 0 1px 0 0 rgba(184,179,160,0.4)"
+          : "0 1px 0 0 rgba(184,179,160,0.3)",
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-[72px]">
-          {/* Logo — editorial mark on bone */}
-          <Link href="/" className="group flex items-center gap-2.5 flex-shrink-0">
+        <div className="flex items-center justify-between h-[76px]">
+          {/* Logo — editorial monogram. Thin gold ring on bone holding a
+              Playfair italic Z. Reads like a Sotheby's mark, not a tech
+              square. Wordmark sits next to it in Playfair regular at
+              the right optical weight to balance the italic Z. */}
+          <Link href="/" className="group flex items-center gap-3 flex-shrink-0">
             <div
-              className="relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-500 group-hover:scale-[1.04]"
+              className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-[1.04]"
               style={{
-                background: "var(--ink)",
-                boxShadow: "var(--shadow-1)",
+                background: "var(--paper)",
+                border: "1.5px solid var(--gold)",
+                boxShadow: "0 2px 6px -2px rgba(140,107,37,0.18), inset 0 0 0 3px var(--paper)",
               }}
             >
-              <span className="font-black text-[15px] tracking-tight" style={{ color: "var(--gold)" }}>Z</span>
+              <span
+                className="text-[20px] leading-none"
+                style={{
+                  fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+                  fontStyle: "italic",
+                  fontWeight: 600,
+                  color: "var(--ink)",
+                  marginTop: "1px",
+                }}
+              >
+                Z
+              </span>
             </div>
-            <span className="hidden sm:block font-semibold text-[17px] tracking-[-0.02em]" style={{ color: "var(--ink)" }}>
+            <span
+              className="hidden sm:block text-[19px] tracking-[-0.01em]"
+              style={{
+                fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+                fontWeight: 500,
+                color: "var(--ink)",
+                letterSpacing: "0.005em",
+              }}
+            >
               Zoobicon
             </span>
           </Link>
@@ -357,15 +387,40 @@ export default function SiteNavigation() {
             )}
             <Link
               href="/builder"
-              className="group inline-flex items-center gap-1.5 px-5 py-2.5 text-[13px] font-semibold rounded-full transition-all duration-300 hover:-translate-y-0.5"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 text-[13px] rounded-full transition-all duration-300 hover:-translate-y-0.5"
               style={{
-                background: "var(--ink)",
-                color: "var(--paper)",
-                boxShadow: "0 10px 30px -12px rgba(10,10,11,0.35)",
+                // Champagne fill on bone — Sotheby's-catalogue CTA, not a
+                // tech-startup pill. Deep ink text for AA contrast. Thin
+                // gold-deep border + soft warm shadow gives the button real
+                // edge without looking heavy.
+                background: "var(--gold)",
+                color: "var(--ink)",
+                border: "1px solid var(--gold-deep)",
+                boxShadow: "0 6px 18px -8px rgba(140,107,37,0.45), inset 0 1px 0 0 rgba(255,255,255,0.25)",
+                fontWeight: 600,
+                letterSpacing: "0.01em",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "var(--gold-deep)";
+                e.currentTarget.style.color = "var(--paper)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "var(--gold)";
+                e.currentTarget.style.color = "var(--ink)";
               }}
             >
-              <Rocket className="w-3.5 h-3.5 transition-transform group-hover:rotate-[-8deg]" />
-              Start Building
+              <span>Start Building</span>
+              <span
+                className="text-[15px] leading-none transition-transform group-hover:translate-x-0.5"
+                style={{
+                  fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+                  fontWeight: 500,
+                  marginTop: "-1px",
+                }}
+                aria-hidden
+              >
+                →
+              </span>
             </Link>
           </div>
 
@@ -437,10 +492,17 @@ export default function SiteNavigation() {
               <Link
                 href="/builder"
                 onClick={() => setMobileOpen(false)}
-                className="block p-3 text-center text-sm font-semibold rounded-lg"
-                style={{ background: "var(--ink)", color: "var(--paper)" }}
+                className="block p-3 text-center text-sm rounded-lg transition-colors"
+                style={{
+                  background: "var(--gold)",
+                  color: "var(--ink)",
+                  border: "1px solid var(--gold-deep)",
+                  fontWeight: 600,
+                  letterSpacing: "0.01em",
+                  boxShadow: "0 4px 12px -4px rgba(140,107,37,0.4), inset 0 1px 0 0 rgba(255,255,255,0.25)",
+                }}
               >
-                Start Building
+                Start Building →
               </Link>
             </div>
           </div>
