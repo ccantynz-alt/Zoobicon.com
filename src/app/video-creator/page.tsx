@@ -484,7 +484,7 @@ SCRIPT_2:
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white relative overflow-hidden fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[var(--paper)] text-white relative overflow-hidden fs-grain pt-[72px]">
       {/* Ambient cinematic glow — matches Filmora standard */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
         <div
@@ -499,7 +499,7 @@ SCRIPT_2:
       </div>
 
       {/* Step indicator sub-header — below global nav */}
-      <div className="relative z-40 border-b border-white/[0.04] bg-[#0b1530]/60 backdrop-blur-xl">
+      <div className="relative z-40 border-b border-white/[0.04] bg-[var(--paper)]/60 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-2.5">
             <div

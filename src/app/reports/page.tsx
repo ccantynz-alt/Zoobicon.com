@@ -108,7 +108,7 @@ export default function ReportsPage() {
   return (
     <div className="min-h-screen text-white">
       {/* Header */}
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-md sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>

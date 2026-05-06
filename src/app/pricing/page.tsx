@@ -168,7 +168,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0b1530] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
+    <div className="relative min-h-screen bg-[var(--paper)] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
       {/* ── structured data ── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />

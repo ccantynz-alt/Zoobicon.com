@@ -151,7 +151,7 @@ export default function MetaTagGeneratorPage() {
   const previewUrl = siteUrl || "https://yoursite.com";
 
   return (
-    <div className="relative z-10 min-h-screen bg-[#0b1530] text-white pt-[72px]">
+    <div className="relative z-10 min-h-screen bg-[var(--paper)] text-white pt-[72px]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -203,7 +203,7 @@ export default function MetaTagGeneratorPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Best Coffee Roastery in Auckland"
-                  className={`w-full px-4 py-2.5 bg-[#0b1530] border rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 ${
+                  className={`w-full px-4 py-2.5 bg-[var(--paper)] border rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 ${
                     titleWarning
                       ? "border-stone-500/40 focus:ring-stone-500/30"
                       : "border-white/[0.08] focus:ring-stone-500/30"
@@ -236,7 +236,7 @@ export default function MetaTagGeneratorPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="A compelling description of your page for search results..."
                   rows={3}
-                  className={`w-full px-4 py-2.5 bg-[#0b1530] border rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 resize-none ${
+                  className={`w-full px-4 py-2.5 bg-[var(--paper)] border rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 resize-none ${
                     descWarning
                       ? "border-stone-500/40 focus:ring-stone-500/30"
                       : "border-white/[0.08] focus:ring-stone-500/30"
@@ -260,7 +260,7 @@ export default function MetaTagGeneratorPage() {
                   value={keywords}
                   onChange={(e) => setKeywords(e.target.value)}
                   placeholder="coffee, roastery, auckland, beans (comma separated)"
-                  className="w-full px-4 py-2.5 bg-[#0b1530] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
+                  className="w-full px-4 py-2.5 bg-[var(--paper)] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
                 />
               </div>
 
@@ -274,7 +274,7 @@ export default function MetaTagGeneratorPage() {
                   value={author}
                   onChange={(e) => setAuthor(e.target.value)}
                   placeholder="Your name or company"
-                  className="w-full px-4 py-2.5 bg-[#0b1530] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
+                  className="w-full px-4 py-2.5 bg-[var(--paper)] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
                 />
               </div>
 
@@ -288,7 +288,7 @@ export default function MetaTagGeneratorPage() {
                   value={siteUrl}
                   onChange={(e) => setSiteUrl(e.target.value)}
                   placeholder="https://yoursite.com"
-                  className="w-full px-4 py-2.5 bg-[#0b1530] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
+                  className="w-full px-4 py-2.5 bg-[var(--paper)] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
                 />
               </div>
             </div>
@@ -307,7 +307,7 @@ export default function MetaTagGeneratorPage() {
                   value={ogImage}
                   onChange={(e) => setOgImage(e.target.value)}
                   placeholder="https://yoursite.com/og-image.png (1200x630 recommended)"
-                  className="w-full px-4 py-2.5 bg-[#0b1530] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
+                  className="w-full px-4 py-2.5 bg-[var(--paper)] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
                 />
               </div>
 
@@ -321,7 +321,7 @@ export default function MetaTagGeneratorPage() {
                   value={twitterHandle}
                   onChange={(e) => setTwitterHandle(e.target.value)}
                   placeholder="@yourhandle"
-                  className="w-full px-4 py-2.5 bg-[#0b1530] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
+                  className="w-full px-4 py-2.5 bg-[var(--paper)] border border-white/[0.08] rounded-xl text-sm text-white placeholder-white/15 focus:outline-none focus:ring-2 focus:ring-stone-500/30"
                 />
               </div>
             </div>
@@ -408,7 +408,7 @@ export default function MetaTagGeneratorPage() {
                   )}
                 </button>
               </div>
-              <pre className="bg-[#0b1530] border border-white/[0.06] rounded-xl p-4 text-[11px] text-stone-300/80 font-mono overflow-x-auto max-h-72 overflow-y-auto leading-relaxed">
+              <pre className="bg-[var(--paper)] border border-white/[0.06] rounded-xl p-4 text-[11px] text-stone-300/80 font-mono overflow-x-auto max-h-72 overflow-y-auto leading-relaxed">
                 {generatedTags}
               </pre>
             </div>

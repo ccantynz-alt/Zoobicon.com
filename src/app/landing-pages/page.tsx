@@ -82,7 +82,7 @@ export default function LandingPagesPage() {
 
   return (
     <div className="min-h-screen bg-transparent text-white">
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
@@ -338,7 +338,7 @@ export default function LandingPagesPage() {
               ))}
             </div>
             <div className="p-1 rounded-2xl bg-gradient-to-r from-stone-500/20 to-stone-500/20">
-              <div className="bg-[#0a1628] rounded-xl p-8 min-h-[400px] flex items-center justify-center relative">
+              <div className="bg-[var(--paper)] rounded-xl p-8 min-h-[400px] flex items-center justify-center relative">
                 <div className="absolute inset-0 bg-black/50 rounded-xl" />
                 <div className="relative z-10 bg-white rounded-2xl p-6 max-w-sm text-black">
                   <h3 className="text-lg font-bold mb-2">Wait! Before you go...</h3>

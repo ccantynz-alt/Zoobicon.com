@@ -172,7 +172,7 @@ export default function TldPage() {
 
   if (!info) {
     return (
-      <div className="min-h-screen bg-[#0b0b16] text-white pt-24 pb-16">
+      <div className="min-h-screen bg-[var(--paper)] text-white pt-24 pb-16">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h1 className="text-3xl font-bold mb-4">Extension not found</h1>
           <p className="text-slate-400 mb-8">We don&apos;t have information about .{tld} domains yet.</p>
@@ -223,7 +223,7 @@ export default function TldPage() {
   const Icon = info.icon;
 
   return (
-    <div className="min-h-screen bg-[#0b0b16] text-white">
+    <div className="min-h-screen bg-[var(--paper)] text-white">
 
       {/* Hero */}
       <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden">

@@ -105,7 +105,7 @@ export default function StorePage() {
 
   return (
     <div className="min-h-screen text-white">
-      <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
           <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
           <div className="flex items-center gap-4">

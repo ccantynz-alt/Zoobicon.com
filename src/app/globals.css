@@ -146,7 +146,7 @@ img, video {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a1628;
+  background: var(--paper);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -266,9 +266,9 @@ pre code {
 }
 
 .cyber-input {
-  background: #0a1628;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #f0f0f5;
+  background: var(--paper-input);
+  border: 1px solid var(--rule);
+  color: var(--ink);
   font-family: "Inter", system-ui, sans-serif;
   font-size: 14px;
   padding: 12px 16px;
@@ -463,9 +463,9 @@ pre code {
   box-shadow: 0 4px 20px rgba(124, 90, 255, 0.15);
 }
 
-/* Void page — deep navy canvas */
+/* Void page — was deep navy canvas, now bone (rule 29 reversal) */
 .bg-void {
-  background: #0b1530 !important;
+  background: var(--paper) !important;
 }
 
 /* Crisp white text with subtle glow for black fog pages */
@@ -1823,13 +1823,19 @@ select {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Deep navy canvas — replaces pure black, still dark enough for editorial contrast */
-  --fs-bg-0: #060e1f;           /* page background (navy-950) */
-  --fs-bg-1: #0a1628;           /* nav + footer (navy-900) */
-  --fs-bg-2: #0f2148;           /* cards (navy-800) */
-  --fs-bg-3: #152e60;           /* elevated cards (navy-700) */
-  --fs-hair: rgba(255,255,255,0.06);
-  --fs-hair-strong: rgba(255,255,255,0.12);
+  /* Editorial-light surfaces (rule 29 reversal — 2026-05-06).
+   * Was Filmora navy (#060e1f / #0a1628 / #0f2148 / #152e60). The
+   * Filmora vars persist as aliases so any component using `.fs-card`
+   * or `var(--fs-bg-*)` directly now paints on the editorial palette
+   * without touching every consumer. Hairline tokens flipped from
+   * white-on-navy translucent to ink-on-paper translucent so borders
+   * remain visible against the new bone surfaces. */
+  --fs-bg-0: var(--paper);          /* page background — pure white */
+  --fs-bg-1: var(--paper-elevated); /* nav + footer — warm cream */
+  --fs-bg-2: var(--paper-elevated); /* cards — warm cream */
+  --fs-bg-3: #ffffff;               /* elevated cards — pure white pop on cream pages */
+  --fs-hair: rgba(10, 10, 11, 0.08);
+  --fs-hair-strong: rgba(10, 10, 11, 0.16);
 
   /* Display typography scale (Filmora uses 204px for final CTA) */
   --fs-display-2xl: clamp(4rem, 11vw, 11rem);     /* ~176px */

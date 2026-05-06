@@ -375,7 +375,7 @@ export default function DomainsPage() {
               <div>
                 <label className="block text-[11px] uppercase tracking-[0.15em] font-semibold text-white/55 mb-1.5">Country</label>
                 <select value={contactInfo.country} onChange={e => setContactInfo(p => ({ ...p, country: e.target.value }))}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0b1530] border border-white/[0.08] text-white text-[13px] focus:outline-none focus:border-[#E8D4B0]/40 transition-all">
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--paper)] border border-white/[0.08] text-white text-[13px] focus:outline-none focus:border-[#E8D4B0]/40 transition-all">
                   <option value="NZ">New Zealand</option>
                   <option value="AU">Australia</option>
                   <option value="US">United States</option>

@@ -408,7 +408,7 @@ export default function EsimCountryPage({ params }: { params: { country: string 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Header */}
-      <nav className="border-b border-white/[0.06] bg-[#0b1530]/90 backdrop-blur-xl">
+      <nav className="border-b border-white/[0.06] bg-[var(--paper)]/90 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between h-14">
           <a href="/" className="text-sm font-bold">Zoobicon</a>
           <div className="flex gap-4 text-xs text-white/40">
