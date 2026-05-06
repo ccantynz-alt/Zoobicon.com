@@ -195,24 +195,35 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex relative z-10">
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-60 lg:fixed lg:inset-y-0 bg-white border-r border-slate-200 z-40 shadow-sm">
+      {/* Desktop sidebar — elevated cream so it separates from the bone page */}
+      <aside
+        className="hidden lg:flex lg:flex-col lg:w-60 lg:fixed lg:inset-y-0 z-40 shadow-sm"
+        style={{
+          background: "var(--paper-elevated)",
+          borderRight: "1px solid var(--rule)",
+        }}
+      >
         {sidebarContent}
       </aside>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+          className="fixed inset-0 z-40 lg:hidden"
+          style={{ background: "rgba(10, 10, 11, 0.35)", backdropFilter: "blur(4px)" }}
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Mobile sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 w-60 bg-white border-r border-slate-200 z-50 flex flex-col transform transition-transform duration-200 ease-in-out lg:hidden shadow-2xl ${
+        className={`fixed inset-y-0 left-0 w-60 z-50 flex flex-col transform transition-transform duration-200 ease-in-out lg:hidden shadow-2xl ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
+        style={{
+          background: "var(--paper-elevated)",
+          borderRight: "1px solid var(--rule)",
+        }}
       >
         <button
           onClick={() => setSidebarOpen(false)}
@@ -225,8 +236,14 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
       {/* Main content */}
       <div className="flex-1 lg:pl-60 min-h-screen flex flex-col">
-        {/* Mobile top bar */}
-        <header className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 border-b border-slate-200 bg-white lg:hidden shadow-sm">
+        {/* Mobile top bar — elevated cream */}
+        <header
+          className="sticky top-0 z-30 flex items-center justify-between h-14 px-4 lg:hidden shadow-sm"
+          style={{
+            background: "var(--paper-elevated)",
+            borderBottom: "1px solid var(--rule)",
+          }}
+        >
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-lg text-slate-600 hover:text-slate-700 hover:bg-slate-100 transition-colors"
