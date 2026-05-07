@@ -973,7 +973,7 @@ export default function DomainFinderPage() {
                   key={r.slug}
                   className={`rounded-xl border backdrop-blur-sm transition-all duration-300 ${
                     isAvailable
-                      ? "bg-gradient-to-r from-stone-500/20 to-stone-500/15 border-stone-400/40 shadow-[0_8px_32px_-12px_rgba(139,92,246,0.35)]"
+                      ? "bg-gradient-to-r from-stone-500/20 to-stone-500/15 border-stone-400/40 shadow-[0_8px_32px_-12px_rgba(184,146,63,0.35)]"
                       : isTaken
                       ? "bg-[#0f1830]/85 border-white/[0.08] opacity-70"
                       : "bg-[#101a35]/85 border-white/[0.12] shadow-[0_4px_16px_-8px_rgba(0,0,0,0.4)]"

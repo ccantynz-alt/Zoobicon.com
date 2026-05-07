@@ -84,9 +84,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 <style>
   body{background:radial-gradient(ellipse at top,#1e1b4b 0%,#0b0b15 60%);min-height:100vh}
   pre{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.55}
-  .glow{box-shadow:0 0 80px -20px rgba(139,92,246,.45)}
-  .code-block{background:#060e1f;border:1px solid rgba(139,92,246,.25)}
-  .copy-btn:hover{background:rgba(139,92,246,.2)}
+  .glow{box-shadow:0 0 80px -20px rgba(184,146,63,.45)}
+  .code-block{background:#060e1f;border:1px solid rgba(184,146,63,.25)}
+  .copy-btn:hover{background:rgba(184,146,63,.2)}
 </style>
 </head>
 <body class="text-white antialiased">

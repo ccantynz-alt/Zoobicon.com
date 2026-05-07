@@ -191,7 +191,7 @@ export default function InstantOnboardingPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full group relative inline-flex items-center justify-center gap-3 px-6 py-5 rounded-2xl bg-gradient-to-r from-stone-500 to-stone-500 text-white font-semibold text-lg shadow-[0_0_40px_rgba(168,85,247,0.4)] hover:shadow-[0_0_60px_rgba(168,85,247,0.6)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full group relative inline-flex items-center justify-center gap-3 px-6 py-5 rounded-2xl bg-gradient-to-r from-stone-500 to-stone-500 text-white font-semibold text-lg shadow-[0_0_40px_rgba(184,146,63,0.4)] hover:shadow-[0_0_60px_rgba(184,146,63,0.6)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {submitting ? (
                     <>

@@ -441,9 +441,9 @@ export default function DomainsPage() {
           <div className="absolute left-1/2 top-0 h-[700px] w-[1200px] -translate-x-1/2 -translate-y-1/4 rounded-full blur-[180px]"
             style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
           <div className="absolute right-0 top-1/3 h-[400px] w-[400px] rounded-full blur-[120px]"
-            style={{ background: "radial-gradient(closest-side, rgba(99,102,241,0.08), transparent 70%)" }} />
+            style={{ background: "radial-gradient(closest-side, rgba(184,146,63,0.08), transparent 70%)" }} />
           <div className="absolute left-0 top-1/2 h-[300px] w-[300px] rounded-full blur-[100px]"
-            style={{ background: "radial-gradient(closest-side, rgba(59,130,246,0.06), transparent 70%)" }} />
+            style={{ background: "radial-gradient(closest-side, rgba(212,184,109,0.06), transparent 70%)" }} />
         </div>
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">

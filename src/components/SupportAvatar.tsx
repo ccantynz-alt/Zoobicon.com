@@ -72,8 +72,8 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
         className="absolute inset-0 rounded-2xl blur-2xl transition-all duration-700"
         style={{
           background: isSpeaking
-            ? "radial-gradient(ellipse at 50% 60%, rgba(16,185,129,0.18) 0%, rgba(99,102,241,0.10) 60%, transparent 100%)"
-            : "radial-gradient(ellipse at 50% 60%, rgba(99,102,241,0.08) 0%, transparent 70%)",
+            ? "radial-gradient(ellipse at 50% 60%, rgba(16,185,129,0.18) 0%, rgba(184,146,63,0.10) 60%, transparent 100%)"
+            : "radial-gradient(ellipse at 50% 60%, rgba(184,146,63,0.08) 0%, transparent 70%)",
         }}
       />
 

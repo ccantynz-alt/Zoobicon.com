@@ -8,57 +8,65 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Navy replaces pure black across the platform.
-        // Deep ocean navy — clearly blue, premium, Stripe-inspired.
-        // `black` is remapped below so every existing bg-black/text-black
-        // usage picks up the new tone without 144 file edits.
+        // Editorial-light palette — warm bone, near-black ink, champagne
+        // gold accent. The legacy `navy`, `brand`, `accent.*`, `zoo`, `dark`
+        // palette names are kept so existing class references resolve, but
+        // every shade now points at the editorial scale (warm/stone tones,
+        // gold accent) instead of cold blue/violet. No file edits needed —
+        // bg-navy-900, text-brand-500, bg-zoo-400, etc. all render warm.
         navy: {
-          50: "#eef2fb",
-          100: "#d8e0f3",
-          200: "#b4c3e5",
-          300: "#8299c9",
-          400: "#4f6eaa",
-          500: "#2d4d8c",
-          600: "#1e3a7a",
-          700: "#152e60",
-          800: "#0f2148",
-          900: "#0a1628",
-          950: "#060e1f",
+          50: "#fafaf9",
+          100: "#f5f5f4",
+          200: "#e7e5e4",
+          300: "#d6d3d1",
+          400: "#a8a29e",
+          500: "#78716c",
+          600: "#57534e",
+          700: "#44403c",
+          800: "#292524",
+          900: "#1c1917",
+          950: "#0c0a09",
         },
-        black: "#060e1f",
+        // Pure black stays black so text-black / fill-black still work.
+        // Background usages should already be opt-in via class.
+        black: "#0a0a0b",
         dark: {
-          100: "#162044",
-          200: "#0f1d3a",
-          300: "#0a1628",
+          100: "#f4f3ed",
+          200: "#ecebe1",
+          300: "#e7e5dd",
         },
+        // Brand accent — champagne gold ladder (was Stripe blue).
         brand: {
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#2563eb",
-          600: "#1d4ed8",
-          700: "#1e40af",
+          200: "#f4ead0",
+          300: "#e7d6a3",
+          400: "#d4b86d",
+          500: "#b8923f",
+          600: "#9c7a2c",
+          700: "#7a5e1f",
         },
+        // Accent neutrals — were cyan/purple/pink, now warm tonal variants
+        // so legacy `text-accent-cyan` / `bg-accent-purple` resolve to
+        // editorial neutrals instead of bright sky/violet.
         accent: {
-          cyan: "#22d3ee",
-          purple: "#67e8f9",
-          pink: "#38bdf8",
+          cyan: "#a8a29e",
+          purple: "#78716c",
+          pink: "#b8923f",
+          stone: "#78716c",
         },
-        // Signature color — electric violet/indigo that's uniquely Zoobicon
-        // Not another blue gradient — this is ownable
+        // Signature — was electric violet, now warm gold series.
         zoo: {
-          50: "#f0eeff",
-          100: "#ddd8ff",
-          200: "#bfb4ff",
-          300: "#9b85ff",
-          400: "#7c5aff", // Primary signature
-          500: "#6d3bff", // Saturated core
-          600: "#5a1eff",
-          700: "#4a0ed4",
-          800: "#3d0eab",
-          900: "#2d0a7a",
+          50: "#fdf9ec",
+          100: "#fbf2d4",
+          200: "#f4ead0",
+          300: "#e7d6a3",
+          400: "#d4b86d",
+          500: "#b8923f",
+          600: "#9c7a2c",
+          700: "#7a5e1f",
+          800: "#5a4716",
+          900: "#3a2e0e",
         },
-        // Warm grays — Linear-inspired, not cold blue-gray
+        // Warm grays — kept (already neutral, used as the editorial spine)
         warm: {
           50: "#fafaf9",
           100: "#f5f5f4",

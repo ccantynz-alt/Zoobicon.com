@@ -42,7 +42,7 @@ export default async function OGImage() {
             width: "400px",
             height: "400px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(59, 130, 246, 0.2), transparent 70%)",
+            background: "radial-gradient(circle, rgba(212,184,109, 0.2), transparent 70%)",
             filter: "blur(60px)",
           }}
         />
