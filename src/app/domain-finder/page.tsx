@@ -718,26 +718,22 @@ export default function DomainFinderPage() {
   const allUnverified = checkedAll && results.length > 0 && verifiedCount === 0;
 
   return (
-    <div className="relative z-10 min-h-screen bg-[#f4f3ed] text-white">
+    <div className="relative z-10 min-h-screen bg-[var(--paper)] text-[var(--ink)]">
       {/* Hero */}
       <div className="relative overflow-hidden pb-12 pt-32 md:pt-36 px-4">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-stone-600/15 rounded-full blur-[100px]" />
-        </div>
-
         <div className="relative max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-stone-500/10 border border-stone-500/20 rounded-full text-stone-300 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--gold-soft)] border border-[var(--gold)]/40 rounded-full text-[var(--gold-deep)] text-sm font-medium mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             AI-Powered Domain Discovery
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight text-[var(--ink)]">
             Find your perfect{" "}
-            <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
+            <span className="text-[var(--gold-deep)] italic" style={{ fontFamily: "'Playfair Display', Fraunces, Georgia, serif" }}>
               .com domain
             </span>
           </h1>
-          <p className="text-stone-400 text-lg mb-6 max-w-xl mx-auto">
+          <p className="text-[var(--ink-secondary)] text-lg mb-6 max-w-xl mx-auto">
             Describe your business and AI generates up to 100 brandable names — then we
             instantly check which .com domains are actually available.
           </p>
@@ -749,7 +745,7 @@ export default function DomainFinderPage() {
                 key={p.id}
                 onClick={() => applyPreset(p)}
                 disabled={isRunning}
-                className="px-3 py-1.5 rounded-full text-xs font-medium border bg-white/[0.03] border-white/[0.08] text-stone-300 hover:border-violet-400/40 hover:bg-violet-500/10 hover:text-violet-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-full text-xs font-medium border bg-[var(--paper-elevated)] border-[var(--rule)] text-[var(--ink-secondary)] hover:border-[var(--ink)] hover:text-[var(--ink)] transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
                 title={p.prompt}
               >
                 <span className="text-sm">{p.emoji}</span>
@@ -766,12 +762,12 @@ export default function DomainFinderPage() {
               onChange={(e) => setDescription(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               placeholder="e.g., AI scheduling tool for dentists"
-              className="flex-1 px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 focus:border-stone-500/50 transition-all"
+              className="flex-1 px-4 py-3.5 bg-[var(--paper-input)] border border-[var(--rule)] rounded-xl text-[var(--ink)] placeholder-[var(--ink-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--ink)]/10 focus:border-[var(--ink)] transition-all"
             />
             <button
               onClick={handleSearch}
               disabled={!description.trim() || isRunning}
-              className="px-6 py-3.5 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50 transition-all whitespace-nowrap"
+              className="px-6 py-3.5 bg-[var(--ink)] hover:bg-[var(--ink-secondary)] text-[var(--paper)] rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50 transition-all whitespace-nowrap"
             >
               {isRunning ? (
                 <>
@@ -790,7 +786,7 @@ export default function DomainFinderPage() {
           {/* Filter chips — count, word count, length, real vs invented */}
           <div className="mt-5 flex flex-col items-center gap-3">
             <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl">
-              <span className="text-[11px] uppercase tracking-widest text-stone-500 font-semibold pr-1">Show</span>
+              <span className="text-[11px] uppercase tracking-widest text-[var(--ink-muted)] font-semibold pr-1">Show</span>
               {COUNT_OPTIONS.map((c) => (
                 <button
                   key={c}
@@ -798,8 +794,8 @@ export default function DomainFinderPage() {
                   disabled={isRunning}
                   className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                     count === c
-                      ? "bg-stone-500/20 border-stone-400/40 text-stone-200"
-                      : "bg-white/[0.04] border-white/[0.08] text-stone-400 hover:border-stone-400/30 hover:text-stone-200"
+                      ? "bg-[var(--ink)] border-[var(--ink)] text-[var(--paper)]"
+                      : "bg-[var(--paper-elevated)] border-[var(--rule)] text-[var(--ink-secondary)] hover:border-[var(--ink)] hover:text-[var(--ink)]"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {c} names
@@ -807,7 +803,7 @@ export default function DomainFinderPage() {
               ))}
             </div>
             <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl">
-              <span className="text-[11px] uppercase tracking-widest text-stone-500 font-semibold pr-1">Style</span>
+              <span className="text-[11px] uppercase tracking-widest text-[var(--ink-muted)] font-semibold pr-1">Style</span>
               {([
                 { v: "either" as WordCountChoice, label: "Any words" },
                 { v: 1 as WordCountChoice, label: "1 word only" },
@@ -819,26 +815,26 @@ export default function DomainFinderPage() {
                   disabled={isRunning}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                     wordCount === opt.v
-                      ? "bg-stone-500/15 border-stone-400/40 text-stone-200"
-                      : "bg-white/[0.03] border-white/[0.08] text-stone-400 hover:border-stone-400/30 hover:text-stone-200"
+                      ? "bg-[var(--ink)] border-[var(--ink)] text-[var(--paper)]"
+                      : "bg-[var(--paper-elevated)] border-[var(--rule)] text-[var(--ink-secondary)] hover:border-[var(--ink)] hover:text-[var(--ink)]"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {opt.label}
                 </button>
               ))}
-              <span className="w-px h-4 bg-white/10 mx-1" />
+              <span className="w-px h-4 bg-[var(--rule)] mx-1" />
               <button
                 onClick={() => setLength(length === "short" ? "any" : "short")}
                 disabled={isRunning}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                   length === "short"
-                    ? "bg-amber-500/15 border-amber-400/40 text-amber-200"
-                    : "bg-white/[0.03] border-white/[0.08] text-stone-400 hover:border-amber-400/30 hover:text-stone-200"
+                    ? "bg-[var(--gold-soft)] border-[var(--gold)] text-[var(--gold-deep)]"
+                    : "bg-[var(--paper-elevated)] border-[var(--rule)] text-[var(--ink-secondary)] hover:border-[var(--gold)] hover:text-[var(--gold-deep)]"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 Short ≤6 chars
               </button>
-              <span className="w-px h-4 bg-white/10 mx-1" />
+              <span className="w-px h-4 bg-[var(--rule)] mx-1" />
               {([
                 { v: "either" as WordTypeChoice, label: "Any" },
                 { v: "real" as WordTypeChoice, label: "Real words" },
@@ -850,8 +846,8 @@ export default function DomainFinderPage() {
                   disabled={isRunning}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                     wordType === opt.v
-                      ? "bg-amber-500/15 border-amber-400/40 text-amber-200"
-                      : "bg-white/[0.03] border-white/[0.08] text-stone-400 hover:border-amber-400/30 hover:text-stone-200"
+                      ? "bg-[var(--gold-soft)] border-[var(--gold)] text-[var(--gold-deep)]"
+                      : "bg-[var(--paper-elevated)] border-[var(--rule)] text-[var(--ink-secondary)] hover:border-[var(--gold)] hover:text-[var(--gold-deep)]"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {opt.label}
@@ -862,7 +858,7 @@ export default function DomainFinderPage() {
 
           {/* Error */}
           {errorMsg && (
-            <p className="mt-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 max-w-2xl mx-auto text-left">
+            <p className="mt-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3 max-w-2xl mx-auto text-left">
               {errorMsg}
             </p>
           )}
@@ -872,24 +868,24 @@ export default function DomainFinderPage() {
       {/* Progress bar */}
       {isRunning && (
         <div className="max-w-3xl mx-auto px-4 mb-8">
-          <div className="bg-[#101a35]/85 backdrop-blur-sm border border-white/[0.12] rounded-xl p-4 shadow-[0_4px_16px_-8px_rgba(0,0,0,0.4)]">
+          <div className="bg-[var(--paper-elevated)] border border-[var(--rule)] rounded-xl p-4 shadow-[var(--shadow-1)]">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-stone-300 flex items-center gap-2">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-stone-400" />
+              <span className="text-sm text-[var(--ink-secondary)] flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--ink-muted)]" />
                 {phase === "generating"
                   ? "AI is generating 25 brandable names..."
                   : `Checking .com availability — ${checkedCount} of ${totalCount} done`}
               </span>
               {phase === "checking" && checkedCount > 0 && (
-                <span className="text-xs text-amber-400 font-mono">
+                <span className="text-xs text-[var(--gold-deep)] font-mono">
                   {availableCount} available so far
                 </span>
               )}
             </div>
             {phase === "checking" && totalCount > 0 && (
-              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-[var(--rule)] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-stone-500 to-stone-500 rounded-full transition-all duration-300"
+                  className="h-full bg-[var(--ink)] rounded-full transition-all duration-300"
                   style={{ width: `${(checkedCount / totalCount) * 100}%` }}
                 />
               </div>
@@ -904,23 +900,23 @@ export default function DomainFinderPage() {
           {/* Results header */}
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="font-bold text-xl">
+              <h2 className="font-bold text-xl text-[var(--ink)]">
                 {checkedAll
                   ? `${availableCount} available .com domain${availableCount !== 1 ? "s" : ""} found`
                   : "Checking availability…"}
               </h2>
-              <p className="text-sm text-stone-500 mt-0.5">
+              <p className="text-sm text-[var(--ink-muted)] mt-0.5">
                 {results.length} names generated for &ldquo;{description}&rdquo;
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg p-1">
+              <div className="flex items-center gap-1 bg-[var(--paper-elevated)] border border-[var(--rule)] rounded-lg p-1">
                 <button
                   onClick={() => setFilter("available")}
                   className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                     filter === "available"
-                      ? "bg-violet-600 text-white"
-                      : "text-stone-400 hover:text-white"
+                      ? "bg-[var(--ink)] text-[var(--paper)]"
+                      : "text-[var(--ink-secondary)] hover:text-[var(--ink)]"
                   }`}
                 >
                   Available
@@ -929,8 +925,8 @@ export default function DomainFinderPage() {
                   onClick={() => setFilter("saved")}
                   className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
                     filter === "saved"
-                      ? "bg-violet-600 text-white"
-                      : "text-stone-400 hover:text-white"
+                      ? "bg-[var(--ink)] text-[var(--paper)]"
+                      : "text-[var(--ink-secondary)] hover:text-[var(--ink)]"
                   }`}
                 >
                   <Heart className={`w-3.5 h-3.5 ${savedCount > 0 ? "fill-current" : ""}`} />
@@ -940,8 +936,8 @@ export default function DomainFinderPage() {
                   onClick={() => setFilter("all")}
                   className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                     filter === "all"
-                      ? "bg-violet-600 text-white"
-                      : "text-stone-400 hover:text-white"
+                      ? "bg-[var(--ink)] text-[var(--paper)]"
+                      : "text-[var(--ink-secondary)] hover:text-[var(--ink)]"
                   }`}
                 >
                   All ({results.length})
@@ -950,7 +946,7 @@ export default function DomainFinderPage() {
               <button
                 onClick={exportCsv}
                 title="Export the current view to CSV"
-                className="p-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-stone-300 hover:border-cyan-400/30 hover:text-cyan-200 transition-colors"
+                className="p-2 rounded-lg bg-[var(--paper-elevated)] border border-[var(--rule)] text-[var(--ink-secondary)] hover:border-[var(--ink)] hover:text-[var(--ink)] transition-colors"
               >
                 <Download className="w-4 h-4" />
               </button>
@@ -971,12 +967,12 @@ export default function DomainFinderPage() {
               return (
                 <div
                   key={r.slug}
-                  className={`rounded-xl border backdrop-blur-sm transition-all duration-300 ${
+                  className={`rounded-xl border transition-all duration-300 ${
                     isAvailable
-                      ? "bg-gradient-to-r from-stone-500/20 to-stone-500/15 border-stone-400/40 shadow-[0_8px_32px_-12px_rgba(184,146,63,0.35)]"
+                      ? "bg-[var(--paper-elevated)] border-[var(--gold)] shadow-[0_8px_24px_-12px_rgba(184,146,63,0.25)]"
                       : isTaken
-                      ? "bg-[#0f1830]/85 border-white/[0.08] opacity-70"
-                      : "bg-[#101a35]/85 border-white/[0.12] shadow-[0_4px_16px_-8px_rgba(0,0,0,0.4)]"
+                      ? "bg-[var(--paper)] border-[var(--rule)] opacity-60"
+                      : "bg-[var(--paper-elevated)] border-[var(--rule)] shadow-[var(--shadow-1)]"
                   }`}
                 >
                   <div className="p-4">
@@ -1340,26 +1336,26 @@ export default function DomainFinderPage() {
       {/* Empty / example state */}
       {results.length === 0 && phase === "idle" && (
         <div className="max-w-3xl mx-auto px-4 pb-20">
-          <p className="text-stone-500 text-sm text-center mb-4">Try an example:</p>
+          <p className="text-[var(--ink-muted)] text-sm text-center mb-4">Try an example:</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {EXAMPLES.map((ex) => (
               <button
                 key={ex}
                 onClick={() => setDescription(ex)}
-                className="p-4 bg-[#101a35]/80 backdrop-blur-sm hover:bg-[#142046]/85 border border-white/[0.1] hover:border-stone-500/40 rounded-xl text-sm text-stone-300 hover:text-white text-left transition-all flex items-center gap-3"
+                className="p-4 bg-[var(--paper-elevated)] hover:bg-[var(--paper-input)] border border-[var(--rule)] hover:border-[var(--ink)] rounded-xl text-sm text-[var(--ink-secondary)] hover:text-[var(--ink)] text-left transition-all flex items-center gap-3"
               >
-                <Search className="w-4 h-4 text-stone-600 flex-shrink-0" />
+                <Search className="w-4 h-4 text-[var(--ink-muted)] flex-shrink-0" />
                 {ex}
               </button>
             ))}
           </div>
-          <p className="text-stone-600 text-xs text-center mt-6">
+          <p className="text-[var(--ink-muted)] text-xs text-center mt-6">
             AI generates 25 brand-name ideas, then checks each .com in real time
           </p>
           {/* Recent searches */}
           {history.length > 0 && (
             <div className="mt-8">
-              <p className="text-[11px] uppercase tracking-widest font-semibold text-stone-500 text-center mb-3">
+              <p className="text-[11px] uppercase tracking-widest font-semibold text-[var(--ink-muted)] text-center mb-3">
                 Recent searches
               </p>
               <div className="flex flex-wrap items-center justify-center gap-2">
@@ -1367,7 +1363,7 @@ export default function DomainFinderPage() {
                   <button
                     key={h}
                     onClick={() => setDescription(h)}
-                    className="px-3 py-1.5 rounded-full text-xs text-stone-300 bg-white/[0.03] border border-white/[0.08] hover:border-violet-400/30 hover:text-white transition-colors max-w-xs truncate"
+                    className="px-3 py-1.5 rounded-full text-xs text-[var(--ink-secondary)] bg-[var(--paper-elevated)] border border-[var(--rule)] hover:border-[var(--ink)] hover:text-[var(--ink)] transition-colors max-w-xs truncate"
                     title={h}
                   >
                     {h}
@@ -1383,17 +1379,17 @@ export default function DomainFinderPage() {
       {selected.size > 0 && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 px-4 sm:px-6 max-w-3xl w-[calc(100%-2rem)]">
           <div
-            className="rounded-2xl border border-violet-400/40 bg-gradient-to-r from-[#1a1340]/95 to-[#0f1f3d]/95 backdrop-blur-xl shadow-[0_20px_48px_-16px_rgba(139,92,246,0.5)] px-4 py-3 flex items-center justify-between gap-3"
+            className="rounded-2xl border border-[var(--rule-strong)] bg-[var(--paper-elevated)] backdrop-blur-xl shadow-[var(--shadow-2)] px-4 py-3 flex items-center justify-between gap-3"
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-violet-500/20 border border-violet-400/40 flex items-center justify-center flex-shrink-0">
-                <ShoppingCart className="w-4 h-4 text-violet-200" />
+              <div className="w-8 h-8 rounded-full bg-[var(--gold-soft)] border border-[var(--gold)] flex items-center justify-center flex-shrink-0">
+                <ShoppingCart className="w-4 h-4 text-[var(--gold-deep)]" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-semibold text-[var(--ink)]">
                   {selected.size} domain{selected.size > 1 ? "s" : ""} selected
                 </p>
-                <p className="text-[11px] text-stone-400 truncate">
+                <p className="text-[11px] text-[var(--ink-muted)] truncate">
                   {[...selected].slice(0, 4).map((s) => `${s}.com`).join(" · ")}
                   {selected.size > 4 ? ` +${selected.size - 4} more` : ""}
                 </p>
@@ -1402,13 +1398,13 @@ export default function DomainFinderPage() {
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={() => setSelected(new Set())}
-                className="px-3 py-2 rounded-lg text-xs font-medium text-stone-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                className="px-3 py-2 rounded-lg text-xs font-medium text-[var(--ink-secondary)] hover:text-[var(--ink)] hover:bg-[var(--paper-input)] transition-colors"
               >
                 Clear
               </button>
               <button
                 onClick={bulkRegister}
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-sm font-semibold text-white inline-flex items-center gap-1.5 transition-all"
+                className="px-4 py-2 rounded-lg bg-[var(--ink)] hover:bg-[var(--ink-secondary)] text-sm font-semibold text-[var(--paper)] inline-flex items-center gap-1.5 transition-all"
               >
                 Register {selected.size} <ArrowRight className="w-3.5 h-3.5" />
               </button>

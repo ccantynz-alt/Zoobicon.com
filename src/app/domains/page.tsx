@@ -862,9 +862,9 @@ export default function DomainsPage() {
                                     onClick={() => (inCart ? removeFromCart(a.domain) : addToCart(result))}
                                     className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
                                     style={{
-                                      background: inCart ? "var(--ink)" : "var(--gold)",
+                                      background: inCart ? "var(--ink)" : "var(--paper-elevated)",
                                       color: inCart ? "var(--paper)" : "var(--ink)",
-                                      border: "1px solid var(--gold-deep)",
+                                      border: `1px solid ${inCart ? "var(--ink)" : "var(--gold)"}`,
                                     }}
                                   >
                                     <Check className="w-3 h-3" />.{tld}

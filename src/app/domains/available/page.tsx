@@ -781,9 +781,9 @@ function ResultCard({
               <span
                 className="text-[10px] uppercase tracking-[0.16em] font-semibold px-2 py-0.5 rounded-full"
                 style={{
-                  background: "var(--gold-soft, var(--paper))",
+                  background: "var(--paper)",
                   color: "var(--gold-deep)",
-                  border: "1px solid var(--gold-deep)",
+                  border: "1px solid var(--gold)",
                 }}
               >
                 Premium
