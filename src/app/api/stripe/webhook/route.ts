@@ -404,12 +404,17 @@ export async function POST(request: NextRequest) {
   try {
     switch (event.type) {
       case "checkout.session.completed": {
-        // Single source of truth for checkout completion. Previously this case
-        // contained a SECOND inline domain-registration handler that diverged
-        // from handleCheckoutCompleted/handleDomainRegistration in subtle ways
-        // (different placeholder defaults, different metadata field names).
-        // Two handlers racing on the same event = duplicate registration risk.
-        await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
+        // Single source of truth — handleCheckoutCompleted handles all four
+        // paths (video overage, addon, domain registration, plain plan
+        // upgrade) and runs the user-table upsert that sets `plan` and
+        // `subscription_status`. Previously this case body had inline
+        // copies of the overage and domain branches but skipped the plain
+        // plan upsert entirely — meaning a regular subscription checkout
+        // never wrote `plan = 'pro'` to the users table, so the customer
+        // stayed on the free-tier watermark even after paying. Fixed by
+        // delegating to the canonical handler.
+        const session = event.data.object as Stripe.Checkout.Session;
+        await handleCheckoutCompleted(session);
         handled = true;
         break;
       }

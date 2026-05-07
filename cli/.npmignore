@@ -1,0 +1,8 @@
+src/
+tsconfig.json
+.gitignore
+node_modules/
+*.log
+.env
+.env.local
+.DS_Store

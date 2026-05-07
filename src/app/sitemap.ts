@@ -68,6 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Feature / marketing pages
     { path: '/domains', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/domain-search', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/domain-finder', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/marketplace', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/hosting', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/agencies', priority: 0.8, changeFrequency: 'weekly' },
@@ -78,6 +79,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/video-creator', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/seo', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/analytics', priority: 0.8, changeFrequency: 'weekly' },
+
+    // Honest 2026 competitor comparisons — high-intent SEO targets that
+    // rank for "X alternative" queries.
+    { path: '/vs', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/vs/lovable', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/vs/bolt', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/vs/v0', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/vs/heygen', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/gallery', priority: 0.8, changeFrequency: 'daily' },
     { path: '/starter-kits', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/referral', priority: 0.8, changeFrequency: 'monthly' },
