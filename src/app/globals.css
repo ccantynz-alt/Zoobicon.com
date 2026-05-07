@@ -2961,3 +2961,128 @@ select.cyber-input:focus {
 html, body {
   background-color: var(--paper) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BLUE / PURPLE PURGE — Rule 29: no cold blue or purple on any surface.
+   Attribute-substring selectors catch ALL Tailwind variants + opacity.
+   Scoped overrides under .builder-editorial fix the builder panel text.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Dark sidebar colour not caught by earlier block ── */
+[class*="bg-[#0d1321]"] {
+  background-color: var(--paper-elevated) !important;
+}
+
+/* ── Purple / indigo / violet background solids & opacity variants ── */
+[class*="bg-purple-"],[class*="bg-indigo-"],[class*="bg-violet-"] {
+  background-color: rgba(184,146,63,0.10) !important;
+}
+/* ── Blue / sky / cyan → paper ── */
+[class*="bg-blue-"],[class*="bg-sky-"],[class*="bg-cyan-"] {
+  background-color: var(--paper-elevated) !important;
+}
+
+/* ── Purple / indigo / violet text → warm ink / gold ── */
+[class*="text-purple-"],[class*="text-indigo-"],[class*="text-violet-"] {
+  color: var(--gold-deep) !important;
+}
+[class*="text-blue-"],[class*="text-sky-"],[class*="text-cyan-"] {
+  color: var(--ink-secondary) !important;
+}
+
+/* ── Purple / indigo / violet / blue borders ── */
+[class*="border-purple-"],[class*="border-indigo-"],[class*="border-violet-"],
+[class*="border-blue-"],[class*="border-sky-"] {
+  border-color: var(--rule) !important;
+}
+
+/* ── Ring colours ── */
+[class*="ring-purple-"],[class*="ring-indigo-"],[class*="ring-violet-"],
+[class*="ring-blue-"],[class*="ring-sky-"] {
+  --tw-ring-color: var(--gold) !important;
+}
+
+/* ── Shadow colours ── */
+[class*="shadow-purple-"],[class*="shadow-indigo-"],[class*="shadow-violet-"],
+[class*="shadow-blue-"],[class*="shadow-sky-"] {
+  --tw-shadow-color: rgba(184,146,63,0.15) !important;
+}
+
+/* ── Gradient FROM stops — rewrite the Tailwind CSS variable ── */
+[class*="from-purple-"],[class*="from-indigo-"],[class*="from-violet-"],
+[class*="from-blue-"],[class*="from-sky-"] {
+  --tw-gradient-from: var(--paper-elevated) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(247,245,238,0)) !important;
+}
+/* ── TO stops ── */
+[class*="to-purple-"],[class*="to-indigo-"],[class*="to-violet-"],
+[class*="to-blue-"],[class*="to-sky-"] {
+  --tw-gradient-to: var(--paper) !important;
+}
+/* ── VIA stops ── */
+[class*="via-purple-"],[class*="via-indigo-"],[class*="via-violet-"],
+[class*="via-blue-"],[class*="via-sky-"] {
+  --tw-gradient-stops: var(--tw-gradient-from), var(--paper-elevated), var(--tw-gradient-to, rgba(247,245,238,0)) !important;
+}
+
+/* ── Hover purple/indigo overrides ── */
+[class*="hover:bg-purple-"]:hover,[class*="hover:bg-indigo-"]:hover,
+[class*="hover:bg-violet-"]:hover {
+  background-color: rgba(184,146,63,0.12) !important;
+}
+[class*="hover:border-purple-"]:hover,[class*="hover:border-indigo-"]:hover {
+  border-color: var(--gold) !important;
+}
+[class*="hover:text-purple-"]:hover,[class*="hover:text-indigo-"]:hover,
+[class*="hover:text-violet-"]:hover {
+  color: var(--gold-deep) !important;
+}
+[class*="hover:from-purple-"]:hover,[class*="hover:from-indigo-"]:hover {
+  --tw-gradient-from: rgba(184,146,63,0.20) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(247,245,238,0)) !important;
+}
+[class*="hover:to-purple-"]:hover,[class*="hover:to-indigo-"]:hover {
+  --tw-gradient-to: rgba(184,146,63,0.10) !important;
+}
+
+/* ── Builder editorial scope ──────────────────────────────────────────
+   The builder panels use dark-mode text (text-white/xx) designed for
+   a dark background. With the editorial-light paper backing, we remap
+   those to ink so they remain legible. Only applies inside the root
+   div that carries the .builder-editorial class. ── */
+.builder-editorial [class*="text-white"] {
+  color: var(--ink) !important;
+}
+.builder-editorial [class*="text-white/8"],
+.builder-editorial [class*="text-white/7"],
+.builder-editorial [class*="text-white/6"],
+.builder-editorial [class*="text-white/5"],
+.builder-editorial [class*="text-white/4"],
+.builder-editorial [class*="text-white/3"],
+.builder-editorial [class*="text-white/2"],
+.builder-editorial [class*="text-white/1"] {
+  color: var(--ink-muted) !important;
+}
+/* Subtle bg overlays (bg-white/[0.04] etc.) → paper-elevated tint */
+.builder-editorial [class*="bg-white/[0.0"] {
+  background-color: rgba(10,10,11,0.03) !important;
+}
+.builder-editorial [class*="bg-white/[0.1"] {
+  background-color: rgba(10,10,11,0.06) !important;
+}
+/* White borders → rule */
+.builder-editorial [class*="border-white/[0.0"],
+.builder-editorial [class*="border-white/[0.1"] {
+  border-color: var(--rule) !important;
+}
+/* Hover white bg → stone tint */
+.builder-editorial [class*="hover:bg-white/[0.0"]:hover,
+.builder-editorial [class*="hover:bg-white/[0.1"]:hover {
+  background-color: rgba(10,10,11,0.05) !important;
+}
+/* Hover white text → ink-secondary */
+.builder-editorial [class*="hover:text-white/7"]:hover,
+.builder-editorial [class*="hover:text-white/6"]:hover,
+.builder-editorial [class*="hover:text-white/5"]:hover {
+  color: var(--ink-secondary) !important;
+}
