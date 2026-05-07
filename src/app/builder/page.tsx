@@ -2866,30 +2866,17 @@ root.render(React.createElement(App));
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="absolute inset-0 pointer-events-none">
-                      {/* Editorial-light ambient — subtle warm glow on white */}
-                      <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full blur-[150px]"
-                        style={{ background: "var(--gold-soft)" }}
-                      />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full blur-[150px]" style={{ background: "rgba(184,146,63,0.07)" }} />
+                      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: "rgba(184,146,63,0.04)" }} />
                     </div>
 
                     <div className="relative z-10 text-center px-6 max-w-xl">
-                      <h1
-                        className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight"
-                        style={{ color: "var(--ink)" }}
-                      >
-                        What do you want to{" "}
-                        <span
-                          className="display-italic font-normal"
-                          style={{ color: "var(--gold-deep)" }}
-                        >
-                          build?
+                      <h1 className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic" }}>
+                        <span style={{ background: "linear-gradient(135deg, var(--ink) 0%, var(--gold-deep) 50%, var(--gold) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                          What do you want to build?
                         </span>
                       </h1>
-                      <p
-                        className="text-sm mb-10 leading-relaxed max-w-md mx-auto"
-                        style={{ color: "var(--ink-secondary)" }}
-                      >
+                      <p className="text-sm mb-10 leading-relaxed max-w-md mx-auto" style={{ color: "var(--ink-muted)" }}>
                         Describe your vision and our AI will generate a complete, production-ready React application.
                       </p>
 
@@ -2905,38 +2892,18 @@ root.render(React.createElement(App));
                           <button
                             key={chip.label}
                             onClick={() => setPrompt(chip.label.toLowerCase())}
-                            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] transition-all"
-                            style={{
-                              background: "var(--paper-elevated)",
-                              border: "1px solid var(--rule)",
-                              color: "var(--ink-secondary)",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.borderColor = "var(--gold)";
-                              e.currentTarget.style.background = "var(--gold-soft)";
-                              e.currentTarget.style.color = "var(--gold-deep)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.borderColor = "var(--rule)";
-                              e.currentTarget.style.background = "var(--paper-elevated)";
-                              e.currentTarget.style.color = "var(--ink-secondary)";
-                            }}
+                            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11px] transition-all border"
+                            style={{ background: "var(--paper-elevated)", borderColor: "var(--rule)", color: "var(--ink-secondary)" }}
                           >
-                            <span style={{ color: "var(--ink-muted)" }}>{chip.icon}</span>
+                            <span style={{ color: "var(--gold)" }}>{chip.icon}</span>
                             {chip.label}
                             <ChevronRight size={10} style={{ color: "var(--ink-muted)" }} />
                           </button>
                         ))}
                       </div>
 
-                      <div
-                        className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-semibold"
-                        style={{ color: "var(--gold-deep)" }}
-                      >
-                        <span
-                          className="w-1.5 h-1.5 rounded-full animate-pulse"
-                          style={{ background: "var(--gold)" }}
-                        />
+                      <div className="inline-flex items-center gap-2 text-[10px]" style={{ color: "var(--ink-muted)" }}>
+                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--gold)" }} />
                         {useWebContainers ? "Runtime pre-warmed" : "Sandbox ready"}
                       </div>
                     </div>
