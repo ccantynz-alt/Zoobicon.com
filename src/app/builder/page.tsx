@@ -423,7 +423,7 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
         vx, vy,
         baseVx: vx, baseVy: vy,
         size: 1.2 + Math.random() * 2,
-        hue: 260 + Math.random() * 30, // zoo purple/violet range
+        hue: 35 + Math.random() * 18, // warm gold/amber range
         pulse: Math.random() * Math.PI * 2,
         pulseSpeed: 0.01 + Math.random() * 0.02,
       });
@@ -503,8 +503,8 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < CONNECTION_DIST) {
             const alpha = (1 - dist / CONNECTION_DIST) * (gen ? 0.25 : 0.12);
-            const hue = gen ? 265 + Math.sin(time * 0.02) * 20 : 270;
-            ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${alpha})`;
+            const hue = gen ? 40 + Math.sin(time * 0.02) * 8 : 38;
+            ctx.strokeStyle = `hsla(${hue}, 55%, 48%, ${alpha})`;
             ctx.lineWidth = (1 - dist / CONNECTION_DIST) * 1.5;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
@@ -521,7 +521,7 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < MOUSE_RADIUS * 1.2) {
             const alpha = (1 - dist / (MOUSE_RADIUS * 1.2)) * 0.15;
-            ctx.strokeStyle = `hsla(270, 90%, 70%, ${alpha})`;
+            ctx.strokeStyle = `hsla(38, 55%, 48%, ${alpha})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(mx, my);
@@ -559,9 +559,9 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
         const cx = w / 2, cy = h / 2;
         const ringRadius = 100 + Math.sin(time * 0.03) * 30;
         const ringGlow = ctx.createRadialGradient(cx, cy, ringRadius - 20, cx, cy, ringRadius + 40);
-        ringGlow.addColorStop(0, "hsla(270, 90%, 60%, 0)");
-        ringGlow.addColorStop(0.5, `hsla(270, 90%, 60%, ${0.04 + Math.sin(time * 0.05) * 0.02})`);
-        ringGlow.addColorStop(1, "hsla(270, 90%, 60%, 0)");
+        ringGlow.addColorStop(0, "hsla(38, 55%, 48%, 0)");
+        ringGlow.addColorStop(0.5, `hsla(38, 55%, 48%, ${0.04 + Math.sin(time * 0.05) * 0.02})`);
+        ringGlow.addColorStop(1, "hsla(38, 55%, 48%, 0)");
         ctx.fillStyle = ringGlow;
         ctx.beginPath();
         ctx.arc(cx, cy, ringRadius + 40, 0, Math.PI * 2);
@@ -2127,10 +2127,10 @@ root.render(React.createElement(App));
                 onClick={() => setBuildMode(buildMode === "instant" ? "deep" : buildMode === "deep" ? "pipeline" : "instant")}
                 className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
                   buildMode === "pipeline"
-                    ? "bg-violet-500/20 border-violet-500/40 text-violet-300"
+                    ? "bg-stone-200 border-stone-300 text-stone-700"
                     : buildMode === "deep"
-                    ? "bg-stone-500/10 border-stone-500/30 text-stone-400"
-                    : "bg-stone-500/10 border-stone-500/30 text-stone-400"
+                    ? "bg-stone-100 border-stone-200 text-stone-500"
+                    : "bg-stone-100 border-stone-200 text-stone-500"
                 }`}
                 title={
                   buildMode === "instant" ? "Quick Build: <3s preview from component library (free tier)" :
@@ -2184,7 +2184,10 @@ root.render(React.createElement(App));
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-[#0a0f1e] via-[#0f172a] to-[#111827] relative overflow-hidden">
+    <div
+      className="builder-editorial flex flex-col h-screen relative overflow-hidden"
+      style={{ background: "var(--paper)" }}
+    >
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />
@@ -2212,14 +2215,22 @@ root.render(React.createElement(App));
       {/* Interactive particle constellation background */}
       <BuilderBackground isGenerating={status === "generating"} />
 
-      {/* ── Top Bar ── minimal, dark, premium */}
-      <div className="relative z-10 flex items-center h-12 border-b border-white/[0.06] bg-[#0a0f1e]/80 backdrop-blur-xl px-3 gap-3">
+      {/* ── Top Bar ── editorial-light, matches site header */}
+      <div
+        className="relative z-10 flex items-center h-12 px-3 gap-3"
+        style={{
+          background: "rgba(250, 249, 244, 0.94)",
+          borderBottom: "1px solid var(--rule)",
+          backdropFilter: "blur(12px) saturate(140%)",
+          WebkitBackdropFilter: "blur(12px) saturate(140%)",
+        }}
+      >
         {/* Logo + branding */}
         <Link href="/" className="flex items-center gap-2 mr-2 group">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center shadow-sm transition-shadow" style={{ background: "linear-gradient(135deg, #c9a961 0%, #b8923f 100%)", boxShadow: "0 2px 8px rgba(184,146,63,0.25)" }}>
             <Sparkles className="w-3.5 h-3.5 text-white" />
           </div>
-          <span className="text-sm font-semibold text-white/80 hidden sm:inline">Zoobicon</span>
+          <span className="text-sm font-semibold hidden sm:inline" style={{ color: "var(--ink)" }}>Zoobicon</span>
         </Link>
 
         {/* Divider */}
@@ -2336,8 +2347,8 @@ root.render(React.createElement(App));
                 title={advancedMode ? "Switch to simple mode" : "Show advanced tools"}
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
                   advancedMode
-                    ? "bg-gradient-to-r from-purple-500/15 to-indigo-500/15 text-purple-300 border-purple-500/30 shadow-sm shadow-purple-500/10"
-                    : "bg-white/[0.04] text-white/40 hover:text-white/60 hover:bg-white/[0.07] border-white/[0.08] hover:border-purple-500/20"
+                    ? "border-stone-300 text-stone-700 bg-stone-100"
+                    : "border-stone-200 text-stone-500 hover:text-stone-700 hover:bg-stone-50"
                 }`}
               >
                 <Wand2 size={13} />
@@ -2346,11 +2357,12 @@ root.render(React.createElement(App));
               <button
                 onClick={() => setShowDeployModal(true)}
                 disabled={isDeploying}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[11px] font-semibold transition-all border ${
                   isDeploying
-                    ? "bg-purple-500/10 text-purple-300/50 cursor-wait border border-purple-500/20"
-                    : "bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 border border-purple-400/20"
+                    ? "border-stone-200 text-stone-400 cursor-wait bg-stone-50"
+                    : "text-white border-transparent"
                 }`}
+                style={!isDeploying ? { background: "linear-gradient(135deg, #c9a961 0%, #b8923f 100%)", boxShadow: "0 2px 8px rgba(184,146,63,0.3)" } : {}}
               >
                 <Rocket size={13} className={isDeploying ? "animate-pulse" : ""} />
                 {isDeploying ? "Deploying..." : "Deploy"}
@@ -2374,7 +2386,7 @@ root.render(React.createElement(App));
 
       <div className="flex flex-1 overflow-hidden relative z-10">
         {/* ── Left Panel — Chat / Prompt ── */}
-        <div className="w-[380px] min-w-[320px] flex flex-col border-r border-white/[0.06] border-l border-purple-500/10 bg-[#0d1321]/60 backdrop-blur-xl">
+        <div className="w-[380px] min-w-[320px] flex flex-col" style={{ background: "var(--paper-elevated)", borderRight: "1px solid var(--rule)", borderLeft: "1px solid var(--rule)" }}>
           <AnimatePresence mode="wait">
             {!hasCode ? (
               <motion.div
@@ -2478,8 +2490,8 @@ root.render(React.createElement(App));
                 {/* Chat header */}
                 <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-indigo-500/20 flex items-center justify-center">
-                      <MessageSquare className="w-3 h-3 text-indigo-400" />
+                    <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: "rgba(184,146,63,0.15)" }}>
+                      <MessageSquare className="w-3 h-3" style={{ color: "var(--gold-deep)" }} />
                     </div>
                     <span className="text-xs font-semibold text-white/70">Edit with AI</span>
                     {saveStatus === "saving" && (
@@ -2495,7 +2507,7 @@ root.render(React.createElement(App));
                     <button
                       onClick={() => setShowSections(s => !s)}
                       className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] transition-all ${
-                        showSections ? "text-indigo-300 bg-indigo-500/10" : "text-white/30 hover:text-white/60 hover:bg-white/[0.05]"
+                        showSections ? "text-stone-700 bg-stone-100 border-stone-200" : "text-stone-400 hover:text-stone-700 hover:bg-stone-50"
                       }`}
                       title="Manage sections"
                     >
@@ -2515,8 +2527,8 @@ root.render(React.createElement(App));
                       title={advancedMode ? "Hide advanced tools" : "Show advanced tools"}
                       className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] transition-all border ${
                         advancedMode
-                          ? "text-purple-300 bg-gradient-to-r from-purple-500/15 to-indigo-500/15 border-purple-500/30"
-                          : "text-white/30 hover:text-white/60 bg-white/[0.03] hover:bg-white/[0.06] border-white/[0.06] hover:border-purple-500/20"
+                          ? "text-stone-700 bg-stone-100 border-stone-300"
+                          : "text-stone-400 hover:text-stone-700 bg-stone-50 hover:bg-stone-100 border-stone-200"
                       }`}
                     >
                       <Wand2 size={11} />
@@ -2782,24 +2794,25 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0a0f1e]/95 backdrop-blur-sm overflow-hidden"
+                  className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden"
+                  style={{ background: "rgba(247,245,238,0.97)", backdropFilter: "blur(4px)" }}
                 >
                   <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-purple-600/[0.06] blur-[120px] animate-pulse" />
-                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full bg-indigo-600/[0.04] blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[120px] animate-pulse" style={{ background: "rgba(184,146,63,0.08)" }} />
+                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full blur-[100px] animate-pulse" style={{ background: "rgba(184,146,63,0.05)", animationDelay: "1s" }} />
                   </div>
 
                   <div className="relative z-10 text-center px-6">
                     <div className="relative w-20 h-20 mx-auto mb-8">
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 animate-pulse shadow-2xl shadow-purple-500/30" />
-                      <div className="absolute inset-[3px] rounded-[13px] bg-[#0a0f1e] flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+                      <div className="absolute inset-0 rounded-2xl animate-pulse shadow-xl" style={{ background: "linear-gradient(135deg, #c9a961 0%, #b8923f 100%)", boxShadow: "0 8px 32px rgba(184,146,63,0.35)" }} />
+                      <div className="absolute inset-[3px] rounded-[13px] flex items-center justify-center" style={{ background: "var(--paper)" }}>
+                        <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--gold)" }} />
                       </div>
-                      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-purple-500/20 via-transparent to-blue-500/20 animate-spin" style={{ animationDuration: "3s" }} />
+                      <div className="absolute -inset-1 rounded-2xl animate-spin" style={{ background: "conic-gradient(from 0deg, rgba(184,146,63,0.3), transparent, rgba(184,146,63,0.1))", animationDuration: "3s" }} />
                     </div>
 
-                    <h3 className="text-xl font-semibold text-white/90 mb-2">Building your website</h3>
-                    <p className="text-white/30 text-sm mb-8 max-w-sm">Generating production-ready React components</p>
+                    <h3 className="text-xl font-semibold mb-2" style={{ color: "var(--ink)" }}>Building your website</h3>
+                    <p className="text-sm mb-8 max-w-sm" style={{ color: "var(--ink-muted)" }}>Generating production-ready React components</p>
 
                     <div className="flex flex-col items-center gap-2.5">
                       {pipelineAgents.slice(-4).map((msg, i) => {
