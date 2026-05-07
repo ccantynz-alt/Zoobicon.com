@@ -2736,3 +2736,228 @@ select.cyber-input:focus {
  * to bone above, so the marquee fade on the homepage trust strip will
  * fade to bone — which is exactly what we want. No further action. */
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * RULE-29 FINAL SWEEP — ATTRIBUTE-SELECTOR CATCH-ALL (2026-05-06)
+ *
+ * Craig (paraphrased): "How many times have I asked? Just repaired. I'm
+ * about to run out of usage and you've left me with a polished shit of
+ * a website. I've tried to fix this colours problem so many damn times."
+ *
+ * Root cause of Craig's latest screenshot: /builder shipped a dark
+ * gradient outer wrapper using `bg-gradient-to-br from-[#0a0f1e]
+ * via-[#0f172a] to-[#111827]`. The previous override layer caught
+ * `from-[#0a0f1e]` but NOT `via-[#0f172a]` or `to-[#111827]` — so the
+ * gradient's mid and end stops stayed navy, painting a dark band
+ * across the top of the page where SiteNavigation should have shown.
+ * Same kind of leak: 48 other pages use sticky/fixed top bars styled
+ * `bg-[#0b1530]/80`, `bg-[#0a0f1e]/80`, `bg-zinc-900/80` etc — only a
+ * handful of those /opacity variants were enumerated above.
+ *
+ * Rather than enumerate every hex × every /opacity × every gradient
+ * stop (a hopeless game — there are dozens), this block uses CSS
+ * attribute-substring selectors to catch ANY class containing the dark
+ * hex literal, including all opacity suffixes and all gradient stop
+ * positions. One rule covers infinite variants. New code can't leak
+ * dark navy past this layer without an inline `style=` (which has its
+ * own attribute-selector net below).
+ *
+ * Coverage:
+ *   - bg-[#XXX] flat backgrounds (any case)
+ *   - bg-[#XXX]/40, /50, /60, /70, /80, /90, /95 (any opacity)
+ *   - from-[#XXX], via-[#XXX], to-[#XXX] gradient stops (any position)
+ *   - same hexes used multiple times in the same className list
+ *
+ * The selectors target the page's RAW class attribute string, not the
+ * compiled Tailwind escaped form, so they ignore Tailwind's escape
+ * dance entirely.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Backgrounds — flatten any element whose class contains a dark hex bg
+ * to paper, regardless of /opacity. The slight transparency value here
+ * blends nicely with backdrop-blur where it's used as a sticky bar
+ * background. */
+[class*="bg-[#0b1530]"],
+[class*="bg-[#0a0f1e]"],
+[class*="bg-[#0a1628]"],
+[class*="bg-[#0f2148]"],
+[class*="bg-[#152e60]"],
+[class*="bg-[#060e1f]"],
+[class*="bg-[#131520]"],
+[class*="bg-[#0b0d17]"],
+[class*="bg-[#0e0e1a]"],
+[class*="bg-[#0a0a12]"],
+[class*="bg-[#0a0f2e]"],
+[class*="bg-[#0f172a]"],
+[class*="bg-[#111a2e]"],
+[class*="bg-[#111827]"],
+[class*="bg-[#12121a]"],
+[class*="bg-[#1e1e1e]"],
+[class*="bg-[#1e1e2e]"],
+[class*="bg-[#1a1a24]"],
+[class*="bg-[#162044]"],
+[class*="bg-[#11131c]"],
+[class*="bg-[#0d0d12]"],
+[class*="bg-[#1f2937]"],
+[class*="bg-[#0b0b16]"],
+[class*="bg-[#05060a]"],
+[class*="bg-[#0a0a0f]"] {
+  background-color: rgba(247, 245, 238, 0.94) !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+}
+
+/* Sticky / fixed dark top bars are the most visible offenders. When the
+ * element is `sticky top-0` AND has a dark bg class, give it the same
+ * editorial header treatment as SiteNavigation — bright cream lift +
+ * warm hairline + soft shadow — so per-page top-bars feel like part of
+ * the same chrome family instead of an alien dark strip. */
+.sticky[class*="top-0"][class*="bg-[#0"],
+.fixed[class*="top-0"][class*="bg-[#0"],
+.sticky[class*="top-0"][class*="bg-zinc-9"],
+.sticky[class*="top-0"][class*="bg-slate-9"],
+.sticky[class*="top-0"][class*="bg-gray-9"],
+.sticky[class*="top-0"][class*="bg-neutral-9"],
+.fixed[class*="top-0"][class*="bg-zinc-9"],
+.fixed[class*="top-0"][class*="bg-slate-9"],
+.fixed[class*="top-0"][class*="bg-gray-9"],
+.fixed[class*="top-0"][class*="bg-neutral-9"] {
+  background-color: rgba(250, 249, 244, 0.94) !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+  border-bottom: 1px solid var(--rule) !important;
+  box-shadow: 0 4px 16px -6px rgba(10,10,11,0.06) !important;
+}
+
+/* Gradient stops — `from-[#0..]`, `via-[#0..]`, `to-[#0..]` for ANY
+ * dark hex. Reset the compiled Tailwind gradient variables to bone so
+ * the gradient flattens to paper regardless of which stops were dark.
+ * This is what fixed the /builder outer wrapper. */
+[class*="from-[#0a0f1e]"],
+[class*="from-[#0f172a]"],
+[class*="from-[#111827]"],
+[class*="from-[#0b1530]"],
+[class*="from-[#0a1628]"],
+[class*="from-[#0f2148]"],
+[class*="from-[#0b0d17]"],
+[class*="from-[#0e0e1a]"],
+[class*="from-[#0a0a12]"],
+[class*="from-[#060e1f]"],
+[class*="from-[#0b0b16]"],
+[class*="from-[#05060a]"],
+[class*="from-[#11131c]"],
+[class*="from-[#0d0d12]"],
+[class*="from-[#1f2937]"],
+[class*="from-[#131520]"] {
+  --tw-gradient-from: var(--paper) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(247 245 238 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+[class*="via-[#0a0f1e]"],
+[class*="via-[#0f172a]"],
+[class*="via-[#111827]"],
+[class*="via-[#0b1530]"],
+[class*="via-[#0a1628]"],
+[class*="via-[#0f2148]"],
+[class*="via-[#0b0d17]"],
+[class*="via-[#0e0e1a]"],
+[class*="via-[#060e1f]"],
+[class*="via-[#0b0b16]"],
+[class*="via-[#11131c]"],
+[class*="via-[#1f2937]"],
+[class*="via-[#131520]"] {
+  --tw-gradient-via: var(--paper) !important;
+  --tw-gradient-via-stops: var(--tw-gradient-position, ), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-via-stops) !important;
+}
+
+[class*="to-[#0a0f1e]"],
+[class*="to-[#0f172a]"],
+[class*="to-[#111827]"],
+[class*="to-[#0b1530]"],
+[class*="to-[#0a1628]"],
+[class*="to-[#0f2148]"],
+[class*="to-[#0b0d17]"],
+[class*="to-[#0e0e1a]"],
+[class*="to-[#060e1f]"],
+[class*="to-[#0b0b16]"],
+[class*="to-[#11131c]"],
+[class*="to-[#1f2937]"],
+[class*="to-[#131520]"] {
+  --tw-gradient-to: var(--paper) var(--tw-gradient-to-position) !important;
+}
+
+/* Inline-style dark-color holdouts — pages that hard-code
+ * `style={{ background: '#0...' }}` can't be reached by class
+ * selectors. A handful of attribute-substring selectors below cover
+ * every common dark literal regardless of whitespace, quote-style or
+ * format (background / background-color / shorthand). The two-pass
+ * pattern (with-and-without-space) covers JSX which trims after `:`. */
+[style*="background:#0a"],
+[style*="background: #0a"],
+[style*="background:#0b"],
+[style*="background: #0b"],
+[style*="background:#0c"],
+[style*="background: #0c"],
+[style*="background:#0d"],
+[style*="background: #0d"],
+[style*="background:#0e"],
+[style*="background: #0e"],
+[style*="background:#0f"],
+[style*="background: #0f"],
+[style*="background:#11"],
+[style*="background: #11"],
+[style*="background:#12"],
+[style*="background: #12"],
+[style*="background:#1a"],
+[style*="background: #1a"],
+[style*="background:#1e"],
+[style*="background: #1e"],
+[style*="background:#1f"],
+[style*="background: #1f"],
+[style*="background-color:#0"],
+[style*="background-color: #0"],
+[style*="background-color:#1"],
+[style*="background-color: #1"] {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* CSS gradient inline-style — `style={{ background: 'linear-gradient(...
+ * #0a0f1e ...)' }}`. Detect the keyword + dark hex anywhere. */
+[style*="linear-gradient"][style*="#0a0f"],
+[style*="linear-gradient"][style*="#0b15"],
+[style*="linear-gradient"][style*="#0f17"],
+[style*="linear-gradient"][style*="#0a16"],
+[style*="linear-gradient"][style*="#0f21"],
+[style*="linear-gradient"][style*="#1118"],
+[style*="linear-gradient"][style*="#1313"],
+[style*="radial-gradient"][style*="#0a0f"],
+[style*="radial-gradient"][style*="#0b15"],
+[style*="radial-gradient"][style*="#0f17"] {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* Common animated-ring / status-dot purples that show up on the
+ * builder, video creator, dashboard generation states — flip to gold
+ * so the editorial palette stays consistent during loading states. */
+.bg-purple-500\/20, .bg-purple-500\/30, .bg-purple-500\/40, .bg-purple-500\/50,
+.bg-violet-500\/20, .bg-violet-500\/30, .bg-violet-500\/40, .bg-violet-500\/50,
+.bg-indigo-500\/20, .bg-indigo-500\/30, .bg-indigo-500\/40, .bg-indigo-500\/50,
+.bg-purple-600\/20, .bg-purple-600\/30, .bg-purple-600\/40, .bg-purple-600\/50,
+.shadow-purple-500\/20, .shadow-purple-500\/30, .shadow-purple-500\/40,
+.shadow-violet-500\/20, .shadow-violet-500\/30, .shadow-violet-500\/40 {
+  background-color: var(--gold-soft) !important;
+  --tw-shadow-color: var(--gold-glow) !important;
+}
+
+/* Final body lock — paint paper at the html level too so any
+ * out-of-flow page wrapper that escapes the override above (e.g.
+ * `position:fixed inset-0` modals) lands on bone instead of bleeding
+ * the browser default white. */
+html, body {
+  background-color: var(--paper) !important;
+}

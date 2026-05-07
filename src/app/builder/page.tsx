@@ -2184,7 +2184,10 @@ root.render(React.createElement(App));
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-[#0a0f1e] via-[#0f172a] to-[#111827] relative overflow-hidden">
+    <div
+      className="flex flex-col h-screen relative overflow-hidden"
+      style={{ background: "var(--paper)" }}
+    >
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />
@@ -2212,8 +2215,16 @@ root.render(React.createElement(App));
       {/* Interactive particle constellation background */}
       <BuilderBackground isGenerating={status === "generating"} />
 
-      {/* ── Top Bar ── minimal, dark, premium */}
-      <div className="relative z-10 flex items-center h-12 border-b border-white/[0.06] bg-[#0a0f1e]/80 backdrop-blur-xl px-3 gap-3">
+      {/* ── Top Bar ── editorial-light, matches site header */}
+      <div
+        className="relative z-10 flex items-center h-12 px-3 gap-3"
+        style={{
+          background: "rgba(250, 249, 244, 0.94)",
+          borderBottom: "1px solid var(--rule)",
+          backdropFilter: "blur(12px) saturate(140%)",
+          WebkitBackdropFilter: "blur(12px) saturate(140%)",
+        }}
+      >
         {/* Logo + branding */}
         <Link href="/" className="flex items-center gap-2 mr-2 group">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
