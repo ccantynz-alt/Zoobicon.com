@@ -54,7 +54,7 @@ export default function TopBar() {
             <Image src={agencyBrand.logoUrl} alt={brandName} width={32} height={32} unoptimized className="rounded-lg object-cover" />
           ) : (
             <div
-              className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center text-white font-bold text-sm"
+              className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center text-white font-bold text-sm"
               style={brandGradient}
             >
               {brandInitial}
@@ -105,7 +105,7 @@ export default function TopBar() {
           </span>
         )}
         {agencyBrand && !isAdmin && (
-          <span className="text-[10px] font-medium tracking-wider hidden sm:inline" style={{ color: agencyBrand.primaryColor || "#3b82f6", opacity: 0.6 }}>
+          <span className="text-[10px] font-medium tracking-wider hidden sm:inline" style={{ color: agencyBrand.primaryColor || "#78716c", opacity: 0.6 }}>
             WHITE-LABEL
           </span>
         )}

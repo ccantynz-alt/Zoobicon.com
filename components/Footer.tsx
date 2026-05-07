@@ -10,8 +10,8 @@ export default function Footer() {
           <span className="text-slate-600 text-sm">— The AI website builder from the future.</span>
         </div>
         <div className="flex items-center gap-6 text-sm text-slate-500">
-          <a href="#" className="hover:text-slate-300 transition-colors">Privacy</a>
-          <a href="#" className="hover:text-slate-300 transition-colors">Terms</a>
+          <a href="/privacy" className="hover:text-slate-300 transition-colors">Privacy</a>
+          <a href="/terms" className="hover:text-slate-300 transition-colors">Terms</a>
           <a
             href="https://github.com/ccantynz-alt/Zoobicon.com"
             target="_blank"

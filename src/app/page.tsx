@@ -121,16 +121,17 @@ const TESTIMONIALS = [
 
 export default function HomePage() {
   return (
-    <div className="text-white selection:bg-indigo-500/30 selection:text-white">
+    <div style={{ color: "var(--ink)" }}>
       <div className="pt-[72px]">
         <HeroBuilder />
 
-        {/* ── Trust strip — infinite marquee, Filmora pattern ── */}
+        {/* ── Trust strip — infinite marquee, editorial pattern ── */}
         <section
-          className="relative border-y border-white/[0.05]"
+          className="relative"
           style={{
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.012) 0%, rgba(255,255,255,0.002) 100%)",
+            background: "var(--paper-elevated)",
+            borderTop: "1px solid var(--rule)",
+            borderBottom: "1px solid var(--rule)",
           }}
         >
           <div className="relative py-8 overflow-hidden fs-marquee-paused">
@@ -145,8 +146,8 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#0b1530] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#0b1530] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#f4f3ed] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#f4f3ed] to-transparent" />
           </div>
         </section>
 
@@ -297,7 +298,7 @@ export default function HomePage() {
                   className="relative overflow-hidden border border-white/[0.08]"
                   style={{
                     borderRadius: "40px",
-                    background: "linear-gradient(180deg, rgba(17,17,24,0.6) 0%, rgba(26,26,36,0.6) 100%)",
+                    background: "var(--paper-elevated)",
                     boxShadow:
                       "0 60px 120px -30px rgba(0,0,0,0.6), 0 30px 60px -20px rgba(232,212,176,0.15)",
                   }}
@@ -444,7 +445,7 @@ export default function HomePage() {
                     className="h-full rounded-[30px] border border-white/[0.08] p-8"
                     style={{
                       background:
-                        "linear-gradient(180deg, rgba(17,17,24,0.8) 0%, rgba(26,26,36,0.4) 100%)",
+                        "var(--paper-elevated)",
                       boxShadow: "0 30px 60px -30px rgba(0,0,0,0.5)",
                     }}
                   >
@@ -464,8 +465,8 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#0b1530] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#0b1530] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#f4f3ed] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#f4f3ed] to-transparent" />
           </div>
         </section>
 

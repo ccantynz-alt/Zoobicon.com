@@ -132,7 +132,7 @@ export default function AiImagesPanel({ code, onApplyImages }: AiImagesPanelProp
         <button
           onClick={handleReplaceAll}
           disabled={!code || status === "generating"}
-          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-500 to-accent-purple text-white text-xs font-medium py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40"
+          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-500 to-accent-stone text-white text-xs font-medium py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40"
         >
           {status === "generating" ? (
             <>

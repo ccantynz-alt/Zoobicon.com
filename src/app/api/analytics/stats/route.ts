@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStats } from "@/lib/analytics-engine";
+import { requireAdmin } from "@/lib/admin-auth";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
-    const isAdmin = req.headers.get("x-admin") === "true" || !!req.headers.get("x-admin");
-    if (!isAdmin) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    }
+    const denied = requireAdmin(req);
+    if (denied) return denied;
     const { searchParams } = new URL(req.url);
     const siteId = searchParams.get("siteId");
     const days = parseInt(searchParams.get("days") || "7", 10);

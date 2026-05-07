@@ -122,7 +122,7 @@ export default function PortfolioPage() {
 
   return (
     <div className="min-h-screen text-white">
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
@@ -309,7 +309,7 @@ export default function PortfolioPage() {
             </div>
             <div className="bg-white/5 rounded-2xl border border-white/10 p-8 mx-auto transition-all" style={{ maxWidth: viewport === 'desktop' ? '100%' : viewport === 'tablet' ? '768px' : '375px' }}>
               {/* Simulated Portfolio Preview */}
-              <div className="bg-[#0a1628] rounded-xl p-8 min-h-[600px]">
+              <div className="bg-[var(--paper)] rounded-xl p-8 min-h-[600px]">
                 <nav className="flex items-center justify-between mb-12">
                   <span className="text-xl font-bold">{aboutInfo.name}</span>
                   <div className="flex gap-6 text-sm text-white/50">
@@ -367,7 +367,7 @@ export default function PortfolioPage() {
                 {[
                   { name: 'Dark', bg: '#0a0a12', fg: '#fff' },
                   { name: 'Light', bg: '#fafafa', fg: '#111' },
-                  { name: 'Navy', bg: '#0f172a', fg: '#e2e8f0' },
+                  { name: 'Navy', bg: '#f4f3ed', fg: '#e2e8f0' },
                   { name: 'Warm', bg: '#1a1412', fg: '#fde8d0' },
                 ].map(theme => (
                   <button onClick={() => {}} key={theme.name} className="p-3 rounded-xl border border-white/10 hover:border-stone-500/50 transition-all text-center">

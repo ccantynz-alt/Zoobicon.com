@@ -224,8 +224,8 @@ export default function AdminHealthPage() {
         </Link>
 
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center">
-            <Activity className="w-6 h-6 text-indigo-500" />
+          <div className="w-12 h-12 rounded-2xl bg-stone-50 border border-stone-200 flex items-center justify-center">
+            <Activity className="w-6 h-6 text-stone-500" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-slate-800">System Health</h1>
@@ -234,10 +234,10 @@ export default function AdminHealthPage() {
         </div>
 
         {/* Auto-monitoring info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8">
+        <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 mb-8">
           <p className="text-sm text-slate-700">
-            <strong>Auto-monitoring active.</strong> Vercel Cron runs a deep health check every 2 hours at <code className="text-xs bg-blue-100 px-1.5 py-0.5 rounded">/api/health?deep=true</code>.
-            Add <code className="text-xs bg-blue-100 px-1.5 py-0.5 rounded">?webhook=YOUR_SLACK_URL</code> to get Hash alerts on failures.
+            <strong>Auto-monitoring active.</strong> Vercel Cron runs a deep health check every 2 hours at <code className="text-xs bg-stone-100 px-1.5 py-0.5 rounded">/api/health?deep=true</code>.
+            Add <code className="text-xs bg-stone-100 px-1.5 py-0.5 rounded">?webhook=YOUR_SLACK_URL</code> to get Hash alerts on failures.
           </p>
         </div>
 
@@ -245,8 +245,8 @@ export default function AdminHealthPage() {
         <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-8">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-indigo-500" />
+              <div className="w-10 h-10 rounded-xl bg-stone-50 border border-stone-200 flex items-center justify-center">
+                <Zap className="w-5 h-5 text-stone-500" />
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-slate-800">Live Dependency Status</h2>
@@ -267,7 +267,7 @@ export default function AdminHealthPage() {
                 onClick={() => setAutoRefresh((v) => !v)}
                 className={`text-xs px-3 py-1 rounded-full border transition-colors ${
                   autoRefresh
-                    ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                    ? "bg-stone-50 text-stone-700 border-stone-200"
                     : "bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300"
                 }`}
               >
@@ -402,7 +402,7 @@ export default function AdminHealthPage() {
           <button
             onClick={runQuickCheck}
             disabled={loading !== null}
-            className="flex-1 py-3 rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 py-3 rounded-xl text-sm font-medium bg-stone-600 hover:bg-stone-500 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loading === "quick" ? "Running..." : "Run Quick Check (~5s)"}
           </button>
@@ -422,13 +422,13 @@ export default function AdminHealthPage() {
           <div className="space-y-3 text-sm text-slate-700">
             <div className="bg-slate-50 rounded-lg p-3">
               <p className="font-medium text-slate-800 mb-1">UptimeRobot (free, 5-min intervals)</p>
-              <p className="text-xs text-slate-600">Add HTTP monitor: <code className="text-indigo-600">GET https://zoobicon.com/api/health</code></p>
+              <p className="text-xs text-slate-600">Add HTTP monitor: <code className="text-stone-600">GET https://zoobicon.com/api/health</code></p>
               <p className="text-xs text-slate-600">Alert on non-200 status. Gets you email/SMS on failures.</p>
             </div>
             <div className="bg-slate-50 rounded-lg p-3">
               <p className="font-medium text-slate-800 mb-1">Hash Webhook Alerts</p>
               <p className="text-xs text-slate-600">Create a Hash webhook, then set the cron URL to:</p>
-              <code className="text-xs text-indigo-600 break-all">/api/health?deep=true&webhook=https://hooks.slack.com/services/YOUR/WEBHOOK/URL</code>
+              <code className="text-xs text-stone-600 break-all">/api/health?deep=true&webhook=https://hooks.slack.com/services/YOUR/WEBHOOK/URL</code>
             </div>
             <div className="bg-slate-50 rounded-lg p-3">
               <p className="font-medium text-slate-800 mb-1">Vercel Cron (already configured)</p>

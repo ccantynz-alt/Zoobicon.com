@@ -135,7 +135,7 @@ export default function CLIPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0b1530]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[var(--paper)]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2">
@@ -155,7 +155,7 @@ export default function CLIPage() {
             <div className="hidden md:flex items-center gap-2 bg-dark-200 border border-white/[0.10] rounded-lg px-3 py-1.5 font-mono text-xs text-white/60">
               <span className="text-stone-400">$</span> npm i -g @zoobicon/cli
               <button onClick={() => copyText("npm i -g @zoobicon/cli", "nav")} className="text-white/50 hover:text-white/65 ml-1">
-                {copied === "nav" ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
+                {copied === "nav" ? <Check className="w-3 h-3 text-accent-stone" /> : <Copy className="w-3 h-3" />}
               </button>
             </div>
           </div>
@@ -191,7 +191,7 @@ export default function CLIPage() {
                 className="group flex items-center gap-3 bg-dark-200 border border-white/[0.12] hover:border-stone-500/30 rounded-xl px-6 py-3 font-mono text-sm text-white/60 transition-all"
               >
                 <span className="text-stone-400">$</span> npm install -g @zoobicon/cli
-                {copied === "hero" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/65" />}
+                {copied === "hero" ? <Check className="w-4 h-4 text-accent-stone" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/65" />}
               </button>
               <a href="#commands" className="px-6 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all flex items-center gap-2">
                 <Package className="w-4 h-4" />
@@ -238,13 +238,13 @@ export default function CLIPage() {
                     <span className="text-[9px] font-bold uppercase tracking-wider text-stone-400/60 bg-stone-500/10 px-2 py-0.5 rounded w-16 text-center flex-shrink-0">
                       {cmd.category}
                     </span>
-                    <code className="text-sm font-mono text-accent-cyan/80 flex-shrink-0">{cmd.cmd}</code>
+                    <code className="text-sm font-mono text-accent-stone/80 flex-shrink-0">{cmd.cmd}</code>
                     <span className="text-xs text-white/50 hidden md:block flex-1">{cmd.desc}</span>
                     <button
                       onClick={() => copyText(cmd.cmd, `cmd-${i}`)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                     >
-                      {copied === `cmd-${i}` ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3 text-white/50" />}
+                      {copied === `cmd-${i}` ? <Check className="w-3 h-3 text-accent-stone" /> : <Copy className="w-3 h-3 text-white/50" />}
                     </button>
                   </div>
                 ))}
@@ -274,7 +274,7 @@ export default function CLIPage() {
                 <div className="space-y-3">
                   {["Generate sites from config files in your repo", "Run SEO audits as quality gates", "Auto-deploy to production on merge to main", "Hash/MessageSquare notifications on deploy"].map((item, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <Check className="w-4 h-4 text-accent-cyan flex-shrink-0" />
+                      <Check className="w-4 h-4 text-accent-stone flex-shrink-0" />
                       <span className="text-sm text-white/65">{item}</span>
                     </div>
                   ))}
@@ -319,9 +319,9 @@ export default function CLIPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="gradient-border rounded-2xl p-8 md:p-12 text-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-cyan/20 bg-accent-cyan/5 mb-6">
-                <Globe className="w-3 h-3 text-accent-cyan" />
-                <span className="text-xs font-medium text-accent-cyan">Free Hosting</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-stone/20 bg-accent-stone/5 mb-6">
+                <Globe className="w-3 h-3 text-accent-stone" />
+                <span className="text-xs font-medium text-accent-stone">Free Hosting</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4">
                 Every Site Gets a<br /><span className="text-stone-400">yourname.zoobicon.sh</span> Domain
@@ -332,13 +332,13 @@ export default function CLIPage() {
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 <div className="bg-dark-400 border border-white/[0.10] rounded-lg px-4 py-2 font-mono text-sm text-white/65">
-                  <span className="text-accent-cyan">myportfolio</span>.zoobicon.sh
+                  <span className="text-accent-stone">myportfolio</span>.zoobicon.sh
                 </div>
                 <div className="bg-dark-400 border border-white/[0.10] rounded-lg px-4 py-2 font-mono text-sm text-white/65">
-                  <span className="text-accent-cyan">client-store</span>.zoobicon.sh
+                  <span className="text-accent-stone">client-store</span>.zoobicon.sh
                 </div>
                 <div className="bg-dark-400 border border-white/[0.10] rounded-lg px-4 py-2 font-mono text-sm text-white/65">
-                  <span className="text-accent-cyan">my-startup</span>.zoobicon.sh
+                  <span className="text-accent-stone">my-startup</span>.zoobicon.sh
                 </div>
               </div>
             </motion.div>
@@ -360,7 +360,7 @@ export default function CLIPage() {
           >
             <span className="text-stone-400">$</span>
             npm install -g @zoobicon/cli && zb auth login
-            {copied === "cta" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/65" />}
+            {copied === "cta" ? <Check className="w-4 h-4 text-accent-stone" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/65" />}
           </button>
           <div className="flex justify-center gap-4">
             <Link href="/auth/signup" className="btn-gradient px-8 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2">

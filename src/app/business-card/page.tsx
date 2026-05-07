@@ -32,10 +32,10 @@ import {
 
 const TEMPLATES = [
   { id: 'minimal', name: 'Minimal', preview: 'bg-white', accent: '#0a0a12' },
-  { id: 'gradient', name: 'Gradient', preview: 'bg-gradient-to-br from-stone-600 to-stone-600', accent: '#8b5cf6' },
+  { id: 'gradient', name: 'Gradient', preview: 'bg-gradient-to-br from-stone-600 to-stone-600', accent: '#78716c' },
   { id: 'dark', name: 'Dark Pro', preview: 'bg-gray-900', accent: '#f59e0b' },
   { id: 'nature', name: 'Nature', preview: 'bg-gradient-to-br from-stone-500 to-stone-600', accent: '#10b981' },
-  { id: 'ocean', name: 'Ocean', preview: 'bg-gradient-to-br from-stone-500 to-stone-500', accent: '#3b82f6' },
+  { id: 'ocean', name: 'Ocean', preview: 'bg-gradient-to-br from-stone-500 to-stone-500', accent: '#78716c' },
   { id: 'sunset', name: 'Sunset', preview: 'bg-gradient-to-br from-stone-500 to-stone-500', accent: '#f97316' },
   { id: 'corporate', name: 'Corporate', preview: 'bg-slate-800', accent: '#64748b' },
   { id: 'neon', name: 'Neon', preview: 'bg-black', accent: '#22d3ee' },
@@ -61,7 +61,7 @@ export default function BusinessCardPage() {
   const [activeTab, setActiveTab] = useState<'edit' | 'design' | 'qr'>('edit');
   const [copied, setCopied] = useState(false);
   const [showQR, setShowQR] = useState(true);
-  const [primaryColor, setPrimaryColor] = useState('#8b5cf6');
+  const [primaryColor, setPrimaryColor] = useState('#78716c');
   const [fontFamily, setFontFamily] = useState('Inter');
   const [selectedShape, setSelectedShape] = useState('Standard (3.5" x 2")');
 
@@ -72,7 +72,7 @@ export default function BusinessCardPage() {
 
   return (
     <div className="min-h-screen text-white">
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
@@ -94,7 +94,7 @@ export default function BusinessCardPage() {
               canvas.width = 840; canvas.height = 504;
               const ctx = canvas.getContext('2d');
               if (!ctx) return;
-              ctx.fillStyle = '#8b5cf6';
+              ctx.fillStyle = '#78716c';
               ctx.fillRect(0, 0, 840, 504);
               ctx.fillStyle = '#ffffff';
               ctx.font = 'bold 36px Inter, sans-serif';
@@ -269,7 +269,7 @@ export default function BusinessCardPage() {
                     <input type="color" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="w-10 h-10 rounded-lg cursor-pointer bg-transparent" />
                     <input type="text" value={primaryColor} onChange={(e) => setPrimaryColor(e.target.value)} className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm w-32 focus:outline-none" />
                     <div className="flex gap-2">
-                      {['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#06b6d4', '#f97316'].map((c) => (
+                      {['#78716c', '#78716c', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#78716c', '#f97316'].map((c) => (
                         <button key={c} onClick={() => setPrimaryColor(c)} className="w-8 h-8 rounded-lg border-2 border-transparent hover:border-white/40 transition" style={{ backgroundColor: c }} />
                       ))}
                     </div>

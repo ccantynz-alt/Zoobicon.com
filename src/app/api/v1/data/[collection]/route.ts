@@ -4,24 +4,69 @@
  * Generic per-project data storage for generated sites.
  * A "collection" is any logical bucket: "messages", "bookings", "subscribers", etc.
  * All rows are scoped to a projectId so there's zero cross-site leakage.
- * CORS is open so deployed sites at *.zoobicon.sh can call this.
+ *
+ * CORS: by default we only echo back trusted origins (zoobicon.sh + zoobicon.com
+ * subdomains). To open up to a customer's external domain, set
+ * NEXT_PUBLIC_DATA_API_ALLOWED_ORIGINS to a comma-separated list.
+ *
+ * Auth: an Authorization header is OPTIONAL. If present, the JWT is fully
+ * verified (HS256, signed with JWT_SECRET) and the payload's `sub` is stored
+ * with the row. A FORGED or INVALID token is rejected with 401 — the
+ * previous implementation silently parsed unverified payloads, which let
+ * any caller impersonate any user.
  */
 
 import { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
+import { verifyJwtHS256 } from "@/lib/jwt-verify";
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
+const ALLOWED_ORIGIN_SUFFIXES = [
+  ".zoobicon.sh",
+  ".zoobicon.com",
+  ".zoobicon.app",
+  ".zoobicon.io",
+  ".zoobicon.ai",
+];
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: CORS_HEADERS });
+function getExtraAllowedOrigins(): string[] {
+  const raw = process.env.NEXT_PUBLIC_DATA_API_ALLOWED_ORIGINS || "";
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
-function errRes(status: number, message: string): Response {
-  return Response.json({ error: message }, { status, headers: CORS_HEADERS });
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  if (origin === "https://zoobicon.com" || origin === "https://www.zoobicon.com") return true;
+  for (const suffix of ALLOWED_ORIGIN_SUFFIXES) {
+    if (origin.endsWith(suffix) || origin.includes(`://`) && new URL(origin).hostname.endsWith(suffix)) {
+      return true;
+    }
+  }
+  for (const extra of getExtraAllowedOrigins()) {
+    if (origin === extra) return true;
+  }
+  return false;
+}
+
+function corsHeaders(req: NextRequest): Record<string, string> {
+  const origin = req.headers.get("origin");
+  const allow = origin && isAllowedOrigin(origin) ? origin : "";
+  return {
+    "Access-Control-Allow-Origin": allow,
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Vary": "Origin",
+  };
+}
+
+export async function OPTIONS(req: NextRequest) {
+  return new Response(null, { status: 204, headers: corsHeaders(req) });
+}
+
+function errRes(req: NextRequest, status: number, message: string): Response {
+  return Response.json({ error: message }, { status, headers: corsHeaders(req) });
 }
 
 function sanitiseCollection(raw: string): string {
@@ -35,33 +80,37 @@ export async function POST(
 ) {
   const { collection: rawCollection } = await params;
   const collection = sanitiseCollection(rawCollection);
-  if (!collection) return errRes(400, "Invalid collection name");
+  if (!collection) return errRes(req, 400, "Invalid collection name");
 
   let body: { projectId?: string; data?: Record<string, unknown> };
   try {
     body = await req.json();
   } catch {
-    return errRes(400, "Invalid JSON");
+    return errRes(req, 400, "Invalid JSON");
   }
 
   const { projectId, data } = body;
   if (!projectId || !data || typeof data !== "object") {
-    return errRes(400, "projectId and data are required");
+    return errRes(req, 400, "projectId and data are required");
   }
 
-  // Optionally attach the authenticated user's ID if a valid session is present
+  // Optionally attach the authenticated user's ID if a valid JWT is present.
+  // The token MUST be HS256-signed with JWT_SECRET. A malformed, forged, or
+  // expired token returns 401 — silently downgrading to anonymous would
+  // hide tampering and let callers pick any sub they wanted.
   const authHeader = req.headers.get("authorization");
   let userId: string | null = null;
-  if (authHeader?.startsWith("Bearer ")) {
-    try {
-      const token = authHeader.slice(7);
-      const raw = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-      const payload = JSON.parse(atob(raw));
-      if (payload.sub && (!payload.exp || payload.exp > Math.floor(Date.now() / 1000))) {
-        userId = payload.sub as string;
+  if (authHeader) {
+    if (!authHeader.startsWith("Bearer ")) {
+      return errRes(req, 401, "Authorization header must use Bearer scheme");
+    }
+    const token = authHeader.slice(7).trim();
+    if (token.length > 0) {
+      const claims = await verifyJwtHS256(token, process.env.JWT_SECRET);
+      if (!claims) {
+        return errRes(req, 401, "Invalid or expired token");
       }
-    } catch {
-      // Invalid token — proceed as anonymous
+      if (typeof claims.sub === "string") userId = claims.sub;
     }
   }
 
@@ -71,13 +120,13 @@ export async function POST(
       VALUES (${projectId}, ${collection}, ${JSON.stringify(data)}, ${userId})
       RETURNING id, created_at
     `;
-    return Response.json({ id: row.id, created_at: row.created_at }, { headers: CORS_HEADERS });
+    return Response.json({ id: row.id, created_at: row.created_at }, { headers: corsHeaders(req) });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (msg.includes("DATABASE_URL") || msg.includes("site_data")) {
-      return errRes(503, "Database not ready — visit /api/db/init to initialise");
+      return errRes(req, 503, "Database not ready — visit /api/db/init to initialise");
     }
-    return errRes(500, "Server error");
+    return errRes(req, 500, "Server error");
   }
 }
 
@@ -88,11 +137,11 @@ export async function GET(
 ) {
   const { collection: rawCollection } = await params;
   const collection = sanitiseCollection(rawCollection);
-  if (!collection) return errRes(400, "Invalid collection name");
+  if (!collection) return errRes(req, 400, "Invalid collection name");
 
   const { searchParams } = new URL(req.url);
   const projectId = searchParams.get("projectId");
-  if (!projectId) return errRes(400, "projectId query parameter is required");
+  if (!projectId) return errRes(req, 400, "projectId query parameter is required");
 
   try {
     const rows = await sql`
@@ -101,13 +150,13 @@ export async function GET(
       ORDER BY created_at DESC
       LIMIT 500
     `;
-    return Response.json({ rows }, { headers: CORS_HEADERS });
+    return Response.json({ rows }, { headers: corsHeaders(req) });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (msg.includes("DATABASE_URL") || msg.includes("site_data")) {
-      return errRes(503, "Database not ready — visit /api/db/init to initialise");
+      return errRes(req, 503, "Database not ready — visit /api/db/init to initialise");
     }
-    return errRes(500, "Server error");
+    return errRes(req, 500, "Server error");
   }
 }
 

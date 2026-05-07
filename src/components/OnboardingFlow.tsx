@@ -167,7 +167,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               key={i}
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 i === step
-                  ? "w-8 bg-gradient-to-r from-brand-500 to-accent-purple"
+                  ? "w-8 bg-gradient-to-r from-brand-500 to-accent-stone"
                   : i < step
                   ? "w-4 bg-brand-500/40"
                   : "w-4 bg-white/10"
@@ -301,7 +301,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 transition={{ duration: 0.25, ease: "easeInOut" }}
               >
                 <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-accent-purple/20 border border-brand-500/20 mb-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/20 to-accent-stone/20 border border-brand-500/20 mb-4">
                     <Sparkles className="w-8 h-8 text-brand-400" />
                   </div>
                   <h2 className="text-2xl font-bold tracking-tight mb-2">
@@ -326,7 +326,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 <div className="flex flex-col gap-3">
                   <button
                     onClick={handleBuildNow}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-accent-purple text-white font-semibold text-sm hover:brightness-110 transition-all"
+                    className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-accent-stone text-white font-semibold text-sm hover:brightness-110 transition-all"
                   >
                     Build This Now
                     <ArrowRight className="w-4 h-4" />

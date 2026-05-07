@@ -73,7 +73,7 @@ export default function ChatbotWidgetPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0d17] text-white">
+    <div className="min-h-screen bg-[var(--paper)] text-white">
       {/* Header */}
       <header className="border-b border-white/10 bg-[#0f2148]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -179,10 +179,13 @@ export default function ChatbotWidgetPage() {
                   <div className="h-2 w-64 bg-white/5 rounded mb-2" />
                   <div className="h-2 w-40 bg-white/5 rounded" />
                 </div>
-                {/* Mock chat button */}
+                {/* Mock chat button — preview only, intentionally inert */}
                 <div className="absolute bottom-5 right-5">
                   <button
-                    className="w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
+                    type="button"
+                    aria-label="Open chat (preview only)"
+                    aria-disabled="true"
+                    className="w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform cursor-default"
                     style={{ background: color }}
                   >
                     <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">

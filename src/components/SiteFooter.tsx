@@ -33,48 +33,43 @@ export default function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative border-t border-white/[0.06] bg-[#0b1530] overflow-hidden">
-      {/* Ambient warm glow — restrained, just enough to signal depth */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div
-          className="absolute left-1/2 top-0 h-[560px] w-[1100px] -translate-x-1/2 rounded-full blur-[140px]"
-          style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.06), transparent 70%)" }}
-        />
-      </div>
-
+    <footer className="relative border-t" style={{ borderColor: "var(--rule)", background: "var(--paper)" }}>
       <div className="relative mx-auto max-w-7xl px-6 pt-20 pb-10">
         {/* Top CTA strip — conversion surface */}
         <div
-          className="relative mb-20 overflow-hidden rounded-[32px] border border-white/[0.08] p-10 sm:p-14"
+          className="relative mb-20 overflow-hidden rounded-[32px] p-10 sm:p-14"
           style={{
-            background:
-              "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(26,26,36,0.65) 100%)",
+            background: "var(--paper-elevated)",
+            border: "1px solid var(--rule)",
+            boxShadow: "var(--shadow-2)",
           }}
         >
-          <div
-            className="pointer-events-none absolute -right-24 -top-24 h-[400px] w-[400px] rounded-full blur-[120px]"
-            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.18), transparent 70%)" }}
-          />
           <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
             <div className="max-w-xl">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1 text-[11px] font-medium text-white/70 backdrop-blur">
-                <Sparkles className="h-3 w-3 text-[#E8D4B0]" />
+              <div
+                className="mb-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium"
+                style={{
+                  border: "1px solid var(--rule)",
+                  background: "var(--paper)",
+                  color: "var(--ink-secondary)",
+                }}
+              >
+                <Sparkles className="h-3 w-3" style={{ color: "var(--gold-deep)" }} />
                 Ready when you are
               </div>
-              <h2 className="text-4xl sm:text-5xl font-semibold leading-[1.05] tracking-[-0.032em] text-white">
+              <h2
+                className="text-4xl sm:text-5xl font-semibold leading-[1.05] tracking-[-0.032em]"
+                style={{ color: "var(--ink)" }}
+              >
                 Build the thing.{" "}
                 <span
-                  className="font-normal"
-                  style={{
-                    fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                    fontStyle: "italic",
-                    color: "#E8D4B0",
-                  }}
+                  className="display-italic font-normal"
+                  style={{ color: "var(--gold-deep)" }}
                 >
                   Today.
                 </span>
               </h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-white/55 max-w-md">
+              <p className="mt-4 text-[15px] leading-relaxed max-w-md" style={{ color: "var(--ink-secondary)" }}>
                 One sentence. Sixty seconds. A complete, responsive site, domain,
                 email and video in a single flow. No templates. No code.
               </p>
@@ -82,11 +77,11 @@ export default function SiteFooter() {
             <div className="flex flex-wrap items-center gap-3">
               <Link
                 href="/builder"
-                className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
+                className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition-all duration-300 hover:-translate-y-0.5"
                 style={{
-                  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                  color: "#0a1628",
-                  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+                  background: "var(--ink)",
+                  color: "var(--paper)",
+                  boxShadow: "0 8px 24px -8px rgba(10,10,11,0.25)",
                 }}
               >
                 Start building
@@ -94,7 +89,12 @@ export default function SiteFooter() {
               </Link>
               <Link
                 href="/pricing"
-                className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-6 py-3 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-medium transition-all duration-300 hover:-translate-y-0.5"
+                style={{
+                  border: "1px solid var(--rule-strong)",
+                  background: "var(--paper)",
+                  color: "var(--ink)",
+                }}
               >
                 See pricing
               </Link>
@@ -110,38 +110,52 @@ export default function SiteFooter() {
               <div
                 className="flex h-9 w-9 items-center justify-center rounded-xl"
                 style={{
-                  background: "linear-gradient(135deg, #E8D4B0 0%, #F7C8A0 60%, #E08BB0 100%)",
-                  boxShadow: "0 10px 30px -12px rgba(232,212,176,0.55)",
+                  background: "var(--ink)",
+                  boxShadow: "var(--shadow-1)",
                 }}
               >
-                <span className="text-black font-black text-[15px] tracking-tight">Z</span>
+                <span style={{ color: "var(--gold)" }} className="font-black text-[15px] tracking-tight">Z</span>
               </div>
-              <span className="text-white font-semibold text-[18px] tracking-[-0.02em]">
+              <span className="font-semibold text-[18px] tracking-[-0.02em]" style={{ color: "var(--ink)" }}>
                 Zoobicon
               </span>
             </Link>
-            <p className="text-[13px] text-white/50 leading-relaxed max-w-sm mb-6">
+            <p className="text-[13px] leading-relaxed max-w-sm mb-6" style={{ color: "var(--ink-secondary)" }}>
               The AI platform for building websites, making videos, registering
               domains and launching a business. Seventy-five tools, one price.
             </p>
             <div className="flex flex-wrap items-center gap-2.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] text-white/55">
-                <ShieldCheck className="h-3 w-3 text-emerald-400" /> SOC 2 aligned
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px]"
+                style={{ border: "1px solid var(--rule)", background: "var(--paper)", color: "var(--ink-secondary)" }}
+              >
+                <ShieldCheck className="h-3 w-3 text-emerald-600" /> SOC 2 aligned
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] text-white/55">
-                <Lock className="h-3 w-3 text-[#E8D4B0]" /> GDPR ready
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px]"
+                style={{ border: "1px solid var(--rule)", background: "var(--paper)", color: "var(--ink-secondary)" }}
+              >
+                <Lock className="h-3 w-3" style={{ color: "var(--gold-deep)" }} /> GDPR ready
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] text-white/55">
-                <Zap className="h-3 w-3 text-[#E8D4B0]" /> Stripe Verified
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px]"
+                style={{ border: "1px solid var(--rule)", background: "var(--paper)", color: "var(--ink-secondary)" }}
+              >
+                <Zap className="h-3 w-3" style={{ color: "var(--gold-deep)" }} /> Stripe Verified
               </span>
             </div>
             <Link
               href="/launch-status"
-              className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.04] px-3 py-1.5 text-[11px] font-medium text-emerald-300/90 transition-all hover:border-emerald-400/40 hover:text-emerald-300"
+              className="mt-6 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-medium transition-all"
+              style={{
+                border: "1px solid rgba(16, 185, 129, 0.3)",
+                background: "rgba(16, 185, 129, 0.06)",
+                color: "rgb(5, 122, 85)",
+              }}
             >
               <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500/60" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
               </span>
               All systems operational
               <ArrowRight className="h-3 w-3 opacity-60" />
@@ -194,14 +208,17 @@ export default function SiteFooter() {
         </div>
 
         {/* Four-domain signature + copyright (rule 11) */}
-        <div className="mt-16 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="text-[11px] text-white/35 flex items-center gap-1.5">
+        <div
+          className="mt-16 pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+          style={{ borderTop: "1px solid var(--rule)" }}
+        >
+          <div className="text-[11px] flex items-center gap-1.5" style={{ color: "var(--ink-muted)" }}>
             <Globe2 className="h-3 w-3" />
             <span className="font-mono tracking-tight">
               zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh
             </span>
           </div>
-          <div className="text-[11px] text-white/35">
+          <div className="text-[11px]" style={{ color: "var(--ink-muted)" }}>
             © {year} Zoobicon Limited. Built on Opus 4.7.
           </div>
         </div>
@@ -221,7 +238,7 @@ function FooterColumn({
     <div>
       <div
         className="mb-4 text-[10px] uppercase tracking-[0.2em] font-semibold"
-        style={{ color: "rgba(232,212,176,0.75)" }}
+        style={{ color: "var(--gold-deep)" }}
       >
         {label}
       </div>
@@ -230,7 +247,8 @@ function FooterColumn({
           <li key={l.href}>
             <Link
               href={l.href}
-              className="group inline-flex items-center gap-1 text-[13px] text-white/55 hover:text-white transition-colors"
+              className="group inline-flex items-center gap-1 text-[13px] transition-colors"
+              style={{ color: "var(--ink-secondary)" }}
             >
               {l.name}
               <ArrowRight className="h-3 w-3 opacity-0 -translate-x-1 group-hover:opacity-60 group-hover:translate-x-0 transition-all" />

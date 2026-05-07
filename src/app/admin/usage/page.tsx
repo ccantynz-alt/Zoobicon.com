@@ -188,8 +188,8 @@ export default function UsagePage() {
       sub: "This billing period",
       trend: true,
       icon: BarChart3,
-      iconColor: "text-indigo-600",
-      iconBg: "bg-indigo-50",
+      iconColor: "text-stone-600",
+      iconBg: "bg-stone-50",
     },
     {
       label: "Active Sites",
@@ -217,7 +217,7 @@ export default function UsagePage() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-1">
-            <CreditCard className="w-6 h-6 text-indigo-600" />
+            <CreditCard className="w-6 h-6 text-stone-600" />
             <h1 className="text-2xl font-bold tracking-tight text-slate-800">Usage &amp; Credits</h1>
           </div>
           <p className="text-slate-600 text-sm">Monitor your platform usage, credit balance, and API activity.</p>
@@ -276,7 +276,7 @@ export default function UsagePage() {
               return (
                 <div key={i} className="flex-1 group relative flex flex-col items-center justify-end h-full">
                   <div
-                    className="w-full rounded-t bg-indigo-400 hover:bg-indigo-500 transition-colors cursor-default min-h-[3px]"
+                    className="w-full rounded-t bg-stone-400 hover:bg-stone-500 transition-colors cursor-default min-h-[3px]"
                     style={{ height: `${heightPct}%` }}
                   />
                   {/* Tooltip */}
@@ -302,7 +302,7 @@ export default function UsagePage() {
           className="rounded-xl border border-slate-200 bg-white p-6 mb-10"
         >
           <div className="flex items-center gap-2 mb-6">
-            <CreditCard className="w-5 h-5 text-indigo-600" />
+            <CreditCard className="w-5 h-5 text-stone-600" />
             <h2 className="text-base font-bold text-slate-800">Credit Balance</h2>
           </div>
 
@@ -318,9 +318,9 @@ export default function UsagePage() {
               <div className="flex items-center gap-2 mb-4">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                   stats.plan === "enterprise"
-                    ? "bg-indigo-50 text-indigo-700"
+                    ? "bg-stone-50 text-stone-700"
                     : stats.plan === "pro"
-                      ? "bg-indigo-50 text-indigo-700"
+                      ? "bg-stone-50 text-stone-700"
                       : "bg-slate-100 text-slate-600"
                 }`}>
                   {stats.plan} Plan
@@ -352,7 +352,7 @@ export default function UsagePage() {
                 <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-700 ${
-                      creditPct > 90 ? "bg-red-400" : creditPct > 70 ? "bg-amber-400" : "bg-indigo-500"
+                      creditPct > 90 ? "bg-red-400" : creditPct > 70 ? "bg-amber-400" : "bg-stone-500"
                     }`}
                     style={{ width: `${creditPct}%` }}
                   />
@@ -361,7 +361,7 @@ export default function UsagePage() {
               </div>
               <Link
                 href="/pricing"
-                className="mt-4 inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors w-full"
+                className="mt-4 inline-flex items-center justify-center gap-2 bg-stone-600 hover:bg-stone-500 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors w-full"
               >
                 <ArrowUpRight className="w-4 h-4" />
                 Upgrade Plan
@@ -378,7 +378,7 @@ export default function UsagePage() {
           className="rounded-xl border border-slate-200 bg-white p-6 mb-10"
         >
           <div className="flex items-center gap-2 mb-6">
-            <Key className="w-5 h-5 text-indigo-600" />
+            <Key className="w-5 h-5 text-stone-600" />
             <h2 className="text-base font-bold text-slate-800">API Key Usage</h2>
           </div>
 
@@ -426,7 +426,7 @@ export default function UsagePage() {
           className="rounded-xl border border-slate-200 bg-white p-6"
         >
           <div className="flex items-center gap-2 mb-6">
-            <Activity className="w-5 h-5 text-indigo-600" />
+            <Activity className="w-5 h-5 text-stone-600" />
             <h2 className="text-base font-bold text-slate-800">Recent Activity</h2>
           </div>
 
@@ -439,7 +439,7 @@ export default function UsagePage() {
                 {/* Type badge */}
                 <span className={`flex-shrink-0 w-20 text-center px-2 py-1 rounded text-xs font-bold uppercase tracking-wider ${
                   item.type === "generate"
-                    ? "bg-indigo-50 text-indigo-700"
+                    ? "bg-stone-50 text-stone-700"
                     : item.type === "deploy"
                       ? "bg-emerald-50 text-emerald-700"
                       : "bg-amber-50 text-amber-700"

@@ -43,8 +43,8 @@ interface ChatbotItem {
 }
 
 const DEMO_BOTS: ChatbotItem[] = [
-  { id: '1', name: 'Customer Support', status: 'active', conversations: 2847, leads: 189, satisfaction: 4.7, escalations: 23, avgResponse: '0.8s', createdAt: '2026-03-15', color: '#8b5cf6' },
-  { id: '2', name: 'Sales Assistant', status: 'active', conversations: 1532, leads: 412, satisfaction: 4.5, escalations: 8, avgResponse: '1.1s', createdAt: '2026-03-20', color: '#3b82f6' },
+  { id: '1', name: 'Customer Support', status: 'active', conversations: 2847, leads: 189, satisfaction: 4.7, escalations: 23, avgResponse: '0.8s', createdAt: '2026-03-15', color: '#78716c' },
+  { id: '2', name: 'Sales Assistant', status: 'active', conversations: 1532, leads: 412, satisfaction: 4.5, escalations: 8, avgResponse: '1.1s', createdAt: '2026-03-20', color: '#78716c' },
   { id: '3', name: 'FAQ Bot', status: 'active', conversations: 5241, leads: 67, satisfaction: 4.8, escalations: 3, avgResponse: '0.4s', createdAt: '2026-03-22', color: '#10b981' },
   { id: '4', name: 'Booking Agent', status: 'paused', conversations: 891, leads: 234, satisfaction: 4.4, escalations: 15, avgResponse: '1.3s', createdAt: '2026-03-25', color: '#f59e0b' },
 ];
@@ -58,7 +58,7 @@ export default function ChatbotsPage() {
   const [formName, setFormName] = useState('');
   const [formDesc, setFormDesc] = useState('');
   const [formGreeting, setFormGreeting] = useState('');
-  const [formColor, setFormColor] = useState('#8b5cf6');
+  const [formColor, setFormColor] = useState('#78716c');
   const [formCollectEmail, setFormCollectEmail] = useState(true);
   const [formEscalationEmail, setFormEscalationEmail] = useState('');
 
@@ -80,7 +80,7 @@ export default function ChatbotsPage() {
   return (
     <div className="min-h-screen bg-transparent text-white">
       {/* Header */}
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
@@ -337,7 +337,7 @@ export default function ChatbotsPage() {
                 <div>
                   <label className="block text-sm text-white/60 mb-2">Widget Color</label>
                   <div className="flex gap-3">
-                    {['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#6366f1', '#14b8a6'].map(c => (
+                    {['#78716c', '#78716c', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#78716c', '#14b8a6'].map(c => (
                       <button
                         key={c}
                         onClick={() => setFormColor(c)}

@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { provisionVpn } from "@/lib/vpn-provider";
+import { requireApiKey, isAuthenticated } from "@/lib/v1-auth";
 import QRCode from "qrcode";
 
 export async function POST(request: NextRequest) {
-  try {
-    const { userId, planId } = await request.json();
+  const auth = await requireApiKey(request);
+  if (!isAuthenticated(auth)) return auth;
 
-    if (!userId || !planId) {
+  try {
+    const { planId } = await request.json();
+
+    // Ownership is derived from the validated API key — never trust a
+    // client-supplied userId. Previously this route accepted any userId
+    // in the request body and would provision a VPN for that account.
+    const userId = auth.ownerEmail;
+
+    if (!planId) {
       return NextResponse.json(
-        { error: "userId and planId are required" },
+        { error: "planId is required" },
         { status: 400 }
       );
     }

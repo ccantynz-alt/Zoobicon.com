@@ -349,8 +349,26 @@ export async function POST(req: NextRequest) {
     // that's a real error and must NOT be swallowed silently.
 
     if (!process.env.STRIPE_SECRET_KEY) {
-      // No Stripe key — dev/test mode only
-      console.warn("[domains/register] STRIPE_SECRET_KEY not set. Returning test-mode order.");
+      // No Stripe key. In production this is a hard fail — returning
+      // {success:true, checkoutUrl:null} to a real customer would have them
+      // believe their domain was reserved when no payment was taken AND
+      // the DB write was wrapped in `catch {}` so failures vanished. In
+      // dev/preview we still allow the test-mode write so local builds
+      // can exercise the endpoint without Stripe credentials.
+      const isProd = process.env.NODE_ENV === "production" && process.env.VERCEL_ENV === "production";
+      if (isProd) {
+        console.error("[domains/register] STRIPE_SECRET_KEY missing in production — refusing to mark order as 'pending_payment' without an actual Stripe session.");
+        return NextResponse.json(
+          {
+            error:
+              "Domain checkout is not available right now: STRIPE_SECRET_KEY is not configured. The team has been notified.",
+          },
+          { status: 503 }
+        );
+      }
+
+      console.warn("[domains/register] STRIPE_SECRET_KEY not set — running test-mode in dev/preview environment.");
+      let dbWriteError: string | null = null;
       try {
         const { sql } = await import("@/lib/db");
         const now = new Date();
@@ -369,8 +387,9 @@ export async function POST(req: NextRequest) {
             ON CONFLICT (domain) DO NOTHING
           `;
         }
-      } catch {
-        // Database not available in dev — that's fine
+      } catch (err) {
+        dbWriteError = err instanceof Error ? err.message : String(err);
+        console.error("[domains/register] dev-mode DB write failed:", dbWriteError);
       }
 
       return NextResponse.json({
@@ -378,6 +397,7 @@ export async function POST(req: NextRequest) {
         checkoutUrl: null,
         message: "Stripe is not configured. Order saved in test mode — no payment taken.",
         orderSummary,
+        ...(dbWriteError ? { devWarning: `DB write failed in test mode: ${dbWriteError}` } : {}),
       });
     }
 

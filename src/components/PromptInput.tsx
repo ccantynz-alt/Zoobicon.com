@@ -294,7 +294,7 @@ export default function PromptInput({
           <div className="relative flex items-center gap-2 mb-1.5">
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
               tier === "premium"
-                ? "bg-gradient-to-br from-brand-500/30 to-accent-cyan/20"
+                ? "bg-gradient-to-br from-brand-500/30 to-accent-stone/20"
                 : "bg-white/[0.06]"
             }`}>
               <Sparkles className={`w-3.5 h-3.5 ${
@@ -448,7 +448,7 @@ export default function PromptInput({
       <div className="relative flex-1 min-h-0">
         <textarea
           ref={textareaRef}
-          className="w-full h-full min-h-[120px] bg-[#0a1628] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-4 pr-12 outline-none transition-colors focus:border-brand-500/50 focus:shadow-glow resize-none placeholder:text-white/50"
+          className="w-full h-full min-h-[120px] bg-[var(--paper-elevated)] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-4 pr-12 outline-none transition-colors focus:border-brand-500/50 focus:shadow-glow resize-none placeholder:text-white/50"
           placeholder="Describe the website you want to build..."
           value={prompt}
           onChange={(e) => onPromptChange(e.target.value)}
@@ -505,7 +505,7 @@ export default function PromptInput({
       <button
         className={`w-full py-3 rounded-xl text-sm font-bold text-white uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed transition-all ${
           tier === "premium"
-            ? "bg-gradient-to-r from-brand-500 via-accent-purple to-brand-600 hover:shadow-glow"
+            ? "bg-gradient-to-r from-brand-500 via-accent-stone to-brand-600 hover:shadow-glow"
             : "btn-gradient"
         }`}
         onClick={handleGenerateWithCustomization}
@@ -535,7 +535,7 @@ export default function PromptInput({
           <div className="relative">
             <textarea
               ref={editInputRef}
-              className="w-full min-h-[70px] bg-[#0a1628] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-3 pr-20 outline-none transition-colors focus:border-brand-500/50 resize-none placeholder:text-white/50"
+              className="w-full min-h-[70px] bg-[var(--paper-elevated)] border border-white/[0.06] text-white/90 text-sm font-mono rounded-xl p-3 pr-20 outline-none transition-colors focus:border-brand-500/50 resize-none placeholder:text-white/50"
               placeholder="e.g. Change the hero background to blue, add a pricing section..."
               value={editPrompt}
               onChange={(e) => onEditPromptChange(e.target.value)}

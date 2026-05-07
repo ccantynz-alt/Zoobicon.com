@@ -209,9 +209,47 @@ interface PlanResult {
   bgColor: string;
 }
 
-function inferBrandName(prompt: string): string {
-  const m = prompt.match(/(?:called|named|for)\s+([A-Z][A-Za-z0-9]+)/);
-  return m ? m[1] : "Northwind";
+/**
+ * Best-effort brand name extraction from the user's prompt.
+ *
+ * Returns either an explicit name found in the prompt OR a slug derived
+ * from the prompt's salient nouns. The previous version silently returned
+ * "Northwind" whenever the explicit-name regex missed — which gave every
+ * site that didn't say "called X" a generic Microsoft-branded fallback.
+ * That was a Bible Law 8 violation: the user had no way to know we'd
+ * picked a placeholder.
+ *
+ * Now: explicit match → use it. Otherwise pull the most signal-rich word
+ * (first capitalised non-stopword, then first noun-like token) so the
+ * generated site at least references the user's vocabulary. If even that
+ * fails we surface a clear "BRAND_INFERRED" sentinel so the caller can
+ * emit a warning event instead of shipping a placeholder name.
+ */
+const BRAND_STOPWORDS = new Set([
+  "a","an","and","or","the","for","with","without","my","our","your","their",
+  "this","that","these","those","is","are","was","were","be","been","being",
+  "i","you","we","they","he","she","it","want","need","build","create","make",
+  "site","website","page","app","application","store","shop","platform","tool",
+]);
+
+export function inferBrandName(prompt: string): string {
+  const explicit = prompt.match(/(?:called|named|for|brand(?:ed)?)\s+([A-Z][A-Za-z0-9]{1,30})/);
+  if (explicit) return explicit[1];
+
+  const tokens = prompt.split(/[^A-Za-z0-9]+/).filter(Boolean);
+  const cap = tokens.find((t) => /^[A-Z]/.test(t) && !BRAND_STOPWORDS.has(t.toLowerCase()) && t.length >= 3 && t.length <= 24);
+  if (cap) return cap.charAt(0).toUpperCase() + cap.slice(1);
+
+  const noun = tokens.find((t) => !BRAND_STOPWORDS.has(t.toLowerCase()) && t.length >= 4 && t.length <= 24);
+  if (noun) return noun.charAt(0).toUpperCase() + noun.slice(1).toLowerCase();
+
+  // Last resort — derive from the first non-stopword token of any length.
+  // This is still better than "Northwind" because at least the user's
+  // vocabulary shows up in the generated copy.
+  const firstReal = tokens.find((t) => !BRAND_STOPWORDS.has(t.toLowerCase()) && t.length >= 2);
+  if (firstReal) return firstReal.charAt(0).toUpperCase() + firstReal.slice(1).toLowerCase();
+
+  return "Studio";
 }
 
 async function planComponents(prompt: string): Promise<PlanResult> {

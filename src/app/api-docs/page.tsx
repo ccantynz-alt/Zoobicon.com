@@ -190,7 +190,7 @@ sites = JSON.parse(response.body)['sites']`,
 
 const methodColors: Record<string, string> = {
   GET: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  POST: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+  POST: 'bg-stone-500/20 text-stone-400 border-stone-500/30',
   PUT: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
   DELETE: 'bg-red-500/20 text-red-400 border-red-500/30',
 };
@@ -240,10 +240,10 @@ export default function ApiDocsPage() {
 
   return (
     <div className="min-h-screen text-white">
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</Link>
+            <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-fuchsia-400 bg-clip-text text-transparent">Zoobicon</Link>
             <span className="text-white/30">/</span>
             <span className="font-semibold text-white">API Documentation</span>
           </div>
@@ -262,7 +262,7 @@ export default function ApiDocsPage() {
             <div className="sticky top-24 space-y-2">
               <div className="relative mb-4">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
-                <input type="text" placeholder="Search endpoints..." className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" />
+                <input type="text" placeholder="Search endpoints..." className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-stone-500/50" />
               </div>
 
               {/* Quick Links */}
@@ -270,13 +270,17 @@ export default function ApiDocsPage() {
                 <h4 className="text-xs font-medium text-white/40 mb-2 uppercase tracking-wider">Quick Links</h4>
                 <div className="space-y-1.5">
                   {[
-                    { label: 'Authentication', icon: Lock },
-                    { label: 'Rate Limits', icon: Clock },
-                    { label: 'Error Codes', icon: AlertTriangle },
+                    { label: 'Authentication', icon: Lock, anchor: 'authentication' },
+                    { label: 'Rate Limits', icon: Clock, anchor: 'rate-limits' },
+                    { label: 'Error Codes', icon: AlertTriangle, anchor: 'error-codes' },
                   ].map((link) => (
-                    <button key={link.label} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition">
+                    <a
+                      key={link.label}
+                      href={`#${link.anchor}`}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition"
+                    >
                       <link.icon className="w-4 h-4" /> {link.label}
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -295,7 +299,7 @@ export default function ApiDocsPage() {
                           key={ep.path + ep.method}
                           onClick={() => setSelectedEndpoint(ep.path)}
                           className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition ${
-                            selectedEndpoint === ep.path ? 'bg-violet-600/20 text-white' : 'text-white/50 hover:text-white hover:bg-white/5'
+                            selectedEndpoint === ep.path ? 'bg-stone-600/20 text-white' : 'text-white/50 hover:text-white hover:bg-white/5'
                           }`}
                         >
                           <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold border ${methodColors[ep.method]}`}>{ep.method}</span>
@@ -314,7 +318,7 @@ export default function ApiDocsPage() {
             {/* Auth Section */}
             <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
               <div className="flex items-center gap-3 mb-4">
-                <Shield className="w-5 h-5 text-violet-400" />
+                <Shield className="w-5 h-5 text-stone-400" />
                 <h2 className="text-lg font-bold">Authentication</h2>
               </div>
               <p className="text-sm text-white/60 mb-4">
@@ -326,7 +330,7 @@ export default function ApiDocsPage() {
               <div className="grid grid-cols-3 gap-4">
                 {[
                   { plan: 'Free', limit: '10 req/min', color: 'text-white/60' },
-                  { plan: 'Pro', limit: '60 req/min', color: 'text-violet-400' },
+                  { plan: 'Pro', limit: '60 req/min', color: 'text-stone-400' },
                   { plan: 'Enterprise', limit: '600 req/min', color: 'text-amber-400' },
                 ].map((tier) => (
                   <div key={tier.plan} className="p-3 rounded-lg bg-white/5 border border-white/10 text-center">
@@ -346,7 +350,7 @@ export default function ApiDocsPage() {
                     <button
                       key={lang}
                       onClick={() => setSelectedLang(lang)}
-                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${selectedLang === lang ? 'bg-violet-600' : 'hover:bg-white/10'}`}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${selectedLang === lang ? 'bg-stone-600' : 'hover:bg-white/10'}`}
                     >
                       {lang === 'curl' ? 'cURL' : lang.charAt(0).toUpperCase() + lang.slice(1)}
                     </button>
@@ -367,9 +371,9 @@ export default function ApiDocsPage() {
             </div>
 
             {/* Try It */}
-            <div className="p-6 rounded-2xl bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20">
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-stone-500/10 to-fuchsia-500/10 border border-stone-500/20">
               <div className="flex items-center gap-3 mb-4">
-                <Play className="w-5 h-5 text-violet-400" />
+                <Play className="w-5 h-5 text-stone-400" />
                 <h2 className="text-lg font-bold">Try It</h2>
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -378,12 +382,12 @@ export default function ApiDocsPage() {
                   <textarea
                     value={tryItBody}
                     onChange={(e) => setTryItBody(e.target.value)}
-                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono resize-none h-48 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono resize-none h-48 focus:outline-none focus:ring-2 focus:ring-stone-500/50"
                   />
                   <button
                     onClick={handleTryIt}
                     disabled={sending}
-                    className="mt-3 w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="mt-3 w-full py-3 rounded-xl bg-gradient-to-r from-stone-600 to-fuchsia-600 font-medium text-sm hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {sending ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Sending...</> : <><Send className="w-4 h-4" /> Send Request</>}
                   </button>

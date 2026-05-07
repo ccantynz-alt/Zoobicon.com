@@ -55,7 +55,7 @@ const TEMPLATES = [
   { name: 'Restaurant Menu', type: 'url' as QRType, fg: '#D4451A', bg: '#FFF8F0', corner: 'rounded' as CornerStyle },
   { name: 'Business Card', type: 'vcard' as QRType, fg: '#1A365D', bg: '#FFFFFF', corner: 'square' as CornerStyle },
   { name: 'WiFi Guest', type: 'wifi' as QRType, fg: '#2D8CFF', bg: '#F0F8FF', corner: 'dots' as CornerStyle },
-  { name: 'Event Ticket', type: 'url' as QRType, fg: '#6B21A8', bg: '#FAF5FF', corner: 'diamond' as CornerStyle },
+  { name: 'Event Ticket', type: 'url' as QRType, fg: '#44403c', bg: '#fafaf9', corner: 'diamond' as CornerStyle },
   { name: 'Product Packaging', type: 'url' as QRType, fg: '#065F46', bg: '#ECFDF5', corner: 'rounded' as CornerStyle },
   { name: 'Social Media', type: 'url' as QRType, fg: '#E11D48', bg: '#FFF1F2', corner: 'dots' as CornerStyle },
 ];
@@ -141,7 +141,7 @@ export default function QRCodesPage() {
   const [config, setConfig] = useState<QRConfig>({
     type: 'url',
     data: { url: 'https://zoobicon.com' },
-    fgColor: '#8B5CF6',
+    fgColor: '#78716c',
     bgColor: '#FFFFFF',
     cornerStyle: 'rounded',
     logoEnabled: true,
@@ -175,7 +175,7 @@ export default function QRCodesPage() {
   return (
     <div className="min-h-screen text-white">
       {/* Header */}
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">

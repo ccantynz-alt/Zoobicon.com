@@ -114,7 +114,9 @@ export default function SiteNavigation() {
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  // Admin role is intentionally NOT surfaced in the public nav per
+  // Craig's directive — admin access is URL-only (/admin). The
+  // localStorage payload still includes role for downstream guards.
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const megaRef = useRef<HTMLDivElement>(null);
@@ -125,9 +127,10 @@ export default function SiteNavigation() {
     try {
       const raw = localStorage.getItem("zoobicon_user");
       if (raw) {
-        const user = JSON.parse(raw);
+        // Parse just to validate the payload shape; role intentionally
+        // not surfaced in nav per Craig's directive (admin via URL only).
+        JSON.parse(raw);
         setIsLoggedIn(true);
-        setIsAdmin(user.role === "admin");
       }
     } catch { /* ignore */ }
   }, []);
@@ -174,26 +177,62 @@ export default function SiteNavigation() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-[#0b1530]/85 backdrop-blur-2xl border-b border-white/[0.08] shadow-[0_8px_32px_-16px_rgba(0,0,0,0.6)]"
-          : "bg-[#0b1530]/40 backdrop-blur-xl border-b border-white/[0.03]"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      style={{
+        // Soft-lift header — barely brighter than the bone page, defined
+        // mostly by the hairline bottom + soft shadow rather than by being
+        // a darker band. Craig: "the header is a little dark — lighten it
+        // a little bit so it's not so dark." Switched from paper-elevated
+        // (#ecebe1) to paper-bright (#faf9f4 ≈ paper +3%) so the bar reads
+        // as a lift, not a separate stratum.
+        background: scrolled
+          ? "rgba(250, 249, 244, 0.94)"
+          : "rgba(250, 249, 244, 0.82)",
+        backdropFilter: "blur(24px) saturate(140%)",
+        WebkitBackdropFilter: "blur(24px) saturate(140%)",
+        borderBottom: "1px solid var(--rule)",
+        boxShadow: scrolled
+          ? "0 4px 16px -6px rgba(10,10,11,0.06), 0 1px 0 0 rgba(184,179,160,0.28)"
+          : "0 1px 0 0 rgba(184,179,160,0.22)",
+      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-[72px]">
-          {/* Logo — editorial warm mark + word mark */}
-          <Link href="/" className="group flex items-center gap-2.5 flex-shrink-0">
+        <div className="flex items-center justify-between h-[76px]">
+          {/* Logo — editorial monogram. Thin gold ring on bone holding a
+              Playfair italic Z. Reads like a Sotheby's mark, not a tech
+              square. Wordmark sits next to it in Playfair regular at
+              the right optical weight to balance the italic Z. */}
+          <Link href="/" className="group flex items-center gap-3 flex-shrink-0">
             <div
-              className="relative w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-500 group-hover:scale-[1.04]"
+              className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-[1.04]"
               style={{
-                background: "linear-gradient(135deg, #E8D4B0 0%, #F7C8A0 60%, #E08BB0 100%)",
-                boxShadow: "0 10px 30px -12px rgba(232,212,176,0.55)",
+                background: "var(--paper)",
+                border: "1.5px solid var(--gold)",
+                boxShadow: "0 2px 6px -2px rgba(140,107,37,0.18), inset 0 0 0 3px var(--paper)",
               }}
             >
-              <span className="text-black font-black text-[15px] tracking-tight">Z</span>
+              <span
+                className="text-[20px] leading-none"
+                style={{
+                  fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+                  fontStyle: "italic",
+                  fontWeight: 600,
+                  color: "var(--ink)",
+                  marginTop: "1px",
+                }}
+              >
+                Z
+              </span>
             </div>
-            <span className="hidden sm:block text-white font-semibold text-[17px] tracking-[-0.02em]">
+            <span
+              className="hidden sm:block text-[19px] tracking-[-0.01em]"
+              style={{
+                fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+                fontWeight: 500,
+                color: "var(--ink)",
+                letterSpacing: "0.005em",
+              }}
+            >
               Zoobicon
             </span>
           </Link>
@@ -214,32 +253,32 @@ export default function SiteNavigation() {
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${megaOpen ? "rotate-180 text-[#E8D4B0]" : ""}`} />
               </button>
 
-              {/* Mega Menu Panel — FULL WIDTH 6 columns, cinematic treatment */}
+              {/* Mega Menu Panel — FULL WIDTH 6 columns, editorial bright treatment.
+                  Background sits at near-paper-input white (very bright) with a
+                  strong rule + shadow so it reads as a defined drop-down panel
+                  on top of the cream header. Item text below uses explicit ink
+                  colours instead of relying on the override layer's mapping —
+                  the override pulls text-white/X down to muted grey which read
+                  as dull. */}
               {megaOpen && (
                 <div
                   data-mega-menu
-                  className="fixed top-[72px] left-0 right-0 border-b border-white/[0.08] shadow-[0_40px_80px_-24px_rgba(0,0,0,0.8)]"
+                  className="fixed top-[76px] left-0 right-0"
                   style={{
-                    background:
-                      "linear-gradient(180deg, rgba(10,10,15,0.98) 0%, rgba(20,40,95,0.98) 100%)",
-                    backdropFilter: "blur(24px)",
+                    background: "rgba(255, 254, 250, 0.99)",
+                    backdropFilter: "blur(28px) saturate(140%)",
+                    WebkitBackdropFilter: "blur(28px) saturate(140%)",
+                    borderBottom: "1px solid var(--rule-strong)",
+                    boxShadow: "0 16px 48px -12px rgba(10,10,11,0.18), 0 4px 12px -4px rgba(10,10,11,0.08)",
                   }}
                 >
-                  {/* Ambient warm glow */}
-                  <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                    <div
-                      className="absolute left-1/2 top-0 h-[400px] w-[900px] -translate-x-1/2 rounded-full blur-[120px]"
-                      style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.08), transparent 70%)" }}
-                    />
-                  </div>
-
                   <div className="relative max-w-7xl mx-auto px-6 py-10">
                     <div className="grid grid-cols-6 gap-8">
                       {PRODUCT_SECTIONS.map((section) => (
                         <div key={section.label}>
                           <h3
-                            className="mb-4 text-[10px] uppercase tracking-[0.2em] font-semibold"
-                            style={{ color: "rgba(232,212,176,0.75)" }}
+                            className="mb-4 text-[10px] uppercase tracking-[0.22em] font-semibold"
+                            style={{ color: "var(--gold-deep)" }}
                           >
                             {section.label}
                           </h3>
@@ -248,27 +287,45 @@ export default function SiteNavigation() {
                               <Link
                                 key={item.href}
                                 href={item.href}
-                                className="group flex items-start gap-2.5 p-2.5 rounded-xl transition-all duration-300 hover:bg-white/[0.04] hover:translate-x-0.5"
+                                className="group flex items-start gap-2.5 p-2.5 rounded-xl transition-all duration-200 hover:translate-x-0.5"
+                                style={{ background: "transparent" }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = "var(--paper-elevated)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = "transparent";
+                                }}
                                 onClick={() => setMegaOpen(false)}
                               >
-                                <item.icon className="w-4 h-4 text-white/40 group-hover:text-[#E8D4B0] transition-colors mt-0.5 flex-shrink-0" />
+                                <item.icon
+                                  className="w-4 h-4 group-hover:text-[var(--gold-deep)] transition-colors mt-0.5 flex-shrink-0"
+                                  style={{ color: "var(--ink-muted)" }}
+                                />
                                 <div className="min-w-0">
-                                  <div className="text-[13px] text-white/85 group-hover:text-white font-medium flex items-center gap-1.5">
+                                  <div
+                                    className="text-[13px] font-semibold flex items-center gap-1.5"
+                                    style={{ color: "var(--ink)" }}
+                                  >
                                     <span className="truncate">{item.name}</span>
                                     {item.badge && (
                                       <span
-                                        className="text-[9px] px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
+                                        className="text-[9px] px-1.5 py-0.5 rounded-full font-bold flex-shrink-0 uppercase tracking-wider"
                                         style={{
-                                          background: "rgba(232,212,176,0.14)",
-                                          color: "#F0DCB8",
-                                          border: "1px solid rgba(232,212,176,0.3)",
+                                          background: "var(--gold-soft)",
+                                          color: "var(--gold-deep)",
+                                          border: "1px solid var(--gold)",
                                         }}
                                       >
                                         {item.badge}
                                       </span>
                                     )}
                                   </div>
-                                  <div className="text-[11px] text-white/40 mt-0.5 leading-relaxed">{item.desc}</div>
+                                  <div
+                                    className="text-[11px] mt-0.5 leading-relaxed"
+                                    style={{ color: "var(--ink-secondary)" }}
+                                  >
+                                    {item.desc}
+                                  </div>
                                 </div>
                               </Link>
                             ))}
@@ -276,15 +333,21 @@ export default function SiteNavigation() {
                         </div>
                       ))}
                     </div>
-                    <div className="mt-8 pt-6 border-t border-white/[0.06] flex items-center justify-between">
-                      <span className="text-[12px] text-white/45">
+                    <div
+                      className="mt-8 pt-6 flex items-center justify-between"
+                      style={{ borderTop: "1px solid var(--rule)" }}
+                    >
+                      <span className="text-[12px]" style={{ color: "var(--ink-secondary)" }}>
                         75+ products bundled.{" "}
-                        <span className="text-white/65">Replaces $923/mo in SaaS subscriptions.</span>
+                        <span style={{ color: "var(--ink)", fontWeight: 600 }}>
+                          Replaces $923/mo in SaaS subscriptions.
+                        </span>
                       </span>
                       <div className="flex items-center gap-5">
                         <Link
                           href="/domains"
-                          className="group text-[12px] text-white/60 hover:text-[#E8D4B0] flex items-center gap-1.5 transition-colors"
+                          className="group text-[12px] flex items-center gap-1.5 transition-colors"
+                          style={{ color: "var(--ink-secondary)" }}
                           onClick={() => setMegaOpen(false)}
                         >
                           Search domains
@@ -334,14 +397,9 @@ export default function SiteNavigation() {
                 >
                   <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
                 </Link>
-                {isAdmin && (
-                  <Link
-                    href="/admin"
-                    className="px-3.5 py-2 text-[13px] text-[#E8D4B0]/70 hover:text-[#E8D4B0] rounded-full hover:bg-[#E8D4B0]/[0.06] transition-colors"
-                  >
-                    Admin
-                  </Link>
-                )}
+                {/* Admin link intentionally hidden from the public nav.
+                    Craig accesses /admin by typing it in the address
+                    bar so customers never see it. (2026-05-06) */}
                 <button
                   onClick={handleLogout}
                   className="p-2 text-white/40 hover:text-white/70 rounded-full hover:bg-white/[0.04] transition-colors"
@@ -360,15 +418,41 @@ export default function SiteNavigation() {
             )}
             <Link
               href="/builder"
-              className="group inline-flex items-center gap-1.5 px-5 py-2.5 text-[13px] font-semibold rounded-full transition-all duration-500 hover:-translate-y-0.5"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 text-[13px] rounded-full transition-all duration-300 hover:-translate-y-0.5"
               style={{
-                background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                color: "#0a1628",
-                boxShadow: "0 10px 30px -12px rgba(232,212,176,0.45)",
+                // Bright champagne gradient with crisp white text — Craig:
+                // "the gold is nice but doesn't seem to work — the writing
+                // should be white." A subtle gradient (soft champagne →
+                // deeper champagne) keeps the gold feel while giving the
+                // button enough body for white text to land cleanly. Inner
+                // highlight + soft warm shadow finish the polish.
+                background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)",
+                color: "#ffffff",
+                border: "1px solid #a47d2c",
+                boxShadow: "0 6px 18px -8px rgba(140,107,37,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                fontWeight: 600,
+                letterSpacing: "0.01em",
+                textShadow: "0 1px 1px rgba(80,55,15,0.35)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "linear-gradient(135deg, #b8923f 0%, #8c6b25 100%)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)";
               }}
             >
-              <Rocket className="w-3.5 h-3.5 transition-transform group-hover:rotate-[-8deg]" />
-              Start Building
+              <span>Start Building</span>
+              <span
+                className="text-[15px] leading-none transition-transform group-hover:translate-x-0.5"
+                style={{
+                  fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+                  fontWeight: 500,
+                  marginTop: "-1px",
+                }}
+                aria-hidden
+              >
+                →
+              </span>
             </Link>
           </div>
 
@@ -383,13 +467,15 @@ export default function SiteNavigation() {
         </div>
       </div>
 
-      {/* Mobile Menu — full-screen cinematic overlay */}
+      {/* Mobile Menu — full-screen editorial overlay */}
       {mobileOpen && (
         <div
-          className="lg:hidden border-t border-white/[0.06] max-h-[85vh] overflow-y-auto"
+          className="lg:hidden max-h-[85vh] overflow-y-auto"
           style={{
-            background: "linear-gradient(180deg, rgba(5,5,8,0.98) 0%, rgba(10,10,15,0.98) 100%)",
+            background: "rgba(250,250,247,0.98)",
             backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+            borderTop: "1px solid var(--rule)",
           }}
         >
           <div className="px-4 py-4 space-y-5">
@@ -430,7 +516,8 @@ export default function SiteNavigation() {
               {isLoggedIn ? (
                 <>
                   <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]">Dashboard</Link>
-                  {isAdmin && <Link href="/admin" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-stone-400 rounded-lg hover:bg-stone-500/10">Admin Panel</Link>}
+                  {/* Admin link intentionally hidden from mobile nav too —
+                      access /admin by URL only. */}
                 </>
               ) : (
                 <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]">Sign in</Link>
@@ -438,9 +525,18 @@ export default function SiteNavigation() {
               <Link
                 href="/builder"
                 onClick={() => setMobileOpen(false)}
-                className="block p-3 text-center text-sm font-semibold bg-stone-600 text-white rounded-lg"
+                className="block p-3 text-center text-sm rounded-lg transition-colors"
+                style={{
+                  background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)",
+                  color: "#ffffff",
+                  border: "1px solid #a47d2c",
+                  fontWeight: 600,
+                  letterSpacing: "0.01em",
+                  boxShadow: "0 4px 12px -4px rgba(140,107,37,0.45), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                  textShadow: "0 1px 1px rgba(80,55,15,0.35)",
+                }}
               >
-                Start Building
+                Start Building →
               </Link>
             </div>
           </div>

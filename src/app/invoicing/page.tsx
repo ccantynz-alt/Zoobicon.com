@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import DemoDataBanner from "@/components/DemoDataBanner";
 import {
   Receipt,
   DollarSign,
@@ -110,7 +111,7 @@ export default function InvoicingPage() {
 
   return (
     <div className="min-h-screen text-white">
-      <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
           <Link href="/" className="text-xl font-bold tracking-tight bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
           <div className="flex items-center gap-4">
@@ -141,6 +142,7 @@ export default function InvoicingPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-10 space-y-10">
+        <DemoDataBanner entity="invoices" ctaHref="/invoicing/new" ctaLabel="Create your first invoice" />
         {/* Stats */}
         <motion.div variants={stagger} initial="hidden" animate="visible" className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {STAT_CARDS.map((s) => (

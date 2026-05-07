@@ -172,11 +172,11 @@ export default function OperationsPage() {
   const healthStatus = health?.status || "unknown";
 
   const metricIconColorMap: Record<string, string> = {
-    indigo: "text-indigo-500",
+    indigo: "text-stone-500",
     slate: "text-slate-700",
     red: "text-red-500",
     emerald: "text-emerald-500",
-    cyan: "text-cyan-500",
+    cyan: "text-stone-500",
     yellow: "text-amber-500",
   };
 
@@ -248,11 +248,11 @@ export default function OperationsPage() {
         {/* Agent Control Panel */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2"><Bot className="w-5 h-5 text-indigo-500" /> Agent Control</h2>
+            <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2"><Bot className="w-5 h-5 text-stone-500" /> Agent Control</h2>
             <button
               onClick={runAllAgents}
               disabled={runningAgent === "all"}
-              className="text-xs px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors disabled:opacity-50 flex items-center gap-1"
+              className="text-xs px-3 py-1.5 rounded-lg bg-stone-600 hover:bg-stone-500 text-white transition-colors disabled:opacity-50 flex items-center gap-1"
             >
               {runningAgent === "all" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
               Run All
@@ -292,7 +292,7 @@ export default function OperationsPage() {
                   <button
                     onClick={() => runAgent(agent.id)}
                     disabled={runningAgent === agent.id}
-                    className="p-1.5 rounded-lg bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-500 transition-colors disabled:opacity-50"
+                    className="p-1.5 rounded-lg bg-slate-50 text-slate-600 hover:bg-stone-50 hover:text-stone-500 transition-colors disabled:opacity-50"
                     title="Run Now"
                   >
                     {runningAgent === agent.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
@@ -307,7 +307,7 @@ export default function OperationsPage() {
         <div className="space-y-6">
           {/* Quick Actions */}
           <div>
-            <h2 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2"><Zap className="w-5 h-5 text-indigo-500" /> Quick Actions</h2>
+            <h2 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2"><Zap className="w-5 h-5 text-stone-500" /> Quick Actions</h2>
             <div className="grid grid-cols-2 gap-2">
               {[
                 { label: "Health Check", action: runHealthCheck, icon: Heart },
@@ -337,7 +337,7 @@ export default function OperationsPage() {
 
           {/* Activity Feed */}
           <div>
-            <h2 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2"><Activity className="w-5 h-5 text-indigo-500" /> Live Activity</h2>
+            <h2 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2"><Activity className="w-5 h-5 text-stone-500" /> Live Activity</h2>
             <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
               {activity.length === 0 ? (
                 <div className="text-sm text-slate-700 p-4 text-center">No recent activity</div>

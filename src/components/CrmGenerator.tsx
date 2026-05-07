@@ -100,12 +100,12 @@ const BUSINESS_TYPES = [
 ];
 
 const COLOR_SCHEMES = [
-  { name: "Blue", primary: "#3b82f6", bg: "bg-stone-500" },
-  { name: "Purple", primary: "#8b5cf6", bg: "bg-stone-500" },
+  { name: "Blue", primary: "#78716c", bg: "bg-stone-500" },
+  { name: "Purple", primary: "#78716c", bg: "bg-stone-500" },
   { name: "Emerald", primary: "#10b981", bg: "bg-stone-500" },
   { name: "Rose", primary: "#f43f5e", bg: "bg-stone-500" },
   { name: "Amber", primary: "#f59e0b", bg: "bg-stone-500" },
-  { name: "Cyan", primary: "#06b6d4", bg: "bg-stone-500" },
+  { name: "Cyan", primary: "#78716c", bg: "bg-stone-500" },
 ];
 
 export default function CrmGenerator({ onGenerate }: CrmGeneratorProps) {

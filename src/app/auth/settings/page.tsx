@@ -176,14 +176,14 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-transparent relative">
       <BackgroundEffects preset="calm" />
       {/* Nav */}
-      <nav className="border-b border-white/[0.04] bg-[#0b1530]/80 backdrop-blur-2xl sticky top-0 z-50">
+      <nav className="border-b border-white/[0.04] bg-[var(--paper)]/80 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="text-white/50 hover:text-white/60 transition-colors">
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center">
                 <Zap className="w-3.5 h-3.5 text-white" />
               </div>
               <span className="text-base font-bold tracking-tight">Zoobicon</span>
@@ -197,7 +197,7 @@ export default function SettingsPage() {
         {/* Account info */}
         <section className="gradient-border rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-purple/20 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-stone/20 flex items-center justify-center">
               <User className="w-4 h-4 text-brand-400" />
             </div>
             <h2 className="text-base font-bold">Account</h2>
@@ -230,7 +230,7 @@ export default function SettingsPage() {
         {user.role === "admin" ? (
           <section className="gradient-border rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-purple/20 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-stone/20 flex items-center justify-center">
                 <Shield className="w-4 h-4 text-brand-400" />
               </div>
               <h2 className="text-base font-bold">Change Admin Password</h2>
@@ -365,7 +365,7 @@ export default function SettingsPage() {
           /* Regular user — forgot password prompt */
           <section className="gradient-border rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-purple/20 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500/20 to-accent-stone/20 flex items-center justify-center">
                 <Shield className="w-4 h-4 text-brand-400" />
               </div>
               <h2 className="text-base font-bold">Password</h2>
@@ -386,8 +386,8 @@ export default function SettingsPage() {
         <section className="gradient-border rounded-2xl p-6">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent-cyan/20 to-brand-500/10 flex items-center justify-center">
-                <Key className="w-4 h-4 text-accent-cyan" />
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent-stone/20 to-brand-500/10 flex items-center justify-center">
+                <Key className="w-4 h-4 text-accent-stone" />
               </div>
               <h2 className="text-base font-bold">API Keys</h2>
             </div>
@@ -453,7 +453,7 @@ export default function SettingsPage() {
                 <p className="text-[10px] text-white/50 mb-2 font-mono">Quick start</p>
                 <div className="bg-dark-400/60 rounded-lg p-3 text-[10px] font-mono text-white/50 leading-relaxed overflow-x-auto">
                   <span className="text-white/50">curl</span> https://zoobicon.com/api/generate \<br />
-                  &nbsp;&nbsp;<span className="text-white/50">-H</span> <span className="text-accent-cyan/60">&quot;Authorization: Bearer {showApiKey ? apiKey : apiKey.slice(0, 16) + "…"}&quot;</span> \<br />
+                  &nbsp;&nbsp;<span className="text-white/50">-H</span> <span className="text-accent-stone/60">&quot;Authorization: Bearer {showApiKey ? apiKey : apiKey.slice(0, 16) + "…"}&quot;</span> \<br />
                   &nbsp;&nbsp;<span className="text-white/50">-d</span> <span className="text-brand-400/60">&apos;&#123;&quot;prompt&quot;:&quot;A landing page for my SaaS&quot;&#125;&apos;</span>
                 </div>
               </div>

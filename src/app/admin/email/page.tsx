@@ -116,22 +116,22 @@ AI Website Builder | zoobicon.com
 support@zoobicon.com`;
 
   const HTML_SIGNATURE = `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#333333;line-height:1.4;">
-<tr><td style="padding-bottom:12px;border-bottom:2px solid #7c3aed;">
+<tr><td style="padding-bottom:12px;border-bottom:2px solid #57534e;">
 <table cellpadding="0" cellspacing="0" border="0"><tr>
 <td style="padding-right:16px;vertical-align:top;">
-<table cellpadding="0" cellspacing="0" border="0" style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#3b82f6);"><tr><td align="center" style="color:#ffffff;font-size:20px;font-weight:bold;font-family:Arial,sans-serif;">Z</td></tr></table>
+<table cellpadding="0" cellspacing="0" border="0" style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#57534e,#78716c);"><tr><td align="center" style="color:#ffffff;font-size:20px;font-weight:bold;font-family:Arial,sans-serif;">Z</td></tr></table>
 </td>
 <td style="vertical-align:top;">
-<strong style="font-size:14px;color:#111827;">Zoobicon</strong><br/>
-<span style="font-size:12px;color:#7c3aed;font-weight:600;">AI Website Builder</span><br/>
+<strong style="font-size:14px;color:#f4f3ed;">Zoobicon</strong><br/>
+<span style="font-size:12px;color:#57534e;font-weight:600;">AI Website Builder</span><br/>
 <span style="font-size:11px;color:#6b7280;">Build websites in seconds, not weeks</span>
 </td>
 </tr></table>
 </td></tr>
 <tr><td style="padding-top:10px;font-size:11px;color:#6b7280;">
-<a href="https://zoobicon.com" style="color:#7c3aed;text-decoration:none;font-weight:600;">zoobicon.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-<a href="mailto:support@zoobicon.com" style="color:#7c3aed;text-decoration:none;">support@zoobicon.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-<a href="https://zoobicon.ai" style="color:#7c3aed;text-decoration:none;">zoobicon.ai</a>
+<a href="https://zoobicon.com" style="color:#57534e;text-decoration:none;font-weight:600;">zoobicon.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+<a href="mailto:support@zoobicon.com" style="color:#57534e;text-decoration:none;">support@zoobicon.com</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+<a href="https://zoobicon.ai" style="color:#57534e;text-decoration:none;">zoobicon.ai</a>
 </td></tr>
 </table>`;
 
@@ -368,7 +368,7 @@ support@zoobicon.com`;
           {FOLDERS.map(({ key, label, icon: Icon }) => (
             <button key={key} onClick={() => { setFolder(key); setSelectedEmail(null); setSelected(new Set()); setSidebarOpen(false); }} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${folder === key ? "bg-slate-100 text-slate-800 font-medium" : "text-slate-600 hover:bg-slate-50 hover:text-slate-800"}`}>
               <Icon className="w-4 h-4" /><span className="flex-1 text-left">{label}</span>
-              {key === "inbox" && unreadCount > 0 && <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium">{unreadCount}</span>}
+              {key === "inbox" && unreadCount > 0 && <span className="text-xs bg-stone-100 text-stone-700 px-1.5 py-0.5 rounded-full font-medium">{unreadCount}</span>}
             </button>
           ))}
           <div className="mt-auto pt-4 border-t border-slate-200">
@@ -395,7 +395,7 @@ support@zoobicon.com`;
             </div>
             <div className="flex items-center gap-2 text-xs">
               <button onClick={toggleSelectAll} className="p-1 rounded hover:bg-slate-100 transition-colors">
-                {selected.size > 0 && selected.size === emails.length ? <CheckSquare className="w-4 h-4 text-blue-600" /> : <Square className="w-4 h-4 text-slate-600" />}
+                {selected.size > 0 && selected.size === emails.length ? <CheckSquare className="w-4 h-4 text-stone-600" /> : <Square className="w-4 h-4 text-slate-600" />}
               </button>
               {selected.size > 0 ? (
                 <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-1">
@@ -428,11 +428,11 @@ support@zoobicon.com`;
               <AnimatePresence initial={false}>
                 {emails.map((email) => (
                   <motion.div key={email.id} layout initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.15 }}>
-                    <div className={`flex items-start gap-3 px-4 py-3 border-b border-slate-200 cursor-pointer transition-colors ${selectedEmail?.id === email.id ? "bg-blue-50" : "hover:bg-slate-50"} ${!email.read ? "bg-slate-50" : ""}`} onClick={() => { setSelectedEmail(email); if (!email.read) markRead(email, true); }}>
+                    <div className={`flex items-start gap-3 px-4 py-3 border-b border-slate-200 cursor-pointer transition-colors ${selectedEmail?.id === email.id ? "bg-stone-50" : "hover:bg-slate-50"} ${!email.read ? "bg-slate-50" : ""}`} onClick={() => { setSelectedEmail(email); if (!email.read) markRead(email, true); }}>
                       <button onClick={(ev) => { ev.stopPropagation(); toggleSelect(email.id); }} className="mt-0.5 p-0.5 rounded hover:bg-slate-100 transition-colors flex-shrink-0">
-                        {selected.has(email.id) ? <CheckSquare className="w-4 h-4 text-blue-600" /> : <Square className="w-4 h-4 text-slate-600" />}
+                        {selected.has(email.id) ? <CheckSquare className="w-4 h-4 text-stone-600" /> : <Square className="w-4 h-4 text-slate-600" />}
                       </button>
-                      <div className="w-2 mt-2 flex-shrink-0">{!email.read && <div className="w-2 h-2 bg-blue-500 rounded-full" />}</div>
+                      <div className="w-2 mt-2 flex-shrink-0">{!email.read && <div className="w-2 h-2 bg-stone-500 rounded-full" />}</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className={`text-sm truncate ${email.read ? "text-slate-700" : "text-slate-800 font-semibold"}`}>{email.from_address}</span>
@@ -480,7 +480,18 @@ support@zoobicon.com`;
               <div className="flex-1 overflow-y-auto p-6">
                 <div className="bg-white rounded-xl p-6 shadow-sm">
                   {selectedEmail.html_body ? (
-                    <div className="prose prose-sm max-w-none prose-p:text-gray-800 prose-a:text-blue-600 prose-headings:text-gray-900" dangerouslySetInnerHTML={{ __html: selectedEmail.html_body }} />
+                    // Inbound email HTML is untrusted. Rendering it via
+                    // dangerouslySetInnerHTML let any sender execute JS in
+                    // the admin's session (XSS). A sandboxed iframe with
+                    // empty sandbox attribute disables scripts, forms,
+                    // popups, and same-origin access — the gold-standard
+                    // pattern Gmail/Fastmail use for untrusted email HTML.
+                    <iframe
+                      title="Email body"
+                      sandbox=""
+                      srcDoc={selectedEmail.html_body}
+                      className="w-full min-h-[400px] border-0"
+                    />
                   ) : (
                     <pre className="whitespace-pre-wrap text-sm text-gray-800 font-sans leading-relaxed">{selectedEmail.text_body}</pre>
                   )}
@@ -525,11 +536,11 @@ support@zoobicon.com`;
               <AnimatePresence>
                 {showPolishDiff && polishResult && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="border-t border-slate-200 overflow-hidden">
-                    <div className="px-4 py-3 bg-blue-50">
+                    <div className="px-4 py-3 bg-stone-50">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-blue-600" />
-                          <span className="text-xs font-semibold text-blue-700">AI Polish Suggestions</span>
+                          <Sparkles className="w-4 h-4 text-stone-600" />
+                          <span className="text-xs font-semibold text-stone-700">AI Polish Suggestions</span>
                           <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${polishResult.score >= 90 ? "bg-green-100 text-green-700" : polishResult.score >= 70 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"}`}>
                             Score: {polishResult.score}/100
                           </span>
@@ -548,7 +559,7 @@ support@zoobicon.com`;
                         <div className="space-y-1 mb-2">
                           {polishResult.changes.map((change, i) => (
                             <div key={i} className="flex items-start gap-2 text-xs">
-                              <Wand2 className="w-3 h-3 text-blue-500 mt-0.5 shrink-0" />
+                              <Wand2 className="w-3 h-3 text-stone-500 mt-0.5 shrink-0" />
                               <span className="text-slate-600">{change}</span>
                             </div>
                           ))}
@@ -566,9 +577,9 @@ support@zoobicon.com`;
                   <button onClick={() => {}} className="p-2 rounded-lg hover:bg-slate-100 transition-colors" title="Attach file"><Paperclip className="w-4 h-4 text-slate-600" /></button>
 
                   {/* AI Polish Button */}
-                  <button onClick={handlePolish} disabled={polishing || !composeData.text.trim()} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-blue-50 border border-transparent hover:border-blue-200 transition-all disabled:opacity-30 group" title="AI Polish — fix grammar, tone & clarity">
-                    {polishing ? <Loader2 className="w-4 h-4 text-blue-500 animate-spin" /> : <Sparkles className="w-4 h-4 text-slate-600 group-hover:text-blue-600" />}
-                    <span className="text-xs text-slate-600 group-hover:text-blue-600 hidden sm:inline">Polish</span>
+                  <button onClick={handlePolish} disabled={polishing || !composeData.text.trim()} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-stone-50 border border-transparent hover:border-stone-200 transition-all disabled:opacity-30 group" title="AI Polish — fix grammar, tone & clarity">
+                    {polishing ? <Loader2 className="w-4 h-4 text-stone-500 animate-spin" /> : <Sparkles className="w-4 h-4 text-slate-600 group-hover:text-stone-600" />}
+                    <span className="text-xs text-slate-600 group-hover:text-stone-600 hidden sm:inline">Polish</span>
                   </button>
 
                   {/* Templates */}
@@ -600,7 +611,7 @@ support@zoobicon.com`;
 
                   {/* AI Subject Line */}
                   <button onClick={generateSubject} disabled={generatingSubject || !composeData.text.trim()} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 transition-colors group disabled:opacity-30" title="AI generate subject line">
-                    {generatingSubject ? <Loader2 className="w-4 h-4 text-blue-500 animate-spin" /> : <Zap className="w-4 h-4 text-slate-600 group-hover:text-slate-600" />}
+                    {generatingSubject ? <Loader2 className="w-4 h-4 text-stone-500 animate-spin" /> : <Zap className="w-4 h-4 text-slate-600 group-hover:text-slate-600" />}
                     <span className="text-xs text-slate-600 group-hover:text-slate-600 hidden sm:inline">Subject</span>
                   </button>
 

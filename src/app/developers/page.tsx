@@ -110,7 +110,7 @@ const PRICING_TIERS = [
   },
 ];
 
-const CARD_BG = "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const CARD_BG = "var(--paper-elevated)";
 const PRIMARY_CTA = {
   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
   color: "#0a1628",
@@ -169,7 +169,7 @@ export default function DevelopersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[var(--paper)] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
@@ -380,7 +380,7 @@ export default function DevelopersPage() {
                   <div
                     key={item.label}
                     className="rounded-[16px] border border-white/[0.08] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/25"
-                    style={{ background: "rgba(10,10,15,0.6)" }}
+                    style={{ background: "var(--paper-elevated)" }}
                   >
                     <div className="font-mono text-2xl font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>
                       {item.price}
@@ -421,11 +421,11 @@ export default function DevelopersPage() {
                 </Link>
               </div>
 
-              <div className="relative p-6 rounded-xl border border-accent-cyan/30 bg-accent-cyan/[0.02] shadow-glow-cyan">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-accent-cyan to-emerald-500 text-xs font-bold text-white">
+              <div className="relative p-6 rounded-xl border border-accent-stone/30 bg-accent-stone/[0.02] shadow-glow-cyan">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-accent-stone to-emerald-500 text-xs font-bold text-white">
                   Popular
                 </div>
-                <div className="text-sm font-semibold text-accent-cyan mb-2">Pro</div>
+                <div className="text-sm font-semibold text-accent-stone mb-2">Pro</div>
                 <div className="text-3xl font-black mb-1">$79<span className="text-lg font-normal text-white/60">/mo</span></div>
                 <div className="text-xs text-white/60 mb-4">60 requests/min</div>
                 <ul className="space-y-2 mb-6 text-sm text-white/65">
@@ -435,7 +435,7 @@ export default function DevelopersPage() {
                   <li>Webhook callbacks</li>
                   <li>Priority support</li>
                 </ul>
-                <Link href="/auth/signup" className="block text-center w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-emerald-500 text-sm font-bold text-white">
+                <Link href="/auth/signup" className="block text-center w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-stone to-emerald-500 text-sm font-bold text-white">
                   Start Pro
                 </Link>
               </div>
@@ -476,7 +476,7 @@ export default function DevelopersPage() {
                 }`}
                 style={{
                   background: tier.highlighted
-                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(20,40,95,0.85) 100%)"
+                    ? "var(--paper-elevated)"
                     : CARD_BG,
                 }}
               >

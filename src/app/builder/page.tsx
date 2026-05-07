@@ -66,6 +66,143 @@ function PreviewSwitcher({ useWebContainers, onWebContainersFail, files, reactDe
     </WebContainerErrorBoundary>
   );
 }
+
+// ───────────────────────────────────────────────────────────────────────────
+// Launch video polaroid — a floating preview pinned over the site preview.
+// Shows progress while the launch video pipeline runs, the looping video
+// once it lands, and a clear retry path when it fails (Bible Law 8).
+//
+// Editorial-light palette: warm bone surfaces, near-black text, deep
+// champagne accent. NO dark gradients, NO champagne-on-black.
+// ───────────────────────────────────────────────────────────────────────────
+interface LaunchVideoState {
+  status: "idle" | "running" | "ready" | "error";
+  step: string;
+  videoUrl?: string;
+  durationSec?: number;
+  script?: string;
+  error?: string;
+}
+
+interface LaunchVideoPolaroidProps {
+  state: LaunchVideoState;
+  onRetry: () => void;
+  onDismiss: () => void;
+}
+
+function LaunchVideoPolaroid({ state, onRetry, onDismiss }: LaunchVideoPolaroidProps): JSX.Element | null {
+  const [copied, setCopied] = useState(false);
+  if (state.status === "idle") return null;
+
+  const embedSnippet = state.videoUrl
+    ? `<video src="${state.videoUrl}" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover" />`
+    : "";
+
+  async function handleCopy() {
+    if (!embedSnippet) return;
+    try {
+      await navigator.clipboard.writeText(embedSnippet);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Clipboard blocked — surface the snippet via prompt() as a last resort.
+      window.prompt("Copy embed code:", embedSnippet);
+    }
+  }
+
+  return (
+    <div
+      className="absolute right-4 bottom-4 z-40 w-[280px] rounded-2xl shadow-[0_24px_60px_-20px_rgba(10,10,11,0.45)] border border-[#e8e6dc] bg-[#fafaf7] overflow-hidden"
+      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+    >
+      {/* Polaroid header */}
+      <div className="flex items-center justify-between px-3 py-2 border-b border-[#e8e6dc] bg-[#f4f3ed]">
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded-md bg-[#c9a961]/15 flex items-center justify-center">
+            <Video size={12} className="text-[#a8884b]" />
+          </div>
+          <span className="text-[11px] font-semibold tracking-wide text-[#0a0a0b]">
+            Launch video
+          </span>
+          {state.status === "ready" && state.durationSec ? (
+            <span className="text-[10px] text-[#6b6b6b]">{state.durationSec}s</span>
+          ) : null}
+        </div>
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Dismiss launch video"
+          className="p-1 rounded hover:bg-[#e8e6dc] text-[#6b6b6b]"
+        >
+          <X size={12} />
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="p-3">
+        <div className="aspect-video rounded-lg overflow-hidden bg-[#f4f3ed] border border-[#e8e6dc] relative flex items-center justify-center">
+          {state.status === "running" ? (
+            <div className="flex flex-col items-center gap-2 px-4 text-center">
+              <Loader2 size={20} className="animate-spin text-[#c9a961]" />
+              <span className="text-[10px] text-[#0a0a0b]/70 leading-snug">
+                {state.step || "Crafting your launch video..."}
+              </span>
+            </div>
+          ) : state.status === "ready" && state.videoUrl ? (
+            <video
+              src={state.videoUrl}
+              autoPlay
+              muted
+              loop
+              playsInline
+              controls={false}
+              className="w-full h-full object-cover"
+            />
+          ) : state.status === "error" ? (
+            <div className="flex flex-col items-center gap-2 px-4 text-center">
+              <AlertTriangle size={20} className="text-[#a8884b]" />
+              <span className="text-[10px] text-[#0a0a0b]/80 leading-snug">
+                Video generation failed: {state.error || "unknown error"}
+              </span>
+            </div>
+          ) : null}
+        </div>
+
+        {/* Footer actions */}
+        {state.status === "ready" && state.videoUrl ? (
+          <div className="mt-3 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="flex-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider border border-[#e8e6dc] bg-[#fafaf7] text-[#0a0a0b] hover:bg-[#f4f3ed] transition flex items-center justify-center gap-1.5"
+            >
+              <Copy size={11} />
+              {copied ? "Copied" : "Copy embed code"}
+            </button>
+            <a
+              href={state.videoUrl}
+              download
+              className="px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider border border-[#c9a961]/40 bg-[#c9a961]/10 text-[#7a6535] hover:bg-[#c9a961]/20 transition"
+            >
+              <Download size={11} />
+            </a>
+          </div>
+        ) : state.status === "error" ? (
+          <div className="mt-3 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onRetry}
+              className="flex-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider border border-[#e8e6dc] bg-[#fafaf7] text-[#0a0a0b] hover:bg-[#f4f3ed] transition flex items-center justify-center gap-1.5"
+            >
+              <RotateCcw size={11} />
+              Retry
+            </button>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 import CodePanel from "@/components/CodePanel";
 import ChatPanel from "@/components/ChatPanel";
 import SectionEditor from "@/components/SectionEditor";
@@ -152,6 +289,8 @@ import {
   Zap,
   Loader2,
   Layout,
+  Video,
+  Copy,
 } from "lucide-react";
 
 /** Sanitize raw API error messages for user display */
@@ -286,7 +425,7 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
         vx, vy,
         baseVx: vx, baseVy: vy,
         size: 1.2 + Math.random() * 2,
-        hue: 260 + Math.random() * 30, // zoo purple/violet range
+        hue: 35 + Math.random() * 18, // warm gold/amber range
         pulse: Math.random() * Math.PI * 2,
         pulseSpeed: 0.01 + Math.random() * 0.02,
       });
@@ -366,8 +505,8 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < CONNECTION_DIST) {
             const alpha = (1 - dist / CONNECTION_DIST) * (gen ? 0.25 : 0.12);
-            const hue = gen ? 265 + Math.sin(time * 0.02) * 20 : 270;
-            ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${alpha})`;
+            const hue = gen ? 40 + Math.sin(time * 0.02) * 8 : 38;
+            ctx.strokeStyle = `hsla(${hue}, 55%, 48%, ${alpha})`;
             ctx.lineWidth = (1 - dist / CONNECTION_DIST) * 1.5;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
@@ -384,7 +523,7 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < MOUSE_RADIUS * 1.2) {
             const alpha = (1 - dist / (MOUSE_RADIUS * 1.2)) * 0.15;
-            ctx.strokeStyle = `hsla(270, 90%, 70%, ${alpha})`;
+            ctx.strokeStyle = `hsla(38, 55%, 48%, ${alpha})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(mx, my);
@@ -422,9 +561,9 @@ function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
         const cx = w / 2, cy = h / 2;
         const ringRadius = 100 + Math.sin(time * 0.03) * 30;
         const ringGlow = ctx.createRadialGradient(cx, cy, ringRadius - 20, cx, cy, ringRadius + 40);
-        ringGlow.addColorStop(0, "hsla(270, 90%, 60%, 0)");
-        ringGlow.addColorStop(0.5, `hsla(270, 90%, 60%, ${0.04 + Math.sin(time * 0.05) * 0.02})`);
-        ringGlow.addColorStop(1, "hsla(270, 90%, 60%, 0)");
+        ringGlow.addColorStop(0, "hsla(38, 55%, 48%, 0)");
+        ringGlow.addColorStop(0.5, `hsla(38, 55%, 48%, ${0.04 + Math.sin(time * 0.05) * 0.02})`);
+        ringGlow.addColorStop(1, "hsla(38, 55%, 48%, 0)");
         ctx.fillStyle = ringGlow;
         ctx.beginPath();
         ctx.arc(cx, cy, ringRadius + 40, 0, Math.PI * 2);
@@ -545,6 +684,18 @@ function BuilderPage() {
   const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Opus, pipeline=7-agent
   const instantMode = buildMode === "instant"; // back-compat
   const [fullStack, setFullStack] = useState(false); // Full-stack mode: auto-provisions Supabase backend (auth, database, storage)
+  // Launch video combo — same prompt produces site + 30s hero launch video.
+  // No competitor (Lovable/Bolt/v0/HeyGen) has this combo. Default ON.
+  const [includeLaunchVideo, setIncludeLaunchVideo] = useState(true);
+  const [launchVideo, setLaunchVideo] = useState<{
+    status: "idle" | "running" | "ready" | "error";
+    step: string;
+    videoUrl?: string;
+    durationSec?: number;
+    script?: string;
+    error?: string;
+  }>({ status: "idle", step: "" });
+  const launchVideoAbortRef = useRef<AbortController | null>(null);
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [reactFiles, setReactFiles] = useState<Record<string, string> | null>(null);
@@ -778,8 +929,8 @@ function BuilderPage() {
               if (agency?.brand_config?.agencyName) {
                 setAgencyBrand({
                   agencyName: agency.brand_config.agencyName,
-                  primaryColor: agency.brand_config.primaryColor || "#3b82f6",
-                  secondaryColor: agency.brand_config.secondaryColor || "#8b5cf6",
+                  primaryColor: agency.brand_config.primaryColor || "#78716c",
+                  secondaryColor: agency.brand_config.secondaryColor || "#78716c",
                   logoUrl: agency.brand_config.logoUrl,
                 });
                 // Store for TopBar to pick up
@@ -1085,6 +1236,101 @@ function BuilderPage() {
     });
   }, []);
 
+  /**
+   * Trigger the launch video pipeline once the site has been generated.
+   * Streams progress steps, then either yields a videoUrl or surfaces an
+   * error — never blocks or kills the site flow (Bible Law 8).
+   *
+   * Declared BEFORE handleGenerate so handleGenerate's dep array can
+   * reference it without hitting a temporal dead zone at component init.
+   */
+  const generateLaunchVideo = useCallback(async (sitePrompt: string) => {
+    if (!sitePrompt.trim()) return;
+    // Cancel any in-flight launch video request from a previous build.
+    launchVideoAbortRef.current?.abort();
+    const controller = new AbortController();
+    launchVideoAbortRef.current = controller;
+
+    setLaunchVideo({ status: "running", step: "Preparing launch video…" });
+
+    // Best-effort brand inference — first capitalised word in prompt.
+    const brandMatch = sitePrompt.match(/(?:called|named|for|brand(?:ed)?)\s+([A-Z][A-Za-z0-9]{1,30})/);
+    const fallbackBrand = sitePrompt
+      .split(/[^A-Za-z0-9]+/)
+      .find((t) => /^[A-Z]/.test(t) && t.length >= 3);
+    const brandName = (brandMatch?.[1] || fallbackBrand || "").trim();
+
+    try {
+      const res = await fetch("/api/generate/launch-video", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          tagline: sitePrompt.trim().slice(0, 200),
+          valueProp: sitePrompt.trim(),
+          brandName: brandName || undefined,
+          stream: true,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok || !res.body) {
+        const errBody = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        throw new Error(errBody.error || `Video service returned HTTP ${res.status}`);
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop() || "";
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6).trim();
+          if (!jsonStr) continue;
+          try {
+            const event = JSON.parse(jsonStr);
+            if (event.type === "step" && event.message) {
+              setLaunchVideo((prev) => ({ ...prev, status: "running", step: event.message }));
+            } else if (event.type === "script" && event.script) {
+              setLaunchVideo((prev) => ({ ...prev, script: event.script }));
+            } else if (event.type === "video" && event.videoUrl) {
+              setLaunchVideo((prev) => ({
+                ...prev,
+                status: "ready",
+                videoUrl: event.videoUrl,
+                durationSec: event.durationSec,
+              }));
+            } else if (event.type === "done") {
+              setLaunchVideo((prev) => ({
+                ...prev,
+                status: "ready",
+                step: "Launch video ready",
+                videoUrl: event.videoUrl || prev.videoUrl,
+                durationSec: event.durationSec || prev.durationSec,
+                script: event.script || prev.script,
+              }));
+            } else if (event.type === "error") {
+              const msg = typeof event.message === "string" ? event.message : "Launch video failed";
+              setLaunchVideo({ status: "error", step: "", error: msg });
+              return;
+            }
+          } catch (e) {
+            if (e instanceof SyntaxError) continue;
+            throw e;
+          }
+        }
+      }
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return;
+      const msg = err instanceof Error ? err.message : String(err);
+      setLaunchVideo({ status: "error", step: "", error: msg });
+    }
+  }, []);
+
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
@@ -1259,6 +1505,11 @@ function BuilderPage() {
                   }
                   setPipelineAgents(prev => [...prev, "Build complete"]);
                   trackEvent("build");
+                  // Cross-product moat: kick off the launch video pipeline now
+                  // that the site is finished. Never blocks the site flow.
+                  if (includeLaunchVideo) {
+                    void generateLaunchVideo(prompt);
+                  }
                 }
               } else if (event.type === "warning") {
                 // Non-fatal in-flight warning (section-fallback, etc.) — show it
@@ -1336,6 +1587,9 @@ function BuilderPage() {
                 setBuildProgress(null);
                 setPipelineAgents(prev => [...prev, "Build complete"]);
                 trackEvent("build");
+                if (includeLaunchVideo) {
+                  void generateLaunchVideo(prompt);
+                }
               } else if (event.type === "warning") {
                 const kind = event.kind || "warning";
                 const section = event.section || "";
@@ -1384,7 +1638,7 @@ function BuilderPage() {
       }
       return;
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection, includeLaunchVideo, generateLaunchVideo]);
 
   // Edit existing React files via the same streaming endpoint
   const handleEdit = useCallback(async () => {
@@ -1758,7 +2012,7 @@ root.render(React.createElement(App));
   /* ─── Recording Mode: fullscreen preview only ─── */
   if (recordingMode) {
     return (
-      <div className="h-screen w-screen bg-[#0b1530] relative overflow-hidden">
+      <div className="h-screen w-screen bg-[var(--paper)] relative overflow-hidden">
         {/* Minimal recording chrome — press Escape to exit */}
         <div className="absolute top-3 right-3 z-50 flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-500/20 border border-stone-500/40 text-stone-400 text-xs font-semibold animate-pulse">
@@ -1858,6 +2112,12 @@ root.render(React.createElement(App));
           files={reactFiles || {}}
           reactDeps={reactDeps}
         />
+        {/* Launch video polaroid — floats over preview, never blocks site flow */}
+        <LaunchVideoPolaroid
+          state={launchVideo}
+          onRetry={() => generateLaunchVideo(prompt)}
+          onDismiss={() => setLaunchVideo({ status: "idle", step: "" })}
+        />
         {isAdmin && (
           <button
             type="button"
@@ -1885,10 +2145,10 @@ root.render(React.createElement(App));
                 onClick={() => setBuildMode(buildMode === "instant" ? "deep" : buildMode === "deep" ? "pipeline" : "instant")}
                 className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
                   buildMode === "pipeline"
-                    ? "bg-violet-500/20 border-violet-500/40 text-violet-300"
+                    ? "bg-stone-200 border-stone-300 text-stone-700"
                     : buildMode === "deep"
-                    ? "bg-stone-500/10 border-stone-500/30 text-stone-400"
-                    : "bg-stone-500/10 border-stone-500/30 text-stone-400"
+                    ? "bg-stone-100 border-stone-200 text-stone-500"
+                    : "bg-stone-100 border-stone-200 text-stone-500"
                 }`}
                 title={
                   buildMode === "instant" ? "Quick Build: <3s preview from component library (free tier)" :
@@ -1911,6 +2171,23 @@ root.render(React.createElement(App));
                 {fullStack ? "Full-Stack" : "Frontend"}
               </button>
               <button
+                onClick={() => setIncludeLaunchVideo((v) => !v)}
+                aria-pressed={includeLaunchVideo}
+                className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
+                  includeLaunchVideo
+                    ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                    : "bg-white/5 border-white/10 text-white/40"
+                }`}
+                title={
+                  includeLaunchVideo
+                    ? "Launch video: 30-second hero spokesperson video auto-generates after the site"
+                    : "Launch video off — site only"
+                }
+              >
+                <Video size={12} className="inline mr-1" />
+                {includeLaunchVideo ? "+ Launch Video" : "Site Only"}
+              </button>
+              <button
                 onClick={handleGenerate}
                 disabled={!prompt.trim() || status === "generating"}
                 className="px-5 py-2 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 text-white text-sm font-semibold hover:from-stone-500 hover:to-stone-500 disabled:opacity-40 transition-all"
@@ -1925,7 +2202,10 @@ root.render(React.createElement(App));
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-[#0a0f1e] via-[#0f172a] to-[#111827] relative overflow-hidden">
+    <div
+      className="builder-editorial flex flex-col h-screen relative overflow-hidden"
+      style={{ background: "var(--paper)" }}
+    >
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />
@@ -1953,14 +2233,50 @@ root.render(React.createElement(App));
       {/* Interactive particle constellation background */}
       <BuilderBackground isGenerating={status === "generating"} />
 
-      {/* ── Top Bar ── minimal, dark, premium */}
-      <div className="relative z-10 flex items-center h-12 border-b border-white/[0.06] bg-[#0a0f1e]/80 backdrop-blur-xl px-3 gap-3">
+      {/* ── Top Bar ── editorial-light, matches site header */}
+      <div
+        className="relative z-10 flex items-center h-12 px-3 gap-3"
+        style={{
+          background: "rgba(250, 249, 244, 0.94)",
+          borderBottom: "1px solid var(--rule)",
+          backdropFilter: "blur(12px) saturate(140%)",
+          WebkitBackdropFilter: "blur(12px) saturate(140%)",
+        }}
+      >
         {/* Logo + branding */}
         <Link href="/" className="flex items-center gap-2 mr-2 group">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
-            <Sparkles className="w-3.5 h-3.5 text-white" />
+          <div
+            className="relative w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-[1.04]"
+            style={{
+              background: "var(--paper)",
+              border: "1.5px solid var(--gold)",
+              boxShadow: "0 2px 6px -2px rgba(140,107,37,0.18), inset 0 0 0 2px var(--paper)",
+            }}
+          >
+            <span
+              className="text-[14px] leading-none"
+              style={{
+                fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+                fontStyle: "italic",
+                fontWeight: 600,
+                color: "var(--ink)",
+                marginTop: "1px",
+              }}
+            >
+              Z
+            </span>
           </div>
-          <span className="text-sm font-semibold text-white/80 hidden sm:inline">Zoobicon</span>
+          <span
+            className="text-sm hidden sm:inline"
+            style={{
+              fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+              fontWeight: 500,
+              color: "var(--ink)",
+              letterSpacing: "0.005em",
+            }}
+          >
+            Zoobicon
+          </span>
         </Link>
 
         {/* Divider */}
@@ -2077,8 +2393,8 @@ root.render(React.createElement(App));
                 title={advancedMode ? "Switch to simple mode" : "Show advanced tools"}
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
                   advancedMode
-                    ? "bg-gradient-to-r from-purple-500/15 to-indigo-500/15 text-purple-300 border-purple-500/30 shadow-sm shadow-purple-500/10"
-                    : "bg-white/[0.04] text-white/40 hover:text-white/60 hover:bg-white/[0.07] border-white/[0.08] hover:border-purple-500/20"
+                    ? "border-stone-300 text-stone-700 bg-stone-100"
+                    : "border-stone-200 text-stone-500 hover:text-stone-700 hover:bg-stone-50"
                 }`}
               >
                 <Wand2 size={13} />
@@ -2087,11 +2403,12 @@ root.render(React.createElement(App));
               <button
                 onClick={() => setShowDeployModal(true)}
                 disabled={isDeploying}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[11px] font-semibold transition-all border ${
                   isDeploying
-                    ? "bg-purple-500/10 text-purple-300/50 cursor-wait border border-purple-500/20"
-                    : "bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 border border-purple-400/20"
+                    ? "border-stone-200 text-stone-400 cursor-wait bg-stone-50"
+                    : "text-white border-transparent"
                 }`}
+                style={!isDeploying ? { background: "linear-gradient(135deg, #c9a961 0%, #b8923f 100%)", boxShadow: "0 2px 8px rgba(184,146,63,0.3)" } : {}}
               >
                 <Rocket size={13} className={isDeploying ? "animate-pulse" : ""} />
                 {isDeploying ? "Deploying..." : "Deploy"}
@@ -2115,7 +2432,7 @@ root.render(React.createElement(App));
 
       <div className="flex flex-1 overflow-hidden relative z-10">
         {/* ── Left Panel — Chat / Prompt ── */}
-        <div className="w-[380px] min-w-[320px] flex flex-col border-r border-white/[0.06] border-l border-purple-500/10 bg-[#0d1321]/60 backdrop-blur-xl">
+        <div className="w-[380px] min-w-[320px] flex flex-col" style={{ background: "var(--paper-elevated)", borderRight: "1px solid var(--rule)", borderLeft: "1px solid var(--rule)" }}>
           <AnimatePresence mode="wait">
             {!hasCode ? (
               <motion.div
@@ -2253,8 +2570,8 @@ root.render(React.createElement(App));
                 {/* Chat header */}
                 <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-indigo-500/20 flex items-center justify-center">
-                      <MessageSquare className="w-3 h-3 text-indigo-400" />
+                    <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: "rgba(184,146,63,0.15)" }}>
+                      <MessageSquare className="w-3 h-3" style={{ color: "var(--gold-deep)" }} />
                     </div>
                     <span className="text-xs font-semibold text-white/70">Edit with AI</span>
                     {saveStatus === "saving" && (
@@ -2270,7 +2587,7 @@ root.render(React.createElement(App));
                     <button
                       onClick={() => setShowSections(s => !s)}
                       className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] transition-all ${
-                        showSections ? "text-indigo-300 bg-indigo-500/10" : "text-white/30 hover:text-white/60 hover:bg-white/[0.05]"
+                        showSections ? "text-stone-700 bg-stone-100 border-stone-200" : "text-stone-400 hover:text-stone-700 hover:bg-stone-50"
                       }`}
                       title="Manage sections"
                     >
@@ -2290,8 +2607,8 @@ root.render(React.createElement(App));
                       title={advancedMode ? "Hide advanced tools" : "Show advanced tools"}
                       className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] transition-all border ${
                         advancedMode
-                          ? "text-purple-300 bg-gradient-to-r from-purple-500/15 to-indigo-500/15 border-purple-500/30"
-                          : "text-white/30 hover:text-white/60 bg-white/[0.03] hover:bg-white/[0.06] border-white/[0.06] hover:border-purple-500/20"
+                          ? "text-stone-700 bg-stone-100 border-stone-300"
+                          : "text-stone-400 hover:text-stone-700 bg-stone-50 hover:bg-stone-100 border-stone-200"
                       }`}
                     >
                       <Wand2 size={11} />
@@ -2403,7 +2720,7 @@ root.render(React.createElement(App));
             */}
             <div
               ref={previewContainerRef}
-              className="absolute inset-0 bg-[#0a0f1e]"
+              className="absolute inset-0 bg-[#f4f3ed]"
               style={{
                 visibility: activeTab === "preview" ? "visible" : "hidden",
                 zIndex: activeTab === "preview" ? 1 : 0,
@@ -2533,7 +2850,7 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-20 flex items-center justify-center bg-[#0a0f1e]"
+                  className="absolute inset-0 z-20 flex items-center justify-center bg-[#f4f3ed]"
                 >
                   <div className="max-w-md text-center px-8">
                     <div className="w-14 h-14 rounded-2xl bg-stone-500/10 border border-stone-500/15 flex items-center justify-center mx-auto mb-5">
@@ -2557,24 +2874,25 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0a0f1e]/95 backdrop-blur-sm overflow-hidden"
+                  className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden"
+                  style={{ background: "rgba(247,245,238,0.97)", backdropFilter: "blur(4px)" }}
                 >
                   <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-purple-600/[0.06] blur-[120px] animate-pulse" />
-                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full bg-indigo-600/[0.04] blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[120px] animate-pulse" style={{ background: "rgba(184,146,63,0.08)" }} />
+                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full blur-[100px] animate-pulse" style={{ background: "rgba(184,146,63,0.05)", animationDelay: "1s" }} />
                   </div>
 
                   <div className="relative z-10 text-center px-6">
                     <div className="relative w-20 h-20 mx-auto mb-8">
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 animate-pulse shadow-2xl shadow-purple-500/30" />
-                      <div className="absolute inset-[3px] rounded-[13px] bg-[#0a0f1e] flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+                      <div className="absolute inset-0 rounded-2xl animate-pulse shadow-xl" style={{ background: "linear-gradient(135deg, #c9a961 0%, #b8923f 100%)", boxShadow: "0 8px 32px rgba(184,146,63,0.35)" }} />
+                      <div className="absolute inset-[3px] rounded-[13px] flex items-center justify-center" style={{ background: "var(--paper)" }}>
+                        <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--gold)" }} />
                       </div>
-                      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-purple-500/20 via-transparent to-blue-500/20 animate-spin" style={{ animationDuration: "3s" }} />
+                      <div className="absolute -inset-1 rounded-2xl animate-spin" style={{ background: "conic-gradient(from 0deg, rgba(184,146,63,0.3), transparent, rgba(184,146,63,0.1))", animationDuration: "3s" }} />
                     </div>
 
-                    <h3 className="text-xl font-semibold text-white/90 mb-2">Building your website</h3>
-                    <p className="text-white/30 text-sm mb-8 max-w-sm">Generating production-ready React components</p>
+                    <h3 className="text-xl font-semibold mb-2" style={{ color: "var(--ink)" }}>Building your website</h3>
+                    <p className="text-sm mb-8 max-w-sm" style={{ color: "var(--ink-muted)" }}>Generating production-ready React components</p>
 
                     <div className="flex flex-col items-center gap-2.5">
                       {pipelineAgents.slice(-4).map((msg, i) => {
@@ -2623,21 +2941,22 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-10 overflow-hidden bg-[#0a0f1e]/95 backdrop-blur-sm"
+                  className="absolute inset-0 z-10 overflow-hidden"
+                  style={{ background: "var(--paper)" }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-purple-600/[0.06] blur-[150px]" />
-                      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-blue-600/[0.04] blur-[120px]" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full blur-[150px]" style={{ background: "rgba(184,146,63,0.07)" }} />
+                      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: "rgba(184,146,63,0.04)" }} />
                     </div>
 
                     <div className="relative z-10 text-center px-6 max-w-xl">
-                      <h1 className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight">
-                        <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-indigo-300 bg-clip-text text-transparent">
+                      <h1 className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic" }}>
+                        <span style={{ background: "linear-gradient(135deg, var(--ink) 0%, var(--gold-deep) 50%, var(--gold) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
                           What do you want to build?
                         </span>
                       </h1>
-                      <p className="text-white/40 text-sm mb-10 leading-relaxed max-w-md mx-auto">
+                      <p className="text-sm mb-10 leading-relaxed max-w-md mx-auto" style={{ color: "var(--ink-muted)" }}>
                         Describe your vision and our AI will generate a complete, production-ready React application.
                       </p>
 
@@ -2653,17 +2972,18 @@ root.render(React.createElement(App));
                           <button
                             key={chip.label}
                             onClick={() => setPrompt(chip.label.toLowerCase())}
-                            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] text-white/40 hover:text-white/70 hover:bg-purple-500/[0.08] hover:border-purple-500/[0.20] transition-all"
+                            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11px] transition-all border"
+                            style={{ background: "var(--paper-elevated)", borderColor: "var(--rule)", color: "var(--ink-secondary)" }}
                           >
-                            <span className="text-white/25 group-hover:text-purple-400 transition-colors">{chip.icon}</span>
+                            <span style={{ color: "var(--gold)" }}>{chip.icon}</span>
                             {chip.label}
-                            <ChevronRight size={10} className="text-white/15 group-hover:text-purple-300/40 transition-colors" />
+                            <ChevronRight size={10} style={{ color: "var(--ink-muted)" }} />
                           </button>
                         ))}
                       </div>
 
-                      <div className="inline-flex items-center gap-2 text-[10px] text-white/25">
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400/60 animate-pulse" />
+                      <div className="inline-flex items-center gap-2 text-[10px]" style={{ color: "var(--ink-muted)" }}>
+                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--gold)" }} />
                         {useWebContainers ? "Runtime pre-warmed" : "Sandbox ready"}
                       </div>
                     </div>

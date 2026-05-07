@@ -36,15 +36,15 @@ interface ChecklistItem {
 }
 
 const CATEGORIES = [
-  { key: "infrastructure", label: "Infrastructure & DevOps", icon: Server, color: "text-blue-500" },
+  { key: "infrastructure", label: "Infrastructure & DevOps", icon: Server, color: "text-stone-500" },
   { key: "security", label: "Security & Auth", icon: Shield, color: "text-red-500" },
-  { key: "email", label: "Email & Notifications", icon: Mail, color: "text-violet-500" },
+  { key: "email", label: "Email & Notifications", icon: Mail, color: "text-stone-500" },
   { key: "payments", label: "Payments & Billing", icon: CreditCard, color: "text-emerald-500" },
   { key: "seo", label: "SEO & Marketing", icon: Search, color: "text-orange-500" },
   { key: "performance", label: "Performance & Speed", icon: Zap, color: "text-amber-500" },
   { key: "quality", label: "Quality & Testing", icon: Bug, color: "text-rose-500" },
-  { key: "ux", label: "UX & Accessibility", icon: Accessibility, color: "text-cyan-500" },
-  { key: "ai", label: "AI Pipeline & Models", icon: Bot, color: "text-indigo-500" },
+  { key: "ux", label: "UX & Accessibility", icon: Accessibility, color: "text-stone-500" },
+  { key: "ai", label: "AI Pipeline & Models", icon: Bot, color: "text-stone-500" },
   { key: "competitive", label: "Competitive Edge", icon: Trophy, color: "text-yellow-500" },
   { key: "legal", label: "Legal & Compliance", icon: FileText, color: "text-slate-700" },
   { key: "monitoring", label: "Monitoring & Analytics", icon: BarChart3, color: "text-teal-500" },
@@ -219,7 +219,7 @@ export default function PreLaunchChecklistPage() {
       <div>
         {/* Header */}
         <div className="flex items-start gap-4 mb-8">
-          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-indigo-600 flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-stone-400 via-stone-500 to-stone-600 flex items-center justify-center shrink-0">
             <Rocket className="w-7 h-7 text-white" />
           </div>
           <div>
@@ -264,9 +264,9 @@ export default function PreLaunchChecklistPage() {
         </div>
 
         {/* Competitive Landscape Summary */}
-        <div className="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-6 mb-6">
+        <div className="bg-gradient-to-r from-stone-50 to-stone-50 border border-stone-200 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-3">
-            <Target className="w-5 h-5 text-indigo-600" />
+            <Target className="w-5 h-5 text-stone-600" />
             <h2 className="font-semibold text-slate-800">Competitive Position at Launch</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
@@ -275,7 +275,7 @@ export default function PreLaunchChecklistPage() {
               <div className="text-slate-700">White-label agency, 43 generators, multi-LLM, full-stack gen, e-commerce gen, 21+ tools</div>
             </div>
             <div className="bg-white rounded-lg p-3 border border-slate-200">
-              <div className="text-blue-600 font-medium mb-1">We Match</div>
+              <div className="text-stone-600 font-medium mb-1">We Match</div>
               <div className="text-slate-700">Visual editing, project mode, templates, multi-page sites, GitHub export</div>
             </div>
             <div className="bg-white rounded-lg p-3 border border-slate-200">
@@ -283,7 +283,7 @@ export default function PreLaunchChecklistPage() {
               <div className="text-slate-700">Build speed (95s vs Bolt 3-5s), in-browser runtime, real-time collab</div>
             </div>
             <div className="bg-white rounded-lg p-3 border border-slate-200">
-              <div className="text-indigo-600 font-medium mb-1">Unique Moat</div>
+              <div className="text-stone-600 font-medium mb-1">Unique Moat</div>
               <div className="text-slate-700">Agency platform, 43 specialized generators, Opus quality, WordPress plugin</div>
             </div>
           </div>
@@ -298,7 +298,7 @@ export default function PreLaunchChecklistPage() {
               onClick={() => setFilterPriority(p)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filterPriority === p
-                  ? "bg-indigo-500 text-white"
+                  ? "bg-stone-500 text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
@@ -313,7 +313,7 @@ export default function PreLaunchChecklistPage() {
           <button
             onClick={() => setShowCompetitorNotes(!showCompetitorNotes)}
             className={`ml-auto px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              showCompetitorNotes ? "bg-indigo-50 text-indigo-600 border border-indigo-200" : "bg-slate-100 text-slate-700"
+              showCompetitorNotes ? "bg-stone-50 text-stone-600 border border-stone-200" : "bg-slate-100 text-slate-700"
             }`}
           >
             <Trophy className="w-3 h-3 inline mr-1" />
@@ -341,7 +341,7 @@ export default function PreLaunchChecklistPage() {
                   <span className="text-sm text-slate-700">{catChecked}/{items.length}</span>
                   <div className="w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden mx-2">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${catChecked === items.length ? "bg-emerald-500" : "bg-indigo-400"}`}
+                      className={`h-full rounded-full transition-all duration-500 ${catChecked === items.length ? "bg-emerald-500" : "bg-stone-400"}`}
                       style={{ width: `${items.length > 0 ? (catChecked / items.length) * 100 : 0}%` }}
                     />
                   </div>
@@ -376,7 +376,7 @@ export default function PreLaunchChecklistPage() {
                               {item.priority}
                             </span>
                             {item.link && (
-                              <Link href={item.link} className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors">
+                              <Link href={item.link} className="text-xs text-stone-500 hover:text-stone-600 transition-colors">
                                 Open →
                               </Link>
                             )}
@@ -385,8 +385,8 @@ export default function PreLaunchChecklistPage() {
                             {item.description}
                           </p>
                           {showCompetitorNotes && item.competitorNote && (
-                            <div className="mt-2 text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 rounded px-2.5 py-1.5">
-                              <Trophy className="w-3 h-3 inline mr-1 text-indigo-500" />
+                            <div className="mt-2 text-xs text-stone-700 bg-stone-50 border border-stone-200 rounded px-2.5 py-1.5">
+                              <Trophy className="w-3 h-3 inline mr-1 text-stone-500" />
                               {item.competitorNote}
                             </div>
                           )}

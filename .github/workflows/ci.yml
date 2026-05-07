@@ -24,6 +24,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Critical-deps guard
+        # Fails CI if an auto-fix bot (GateTest etc) silently removes a
+        # dependency the project cannot run without. See the script's
+        # header for the rationale.
+        run: node scripts/critical-deps-guard.js
+
       - name: Quality Gate
         run: node scripts/quality-gate.js
 

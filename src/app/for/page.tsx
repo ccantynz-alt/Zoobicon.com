@@ -20,7 +20,7 @@ export default function IndustriesHubPage() {
   const industries = Object.values(INDUSTRIES);
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white">
+    <div className="min-h-screen bg-[var(--paper)] text-white">
       <section className="pt-24 pb-16 px-4">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">

@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       businessName,
       businessDescription,
       greeting,
-      primaryColor = "#8b5cf6",
+      primaryColor = "#78716c",
       position = "bottom-right",
       collectEmail = true,
       knowledgeBase,

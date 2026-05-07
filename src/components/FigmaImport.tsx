@@ -104,7 +104,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           }}
           className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
             activeTab === "url"
-              ? "bg-[#0f2148] text-white shadow-lg"
+              ? "bg-[var(--paper)] text-white shadow-lg"
               : "text-[#666] hover:text-[#999]"
           }`}
         >
@@ -118,7 +118,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           }}
           className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
             activeTab === "json"
-              ? "bg-[#0f2148] text-white shadow-lg"
+              ? "bg-[var(--paper)] text-white shadow-lg"
               : "text-[#666] hover:text-[#999]"
           }`}
         >
@@ -141,7 +141,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
                 value={figmaUrl}
                 onChange={(e) => setFigmaUrl(e.target.value)}
                 placeholder="https://www.figma.com/file/..."
-                className="w-full bg-[#12121a] border border-[#1e1e2e] rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#3b82f6] transition-colors"
+                className="w-full bg-[#12121a] border border-[#1e1e2e] rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#78716c] transition-colors"
               />
             </div>
           </div>
@@ -155,7 +155,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
               value={accessToken}
               onChange={(e) => setAccessToken(e.target.value)}
               placeholder="figd_xxxxxxxxxxxxxxxxxx"
-              className="w-full bg-[#12121a] border border-[#1e1e2e] rounded-xl py-3 px-4 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#3b82f6] transition-colors"
+              className="w-full bg-[#12121a] border border-[#1e1e2e] rounded-xl py-3 px-4 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#78716c] transition-colors"
             />
           </div>
 
@@ -165,11 +165,11 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
                 How to get your access token:
               </span>{" "}
               Open Layers, go to{" "}
-              <span className="text-[#3b82f6]">
+              <span className="text-[#78716c]">
                 Settings &rarr; Account &rarr; Personal access tokens
               </span>
               , then click{" "}
-              <span className="text-[#3b82f6]">
+              <span className="text-[#78716c]">
                 &quot;Generate new token&quot;
               </span>
               . Copy the token and paste it above. Tokens provide read-only
@@ -191,7 +191,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
               onChange={(e) => setFigmaJson(e.target.value)}
               placeholder='Paste your Layers JSON here... (e.g., from Layers API response or "Copy as JSON" plugin)'
               rows={10}
-              className="w-full bg-[#12121a] border border-[#1e1e2e] rounded-xl py-3 px-4 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#3b82f6] transition-colors font-mono resize-y"
+              className="w-full bg-[#12121a] border border-[#1e1e2e] rounded-xl py-3 px-4 text-sm text-white placeholder-[#444] focus:outline-none focus:border-[#78716c] transition-colors font-mono resize-y"
             />
           </div>
 
@@ -201,11 +201,11 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
                 How to export JSON:
               </span>{" "}
               Use a Layers plugin like{" "}
-              <span className="text-[#3b82f6]">
+              <span className="text-[#78716c]">
                 &quot;JSON from Design&quot;
               </span>{" "}
               or copy the API response from{" "}
-              <span className="text-[#3b82f6]">
+              <span className="text-[#78716c]">
                 api.figma.com/v1/files/&#123;key&#125;
               </span>
               . The JSON should contain node structure with layout, style, and
@@ -229,8 +229,8 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           disabled={!canSubmit || loading}
           className={`mt-6 w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl text-sm font-semibold transition-all duration-200 ${
             canSubmit && !loading
-              ? "bg-gradient-to-r from-[#3b82f6] to-[#3b82f6] text-white hover:shadow-lg hover:shadow-stone-500/20 cursor-pointer"
-              : "bg-[#0f2148] text-[#444] cursor-not-allowed"
+              ? "bg-gradient-to-r from-[#78716c] to-[#78716c] text-white hover:shadow-lg hover:shadow-stone-500/20 cursor-pointer"
+              : "bg-[var(--paper)] text-[#444] cursor-not-allowed"
           }`}
         >
           {loading ? (
@@ -257,9 +257,9 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
                   <Check className="w-3 h-3 text-stone-400" />
                 </div>
               ) : i === loadingStep ? (
-                <Loader2 className="w-5 h-5 text-[#3b82f6] animate-spin" />
+                <Loader2 className="w-5 h-5 text-[#78716c] animate-spin" />
               ) : (
-                <div className="w-5 h-5 rounded-full bg-[#0f2148]" />
+                <div className="w-5 h-5 rounded-full bg-[var(--paper)]" />
               )}
               <span
                 className={`text-sm ${
@@ -287,7 +287,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
             {/* Color Swatches */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Palette className="w-4 h-4 text-[#3b82f6]" />
+                <Palette className="w-4 h-4 text-[#78716c]" />
                 <span className="text-sm font-medium text-[#999]">
                   Colors ({result.designTokens.colors.length})
                 </span>
@@ -316,7 +316,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
             {/* Fonts */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <Type className="w-4 h-4 text-[#3b82f6]" />
+                <Type className="w-4 h-4 text-[#78716c]" />
                 <span className="text-sm font-medium text-[#999]">
                   Fonts ({result.designTokens.fonts.length})
                 </span>
@@ -325,7 +325,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
                 {result.designTokens.fonts.map((font) => (
                   <span
                     key={font}
-                    className="px-3 py-1.5 bg-[#0f2148] border border-[#2a2a3a] rounded-lg text-xs text-[#ccc] font-medium"
+                    className="px-3 py-1.5 bg-[var(--paper)] border border-[#2a2a3a] rounded-lg text-xs text-[#ccc] font-medium"
                   >
                     {font}
                   </span>
@@ -345,7 +345,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
                 {result.designTokens.spacing.map((sp) => (
                   <span
                     key={sp}
-                    className="px-2.5 py-1 bg-[#0f2148] border border-[#2a2a3a] rounded-lg text-xs text-[#ccc] font-mono"
+                    className="px-2.5 py-1 bg-[var(--paper)] border border-[#2a2a3a] rounded-lg text-xs text-[#ccc] font-mono"
                   >
                     {sp}px
                   </span>
@@ -365,7 +365,7 @@ export default function FigmaImport({ onImport }: FigmaImportProps) {
           {/* Use This Design Button */}
           <button
             onClick={() => onImport(result.html)}
-            className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#3b82f6] to-[#3b82f6] text-white hover:shadow-lg hover:shadow-stone-500/20 transition-all duration-200 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#78716c] to-[#78716c] text-white hover:shadow-lg hover:shadow-stone-500/20 transition-all duration-200 cursor-pointer"
           >
             Use This Design
             <ArrowRight className="w-4 h-4" />

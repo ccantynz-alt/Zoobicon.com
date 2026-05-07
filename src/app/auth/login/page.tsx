@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import { safeRedirect } from "@/lib/safe-redirect";
 import {
   Zap,
   Eye,
@@ -62,13 +63,9 @@ export default function LoginPage() {
         // Honor ?redirect param — the builder + marketplace + any gated page
         // sends users here with their original destination. Dropping them on
         // /dashboard instead breaks the flow and feels like a loop.
-        // Guard against open-redirects: only same-origin relative paths.
-        let dest = "/dashboard";
-        try {
-          const r = searchParams.get("redirect");
-          if (r && r.startsWith("/") && !r.startsWith("//")) dest = r;
-        } catch {}
-        window.location.href = dest;
+        // safeRedirect blocks open-redirect phishing (//evil.com, /\evil.com,
+        // /%2f%2fevil.com, etc.) and falls back to /dashboard when unsafe.
+        window.location.href = safeRedirect(searchParams.get("redirect"));
         return;
       }
 
@@ -87,7 +84,7 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           <Link href="/" className="flex items-center gap-2 mb-12">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <span className="text-lg font-bold tracking-tight">Zoobicon</span>

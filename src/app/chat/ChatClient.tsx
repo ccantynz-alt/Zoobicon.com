@@ -461,7 +461,7 @@ export default function ChatClient() {
   const hasMessages = activeMessages.length > 0;
 
   return (
-    <div className="h-screen w-screen flex bg-[#0b0d17] text-white overflow-hidden">
+    <div className="h-screen w-screen flex bg-[var(--paper)] text-white overflow-hidden">
       {/* Sidebar */}
       <aside
         className={`shrink-0 border-r border-white/10 bg-[#0f2148] flex flex-col transition-all duration-200 ${
@@ -579,7 +579,7 @@ export default function ChatClient() {
                   localStorage.setItem(STORAGE_TOKEN, e.target.value);
                 }}
                 placeholder="Leave blank if ADMIN_CHAT_TOKEN isn't set on the server"
-                className="w-full px-3 py-2 rounded-md bg-[#0b0d17] border border-white/10 text-sm text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50"
+                className="w-full px-3 py-2 rounded-md bg-[var(--paper)] border border-white/10 text-sm text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50"
               />
               <p className="text-[11px] text-white/40 mt-1.5">
                 If the server has ADMIN_CHAT_TOKEN set, paste the same value here to authenticate. Otherwise any caller on the network can use the endpoint.

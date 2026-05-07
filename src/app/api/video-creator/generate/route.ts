@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     const styleDesc = STYLE_DESCRIPTIONS[style] || STYLE_DESCRIPTIONS["modern-minimalist"];
     const platformSpec = PLATFORM_SPECS[platform] || PLATFORM_SPECS["youtube"];
     const typeGuidance = PROJECT_TYPE_GUIDANCE[projectType] || PROJECT_TYPE_GUIDANCE["social-ad"];
-    const brandColorStr = brandSettings?.colors?.length ? brandSettings.colors.join(", ") : "#7c3aed, #ec4899";
+    const brandColorStr = brandSettings?.colors?.length ? brandSettings.colors.join(", ") : "#57534e, #ec4899";
     const brandFontStr = brandSettings?.font || "Inter";
 
     const sceneCount = Math.max(4, Math.min(10, Math.ceil(duration / 10)));
@@ -199,7 +199,7 @@ Generate the complete storyboard as JSON.`;
         textOverlay: scene.textOverlay || "",
         transition: scene.transition || "cut",
         cameraMovement: scene.cameraMovement || "static",
-        colorPalette: Array.isArray(scene.colorPalette) ? scene.colorPalette : brandSettings?.colors || ["#7c3aed", "#ec4899"],
+        colorPalette: Array.isArray(scene.colorPalette) ? scene.colorPalette : brandSettings?.colors || ["#57534e", "#ec4899"],
       })),
       totalDuration: parsed.totalDuration || `${duration}s`,
       estimatedRenderTime: parsed.estimatedRenderTime || "2-5 minutes",

@@ -66,10 +66,10 @@ export default function WordPressPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0b1530]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[var(--paper)]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-stone-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-stone to-stone-600 flex items-center justify-center">
               <span className="text-sm font-bold text-white">Z</span>
             </div>
             <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -135,11 +135,11 @@ export default function WordPressPage() {
               {STEPS.map((s) => (
                 <motion.div key={s.step} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-accent-cyan/10 flex items-center justify-center shrink-0">
-                      <s.icon className="w-5 h-5 text-accent-cyan" />
+                    <div className="w-10 h-10 rounded-lg bg-accent-stone/10 flex items-center justify-center shrink-0">
+                      <s.icon className="w-5 h-5 text-accent-stone" />
                     </div>
                     <div>
-                      <div className="text-xs text-accent-cyan font-mono mb-1">Step {s.step}</div>
+                      <div className="text-xs text-accent-stone font-mono mb-1">Step {s.step}</div>
                       <h3 className="text-lg font-bold mb-2">{s.title}</h3>
                       <p className="text-sm text-white/60 leading-relaxed">{s.description}</p>
                     </div>
@@ -165,7 +165,7 @@ export default function WordPressPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {FEATURES.map((f, i) => (
                 <motion.div key={i} variants={fadeInUp} className="gradient-border card-hover p-6 rounded-xl">
-                  <f.icon className="w-8 h-8 text-accent-cyan/60 mb-4" />
+                  <f.icon className="w-8 h-8 text-accent-stone/60 mb-4" />
                   <h3 className="text-lg font-bold mb-2">{f.title}</h3>
                   <p className="text-sm text-white/60 leading-relaxed">{f.desc}</p>
                 </motion.div>
@@ -205,9 +205,9 @@ export default function WordPressPage() {
               </div>
             </motion.div>
 
-            <motion.div variants={fadeInUp} className="mt-6 bg-accent-cyan/5 border border-accent-cyan/10 rounded-xl p-4">
+            <motion.div variants={fadeInUp} className="mt-6 bg-accent-stone/5 border border-accent-stone/10 rounded-xl p-4">
               <p className="text-sm text-white/60 leading-relaxed">
-                <span className="text-accent-cyan font-semibold">Recommendation:</span> For the fastest, easiest experience, host directly on <Link href="/hosting" className="text-accent-cyan hover:underline">zoobicon.sh</Link> — free hosting with SSL, CDN, and instant deploys. No WordPress needed.
+                <span className="text-accent-stone font-semibold">Recommendation:</span> For the fastest, easiest experience, host directly on <Link href="/hosting" className="text-accent-stone hover:underline">zoobicon.sh</Link> — free hosting with SSL, CDN, and instant deploys. No WordPress needed.
               </p>
             </motion.div>
           </motion.div>

@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
             avatarImageUrl: body.avatarImageUrl,
             voiceStyle: (body.voiceStyle as VideoGenerationRequest["voiceStyle"]) || "professional",
             voiceGender: (body.voiceGender as VideoGenerationRequest["voiceGender"]) || "female",
-            background: body.background || "#0f172a",
+            background: body.background || "#f4f3ed",
             format: (body.format as VideoGenerationRequest["format"]) || "landscape",
           },
           (status) => {

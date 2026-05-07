@@ -10,6 +10,7 @@ import HeroEffects, { CursorGlowTracker } from "@/components/HeroEffects";
 import SocialPublishPanel from "@/components/SocialPublishPanel";
 import VideoSeriesPanel from "@/components/VideoSeriesPanel";
 import BatchVideosPanel from "@/components/BatchVideosPanel";
+import DubPanel from "@/components/DubPanel";
 import type { VideoSeriesEpisode } from "@/lib/video-social-publish";
 import {
   Video,
@@ -281,7 +282,7 @@ export default function VideoCreatorDashboard() {
   const [platform, setPlatform] = useState("tiktok");
   const [duration, setDuration] = useState(30);
   const [music, setMusic] = useState("upbeat");
-  const [brandColors, setBrandColors] = useState(["#06b6d4", "#2563eb"]);
+  const [brandColors, setBrandColors] = useState(["#78716c", "#57534e"]);
   const [brandFont, setBrandFont] = useState("Inter");
 
   // Voice recording state
@@ -1457,7 +1458,7 @@ export default function VideoCreatorDashboard() {
     <div className="relative min-h-screen text-white antialiased">
       <BackgroundEffects preset="technical" />
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[#0b1530]/80 backdrop-blur-2xl saturate-150">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-[var(--paper)]/80 backdrop-blur-2xl saturate-150">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5">
@@ -1864,7 +1865,9 @@ export default function VideoCreatorDashboard() {
                                 }`}
                               >
                                 {avatar.preview_image_url ? (
-                                  <img src={avatar.preview_image_url} alt={avatar.name} className="w-8 h-8 rounded-full mx-auto mb-1 object-cover" />
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  // — avatar URLs come from HeyGen/Hedra and aren't on a host we whitelist in next.config.
+                                  <img src={avatar.preview_image_url} alt={avatar.name} className="w-8 h-8 rounded-full mx-auto mb-1 object-cover" loading="lazy" />
                                 ) : (
                                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-stone-400 to-stone-400 mx-auto mb-1 flex items-center justify-center text-white text-[10px] font-bold">
                                     {avatar.name[0]}
@@ -2172,6 +2175,23 @@ export default function VideoCreatorDashboard() {
                 </motion.div>
               )}
 
+              {/* ── One-click multi-language dub (Fish Audio S1 + Hedra) ── */}
+              {spokespersonVideoUrl && script.trim() && (
+                <motion.div initial="hidden" animate="visible" variants={fadeIn}>
+                  <DubPanel
+                    sourceScript={script}
+                    sourceVideoUrl={spokespersonVideoUrl}
+                    sourceImageUrl={
+                      heygenAvatars.find((a) => a.id === spokespersonAvatarId)?.preview_image_url
+                    }
+                    sourceLabel={
+                      heygenAvatars.find((a) => a.id === spokespersonAvatarId)?.name ||
+                      "Spokesperson video"
+                    }
+                  />
+                </motion.div>
+              )}
+
               {/* Generate Button */}
               <motion.div initial="hidden" animate="visible" variants={fadeIn}>
                 <button
@@ -2281,9 +2301,12 @@ export default function VideoCreatorDashboard() {
                         >
                           {/* Show AI-generated scene image if available */}
                           {sceneImages.find((img) => img.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber) && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            // — scene image URLs are signed Replicate outputs, not on a host we whitelist in next.config.
                             <img
                               src={sceneImages.find((img) => img.sceneNumber === storyboard.storyboard[activeScene]?.sceneNumber)?.imageUrl}
                               alt={`Scene ${storyboard.storyboard[activeScene]?.sceneNumber}`}
+                              loading="lazy"
                               className="absolute inset-0 w-full h-full object-cover"
                             />
                           )}

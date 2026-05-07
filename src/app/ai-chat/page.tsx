@@ -62,7 +62,7 @@ export default function AIChatPage() {
   const [botName, setBotName] = useState('Support Bot');
   const [botModel, setBotModel] = useState('claude');
   const [botPersonality, setBotPersonality] = useState('friendly');
-  const [botColor, setBotColor] = useState('#8b5cf6');
+  const [botColor, setBotColor] = useState('#78716c');
   const [greeting, setGreeting] = useState("Hi! 👋 I'm your AI assistant. How can I help you today?");
   const [showEmbed, setShowEmbed] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -99,7 +99,7 @@ export default function AIChatPage() {
 
   return (
     <div className="min-h-screen text-white">
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
@@ -159,7 +159,7 @@ export default function AIChatPage() {
                   <div>
                     <label className="block text-xs text-white/50 mb-1">Widget Color</label>
                     <div className="flex gap-2">
-                      {['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899'].map(c => (
+                      {['#78716c', '#78716c', '#10b981', '#f59e0b', '#ef4444', '#ec4899'].map(c => (
                         <button key={c} onClick={() => setBotColor(c)} className={`w-8 h-8 rounded-full border-2 transition-transform ${botColor === c ? 'border-white scale-110' : 'border-transparent'}`} style={{ backgroundColor: c }} />
                       ))}
                     </div>

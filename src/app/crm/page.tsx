@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import DemoDataBanner from '@/components/DemoDataBanner';
 import Link from 'next/link';
 import {
   Users,
@@ -146,7 +147,7 @@ export default function CRMPage() {
 
   return (
     <div className="min-h-screen bg-transparent text-white">
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">Zoobicon</Link>
@@ -173,6 +174,7 @@ export default function CRMPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        <DemoDataBanner entity="deals" ctaHref="/crm?tab=contacts" ctaLabel="Add your first contact" />
         {/* Dashboard */}
         {tab === 'dashboard' && (
           <div>

@@ -5,8 +5,12 @@ import {
   transcribeAudio,
   transcribeUrl,
 } from "@/lib/transcription-provider";
+import { requireApiKey, isAuthenticated } from "@/lib/v1-auth";
+
+const MAX_AUDIO_BYTES = 25 * 1024 * 1024; // 25MB hard cap — matches OpenAI Whisper
 
 export async function GET() {
+  // Plans catalogue is public — no key required to list pricing.
   try {
     const plans = await getTranscriptionPlans();
     return NextResponse.json({ provider: getProviderName(), plans });
@@ -19,6 +23,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireApiKey(req);
+  if (!isAuthenticated(auth)) return auth;
+
   try {
     const contentType = req.headers.get("content-type") || "";
 
@@ -30,6 +37,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           { success: false, error: "No file provided in form data" },
           { status: 400 }
+        );
+      }
+      if (file.size > MAX_AUDIO_BYTES) {
+        return NextResponse.json(
+          { success: false, error: `Audio too large (${file.size} bytes). Max ${MAX_AUDIO_BYTES} bytes.` },
+          { status: 413 }
         );
       }
 
@@ -71,14 +84,27 @@ export async function POST(req: NextRequest) {
     // For URL-based transcription, if options are provided, use transcribeAudio via fetch
     // Otherwise use the simpler transcribeUrl
     if (punctuate !== undefined || paragraphs !== undefined || summarize !== undefined) {
-      const audioRes = await fetch(audioUrl);
+      const audioRes = await fetch(audioUrl, { signal: AbortSignal.timeout(30_000) });
       if (!audioRes.ok) {
         return NextResponse.json(
           { success: false, error: `Failed to fetch audio from URL: ${audioRes.status}` },
           { status: 400 }
         );
       }
+      const lengthHeader = Number(audioRes.headers.get("content-length") || "0");
+      if (lengthHeader && lengthHeader > MAX_AUDIO_BYTES) {
+        return NextResponse.json(
+          { success: false, error: `Audio too large at ${audioUrl} (${lengthHeader} bytes). Max ${MAX_AUDIO_BYTES} bytes.` },
+          { status: 413 }
+        );
+      }
       const buffer = Buffer.from(await audioRes.arrayBuffer());
+      if (buffer.byteLength > MAX_AUDIO_BYTES) {
+        return NextResponse.json(
+          { success: false, error: `Audio too large (${buffer.byteLength} bytes). Max ${MAX_AUDIO_BYTES} bytes.` },
+          { status: 413 }
+        );
+      }
       const result = await transcribeAudio(buffer, language, {
         punctuate,
         paragraphs,

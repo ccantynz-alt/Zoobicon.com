@@ -17,9 +17,9 @@ export interface CustomizationOptions {
 
 const PALETTES = [
   { id: "professional", label: "Professional", colors: ["#1e3a5f", "#ffffff", "#6b7280"] },
-  { id: "vibrant", label: "Vibrant", colors: ["#7c3aed", "#ec4899", "#f97316"] },
+  { id: "vibrant", label: "Vibrant", colors: ["#57534e", "#ec4899", "#f97316"] },
   { id: "nature", label: "Nature", colors: ["#166534", "#78350f", "#fef3c7"] },
-  { id: "tech", label: "Tech", colors: ["#0f172a", "#2563eb", "#06b6d4"] },
+  { id: "tech", label: "Tech", colors: ["#f4f3ed", "#57534e", "#78716c"] },
   { id: "custom", label: "Custom", colors: [] },
 ];
 
@@ -163,12 +163,12 @@ export default function CustomizationPanel({ options, onChange }: CustomizationP
               <span className="text-[10px] text-white/50">Primary</span>
               <input
                 type="color"
-                value={options.customColors?.primary || "#2563eb"}
+                value={options.customColors?.primary || "#57534e"}
                 onChange={(e) =>
                   update({
                     customColors: {
                       primary: e.target.value,
-                      accent: options.customColors?.accent || "#06b6d4",
+                      accent: options.customColors?.accent || "#78716c",
                     },
                   })
                 }
@@ -179,11 +179,11 @@ export default function CustomizationPanel({ options, onChange }: CustomizationP
               <span className="text-[10px] text-white/50">Accent</span>
               <input
                 type="color"
-                value={options.customColors?.accent || "#06b6d4"}
+                value={options.customColors?.accent || "#78716c"}
                 onChange={(e) =>
                   update({
                     customColors: {
-                      primary: options.customColors?.primary || "#2563eb",
+                      primary: options.customColors?.primary || "#57534e",
                       accent: e.target.value,
                     },
                   })

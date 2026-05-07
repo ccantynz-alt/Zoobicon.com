@@ -1,24 +1,35 @@
 "use client";
 
 /**
- * /launch — Rung 3: one-prompt business launch flow.
+ * /launch — Domain → Brand → Site → Deploy in one editorial-light flow.
+ *
+ * Replaces the previous dark-navy plan/assemble UI (which violated Bible
+ * Rule §29 — "no dark surfaces") with a clean editorial-light page that
+ * drives the new /api/launch/shortlist and /api/launch/ship endpoints.
  *
  * Flow:
- *   1. User types one-sentence business description → POST /api/launch/plan
- *   2. Page shows plan + 12 brand names with live availability checks
- *      (parallel worker pool of 4, each calling /api/domains/search)
- *   3. User clicks a domain → POST /api/launch/assemble
- *   4. Page shows launch-kit cards with CTAs (builder, video, checkout, email)
+ *   1. User types a one-line business description.
+ *   2. POST /api/launch/shortlist → 8 cards (name + tagline + palette +
+ *      monogram). Cards with .com available are highlighted.
+ *   3. User clicks "Pick this one" on the brand they want.
+ *   4. POST /api/launch/ship as an SSE stream. Live progress updates as
+ *      Home / Features / Pricing / Contact pages generate, then deploy
+ *      and (optionally) registration. Final card carries the live URL.
  *
- * Design: cinematic deep-navy, dotted grid pattern, large display typography,
- * lucide icons, framer-motion reveals. Matches the rest of the navy palette
- * (bg-[#0b1530], surface / surface-elevated from globals.css).
+ * Bible Rule §29: warm bone background, near-black text, deep champagne
+ * accents. Hairline rules. Restrained shadows. Display in Playfair-style
+ * serif (via Fraunces fallback already in globals.css), body in Inter.
  *
- * Law 8 — no blank screens. Every failure state renders a visible message.
+ * Bible Law 8: every failure path renders a visible message — no blank
+ * screens, no silent errors. The SSE stream emits typed `error` events
+ * which the page surfaces as red banners.
+ *
+ * Note: the legacy plan/assemble routes (/api/launch/plan and
+ * /api/launch/assemble) remain functional — this page no longer calls
+ * them, but they aren't deleted in case other clients depend on them.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Sparkles,
   Send,
@@ -29,863 +40,1019 @@ import {
   HelpCircle,
   ArrowRight,
   Globe,
-  Shield,
-  Gem,
   Rocket,
-  Video,
-  ShoppingCart,
-  Mail,
-  RefreshCcw,
-  Target,
-  Sparkle,
+  RefreshCw,
 } from "lucide-react";
 
-// ---------------------------------------------------------------------------
-// Types matching the API contracts
-// ---------------------------------------------------------------------------
+// ─── Types ────────────────────────────────────────────────────────────────
 
-type TLD = "com" | "ai" | "io" | "sh";
+interface BrandKit {
+  palette: string[];
+  logoSvg: string;
+  typography: { display: string; body: string };
+}
 
-interface BrandNameSuggestion {
+interface Candidate {
   name: string;
-  tld: TLD;
-  rationale: string;
+  tagline: string;
+  comAvailable: boolean | null;
+  brandKit: BrandKit | null;
 }
 
-interface StarterSection {
-  id: "hero" | "features" | "pricing" | "about" | "contact";
-  headline: string;
-  subhead: string;
-  bullets: string[];
+interface ShortlistResponse {
+  candidates: Candidate[];
+  meta: {
+    model: string;
+    elapsedMs: number;
+    kitsAttempted: number;
+    kitsReturned: number;
+    kitFailures: number;
+  };
+  error?: string;
 }
 
-interface LaunchPlan {
-  concept: string;
-  targetCustomer: string;
-  positioning: string;
-  taglines: string[];
-  brandNames: BrandNameSuggestion[];
-  suggestedTlds: Array<{ tld: string; reason: string }>;
-  starterSections: StarterSection[];
-  emailPrefixes: string[];
-  meta: { model: string; elapsedMs: number };
-}
-
-interface AvailabilityState {
-  status: "pending" | "checking" | "available" | "taken" | "unknown" | "error";
-  price: number | null;
+interface ShipEventBase {
+  type: string;
   message?: string;
 }
-
-interface LaunchKit {
-  domain: {
-    name: string;
-    availability: {
-      available: boolean | null;
-      price: number | null;
-      tld: string;
-      confidence: "high" | "low" | "unknown";
-      unavailableReason?: string;
-    };
-    trademark: {
-      status: "clear" | "conflict" | "unknown" | "unavailable";
-      registries_checked: string[];
-      conflictCount: number;
-      notes: string | null;
-      unavailableReason?: string;
-    };
-    valuation: {
-      low: number | null;
-      high: number | null;
-      midpoint: number | null;
-      confidence: "low" | "medium" | "high" | "unknown";
-      factors: string[];
-      unavailableReason?: string;
-    };
-  };
-  brand: { name: string; tagline: string; positioning: string; concept: string };
-  nextSteps: Array<{
-    action: "build-site" | "create-video" | "buy-domain" | "connect-email";
-    href: string;
-    label: string;
-    description: string;
-  }>;
-  meta: { assembledAt: string; partialFailures: string[] };
+interface ShipCompleteEvent extends ShipEventBase {
+  type: "complete";
+  siteUrl: string;
+  siteSlug?: string;
+  domain: string;
+  domainRegistered: boolean;
+  registrarOrderId?: string;
+  registrarError?: string;
+  attempts?: Array<{ provider: string; success: boolean; error?: string; durationMs: number }>;
 }
+type ShipEvent =
+  | ({ type: "site-step" | "deploy-step" | "register-step" | "error" } & ShipEventBase)
+  | ShipCompleteEvent;
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
+type Stage =
+  | "idle"
+  | "shortlisting"
+  | "choosing"
+  | "shipping"
+  | "complete"
+  | "error";
+
+// ─── Component ────────────────────────────────────────────────────────────
 
 export default function LaunchPage() {
-  const [prompt, setPrompt] = useState("");
-  const [planning, setPlanning] = useState(false);
-  const [planError, setPlanError] = useState<string | null>(null);
-  const [plan, setPlan] = useState<LaunchPlan | null>(null);
+  const [description, setDescription] = useState("");
+  const [stage, setStage] = useState<Stage>("idle");
+  const [errorBanner, setErrorBanner] = useState<string | null>(null);
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [shipLog, setShipLog] = useState<Array<{ kind: string; text: string }>>([]);
+  const [shipResult, setShipResult] = useState<ShipCompleteEvent | null>(null);
 
-  const [availability, setAvailability] = useState<Record<string, AvailabilityState>>({});
-  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
-  const [assembling, setAssembling] = useState(false);
-  const [assembleError, setAssembleError] = useState<string | null>(null);
-  const [kit, setKit] = useState<LaunchKit | null>(null);
-
-  // Abort controllers — one active at a time per phase
-  const planAbort = useRef<AbortController | null>(null);
-  const availAbort = useRef<AbortController | null>(null);
-  const assembleAbort = useRef<AbortController | null>(null);
-
-  // Abort everything on unmount
   useEffect(() => {
     return () => {
-      planAbort.current?.abort();
-      availAbort.current?.abort();
-      assembleAbort.current?.abort();
+      abortRef.current?.abort();
     };
   }, []);
 
-  // -----------------------------------------------------------------------
-  // Step 1 — request a plan
-  // -----------------------------------------------------------------------
-  async function requestPlan(e?: React.FormEvent) {
-    e?.preventDefault();
-    const trimmed = prompt.trim();
-    if (trimmed.length < 6) {
-      setPlanError("Describe your business in at least 6 characters.");
+  const submitShortlist = useCallback(async () => {
+    if (description.trim().length < 3) {
+      setErrorBanner("Tell us a little more about your business — at least 3 characters.");
       return;
     }
-    // Reset downstream state
-    setPlan(null);
-    setKit(null);
-    setSelectedDomain(null);
-    setAvailability({});
-    setAssembleError(null);
+    setErrorBanner(null);
+    setCandidates([]);
+    setSelectedIndex(null);
+    setShipLog([]);
+    setShipResult(null);
+    setStage("shortlisting");
 
-    setPlanError(null);
-    setPlanning(true);
-
-    planAbort.current?.abort();
-    const ac = new AbortController();
-    planAbort.current = ac;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
-      const res = await fetch("/api/launch/plan", {
+      const res = await fetch("/api/launch/shortlist", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ prompt: trimmed }),
-        signal: ac.signal,
+        body: JSON.stringify({ description: description.trim(), count: 8 }),
+        signal: controller.signal,
       });
-      const data = await res.json().catch(() => ({}));
+      const data = (await res.json()) as ShortlistResponse;
       if (!res.ok) {
-        setPlanError(
-          (typeof data?.error === "string" && data.error) ||
-            `Launch planner failed (HTTP ${res.status}). Please try again.`,
+        setErrorBanner(
+          data.error || `Shortlist endpoint returned ${res.status} ${res.statusText}.`,
         );
+        setStage("error");
         return;
       }
-      setPlan(data as LaunchPlan);
-      // Kick off availability checks after a tick so the UI paints first
-      queueMicrotask(() => runAvailabilityChecks(data as LaunchPlan));
+      if (!Array.isArray(data.candidates) || data.candidates.length === 0) {
+        setErrorBanner("Claude returned no usable names. Try a more specific description.");
+        setStage("error");
+        return;
+      }
+      setCandidates(data.candidates);
+      setStage("choosing");
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
-      setPlanError(
-        err instanceof Error
-          ? `Could not reach the launch planner: ${err.message}`
-          : "Could not reach the launch planner. Check your connection and try again.",
+      setErrorBanner(
+        `Shortlist failed: ${err instanceof Error ? err.message : "unknown network error"}`,
       );
-    } finally {
-      setPlanning(false);
+      setStage("error");
     }
-  }
+  }, [description]);
 
-  // -----------------------------------------------------------------------
-  // Step 2 — check availability in a 4-wide worker pool
-  // -----------------------------------------------------------------------
-  async function runAvailabilityChecks(p: LaunchPlan) {
-    availAbort.current?.abort();
-    const ac = new AbortController();
-    availAbort.current = ac;
+  const submitShip = useCallback(
+    async (idx: number) => {
+      const candidate = candidates[idx];
+      if (!candidate || !candidate.brandKit) return;
+      setSelectedIndex(idx);
+      setStage("shipping");
+      setShipLog([{ kind: "site-step", text: "Starting build..." }]);
+      setShipResult(null);
+      setErrorBanner(null);
 
-    const initial: Record<string, AvailabilityState> = {};
-    for (const b of p.brandNames) {
-      initial[fullDomain(b)] = { status: "pending", price: null };
-    }
-    setAvailability(initial);
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
 
-    const queue = [...p.brandNames];
-    const WORKERS = 4;
-
-    async function worker() {
-      while (queue.length > 0) {
-        const item = queue.shift();
-        if (!item) return;
-        const domain = fullDomain(item);
-        setAvailability((prev) => ({
-          ...prev,
-          [domain]: { status: "checking", price: null },
-        }));
-        try {
-          const url = `/api/domains/search?q=${encodeURIComponent(item.name)}&tlds=${item.tld}`;
-          const res = await fetch(url, { signal: ac.signal });
-          if (!res.ok) {
-            setAvailability((prev) => ({
-              ...prev,
-              [domain]: {
-                status: "error",
-                price: null,
-                message: `Search failed (HTTP ${res.status})`,
-              },
-            }));
-            continue;
-          }
-          const data = await res.json();
-          const match =
-            (Array.isArray(data?.results) ? data.results : []).find(
-              (r: { domain?: string }) =>
-                typeof r.domain === "string" && r.domain.toLowerCase() === domain,
-            ) || data?.results?.[0];
-          if (!match) {
-            setAvailability((prev) => ({
-              ...prev,
-              [domain]: { status: "unknown", price: null },
-            }));
-            continue;
-          }
-          const status: AvailabilityState["status"] =
-            match.available === true
-              ? "available"
-              : match.available === false
-                ? "taken"
-                : "unknown";
-          setAvailability((prev) => ({
-            ...prev,
-            [domain]: {
-              status,
-              price: typeof match.price === "number" ? match.price : null,
-            },
-          }));
-        } catch (err) {
-          if ((err as Error).name === "AbortError") return;
-          setAvailability((prev) => ({
-            ...prev,
-            [domain]: {
-              status: "error",
-              price: null,
-              message: err instanceof Error ? err.message : "Unknown error",
-            },
-          }));
+      try {
+        const res = await fetch("/api/launch/ship", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            name: candidate.name,
+            tagline: candidate.tagline,
+            brandKit: candidate.brandKit,
+            description: description.trim(),
+            // No registrant in MVP — site deploys, registration is best-effort.
+          }),
+          signal: controller.signal,
+        });
+        if (!res.ok || !res.body) {
+          const text = await res.text().catch(() => "");
+          setErrorBanner(
+            `Launch endpoint returned ${res.status} ${res.statusText}. ${text.slice(0, 200)}`,
+          );
+          setStage("error");
+          return;
         }
-      }
-    }
-
-    await Promise.all(Array.from({ length: Math.min(WORKERS, queue.length) }, worker));
-  }
-
-  // -----------------------------------------------------------------------
-  // Step 3 — assemble the launch kit for the chosen domain
-  // -----------------------------------------------------------------------
-  async function chooseDomain(b: BrandNameSuggestion) {
-    if (!plan) return;
-    const domain = fullDomain(b);
-    setSelectedDomain(domain);
-    setAssembleError(null);
-    setKit(null);
-    setAssembling(true);
-
-    assembleAbort.current?.abort();
-    const ac = new AbortController();
-    assembleAbort.current = ac;
-
-    try {
-      const res = await fetch("/api/launch/assemble", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          prompt: prompt.trim(),
-          chosenDomain: domain,
-          plan,
-        }),
-        signal: ac.signal,
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setAssembleError(
-          (typeof data?.error === "string" && data.error) ||
-            `Assembly failed (HTTP ${res.status}). Please try again.`,
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const events = buffer.split(/\n\n/);
+          buffer = events.pop() || "";
+          for (const block of events) {
+            const lines = block.split("\n");
+            const dataLine = lines.find((l) => l.startsWith("data:"));
+            if (!dataLine) continue;
+            try {
+              const evt = JSON.parse(dataLine.slice(5).trim()) as ShipEvent;
+              handleShipEvent(evt, setShipLog, setShipResult, setErrorBanner, setStage);
+            } catch {
+              /* ignore malformed event */
+            }
+          }
+        }
+      } catch (err) {
+        if ((err as Error).name === "AbortError") return;
+        setErrorBanner(
+          `Launch stream failed: ${err instanceof Error ? err.message : "unknown error"}`,
         );
-        return;
+        setStage("error");
       }
-      setKit(data as LaunchKit);
-      // Scroll the kit into view after paint
-      requestAnimationFrame(() => {
-        document.getElementById("launch-kit")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    } catch (err) {
-      if ((err as Error).name === "AbortError") return;
-      setAssembleError(
-        err instanceof Error
-          ? `Could not assemble the launch kit: ${err.message}`
-          : "Could not assemble the launch kit. Please try again.",
-      );
-    } finally {
-      setAssembling(false);
-    }
-  }
-
-  // -----------------------------------------------------------------------
-  // Derived UI state
-  // -----------------------------------------------------------------------
-  const availableCount = useMemo(
-    () => Object.values(availability).filter((a) => a.status === "available").length,
-    [availability],
+    },
+    [candidates, description],
   );
-  const totalChecked = useMemo(
-    () =>
-      Object.values(availability).filter(
-        (a) => a.status === "available" || a.status === "taken" || a.status === "unknown",
-      ).length,
-    [availability],
+
+  const reset = useCallback(() => {
+    abortRef.current?.abort();
+    setDescription("");
+    setStage("idle");
+    setErrorBanner(null);
+    setCandidates([]);
+    setSelectedIndex(null);
+    setShipLog([]);
+    setShipResult(null);
+  }, []);
+
+  const buildableCount = useMemo(
+    () => candidates.filter((c) => c.brandKit !== null).length,
+    [candidates],
   );
 
   return (
-    <main className="relative min-h-screen bg-[#0b1530] text-white overflow-x-hidden">
-      {/* Ambient background */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "var(--paper)",
+        color: "var(--ink)",
+      }}
+    >
+      <main
         style={{
-          backgroundImage:
-            "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99,102,241,0.20), transparent 60%), radial-gradient(ellipse 60% 40% at 80% 100%, rgba(59,130,246,0.15), transparent 60%)",
+          maxWidth: 1100,
+          margin: "0 auto",
+          padding: "64px 24px 96px",
         }}
-      />
-      {/* Dotted grid */}
+      >
+        <Header />
+
+        {errorBanner && (
+          <div
+            role="alert"
+            style={{
+              marginTop: 32,
+              padding: "16px 20px",
+              borderRadius: 12,
+              border: "1px solid #c9322a",
+              background: "#fff4f3",
+              color: "#7a1c16",
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 12,
+            }}
+          >
+            <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: 2 }} />
+            <div style={{ fontSize: 14, lineHeight: 1.55 }}>{errorBanner}</div>
+          </div>
+        )}
+
+        {/* ── Stage: idle / shortlisting → input ─────────────────────────── */}
+        {(stage === "idle" || stage === "shortlisting" || stage === "error") && (
+          <DescribeBox
+            description={description}
+            setDescription={setDescription}
+            onSubmit={submitShortlist}
+            loading={stage === "shortlisting"}
+          />
+        )}
+
+        {/* ── Stage: choosing → cards ────────────────────────────────────── */}
+        {stage === "choosing" && (
+          <ShortlistGrid
+            candidates={candidates}
+            buildableCount={buildableCount}
+            onPick={submitShip}
+            onReshuffle={submitShortlist}
+          />
+        )}
+
+        {/* ── Stage: shipping / complete → progress + result ─────────────── */}
+        {(stage === "shipping" || stage === "complete") && (
+          <ShipProgress
+            stage={stage}
+            log={shipLog}
+            result={shipResult}
+            chosen={selectedIndex !== null ? candidates[selectedIndex] : undefined}
+            onReset={reset}
+          />
+        )}
+      </main>
+    </div>
+  );
+}
+
+// ─── Subcomponents ────────────────────────────────────────────────────────
+
+function Header() {
+  return (
+    <header style={{ textAlign: "center" }}>
       <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.18]"
         style={{
-          backgroundImage:
-            "radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-          maskImage:
-            "radial-gradient(ellipse 70% 60% at 50% 40%, #000 50%, transparent 100%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 70% 60% at 50% 40%, #000 50%, transparent 100%)",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "6px 14px",
+          borderRadius: 999,
+          border: "1px solid var(--rule)",
+          background: "var(--paper-elevated)",
+          fontSize: 12,
+          letterSpacing: ".08em",
+          textTransform: "uppercase",
+          color: "var(--ink-secondary)",
+          fontWeight: 600,
         }}
+      >
+        <Sparkles size={14} style={{ color: "var(--gold-deep)" }} />
+        Domain → Brand → Site → Deploy
+      </div>
+      <h1
+        style={{
+          fontFamily: "'Playfair Display', 'Fraunces', Georgia, serif",
+          fontStyle: "italic",
+          fontWeight: 600,
+          fontSize: "clamp(2.5rem, 5vw, 4rem)",
+          lineHeight: 1.05,
+          marginTop: 24,
+          marginBottom: 16,
+          letterSpacing: "-.01em",
+        }}
+      >
+        Launch a brand in one breath.
+      </h1>
+      <p
+        style={{
+          maxWidth: 640,
+          margin: "0 auto",
+          color: "var(--ink-secondary)",
+          fontSize: "1.1rem",
+          lineHeight: 1.6,
+        }}
+      >
+        Describe your business once. We'll propose names, check the .com,
+        sketch a brand identity, build a four-page site, and put it on the
+        internet. The whole launch in a single round-trip.
+      </p>
+    </header>
+  );
+}
+
+function DescribeBox({
+  description,
+  setDescription,
+  onSubmit,
+  loading,
+}: {
+  description: string;
+  setDescription: (v: string) => void;
+  onSubmit: () => void;
+  loading: boolean;
+}) {
+  return (
+    <section
+      style={{
+        marginTop: 40,
+        padding: 28,
+        borderRadius: 16,
+        background: "var(--paper-elevated)",
+        border: "1px solid var(--rule)",
+      }}
+    >
+      <label
+        htmlFor="launch-desc"
+        style={{
+          display: "block",
+          fontSize: 13,
+          letterSpacing: ".06em",
+          textTransform: "uppercase",
+          color: "var(--ink-muted)",
+          fontWeight: 600,
+          marginBottom: 12,
+        }}
+      >
+        Describe your business
+      </label>
+      <textarea
+        id="launch-desc"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="e.g. AI agent that handles dispatch and quoting for plumbers"
+        rows={3}
+        disabled={loading}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+            e.preventDefault();
+            onSubmit();
+          }
+        }}
+        style={{
+          width: "100%",
+          padding: "16px 18px",
+          borderRadius: 12,
+          border: "1px solid var(--rule)",
+          background: "var(--paper)",
+          color: "var(--ink)",
+          fontSize: 17,
+          lineHeight: 1.5,
+          fontFamily: "inherit",
+          resize: "vertical",
+          outline: "none",
+          transition: "border-color .2s ease",
+        }}
+        onFocus={(e) => (e.currentTarget.style.borderColor = "var(--gold-deep)")}
+        onBlur={(e) => (e.currentTarget.style.borderColor = "var(--rule)")}
       />
-
-      <section className="relative mx-auto max-w-5xl px-6 pt-24 pb-12 md:pt-32 md:pb-16">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-white/70"
+      <div
+        style={{
+          marginTop: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap",
+        }}
+      >
+        <span style={{ color: "var(--ink-muted)", fontSize: 13 }}>
+          Press &#8984; + Enter to submit
+        </span>
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={loading || description.trim().length < 3}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "12px 22px",
+            borderRadius: 10,
+            border: "1px solid var(--ink)",
+            background: loading ? "var(--paper-elevated)" : "var(--ink)",
+            color: loading ? "var(--ink)" : "var(--paper)",
+            fontWeight: 600,
+            fontSize: 15,
+            cursor: loading || description.trim().length < 3 ? "not-allowed" : "pointer",
+            opacity: description.trim().length < 3 && !loading ? 0.5 : 1,
+            transition: "all .2s ease",
+          }}
         >
-          <Sparkle className="h-3.5 w-3.5 text-indigo-300" />
-          Rung 3 — One-prompt launch
-        </motion.div>
+          {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+          {loading ? "Generating shortlist..." : "Generate shortlist"}
+        </button>
+      </div>
+    </section>
+  );
+}
 
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.05, ease: "easeOut" }}
-          className="mt-6 text-5xl font-semibold leading-[1.05] tracking-tight md:text-7xl"
+function ShortlistGrid({
+  candidates,
+  buildableCount,
+  onPick,
+  onReshuffle,
+}: {
+  candidates: Candidate[];
+  buildableCount: number;
+  onPick: (idx: number) => void;
+  onReshuffle: () => void;
+}) {
+  return (
+    <section style={{ marginTop: 40 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          marginBottom: 20,
+          gap: 12,
+          flexWrap: "wrap",
+        }}
+      >
+        <h2
+          style={{
+            fontFamily: "'Playfair Display', 'Fraunces', Georgia, serif",
+            fontStyle: "italic",
+            fontWeight: 600,
+            fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
+            margin: 0,
+          }}
         >
-          Describe your business.
-          <br />
-          <span className="bg-gradient-to-r from-indigo-200 via-sky-200 to-white bg-clip-text text-transparent">
-            We&apos;ll plan the launch.
+          Pick your brand.
+        </h2>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <span style={{ color: "var(--ink-muted)", fontSize: 14 }}>
+            {buildableCount} of {candidates.length} ready to ship
           </span>
-        </motion.h1>
+          <button
+            type="button"
+            onClick={onReshuffle}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 14px",
+              borderRadius: 999,
+              border: "1px solid var(--rule)",
+              background: "var(--paper-elevated)",
+              color: "var(--ink-secondary)",
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: "pointer",
+            }}
+          >
+            <RefreshCw size={13} />
+            Reshuffle
+          </button>
+        </div>
+      </div>
+      <div
+        style={{
+          display: "grid",
+          gap: 18,
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+        }}
+      >
+        {candidates.map((c, i) => (
+          <CandidateCard key={`${c.name}-${i}`} candidate={c} onPick={() => onPick(i)} />
+        ))}
+      </div>
+    </section>
+  );
+}
 
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.12, ease: "easeOut" }}
-          className="mt-5 max-w-2xl text-lg text-white/70 md:text-xl"
-        >
-          One sentence in. A brand, twelve names with live availability, a positioning
-          statement, starter page sections, and an execute button for every next step.
-        </motion.p>
+function CandidateCard({ candidate, onPick }: { candidate: Candidate; onPick: () => void }) {
+  const buildable = candidate.brandKit !== null;
+  const status = candidate.comAvailable;
+  return (
+    <article
+      style={{
+        position: "relative",
+        padding: 22,
+        borderRadius: 14,
+        background: "var(--paper-elevated)",
+        border: buildable ? "1px solid var(--gold)" : "1px solid var(--rule)",
+        opacity: buildable ? 1 : 0.65,
+        display: "flex",
+        flexDirection: "column",
+        gap: 14,
+        boxShadow: buildable ? "0 8px 30px -20px rgba(201,169,97,0.4)" : "none",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div
+          style={{ flexShrink: 0, width: 56, height: 56 }}
+          aria-hidden="true"
+          dangerouslySetInnerHTML={{
+            __html:
+              candidate.brandKit?.logoSvg ||
+              fallbackInlineMonogram(candidate.name),
+          }}
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h3
+            style={{
+              fontFamily: "'Playfair Display', 'Fraunces', Georgia, serif",
+              fontWeight: 600,
+              fontSize: 22,
+              lineHeight: 1.1,
+              margin: 0,
+              letterSpacing: "-.005em",
+            }}
+          >
+            {candidate.name}
+          </h3>
+          <p
+            style={{
+              color: "var(--ink-muted)",
+              fontSize: 13,
+              margin: "4px 0 0",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {candidate.name.toLowerCase()}.com
+          </p>
+        </div>
+        <AvailabilityPill status={status} />
+      </div>
+      <p
+        style={{
+          color: "var(--ink-secondary)",
+          fontSize: 14,
+          lineHeight: 1.55,
+          margin: 0,
+          minHeight: 44,
+        }}
+      >
+        {candidate.tagline}
+      </p>
+      {candidate.brandKit && (
+        <PaletteRow palette={candidate.brandKit.palette} typography={candidate.brandKit.typography} />
+      )}
+      <button
+        type="button"
+        onClick={onPick}
+        disabled={!buildable}
+        style={{
+          marginTop: 4,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          padding: "10px 16px",
+          borderRadius: 10,
+          border: buildable ? "1px solid var(--ink)" : "1px solid var(--rule)",
+          background: buildable ? "var(--ink)" : "var(--paper)",
+          color: buildable ? "var(--paper)" : "var(--ink-muted)",
+          fontWeight: 600,
+          fontSize: 14,
+          cursor: buildable ? "pointer" : "not-allowed",
+          width: "100%",
+        }}
+      >
+        {buildable ? (
+          <>
+            Pick {candidate.name} <ArrowRight size={14} />
+          </>
+        ) : (
+          <>.com taken — pick another</>
+        )}
+      </button>
+    </article>
+  );
+}
 
-        <form onSubmit={requestPlan} className="mt-10">
-          <div className="surface-elevated flex flex-col gap-3 p-3 md:flex-row md:items-stretch">
-            <textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="e.g. An AI scheduling assistant for solo trades in New Zealand that books jobs from text messages."
-              rows={3}
-              maxLength={1200}
-              className="min-h-[88px] flex-1 resize-none bg-transparent px-4 py-3 text-base text-white placeholder:text-white/40 focus:outline-none md:text-lg"
-              disabled={planning}
+function AvailabilityPill({ status }: { status: boolean | null }) {
+  if (status === true) {
+    return (
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          padding: "4px 10px",
+          borderRadius: 999,
+          border: "1px solid var(--gold)",
+          background: "rgba(201,169,97,0.08)",
+          color: "var(--gold-deep)",
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: ".06em",
+          textTransform: "uppercase",
+          flexShrink: 0,
+        }}
+      >
+        <CheckCircle2 size={12} /> Free
+      </span>
+    );
+  }
+  if (status === false) {
+    return (
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
+          padding: "4px 10px",
+          borderRadius: 999,
+          border: "1px solid var(--rule)",
+          background: "var(--paper)",
+          color: "var(--ink-muted)",
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: ".06em",
+          textTransform: "uppercase",
+          flexShrink: 0,
+        }}
+      >
+        <XCircle size={12} /> Taken
+      </span>
+    );
+  }
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        padding: "4px 10px",
+        borderRadius: 999,
+        border: "1px solid var(--rule)",
+        background: "var(--paper)",
+        color: "var(--ink-muted)",
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: ".06em",
+        textTransform: "uppercase",
+        flexShrink: 0,
+      }}
+    >
+      <HelpCircle size={12} /> Unknown
+    </span>
+  );
+}
+
+function PaletteRow({
+  palette,
+  typography,
+}: {
+  palette: string[];
+  typography: { display: string; body: string };
+}) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+      <div style={{ display: "flex", gap: 6 }}>
+        {palette.slice(0, 3).map((hex, i) => (
+          <span
+            key={`${hex}-${i}`}
+            title={hex}
+            style={{
+              display: "inline-block",
+              width: 22,
+              height: 22,
+              borderRadius: 6,
+              background: hex,
+              border: "1px solid var(--rule)",
+            }}
+          />
+        ))}
+      </div>
+      <div style={{ textAlign: "right", fontSize: 11, color: "var(--ink-muted)", lineHeight: 1.4 }}>
+        <div style={{ fontStyle: "italic", fontFamily: "'Playfair Display', serif" }}>
+          {typography.display}
+        </div>
+        <div>{typography.body}</div>
+      </div>
+    </div>
+  );
+}
+
+function ShipProgress({
+  stage,
+  log,
+  result,
+  chosen,
+  onReset,
+}: {
+  stage: Stage;
+  log: Array<{ kind: string; text: string }>;
+  result: ShipCompleteEvent | null;
+  chosen?: Candidate;
+  onReset: () => void;
+}) {
+  const total = 6; // assemble + 4 pages + deploy/register
+  const done = log.filter((l) => /done\.|Deployed|Registered|skipped/i.test(l.text)).length;
+  const progress = stage === "complete" ? 100 : Math.min(95, Math.round((done / total) * 100));
+
+  return (
+    <section style={{ marginTop: 40 }}>
+      <div
+        style={{
+          padding: 28,
+          borderRadius: 16,
+          background: "var(--paper-elevated)",
+          border: "1px solid var(--rule)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+          {chosen && (
+            <div
+              style={{ width: 56, height: 56, flexShrink: 0 }}
+              dangerouslySetInnerHTML={{
+                __html:
+                  chosen.brandKit?.logoSvg || fallbackInlineMonogram(chosen.name),
+              }}
             />
-            <button
-              type="submit"
-              disabled={planning || prompt.trim().length < 6}
-              className="group inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-base font-semibold text-[#060e1f] transition hover:bg-indigo-100 disabled:cursor-not-allowed disabled:bg-white/30 disabled:text-white/70 md:px-8"
+          )}
+          <div style={{ flex: 1 }}>
+            <h2
+              style={{
+                fontFamily: "'Playfair Display', 'Fraunces', Georgia, serif",
+                fontStyle: "italic",
+                fontWeight: 600,
+                fontSize: "clamp(1.6rem, 3vw, 2rem)",
+                margin: 0,
+                letterSpacing: "-.005em",
+              }}
             >
-              {planning ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Planning
-                </>
-              ) : (
-                <>
-                  <Send className="h-4 w-4 transition group-hover:translate-x-0.5" />
-                  Plan my launch
-                </>
-              )}
-            </button>
-          </div>
-          <div className="mt-3 flex items-center justify-between text-xs text-white/50">
-            <span>{prompt.length}/1200</span>
-            <span>Powered by Claude Haiku with cross-provider failover</span>
-          </div>
-        </form>
-
-        {planError && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-6 flex items-start gap-3 rounded-lg border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-100"
-          >
-            <AlertTriangle className="mt-0.5 h-4 w-4 flex-none text-red-300" />
-            <div className="flex-1">
-              <div className="font-medium">Couldn&apos;t generate your launch plan</div>
-              <div className="mt-1 text-red-100/80">{planError}</div>
-            </div>
-            <button
-              onClick={() => requestPlan()}
-              className="inline-flex items-center gap-1.5 rounded-md border border-red-300/40 bg-red-500/20 px-3 py-1.5 text-xs font-medium text-red-100 hover:bg-red-500/30"
-            >
-              <RefreshCcw className="h-3 w-3" /> Retry
-            </button>
-          </motion.div>
-        )}
-      </section>
-
-      {/* Plan + brand names */}
-      <AnimatePresence>
-        {plan && (
-          <motion.section
-            key="plan"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="relative mx-auto max-w-6xl px-6 pb-16"
-          >
-            <div className="grid gap-4 md:grid-cols-3">
-              <PlanCard
-                icon={<Target className="h-4 w-4 text-indigo-300" />}
-                label="Target customer"
-                body={plan.targetCustomer}
-              />
-              <PlanCard
-                icon={<Sparkles className="h-4 w-4 text-sky-300" />}
-                label="Concept"
-                body={plan.concept}
-              />
-              <PlanCard
-                icon={<Rocket className="h-4 w-4 text-fuchsia-300" />}
-                label="Positioning"
-                body={plan.positioning}
-              />
-            </div>
-
-            {plan.taglines.length > 0 && (
-              <div className="mt-4 surface p-5">
-                <div className="text-xs font-medium uppercase tracking-widest text-white/50">
-                  Tagline options
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {plan.taglines.map((t, i) => (
-                    <span
-                      key={i}
-                      className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-white/85"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="mt-12 flex items-end justify-between">
-              <div>
-                <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
-                  Pick your domain
-                </h2>
-                <p className="mt-1 text-sm text-white/60">
-                  {totalChecked} of {plan.brandNames.length} checked
-                  {availableCount > 0 ? ` · ${availableCount} available right now` : ""}
-                </p>
-              </div>
-              <button
-                onClick={() => runAvailabilityChecks(plan)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-white/80 hover:bg-white/[0.08]"
-              >
-                <RefreshCcw className="h-3 w-3" /> Re-check all
-              </button>
-            </div>
-
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {plan.brandNames.map((b, i) => {
-                const domain = fullDomain(b);
-                const a = availability[domain] || { status: "pending", price: null };
-                const selected = selectedDomain === domain;
-                return (
-                  <motion.button
-                    key={domain}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: Math.min(0.04 * i, 0.4) }}
-                    type="button"
-                    onClick={() => chooseDomain(b)}
-                    disabled={a.status === "taken"}
-                    className={[
-                      "group relative w-full rounded-xl border p-4 text-left transition",
-                      selected
-                        ? "border-indigo-300/60 bg-indigo-500/10 ring-2 ring-indigo-400/40"
-                        : a.status === "available"
-                          ? "border-emerald-400/30 bg-emerald-500/[0.06] hover:border-emerald-300/60 hover:bg-emerald-500/[0.1]"
-                          : a.status === "taken"
-                            ? "border-white/[0.06] bg-white/[0.02] opacity-60"
-                            : "border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.07]",
-                    ].join(" ")}
-                  >
-                    <div className="flex items-baseline justify-between gap-3">
-                      <div className="flex items-baseline gap-0.5">
-                        <span className="text-xl font-semibold tracking-tight">{b.name}</span>
-                        <span className="text-xl font-medium text-white/50">.{b.tld}</span>
-                      </div>
-                      <AvailabilityBadge state={a} />
-                    </div>
-                    {b.rationale && (
-                      <p className="mt-2 line-clamp-2 text-xs text-white/55">{b.rationale}</p>
-                    )}
-                    <div className="mt-3 flex items-center justify-between text-xs">
-                      <span className="text-white/50">
-                        {a.price != null
-                          ? `$${a.price.toFixed(2)}/yr`
-                          : a.status === "checking"
-                            ? "checking availability…"
-                            : a.status === "error"
-                              ? a.message || "check failed"
-                              : ""}
-                      </span>
-                      {a.status === "available" && (
-                        <span className="inline-flex items-center gap-1 text-emerald-300 transition group-hover:translate-x-0.5">
-                          Use this <ArrowRight className="h-3 w-3" />
-                        </span>
-                      )}
-                    </div>
-                  </motion.button>
-                );
-              })}
-            </div>
-
-            {assembleError && (
-              <div className="mt-6 flex items-start gap-3 rounded-lg border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-                <AlertTriangle className="mt-0.5 h-4 w-4 flex-none text-red-300" />
-                <div className="flex-1">
-                  <div className="font-medium">Couldn&apos;t assemble your launch kit</div>
-                  <div className="mt-1 text-red-100/80">{assembleError}</div>
-                </div>
-              </div>
-            )}
-
-            {assembling && (
-              <div className="mt-6 flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/80">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Running trademark, valuation, and availability checks in parallel…
-              </div>
-            )}
-
-            {/* Starter sections preview */}
-            {plan.starterSections.length > 0 && (
-              <div className="mt-12">
-                <h3 className="text-xl font-semibold tracking-tight">Starter page sections</h3>
-                <p className="mt-1 text-sm text-white/60">
-                  We&apos;ll pre-load these when you open the builder.
-                </p>
-                <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                  {plan.starterSections.map((s) => (
-                    <div key={s.id} className="surface p-4">
-                      <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">
-                        {s.id}
-                      </div>
-                      <div className="mt-1 text-base font-semibold text-white">{s.headline}</div>
-                      {s.subhead && <div className="mt-1 text-sm text-white/65">{s.subhead}</div>}
-                      {s.bullets.length > 0 && (
-                        <ul className="mt-3 space-y-1 text-xs text-white/55">
-                          {s.bullets.map((b, i) => (
-                            <li key={i} className="flex items-start gap-1.5">
-                              <span className="mt-1 h-1 w-1 flex-none rounded-full bg-white/40" />
-                              {b}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </motion.section>
-        )}
-      </AnimatePresence>
-
-      {/* Launch kit */}
-      <AnimatePresence>
-        {kit && (
-          <motion.section
-            id="launch-kit"
-            key="kit"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.55 }}
-            className="relative mx-auto max-w-6xl px-6 pb-24"
-          >
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/[0.08] px-3 py-1 text-[11px] font-medium uppercase tracking-widest text-emerald-200">
-              <CheckCircle2 className="h-3.5 w-3.5" /> Launch kit ready
-            </div>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-              {kit.brand.name}{" "}
-              <span className="text-white/40">— {kit.domain.name}</span>
+              {stage === "complete"
+                ? `${chosen?.name || "Your brand"} is live.`
+                : `Launching ${chosen?.name || "your brand"}...`}
             </h2>
-            <p className="mt-2 max-w-3xl text-white/70">{kit.brand.tagline}</p>
-            <p className="mt-1 max-w-3xl text-sm text-white/55">{kit.brand.positioning}</p>
+            <p style={{ color: "var(--ink-muted)", fontSize: 14, margin: "4px 0 0" }}>
+              {stage === "complete"
+                ? "The site is on the internet. Your domain status is below."
+                : "Site building. Streaming live progress."}
+            </p>
+          </div>
+          {stage === "shipping" && (
+            <Loader2 size={22} className="animate-spin" style={{ color: "var(--gold-deep)" }} />
+          )}
+        </div>
 
-            {kit.meta.partialFailures.length > 0 && (
-              <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-none text-amber-300" />
-                Some enrichments were unavailable: {kit.meta.partialFailures.join(", ")}. You can
-                still proceed — we&apos;ll retry those checks from the dashboard.
-              </div>
-            )}
+        <div
+          style={{
+            height: 4,
+            background: "var(--rule)",
+            borderRadius: 999,
+            overflow: "hidden",
+            marginBottom: 20,
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              width: `${progress}%`,
+              background: "var(--gold-deep)",
+              transition: "width .4s ease",
+            }}
+          />
+        </div>
 
-            <div className="mt-8 grid gap-4 md:grid-cols-3">
-              {/* Availability */}
-              <KitCard
-                icon={<Globe className="h-4 w-4 text-sky-300" />}
-                title="Availability"
-                body={
-                  kit.domain.availability.available === true ? (
-                    <span className="text-emerald-300">Available — lock it in</span>
-                  ) : kit.domain.availability.available === false ? (
-                    <span className="text-red-300">Taken — pick another</span>
-                  ) : (
-                    <span className="text-white/60">
-                      Unknown{" "}
-                      {kit.domain.availability.unavailableReason
-                        ? `(${kit.domain.availability.unavailableReason})`
-                        : ""}
-                    </span>
-                  )
-                }
-                footer={
-                  kit.domain.availability.price != null
-                    ? `$${kit.domain.availability.price.toFixed(2)}/year`
-                    : "Pricing unavailable"
-                }
-              />
-              {/* Trademark */}
-              <KitCard
-                icon={<Shield className="h-4 w-4 text-indigo-300" />}
-                title="Trademark"
-                body={
-                  kit.domain.trademark.status === "clear" ? (
-                    <span className="text-emerald-300">No conflicts found</span>
-                  ) : kit.domain.trademark.status === "conflict" ? (
-                    <span className="text-red-300">
-                      {kit.domain.trademark.conflictCount} potential conflict
-                      {kit.domain.trademark.conflictCount === 1 ? "" : "s"}
-                    </span>
-                  ) : kit.domain.trademark.status === "unavailable" ? (
-                    <span className="text-white/60">
-                      Unavailable{" "}
-                      {kit.domain.trademark.unavailableReason
-                        ? `(${kit.domain.trademark.unavailableReason})`
-                        : ""}
-                    </span>
-                  ) : (
-                    <span className="text-white/60">Inconclusive — verify with counsel</span>
-                  )
-                }
-                footer={
-                  kit.domain.trademark.registries_checked.length > 0
-                    ? `Checked: ${kit.domain.trademark.registries_checked.join(", ")}`
-                    : "AI-sourced signal — verify before filing"
-                }
-              />
-              {/* Valuation */}
-              <KitCard
-                icon={<Gem className="h-4 w-4 text-fuchsia-300" />}
-                title="Valuation"
-                body={
-                  kit.domain.valuation.midpoint != null ? (
-                    <span>
-                      ~$
-                      {kit.domain.valuation.midpoint.toLocaleString()}
-                      {kit.domain.valuation.low != null && kit.domain.valuation.high != null && (
-                        <span className="text-white/50">
-                          {" "}
-                          (${kit.domain.valuation.low.toLocaleString()}–$
-                          {kit.domain.valuation.high.toLocaleString()})
-                        </span>
-                      )}
-                    </span>
-                  ) : (
-                    <span className="text-white/60">
-                      Unavailable{" "}
-                      {kit.domain.valuation.unavailableReason
-                        ? `(${kit.domain.valuation.unavailableReason})`
-                        : ""}
-                    </span>
-                  )
-                }
-                footer={
-                  kit.domain.valuation.factors.length > 0
-                    ? kit.domain.valuation.factors.slice(0, 2).join(" · ")
-                    : `Confidence: ${kit.domain.valuation.confidence}`
-                }
-              />
-            </div>
+        <ol
+          style={{
+            listStyle: "none",
+            padding: 0,
+            margin: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            fontFamily: "'JetBrains Mono', 'Menlo', monospace",
+            fontSize: 13,
+            color: "var(--ink-secondary)",
+          }}
+        >
+          {log.map((entry, i) => (
+            <li
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 10,
+                padding: "6px 0",
+              }}
+            >
+              <StepIcon kind={entry.kind} />
+              <span>{entry.text}</span>
+            </li>
+          ))}
+          {log.length === 0 && (
+            <li style={{ color: "var(--ink-muted)" }}>Waiting for first event...</li>
+          )}
+        </ol>
 
-            {/* Next steps */}
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold tracking-tight">Execute the launch</h3>
-              <div className="mt-4 grid gap-3 md:grid-cols-2">
-                {kit.nextSteps.map((step) => (
-                  <a
-                    key={step.action}
-                    href={step.href}
-                    className="surface-interactive group block p-5"
-                  >
-                    <div className="flex items-center gap-2">
-                      <NextStepIcon action={step.action} />
-                      <span className="text-base font-semibold">{step.label}</span>
-                      <ArrowRight className="ml-auto h-4 w-4 text-white/40 transition group-hover:translate-x-1 group-hover:text-white/80" />
-                    </div>
-                    <p className="mt-2 text-sm text-white/65">{step.description}</p>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </motion.section>
+        {result && stage === "complete" && (
+          <ResultPanel result={result} onReset={onReset} />
         )}
-      </AnimatePresence>
-    </main>
+      </div>
+    </section>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Subcomponents
-// ---------------------------------------------------------------------------
+function StepIcon({ kind }: { kind: string }) {
+  if (kind === "error") {
+    return <XCircle size={14} style={{ color: "#c9322a", flexShrink: 0, marginTop: 2 }} />;
+  }
+  if (kind === "deploy-step" || kind === "register-step") {
+    return <Rocket size={14} style={{ color: "var(--gold-deep)", flexShrink: 0, marginTop: 2 }} />;
+  }
+  return <Sparkles size={14} style={{ color: "var(--gold-deep)", flexShrink: 0, marginTop: 2 }} />;
+}
 
-function PlanCard({
-  icon,
-  label,
-  body,
+function ResultPanel({
+  result,
+  onReset,
 }: {
-  icon: React.ReactNode;
-  label: string;
-  body: string;
+  result: ShipCompleteEvent;
+  onReset: () => void;
 }) {
   return (
-    <div className="surface-elevated p-5">
-      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white/50">
-        {icon}
-        {label}
+    <div
+      style={{
+        marginTop: 24,
+        padding: 20,
+        borderRadius: 12,
+        background: "var(--paper)",
+        border: "1px solid var(--gold)",
+      }}
+    >
+      <div
+        style={{
+          display: "grid",
+          gap: 14,
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          marginBottom: 16,
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontSize: 11,
+              letterSpacing: ".08em",
+              textTransform: "uppercase",
+              color: "var(--ink-muted)",
+              fontWeight: 600,
+              marginBottom: 4,
+            }}
+          >
+            Live URL
+          </div>
+          <a
+            href={result.siteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: "var(--ink)",
+              fontWeight: 600,
+              textDecoration: "none",
+              wordBreak: "break-all",
+            }}
+          >
+            {result.siteUrl} <ArrowRight size={14} style={{ verticalAlign: "middle" }} />
+          </a>
+        </div>
+        <div>
+          <div
+            style={{
+              fontSize: 11,
+              letterSpacing: ".08em",
+              textTransform: "uppercase",
+              color: "var(--ink-muted)",
+              fontWeight: 600,
+              marginBottom: 4,
+            }}
+          >
+            Domain
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Globe size={14} style={{ color: "var(--ink-muted)" }} />
+            <span style={{ fontWeight: 600 }}>{result.domain}</span>
+            <span
+              style={{
+                padding: "2px 8px",
+                borderRadius: 999,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: ".06em",
+                textTransform: "uppercase",
+                background: result.domainRegistered ? "var(--gold-deep)" : "var(--rule)",
+                color: result.domainRegistered ? "var(--paper)" : "var(--ink-muted)",
+              }}
+            >
+              {result.domainRegistered ? "Registered" : "Not registered"}
+            </span>
+          </div>
+          {!result.domainRegistered && result.registrarError && (
+            <p style={{ color: "var(--ink-muted)", fontSize: 12, margin: "6px 0 0" }}>
+              {result.registrarError}
+            </p>
+          )}
+        </div>
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-white/85">{body}</p>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <a
+          href={result.siteUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "10px 18px",
+            borderRadius: 10,
+            background: "var(--ink)",
+            color: "var(--paper)",
+            fontWeight: 600,
+            fontSize: 14,
+            textDecoration: "none",
+          }}
+        >
+          Open site <ArrowRight size={14} />
+        </a>
+        <button
+          type="button"
+          onClick={onReset}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "10px 18px",
+            borderRadius: 10,
+            border: "1px solid var(--rule)",
+            background: "var(--paper-elevated)",
+            color: "var(--ink)",
+            fontWeight: 600,
+            fontSize: 14,
+            cursor: "pointer",
+          }}
+        >
+          <RefreshCw size={14} /> Launch another
+        </button>
+      </div>
     </div>
   );
 }
 
-function KitCard({
-  icon,
-  title,
-  body,
-  footer,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  body: React.ReactNode;
-  footer: string;
-}) {
-  return (
-    <div className="surface-elevated p-5">
-      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-white/50">
-        {icon}
-        {title}
-      </div>
-      <div className="mt-3 text-lg font-semibold">{body}</div>
-      <div className="mt-2 text-xs text-white/50">{footer}</div>
-    </div>
-  );
-}
+// ─── Helpers ──────────────────────────────────────────────────────────────
 
-function AvailabilityBadge({ state }: { state: AvailabilityState }) {
-  switch (state.status) {
-    case "available":
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-200">
-          <CheckCircle2 className="h-3 w-3" /> Free
-        </span>
-      );
-    case "taken":
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-red-200">
-          <XCircle className="h-3 w-3" /> Taken
-        </span>
-      );
-    case "checking":
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/70">
-          <Loader2 className="h-3 w-3 animate-spin" /> Checking
-        </span>
-      );
-    case "error":
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-200">
-          <AlertTriangle className="h-3 w-3" /> Error
-        </span>
-      );
-    case "unknown":
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/50">
-          <HelpCircle className="h-3 w-3" /> Unknown
-        </span>
-      );
-    case "pending":
-    default:
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/40">
-          Queued
-        </span>
-      );
+function handleShipEvent(
+  evt: ShipEvent,
+  setLog: (
+    update: (prev: Array<{ kind: string; text: string }>) => Array<{ kind: string; text: string }>,
+  ) => void,
+  setResult: (r: ShipCompleteEvent | null) => void,
+  setBanner: (s: string | null) => void,
+  setStage: (s: Stage) => void,
+) {
+  if (evt.type === "complete") {
+    setResult(evt);
+    setStage("complete");
+    return;
+  }
+  if (evt.type === "error") {
+    setBanner(evt.message || "Launch failed (no message provided).");
+    setStage("error");
+    return;
+  }
+  if (evt.message) {
+    setLog((prev) => [...prev, { kind: evt.type, text: evt.message! }]);
   }
 }
 
-function NextStepIcon({ action }: { action: LaunchKit["nextSteps"][number]["action"] }) {
-  switch (action) {
-    case "build-site":
-      return <Rocket className="h-5 w-5 text-indigo-300" />;
-    case "create-video":
-      return <Video className="h-5 w-5 text-fuchsia-300" />;
-    case "buy-domain":
-      return <ShoppingCart className="h-5 w-5 text-emerald-300" />;
-    case "connect-email":
-      return <Mail className="h-5 w-5 text-sky-300" />;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Pure helpers
-// ---------------------------------------------------------------------------
-
-function fullDomain(b: BrandNameSuggestion): string {
-  return `${b.name}.${b.tld}`.toLowerCase();
+function fallbackInlineMonogram(name: string): string {
+  const letter = (name.charAt(0) || "Z").toUpperCase();
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88" width="88" height="88"><rect width="88" height="88" rx="14" fill="#0A0A0B"/><text x="44" y="58" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="46" fill="#FAFAF7">${letter}</text></svg>`;
 }

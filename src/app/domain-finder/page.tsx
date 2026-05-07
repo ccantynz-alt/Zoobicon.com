@@ -718,22 +718,22 @@ export default function DomainFinderPage() {
   const allUnverified = checkedAll && results.length > 0 && verifiedCount === 0;
 
   return (
-    <div className="relative z-10 min-h-screen bg-[#0a0f1e] text-white">
+    <div className="relative z-10 min-h-screen bg-[#f4f3ed] text-white">
       {/* Hero */}
       <div className="relative overflow-hidden pb-12 pt-32 md:pt-36 px-4">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-violet-600/15 rounded-full blur-[100px]" />
+          <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-stone-600/15 rounded-full blur-[100px]" />
         </div>
 
         <div className="relative max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-violet-500/10 border border-violet-500/20 rounded-full text-violet-300 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-stone-500/10 border border-stone-500/20 rounded-full text-stone-300 text-sm font-medium mb-6">
             <Sparkles className="w-3.5 h-3.5" />
             AI-Powered Domain Discovery
           </div>
 
           <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
             Find your perfect{" "}
-            <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               .com domain
             </span>
           </h1>
@@ -766,12 +766,12 @@ export default function DomainFinderPage() {
               onChange={(e) => setDescription(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               placeholder="e.g., AI scheduling tool for dentists"
-              className="flex-1 px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all"
+              className="flex-1 px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 focus:border-stone-500/50 transition-all"
             />
             <button
               onClick={handleSearch}
               disabled={!description.trim() || isRunning}
-              className="px-6 py-3.5 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50 transition-all whitespace-nowrap"
+              className="px-6 py-3.5 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50 transition-all whitespace-nowrap"
             >
               {isRunning ? (
                 <>
@@ -798,8 +798,8 @@ export default function DomainFinderPage() {
                   disabled={isRunning}
                   className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                     count === c
-                      ? "bg-violet-500/20 border-violet-400/40 text-violet-200"
-                      : "bg-white/[0.04] border-white/[0.08] text-slate-400 hover:border-violet-400/30 hover:text-slate-200"
+                      ? "bg-stone-500/20 border-stone-400/40 text-stone-200"
+                      : "bg-white/[0.04] border-white/[0.08] text-slate-400 hover:border-stone-400/30 hover:text-slate-200"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {c} names
@@ -819,8 +819,8 @@ export default function DomainFinderPage() {
                   disabled={isRunning}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                     wordCount === opt.v
-                      ? "bg-cyan-500/15 border-cyan-400/40 text-cyan-200"
-                      : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:border-cyan-400/30 hover:text-slate-200"
+                      ? "bg-stone-500/15 border-stone-400/40 text-stone-200"
+                      : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:border-stone-400/30 hover:text-slate-200"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {opt.label}
@@ -875,7 +875,7 @@ export default function DomainFinderPage() {
           <div className="bg-[#101a35]/85 backdrop-blur-sm border border-white/[0.12] rounded-xl p-4 shadow-[0_4px_16px_-8px_rgba(0,0,0,0.4)]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-slate-300 flex items-center gap-2">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-violet-400" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-stone-400" />
                 {phase === "generating"
                   ? "AI is generating 25 brandable names..."
                   : `Checking .com availability — ${checkedCount} of ${totalCount} done`}
@@ -889,7 +889,7 @@ export default function DomainFinderPage() {
             {phase === "checking" && totalCount > 0 && (
               <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full transition-all duration-300"
+                  className="h-full bg-gradient-to-r from-stone-500 to-stone-500 rounded-full transition-all duration-300"
                   style={{ width: `${(checkedCount / totalCount) * 100}%` }}
                 />
               </div>
@@ -973,7 +973,7 @@ export default function DomainFinderPage() {
                   key={r.slug}
                   className={`rounded-xl border backdrop-blur-sm transition-all duration-300 ${
                     isAvailable
-                      ? "bg-gradient-to-r from-violet-500/20 to-cyan-500/15 border-violet-400/40 shadow-[0_8px_32px_-12px_rgba(139,92,246,0.35)]"
+                      ? "bg-gradient-to-r from-stone-500/20 to-stone-500/15 border-stone-400/40 shadow-[0_8px_32px_-12px_rgba(139,92,246,0.35)]"
                       : isTaken
                       ? "bg-[#0f1830]/85 border-white/[0.08] opacity-70"
                       : "bg-[#101a35]/85 border-white/[0.12] shadow-[0_4px_16px_-8px_rgba(0,0,0,0.4)]"
@@ -1129,7 +1129,7 @@ export default function DomainFinderPage() {
                         {!r.expandedTlds ? (
                           <button
                             onClick={() => expandTlds(idx, r.slug)}
-                            className="text-xs text-slate-500 hover:text-violet-400 flex items-center gap-1 transition-colors"
+                            className="text-xs text-slate-500 hover:text-stone-400 flex items-center gap-1 transition-colors"
                           >
                             <ChevronDown className="w-3.5 h-3.5" />
                             Check .io, .ai, .dev, .app, .co
@@ -1309,7 +1309,7 @@ export default function DomainFinderPage() {
               </p>
               <button
                 onClick={handleSearch}
-                className="mt-5 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 rounded-lg text-sm font-semibold inline-flex items-center gap-2"
+                className="mt-5 px-5 py-2.5 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 rounded-lg text-sm font-semibold inline-flex items-center gap-2"
               >
                 <Loader2 className="w-3.5 h-3.5" />
                 Try again
@@ -1346,7 +1346,7 @@ export default function DomainFinderPage() {
               <button
                 key={ex}
                 onClick={() => setDescription(ex)}
-                className="p-4 bg-[#101a35]/80 backdrop-blur-sm hover:bg-[#142046]/85 border border-white/[0.1] hover:border-violet-500/40 rounded-xl text-sm text-slate-300 hover:text-white text-left transition-all flex items-center gap-3"
+                className="p-4 bg-[#101a35]/80 backdrop-blur-sm hover:bg-[#142046]/85 border border-white/[0.1] hover:border-stone-500/40 rounded-xl text-sm text-slate-300 hover:text-white text-left transition-all flex items-center gap-3"
               >
                 <Search className="w-4 h-4 text-slate-600 flex-shrink-0" />
                 {ex}

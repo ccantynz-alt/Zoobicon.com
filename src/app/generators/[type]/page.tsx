@@ -1864,7 +1864,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       {
         id: "existingColors",
         label: "Existing Brand Colors",
-        placeholder: "List existing colors with hex codes if available (e.g. Primary Blue: #2563EB)",
+        placeholder: "List existing colors with hex codes if available (e.g. Primary Blue: #57534e)",
         type: "textarea",
       },
       {

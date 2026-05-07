@@ -161,9 +161,9 @@ export default function AgencyDashboard() {
   const [brandConfig, setBrandConfig] = useState({
     agencyName: "",
     logoUrl: "",
-    primaryColor: "#3b82f6",
-    secondaryColor: "#8b5cf6",
-    accentColor: "#06b6d4",
+    primaryColor: "#78716c",
+    secondaryColor: "#78716c",
+    accentColor: "#78716c",
   });
 
   // ─── Auth check ──────────────────────────────────────────────────────────
@@ -217,9 +217,9 @@ export default function AgencyDashboard() {
         setBrandConfig({
           agencyName: data.agency.brand_config.agencyName || data.agency.name || "",
           logoUrl: data.agency.brand_config.logoUrl || "",
-          primaryColor: data.agency.brand_config.primaryColor || "#3b82f6",
-          secondaryColor: data.agency.brand_config.secondaryColor || "#8b5cf6",
-          accentColor: data.agency.brand_config.accentColor || "#06b6d4",
+          primaryColor: data.agency.brand_config.primaryColor || "#78716c",
+          secondaryColor: data.agency.brand_config.secondaryColor || "#78716c",
+          accentColor: data.agency.brand_config.accentColor || "#78716c",
         });
       }
 

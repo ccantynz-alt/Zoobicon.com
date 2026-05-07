@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import BackgroundEffects from "@/components/BackgroundEffects";
+import { safeRedirect } from "@/lib/safe-redirect";
 import {
   Zap,
   Eye,
@@ -94,13 +95,13 @@ export default function SignupPage() {
       // Honor ?redirect param — /builder and /marketplace both send the user
       // here with ?redirect=/their-original-path. Ignoring it drops them on
       // /dashboard and breaks the flow they were in the middle of.
-      // Guard against open-redirects: only same-origin relative paths.
-      let dest = "/dashboard";
+      // safeRedirect blocks every known open-redirect bypass and falls back
+      // to /dashboard when the value can't be trusted.
+      let raw: string | null = null;
       try {
-        const r = new URLSearchParams(window.location.search).get("redirect");
-        if (r && r.startsWith("/") && !r.startsWith("//")) dest = r;
-      } catch {}
-      window.location.href = dest;
+        raw = new URLSearchParams(window.location.search).get("redirect");
+      } catch { /* ignore */ }
+      window.location.href = safeRedirect(raw);
     } catch {
       setAuthError("Network error. Please try again.");
     } finally {
@@ -115,7 +116,7 @@ export default function SignupPage() {
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           <Link href="/" className="flex items-center gap-2 mb-12">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -216,8 +217,8 @@ export default function SignupPage() {
                 <div className="flex gap-3 mt-2">
                   {passwordChecks.map((check) => (
                     <div key={check.label} className="flex items-center gap-1">
-                      <Check className={`w-3 h-3 ${check.met ? "text-accent-cyan" : "text-white/15"}`} />
-                      <span className={`text-[10px] ${check.met ? "text-accent-cyan" : "text-white/50"}`}>
+                      <Check className={`w-3 h-3 ${check.met ? "text-accent-stone" : "text-white/15"}`} />
+                      <span className={`text-[10px] ${check.met ? "text-accent-stone" : "text-white/50"}`}>
                         {check.label}
                       </span>
                     </div>
@@ -273,8 +274,8 @@ export default function SignupPage() {
               "8+ AI-Powered Products",
             ].map((feature) => (
               <div key={feature} className="flex items-center gap-3 justify-center">
-                <div className="w-5 h-5 rounded-full bg-accent-cyan/10 flex items-center justify-center">
-                  <Check className="w-3 h-3 text-accent-cyan" />
+                <div className="w-5 h-5 rounded-full bg-accent-stone/10 flex items-center justify-center">
+                  <Check className="w-3 h-3 text-accent-stone" />
                 </div>
                 <span className="text-sm text-white/50">{feature}</span>
               </div>

@@ -106,7 +106,7 @@ export default function MobileAdminDashboard() {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-slate-200 safe-top">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <div>
@@ -207,16 +207,16 @@ export default function MobileAdminDashboard() {
 
           {/* MRR Estimate */}
           {analytics?.planDistribution && analytics.planDistribution.length > 0 && (
-            <div className="rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 p-4">
+            <div className="rounded-2xl bg-gradient-to-r from-stone-50 to-stone-50 border border-stone-200 p-4">
               <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-4 h-4 text-indigo-500" />
+                <TrendingUp className="w-4 h-4 text-stone-500" />
                 <span className="text-xs font-semibold text-slate-600">Plan Distribution</span>
               </div>
               <div className="space-y-2">
                 {analytics.planDistribution.map((p) => (
                   <div key={p.plan} className="flex items-center justify-between">
                     <span className="text-sm text-slate-700 capitalize">{p.plan || "free"}</span>
-                    <span className="text-sm font-mono text-indigo-600">{p.count}</span>
+                    <span className="text-sm font-mono text-stone-600">{p.count}</span>
                   </div>
                 ))}
               </div>
@@ -228,10 +228,10 @@ export default function MobileAdminDashboard() {
             <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <UserPlus className="w-4 h-4 text-indigo-500" />
+                  <UserPlus className="w-4 h-4 text-stone-500" />
                   <span className="text-xs font-semibold text-slate-700">Recent Signups</span>
                 </div>
-                <Link href="/admin" className="text-xs text-indigo-500 active:opacity-70">
+                <Link href="/admin" className="text-xs text-stone-500 active:opacity-70">
                   View all <ArrowUpRight className="w-3 h-3 inline" />
                 </Link>
               </div>
@@ -244,8 +244,8 @@ export default function MobileAdminDashboard() {
                     </div>
                     <div className="text-right ml-3 shrink-0">
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
-                        user.plan === "pro" ? "bg-indigo-50 text-indigo-600" :
-                        user.plan === "agency" ? "bg-purple-50 text-purple-600" :
+                        user.plan === "pro" ? "bg-stone-50 text-stone-600" :
+                        user.plan === "agency" ? "bg-stone-50 text-stone-600" :
                         user.plan === "creator" ? "bg-emerald-50 text-emerald-600" :
                         "bg-slate-100 text-slate-700"
                       }`}>{user.plan || "free"}</span>
@@ -262,7 +262,7 @@ export default function MobileAdminDashboard() {
             <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-indigo-500" />
+                  <BarChart3 className="w-4 h-4 text-stone-500" />
                   <span className="text-xs font-semibold text-slate-700">Recent Projects</span>
                 </div>
               </div>
@@ -318,16 +318,16 @@ function StatCard({ icon: Icon, label, value, color }: {
   icon: React.ElementType; label: string; value: number; color: string;
 }) {
   const colorMap: Record<string, string> = {
-    brand: "from-indigo-50 to-indigo-50/50 border-indigo-200",
-    purple: "from-purple-50 to-purple-50/50 border-purple-200",
+    brand: "from-stone-50 to-stone-50/50 border-stone-200",
+    purple: "from-stone-50 to-stone-50/50 border-stone-200",
     emerald: "from-emerald-50 to-emerald-50/50 border-emerald-200",
-    cyan: "from-cyan-50 to-cyan-50/50 border-cyan-200",
+    cyan: "from-stone-50 to-stone-50/50 border-stone-200",
   };
   const iconMap: Record<string, string> = {
-    brand: "text-indigo-500",
-    purple: "text-purple-500",
+    brand: "text-stone-500",
+    purple: "text-stone-500",
     emerald: "text-emerald-500",
-    cyan: "text-cyan-500",
+    cyan: "text-stone-500",
   };
 
   return (

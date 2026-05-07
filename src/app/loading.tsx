@@ -6,7 +6,7 @@ export default function Loading() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#060e1f",
+        background: "#fafaf7",
       }}
     >
       <div
@@ -14,7 +14,7 @@ export default function Loading() {
           width: "40px",
           height: "40px",
           borderRadius: "10px",
-          background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+          background: "#0a0a0b",
           animation: "pulse 1.5s ease-in-out infinite",
         }}
       />

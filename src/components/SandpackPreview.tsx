@@ -24,31 +24,35 @@ interface SandpackPreviewPropsReact {
 type SandpackPreviewProps = SandpackPreviewPropsHTML | SandpackPreviewPropsReact;
 
 /**
- * Zoobicon-branded dark theme for Sandpack.
+ * Zoobicon-branded LIGHT theme for Sandpack — editorial palette.
+ * Was previously the Filmora dark theme (#0f2148 navy with cyan
+ * syntax highlighting). Flipped to bone surfaces + ink syntax so
+ * the builder's preview pane reads as part of the editorial-light
+ * design system, not as a foreign code editor.
  */
 const zoobiconTheme = {
   colors: {
-    surface1: "#0f2148",
-    surface2: "#1a1d2e",
-    surface3: "#252840",
-    clickable: "#999999",
-    base: "#e0e0e0",
-    disabled: "#4a4a4a",
-    hover: "#c5c5c5",
-    accent: "#6d5dfc",
-    error: "#ff453a",
-    errorSurface: "#3d1e1e",
+    surface1: "#ffffff",      // primary: pure white iframe bg
+    surface2: "#f4f1e6",      // secondary: warm cream (var --paper-elevated)
+    surface3: "#eeebde",      // tertiary: deeper cream for selection
+    clickable: "#76767e",     // interactive idle
+    base: "#0a0a0b",          // body text — near-black
+    disabled: "#a8a392",      // disabled / placeholder
+    hover: "#0a0a0b",         // hover text
+    accent: "#b8923f",        // champagne accent
+    error: "#b91c1c",
+    errorSurface: "#fef2f2",
   },
   syntax: {
-    plain: "#d4d4d4",
-    comment: { color: "#6a737d", fontStyle: "italic" as const },
-    keyword: "#c792ea",
-    tag: "#80cbc4",
-    punctuation: "#89ddff",
-    definition: "#82aaff",
-    property: "#c792ea",
-    static: "#f78c6c",
-    string: "#c3e88d",
+    plain: "#0a0a0b",
+    comment: { color: "#76767e", fontStyle: "italic" as const },
+    keyword: "#8c6b25",
+    tag: "#0a0a0b",
+    punctuation: "#2a2a30",
+    definition: "#0a0a0b",
+    property: "#8c6b25",
+    static: "#b8923f",
+    string: "#1a3d2e",
   },
   font: {
     body: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -177,17 +181,22 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
   const { showEditor = false } = props;
   const mode = props.mode || "html";
 
+  // Extract the mode-specific input into a stable value so the useMemo
+  // dependency arrays below can be statically checked. The previous inline
+  // ternaries triggered react-hooks/exhaustive-deps because eslint can't
+  // statically prove the discriminated-union narrowing.
+  const htmlInput = mode === "html" ? (props as SandpackPreviewPropsHTML).html : "";
+  const reactFilesInput = mode === "react" ? (props as SandpackPreviewPropsReact).files : null;
+
   const htmlFiles = useMemo(() => {
     if (mode !== "html") return {};
-    const html = (props as SandpackPreviewPropsHTML).html || "";
-    return extractSandpackFiles(html);
-  }, [mode, mode === "html" ? (props as SandpackPreviewPropsHTML).html : ""]);
+    return extractSandpackFiles(htmlInput || "");
+  }, [mode, htmlInput]);
 
   const reactFiles = useMemo(() => {
     if (mode !== "react") return {};
-    const files = (props as SandpackPreviewPropsReact).files || {};
-    return buildReactSandpackFiles(files);
-  }, [mode, mode === "react" ? (props as SandpackPreviewPropsReact).files : null]);
+    return buildReactSandpackFiles(reactFilesInput || {});
+  }, [mode, reactFilesInput]);
 
   const dependencies = mode === "react" ? (props as SandpackPreviewPropsReact).dependencies : undefined;
 
@@ -236,8 +245,8 @@ export default function App() {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "#0f2148",
-      color: "rgba(255,255,255,0.4)",
+      background: "#fafaf7",
+      color: "rgba(10,10,11,0.55)",
       fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
       fontSize: "14px",
     }}>
@@ -267,7 +276,7 @@ export default function App() {
 <head>
   <meta charset="utf-8" />
   <style>
-    body { margin: 0; background: #0f2148; color: rgba(255,255,255,0.4); font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 14px; text-align: center; }
+    body { margin: 0; background: #ffffff; color: #2a2a30; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 14px; text-align: center; }
     .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid rgba(109,93,252,0.2); border-top-color: #6d5dfc; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>

@@ -71,21 +71,21 @@ const SLIDE_TYPE_CONFIG: Record<SlideType, { label: string; icon: React.ReactNod
 const THEMES: DeckTheme[] = [
   { id: 'yc', name: 'YC Classic', bg: '#FFFFFF', text: '#1A1A1A', accent: '#FF6600', secondaryBg: '#FFF7F0' },
   { id: 'sequoia', name: 'Sequoia', bg: '#0D1117', text: '#F0F6FC', accent: '#58A6FF', secondaryBg: '#161B22' },
-  { id: 'creative', name: 'Creative', bg: '#1A0B2E', text: '#F8F0FF', accent: '#A855F7', secondaryBg: '#2D1B4E' },
+  { id: 'creative', name: 'Creative', bg: '#1A0B2E', text: '#F8F0FF', accent: '#78716c', secondaryBg: '#2D1B4E' },
   { id: 'minimal', name: 'Minimal', bg: '#FAFAFA', text: '#333333', accent: '#000000', secondaryBg: '#F0F0F0' },
   { id: 'modern', name: 'Modern Dark', bg: '#0A0A12', text: '#FFFFFF', accent: '#22D3EE', secondaryBg: '#1A1A2E' },
   { id: 'warm', name: 'Warm Earth', bg: '#1C1410', text: '#FDE8D0', accent: '#F59E0B', secondaryBg: '#2A1F18' },
 ];
 
 const DEMO_SLIDES: Slide[] = [
-  { id: 's1', type: 'title', title: 'Zoobicon', content: { tagline: 'AI Website Builder That Ships in 90 Seconds', subtitle: 'Seed Round — March 2026', founded: '2025' }, bgColor: '#0A0A12', accentColor: '#8B5CF6' },
+  { id: 's1', type: 'title', title: 'Zoobicon', content: { tagline: 'AI Website Builder That Ships in 90 Seconds', subtitle: 'Seed Round — March 2026', founded: '2025' }, bgColor: '#0A0A12', accentColor: '#78716c' },
   { id: 's2', type: 'problem', title: 'The Problem', content: { headline: 'Building a website still takes 2-6 weeks', points: ['Small businesses pay $5,000-$50,000 for a custom site', '68% of freelancers spend 40%+ of their time on repetitive web work', 'Existing "AI builders" produce generic, unusable output'] }, bgColor: '#0A0A12', accentColor: '#EF4444' },
   { id: 's3', type: 'solution', title: 'The Solution', content: { headline: 'Describe it. Get a $20K-quality site in 90 seconds.', points: ['7-agent AI pipeline with Claude Opus for premium output', '43 specialized generators (not one-size-fits-all)', 'One-click deploy to custom subdomain with SSL'], demo: 'Live demo: zoobicon.com/builder' }, bgColor: '#0A0A12', accentColor: '#22C55E' },
-  { id: 's4', type: 'market', title: 'Market Opportunity', content: { tam: '$13.2B', tamLabel: 'Global Website Builder Market (2026)', sam: '$4.1B', samLabel: 'SMB + Freelancer Segment', som: '$82M', somLabel: 'Year 3 Target (2% SAM)' }, bgColor: '#0A0A12', accentColor: '#3B82F6' },
-  { id: 's5', type: 'traction', title: 'Traction', content: { metrics: ['47,293 sites generated', '$18.2K MRR (growing 34% MoM)', '12,400 registered users', '89% generation success rate', '4.7/5 user satisfaction score'], timeline: 'Since launch: January 2026' }, bgColor: '#0A0A12', accentColor: '#8B5CF6' },
+  { id: 's4', type: 'market', title: 'Market Opportunity', content: { tam: '$13.2B', tamLabel: 'Global Website Builder Market (2026)', sam: '$4.1B', samLabel: 'SMB + Freelancer Segment', som: '$82M', somLabel: 'Year 3 Target (2% SAM)' }, bgColor: '#0A0A12', accentColor: '#78716c' },
+  { id: 's5', type: 'traction', title: 'Traction', content: { metrics: ['47,293 sites generated', '$18.2K MRR (growing 34% MoM)', '12,400 registered users', '89% generation success rate', '4.7/5 user satisfaction score'], timeline: 'Since launch: January 2026' }, bgColor: '#0A0A12', accentColor: '#78716c' },
   { id: 's6', type: 'business-model', title: 'Business Model', content: { headline: 'SaaS + Usage-Based Hybrid', tiers: ['Free: 3 builds/month', 'Creator ($19/mo): 15 builds + custom domains', 'Pro ($49/mo): Unlimited + API access + all tools', 'Agency ($99/mo): White-label + client portal + bulk gen'], arpu: 'Current ARPU: $34/mo' }, bgColor: '#0A0A12', accentColor: '#F59E0B' },
-  { id: 's7', type: 'team', title: 'Team', content: { members: ['CEO — 10yr product leader (ex-Stripe)', 'CTO — Former AI research at DeepMind', 'Head of Design — Led design at Layers', 'Head of Growth — Scaled Vercel to $100M ARR'] }, bgColor: '#0A0A12', accentColor: '#8B5CF6' },
-  { id: 's8', type: 'ask', title: 'The Ask', content: { amount: '$4M Seed Round', use: ['40% — Engineering (hire 6 engineers)', '25% — AI compute costs (Anthropic, GPU)', '20% — Sales & Marketing', '15% — Operations & Legal'], timeline: 'Runway: 18 months to Series A' }, bgColor: '#0A0A12', accentColor: '#8B5CF6' },
+  { id: 's7', type: 'team', title: 'Team', content: { members: ['CEO — 10yr product leader (ex-Stripe)', 'CTO — Former AI research at DeepMind', 'Head of Design — Led design at Layers', 'Head of Growth — Scaled Vercel to $100M ARR'] }, bgColor: '#0A0A12', accentColor: '#78716c' },
+  { id: 's8', type: 'ask', title: 'The Ask', content: { amount: '$4M Seed Round', use: ['40% — Engineering (hire 6 engineers)', '25% — AI compute costs (Anthropic, GPU)', '20% — Sales & Marketing', '15% — Operations & Legal'], timeline: 'Runway: 18 months to Series A' }, bgColor: '#0A0A12', accentColor: '#78716c' },
 ];
 
 function SlidePreview({ slide, isActive, theme }: { slide: Slide; isActive: boolean; theme: DeckTheme }) {
@@ -242,7 +242,7 @@ export default function PitchDeckPage() {
 
   return (
     <div className="min-h-screen text-white">
-      <header className="border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">

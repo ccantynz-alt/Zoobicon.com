@@ -70,7 +70,7 @@ WHEN THE USER PICKS A DRAFT (says "draft 1", "that one", "go", "yes", "perfect",
 [The complete approved script with [pause] and [beat] markers]
 ---END_SCRIPT---
 ---VIDEO_CONFIG---
-{"type":"spokesperson","duration":"30","tone":"professional","background":"#0f172a","aspectRatio":"9:16","captions":true,"music":"upbeat-corporate"}
+{"type":"spokesperson","duration":"30","tone":"professional","background":"#f4f3ed","aspectRatio":"9:16","captions":true,"music":"upbeat-corporate"}
 ---END_CONFIG---
 ---STORYBOARD---
 [

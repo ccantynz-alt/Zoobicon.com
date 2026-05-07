@@ -233,7 +233,7 @@ const HOSTED_FEATURES = [
    ═══════════════════════════════════════════════════════════════ */
 export default function AgentsPage() {
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white relative">
+    <div className="min-h-screen bg-[var(--paper)] text-white relative">
       <BackgroundEffects preset="technical" />
 
       {/* ──────────── HERO ──────────── */}

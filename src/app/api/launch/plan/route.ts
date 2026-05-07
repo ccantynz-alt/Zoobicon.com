@@ -284,7 +284,6 @@ Produce the launch plan JSON now. Start with { and end with }. No other text.`;
 // Mirrors src/app/api/tools/business-names/route.ts
 // ---------------------------------------------------------------------------
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- LLM output is untyped until sanitized
 function extractJsonObject(text: string): any | null {
   let cleaned = text.trim();
   cleaned = cleaned.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "");
@@ -357,7 +356,6 @@ const ALLOWED_SECTION_IDS = new Set<StarterSection["id"]>([
   "contact",
 ]);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- narrowing happens inline
 function sanitizePlan(raw: any, modelUsed: string, elapsedMs: number): LaunchPlan {
   const concept = coerceString(raw?.concept, 400) || "An AI-native business ready to launch.";
   const targetCustomer =

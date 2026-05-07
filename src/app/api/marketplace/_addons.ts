@@ -47,7 +47,7 @@ export const ADDONS: Addon[] = [
     tag: "Top Rated",
     rating: 4.8,
     installs: "8.2K",
-    gradient: "from-accent-cyan to-emerald-600",
+    gradient: "from-accent-stone to-emerald-600",
     iconName: "Search",
   },
   {
@@ -61,7 +61,7 @@ export const ADDONS: Addon[] = [
     featured: true,
     rating: 4.7,
     installs: "6.8K",
-    gradient: "from-accent-purple to-blue-700",
+    gradient: "from-accent-stone to-stone-700",
     iconName: "Video",
   },
   {
@@ -90,7 +90,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.8,
     installs: "15.1K",
-    gradient: "from-indigo-500 to-blue-600",
+    gradient: "from-stone-500 to-stone-600",
     iconName: "CreditCard",
   },
   {
@@ -118,7 +118,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.5,
     installs: "5.1K",
-    gradient: "from-cyan-500 to-blue-600",
+    gradient: "from-stone-500 to-stone-600",
     iconName: "MessageSquare",
   },
   {
@@ -132,7 +132,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.7,
     installs: "7.9K",
-    gradient: "from-cyan-500 to-rose-600",
+    gradient: "from-stone-500 to-rose-600",
     iconName: "Palette",
   },
   {
@@ -146,7 +146,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.6,
     installs: "3.8K",
-    gradient: "from-blue-500 to-indigo-600",
+    gradient: "from-stone-500 to-stone-600",
     iconName: "Bot",
   },
   {
@@ -202,7 +202,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.3,
     installs: "8.6K",
-    gradient: "from-rose-500 to-blue-700",
+    gradient: "from-rose-500 to-stone-700",
     iconName: "Type",
   },
   {
@@ -216,7 +216,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.6,
     installs: "3.2K",
-    gradient: "from-blue-500 to-indigo-600",
+    gradient: "from-stone-500 to-stone-600",
     iconName: "Globe",
   },
   {
@@ -244,7 +244,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.4,
     installs: "5.6K",
-    gradient: "from-teal-500 to-cyan-600",
+    gradient: "from-teal-500 to-stone-600",
     iconName: "Clock",
   },
   {
@@ -259,7 +259,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.8,
     installs: "2.9K",
-    gradient: "from-blue-500 to-blue-600",
+    gradient: "from-stone-500 to-stone-600",
     iconName: "TrendingUp",
   },
   {
@@ -301,7 +301,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.5,
     installs: "6.1K",
-    gradient: "from-sky-500 to-blue-600",
+    gradient: "from-stone-500 to-stone-600",
     iconName: "Layers",
   },
 ];
