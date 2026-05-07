@@ -52,7 +52,7 @@ export default async function IndustryPage({ params }: Props) {
   if (!data) notFound();
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white">
+    <div className="min-h-screen bg-[var(--paper)] text-white">
       {/* JSON-LD */}
       <script
         type="application/ld+json"

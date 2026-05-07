@@ -333,7 +333,7 @@ export default function ShareModal({
 
           {/* Modal */}
           <motion.div
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a12] shadow-2xl shadow-stone-500/5"
+            className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[var(--paper-elevated)] shadow-2xl shadow-stone-500/5"
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}

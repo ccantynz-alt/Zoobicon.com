@@ -90,7 +90,7 @@ function IframePreview({ html }: { html: string }) {
   return (
     <div className="relative w-full overflow-hidden" style={{ aspectRatio: "16/10" }}>
       {/* Browser chrome */}
-      <div className="flex items-center gap-1.5 px-3 py-2 bg-[#0e0e18]/80 backdrop-blur-sm border-b border-white/[0.04]">
+      <div className="flex items-center gap-1.5 px-3 py-2 bg-[var(--paper-elevated)]/80 backdrop-blur-sm border-b border-white/[0.04]">
         <div className="flex gap-1.5">
           <div className="w-[7px] h-[7px] rounded-full bg-[#ff5f57]/60" />
           <div className="w-[7px] h-[7px] rounded-full bg-[#febc2e]/60" />
@@ -185,7 +185,7 @@ export default function ShowcaseGallery() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-[1]" />
 
                   {/* Info bar */}
-                  <div className="relative z-[2] p-4 bg-[#0a0a12]/90 backdrop-blur-xl border-t border-white/[0.04]">
+                  <div className="relative z-[2] p-4 bg-[var(--paper-elevated)]/90 backdrop-blur-xl border-t border-white/[0.04]">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="text-white font-bold text-[15px] tracking-tight">{item.name}</h3>
                       <span className="text-[10px] px-2.5 py-0.5 rounded-full font-semibold bg-stone-500/10 text-stone-400 border border-stone-500/20">

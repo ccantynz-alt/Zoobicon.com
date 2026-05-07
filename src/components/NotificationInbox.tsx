@@ -179,7 +179,7 @@ export default function NotificationInbox() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.97 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute right-0 top-full mt-2 w-[360px] max-h-[480px] rounded-xl bg-[#0a0a12] border border-white/10 shadow-2xl shadow-black/40 overflow-hidden z-50"
+            className="absolute right-0 top-full mt-2 w-[360px] max-h-[480px] rounded-xl bg-[var(--paper-elevated)] border border-white/10 shadow-2xl shadow-black/40 overflow-hidden z-50"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">

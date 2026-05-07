@@ -26,7 +26,7 @@ export default function PrivacyPage() {
     <div className="relative min-h-screen text-[#e8e8ec]">
       <BackgroundEffects preset="minimal" />
       {/* Nav */}
-      <nav className="border-b border-white/[0.06] bg-[#0b1530]/80 backdrop-blur-2xl">
+      <nav className="border-b border-white/[0.06] bg-[var(--paper)]/80 backdrop-blur-2xl">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <Link href="/" className="flex items-center gap-2 w-fit">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
