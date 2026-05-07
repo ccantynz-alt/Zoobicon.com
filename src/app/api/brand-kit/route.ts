@@ -37,18 +37,18 @@ export async function POST(request: NextRequest) {
       }
 
       const INDUSTRY_COLORS: Record<string, { primary: string; secondary: string; accent: string }> = {
-        technology: { primary: "#6366f1", secondary: "#8b5cf6", accent: "#06b6d4" },
-        healthcare: { primary: "#0ea5e9", secondary: "#14b8a6", accent: "#22c55e" },
-        finance: { primary: "#1e40af", secondary: "#3b82f6", accent: "#f59e0b" },
-        education: { primary: "#7c3aed", secondary: "#a78bfa", accent: "#f97316" },
+        technology: { primary: "#78716c", secondary: "#78716c", accent: "#78716c" },
+        healthcare: { primary: "#78716c", secondary: "#14b8a6", accent: "#22c55e" },
+        finance: { primary: "#44403c", secondary: "#78716c", accent: "#f59e0b" },
+        education: { primary: "#57534e", secondary: "#a8a29e", accent: "#f97316" },
         food: { primary: "#dc2626", secondary: "#f97316", accent: "#facc15" },
-        fashion: { primary: "#ec4899", secondary: "#f43f5e", accent: "#a855f7" },
+        fashion: { primary: "#ec4899", secondary: "#f43f5e", accent: "#78716c" },
         fitness: { primary: "#16a34a", secondary: "#22c55e", accent: "#eab308" },
         real_estate: { primary: "#0d9488", secondary: "#14b8a6", accent: "#f59e0b" },
-        creative: { primary: "#e11d48", secondary: "#be185d", accent: "#8b5cf6" },
+        creative: { primary: "#e11d48", secondary: "#be185d", accent: "#78716c" },
         legal: { primary: "#1e3a5f", secondary: "#374151", accent: "#d4a853" },
-        nonprofit: { primary: "#059669", secondary: "#10b981", accent: "#6366f1" },
-        ecommerce: { primary: "#7c3aed", secondary: "#6366f1", accent: "#f59e0b" },
+        nonprofit: { primary: "#059669", secondary: "#10b981", accent: "#78716c" },
+        ecommerce: { primary: "#57534e", secondary: "#78716c", accent: "#f59e0b" },
       };
 
       const key = industry.toLowerCase().replace(/[\s&-]+/g, "_");
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     if (action === "generate-logo") {
       const { brandName, industry } = body;
       // Generate a simple SVG text-based logo
-      const colors = body.colors || { primary: "#6366f1" };
+      const colors = body.colors || { primary: "#78716c" };
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
         <rect width="200" height="60" rx="8" fill="${colors.primary}" opacity="0.1"/>
         <text x="100" y="38" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="700" fill="${colors.primary}">${brandName || "Brand"}</text>

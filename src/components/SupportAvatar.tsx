@@ -181,7 +181,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
         {/* Bottom nameplate */}
         <div className="flex items-center justify-between px-4 py-2.5 border-t border-white/[0.06] bg-dark-400/40">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500/30 to-accent-purple/30 border border-brand-500/20 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500/30 to-accent-stone/30 border border-brand-500/20 flex items-center justify-center">
               <Headphones className="w-3 h-3 text-brand-400" />
             </div>
             <div>

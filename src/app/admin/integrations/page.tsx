@@ -252,7 +252,7 @@ function ConnectModal({
             <button
               onClick={() => onConnect({})}
               className="w-full py-3 rounded-xl font-medium text-white transition-all hover:brightness-110"
-              style={{ backgroundColor: integration.color === "#FFFFFF" ? "#6366f1" : integration.color }}
+              style={{ backgroundColor: integration.color === "#FFFFFF" ? "#78716c" : integration.color }}
             >
               Connect with {integration.name}
             </button>
@@ -270,14 +270,14 @@ function ConnectModal({
                   placeholder={f.placeholder}
                   value={fields[f.key] || ""}
                   onChange={(e) => setFields({ ...fields, [f.key]: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
                 />
               </div>
             ))}
             <button
               onClick={() => onConnect(fields)}
               disabled={integration.fields?.some((f) => !fields[f.key])}
-              className="w-full py-3 rounded-xl font-medium text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              className="w-full py-3 rounded-xl font-medium text-white bg-stone-600 hover:bg-stone-500 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
               Save & Connect
             </button>
@@ -302,7 +302,7 @@ function ConnectModal({
             </div>
             <button
               onClick={() => onConnect({ webhookUrl: integration.webhookUrl || "" })}
-              className="w-full py-3 rounded-xl font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition-all"
+              className="w-full py-3 rounded-xl font-medium text-white bg-stone-600 hover:bg-stone-500 transition-all"
             >
               Mark as Connected
             </button>
@@ -461,8 +461,8 @@ export default function IntegrationsPage() {
           className="mb-10"
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-              <Plug className="w-5 h-5 text-indigo-600" />
+            <div className="w-10 h-10 rounded-xl bg-stone-50 flex items-center justify-center">
+              <Plug className="w-5 h-5 text-stone-600" />
             </div>
             <h1 className="text-3xl font-bold text-slate-800">Integrations</h1>
           </div>
@@ -626,7 +626,7 @@ export default function IntegrationsPage() {
                         ) : (
                           <button
                             onClick={() => setConnectModal(integration)}
-                            className="w-full py-2.5 rounded-xl text-sm font-medium bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all"
+                            className="w-full py-2.5 rounded-xl text-sm font-medium bg-stone-50 text-stone-600 hover:bg-stone-100 transition-all"
                           >
                             Connect
                           </button>
@@ -643,7 +643,7 @@ export default function IntegrationsPage() {
         {/* Loading state */}
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-stone-500 border-t-transparent rounded-full animate-spin" />
           </div>
         )}
       </main>

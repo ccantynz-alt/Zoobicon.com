@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
             description: description || "",
             location: location || "video",
             slug,
-            color: "#3b82f6",
+            color: "#78716c",
             bufferMinutes: 10,
             maxAdvanceDays: 30,
             enabled: true,

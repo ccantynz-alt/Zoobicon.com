@@ -410,8 +410,8 @@ export default function ChatPanel({
         {messages.length === 0 && (
           <div className="py-6">
             <div className="flex items-center justify-center mb-4">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 border border-indigo-500/20 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-indigo-400" />
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 border border-stone-500/20 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-stone-400" />
               </div>
             </div>
             <p className="text-center text-sm text-white/70 font-medium mb-1">
@@ -439,11 +439,11 @@ export default function ChatPanel({
                     onClick={() => handleSend(suggestion)}
                     disabled={isEditing || isGenerating}
                     className="flex items-center gap-2 w-full text-left text-xs text-white/50
-                               hover:text-indigo-300 py-2 px-3 rounded-lg hover:bg-indigo-500/[0.06]
+                               hover:text-stone-300 py-2 px-3 rounded-lg hover:bg-stone-500/[0.06]
                                transition-all duration-150 disabled:opacity-30 disabled:cursor-not-allowed
-                               border border-transparent hover:border-indigo-500/10"
+                               border border-transparent hover:border-stone-500/10"
                   >
-                    <Zap className="w-3 h-3 text-indigo-500/50 flex-shrink-0" />
+                    <Zap className="w-3 h-3 text-stone-500/50 flex-shrink-0" />
                     {suggestion}
                   </button>
                 ))}
@@ -471,17 +471,17 @@ export default function ChatPanel({
                         ? "bg-red-500/15 border border-red-500/20"
                         : msg.status === "complete"
                         ? "bg-emerald-500/15 border border-emerald-500/20"
-                        : "bg-indigo-500/15 border border-indigo-500/20"
+                        : "bg-stone-500/15 border border-stone-500/20"
                     }`}
                   >
                     {msg.status === "pending" || msg.status === "streaming" ? (
-                      <Loader2 className="w-3 h-3 text-indigo-400 animate-spin" />
+                      <Loader2 className="w-3 h-3 text-stone-400 animate-spin" />
                     ) : msg.status === "error" ? (
                       <AlertCircle className="w-3 h-3 text-red-400" />
                     ) : msg.status === "complete" ? (
                       <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                     ) : (
-                      <Bot className="w-3 h-3 text-indigo-400" />
+                      <Bot className="w-3 h-3 text-stone-400" />
                     )}
                   </div>
                 </div>
@@ -491,7 +491,7 @@ export default function ChatPanel({
               <div
                 className={`max-w-[260px] ${
                   msg.role === "user"
-                    ? "bg-indigo-500/15 border border-indigo-500/20 text-indigo-200 rounded-2xl rounded-tr-md px-3.5 py-2"
+                    ? "bg-stone-500/15 border border-stone-500/20 text-stone-200 rounded-2xl rounded-tr-md px-3.5 py-2"
                     : msg.status === "error"
                     ? "bg-red-500/8 border border-red-500/15 text-red-300/80 rounded-2xl rounded-tl-md px-3.5 py-2"
                     : msg.status === "complete"
@@ -502,7 +502,7 @@ export default function ChatPanel({
                 <p
                   className={`text-xs leading-relaxed ${
                     msg.role === "user"
-                      ? "text-indigo-200"
+                      ? "text-stone-200"
                       : msg.status === "error"
                       ? "text-red-300/80"
                       : msg.status === "complete"
@@ -553,8 +553,8 @@ export default function ChatPanel({
               {/* User avatar */}
               {msg.role === "user" && (
                 <div className="flex-shrink-0 mt-0.5">
-                  <div className="w-6 h-6 rounded-full bg-indigo-500/10 border border-indigo-500/15 flex items-center justify-center">
-                    <User className="w-3 h-3 text-indigo-400/60" />
+                  <div className="w-6 h-6 rounded-full bg-stone-500/10 border border-stone-500/15 flex items-center justify-center">
+                    <User className="w-3 h-3 text-stone-400/60" />
                   </div>
                 </div>
               )}
@@ -601,17 +601,17 @@ export default function ChatPanel({
             disabled={!hasFiles || isEditing || isGenerating}
             rows={2}
             className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-3.5 py-2.5 pr-12 text-xs
-                       text-white/80 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-indigo-500/20
-                       focus:border-indigo-500/30 transition-all resize-none disabled:opacity-30
+                       text-white/80 placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-stone-500/20
+                       focus:border-stone-500/30 transition-all resize-none disabled:opacity-30
                        disabled:cursor-not-allowed"
           />
           <button
             onClick={() => handleSend()}
             disabled={!input.trim() || !hasFiles || isEditing || isGenerating}
-            className="absolute right-2 bottom-2 p-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600
+            className="absolute right-2 bottom-2 p-2 rounded-lg bg-gradient-to-r from-stone-600 to-stone-600
                        text-white disabled:opacity-20 disabled:cursor-not-allowed
-                       hover:from-indigo-500 hover:to-violet-500 transition-all
-                       shadow-lg shadow-indigo-500/20 disabled:shadow-none"
+                       hover:from-stone-500 hover:to-stone-500 transition-all
+                       shadow-lg shadow-stone-500/20 disabled:shadow-none"
           >
             {isEditing ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />

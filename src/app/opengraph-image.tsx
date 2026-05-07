@@ -99,7 +99,7 @@ export default async function OGImage() {
               fontWeight: 800,
               letterSpacing: "-0.04em",
               lineHeight: 1,
-              background: "linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee)",
+              background: "linear-gradient(135deg, #7c5aff, #78716c, #22d3ee)",
               backgroundClip: "text",
               color: "transparent",
             }}

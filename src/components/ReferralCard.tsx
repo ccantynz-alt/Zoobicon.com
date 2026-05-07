@@ -169,7 +169,7 @@ export default function ReferralCard() {
           </div>
           <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-brand-500 to-accent-cyan rounded-full transition-all"
+              className="h-full bg-gradient-to-r from-brand-500 to-accent-stone rounded-full transition-all"
               style={{ width: `${Math.min(100, (data.signups / tier.nextTierAt) * 100)}%` }}
             />
           </div>

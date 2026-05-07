@@ -216,7 +216,7 @@ export default function IntelPage() {
     switch (severity) {
       case "critical": return "text-red-600 bg-red-50 border-red-200";
       case "warning": return "text-amber-600 bg-amber-50 border-amber-200";
-      case "info": return "text-blue-600 bg-blue-50 border-blue-200";
+      case "info": return "text-stone-600 bg-stone-50 border-stone-200";
       default: return "text-slate-700 bg-slate-50 border-slate-200";
     }
   };
@@ -241,8 +241,8 @@ export default function IntelPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center">
-            <Radar className="w-5 h-5 text-indigo-600" />
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-stone-100 to-stone-200 flex items-center justify-center">
+            <Radar className="w-5 h-5 text-stone-600" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-800">Competitive Intelligence</h1>
@@ -255,7 +255,7 @@ export default function IntelPage() {
           <button
             onClick={triggerFullIntel}
             disabled={isLoading || isCrawling}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 transition-colors disabled:opacity-40 text-sm"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-50 text-stone-600 hover:bg-stone-100 border border-stone-200 transition-colors disabled:opacity-40 text-sm"
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
             Full Intel Sweep
@@ -280,7 +280,7 @@ export default function IntelPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === tab.id
-                  ? "border-indigo-500 text-slate-800"
+                  ? "border-stone-500 text-slate-800"
                   : "border-transparent text-slate-600 hover:text-slate-600"
               }`}
             >
@@ -310,11 +310,11 @@ export default function IntelPage() {
             {/* Score Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-5 rounded-xl bg-white border border-slate-200">
-                <div className="text-2xl font-bold text-indigo-600">{zoobiconFeatureCount}/{FEATURE_MATRIX.length}</div>
+                <div className="text-2xl font-bold text-stone-600">{zoobiconFeatureCount}/{FEATURE_MATRIX.length}</div>
                 <div className="text-xs text-slate-700 mt-1">Features (leading)</div>
               </div>
               <div className="p-5 rounded-xl bg-white border border-slate-200">
-                <div className="text-2xl font-bold text-blue-600">7</div>
+                <div className="text-2xl font-bold text-stone-600">7</div>
                 <div className="text-xs text-slate-700 mt-1">Competitors tracked</div>
               </div>
               <div className="p-5 rounded-xl bg-white border border-slate-200">
@@ -330,7 +330,7 @@ export default function IntelPage() {
             {/* Competitive Position Summary */}
             <div className="p-6 rounded-xl bg-white border border-slate-200">
               <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
-                <Activity size={16} className="text-indigo-500" />
+                <Activity size={16} className="text-stone-500" />
                 Competitive Position
               </h3>
               <div className="grid grid-cols-5 gap-4">
@@ -344,17 +344,17 @@ export default function IntelPage() {
                     <div
                       key={name}
                       className={`p-4 rounded-xl text-center ${
-                        isUs ? "bg-indigo-50 border border-indigo-200" : "bg-slate-50 border border-slate-200"
+                        isUs ? "bg-stone-50 border border-stone-200" : "bg-slate-50 border border-slate-200"
                       }`}
                     >
                       <div className="text-sm font-semibold text-slate-700 mb-2">{name}</div>
-                      <div className={`text-3xl font-bold mb-1 ${isUs ? "text-indigo-600" : "text-slate-700"}`}>
+                      <div className={`text-3xl font-bold mb-1 ${isUs ? "text-stone-600" : "text-slate-700"}`}>
                         {count}
                       </div>
                       <div className="text-xs text-slate-600">features</div>
                       <div className="w-full bg-slate-200 rounded-full h-1.5 mt-3">
                         <div
-                          className={`h-1.5 rounded-full ${isUs ? "bg-indigo-500" : "bg-slate-400"}`}
+                          className={`h-1.5 rounded-full ${isUs ? "bg-stone-500" : "bg-slate-400"}`}
                           style={{ width: `${(count / FEATURE_MATRIX.length) * 100}%` }}
                         />
                       </div>
@@ -391,7 +391,7 @@ export default function IntelPage() {
                     <tr className="border-b border-slate-200">
                       <th className="text-left py-3 px-4 text-slate-700 font-medium">Tier</th>
                       {competitorNames.map((name) => (
-                        <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-indigo-600" : "text-slate-700"}`}>
+                        <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-stone-600" : "text-slate-700"}`}>
                           {name}
                         </th>
                       ))}
@@ -401,7 +401,7 @@ export default function IntelPage() {
                     {PRICING_MATRIX.map((row) => (
                       <tr key={row.tier} className="border-b border-slate-100">
                         <td className="py-3 px-4 text-slate-700">{row.tier}</td>
-                        <td className="py-3 px-4 text-center text-indigo-600 font-semibold">{row.zoobicon}</td>
+                        <td className="py-3 px-4 text-center text-stone-600 font-semibold">{row.zoobicon}</td>
                         <td className="py-3 px-4 text-center text-slate-700">{row.lovable}</td>
                         <td className="py-3 px-4 text-center text-slate-700">{row.bolt}</td>
                         <td className="py-3 px-4 text-center text-slate-700">{row.v0}</td>
@@ -429,7 +429,7 @@ export default function IntelPage() {
                     }}
                     className={`p-4 rounded-xl border transition-all text-left ${
                       selectedCompetitor === c.name
-                        ? "bg-indigo-50 border-indigo-200"
+                        ? "bg-stone-50 border-stone-200"
                         : "bg-white border-slate-200 hover:border-slate-300"
                     }`}
                   >
@@ -445,7 +445,7 @@ export default function IntelPage() {
                     <button
                       onClick={(e) => { e.stopPropagation(); runCrawl(c.name); }}
                       disabled={isCrawling}
-                      className="mt-2 text-xs text-indigo-400 hover:text-indigo-600 transition-colors block"
+                      className="mt-2 text-xs text-stone-400 hover:text-stone-600 transition-colors block"
                     >
                       Crawl now
                     </button>
@@ -460,7 +460,7 @@ export default function IntelPage() {
         {activeTab === "matrix" && (
           <div className="p-6 rounded-xl bg-white border border-slate-200">
             <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
-              <Layers size={16} className="text-indigo-500" />
+              <Layers size={16} className="text-stone-500" />
               Full Feature Comparison
             </h3>
             <div className="overflow-x-auto">
@@ -469,7 +469,7 @@ export default function IntelPage() {
                   <tr className="border-b border-slate-200">
                     <th className="text-left py-3 px-4 text-slate-700 font-medium">Feature</th>
                     {competitorNames.map((name) => (
-                      <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-indigo-600" : "text-slate-700"}`}>
+                      <th key={name} className={`text-center py-3 px-4 font-medium ${name === "Zoobicon" ? "text-stone-600" : "text-slate-700"}`}>
                         {name}
                       </th>
                     ))}
@@ -504,7 +504,7 @@ export default function IntelPage() {
                         return f[key];
                       }).length;
                       return (
-                        <td key={name} className={`py-3 px-4 text-center font-bold ${name === "Zoobicon" ? "text-indigo-600" : "text-slate-700"}`}>
+                        <td key={name} className={`py-3 px-4 text-center font-bold ${name === "Zoobicon" ? "text-stone-600" : "text-slate-700"}`}>
                           {count}
                         </td>
                       );
@@ -552,7 +552,7 @@ export default function IntelPage() {
                           <span className={`text-xs px-2 py-0.5 rounded-full uppercase tracking-wider ${
                             alert.severity === "critical" ? "bg-red-50 text-red-600"
                               : alert.severity === "warning" ? "bg-amber-50 text-amber-600"
-                              : "bg-blue-50 text-blue-600"
+                              : "bg-stone-50 text-stone-600"
                           }`}>
                             {alert.severity}
                           </span>
@@ -597,7 +597,7 @@ export default function IntelPage() {
                 <button
                   onClick={triggerFullIntel}
                   disabled={isLoading}
-                  className="mt-4 px-6 py-2.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 transition-colors text-sm font-medium"
+                  className="mt-4 px-6 py-2.5 rounded-lg bg-stone-50 text-stone-600 hover:bg-stone-100 border border-stone-200 transition-colors text-sm font-medium"
                 >
                   Scan Now
                 </button>
@@ -616,7 +616,7 @@ export default function IntelPage() {
                             {trend.source}
                           </span>
                           {trend.category && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-stone-50 text-stone-600">
                               {trend.category}
                             </span>
                           )}
@@ -640,7 +640,7 @@ export default function IntelPage() {
                             href={trend.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-indigo-400 hover:text-indigo-600"
+                            className="text-stone-400 hover:text-stone-600"
                           >
                             <ExternalLink size={14} />
                           </a>
@@ -662,7 +662,7 @@ export default function IntelPage() {
               <button
                 onClick={() => setSelectedCompetitor(null)}
                 className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
-                  !selectedCompetitor ? "bg-indigo-50 text-indigo-600 border border-indigo-200" : "bg-slate-100 text-slate-700 hover:text-slate-700"
+                  !selectedCompetitor ? "bg-stone-50 text-stone-600 border border-stone-200" : "bg-slate-100 text-slate-700 hover:text-slate-700"
                 }`}
               >
                 All
@@ -673,7 +673,7 @@ export default function IntelPage() {
                   onClick={() => setSelectedCompetitor(selectedCompetitor === c.name ? null : c.name)}
                   className={`px-3 py-1.5 rounded-lg text-xs transition-colors ${
                     selectedCompetitor === c.name
-                      ? "bg-indigo-50 text-indigo-600 border border-indigo-200"
+                      ? "bg-stone-50 text-stone-600 border border-stone-200"
                       : "bg-slate-100 text-slate-700 hover:text-slate-700"
                   }`}
                 >
@@ -701,7 +701,7 @@ export default function IntelPage() {
                 {report?.insights && report.insights.length > 0 && (
                   <div className="space-y-2 mb-4">
                     {report.insights.map((insight, i) => (
-                      <div key={i} className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-sm text-blue-700">
+                      <div key={i} className="p-3 rounded-lg bg-stone-50 border border-stone-200 text-sm text-stone-700">
                         {insight}
                       </div>
                     ))}
@@ -721,7 +721,7 @@ export default function IntelPage() {
                             href={result.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-indigo-400 hover:text-indigo-600 transition-colors flex items-center gap-1"
+                            className="text-xs text-stone-400 hover:text-stone-600 transition-colors flex items-center gap-1"
                           >
                             {result.url}
                             <ExternalLink size={10} />
@@ -753,7 +753,7 @@ export default function IntelPage() {
                           <span className="text-xs uppercase tracking-wider text-slate-600">Features</span>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {result.features.map((f, j) => (
-                              <span key={j} className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">{f}</span>
+                              <span key={j} className="text-xs px-2 py-0.5 rounded-full bg-stone-50 text-stone-600">{f}</span>
                             ))}
                           </div>
                         </div>
@@ -764,7 +764,7 @@ export default function IntelPage() {
                           <span className="text-xs uppercase tracking-wider text-slate-600">Tech</span>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {result.techStack.map((t, j) => (
-                              <span key={j} className="text-xs px-2 py-0.5 rounded-full bg-purple-50 text-purple-600">{t}</span>
+                              <span key={j} className="text-xs px-2 py-0.5 rounded-full bg-stone-50 text-stone-600">{t}</span>
                             ))}
                           </div>
                         </div>
@@ -800,7 +800,7 @@ export default function IntelPage() {
                 </p>
                 <button
                   onClick={() => runCrawl()}
-                  className="px-6 py-2.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 transition-colors text-sm font-medium"
+                  className="px-6 py-2.5 rounded-lg bg-stone-50 text-stone-600 hover:bg-stone-100 border border-stone-200 transition-colors text-sm font-medium"
                 >
                   Start First Crawl
                 </button>

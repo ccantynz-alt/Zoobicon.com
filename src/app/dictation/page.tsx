@@ -813,7 +813,7 @@ export default function DictationPage() {
               style={{
                 fontSize: `${fontSize}px`,
                 lineHeight: "1.7",
-                caretColor: "#a78bfa",
+                caretColor: "#a8a29e",
               }}
               spellCheck
             />

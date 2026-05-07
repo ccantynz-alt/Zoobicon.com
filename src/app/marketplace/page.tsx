@@ -87,8 +87,8 @@ interface MarketplaceItem {
 /* ---------- hardcoded fallback (matches API catalog) ---------- */
 const FALLBACK_ITEMS: MarketplaceItem[] = [
   { id: "premium-template-pack", name: "Premium Template Pack", category: "Templates", description: "50 hand-crafted, conversion-optimized website templates for SaaS, e-commerce, portfolios, and more.", price: 2900, priceLabel: "$29", priceType: "one-time", rating: 4.9, installs: "12.4K", iconName: "Layout", gradient: "from-brand-500 to-brand-700", featured: true, tag: "Best Seller" },
-  { id: "seo-campaign-agent", name: "SEO Campaign Agent", category: "AI Agents", description: "Autonomous SEO agent that researches keywords, writes content, builds backlinks, and tracks rankings 24/7.", price: 2900, priceLabel: "$29/mo", priceType: "monthly", rating: 4.8, installs: "8.2K", iconName: "Search", gradient: "from-accent-cyan to-stone-600", featured: true, tag: "Top Rated" },
-  { id: "ai-video-creator", name: "AI Video Creator", category: "AI Agents", description: "Generate scroll-stopping videos for TikTok, Camera, YouTube, and ThumbsUp. No scripts needed.", price: 1900, priceLabel: "$19/mo", priceType: "monthly", rating: 4.7, installs: "6.8K", iconName: "Video", gradient: "from-accent-purple to-stone-700", featured: true },
+  { id: "seo-campaign-agent", name: "SEO Campaign Agent", category: "AI Agents", description: "Autonomous SEO agent that researches keywords, writes content, builds backlinks, and tracks rankings 24/7.", price: 2900, priceLabel: "$29/mo", priceType: "monthly", rating: 4.8, installs: "8.2K", iconName: "Search", gradient: "from-accent-stone to-stone-600", featured: true, tag: "Top Rated" },
+  { id: "ai-video-creator", name: "AI Video Creator", category: "AI Agents", description: "Generate scroll-stopping videos for TikTok, Camera, YouTube, and ThumbsUp. No scripts needed.", price: 1900, priceLabel: "$19/mo", priceType: "monthly", rating: 4.7, installs: "6.8K", iconName: "Video", gradient: "from-accent-stone to-stone-700", featured: true },
   { id: "ai-email-support", name: "AI Email Support", category: "AI Agents", description: "World-class AI customer support. Auto-replies, sentiment analysis, smart routing, 24/7 operation.", price: 2400, priceLabel: "$24/mo", priceType: "monthly", rating: 4.9, installs: "4.5K", iconName: "Mail", gradient: "from-stone-500 to-stone-600", tag: "New" },
   { id: "stripe-payments", name: "Stripe Payments", category: "E-Commerce", description: "Accept payments instantly. Stripe integration with checkout pages, subscriptions, and invoicing.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.8, installs: "15.1K", iconName: "CreditCard", gradient: "from-stone-500 to-stone-600" },
   { id: "google-analytics", name: "Google Analytics", category: "Analytics", description: "Full Google Analytics 4 integration. Track visitors, conversions, and user behavior automatically.", price: 0, priceLabel: "Free", priceType: "free", rating: 4.6, installs: "18.3K", iconName: "BarChart3", gradient: "from-stone-500 to-stone-600" },
@@ -324,7 +324,7 @@ export default function MarketplacePage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-stone-700 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-stone to-stone-700 flex items-center justify-center">
                 <Store className="w-4 h-4 text-white" />
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -386,9 +386,9 @@ export default function MarketplacePage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-3 mb-6">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-purple/20 bg-accent-purple/5">
-                <Store className="w-3 h-3 text-accent-purple" />
-                <span className="text-xs font-medium text-accent-purple">Add-ons Marketplace</span>
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-stone/20 bg-accent-stone/5">
+                <Store className="w-3 h-3 text-accent-stone" />
+                <span className="text-xs font-medium text-accent-stone">Add-ons Marketplace</span>
               </span>
             </motion.div>
 
@@ -404,7 +404,7 @@ export default function MarketplacePage() {
 
             {/* Search */}
             <motion.div variants={fadeInUp} className="max-w-2xl flex items-center gap-3 mb-8">
-              <div className="flex-1 flex items-center bg-white/[0.07] border border-white/[0.12] rounded-xl overflow-hidden focus-within:border-accent-purple/30 transition-colors">
+              <div className="flex-1 flex items-center bg-white/[0.07] border border-white/[0.12] rounded-xl overflow-hidden focus-within:border-accent-stone/30 transition-colors">
                 <Search className="w-4 h-4 text-white/60 ml-4 flex-shrink-0" />
                 <input
                   type="text"
@@ -421,7 +421,7 @@ export default function MarketplacePage() {
                     onClick={() => setPriceFilter(filter)}
                     className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                       priceFilter === filter
-                        ? "bg-accent-purple/20 text-accent-purple"
+                        ? "bg-accent-stone/20 text-accent-stone"
                         : "text-white/60 hover:text-white/65"
                     }`}
                   >
@@ -454,7 +454,7 @@ export default function MarketplacePage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-6">
-              <Sparkles className="w-5 h-5 text-accent-purple" />
+              <Sparkles className="w-5 h-5 text-accent-stone" />
               <h2 className="text-2xl font-black">Featured</h2>
             </motion.div>
 
@@ -464,7 +464,7 @@ export default function MarketplacePage() {
                 return (
                   <motion.div key={item.id || i} variants={fadeInUp} className="relative gradient-border p-6 rounded-2xl group card-hover">
                     {item.tag && (
-                      <div className="absolute -top-2.5 right-4 px-2.5 py-0.5 rounded-full bg-accent-purple/20 text-accent-purple text-[10px] font-bold border border-accent-purple/30">
+                      <div className="absolute -top-2.5 right-4 px-2.5 py-0.5 rounded-full bg-accent-stone/20 text-accent-stone text-[10px] font-bold border border-accent-stone/30">
                         {item.tag}
                       </div>
                     )}
@@ -491,7 +491,7 @@ export default function MarketplacePage() {
                       </span>
                       <div className="flex items-center gap-2">
                         {item.id === "ai-video-creator" && (
-                          <Link href="/video-creator" className="px-3 py-1.5 rounded-lg text-xs font-bold text-accent-purple border border-accent-purple/20 hover:bg-accent-purple/10 transition-colors flex items-center gap-1">
+                          <Link href="/video-creator" className="px-3 py-1.5 rounded-lg text-xs font-bold text-accent-stone border border-accent-stone/20 hover:bg-accent-stone/10 transition-colors flex items-center gap-1">
                             <ArrowRight className="w-3 h-3" />Try It
                           </Link>
                         )}
@@ -518,7 +518,7 @@ export default function MarketplacePage() {
                   onClick={() => setActiveCategory(cat)}
                   className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
                     activeCategory === cat
-                      ? "bg-accent-purple/20 text-accent-purple border border-accent-purple/30"
+                      ? "bg-accent-stone/20 text-accent-stone border border-accent-stone/30"
                       : "border border-white/[0.10] bg-white/[0.05] text-white/60 hover:text-white/60 hover:border-white/10"
                   }`}
                 >
@@ -544,7 +544,7 @@ export default function MarketplacePage() {
                     className="relative gradient-border p-5 rounded-xl group card-hover"
                   >
                     {item.tag && (
-                      <div className="absolute -top-2 right-3 px-2 py-0.5 rounded-full bg-accent-purple/15 text-accent-purple text-[9px] font-bold border border-accent-purple/20">
+                      <div className="absolute -top-2 right-3 px-2 py-0.5 rounded-full bg-accent-stone/15 text-accent-stone text-[9px] font-bold border border-accent-stone/20">
                         {item.tag}
                       </div>
                     )}
@@ -570,7 +570,7 @@ export default function MarketplacePage() {
                       </div>
                       <div className="flex items-center gap-1.5">
                         {item.id === "ai-video-creator" && (
-                          <Link href="/video-creator" className="px-2 py-1 rounded-lg text-[10px] font-bold text-accent-purple border border-accent-purple/20 hover:bg-accent-purple/10 transition-colors">
+                          <Link href="/video-creator" className="px-2 py-1 rounded-lg text-[10px] font-bold text-accent-stone border border-accent-stone/20 hover:bg-accent-stone/10 transition-colors">
                             Try It
                           </Link>
                         )}
@@ -598,12 +598,12 @@ export default function MarketplacePage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer}>
             <motion.div variants={fadeInUp} className="gradient-border p-10 md:p-16 rounded-2xl relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/5 to-brand-500/5" />
+              <div className="absolute inset-0 bg-gradient-to-br from-accent-stone/5 to-brand-500/5" />
               <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
                 <div className="flex-1">
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-purple/20 bg-accent-purple/5 mb-4">
-                    <Code2 className="w-3 h-3 text-accent-purple" />
-                    <span className="text-xs font-medium text-accent-purple">Build Add-ons</span>
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-accent-stone/20 bg-accent-stone/5 mb-4">
+                    <Code2 className="w-3 h-3 text-accent-stone" />
+                    <span className="text-xs font-medium text-accent-stone">Build Add-ons</span>
                   </div>
                   <h3 className="text-3xl md:text-4xl font-black mb-4">
                     Build & Sell Your<br /><span className="gradient-text">Own Add-ons</span>
@@ -620,7 +620,7 @@ export default function MarketplacePage() {
                       "Featured placement opportunities",
                     ].map((item) => (
                       <li key={item} className="flex items-center gap-2 text-sm text-white/65">
-                        <Zap className="w-4 h-4 text-accent-purple flex-shrink-0" />
+                        <Zap className="w-4 h-4 text-accent-stone flex-shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -634,9 +634,9 @@ export default function MarketplacePage() {
                   </Link>
                 </div>
                 <div className="flex-shrink-0 hidden md:block">
-                  <div className="w-64 h-64 rounded-2xl bg-gradient-to-br from-accent-purple/20 to-brand-500/20 border border-accent-purple/10 flex items-center justify-center">
+                  <div className="w-64 h-64 rounded-2xl bg-gradient-to-br from-accent-stone/20 to-brand-500/20 border border-accent-stone/10 flex items-center justify-center">
                     <div className="text-center">
-                      <Code2 className="w-16 h-16 text-accent-purple/40 mx-auto mb-4" />
+                      <Code2 className="w-16 h-16 text-accent-stone/40 mx-auto mb-4" />
                       <div className="text-3xl font-black gradient-text-static">80%</div>
                       <div className="text-xs text-white/60 mt-1">Revenue Share</div>
                     </div>
@@ -651,7 +651,7 @@ export default function MarketplacePage() {
       {/* CTA */}
       <section className="py-20 border-t border-white/[0.08]">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-          <Store className="w-12 h-12 text-accent-purple/30 mx-auto mb-6" />
+          <Store className="w-12 h-12 text-accent-stone/30 mx-auto mb-6" />
           <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
             Everything You Need.<br /><span className="gradient-text">One Marketplace.</span>
           </h2>

@@ -76,8 +76,8 @@ const CATEGORY_META: Record<
   string,
   { label: string; icon: typeof Globe; color: string }
 > = {
-  "website-builder": { label: "Website Builders", icon: Globe, color: "text-blue-600" },
-  "video-generator": { label: "Video Generators", icon: Video, color: "text-purple-600" },
+  "website-builder": { label: "Website Builders", icon: Globe, color: "text-stone-600" },
+  "video-generator": { label: "Video Generators", icon: Video, color: "text-stone-600" },
   "code-tool": { label: "Code Tools", icon: Code2, color: "text-slate-600" },
 };
 
@@ -105,7 +105,7 @@ function severityColor(severity: string): string {
     case "warning":
       return "bg-amber-50 text-amber-600 border-amber-200";
     case "info":
-      return "bg-blue-50 text-blue-600 border-blue-200";
+      return "bg-stone-50 text-stone-600 border-stone-200";
     default:
       return "bg-gray-50 text-gray-500 border-gray-200";
   }
@@ -207,8 +207,8 @@ export default function MarketIntelPage() {
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-violet-100 to-violet-200">
-              <Radar className="h-5 w-5 text-violet-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-stone-100 to-stone-200">
+              <Radar className="h-5 w-5 text-stone-600" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-800">Market Intelligence</h1>
@@ -224,7 +224,7 @@ export default function MarketIntelPage() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value as CategoryFilter)}
-                className="appearance-none rounded-lg border border-slate-200 bg-white px-4 py-2 pr-8 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none"
+                className="appearance-none rounded-lg border border-slate-200 bg-white px-4 py-2 pr-8 text-sm text-slate-700 focus:border-stone-500 focus:outline-none"
               >
                 <option value="all">All Categories</option>
                 <option value="website-builder">Website Builders</option>
@@ -247,7 +247,7 @@ export default function MarketIntelPage() {
             <button
               onClick={triggerCrawl}
               disabled={isCrawling}
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-2 text-sm font-medium text-white hover:from-indigo-600 hover:to-indigo-700 transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-stone-500 to-stone-600 px-4 py-2 text-sm font-medium text-white hover:from-stone-600 hover:to-stone-700 transition-colors disabled:opacity-50"
             >
               {isCrawling ? (
                 <>
@@ -272,7 +272,7 @@ export default function MarketIntelPage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === tab.id
-                  ? "border-indigo-500 text-slate-800"
+                  ? "border-stone-500 text-slate-800"
                   : "border-transparent text-slate-600 hover:text-slate-600"
               }`}
             >
@@ -347,7 +347,7 @@ export default function MarketIntelPage() {
         {/* Loading */}
         {isLoading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-indigo-400" />
+            <Loader2 className="h-8 w-8 animate-spin text-stone-400" />
           </div>
         )}
 
@@ -485,7 +485,7 @@ export default function MarketIntelPage() {
                           href={snap.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-700"
+                          className="flex items-center gap-1.5 text-stone-600 hover:text-stone-700"
                         >
                           {snap.competitor_name}
                           <ExternalLink className="h-3 w-3" />
@@ -495,9 +495,9 @@ export default function MarketIntelPage() {
                         <span
                           className={`rounded-full px-2 py-0.5 text-xs ${
                             snap.category === "website-builder"
-                              ? "bg-blue-50 text-blue-600"
+                              ? "bg-stone-50 text-stone-600"
                               : snap.category === "video-generator"
-                                ? "bg-purple-50 text-purple-600"
+                                ? "bg-stone-50 text-stone-600"
                                 : "bg-slate-100 text-slate-600"
                           }`}
                         >
@@ -553,14 +553,14 @@ function StatCard({
   isText?: boolean;
 }) {
   const colorMap: Record<string, string> = {
-    violet: "from-violet-50 to-violet-100/50 border-violet-200",
-    blue: "from-blue-50 to-blue-100/50 border-blue-200",
+    violet: "from-stone-50 to-stone-100/50 border-stone-200",
+    blue: "from-stone-50 to-stone-100/50 border-stone-200",
     yellow: "from-yellow-50 to-yellow-100/50 border-yellow-200",
     green: "from-green-50 to-green-100/50 border-green-200",
   };
   const iconColor: Record<string, string> = {
-    violet: "text-violet-500",
-    blue: "text-blue-500",
+    violet: "text-stone-500",
+    blue: "text-stone-500",
     yellow: "text-yellow-600",
     green: "text-green-500",
   };
@@ -667,7 +667,7 @@ function CompetitorCard({
             href={snapshot.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-indigo-500 hover:text-indigo-600"
+            className="inline-flex items-center gap-1 text-xs text-stone-500 hover:text-stone-600"
           >
             Visit site
             <ExternalLink className="h-3 w-3" />
@@ -700,9 +700,9 @@ function ChangeCard({ change }: { change: Change }) {
         <span
           className={`rounded-full px-2 py-0.5 text-xs ${
             change.category === "website-builder"
-              ? "bg-blue-50 text-blue-600"
+              ? "bg-stone-50 text-stone-600"
               : change.category === "video-generator"
-                ? "bg-purple-50 text-purple-600"
+                ? "bg-stone-50 text-stone-600"
                 : "bg-slate-100 text-slate-600"
           }`}
         >
@@ -728,8 +728,8 @@ function ChangeCard({ change }: { change: Change }) {
           </div>
         )}
         {featuresChanged && (
-          <div className="rounded-md bg-blue-50 border border-blue-200 p-2 text-xs">
-            <span className="font-medium text-blue-600">Feature Change:</span>{" "}
+          <div className="rounded-md bg-stone-50 border border-stone-200 p-2 text-xs">
+            <span className="font-medium text-stone-600">Feature Change:</span>{" "}
             <span className="text-slate-700">
               {change.features?.length || 0} features now (was{" "}
               {change.prev_features?.length || 0})

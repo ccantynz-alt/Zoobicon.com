@@ -911,8 +911,8 @@ function BuilderPage() {
               if (agency?.brand_config?.agencyName) {
                 setAgencyBrand({
                   agencyName: agency.brand_config.agencyName,
-                  primaryColor: agency.brand_config.primaryColor || "#3b82f6",
-                  secondaryColor: agency.brand_config.secondaryColor || "#8b5cf6",
+                  primaryColor: agency.brand_config.primaryColor || "#78716c",
+                  secondaryColor: agency.brand_config.secondaryColor || "#78716c",
                   logoUrl: agency.brand_config.logoUrl,
                 });
                 // Store for TopBar to pick up
@@ -2227,10 +2227,38 @@ root.render(React.createElement(App));
       >
         {/* Logo + branding */}
         <Link href="/" className="flex items-center gap-2 mr-2 group">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center shadow-sm transition-shadow" style={{ background: "linear-gradient(135deg, #c9a961 0%, #b8923f 100%)", boxShadow: "0 2px 8px rgba(184,146,63,0.25)" }}>
-            <Sparkles className="w-3.5 h-3.5 text-white" />
+          <div
+            className="relative w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-[1.04]"
+            style={{
+              background: "var(--paper)",
+              border: "1.5px solid var(--gold)",
+              boxShadow: "0 2px 6px -2px rgba(140,107,37,0.18), inset 0 0 0 2px var(--paper)",
+            }}
+          >
+            <span
+              className="text-[14px] leading-none"
+              style={{
+                fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+                fontStyle: "italic",
+                fontWeight: 600,
+                color: "var(--ink)",
+                marginTop: "1px",
+              }}
+            >
+              Z
+            </span>
           </div>
-          <span className="text-sm font-semibold hidden sm:inline" style={{ color: "var(--ink)" }}>Zoobicon</span>
+          <span
+            className="text-sm hidden sm:inline"
+            style={{
+              fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+              fontWeight: 500,
+              color: "var(--ink)",
+              letterSpacing: "0.005em",
+            }}
+          >
+            Zoobicon
+          </span>
         </Link>
 
         {/* Divider */}
@@ -2640,7 +2668,7 @@ root.render(React.createElement(App));
             */}
             <div
               ref={previewContainerRef}
-              className="absolute inset-0 bg-[#0a0f1e]"
+              className="absolute inset-0 bg-[#f4f3ed]"
               style={{
                 visibility: activeTab === "preview" ? "visible" : "hidden",
                 zIndex: activeTab === "preview" ? 1 : 0,
@@ -2770,7 +2798,7 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-20 flex items-center justify-center bg-[#0a0f1e]"
+                  className="absolute inset-0 z-20 flex items-center justify-center bg-[#f4f3ed]"
                 >
                   <div className="max-w-md text-center px-8">
                     <div className="w-14 h-14 rounded-2xl bg-stone-500/10 border border-stone-500/15 flex items-center justify-center mx-auto mb-5">

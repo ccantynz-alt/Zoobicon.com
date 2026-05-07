@@ -519,7 +519,7 @@ export default function PreviewPanel({
           <p
             className="text-lg font-bold uppercase tracking-[8px]"
             style={{
-              background: "linear-gradient(90deg, #60a5fa, #00ddff, #3b82f6, #60a5fa)",
+              background: "linear-gradient(90deg, #a8a29e, #00ddff, #78716c, #a8a29e)",
               backgroundSize: "300% 100%",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -650,7 +650,7 @@ export default function PreviewPanel({
           <p
             className="text-lg font-bold uppercase tracking-[8px]"
             style={{
-              background: "linear-gradient(90deg, #60a5fa, #00ddff, #3b82f6, #60a5fa)",
+              background: "linear-gradient(90deg, #a8a29e, #00ddff, #78716c, #a8a29e)",
               backgroundSize: "300% 100%",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",

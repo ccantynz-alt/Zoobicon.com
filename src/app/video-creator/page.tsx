@@ -390,7 +390,7 @@ SCRIPT_2:
           avatarPresetId: selectedAvatarId,
           voiceGender: (["james", "michael", "david"].includes(selectedAvatarId) ? "male" : "female") as "female" | "male",
           voiceStyle: "professional",
-          background: "#0f172a",
+          background: "#f4f3ed",
           format,
         }),
       });

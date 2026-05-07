@@ -72,13 +72,13 @@ function useConfetti(count: number) {
 
   useEffect(() => {
     const colors = [
-      "#3b82f6",
-      "#8b5cf6",
+      "#78716c",
+      "#78716c",
       "#10b981",
       "#f59e0b",
       "#ef4444",
-      "#06b6d4",
-      "#06b6d4",
+      "#78716c",
+      "#78716c",
       "#f97316",
     ];
     const items = Array.from({ length: count }, (_, i) => ({

@@ -282,7 +282,7 @@ export default function VideoCreatorDashboard() {
   const [platform, setPlatform] = useState("tiktok");
   const [duration, setDuration] = useState(30);
   const [music, setMusic] = useState("upbeat");
-  const [brandColors, setBrandColors] = useState(["#06b6d4", "#2563eb"]);
+  const [brandColors, setBrandColors] = useState(["#78716c", "#57534e"]);
   const [brandFont, setBrandFont] = useState("Inter");
 
   // Voice recording state

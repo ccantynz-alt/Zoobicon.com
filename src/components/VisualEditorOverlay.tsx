@@ -162,7 +162,7 @@ export default function VisualEditor({ active, onEdit, files, onToggle }: Visual
               <div key={item.section} className="flex items-center gap-2">
                 <input
                   type="color"
-                  defaultValue="#4f46e5"
+                  defaultValue="#57534e"
                   onChange={(e) => handleColorChange(item.section, e.target.value)}
                   className="w-6 h-6 rounded border-0 cursor-pointer bg-transparent"
                 />

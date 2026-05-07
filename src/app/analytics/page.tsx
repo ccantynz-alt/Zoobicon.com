@@ -139,7 +139,7 @@ export default function AnalyticsPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center">
                   <Zap className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -172,7 +172,7 @@ export default function AnalyticsPage() {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/[0.10] bg-white/[0.05] hover:bg-white/[0.07] transition-colors"
                 >
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center text-[10px] font-bold text-white">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center text-[10px] font-bold text-white">
                     {userName.charAt(0).toUpperCase()}
                   </div>
                   <span className="text-sm text-white/60 hidden sm:block">{userName}</span>
@@ -241,8 +241,8 @@ export default function AnalyticsPage() {
 
           <div className="rounded-xl border border-white/[0.10] bg-white/[0.05] p-5">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-accent-cyan/10 flex items-center justify-center">
-                <Zap className="w-4 h-4 text-accent-cyan" />
+              <div className="w-8 h-8 rounded-lg bg-accent-stone/10 flex items-center justify-center">
+                <Zap className="w-4 h-4 text-accent-stone" />
               </div>
               <span className="text-xs text-white/60 font-medium">Generations</span>
             </div>
@@ -251,8 +251,8 @@ export default function AnalyticsPage() {
 
           <div className="rounded-xl border border-white/[0.10] bg-white/[0.05] p-5">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-accent-purple/10 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-accent-purple" />
+              <div className="w-8 h-8 rounded-lg bg-accent-stone/10 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-accent-stone" />
               </div>
               <span className="text-xs text-white/60 font-medium">Characters Generated</span>
             </div>
@@ -414,7 +414,7 @@ export default function AnalyticsPage() {
                   href="/products/seo-agent"
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/[0.07] transition-colors group"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-stone-600 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-stone to-stone-600 flex items-center justify-center">
                     <Search className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1">
@@ -428,7 +428,7 @@ export default function AnalyticsPage() {
                   href="/dashboard"
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/[0.07] transition-colors group"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-purple to-stone-700 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-stone to-stone-700 flex items-center justify-center">
                     <BarChart3 className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1">

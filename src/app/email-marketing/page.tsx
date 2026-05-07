@@ -82,7 +82,7 @@ export default function EmailMarketingPage() {
       headline: "Stay in the loop",
       description: "Get the latest updates straight to your inbox.",
       buttonText: "Subscribe",
-      primaryColor: "#6366f1",
+      primaryColor: "#78716c",
       bgColor: "#0f2148",
       textColor: "#ffffff",
     });

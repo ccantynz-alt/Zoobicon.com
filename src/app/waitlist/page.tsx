@@ -332,7 +332,7 @@ export default function WaitlistPage() {
                 <div>
                   <label className="text-xs text-white/40 mb-1 block">Brand Color</label>
                   <div className="flex gap-2">
-                    {['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#06b6d4'].map((c) => (
+                    {['#78716c', '#78716c', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#78716c'].map((c) => (
                       <button onClick={() => {}} key={c} className="w-8 h-8 rounded-lg border-2 border-white/10 hover:border-white/40 transition" style={{ backgroundColor: c }} />
                     ))}
                   </div>

@@ -367,7 +367,7 @@ export default function PortfolioPage() {
                 {[
                   { name: 'Dark', bg: '#0a0a12', fg: '#fff' },
                   { name: 'Light', bg: '#fafafa', fg: '#111' },
-                  { name: 'Navy', bg: '#0f172a', fg: '#e2e8f0' },
+                  { name: 'Navy', bg: '#f4f3ed', fg: '#e2e8f0' },
                   { name: 'Warm', bg: '#1a1412', fg: '#fde8d0' },
                 ].map(theme => (
                   <button onClick={() => {}} key={theme.name} className="p-3 rounded-xl border border-white/10 hover:border-stone-500/50 transition-all text-center">

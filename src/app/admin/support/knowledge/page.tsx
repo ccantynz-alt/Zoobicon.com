@@ -174,7 +174,7 @@ export default function KnowledgeBasePage() {
             <Link href="/admin/support" className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
               <ArrowLeft className="w-5 h-5 text-slate-600" />
             </Link>
-            <BookOpen className="w-6 h-6 text-indigo-500" />
+            <BookOpen className="w-6 h-6 text-stone-500" />
             <h1 className="text-lg font-semibold text-slate-800">Knowledge Base</h1>
             <span className="text-sm text-slate-700">
               {articles.length} articles
@@ -183,7 +183,7 @@ export default function KnowledgeBasePage() {
           <div className="flex items-center gap-2">
             <button
               onClick={startCreate}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+              className="bg-stone-600 hover:bg-stone-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               New Article
@@ -205,7 +205,7 @@ export default function KnowledgeBasePage() {
             }}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
               !selectedCategory
-                ? "bg-indigo-50 text-indigo-700"
+                ? "bg-stone-50 text-stone-700"
                 : "text-slate-600 hover:bg-slate-100"
             }`}
           >
@@ -223,7 +223,7 @@ export default function KnowledgeBasePage() {
                 }}
                 className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
                   selectedCategory === cat
-                    ? "bg-indigo-50 text-indigo-700"
+                    ? "bg-stone-50 text-stone-700"
                     : "text-slate-600 hover:bg-slate-100"
                 }`}
               >
@@ -256,7 +256,7 @@ export default function KnowledgeBasePage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchArticles()}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-400"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-stone-400"
               />
             </div>
           </div>
@@ -288,7 +288,7 @@ export default function KnowledgeBasePage() {
                         setFormData((d) => ({ ...d, title: e.target.value }))
                       }
                       placeholder="e.g., How to deploy a website"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-400"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-stone-400"
                     />
                   </div>
 
@@ -299,7 +299,7 @@ export default function KnowledgeBasePage() {
                       onChange={(e) =>
                         setFormData((d) => ({ ...d, category: e.target.value }))
                       }
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-indigo-400"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-stone-400"
                     >
                       {CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>
@@ -323,7 +323,7 @@ export default function KnowledgeBasePage() {
                       }
                       placeholder="Write the full answer here. Include step-by-step instructions, URLs, pricing details — anything the AI should know when answering questions about this topic."
                       rows={15}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-400 resize-none font-mono"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-stone-400 resize-none font-mono"
                     />
                   </div>
 
@@ -339,7 +339,7 @@ export default function KnowledgeBasePage() {
                         setFormData((d) => ({ ...d, keywords: e.target.value }))
                       }
                       placeholder="deploy, hosting, custom domain, DNS"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-400"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-stone-400"
                     />
                   </div>
 
@@ -353,7 +353,7 @@ export default function KnowledgeBasePage() {
                     <button
                       onClick={handleSave}
                       disabled={saving || !formData.title.trim() || !formData.content.trim()}
-                      className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                      className="bg-stone-600 hover:bg-stone-500 disabled:opacity-50 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
                     >
                       {saving ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -367,7 +367,7 @@ export default function KnowledgeBasePage() {
               </div>
             ) : loading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
+                <Loader2 className="w-6 h-6 text-stone-400 animate-spin" />
               </div>
             ) : articles.length === 0 ? (
               <div className="text-center py-20 text-slate-600">
@@ -379,7 +379,7 @@ export default function KnowledgeBasePage() {
                 </p>
                 <button
                   onClick={startCreate}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
+                  className="bg-stone-600 hover:bg-stone-500 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
                   Create your first article
                 </button>

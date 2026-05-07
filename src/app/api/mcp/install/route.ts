@@ -92,11 +92,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 <body class="text-white antialiased">
 <div class="max-w-4xl mx-auto px-6 py-16">
   <div class="mb-12">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/40 bg-purple-500/10 text-purple-200 text-xs font-medium mb-6">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-stone-500/40 bg-stone-500/10 text-stone-200 text-xs font-medium mb-6">
       <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
       MCP Server Live · ${toolCount} tools · Protocol 2025-06-18
     </div>
-    <h1 class="text-5xl font-bold tracking-tight mb-4 bg-gradient-to-br from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">
+    <h1 class="text-5xl font-bold tracking-tight mb-4 bg-gradient-to-br from-white via-stone-200 to-stone-400 bg-clip-text text-transparent">
       Install Zoobicon MCP
     </h1>
     <p class="text-lg text-gray-400 max-w-2xl">
@@ -105,8 +105,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   </div>
 
   <div class="rounded-xl p-5 mb-10 code-block glow">
-    <div class="text-xs uppercase tracking-wider text-purple-300 mb-2">Server URL</div>
-    <code class="text-purple-200 text-lg">${escapeHtml(mcpUrl)}</code>
+    <div class="text-xs uppercase tracking-wider text-stone-300 mb-2">Server URL</div>
+    <code class="text-stone-200 text-lg">${escapeHtml(mcpUrl)}</code>
   </div>
 
   <div class="mb-6 p-4 rounded-lg border border-amber-500/30 bg-amber-500/5">
@@ -119,51 +119,51 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
   <section class="mb-10">
     <h2 class="text-2xl font-semibold mb-1">Claude Desktop</h2>
-    <p class="text-gray-400 text-sm mb-3">Add to <code class="text-purple-300">~/Library/Application Support/Claude/claude_desktop_config.json</code></p>
+    <p class="text-gray-400 text-sm mb-3">Add to <code class="text-stone-300">~/Library/Application Support/Claude/claude_desktop_config.json</code></p>
     <div class="rounded-xl code-block overflow-hidden">
-      <div class="flex items-center justify-between px-4 py-2 border-b border-purple-500/20 bg-purple-500/5">
-        <span class="text-xs text-purple-300">claude_desktop_config.json</span>
-        <button onclick="navigator.clipboard.writeText(document.getElementById('claude-cfg').innerText)" class="copy-btn text-xs px-2 py-1 rounded border border-purple-500/30 text-purple-200">Copy</button>
+      <div class="flex items-center justify-between px-4 py-2 border-b border-stone-500/20 bg-stone-500/5">
+        <span class="text-xs text-stone-300">claude_desktop_config.json</span>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('claude-cfg').innerText)" class="copy-btn text-xs px-2 py-1 rounded border border-stone-500/30 text-stone-200">Copy</button>
       </div>
-      <pre id="claude-cfg" class="p-4 text-purple-100 overflow-x-auto">${escapeHtml(claudeDesktopConfig)}</pre>
+      <pre id="claude-cfg" class="p-4 text-stone-100 overflow-x-auto">${escapeHtml(claudeDesktopConfig)}</pre>
     </div>
   </section>
 
   <section class="mb-10">
     <h2 class="text-2xl font-semibold mb-1">Cursor</h2>
-    <p class="text-gray-400 text-sm mb-3">Add to <code class="text-purple-300">~/.cursor/mcp.json</code></p>
+    <p class="text-gray-400 text-sm mb-3">Add to <code class="text-stone-300">~/.cursor/mcp.json</code></p>
     <div class="rounded-xl code-block overflow-hidden">
-      <div class="flex items-center justify-between px-4 py-2 border-b border-purple-500/20 bg-purple-500/5">
-        <span class="text-xs text-purple-300">mcp.json</span>
-        <button onclick="navigator.clipboard.writeText(document.getElementById('cursor-cfg').innerText)" class="copy-btn text-xs px-2 py-1 rounded border border-purple-500/30 text-purple-200">Copy</button>
+      <div class="flex items-center justify-between px-4 py-2 border-b border-stone-500/20 bg-stone-500/5">
+        <span class="text-xs text-stone-300">mcp.json</span>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('cursor-cfg').innerText)" class="copy-btn text-xs px-2 py-1 rounded border border-stone-500/30 text-stone-200">Copy</button>
       </div>
-      <pre id="cursor-cfg" class="p-4 text-purple-100 overflow-x-auto">${escapeHtml(cursorConfig)}</pre>
+      <pre id="cursor-cfg" class="p-4 text-stone-100 overflow-x-auto">${escapeHtml(cursorConfig)}</pre>
     </div>
   </section>
 
   <section class="mb-10">
     <h2 class="text-2xl font-semibold mb-1">Windsurf</h2>
-    <p class="text-gray-400 text-sm mb-3">Add to <code class="text-purple-300">~/.codeium/windsurf/mcp_config.json</code></p>
+    <p class="text-gray-400 text-sm mb-3">Add to <code class="text-stone-300">~/.codeium/windsurf/mcp_config.json</code></p>
     <div class="rounded-xl code-block overflow-hidden">
-      <div class="flex items-center justify-between px-4 py-2 border-b border-purple-500/20 bg-purple-500/5">
-        <span class="text-xs text-purple-300">mcp_config.json</span>
-        <button onclick="navigator.clipboard.writeText(document.getElementById('wind-cfg').innerText)" class="copy-btn text-xs px-2 py-1 rounded border border-purple-500/30 text-purple-200">Copy</button>
+      <div class="flex items-center justify-between px-4 py-2 border-b border-stone-500/20 bg-stone-500/5">
+        <span class="text-xs text-stone-300">mcp_config.json</span>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('wind-cfg').innerText)" class="copy-btn text-xs px-2 py-1 rounded border border-stone-500/30 text-stone-200">Copy</button>
       </div>
-      <pre id="wind-cfg" class="p-4 text-purple-100 overflow-x-auto">${escapeHtml(windsurfConfig)}</pre>
+      <pre id="wind-cfg" class="p-4 text-stone-100 overflow-x-auto">${escapeHtml(windsurfConfig)}</pre>
     </div>
   </section>
 
   <section class="mb-10">
     <h2 class="text-2xl font-semibold mb-1">Verify the server</h2>
     <div class="rounded-xl code-block overflow-hidden">
-      <div class="flex items-center justify-between px-4 py-2 border-b border-purple-500/20 bg-purple-500/5">
-        <span class="text-xs text-purple-300">shell</span>
+      <div class="flex items-center justify-between px-4 py-2 border-b border-stone-500/20 bg-stone-500/5">
+        <span class="text-xs text-stone-300">shell</span>
       </div>
       <pre class="p-4 text-green-300 overflow-x-auto">curl ${escapeHtml(pingUrl)}</pre>
     </div>
   </section>
 
-  <footer class="pt-10 mt-10 border-t border-purple-500/15 text-sm text-gray-500">
+  <footer class="pt-10 mt-10 border-t border-stone-500/15 text-sm text-gray-500">
     zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh
   </footer>
 </div>

@@ -103,7 +103,7 @@ export default function ClientPortal() {
   );
 
   const brandName = agencyBrand?.agencyName || "Client Portal";
-  const primaryColor = agencyBrand?.primaryColor || "#3b82f6";
+  const primaryColor = agencyBrand?.primaryColor || "#78716c";
 
   // Preview mode — full-screen iframe
   if (previewSite) {

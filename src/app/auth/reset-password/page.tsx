@@ -74,7 +74,7 @@ function ResetPasswordContent() {
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           <Link href="/" className="flex items-center gap-2 mb-12">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -82,8 +82,8 @@ function ResetPasswordContent() {
 
           {status === "success" ? (
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-cyan/10 to-stone-500/10 border border-accent-cyan/20 mb-6">
-                <CheckCircle2 className="w-8 h-8 text-accent-cyan" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-stone/10 to-stone-500/10 border border-accent-stone/20 mb-6">
+                <CheckCircle2 className="w-8 h-8 text-accent-stone" />
               </div>
               <h1 className="text-2xl font-black tracking-tight mb-3">Password reset</h1>
               <p className="text-white/50 text-sm mb-6">{message}</p>
@@ -170,8 +170,8 @@ function ResetPasswordContent() {
                   <div className="grid grid-cols-2 gap-2">
                     {checks.map((c) => (
                       <div key={c.label} className="flex items-center gap-1.5">
-                        <CheckCircle2 className={`w-3 h-3 flex-shrink-0 ${c.met ? "text-accent-cyan" : "text-white/15"}`} />
-                        <span className={`text-[10px] ${c.met ? "text-accent-cyan" : "text-white/50"}`}>{c.label}</span>
+                        <CheckCircle2 className={`w-3 h-3 flex-shrink-0 ${c.met ? "text-accent-stone" : "text-white/15"}`} />
+                        <span className={`text-[10px] ${c.met ? "text-accent-stone" : "text-white/50"}`}>{c.label}</span>
                       </div>
                     ))}
                   </div>
@@ -217,7 +217,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-dark-400">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple animate-pulse" />
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone animate-pulse" />
       </div>
     }>
       <ResetPasswordContent />

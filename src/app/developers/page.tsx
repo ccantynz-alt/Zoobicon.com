@@ -421,11 +421,11 @@ export default function DevelopersPage() {
                 </Link>
               </div>
 
-              <div className="relative p-6 rounded-xl border border-accent-cyan/30 bg-accent-cyan/[0.02] shadow-glow-cyan">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-accent-cyan to-emerald-500 text-xs font-bold text-white">
+              <div className="relative p-6 rounded-xl border border-accent-stone/30 bg-accent-stone/[0.02] shadow-glow-cyan">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-accent-stone to-emerald-500 text-xs font-bold text-white">
                   Popular
                 </div>
-                <div className="text-sm font-semibold text-accent-cyan mb-2">Pro</div>
+                <div className="text-sm font-semibold text-accent-stone mb-2">Pro</div>
                 <div className="text-3xl font-black mb-1">$79<span className="text-lg font-normal text-white/60">/mo</span></div>
                 <div className="text-xs text-white/60 mb-4">60 requests/min</div>
                 <ul className="space-y-2 mb-6 text-sm text-white/65">
@@ -435,7 +435,7 @@ export default function DevelopersPage() {
                   <li>Webhook callbacks</li>
                   <li>Priority support</li>
                 </ul>
-                <Link href="/auth/signup" className="block text-center w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-emerald-500 text-sm font-bold text-white">
+                <Link href="/auth/signup" className="block text-center w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-stone to-emerald-500 text-sm font-bold text-white">
                   Start Pro
                 </Link>
               </div>

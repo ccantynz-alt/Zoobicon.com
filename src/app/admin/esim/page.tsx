@@ -113,7 +113,7 @@ export default function AdminEsimPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <Wifi className="w-6 h-6 text-cyan-500" />
+            <Wifi className="w-6 h-6 text-stone-500" />
             eSIM Management
           </h1>
           <p className="text-sm text-slate-700 mt-1">
@@ -152,14 +152,14 @@ export default function AdminEsimPage() {
           onChange={(e) => setSearchFilter(e.target.value)}
           placeholder="Search destinations..."
           className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-800
-                     placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-400 transition-all"
+                     placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-stone-500/20 focus:border-stone-400 transition-all"
         />
       </div>
 
       {/* Plans by Region */}
       {loading ? (
         <div className="flex items-center justify-center h-40">
-          <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin" />
+          <RefreshCw className="w-5 h-5 text-stone-400 animate-spin" />
         </div>
       ) : filteredRegions.length === 0 ? (
         <div className="text-center py-12 text-slate-600">
@@ -175,7 +175,7 @@ export default function AdminEsimPage() {
                 className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-50/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <Globe className="w-4 h-4 text-cyan-500" />
+                  <Globe className="w-4 h-4 text-stone-500" />
                   <span className="font-medium text-slate-800">{region}</span>
                   <span className="text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
                     {regionPlans.length} plan{regionPlans.length !== 1 ? "s" : ""}
@@ -212,7 +212,7 @@ export default function AdminEsimPage() {
                           <td className="px-3 py-3">
                             <span className={`text-xs px-2 py-0.5 rounded-full ${
                               plan.networkType.includes("5G")
-                                ? "bg-cyan-50 text-cyan-600 border border-cyan-200"
+                                ? "bg-stone-50 text-stone-600 border border-stone-200"
                                 : "bg-slate-100 text-slate-700"
                             }`}>{plan.networkType}</span>
                           </td>
@@ -223,7 +223,7 @@ export default function AdminEsimPage() {
                             <button
                               onClick={() => handleTestPurchase(plan.id)}
                               disabled={testPurchase.status === "loading"}
-                              className="text-xs px-3 py-1 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 transition-colors disabled:opacity-50"
+                              className="text-xs px-3 py-1 rounded-lg bg-stone-50 text-stone-600 hover:bg-stone-100 border border-stone-200 transition-colors disabled:opacity-50"
                             >
                               Test Purchase
                             </button>
@@ -249,7 +249,7 @@ export default function AdminEsimPage() {
             : "bg-slate-50 border-slate-200"
         }`}>
           <div className="flex items-center gap-2 mb-3">
-            {testPurchase.status === "loading" && <Loader2 className="w-4 h-4 text-indigo-500 animate-spin" />}
+            {testPurchase.status === "loading" && <Loader2 className="w-4 h-4 text-stone-500 animate-spin" />}
             {testPurchase.status === "success" && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
             {testPurchase.status === "error" && <AlertCircle className="w-4 h-4 text-red-500" />}
             <span className="text-sm font-semibold text-slate-800">
@@ -282,14 +282,14 @@ function StatCard({ icon: Icon, label, value, color }: {
   icon: React.ElementType; label: string; value: string | number; color: string;
 }) {
   const colorMap: Record<string, string> = {
-    cyan: "from-cyan-50 to-cyan-100/50 border-cyan-200",
-    purple: "from-purple-50 to-purple-100/50 border-purple-200",
+    cyan: "from-stone-50 to-stone-100/50 border-stone-200",
+    purple: "from-stone-50 to-stone-100/50 border-stone-200",
     emerald: "from-emerald-50 to-emerald-100/50 border-emerald-200",
     amber: "from-amber-50 to-amber-100/50 border-amber-200",
   };
   const iconMap: Record<string, string> = {
-    cyan: "text-cyan-500",
-    purple: "text-purple-500",
+    cyan: "text-stone-500",
+    purple: "text-stone-500",
     emerald: "text-emerald-500",
     amber: "text-amber-500",
   };

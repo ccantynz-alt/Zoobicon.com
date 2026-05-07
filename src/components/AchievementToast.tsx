@@ -42,7 +42,7 @@ function ConfettiBurst() {
     const angle = (i / 24) * 360;
     const distance = 40 + Math.random() * 60;
     const size = 4 + Math.random() * 4;
-    const colors = ["#6d3bff", "#22d3ee", "#f59e0b", "#ef4444", "#10b981", "#ec4899", "#3b82f6"];
+    const colors = ["#6d3bff", "#22d3ee", "#f59e0b", "#ef4444", "#10b981", "#ec4899", "#78716c"];
     const color = colors[i % colors.length];
     const dx = Math.cos((angle * Math.PI) / 180) * distance;
     const dy = Math.sin((angle * Math.PI) / 180) * distance;

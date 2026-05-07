@@ -128,12 +128,41 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-slate-200">
+      <div className="flex items-center gap-2.5 px-5 py-5" style={{ borderBottom: "1px solid var(--rule)" }}>
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-600 flex items-center justify-center shadow-lg shadow-stone-500/25 group-hover:shadow-stone-500/40 transition-shadow">
-            <Zap className="w-4 h-4 text-white" />
+          <div
+            className="relative w-9 h-9 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-[1.04]"
+            style={{
+              background: "var(--paper)",
+              border: "1.5px solid var(--gold)",
+              boxShadow: "0 2px 6px -2px rgba(140,107,37,0.18), inset 0 0 0 2.5px var(--paper)",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+                fontStyle: "italic",
+                fontWeight: 600,
+                fontSize: "17px",
+                lineHeight: 1,
+                color: "var(--ink)",
+                marginTop: "1px",
+              }}
+            >
+              Z
+            </span>
           </div>
-          <span className="text-sm font-bold tracking-tight text-slate-800">ZOOBICON</span>
+          <span
+            style={{
+              fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+              fontWeight: 500,
+              fontSize: "15px",
+              letterSpacing: "0.005em",
+              color: "var(--ink)",
+            }}
+          >
+            Zoobicon
+          </span>
         </Link>
         <span className="text-[9px] font-semibold uppercase tracking-wider text-stone-700 bg-stone-100 border border-stone-200 rounded px-1.5 py-0.5">
           Admin

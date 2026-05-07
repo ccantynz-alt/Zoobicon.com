@@ -299,7 +299,7 @@ export default function ZoobiconShPage() {
             <div className="hidden md:flex items-center gap-2 bg-dark-200 border border-white/[0.10] rounded-lg px-3 py-1.5 font-mono text-xs text-white/60">
               <span className="text-stone-400">$</span> npm i -g zoobicon-cli
               <button onClick={() => copyText("npm i -g zoobicon-cli", "nav")} className="text-white/50 hover:text-white/50 ml-1">
-                {copied === "nav" ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3" />}
+                {copied === "nav" ? <Check className="w-3 h-3 text-accent-stone" /> : <Copy className="w-3 h-3" />}
               </button>
             </div>
           </div>
@@ -321,7 +321,7 @@ export default function ZoobiconShPage() {
 
             <motion.h1 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black tracking-tight leading-[0.95] mb-6">
               Zoobicon.sh &mdash; Deploy<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-zoo-400 via-accent-purple to-accent-cyan">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-zoo-400 via-accent-stone to-accent-stone">
                 from Your Terminal
               </span>
             </motion.h1>
@@ -337,7 +337,7 @@ export default function ZoobiconShPage() {
                 className="group flex items-center gap-3 bg-dark-200 border border-white/[0.12] hover:border-zoo-500/30 rounded-xl px-6 py-3 font-mono text-sm text-white/60 transition-all"
               >
                 <span className="text-stone-400">$</span> npm install -g zoobicon-cli
-                {copied === "hero" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/50" />}
+                {copied === "hero" ? <Check className="w-4 h-4 text-accent-stone" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/50" />}
               </button>
               <a
                 href="#commands"
@@ -363,7 +363,7 @@ export default function ZoobiconShPage() {
             <motion.div variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4">
                 CLI Commands<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-zoo-400 to-accent-purple">Reference</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-zoo-400 to-accent-stone">Reference</span>
               </h2>
               <p className="text-white/60 max-w-xl mx-auto">Everything you need, right from your terminal.</p>
             </motion.div>
@@ -386,7 +386,7 @@ export default function ZoobiconShPage() {
                           onClick={() => copyText(cmd.cmd, `cmd-${i}`)}
                           className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                         >
-                          {copied === `cmd-${i}` ? <Check className="w-3 h-3 text-accent-cyan" /> : <Copy className="w-3 h-3 text-white/50" />}
+                          {copied === `cmd-${i}` ? <Check className="w-3 h-3 text-accent-stone" /> : <Copy className="w-3 h-3 text-white/50" />}
                         </button>
                       </div>
                       <p className="text-xs text-white/50">{cmd.desc}</p>
@@ -458,7 +458,7 @@ export default function ZoobiconShPage() {
             <motion.div variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4">
                 From Idea to<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-zoo-400 to-accent-cyan">Production</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-zoo-400 to-accent-stone">Production</span>
               </h2>
               <p className="text-white/60 max-w-xl mx-auto">A streamlined pipeline from local development to live deployment.</p>
             </motion.div>
@@ -468,7 +468,7 @@ export default function ZoobiconShPage() {
               {/* Desktop horizontal pipeline */}
               <div className="hidden md:flex items-center justify-between relative">
                 {/* Connecting line */}
-                <div className="absolute top-1/2 left-[10%] right-[10%] h-px bg-gradient-to-r from-white/10 via-zoo-500/30 to-accent-purple/30 -translate-y-1/2" />
+                <div className="absolute top-1/2 left-[10%] right-[10%] h-px bg-gradient-to-r from-white/10 via-zoo-500/30 to-accent-stone/30 -translate-y-1/2" />
 
                 {PIPELINE_STEPS.map((step, i) => (
                   <motion.div
@@ -521,7 +521,7 @@ export default function ZoobiconShPage() {
                 </div>
                 <h2 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4">
                   Deploy on<br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-zoo-400 to-accent-purple">Every Push</span>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-zoo-400 to-accent-stone">Every Push</span>
                 </h2>
                 <p className="text-lg text-white/60 leading-relaxed mb-8">
                   Drop Zoobicon into any CI/CD pipeline. Generate, test, and deploy automatically on every commit to main.
@@ -578,7 +578,7 @@ export default function ZoobiconShPage() {
                         onClick={() => copyText(activeTab === "github" ? GITHUB_ACTIONS_YAML : GITLAB_CI_YAML, "cicd")}
                         className="absolute top-3 right-3 p-2 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] transition-colors"
                       >
-                        {copied === "cicd" ? <Check className="w-3.5 h-3.5 text-accent-cyan" /> : <Copy className="w-3.5 h-3.5 text-white/50" />}
+                        {copied === "cicd" ? <Check className="w-3.5 h-3.5 text-accent-stone" /> : <Copy className="w-3.5 h-3.5 text-white/50" />}
                       </button>
                     </div>
                   </div>
@@ -596,7 +596,7 @@ export default function ZoobiconShPage() {
             <motion.div variants={fadeInUp}>
               <Terminal className="w-12 h-12 text-zoo-400/30 mx-auto mb-6" />
               <h2 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4">
-                Install the <span className="text-transparent bg-clip-text bg-gradient-to-r from-zoo-400 to-accent-cyan">CLI</span>
+                Install the <span className="text-transparent bg-clip-text bg-gradient-to-r from-zoo-400 to-accent-stone">CLI</span>
               </h2>
               <p className="text-lg text-white/60 mb-8">One command to deploy AI-powered websites from your terminal.</p>
             </motion.div>
@@ -608,7 +608,7 @@ export default function ZoobiconShPage() {
               >
                 <span className="text-stone-400">$</span>
                 npm install -g zoobicon-cli
-                {copied === "cta" ? <Check className="w-4 h-4 text-accent-cyan" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/50" />}
+                {copied === "cta" ? <Check className="w-4 h-4 text-accent-stone" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/50" />}
               </button>
             </motion.div>
 

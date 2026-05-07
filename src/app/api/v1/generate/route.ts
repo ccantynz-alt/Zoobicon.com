@@ -88,8 +88,8 @@ ${selectedTier === "premium" ? "- Premium quality: extra polish, animations, mic
     if (agency_brand?.agencyName) {
       systemPrompt += `\n\n## WHITE-LABEL BRANDING
 - Brand name: "${agency_brand.agencyName}" — use everywhere instead of any generic name
-- Primary color: ${agency_brand.primaryColor || "#3b82f6"}
-- Secondary color: ${agency_brand.secondaryColor || "#8b5cf6"}
+- Primary color: ${agency_brand.primaryColor || "#78716c"}
+- Secondary color: ${agency_brand.secondaryColor || "#78716c"}
 ${agency_brand.logoUrl ? `- Logo URL: ${agency_brand.logoUrl}` : ""}`;
     }
 

@@ -487,7 +487,7 @@ export default function AdminSettingsPage() {
             <textarea
               value={newMemoryContent}
               onChange={(e) => setNewMemoryContent(e.target.value)}
-              placeholder="e.g. Always use the brand color #4F46E5 for primary buttons..."
+              placeholder="e.g. Always use the brand color #57534e for primary buttons..."
               rows={3}
               className="w-full bg-white border border-slate-200/80 rounded-lg px-3 py-2 text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-stone-400/40 resize-none"
               onKeyDown={(e) => {
@@ -550,9 +550,9 @@ export default function AdminSettingsPage() {
                     <span
                       className={`text-xs uppercase tracking-wider font-semibold rounded px-1.5 py-0.5 ${
                         mem.type === "preference"
-                          ? "text-blue-600 bg-blue-50 border border-blue-200/60"
+                          ? "text-stone-600 bg-stone-50 border border-stone-200/60"
                           : mem.type === "brand"
-                          ? "text-purple-600 bg-purple-50 border border-purple-200/60"
+                          ? "text-stone-600 bg-stone-50 border border-stone-200/60"
                           : mem.type === "instruction"
                           ? "text-emerald-600 bg-emerald-50 border border-emerald-200/60"
                           : mem.type === "feedback"

@@ -41,10 +41,10 @@ import { getUserSegment, getRecommendedGenerators } from "@/lib/user-segment";
 const QUICK_ACTIONS = [
   { icon: Globe, label: "New Website", href: "/builder", color: "from-brand-500 to-brand-700" },
   { icon: Globe, label: "My Domains", href: "/my-domains", color: "from-stone-500 to-stone-600" },
-  { icon: Sparkles, label: "SEO Agent", href: "/seo", color: "from-accent-cyan to-stone-600" },
+  { icon: Sparkles, label: "SEO Agent", href: "/seo", color: "from-accent-stone to-stone-600" },
   { icon: Search, label: "Crawl Competitor", href: "/crawl", color: "from-stone-500 to-stone-600" },
   { icon: BarChart3, label: "Analytics", href: "/analytics", color: "from-stone-500 to-stone-600" },
-  { icon: Video, label: "AI Video Creator", href: "/video-creator", color: "from-accent-purple to-stone-700" },
+  { icon: Video, label: "AI Video Creator", href: "/video-creator", color: "from-accent-stone to-stone-700" },
 ];
 
 const ADMIN_QUICK_ACTIONS = [
@@ -197,7 +197,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-6">
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center">
                   <Zap className="w-4 h-4 text-white" />
                 </div>
                 <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -230,7 +230,7 @@ export default function DashboardPage() {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 bg-[#111318] hover:bg-[#1a1d24] transition-colors"
                 >
-                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center text-[10px] font-bold text-white">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center text-[10px] font-bold text-white">
                     {userName.charAt(0).toUpperCase()}
                   </div>
                   <span className="text-sm text-white/90 hidden sm:block">{userName}</span>
@@ -291,7 +291,7 @@ export default function DashboardPage() {
               Welcome back, {userName}
             </h1>
             {userRole === "admin" && (
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500/20 to-accent-purple/20 border border-brand-500/20 text-xs font-bold text-brand-400">
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-brand-500/20 to-accent-stone/20 border border-brand-500/20 text-xs font-bold text-brand-400">
                 <Crown className="w-3 h-3" /> Admin · Unlimited
               </span>
             )}
@@ -547,7 +547,7 @@ export default function DashboardPage() {
         {/* Projects */}
         {filteredProjects.length === 0 ? (
           <div className="gradient-border p-16 rounded-2xl text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/10 to-accent-purple/10 border border-brand-500/10 mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/10 to-accent-stone/10 border border-brand-500/10 mb-4">
               <Code2 className="w-8 h-8 text-brand-400/40" />
             </div>
             <h3 className="text-lg font-bold text-white/90 mb-2">

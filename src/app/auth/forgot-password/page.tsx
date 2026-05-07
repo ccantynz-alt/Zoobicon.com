@@ -50,7 +50,7 @@ export default function ForgotPasswordPage() {
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           <Link href="/" className="flex items-center gap-2 mb-12">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -59,7 +59,7 @@ export default function ForgotPasswordPage() {
           {submitted ? (
             /* Success state */
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/10 to-accent-purple/10 border border-brand-500/20 mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-500/10 to-accent-stone/10 border border-brand-500/20 mb-6">
                 <CheckCircle2 className="w-8 h-8 text-brand-400" />
               </div>
               <h1 className="text-2xl font-black tracking-tight mb-3">Check your email</h1>

@@ -201,7 +201,7 @@ export default function BookingPage() {
                 const svc = services.find((s) => s.id === a.bookingTypeId);
                 return (
                   <motion.div key={a.id} variants={fadeUp} className="bg-white/5 border border-white/10 rounded-2xl p-5 flex items-center gap-4">
-                    <div className="w-1.5 h-14 rounded-full" style={{ backgroundColor: svc?.color || "#6366f1" }} />
+                    <div className="w-1.5 h-14 rounded-full" style={{ backgroundColor: svc?.color || "#78716c" }} />
                     <div className="flex-1">
                       <p className="font-medium">{a.clientName}</p>
                       <p className="text-sm text-white/50">{svc?.name || "Consultation"} &middot; {formatTime(a.dateTime)} - {formatTime(a.endTime)}</p>
@@ -277,7 +277,7 @@ export default function BookingPage() {
                     duration: isNaN(duration) ? 30 : duration,
                     price: isNaN(price) ? 0 : price,
                     currency: "USD",
-                    color: "#6366f1",
+                    color: "#78716c",
                     location: "video" as const,
                     enabled: true,
                   },

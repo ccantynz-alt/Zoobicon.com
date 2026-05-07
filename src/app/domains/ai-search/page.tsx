@@ -266,8 +266,8 @@ export default function AiSearchPage() {
       <section className="relative overflow-hidden pt-24 pb-16 sm:pt-32 sm:pb-24">
         {/* Ambient glow */}
         <div className="pointer-events-none absolute inset-0 opacity-60">
-          <div className="absolute top-0 left-1/2 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-gradient-to-br from-emerald-500/20 via-cyan-500/10 to-transparent blur-3xl" />
-          <div className="absolute top-40 right-0 h-[400px] w-[500px] rounded-full bg-gradient-to-bl from-violet-500/15 to-transparent blur-3xl" />
+          <div className="absolute top-0 left-1/2 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-gradient-to-br from-emerald-500/20 via-stone-500/10 to-transparent blur-3xl" />
+          <div className="absolute top-40 right-0 h-[400px] w-[500px] rounded-full bg-gradient-to-bl from-stone-500/15 to-transparent blur-3xl" />
         </div>
         {/* Grid */}
         <div
@@ -293,7 +293,7 @@ export default function AiSearchPage() {
 
           <h1 className="text-center font-serif text-5xl leading-[1.02] tracking-[-0.02em] sm:text-7xl lg:text-[96px]">
             <span className="block">Brand names,</span>
-            <span className="block bg-gradient-to-r from-emerald-300 via-cyan-200 to-violet-300 bg-clip-text text-transparent italic">
+            <span className="block bg-gradient-to-r from-emerald-300 via-stone-200 to-stone-300 bg-clip-text text-transparent italic">
               invented for you.
             </span>
           </h1>
@@ -308,7 +308,7 @@ export default function AiSearchPage() {
           {/* ── Prompt ── */}
           <div className="mx-auto mt-12 max-w-3xl">
             <div className="group relative rounded-3xl border border-white/15 bg-white/5 backdrop-blur-xl p-2 transition focus-within:border-emerald-400/50 focus-within:bg-white/8">
-              <div className="absolute -inset-px rounded-3xl bg-gradient-to-r from-emerald-400/20 via-cyan-400/20 to-violet-400/20 opacity-0 blur-xl transition group-focus-within:opacity-100" />
+              <div className="absolute -inset-px rounded-3xl bg-gradient-to-r from-emerald-400/20 via-stone-400/20 to-stone-400/20 opacity-0 blur-xl transition group-focus-within:opacity-100" />
               <div className="relative rounded-[22px] bg-[var(--paper)]/80 p-6">
                 <label className="block text-xs font-medium uppercase tracking-widest text-white/50 mb-3">
                   Describe the mission
@@ -336,7 +336,7 @@ export default function AiSearchPage() {
                   ) : (
                     <button
                       onClick={handleRun}
-                      className="group/btn inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-6 py-3 text-sm font-semibold text-black shadow-[0_0_40px_-10px_rgba(16,185,129,0.8)] hover:shadow-[0_0_60px_-5px_rgba(16,185,129,1)] transition-all hover:scale-[1.02]"
+                      className="group/btn inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-stone-400 px-6 py-3 text-sm font-semibold text-black shadow-[0_0_40px_-10px_rgba(16,185,129,0.8)] hover:shadow-[0_0_60px_-5px_rgba(16,185,129,1)] transition-all hover:scale-[1.02]"
                     >
                       <Zap className="h-4 w-4" />
                       Coin names
@@ -366,7 +366,7 @@ export default function AiSearchPage() {
                 key={s.l}
                 className="rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm p-4 text-center"
               >
-                <div className="font-serif text-3xl bg-gradient-to-br from-emerald-300 to-cyan-300 bg-clip-text text-transparent">
+                <div className="font-serif text-3xl bg-gradient-to-br from-emerald-300 to-stone-300 bg-clip-text text-transparent">
                   {s.k}
                 </div>
                 <div className="mt-1 text-xs text-white/50">{s.l}</div>
@@ -453,7 +453,7 @@ export default function AiSearchPage() {
                 <Brain className="h-5 w-5 text-emerald-300" />
                 <h3 className="text-xl font-semibold">Chosen naming strategies</h3>
                 {phoneticTarget && (
-                  <span className="ml-auto rounded-full border border-cyan-400/30 bg-cyan-400/5 px-3 py-1 text-xs font-medium text-cyan-200">
+                  <span className="ml-auto rounded-full border border-stone-400/30 bg-stone-400/5 px-3 py-1 text-xs font-medium text-stone-200">
                     {phoneticTarget}
                   </span>
                 )}
@@ -488,7 +488,7 @@ export default function AiSearchPage() {
           {rawCandidates.length > 0 && (
             <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-8">
               <div className="mb-4 flex items-center gap-3">
-                <Wand2 className="h-5 w-5 text-cyan-300" />
+                <Wand2 className="h-5 w-5 text-stone-300" />
                 <h3 className="text-xl font-semibold">{rawCandidates.length} candidates generated</h3>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -551,7 +551,7 @@ export default function AiSearchPage() {
           {liveAvailability.length > 0 && (
             <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-8">
               <div className="mb-4 flex items-center gap-3">
-                <Globe className="h-5 w-5 text-violet-300" />
+                <Globe className="h-5 w-5 text-stone-300" />
                 <h3 className="text-xl font-semibold">Live registry check</h3>
                 <span className="ml-auto text-xs text-white/40">
                   {liveAvailability.length} / {liveAvailability[0]?.total || "?"}
@@ -595,7 +595,7 @@ export default function AiSearchPage() {
       {shortlist.length > 0 && (
         <section className="relative border-t border-white/5 py-16 sm:py-24">
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute top-0 left-1/2 h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-gradient-to-br from-emerald-400/10 via-cyan-400/10 to-violet-400/10 blur-3xl" />
+            <div className="absolute top-0 left-1/2 h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-gradient-to-br from-emerald-400/10 via-stone-400/10 to-stone-400/10 blur-3xl" />
           </div>
           <div className="relative mx-auto max-w-6xl px-6">
             <div className="mb-12 text-center">
@@ -669,7 +669,7 @@ export default function AiSearchPage() {
 
                   <Link
                     href={`/domains?q=${c.slug}`}
-                    className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 px-5 py-2.5 text-sm font-semibold text-black shadow-[0_0_30px_-8px_rgba(16,185,129,0.8)] hover:shadow-[0_0_50px_-5px_rgba(16,185,129,1)] transition-all"
+                    className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-stone-400 px-5 py-2.5 text-sm font-semibold text-black shadow-[0_0_30px_-8px_rgba(16,185,129,0.8)] hover:shadow-[0_0_50px_-5px_rgba(16,185,129,1)] transition-all"
                   >
                     Register {c.name.toLowerCase()}
                     <ArrowRight className="h-4 w-4" />

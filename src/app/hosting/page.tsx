@@ -167,7 +167,7 @@ const PLANS = [
     features: ["50 sites", "100GB storage", "500GB bandwidth", "Priority support", "WAF protection", "Advanced analytics", "Team collaboration", "Custom build commands"],
     cta: "Upgrade to Business",
     current: false,
-    color: "border-accent-purple/50",
+    color: "border-accent-stone/50",
   },
   {
     name: "Enterprise",
@@ -176,7 +176,7 @@ const PLANS = [
     features: ["Unlimited sites", "1TB storage", "Unlimited bandwidth", "99.99% SLA", "Dedicated support", "Custom integrations", "SSO / SAML", "Audit logs"],
     cta: "Contact Sales",
     current: false,
-    color: "border-accent-cyan/50",
+    color: "border-accent-stone/50",
   },
 ];
 
@@ -437,7 +437,7 @@ export default function HostingDashboard() {
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-brand-500 to-accent-purple rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-brand-500 to-accent-stone rounded-lg flex items-center justify-center">
                 <Server className="w-4 h-4 text-white" />
               </div>
               <span className="text-lg font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
@@ -480,7 +480,7 @@ export default function HostingDashboard() {
                 className="pl-9 pr-4 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-brand-500/50 w-48 placeholder:text-white/60"
               />
             </div>
-            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-500 to-accent-purple rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
+            <button onClick={() => {}} className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-500 to-accent-stone rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
               <Plus className="w-4 h-4" />
               Add New Site
             </button>
@@ -496,8 +496,8 @@ export default function HostingDashboard() {
         <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[
             { label: "Total Sites", value: liveSites.length.toString(), icon: Globe, sub: `${liveSites.filter((s) => s.status === "live").length} live`, color: "from-brand-500/20 to-brand-500/5", iconColor: "text-brand-400" },
-            { label: "Total Visitors", value: totalVisitors.toLocaleString(), icon: Users, sub: "This month", color: "from-accent-cyan/20 to-accent-cyan/5", iconColor: "text-accent-cyan" },
-            { label: "Bandwidth Used", value: `${totalBandwidth.toFixed(1)} GB`, icon: Wifi, sub: "of 1,834 GB limit", color: "from-accent-purple/20 to-accent-purple/5", iconColor: "text-accent-purple" },
+            { label: "Total Visitors", value: totalVisitors.toLocaleString(), icon: Users, sub: "This month", color: "from-accent-stone/20 to-accent-stone/5", iconColor: "text-accent-stone" },
+            { label: "Bandwidth Used", value: `${totalBandwidth.toFixed(1)} GB`, icon: Wifi, sub: "of 1,834 GB limit", color: "from-accent-stone/20 to-accent-stone/5", iconColor: "text-accent-stone" },
             { label: "Uptime", value: "99.98%", icon: Activity, sub: "Last 30 days", color: "from-stone-500/20 to-stone-500/5", iconColor: "text-stone-400", dot: true },
           ].map((card) => (
             <motion.div key={card.label} variants={fadeInUp} className={`relative overflow-hidden rounded-xl border border-white/5 bg-gradient-to-br ${card.color} p-5`}>
@@ -566,7 +566,7 @@ export default function HostingDashboard() {
                       <tr key={site.id} className="hover:bg-white/[0.05] transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500/20 to-accent-purple/20 flex items-center justify-center text-brand-400">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500/20 to-accent-stone/20 flex items-center justify-center text-brand-400">
                               <FileCode className="w-4 h-4" />
                             </div>
                             <div>
@@ -580,8 +580,8 @@ export default function HostingDashboard() {
                         <td className="px-4 py-4"><StatusBadge status={site.status} /></td>
                         <td className="px-4 py-4">
                           <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-                            site.plan === "Enterprise" ? "bg-accent-cyan/10 text-accent-cyan" :
-                            site.plan === "Business" ? "bg-accent-purple/10 text-accent-purple" :
+                            site.plan === "Enterprise" ? "bg-accent-stone/10 text-accent-stone" :
+                            site.plan === "Business" ? "bg-accent-stone/10 text-accent-stone" :
                             site.plan === "Pro" ? "bg-brand-500/10 text-brand-400" :
                             "bg-white/5 text-white/65"
                           }`}>{site.plan}</span>
@@ -642,9 +642,9 @@ export default function HostingDashboard() {
 
             {/* Deploy from Builder */}
             <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
-              <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Zap className="w-4 h-4 text-accent-purple" /> Deploy from Builder</h3>
+              <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Zap className="w-4 h-4 text-accent-stone" /> Deploy from Builder</h3>
               <p className="text-sm text-white/65 mb-6">Use Zoobicon&apos;s AI Website Builder to generate and deploy a production-ready site in seconds.</p>
-              <Link href="/builder" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-500 to-accent-purple rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
+              <Link href="/builder" className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-500 to-accent-stone rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
                 Open Builder <ArrowUpRight className="w-4 h-4" />
               </Link>
             </motion.div>
@@ -789,7 +789,7 @@ export default function HostingDashboard() {
                   <CopyButton text="your-site.zoobicon.sh" />
                 </div>
                 <div className="flex items-center gap-4 p-3 rounded-lg bg-white/[0.06] border border-white/5">
-                  <span className="text-xs font-mono font-bold text-accent-cyan w-16">A</span>
+                  <span className="text-xs font-mono font-bold text-accent-stone w-16">A</span>
                   <span className="text-sm text-white/70 flex-1">@</span>
                   <span className="text-sm text-white/65 font-mono flex-1">76.76.21.21</span>
                   <CopyButton text="76.76.21.21" />
@@ -827,7 +827,7 @@ export default function HostingDashboard() {
 
             {/* Optimization Toggles */}
             <motion.div variants={fadeInUp} className="lg:col-span-2 rounded-xl border border-white/5 bg-[#141e33] p-6">
-              <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Zap className="w-4 h-4 text-accent-purple" /> Optimization Settings</h3>
+              <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Zap className="w-4 h-4 text-accent-stone" /> Optimization Settings</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 divide-y sm:divide-y-0 divide-white/5">
                 <div className="divide-y divide-white/5">
                   <Toggle enabled={minifyHtml} onToggle={() => setMinifyHtml(!minifyHtml)} label="Minify HTML" />
@@ -875,7 +875,7 @@ export default function HostingDashboard() {
 
               {/* Bandwidth Area Chart */}
               <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
-                <h3 className="font-semibold text-white mb-6 flex items-center gap-2"><Wifi className="w-4 h-4 text-accent-cyan" /> Bandwidth — Last 7 Days</h3>
+                <h3 className="font-semibold text-white mb-6 flex items-center gap-2"><Wifi className="w-4 h-4 text-accent-stone" /> Bandwidth — Last 7 Days</h3>
                 <div className="h-40 relative">
                   <svg viewBox="0 0 700 160" className="w-full h-full" preserveAspectRatio="none">
                     <defs>
@@ -931,7 +931,7 @@ export default function HostingDashboard() {
 
               {/* Top Pages */}
               <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
-                <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><FileCode className="w-4 h-4 text-accent-purple" /> Top Pages</h3>
+                <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><FileCode className="w-4 h-4 text-accent-stone" /> Top Pages</h3>
                 <div className="space-y-2">
                   {TOP_PAGES.map((p) => (
                     <div key={p.path} className="flex items-center gap-3 py-1.5">
@@ -954,12 +954,12 @@ export default function HostingDashboard() {
                       {/* Mobile 32% */}
                       <circle cx="18" cy="18" r="16" fill="none" stroke="#00D2FF" strokeWidth="3" strokeDasharray="32 68" strokeDashoffset={25 - 58} />
                       {/* Tablet 10% */}
-                      <circle cx="18" cy="18" r="16" fill="none" stroke="#A78BFA" strokeWidth="3" strokeDasharray="10 90" strokeDashoffset={25 - 58 - 32} />
+                      <circle cx="18" cy="18" r="16" fill="none" stroke="#a8a29e" strokeWidth="3" strokeDasharray="10 90" strokeDashoffset={25 - 58 - 32} />
                     </svg>
                     <div className="space-y-1.5 text-xs">
                       <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#6C5CE7]" />Desktop — 58%</div>
                       <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#00D2FF]" />Mobile — 32%</div>
-                      <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#A78BFA]" />Tablet — 10%</div>
+                      <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-[#a8a29e]" />Tablet — 10%</div>
                     </div>
                   </div>
                 </div>
@@ -1034,10 +1034,10 @@ export default function HostingDashboard() {
                       <td className="px-6 py-3">
                         <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
                           r.type === "A" ? "bg-brand-500/10 text-brand-400" :
-                          r.type === "CNAME" ? "bg-accent-cyan/10 text-accent-cyan" :
+                          r.type === "CNAME" ? "bg-accent-stone/10 text-accent-stone" :
                           r.type === "MX" ? "bg-stone-500/10 text-stone-400" :
                           r.type === "TXT" ? "bg-stone-500/10 text-stone-400" :
-                          "bg-accent-purple/10 text-accent-purple"
+                          "bg-accent-stone/10 text-accent-stone"
                         }`}>{r.type}</span>
                       </td>
                       <td className="px-4 py-3 text-white/70 font-mono">{r.name}</td>
@@ -1099,7 +1099,7 @@ export default function HostingDashboard() {
 
             {/* Security Toggles */}
             <motion.div variants={fadeInUp} className="rounded-xl border border-white/5 bg-[#141e33] p-6">
-              <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Shield className="w-4 h-4 text-accent-purple" /> Security Settings</h3>
+              <h3 className="font-semibold text-white mb-4 flex items-center gap-2"><Shield className="w-4 h-4 text-accent-stone" /> Security Settings</h3>
               <div className="divide-y divide-white/5">
                 <Toggle enabled={forceHttps} onToggle={() => setForceHttps(!forceHttps)} label="Force HTTPS" />
                 <Toggle enabled={hsts} onToggle={() => setHsts(!hsts)} label="HSTS (Strict Transport Security)" />
@@ -1131,8 +1131,8 @@ export default function HostingDashboard() {
                 {[
                   { label: "Threats Blocked", value: "12,847", sub: "Last 30 days", color: "text-stone-400" },
                   { label: "WAF Rules Triggered", value: "3,291", sub: "Last 30 days", color: "text-stone-400" },
-                  { label: "Bot Traffic Blocked", value: "28.4%", sub: "Of total requests", color: "text-accent-purple" },
-                  { label: "Firewall Events", value: "847", sub: "Last 7 days", color: "text-accent-cyan" },
+                  { label: "Bot Traffic Blocked", value: "28.4%", sub: "Of total requests", color: "text-accent-stone" },
+                  { label: "Firewall Events", value: "847", sub: "Last 7 days", color: "text-accent-stone" },
                 ].map((item) => (
                   <div key={item.label} className="p-4 rounded-lg bg-white/[0.06] border border-white/5 text-center">
                     <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
@@ -1244,7 +1244,7 @@ export default function HostingDashboard() {
                       plan.current
                         ? "bg-white/5 text-white/65 cursor-default"
                         : plan.popular
-                        ? "bg-gradient-to-r from-brand-500 to-accent-purple text-white hover:opacity-90"
+                        ? "bg-gradient-to-r from-brand-500 to-accent-stone text-white hover:opacity-90"
                         : "bg-white/5 hover:bg-white/10 text-white/80"
                     }`}
                     disabled={plan.current}

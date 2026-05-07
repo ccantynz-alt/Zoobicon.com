@@ -30,7 +30,7 @@ export default function ToolsPage() {
       <nav className="border-b border-white/[0.06] bg-[var(--paper)]/90 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between h-14">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center">
               <Zap className="w-3.5 h-3.5 text-white" />
             </div>
             <span className="text-sm font-bold">Zoobicon</span>

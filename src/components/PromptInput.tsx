@@ -294,7 +294,7 @@ export default function PromptInput({
           <div className="relative flex items-center gap-2 mb-1.5">
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
               tier === "premium"
-                ? "bg-gradient-to-br from-brand-500/30 to-accent-cyan/20"
+                ? "bg-gradient-to-br from-brand-500/30 to-accent-stone/20"
                 : "bg-white/[0.06]"
             }`}>
               <Sparkles className={`w-3.5 h-3.5 ${
@@ -505,7 +505,7 @@ export default function PromptInput({
       <button
         className={`w-full py-3 rounded-xl text-sm font-bold text-white uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed transition-all ${
           tier === "premium"
-            ? "bg-gradient-to-r from-brand-500 via-accent-purple to-brand-600 hover:shadow-glow"
+            ? "bg-gradient-to-r from-brand-500 via-accent-stone to-brand-600 hover:shadow-glow"
             : "btn-gradient"
         }`}
         onClick={handleGenerateWithCustomization}

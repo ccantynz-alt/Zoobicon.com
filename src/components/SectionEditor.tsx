@@ -304,7 +304,7 @@ export default function SectionEditor({
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <div className="flex items-center gap-2">
-          <Layout className="w-4 h-4 text-purple-400" />
+          <Layout className="w-4 h-4 text-stone-400" />
           <span className="font-semibold text-white">Sections</span>
           <span className="text-xs text-gray-500">({sections.length})</span>
         </div>
@@ -338,7 +338,7 @@ export default function SectionEditor({
 
                 {/* Category icon */}
                 <div className="w-6 h-6 rounded-md bg-white/5 flex items-center justify-center shrink-0">
-                  <Icon className="w-3.5 h-3.5 text-purple-400" />
+                  <Icon className="w-3.5 h-3.5 text-stone-400" />
                 </div>
 
                 {/* Name */}
@@ -366,7 +366,7 @@ export default function SectionEditor({
                   </button>
                   <button
                     onClick={() => onEditSection(`Edit the ${section.name} section`)}
-                    className="p-1 rounded hover:bg-white/10 text-blue-400"
+                    className="p-1 rounded hover:bg-white/10 text-stone-400"
                     title="Edit section"
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -390,9 +390,9 @@ export default function SectionEditor({
         <button
           onClick={() => setShowPicker((v) => !v)}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium
-                     bg-gradient-to-r from-purple-600/20 to-blue-600/20
-                     border border-purple-500/30 hover:border-purple-400/50
-                     text-purple-300 hover:text-white transition-all"
+                     bg-gradient-to-r from-stone-600/20 to-stone-600/20
+                     border border-stone-500/30 hover:border-stone-400/50
+                     text-stone-300 hover:text-white transition-all"
         >
           {showPicker ? (
             <>
@@ -425,7 +425,7 @@ export default function SectionEditor({
                       className="flex items-center gap-2 px-2 py-2 rounded-md text-xs
                                  hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                     >
-                      <CatIcon className="w-3.5 h-3.5 text-purple-400/70" />
+                      <CatIcon className="w-3.5 h-3.5 text-stone-400/70" />
                       {CATEGORY_LABELS[cat]}
                     </button>
                   );

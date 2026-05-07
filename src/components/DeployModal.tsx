@@ -155,8 +155,8 @@ export default function DeployModal({
       tagline: "Instant preview at zoobicon.sh — always available",
       icon: Server,
       enabled: true,
-      gradient: "from-purple-500/15 to-indigo-500/10",
-      ring: "ring-purple-500/30",
+      gradient: "from-stone-500/15 to-stone-500/10",
+      ring: "ring-stone-500/30",
     },
   ];
 
@@ -181,7 +181,7 @@ export default function DeployModal({
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/60 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-stone-500/60 to-transparent" />
 
             {state !== "deploying" && (
               <button
@@ -199,12 +199,12 @@ export default function DeployModal({
                 <>
                   <div className="text-center mb-5">
                     <motion.div
-                      className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-purple-500/20 to-indigo-500/20 ring-1 ring-purple-500/30"
+                      className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-stone-500/20 to-stone-500/20 ring-1 ring-stone-500/30"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", delay: 0.1, damping: 15 }}
                     >
-                      <Rocket className="h-5 w-5 text-purple-400" />
+                      <Rocket className="h-5 w-5 text-stone-400" />
                     </motion.div>
                     <h2 className="text-xl font-bold text-white">Deploy Your Site</h2>
                     <p className="mt-1 text-sm text-zinc-400">Choose where to host it</p>
@@ -247,7 +247,7 @@ export default function DeployModal({
                           <div className="text-[11px] text-zinc-500 truncate mt-0.5">{p.tagline}</div>
                         </div>
                         {provider === p.id && p.enabled && (
-                          <Check className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                          <Check className="w-4 h-4 text-stone-400 flex-shrink-0" />
                         )}
                       </button>
                     ))}
@@ -264,7 +264,7 @@ export default function DeployModal({
                       onKeyDown={e => { if (e.key === "Enter") handleDeploy(); }}
                       placeholder="My Awesome Site"
                       maxLength={100}
-                      className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-white/30 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/20 transition-all"
+                      className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-white/30 focus:border-stone-500/50 focus:outline-none focus:ring-1 focus:ring-stone-500/20 transition-all"
                     />
                   </div>
 
@@ -276,7 +276,7 @@ export default function DeployModal({
 
                   <button
                     onClick={handleDeploy}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-500/20 active:scale-[0.98]"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-gradient-to-r from-stone-600 to-stone-600 text-white hover:from-stone-500 hover:to-stone-500 shadow-lg shadow-stone-500/20 active:scale-[0.98]"
                   >
                     <Rocket className="h-4 w-4" />
                     Deploy to {provider === "crontech" ? "CronTech" : "Zoobicon Cloud"}
@@ -284,7 +284,7 @@ export default function DeployModal({
 
                   <p className="mt-3 text-center text-[10px] text-zinc-500">
                     Free sites include a &quot;Built with Zoobicon&quot; badge.{" "}
-                    <a href="/pricing" className="text-purple-400/60 hover:text-purple-400 transition-colors">Upgrade to remove</a>
+                    <a href="/pricing" className="text-stone-400/60 hover:text-stone-400 transition-colors">Upgrade to remove</a>
                   </p>
                 </>
               )}
@@ -293,11 +293,11 @@ export default function DeployModal({
               {state === "deploying" && (
                 <div className="text-center py-8">
                   <motion.div
-                    className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-purple-500/10"
+                    className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-stone-500/10"
                     animate={{ rotate: 360 }}
                     transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                   >
-                    <Loader2 className="h-6 w-6 text-purple-400" />
+                    <Loader2 className="h-6 w-6 text-stone-400" />
                   </motion.div>
                   <h2 className="text-lg font-bold text-white mb-1">Deploying...</h2>
                   <p className="text-sm text-zinc-400">
@@ -313,7 +313,7 @@ export default function DeployModal({
                         transition={{ delay: i * 0.8 }}
                       >
                         <motion.div
-                          className="h-1.5 w-1.5 rounded-full bg-purple-400"
+                          className="h-1.5 w-1.5 rounded-full bg-stone-400"
                           animate={{ scale: [1, 1.3, 1] }}
                           transition={{ duration: 0.8, delay: i * 0.8, repeat: Infinity, repeatDelay: 1.6 }}
                         />
@@ -366,7 +366,7 @@ export default function DeployModal({
 
                   <div className="flex gap-2">
                     <a href={url} target="_blank" rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 transition-all active:scale-[0.98]">
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-stone-600 to-stone-600 text-white hover:from-stone-500 hover:to-stone-500 transition-all active:scale-[0.98]">
                       <ExternalLink className="h-4 w-4" />
                       Visit Site
                     </a>
@@ -395,7 +395,7 @@ export default function DeployModal({
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => { setState("naming"); setError(""); }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 transition-all active:scale-[0.98]">
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-gradient-to-r from-stone-600 to-stone-600 text-white hover:from-stone-500 hover:to-stone-500 transition-all active:scale-[0.98]">
                       <RefreshCw className="h-4 w-4" />
                       Try Again
                     </button>

@@ -410,7 +410,7 @@ ${p.sections}
   --color-bg: ${colors.bg || "#ffffff"};
   --color-bg-alt: ${colors.bgAlt || "#f8fafc"};
   --color-surface: ${colors.surface || "#ffffff"};
-  --color-text: ${colors.text || "#0f172a"};
+  --color-text: ${colors.text || "#f4f3ed"};
   --color-text-muted: ${colors.textMuted || "#64748b"};
   --color-border: ${colors.border || "#e2e8f0"};
   --color-accent: ${colors.accent || colors.primary};

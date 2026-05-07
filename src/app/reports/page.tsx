@@ -260,13 +260,13 @@ export default function ReportsPage() {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="p-4 rounded-lg bg-white/5 border border-white/10">
                     <p className="text-xs text-gray-400 mb-2">Traffic (Last 30 Days)</p>
-                    <LineChartWidget data={[420, 380, 510, 490, 620, 580, 710, 690, 780, 820, 750, 890]} color="#3b82f6" />
+                    <LineChartWidget data={[420, 380, 510, 490, 620, 580, 710, 690, 780, 820, 750, 890]} color="#78716c" />
                   </div>
                   <div className="p-4 rounded-lg bg-white/5 border border-white/10">
                     <p className="text-xs text-gray-400 mb-2">Revenue by Channel</p>
                     <PieChartWidget segments={[
-                      { label: 'Organic', value: 45, color: '#3b82f6' },
-                      { label: 'Paid', value: 28, color: '#8b5cf6' },
+                      { label: 'Organic', value: 45, color: '#78716c' },
+                      { label: 'Paid', value: 28, color: '#78716c' },
                       { label: 'Referral', value: 17, color: '#10b981' },
                       { label: 'Direct', value: 10, color: '#f59e0b' },
                     ]} />

@@ -50,8 +50,8 @@ function redirectHtml(title: string, message: string, redirectUrl: string): stri
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>${title} — Zoobicon</title>
 <meta http-equiv="refresh" content="3;url=${redirectUrl}">
-<style>body{font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;color:#fff;margin:0}
+<style>body{font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f4f3ed;color:#fff;margin:0}
 .card{text-align:center;max-width:400px;padding:40px}h1{font-size:24px;margin-bottom:12px}p{color:#94a3b8;font-size:16px;line-height:1.6}
-a{color:#818cf8;text-decoration:none}</style></head>
+a{color:#a8a29e;text-decoration:none}</style></head>
 <body><div class="card"><h1>${title}</h1><p>${message}</p><p>Redirecting... <a href="${redirectUrl}">Click here</a> if not redirected.</p></div></body></html>`;
 }

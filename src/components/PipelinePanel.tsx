@@ -302,7 +302,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
       <button
         onClick={handleRun}
         disabled={!prompt.trim() || status === "running"}
-        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-500 via-accent-purple to-accent-cyan text-white text-sm font-medium py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40"
+        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-500 via-accent-stone to-accent-stone text-white text-sm font-medium py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40"
       >
         {status === "running" ? (
           <>

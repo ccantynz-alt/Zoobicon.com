@@ -49,19 +49,19 @@ const NOTIFICATION_ICONS: Partial<Record<NotificationType, typeof Eye>> = {
 };
 
 const NOTIFICATION_COLORS: Partial<Record<NotificationType, string>> = {
-  site_views: "#06b6d4",
+  site_views: "#78716c",
   deploy_success: "#22c55e",
   achievement: "#eab308",
-  gallery_comment: "#8b5cf6",
-  gallery_upvote: "#3b82f6",
+  gallery_comment: "#78716c",
+  gallery_upvote: "#78716c",
   quota_warning: "#f97316",
-  weekly_report: "#06b6d4",
+  weekly_report: "#78716c",
   referral: "#22c55e",
   challenge: "#ec4899",
   system: "#94a3b8",
   admin_email: "#f59e0b",
   support_ticket: "#ef4444",
-  support_reply: "#8b5cf6",
+  support_reply: "#78716c",
 };
 
 // ── Time-ago helper ──
