@@ -422,7 +422,7 @@ export default function DevelopersPage() {
               </div>
 
               <div className="relative p-6 rounded-xl border border-accent-stone/30 bg-accent-stone/[0.02] shadow-glow-cyan">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-accent-stone to-emerald-500 text-xs font-bold text-white">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-to-r from-accent-stone to-amber-500 text-xs font-bold text-white">
                   Popular
                 </div>
                 <div className="text-sm font-semibold text-accent-stone mb-2">Pro</div>
@@ -435,7 +435,7 @@ export default function DevelopersPage() {
                   <li>Webhook callbacks</li>
                   <li>Priority support</li>
                 </ul>
-                <Link href="/auth/signup" className="block text-center w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-stone to-emerald-500 text-sm font-bold text-white">
+                <Link href="/auth/signup" className="block text-center w-full py-2.5 rounded-xl bg-gradient-to-r from-accent-stone to-amber-500 text-sm font-bold text-white">
                   Start Pro
                 </Link>
               </div>

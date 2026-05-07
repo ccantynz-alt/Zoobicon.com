@@ -81,24 +81,24 @@ export default function AdminRecoverPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-navy-950 via-slate-900 to-navy-950 text-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-navy-950 via-stone-900 to-navy-950 text-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <Link
           href="/auth/login"
-          className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white mb-8 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-stone-400 hover:text-white mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to login
         </Link>
 
-        <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-8 shadow-2xl">
+        <div className="bg-stone-900/60 backdrop-blur-xl border border-stone-800 rounded-2xl p-8 shadow-2xl">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 border border-stone-500/30 flex items-center justify-center">
               <ShieldCheck className="w-6 h-6 text-stone-400" />
             </div>
             <div>
               <h1 className="text-xl font-bold">Admin Recovery</h1>
-              <p className="text-xs text-slate-400">Break-glass access for locked-out admins</p>
+              <p className="text-xs text-stone-400">Break-glass access for locked-out admins</p>
             </div>
           </div>
 
@@ -146,25 +146,25 @@ export default function AdminRecoverPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-stone-300 mb-2">
                   Recovery token
                 </label>
                 <div className="relative">
-                  <KeyRound className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <KeyRound className="w-4 h-4 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="password"
                     value={token}
                     onChange={(e) => setToken(e.target.value)}
                     placeholder="Paste your recovery token"
-                    className="w-full bg-navy-950/60 border border-slate-700 rounded-lg pl-10 pr-3 py-2.5 text-sm placeholder:text-slate-600 focus:outline-none focus:border-stone-500 focus:ring-1 focus:ring-stone-500/50"
+                    className="w-full bg-navy-950/60 border border-stone-700 rounded-lg pl-10 pr-3 py-2.5 text-sm placeholder:text-stone-600 focus:outline-none focus:border-stone-500 focus:ring-1 focus:ring-stone-500/50"
                     autoComplete="off"
                     spellCheck={false}
                     required
                     disabled={loading || (config !== null && !config.configured)}
                   />
                 </div>
-                <p className="text-xs text-slate-500 mt-2">
-                  The token you set as <code className="text-slate-400">ADMIN_RECOVERY_TOKEN</code> in
+                <p className="text-xs text-stone-500 mt-2">
+                  The token you set as <code className="text-stone-400">ADMIN_RECOVERY_TOKEN</code> in
                   Vercel env vars.
                 </p>
               </div>
@@ -179,15 +179,15 @@ export default function AdminRecoverPage() {
               <button
                 type="submit"
                 disabled={loading || !token.trim() || (config !== null && !config.configured)}
-                className="w-full bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 disabled:from-slate-700 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition-all shadow-lg shadow-stone-500/20"
+                className="w-full bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 disabled:from-stone-700 disabled:to-stone-700 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition-all shadow-lg shadow-stone-500/20"
               >
                 {loading ? "Verifying…" : "Recover admin access"}
               </button>
             </form>
           )}
 
-          <div className="mt-6 pt-6 border-t border-slate-800">
-            <div className="text-xs text-slate-500 leading-relaxed">
+          <div className="mt-6 pt-6 border-t border-stone-800">
+            <div className="text-xs text-stone-500 leading-relaxed">
               This endpoint bypasses the database so it works even when Neon is down. It
               requires physical access to Vercel environment variables — meaning only Craig
               can use it.

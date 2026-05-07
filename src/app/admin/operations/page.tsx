@@ -70,15 +70,15 @@ function formatInterval(ms: number): string {
 
 function StatusDot({ status }: { status: string }) {
   const colors: Record<string, string> = {
-    running: "bg-emerald-400 animate-pulse",
-    idle: "bg-slate-400",
+    running: "bg-amber-400 animate-pulse",
+    idle: "bg-stone-400",
     error: "bg-red-400",
-    paused: "bg-slate-300",
-    healthy: "bg-emerald-400",
+    paused: "bg-stone-300",
+    healthy: "bg-amber-400",
     degraded: "bg-amber-400",
     unhealthy: "bg-red-400",
   };
-  return <div className={`w-2.5 h-2.5 rounded-full ${colors[status] || "bg-slate-400"}`} />;
+  return <div className={`w-2.5 h-2.5 rounded-full ${colors[status] || "bg-stone-400"}`} />;
 }
 
 // ── Main Component ──
@@ -164,7 +164,7 @@ export default function OperationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <Loader2 className="w-8 h-8 text-slate-600 animate-spin" />
+        <Loader2 className="w-8 h-8 text-stone-600 animate-spin" />
       </div>
     );
   }
@@ -173,9 +173,9 @@ export default function OperationsPage() {
 
   const metricIconColorMap: Record<string, string> = {
     indigo: "text-stone-500",
-    slate: "text-slate-700",
+    slate: "text-stone-700",
     red: "text-red-500",
-    emerald: "text-emerald-500",
+    emerald: "text-amber-500",
     cyan: "text-stone-500",
     yellow: "text-amber-500",
   };
@@ -185,14 +185,14 @@ export default function OperationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-800">Operations Dashboard</h1>
-          <p className="text-sm text-slate-600 mt-1">Last updated: {lastRefresh.toLocaleTimeString()}</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-stone-800">Operations Dashboard</h1>
+          <p className="text-sm text-stone-600 mt-1">Last updated: {lastRefresh.toLocaleTimeString()}</p>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={fetchData} className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
-            <RefreshCw className="w-4 h-4 text-slate-600" />
+          <button onClick={fetchData} className="p-2 rounded-lg bg-stone-50 hover:bg-stone-100 transition-colors">
+            <RefreshCw className="w-4 h-4 text-stone-600" />
           </button>
-          <Link href="/admin" className="text-sm text-slate-600 hover:text-slate-700 flex items-center gap-1">
+          <Link href="/admin" className="text-sm text-stone-600 hover:text-stone-700 flex items-center gap-1">
             Admin <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
@@ -200,7 +200,7 @@ export default function OperationsPage() {
 
       {/* Health Banner */}
       <div className={`rounded-xl border p-4 mb-6 flex items-center justify-between ${
-        healthStatus === "healthy" ? "bg-emerald-50 border-emerald-200" :
+        healthStatus === "healthy" ? "bg-amber-50 border-amber-200" :
         healthStatus === "degraded" ? "bg-amber-50 border-amber-200" :
         "bg-red-50 border-red-200"
       }`}>
@@ -208,18 +208,18 @@ export default function OperationsPage() {
           <StatusDot status={healthStatus === "healthy" ? "healthy" : healthStatus === "degraded" ? "degraded" : "unhealthy"} />
           <div>
             <span className={`font-semibold ${
-              healthStatus === "healthy" ? "text-emerald-700" :
+              healthStatus === "healthy" ? "text-amber-700" :
               healthStatus === "degraded" ? "text-amber-700" : "text-red-700"
             }`}>
               {healthStatus === "healthy" ? "All Systems Operational" :
                healthStatus === "degraded" ? "Performance Degraded" : "Issues Detected"}
             </span>
             {health?.timestamp && (
-              <span className="text-xs text-slate-700 ml-2">Checked {timeAgo(health.timestamp)}</span>
+              <span className="text-xs text-stone-700 ml-2">Checked {timeAgo(health.timestamp)}</span>
             )}
           </div>
         </div>
-        <button onClick={runHealthCheck} className="text-xs px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 transition-colors">
+        <button onClick={runHealthCheck} className="text-xs px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-600 transition-colors">
           Run Check
         </button>
       </div>
@@ -234,12 +234,12 @@ export default function OperationsPage() {
           { label: "Activity (15m)", value: activity.length, icon: Activity, color: "cyan" },
           { label: "Health", value: healthStatus === "healthy" ? "OK" : healthStatus, icon: Heart, color: healthStatus === "healthy" ? "emerald" : healthStatus === "degraded" ? "yellow" : "red" },
         ].map((m, i) => (
-          <div key={i} className="bg-white border border-slate-200 rounded-xl p-4">
+          <div key={i} className="bg-white border border-stone-200 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <m.icon className={`w-4 h-4 ${metricIconColorMap[m.color] || "text-slate-700"}`} />
-              <span className="text-xs text-slate-700">{m.label}</span>
+              <m.icon className={`w-4 h-4 ${metricIconColorMap[m.color] || "text-stone-700"}`} />
+              <span className="text-xs text-stone-700">{m.label}</span>
             </div>
-            <div className="text-2xl font-bold text-slate-800">{m.value}</div>
+            <div className="text-2xl font-bold text-stone-800">{m.value}</div>
           </div>
         ))}
       </div>
@@ -248,7 +248,7 @@ export default function OperationsPage() {
         {/* Agent Control Panel */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-800 flex items-center gap-2"><Bot className="w-5 h-5 text-stone-500" /> Agent Control</h2>
+            <h2 className="text-lg font-semibold text-stone-800 flex items-center gap-2"><Bot className="w-5 h-5 text-stone-500" /> Agent Control</h2>
             <button
               onClick={runAllAgents}
               disabled={runningAgent === "all"}
@@ -260,16 +260,16 @@ export default function OperationsPage() {
           </div>
           <div className="space-y-2">
             {agents.length === 0 ? (
-              <div className="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-600">
+              <div className="bg-white border border-stone-200 rounded-xl p-8 text-center text-stone-600">
                 No agents registered. Check /api/agents endpoint.
               </div>
             ) : agents.map(agent => (
-              <div key={agent.id} className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between">
+              <div key={agent.id} className="bg-white border border-stone-200 rounded-xl p-3 flex items-center justify-between">
                 <div className="flex items-center gap-3 min-w-0">
                   <StatusDot status={agent.status} />
                   <div className="min-w-0">
-                    <div className="font-medium text-sm text-slate-800 truncate">{agent.name}</div>
-                    <div className="text-xs text-slate-700 flex items-center gap-2">
+                    <div className="font-medium text-sm text-stone-800 truncate">{agent.name}</div>
+                    <div className="text-xs text-stone-700 flex items-center gap-2">
                       {agent.scheduleInterval && <span>Every {formatInterval(agent.scheduleInterval)}</span>}
                       {agent.lastRun && <span>Last: {timeAgo(agent.lastRun)}</span>}
                       {agent.successRate !== undefined && <span>{Math.round(agent.successRate * 100)}% success</span>}
@@ -283,7 +283,7 @@ export default function OperationsPage() {
                   <button
                     onClick={() => togglePause(agent.id)}
                     className={`p-1.5 rounded-lg transition-colors ${
-                      pausedAgents.has(agent.id) ? "bg-amber-50 text-amber-600" : "bg-slate-50 text-slate-600 hover:bg-slate-100"
+                      pausedAgents.has(agent.id) ? "bg-amber-50 text-amber-600" : "bg-stone-50 text-stone-600 hover:bg-stone-100"
                     }`}
                     title={pausedAgents.has(agent.id) ? "Resume" : "Pause"}
                   >
@@ -292,7 +292,7 @@ export default function OperationsPage() {
                   <button
                     onClick={() => runAgent(agent.id)}
                     disabled={runningAgent === agent.id}
-                    className="p-1.5 rounded-lg bg-slate-50 text-slate-600 hover:bg-stone-50 hover:text-stone-500 transition-colors disabled:opacity-50"
+                    className="p-1.5 rounded-lg bg-stone-50 text-stone-600 hover:bg-stone-50 hover:text-stone-500 transition-colors disabled:opacity-50"
                     title="Run Now"
                   >
                     {runningAgent === agent.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
@@ -307,7 +307,7 @@ export default function OperationsPage() {
         <div className="space-y-6">
           {/* Quick Actions */}
           <div>
-            <h2 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2"><Zap className="w-5 h-5 text-stone-500" /> Quick Actions</h2>
+            <h2 className="text-lg font-semibold text-stone-800 mb-3 flex items-center gap-2"><Zap className="w-5 h-5 text-stone-500" /> Quick Actions</h2>
             <div className="grid grid-cols-2 gap-2">
               {[
                 { label: "Health Check", action: runHealthCheck, icon: Heart },
@@ -318,38 +318,38 @@ export default function OperationsPage() {
                 <button
                   key={i}
                   onClick={btn.action}
-                  className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-sm text-slate-700"
+                  className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-50 transition-colors text-sm text-stone-700"
                 >
-                  <btn.icon className="w-4 h-4 text-slate-600" />
+                  <btn.icon className="w-4 h-4 text-stone-600" />
                   {btn.label}
                 </button>
               ))}
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2">
-              <Link href="/admin/pre-launch" className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-sm text-slate-700">
-                <CheckCircle className="w-4 h-4 text-slate-600" /> Pre-Launch
+              <Link href="/admin/pre-launch" className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-50 transition-colors text-sm text-stone-700">
+                <CheckCircle className="w-4 h-4 text-stone-600" /> Pre-Launch
               </Link>
-              <Link href="/email-support" className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-sm text-slate-700">
-                <Bell className="w-4 h-4 text-slate-600" /> Tickets
+              <Link href="/email-support" className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-stone-200 hover:bg-stone-50 transition-colors text-sm text-stone-700">
+                <Bell className="w-4 h-4 text-stone-600" /> Tickets
               </Link>
             </div>
           </div>
 
           {/* Activity Feed */}
           <div>
-            <h2 className="text-lg font-semibold text-slate-800 mb-3 flex items-center gap-2"><Activity className="w-5 h-5 text-stone-500" /> Live Activity</h2>
+            <h2 className="text-lg font-semibold text-stone-800 mb-3 flex items-center gap-2"><Activity className="w-5 h-5 text-stone-500" /> Live Activity</h2>
             <div className="space-y-1.5 max-h-[400px] overflow-y-auto">
               {activity.length === 0 ? (
-                <div className="text-sm text-slate-700 p-4 text-center">No recent activity</div>
+                <div className="text-sm text-stone-700 p-4 text-center">No recent activity</div>
               ) : activity.map((item, i) => (
-                <div key={item.id || i} className="bg-slate-50 rounded-lg p-2.5 text-sm">
+                <div key={item.id || i} className="bg-stone-50 rounded-lg p-2.5 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-700 truncate">{item.description || item.type}</span>
-                    <span className="text-xs text-slate-600 flex-shrink-0 ml-2">
+                    <span className="text-stone-700 truncate">{item.description || item.type}</span>
+                    <span className="text-xs text-stone-600 flex-shrink-0 ml-2">
                       {item.created_at ? timeAgo(item.created_at) : ""}
                     </span>
                   </div>
-                  {item.user_name && <div className="text-xs text-slate-700 mt-0.5">{item.user_name}</div>}
+                  {item.user_name && <div className="text-xs text-stone-700 mt-0.5">{item.user_name}</div>}
                 </div>
               ))}
             </div>
@@ -358,12 +358,12 @@ export default function OperationsPage() {
       </div>
 
       {/* Footer Links */}
-      <div className="mt-8 pt-6 border-t border-slate-200 flex flex-wrap gap-4 text-sm text-slate-600">
-        <Link href="/admin" className="hover:text-slate-700 transition-colors flex items-center gap-1">Admin Dashboard <ArrowRight className="w-3 h-3" /></Link>
-        <Link href="/admin/health" className="hover:text-slate-700 transition-colors flex items-center gap-1">Health Details <ArrowRight className="w-3 h-3" /></Link>
-        <Link href="/admin/intel" className="hover:text-slate-700 transition-colors flex items-center gap-1">Competitive Intel <ArrowRight className="w-3 h-3" /></Link>
-        <Link href="/admin/usage" className="hover:text-slate-700 transition-colors flex items-center gap-1">Usage Analytics <ArrowRight className="w-3 h-3" /></Link>
-        <Link href="/admin/email-settings" className="hover:text-slate-700 transition-colors flex items-center gap-1">Email Settings <ArrowRight className="w-3 h-3" /></Link>
+      <div className="mt-8 pt-6 border-t border-stone-200 flex flex-wrap gap-4 text-sm text-stone-600">
+        <Link href="/admin" className="hover:text-stone-700 transition-colors flex items-center gap-1">Admin Dashboard <ArrowRight className="w-3 h-3" /></Link>
+        <Link href="/admin/health" className="hover:text-stone-700 transition-colors flex items-center gap-1">Health Details <ArrowRight className="w-3 h-3" /></Link>
+        <Link href="/admin/intel" className="hover:text-stone-700 transition-colors flex items-center gap-1">Competitive Intel <ArrowRight className="w-3 h-3" /></Link>
+        <Link href="/admin/usage" className="hover:text-stone-700 transition-colors flex items-center gap-1">Usage Analytics <ArrowRight className="w-3 h-3" /></Link>
+        <Link href="/admin/email-settings" className="hover:text-stone-700 transition-colors flex items-center gap-1">Email Settings <ArrowRight className="w-3 h-3" /></Link>
       </div>
     </div>
   );

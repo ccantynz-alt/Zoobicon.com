@@ -39,7 +39,7 @@ const CATEGORY_LABELS: Record<Check["category"], string> = {
 const CATEGORY_ORDER: Check["category"][] = ["payments", "db", "ai", "domains", "video", "email", "auth", "infra"];
 
 function StatusIcon({ status }: { status: Status }) {
-  if (status === "ok") return <CheckCircle2 className="w-5 h-5 text-emerald-400" />;
+  if (status === "ok") return <CheckCircle2 className="w-5 h-5 text-amber-400" />;
   if (status === "warn") return <AlertTriangle className="w-5 h-5 text-amber-300" />;
   if (status === "missing") return <XCircle className="w-5 h-5 text-rose-400" />;
   return <XCircle className="w-5 h-5 text-rose-500" />;
@@ -121,7 +121,7 @@ export default function SetupPage() {
             >
               <div className="flex items-center gap-3 mb-2">
                 {blockers.length === 0 ? (
-                  <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                  <CheckCircle2 className="w-6 h-6 text-amber-400" />
                 ) : (
                   <AlertTriangle className="w-6 h-6 text-[#E8D4B0]" />
                 )}
@@ -136,7 +136,7 @@ export default function SetupPage() {
                 {data.summary.ok} of {data.summary.total} total dependencies green.
               </p>
               <div className="flex items-center gap-2 text-xs">
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300">
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300">
                   {data.summary.ok} ok
                 </span>
                 {data.summary.warn > 0 && (

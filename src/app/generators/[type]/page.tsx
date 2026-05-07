@@ -449,7 +449,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Build professional real estate websites with property listings, search filters, virtual tour integration, and agent profiles.",
     icon: "Building2",
     category: "Website",
-    color: "from-slate-600 to-zinc-700",
+    color: "from-stone-600 to-stone-700",
     fields: [
       {
         id: "agencyName",
@@ -1134,7 +1134,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate websites with full dark mode support including theme toggles, smooth color transitions, and accessible contrast ratios.",
     icon: "Moon",
     category: "Enhancement",
-    color: "from-gray-800 to-slate-900",
+    color: "from-gray-800 to-stone-900",
     fields: [
       {
         id: "websiteType",
@@ -1903,7 +1903,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate professional report pages with data visualizations, executive summaries, charts, comparison tables, and downloadable sections.",
     icon: "FileBarChart",
     category: "Tool",
-    color: "from-slate-600 to-gray-700",
+    color: "from-stone-600 to-gray-700",
     fields: [
       {
         id: "reportTitle",

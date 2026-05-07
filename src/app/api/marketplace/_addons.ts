@@ -47,7 +47,7 @@ export const ADDONS: Addon[] = [
     tag: "Top Rated",
     rating: 4.8,
     installs: "8.2K",
-    gradient: "from-accent-stone to-emerald-600",
+    gradient: "from-accent-stone to-amber-600",
     iconName: "Search",
   },
   {
@@ -104,7 +104,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.6,
     installs: "18.3K",
-    gradient: "from-emerald-500 to-teal-600",
+    gradient: "from-amber-500 to-amber-600",
     iconName: "BarChart3",
   },
   {
@@ -160,7 +160,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.4,
     installs: "9.2K",
-    gradient: "from-slate-500 to-zinc-600",
+    gradient: "from-stone-500 to-stone-600",
     iconName: "Code2",
   },
   {
@@ -188,7 +188,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.5,
     installs: "11.7K",
-    gradient: "from-green-500 to-emerald-600",
+    gradient: "from-amber-500 to-amber-600",
     iconName: "Image",
   },
   {
@@ -244,7 +244,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.4,
     installs: "5.6K",
-    gradient: "from-teal-500 to-stone-600",
+    gradient: "from-amber-500 to-stone-600",
     iconName: "Clock",
   },
   {
@@ -287,7 +287,7 @@ export const ADDONS: Addon[] = [
     featured: false,
     rating: 4.9,
     installs: "10.2K",
-    gradient: "from-emerald-600 to-green-500",
+    gradient: "from-amber-600 to-amber-500",
     iconName: "Shield",
   },
   {

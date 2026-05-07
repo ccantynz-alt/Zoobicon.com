@@ -20,7 +20,7 @@ const TOOLS = [
   { name: "Privacy Policy Generator", desc: "GDPR/CCPA compliant privacy policy in seconds", href: "/tools/privacy-policy-generator", icon: FileText, color: "from-stone-500 to-stone-600" },
   { name: "Meta Tag Generator", desc: "SEO meta tags with Google and social previews", href: "/tools/meta-tag-generator", icon: Tags, color: "from-stone-500 to-stone-600" },
   { name: "Invoice Generator", desc: "Professional invoices with tax calculation", href: "/tools/invoice-generator", icon: Receipt, color: "from-stone-500 to-stone-600" },
-  { name: "Robots.txt Generator", desc: "Control search engine and AI bot crawling", href: "/tools/robots-txt-generator", icon: FileCode, color: "from-slate-500 to-gray-600" },
+  { name: "Robots.txt Generator", desc: "Control search engine and AI bot crawling", href: "/tools/robots-txt-generator", icon: FileCode, color: "from-stone-500 to-gray-600" },
   { name: "Domain Search", desc: "Check availability across 13 extensions instantly", href: "/domains", icon: Globe, color: "from-stone-500 to-stone-600" },
 ];
 

@@ -175,7 +175,7 @@ export default function TldPage() {
       <div className="min-h-screen bg-[var(--paper)] text-white pt-24 pb-16">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h1 className="text-3xl font-bold mb-4">Extension not found</h1>
-          <p className="text-slate-400 mb-8">We don&apos;t have information about .{tld} domains yet.</p>
+          <p className="text-stone-400 mb-8">We don&apos;t have information about .{tld} domains yet.</p>
           <Link href="/domains" className="text-stone-400 hover:text-stone-300">
             &larr; Search all domains
           </Link>
@@ -232,7 +232,7 @@ export default function TldPage() {
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12">
-            <Link href="/domains" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-400 mb-6 transition-colors">
+            <Link href="/domains" className="inline-flex items-center gap-1 text-sm text-stone-500 hover:text-stone-400 mb-6 transition-colors">
               &larr; All domains
             </Link>
 
@@ -244,10 +244,10 @@ export default function TldPage() {
               {info.tagline}
             </h1>
 
-            <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-3">
+            <p className="text-lg text-stone-300 max-w-2xl mx-auto mb-3">
               Register your .{info.tld} domain from <span className="text-white font-bold">${info.price}/year</span>
             </p>
-            <p className="text-base text-slate-500">
+            <p className="text-base text-stone-500">
               Free WHOIS privacy &middot; Free SSL &middot; Instant activation &middot; AI website builder included
             </p>
           </div>
@@ -256,14 +256,14 @@ export default function TldPage() {
           <div className="bg-white/[0.06] backdrop-blur-sm border border-white/[0.10] rounded-3xl p-6 max-w-2xl mx-auto shadow-xl">
             <div className="flex gap-3">
               <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-500" />
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value.replace(/\s/g, ""))}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                   placeholder={`Search yourname.${tld}...`}
-                  className="w-full pl-12 pr-4 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-lg placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stone-500 transition-shadow"
+                  className="w-full pl-12 pr-4 py-4 bg-white/[0.06] border border-white/[0.10] rounded-2xl text-white text-lg placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500 transition-shadow"
                   autoFocus
                 />
               </div>
@@ -288,18 +288,18 @@ export default function TldPage() {
                     "bg-white/[0.03] border border-white/[0.06]"
                   }`}>
                     <div className="flex items-center gap-3">
-                      {r.checking ? <Loader2 className="w-5 h-5 text-slate-500 animate-spin" /> :
+                      {r.checking ? <Loader2 className="w-5 h-5 text-stone-500 animate-spin" /> :
                        r.available ? <Check className="w-5 h-5 text-stone-400" /> :
                        r.available === false ? <X className="w-5 h-5 text-stone-400/50" /> :
                        <Globe className="w-5 h-5 text-stone-400/50" />}
-                      <span className={`text-lg font-bold ${r.available ? "text-white" : r.available === false ? "text-slate-500 line-through" : "text-slate-400"}`}>
+                      <span className={`text-lg font-bold ${r.available ? "text-white" : r.available === false ? "text-stone-500 line-through" : "text-stone-400"}`}>
                         {r.domain}
                       </span>
                     </div>
                     <div className="flex items-center gap-4">
                       {r.available && (
                         <>
-                          <span className="text-xl font-bold text-white">${r.price}<span className="text-sm text-slate-400">/yr</span></span>
+                          <span className="text-xl font-bold text-white">${r.price}<span className="text-sm text-stone-400">/yr</span></span>
                           <Link
                             href={`/domains?search=${name}&tld=${tld}`}
                             className="px-5 py-2.5 rounded-xl bg-stone-600 hover:bg-stone-500 text-white text-sm font-semibold flex items-center gap-1.5 transition-colors"
@@ -309,7 +309,7 @@ export default function TldPage() {
                         </>
                       )}
                       {r.available === false && <span className="text-sm text-stone-400/60">Taken</span>}
-                      {r.checking && <span className="text-sm text-slate-500">Checking...</span>}
+                      {r.checking && <span className="text-sm text-stone-500">Checking...</span>}
                     </div>
                   </div>
                 ))}
@@ -325,11 +325,11 @@ export default function TldPage() {
           <div className="grid md:grid-cols-2 gap-12">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold mb-4">What is a .{info.tld} domain?</h2>
-              <p className="text-base text-slate-300 leading-relaxed mb-6">{info.description}</p>
+              <p className="text-base text-stone-300 leading-relaxed mb-6">{info.description}</p>
               <h3 className="text-lg font-bold mb-3">Ideal for:</h3>
               <ul className="space-y-2">
                 {info.idealFor.map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-base text-slate-400">
+                  <li key={item} className="flex items-center gap-2 text-base text-stone-400">
                     <Check className="w-4 h-4 text-stone-400 shrink-0" />
                     {item}
                   </li>
@@ -342,7 +342,7 @@ export default function TldPage() {
                 {info.facts.map((fact) => (
                   <div key={fact} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                     <BadgeCheck className="w-5 h-5 text-stone-400 shrink-0 mt-0.5" />
-                    <span className="text-base text-slate-300">{fact}</span>
+                    <span className="text-base text-stone-300">{fact}</span>
                   </div>
                 ))}
               </div>
@@ -350,7 +350,7 @@ export default function TldPage() {
               <h3 className="text-lg font-bold mb-3">Who uses .{info.tld}?</h3>
               <div className="flex flex-wrap gap-2">
                 {info.examples.map((ex) => (
-                  <span key={ex} className="px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-sm text-slate-400">
+                  <span key={ex} className="px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-sm text-stone-400">
                     {ex}
                   </span>
                 ))}
@@ -366,7 +366,7 @@ export default function TldPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Everything included with your .{info.tld} domain
           </h2>
-          <p className="text-lg text-slate-400 mb-12">No hidden fees. No upsells. One price, everything included.</p>
+          <p className="text-lg text-stone-400 mb-12">No hidden fees. No upsells. One price, everything included.</p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
@@ -380,7 +380,7 @@ export default function TldPage() {
               <div key={f.title} className="p-5 rounded-2xl border border-white/[0.06] bg-white/[0.03] text-left">
                 <f.icon className="w-5 h-5 text-stone-400 mb-3" />
                 <div className="text-base font-semibold mb-1">{f.title}</div>
-                <div className="text-sm text-slate-400">{f.desc}</div>
+                <div className="text-sm text-stone-400">{f.desc}</div>
               </div>
             ))}
           </div>
@@ -393,7 +393,7 @@ export default function TldPage() {
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight leading-tight mb-6">
             Get your .{info.tld} domain today
           </h2>
-          <p className="text-lg text-slate-400 max-w-xl mx-auto mb-8">
+          <p className="text-lg text-stone-400 max-w-xl mx-auto mb-8">
             Starting at <span className="text-white font-bold">${info.price}/year</span> with free privacy, SSL, and hosting included.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -411,13 +411,13 @@ export default function TldPage() {
 
           {/* Other TLDs */}
           <div className="mt-12 pt-8 border-t border-white/[0.04]">
-            <p className="text-sm text-slate-500 mb-4">Also available:</p>
+            <p className="text-sm text-stone-500 mb-4">Also available:</p>
             <div className="flex flex-wrap justify-center gap-3">
               {SUPPORTED_TLDS.filter((t) => t !== tld).map((t) => (
                 <Link
                   key={t}
                   href={`/domains/${t}`}
-                  className="px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-sm text-slate-400 hover:text-white hover:border-white/[0.15] transition-all"
+                  className="px-4 py-2 rounded-lg bg-white/[0.04] border border-white/[0.06] text-sm text-stone-400 hover:text-white hover:border-white/[0.15] transition-all"
                 >
                   .{t} — ${TLD_DATA[t].price}/yr
                 </Link>

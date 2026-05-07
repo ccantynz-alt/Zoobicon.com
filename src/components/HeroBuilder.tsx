@@ -414,7 +414,7 @@ export default function HeroBuilder() {
                   isActive
                     ? "border-[#E8D4B0]/60 bg-[#E8D4B0]/[0.08] text-white scale-[1.04]"
                     : isDone
-                    ? "border-emerald-400/30 bg-emerald-400/[0.04] text-emerald-200/80"
+                    ? "border-amber-400/30 bg-amber-400/[0.04] text-amber-200/80"
                     : "border-white/[0.08] bg-white/[0.02] text-white/40"
                 }`}
               >
@@ -426,7 +426,7 @@ export default function HeroBuilder() {
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#E8D4B0]" />
                   </span>
                 )}
-                {isDone && <Check className="h-3 w-3 text-emerald-300" strokeWidth={3} />}
+                {isDone && <Check className="h-3 w-3 text-amber-300" strokeWidth={3} />}
               </div>
             );
           })}
@@ -520,11 +520,11 @@ export default function HeroBuilder() {
           <button
             type="submit"
             disabled={building}
-            className="absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-all hover:-translate-y-[calc(50%+2px)] hover:shadow-lg hover:shadow-white/10 disabled:opacity-50 disabled:hover:translate-y-[-50%]"
+            className="absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-stone-950 transition-all hover:-translate-y-[calc(50%+2px)] hover:shadow-lg hover:shadow-white/10 disabled:opacity-50 disabled:hover:translate-y-[-50%]"
           >
             {building ? (
               <>
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                 Building
               </>
             ) : (
@@ -575,10 +575,10 @@ export default function HeroBuilder() {
               </div>
               <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2 py-0.5">
                 <span className="relative flex h-1 w-1">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/60" />
-                  <span className="relative inline-flex h-1 w-1 rounded-full bg-emerald-400" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400/60" />
+                  <span className="relative inline-flex h-1 w-1 rounded-full bg-amber-400" />
                 </span>
-                <span className="text-[9px] font-medium text-emerald-300/80">
+                <span className="text-[9px] font-medium text-amber-300/80">
                   live
                 </span>
               </span>
@@ -706,12 +706,12 @@ export default function HeroBuilder() {
                 {/* done badge */}
                 {phaseShown("done") && (
                   <div className="absolute top-4 right-4 pointer-events-none">
-                    <div className="flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 backdrop-blur animate-[fadeIn_0.4s_ease-out]">
+                    <div className="flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 backdrop-blur animate-[fadeIn_0.4s_ease-out]">
                       <Check
-                        className="h-2.5 w-2.5 text-emerald-300"
+                        className="h-2.5 w-2.5 text-amber-300"
                         strokeWidth={3}
                       />
-                      <span className="text-[9px] font-semibold text-emerald-200">
+                      <span className="text-[9px] font-semibold text-amber-200">
                         ready
                       </span>
                     </div>
@@ -735,7 +735,7 @@ export default function HeroBuilder() {
               </div>
               <button
                 onClick={goToBuilder}
-                className="inline-flex items-center gap-2 rounded-full bg-[#E8D4B0] px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#E8D4B0]/20"
+                className="inline-flex items-center gap-2 rounded-full bg-[#E8D4B0] px-5 py-2.5 text-sm font-semibold text-stone-950 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#E8D4B0]/20"
               >
                 Open in builder
                 <ArrowRight className="h-4 w-4" />

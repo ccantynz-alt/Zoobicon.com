@@ -52,7 +52,7 @@ const EXTENSIONS: {
   { tld: ".co", price: "$29.99/yr", tagline: "Modern companies", accent: "from-stone-500 to-stone-500" },
   { tld: ".dev", price: "$14.99/yr", tagline: "Developer projects", accent: "from-stone-500 to-stone-500" },
   { tld: ".app", price: "$14.99/yr", tagline: "Mobile & web apps", accent: "from-stone-500 to-stone-500" },
-  { tld: ".net", price: "$13.99/yr", tagline: "Networks", accent: "from-slate-400 to-slate-500" },
+  { tld: ".net", price: "$13.99/yr", tagline: "Networks", accent: "from-stone-400 to-stone-500" },
   { tld: ".org", price: "$11.99/yr", tagline: "Organizations", accent: "from-stone-500 to-stone-500" },
   { tld: ".tech", price: "$6.99/yr", tagline: "Technology", accent: "from-stone-500 to-stone-500" },
   { tld: ".xyz", price: "$2.99/yr", tagline: "Next-gen branding", accent: "from-stone-500 to-stone-500" },
@@ -198,7 +198,7 @@ export default function DomainSearchPage() {
             </span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-lg sm:text-xl text-stone-400 max-w-2xl mx-auto mb-10 leading-relaxed">
             Every other domain search gives you fake results. Ours checks{" "}
             <span className="text-white font-semibold">real registry availability</span> across{" "}
             <span className="text-white font-semibold">13 extensions</span> in one click.
@@ -209,8 +209,8 @@ export default function DomainSearchPage() {
             href="/domains"
             className="group relative inline-flex items-center w-full max-w-xl mx-auto bg-white/5 border border-white/10 rounded-2xl px-6 py-4 hover:border-stone-500/40 hover:bg-white/[0.07] transition-all duration-300"
           >
-            <Search className="w-5 h-5 text-slate-500 mr-3 flex-shrink-0" />
-            <span className="text-slate-500 text-left flex-1">
+            <Search className="w-5 h-5 text-stone-500 mr-3 flex-shrink-0" />
+            <span className="text-stone-500 text-left flex-1">
               Search for your perfect domain...
             </span>
             <span className="flex-shrink-0 px-5 py-2 rounded-xl bg-gradient-to-r from-stone-500 to-stone-500 text-white font-semibold text-sm group-hover:shadow-lg group-hover:shadow-stone-500/25 transition-shadow">
@@ -218,7 +218,7 @@ export default function DomainSearchPage() {
             </span>
           </Link>
 
-          <p className="text-xs text-slate-600 mt-4">
+          <p className="text-xs text-stone-600 mt-4">
             Checks .com, .ai, .io, .sh, .co, .dev, .app, .net, .org, .tech, .xyz, .me, .us
           </p>
         </div>
@@ -232,7 +232,7 @@ export default function DomainSearchPage() {
               Why Every Other Domain Search Is{" "}
               <span className="text-stone-400">Broken</span>
             </h2>
-            <p className="text-slate-400 max-w-xl mx-auto">
+            <p className="text-stone-400 max-w-xl mx-auto">
               We built this because we were tired of the same garbage results everyone else delivers.
             </p>
           </div>
@@ -247,7 +247,7 @@ export default function DomainSearchPage() {
                   <point.icon className="w-6 h-6 text-stone-400" />
                 </div>
                 <h3 className="text-lg font-semibold mb-3">{point.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{point.description}</p>
+                <p className="text-stone-400 text-sm leading-relaxed">{point.description}</p>
               </div>
             ))}
           </div>
@@ -265,14 +265,14 @@ export default function DomainSearchPage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-white/10 bg-white/[0.03]">
-                  <th className="px-6 py-4 text-sm font-medium text-slate-400">Feature</th>
+                  <th className="px-6 py-4 text-sm font-medium text-stone-400">Feature</th>
                   <th className="px-6 py-4 text-sm font-semibold text-stone-400 text-center">
                     Zoobicon
                   </th>
-                  <th className="px-6 py-4 text-sm font-medium text-slate-500 text-center">
+                  <th className="px-6 py-4 text-sm font-medium text-stone-500 text-center">
                     GoDaddy
                   </th>
-                  <th className="px-6 py-4 text-sm font-medium text-slate-500 text-center">
+                  <th className="px-6 py-4 text-sm font-medium text-stone-500 text-center">
                     Namecheap
                   </th>
                 </tr>
@@ -289,7 +289,7 @@ export default function DomainSearchPage() {
                   { feature: ".ai domain support", zoobicon: true, godaddy: true, namecheap: true },
                 ].map((row) => (
                   <tr key={row.feature} className="border-b border-white/5 hover:bg-white/[0.02]">
-                    <td className="px-6 py-3.5 text-slate-300">{row.feature}</td>
+                    <td className="px-6 py-3.5 text-stone-300">{row.feature}</td>
                     <td className="px-6 py-3.5 text-center">
                       {row.zoobicon ? (
                         <Check className="w-5 h-5 text-stone-400 mx-auto" />
@@ -299,14 +299,14 @@ export default function DomainSearchPage() {
                     </td>
                     <td className="px-6 py-3.5 text-center">
                       {row.godaddy ? (
-                        <Check className="w-5 h-5 text-slate-500 mx-auto" />
+                        <Check className="w-5 h-5 text-stone-500 mx-auto" />
                       ) : (
                         <X className="w-5 h-5 text-stone-400/50 mx-auto" />
                       )}
                     </td>
                     <td className="px-6 py-3.5 text-center">
                       {row.namecheap ? (
-                        <Check className="w-5 h-5 text-slate-500 mx-auto" />
+                        <Check className="w-5 h-5 text-stone-500 mx-auto" />
                       ) : (
                         <X className="w-5 h-5 text-stone-400/50 mx-auto" />
                       )}
@@ -333,14 +333,14 @@ export default function DomainSearchPage() {
                   {s.step}
                 </div>
                 <h3 className="text-xl font-semibold mb-3">{s.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{s.description}</p>
+                <p className="text-stone-400 text-sm leading-relaxed">{s.description}</p>
               </div>
             ))}
           </div>
 
           {/* Visual example */}
           <div className="mt-16 rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
-            <p className="text-sm text-slate-500 mb-4 font-medium uppercase tracking-wider">
+            <p className="text-sm text-stone-500 mb-4 font-medium uppercase tracking-wider">
               Example Result
             </p>
             <div className="space-y-3">
@@ -383,7 +383,7 @@ export default function DomainSearchPage() {
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
               13 Extensions. One Search.
             </h2>
-            <p className="text-slate-400 max-w-xl mx-auto">
+            <p className="text-stone-400 max-w-xl mx-auto">
               From the classic .com to the trending .ai — search them all simultaneously.
             </p>
           </div>
@@ -400,7 +400,7 @@ export default function DomainSearchPage() {
                   {ext.tld}
                 </div>
                 <div className="text-white font-semibold text-sm">{ext.price}</div>
-                <div className="text-slate-500 text-xs mt-1">{ext.tagline}</div>
+                <div className="text-stone-500 text-xs mt-1">{ext.tagline}</div>
               </div>
             ))}
           </div>
@@ -431,7 +431,7 @@ export default function DomainSearchPage() {
                 className="p-6 rounded-2xl border border-white/10 bg-white/[0.02]"
               >
                 <h3 className="text-lg font-semibold mb-3">{faq.question}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{faq.answer}</p>
+                <p className="text-stone-400 text-sm leading-relaxed">{faq.answer}</p>
               </div>
             ))}
           </div>
@@ -451,7 +451,7 @@ export default function DomainSearchPage() {
             <span className="text-stone-400 line-through decoration-stone-400/50">Broken</span>{" "}
             Domain Searches
           </h2>
-          <p className="text-slate-400 text-lg mb-10 max-w-xl mx-auto">
+          <p className="text-stone-400 text-lg mb-10 max-w-xl mx-auto">
             13 extensions. Real registry data. Zero upsell garbage. Find your perfect domain in seconds.
           </p>
           <Link
@@ -467,28 +467,28 @@ export default function DomainSearchPage() {
 
       {/* ===== FOOTER ===== */}
       <footer className="border-t border-white/5 py-10">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-500">
           <Link href="/" className="font-semibold text-white hover:text-stone-400 transition-colors">
             Zoobicon
           </Link>
           <div className="flex items-center gap-4">
-            <Link href="/domains" className="hover:text-slate-300 transition-colors">
+            <Link href="/domains" className="hover:text-stone-300 transition-colors">
               Domain Search Tool
             </Link>
             <span className="text-white/10">|</span>
-            <Link href="/hosting" className="hover:text-slate-300 transition-colors">
+            <Link href="/hosting" className="hover:text-stone-300 transition-colors">
               Hosting
             </Link>
             <span className="text-white/10">|</span>
-            <Link href="/pricing" className="hover:text-slate-300 transition-colors">
+            <Link href="/pricing" className="hover:text-stone-300 transition-colors">
               Pricing
             </Link>
             <span className="text-white/10">|</span>
-            <Link href="/support" className="hover:text-slate-300 transition-colors">
+            <Link href="/support" className="hover:text-stone-300 transition-colors">
               Support
             </Link>
           </div>
-          <div className="text-slate-600">
+          <div className="text-stone-600">
             zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh
           </div>
         </div>

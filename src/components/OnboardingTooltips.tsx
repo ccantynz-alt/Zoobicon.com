@@ -197,12 +197,12 @@ export default function OnboardingTooltips({ active }: OnboardingTooltipsProps) 
   const isLast = currentStep === STEPS.length - 1;
 
   const arrowClasses: Record<string, string> = {
-    top: "left-1/2 -translate-x-1/2 -top-2 border-l-transparent border-r-transparent border-t-transparent border-b-zinc-800",
+    top: "left-1/2 -translate-x-1/2 -top-2 border-l-transparent border-r-transparent border-t-transparent border-b-stone-800",
     bottom:
-      "left-1/2 -translate-x-1/2 -bottom-2 border-l-transparent border-r-transparent border-b-transparent border-t-zinc-800",
-    left: "top-1/2 -translate-y-1/2 -left-2 border-t-transparent border-b-transparent border-l-transparent border-r-zinc-800",
+      "left-1/2 -translate-x-1/2 -bottom-2 border-l-transparent border-r-transparent border-b-transparent border-t-stone-800",
+    left: "top-1/2 -translate-y-1/2 -left-2 border-t-transparent border-b-transparent border-l-transparent border-r-stone-800",
     right:
-      "top-1/2 -translate-y-1/2 -right-2 border-t-transparent border-b-transparent border-r-transparent border-l-zinc-800",
+      "top-1/2 -translate-y-1/2 -right-2 border-t-transparent border-b-transparent border-r-transparent border-l-stone-800",
   };
 
   return (
@@ -223,7 +223,7 @@ export default function OnboardingTooltips({ active }: OnboardingTooltipsProps) 
         />
 
         {/* Tooltip body */}
-        <div className="bg-zinc-800 border border-white/10 rounded-xl shadow-2xl shadow-black/60 overflow-hidden">
+        <div className="bg-stone-800 border border-white/10 rounded-xl shadow-2xl shadow-black/60 overflow-hidden">
           {/* Header */}
           <div className="flex items-center gap-3 px-4 pt-4 pb-2">
             <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-stone-500/15 flex items-center justify-center text-stone-400">
@@ -247,7 +247,7 @@ export default function OnboardingTooltips({ active }: OnboardingTooltipsProps) 
           </p>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-white/5 bg-zinc-800/80">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-white/5 bg-stone-800/80">
             {/* Progress dots */}
             <div className="flex items-center gap-1.5">
               {STEPS.map((_, i) => (

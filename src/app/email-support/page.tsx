@@ -1723,17 +1723,17 @@ export default function EmailSupportDashboard() {
                           </div>
                           <div className="flex items-center gap-1">
                             <button onClick={acceptReplyPolish} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-stone-600/20 text-stone-400 text-[10px] hover:bg-stone-600/30 transition-colors"><Check className="w-2.5 h-2.5" /> Accept</button>
-                            <button onClick={() => setPolishResult(null)} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-zinc-700/50 text-zinc-400 text-[10px] hover:bg-zinc-700 transition-colors"><X className="w-2.5 h-2.5" /> Dismiss</button>
+                            <button onClick={() => setPolishResult(null)} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-stone-700/50 text-stone-400 text-[10px] hover:bg-stone-700 transition-colors"><X className="w-2.5 h-2.5" /> Dismiss</button>
                           </div>
                         </div>
                         {polishResult.changes.length > 0 && (
                           <div className="space-y-0.5 mb-1.5">
                             {polishResult.changes.slice(0, 3).map((c, i) => (
-                              <div key={i} className="flex items-start gap-1.5 text-[10px] text-zinc-400"><Wand2 className="w-2.5 h-2.5 text-stone-400 mt-0.5 shrink-0" />{c}</div>
+                              <div key={i} className="flex items-start gap-1.5 text-[10px] text-stone-400"><Wand2 className="w-2.5 h-2.5 text-stone-400 mt-0.5 shrink-0" />{c}</div>
                             ))}
                           </div>
                         )}
-                        <div className="bg-black/20 rounded-lg p-2 text-[11px] text-zinc-300 max-h-20 overflow-y-auto">{polishResult.polished}</div>
+                        <div className="bg-black/20 rounded-lg p-2 text-[11px] text-stone-300 max-h-20 overflow-y-auto">{polishResult.polished}</div>
                       </div>
                     </motion.div>
                   )}

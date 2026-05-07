@@ -39,7 +39,7 @@ const THEMES = [
   { id: 'retro', name: 'Retro', bg: 'bg-stone-50', text: 'text-stone-900', card: 'bg-stone-100' },
   { id: 'bold', name: 'Bold', bg: 'bg-stone-600', text: 'text-white', card: 'bg-white/20' },
   { id: 'nature', name: 'Nature', bg: 'bg-gradient-to-b from-stone-900 to-stone-950', text: 'text-white', card: 'bg-white/10' },
-  { id: 'professional', name: 'Professional', bg: 'bg-slate-900', text: 'text-white', card: 'bg-slate-800' },
+  { id: 'professional', name: 'Professional', bg: 'bg-stone-900', text: 'text-white', card: 'bg-stone-800' },
   { id: 'creative', name: 'Creative', bg: 'bg-gradient-to-b from-stone-500 to-stone-400', text: 'text-white', card: 'bg-white/20' },
   { id: 'brutalist', name: 'Brutalist', bg: 'bg-stone-300', text: 'text-black', card: 'bg-black text-stone-300' },
   { id: 'pastel', name: 'Pastel', bg: 'bg-stone-100', text: 'text-stone-900', card: 'bg-white' },

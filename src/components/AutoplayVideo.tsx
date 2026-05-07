@@ -57,7 +57,7 @@ export default function AutoplayVideo({
   return (
     <div
       ref={containerRef}
-      className={`relative aspect-video overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 ${className}`}
+      className={`relative aspect-video overflow-hidden bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900 ${className}`}
     >
       {!failed && (
         <video
@@ -119,7 +119,7 @@ function CinematicPreview() {
 
           {/* avatar disc */}
           <div className="relative h-24 w-24 rounded-full bg-gradient-to-br from-stone-400/40 via-stone-500/30 to-stone-500/40 p-[1px] shadow-2xl shadow-stone-500/20">
-            <div className="flex h-full w-full items-center justify-center rounded-full bg-zinc-900/80 backdrop-blur">
+            <div className="flex h-full w-full items-center justify-center rounded-full bg-stone-900/80 backdrop-blur">
               <Sparkles className="h-8 w-8 text-stone-300" />
             </div>
           </div>

@@ -93,7 +93,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 <div class="max-w-4xl mx-auto px-6 py-16">
   <div class="mb-12">
     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-stone-500/40 bg-stone-500/10 text-stone-200 text-xs font-medium mb-6">
-      <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+      <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
       MCP Server Live · ${toolCount} tools · Protocol 2025-06-18
     </div>
     <h1 class="text-5xl font-bold tracking-tight mb-4 bg-gradient-to-br from-white via-stone-200 to-stone-400 bg-clip-text text-transparent">
@@ -159,7 +159,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       <div class="flex items-center justify-between px-4 py-2 border-b border-stone-500/20 bg-stone-500/5">
         <span class="text-xs text-stone-300">shell</span>
       </div>
-      <pre class="p-4 text-green-300 overflow-x-auto">curl ${escapeHtml(pingUrl)}</pre>
+      <pre class="p-4 text-amber-300 overflow-x-auto">curl ${escapeHtml(pingUrl)}</pre>
     </div>
   </section>
 

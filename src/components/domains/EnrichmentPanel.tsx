@@ -224,7 +224,7 @@ function TrademarkBadge({
     return (
       <span
         title={`Cleared against ${registries.join(", ")} — no known conflicts`}
-        className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest border border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+        className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-widest border border-amber-500/30 bg-amber-500/10 text-amber-300"
       >
         <ShieldCheck className="w-3 h-3" /> TM CLEAR · {count}
       </span>
@@ -267,7 +267,7 @@ function HandleDot({
       title={`${label}: ${available ? "available" : taken ? "taken" : "unknown"}`}
       className={`inline-flex items-center gap-1 text-[10.5px] px-1.5 py-0.5 rounded-md font-mono ${
         available
-          ? "text-emerald-300/90"
+          ? "text-amber-300/90"
           : taken
             ? "text-white/30 line-through"
             : "text-white/35"
@@ -277,7 +277,7 @@ function HandleDot({
       <span
         className={`w-1 h-1 rounded-full ${
           available
-            ? "bg-emerald-400"
+            ? "bg-amber-400"
             : taken
               ? "bg-white/25"
               : "bg-white/20 animate-pulse"
@@ -357,7 +357,7 @@ function AppStoreRow({
       }
       className={`text-[10.5px] px-2 py-0.5 rounded-md font-mono ${
         free
-          ? "border border-emerald-500/25 bg-emerald-500/[0.06] text-emerald-300"
+          ? "border border-amber-500/25 bg-amber-500/[0.06] text-amber-300"
           : "border border-white/10 bg-white/[0.02] text-white/35 line-through"
       }`}
     >
@@ -425,7 +425,7 @@ function HistoryNote({
     return (
       <span
         title="No Wayback Machine / DNS history on record"
-        className="inline-flex items-center gap-1 text-[11px] text-emerald-300/80"
+        className="inline-flex items-center gap-1 text-[11px] text-amber-300/80"
       >
         <Clock className="w-3 h-3" /> never registered
       </span>

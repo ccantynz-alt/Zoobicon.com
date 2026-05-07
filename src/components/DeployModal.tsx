@@ -186,7 +186,7 @@ export default function DeployModal({
             {state !== "deploying" && (
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 z-10 rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
+                className="absolute top-4 right-4 z-10 rounded-lg p-1.5 text-stone-400 transition-colors hover:bg-white/5 hover:text-white"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -207,7 +207,7 @@ export default function DeployModal({
                       <Rocket className="h-5 w-5 text-stone-400" />
                     </motion.div>
                     <h2 className="text-xl font-bold text-white">Deploy Your Site</h2>
-                    <p className="mt-1 text-sm text-zinc-400">Choose where to host it</p>
+                    <p className="mt-1 text-sm text-stone-400">Choose where to host it</p>
                   </div>
 
                   {/* Provider cards */}
@@ -228,11 +228,11 @@ export default function DeployModal({
                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                           provider === p.id ? "bg-white/15" : "bg-white/5"
                         }`}>
-                          <p.icon className={`w-4 h-4 ${provider === p.id ? "text-white" : "text-zinc-400"}`} />
+                          <p.icon className={`w-4 h-4 ${provider === p.id ? "text-white" : "text-stone-400"}`} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className={`font-semibold text-[13px] ${provider === p.id ? "text-white" : "text-zinc-300"}`}>
+                            <span className={`font-semibold text-[13px] ${provider === p.id ? "text-white" : "text-stone-300"}`}>
                               {p.label}
                             </span>
                             {p.badge && (
@@ -241,10 +241,10 @@ export default function DeployModal({
                               </span>
                             )}
                             {!p.enabled && (
-                              <span className="text-[10px] text-zinc-500">not configured</span>
+                              <span className="text-[10px] text-stone-500">not configured</span>
                             )}
                           </div>
-                          <div className="text-[11px] text-zinc-500 truncate mt-0.5">{p.tagline}</div>
+                          <div className="text-[11px] text-stone-500 truncate mt-0.5">{p.tagline}</div>
                         </div>
                         {provider === p.id && p.enabled && (
                           <Check className="w-4 h-4 text-stone-400 flex-shrink-0" />
@@ -255,7 +255,7 @@ export default function DeployModal({
 
                   {/* Site name */}
                   <div className="mb-4">
-                    <label className="block text-xs font-medium text-zinc-400 mb-1.5">Site Name</label>
+                    <label className="block text-xs font-medium text-stone-400 mb-1.5">Site Name</label>
                     <input
                       ref={inputRef}
                       type="text"
@@ -270,8 +270,8 @@ export default function DeployModal({
 
                   {/* URL preview */}
                   <div className="mb-5 flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5">
-                    <Globe className="h-4 w-4 text-zinc-500 flex-shrink-0" />
-                    <span className="text-xs text-zinc-500 truncate font-mono">{previewUrl}</span>
+                    <Globe className="h-4 w-4 text-stone-500 flex-shrink-0" />
+                    <span className="text-xs text-stone-500 truncate font-mono">{previewUrl}</span>
                   </div>
 
                   <button
@@ -282,7 +282,7 @@ export default function DeployModal({
                     Deploy to {provider === "crontech" ? "CronTech" : "Zoobicon Cloud"}
                   </button>
 
-                  <p className="mt-3 text-center text-[10px] text-zinc-500">
+                  <p className="mt-3 text-center text-[10px] text-stone-500">
                     Free sites include a &quot;Built with Zoobicon&quot; badge.{" "}
                     <a href="/pricing" className="text-stone-400/60 hover:text-stone-400 transition-colors">Upgrade to remove</a>
                   </p>
@@ -300,14 +300,14 @@ export default function DeployModal({
                     <Loader2 className="h-6 w-6 text-stone-400" />
                   </motion.div>
                   <h2 className="text-lg font-bold text-white mb-1">Deploying...</h2>
-                  <p className="text-sm text-zinc-400">
+                  <p className="text-sm text-stone-400">
                     Publishing to {provider === "crontech" ? "CronTech" : "Zoobicon Cloud"}
                   </p>
                   <div className="mt-4 flex items-center justify-center gap-3">
                     {["Validating", "Uploading", "Going live"].map((step, i) => (
                       <motion.div
                         key={step}
-                        className="flex items-center gap-1.5 text-xs text-zinc-500"
+                        className="flex items-center gap-1.5 text-xs text-stone-500"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: i * 0.8 }}
@@ -329,37 +329,37 @@ export default function DeployModal({
                 <>
                   <div className="text-center mb-5">
                     <motion.div
-                      className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-500/30"
+                      className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20 ring-1 ring-amber-500/30"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", damping: 12 }}
                     >
-                      <Check className="h-6 w-6 text-emerald-400" />
+                      <Check className="h-6 w-6 text-amber-400" />
                     </motion.div>
                     <h2 className="text-xl font-bold text-white">Your site is live!</h2>
                     {deployTime !== null && (
-                      <p className="mt-1 text-sm text-zinc-400">
+                      <p className="mt-1 text-sm text-stone-400">
                         Deployed in {deployTime < 1000 ? `${deployTime}ms` : `${(deployTime / 1000).toFixed(1)}s`}
                       </p>
                     )}
                   </div>
 
-                  <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3">
+                  <div className="mb-4 flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-mono text-sm text-emerald-400">{url}</p>
+                      <p className="truncate font-mono text-sm text-amber-400">{url}</p>
                     </div>
                     <button
                       onClick={handleCopy}
                       className="flex shrink-0 items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-white/15 active:scale-95"
                     >
                       {copied ? (
-                        <span className="flex items-center gap-1 text-emerald-400"><Check className="h-3.5 w-3.5" />Copied</span>
+                        <span className="flex items-center gap-1 text-amber-400"><Check className="h-3.5 w-3.5" />Copied</span>
                       ) : (
                         <span className="flex items-center gap-1"><Copy className="h-3.5 w-3.5" />Copy</span>
                       )}
                     </button>
                     <a href={url} target="_blank" rel="noopener noreferrer"
-                      className="shrink-0 rounded-lg bg-white/10 p-1.5 text-zinc-400 transition-colors hover:bg-white/15 hover:text-white">
+                      className="shrink-0 rounded-lg bg-white/10 p-1.5 text-stone-400 transition-colors hover:bg-white/15 hover:text-white">
                       <ExternalLink className="h-3.5 w-3.5" />
                     </a>
                   </div>
@@ -371,7 +371,7 @@ export default function DeployModal({
                       Visit Site
                     </a>
                     <button onClick={onClose}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white/5 text-zinc-300 hover:bg-white/10 transition-all">
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white/5 text-stone-300 hover:bg-white/10 transition-all">
                       Done
                     </button>
                   </div>
@@ -400,7 +400,7 @@ export default function DeployModal({
                       Try Again
                     </button>
                     <button onClick={onClose}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white/5 text-zinc-300 hover:bg-white/10 transition-all">
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white/5 text-stone-300 hover:bg-white/10 transition-all">
                       Close
                     </button>
                   </div>

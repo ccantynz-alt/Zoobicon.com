@@ -197,8 +197,8 @@ export default function UsagePage() {
       sub: "Currently deployed",
       trend: true,
       icon: Globe,
-      iconColor: "text-emerald-600",
-      iconBg: "bg-emerald-50",
+      iconColor: "text-amber-600",
+      iconBg: "bg-amber-50",
     },
     {
       label: "Storage Used",
@@ -206,8 +206,8 @@ export default function UsagePage() {
       sub: `of ${currentLimits.storage}`,
       trend: null,
       icon: HardDrive,
-      iconColor: "text-slate-600",
-      iconBg: "bg-slate-100",
+      iconColor: "text-stone-600",
+      iconBg: "bg-stone-100",
     },
   ];
 
@@ -218,9 +218,9 @@ export default function UsagePage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-1">
             <CreditCard className="w-6 h-6 text-stone-600" />
-            <h1 className="text-2xl font-bold tracking-tight text-slate-800">Usage &amp; Credits</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-stone-800">Usage &amp; Credits</h1>
           </div>
-          <p className="text-slate-600 text-sm">Monitor your platform usage, credit balance, and API activity.</p>
+          <p className="text-stone-600 text-sm">Monitor your platform usage, credit balance, and API activity.</p>
         </div>
 
         {/* ===== 1. Overview Cards ===== */}
@@ -232,20 +232,20 @@ export default function UsagePage() {
               variants={cardVariants}
               initial="hidden"
               animate="visible"
-              className="rounded-xl border border-slate-200 bg-white p-5"
+              className="rounded-xl border border-stone-200 bg-white p-5"
             >
               <div className="flex items-center justify-between mb-3">
                 <div className={`w-10 h-10 rounded-lg ${card.iconBg} flex items-center justify-center`}>
                   <card.icon className={`w-5 h-5 ${card.iconColor}`} />
                 </div>
                 {card.trend !== null && (
-                  <span className={`flex items-center gap-0.5 text-xs font-semibold ${card.trend ? "text-emerald-500" : "text-red-500"}`}>
+                  <span className={`flex items-center gap-0.5 text-xs font-semibold ${card.trend ? "text-amber-500" : "text-red-500"}`}>
                     {card.trend ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
                   </span>
                 )}
               </div>
-              <div className="text-2xl font-black text-slate-800">{card.value}</div>
-              <div className="text-xs text-slate-600 mt-1">{card.sub}</div>
+              <div className="text-2xl font-black text-stone-800">{card.value}</div>
+              <div className="text-xs text-stone-600 mt-1">{card.sub}</div>
             </motion.div>
           ))}
         </div>
@@ -255,16 +255,16 @@ export default function UsagePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.4 }}
-          className="rounded-xl border border-slate-200 bg-white p-6 mb-10"
+          className="rounded-xl border border-stone-200 bg-white p-6 mb-10"
         >
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-base font-bold text-slate-800">Daily Generations</h2>
-              <p className="text-xs text-slate-600">Last 30 days</p>
+              <h2 className="text-base font-bold text-stone-800">Daily Generations</h2>
+              <p className="text-xs text-stone-600">Last 30 days</p>
             </div>
             <div className="text-right">
-              <div className="text-lg font-bold text-slate-800">{totalMonth.toLocaleString()}</div>
-              <div className={`text-xs font-semibold flex items-center gap-0.5 justify-end ${trendUp ? "text-emerald-500" : "text-red-500"}`}>
+              <div className="text-lg font-bold text-stone-800">{totalMonth.toLocaleString()}</div>
+              <div className={`text-xs font-semibold flex items-center gap-0.5 justify-end ${trendUp ? "text-amber-500" : "text-red-500"}`}>
                 {trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                 {Math.abs(trendPct)}% vs prev
               </div>
@@ -280,14 +280,14 @@ export default function UsagePage() {
                     style={{ height: `${heightPct}%` }}
                   />
                   {/* Tooltip */}
-                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 border border-slate-700 text-xs text-white px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-stone-800 border border-stone-700 text-xs text-white px-2 py-1 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                     {d.day}: {d.count}
                   </div>
                 </div>
               );
             })}
           </div>
-          <div className="flex justify-between mt-2 text-xs text-slate-600">
+          <div className="flex justify-between mt-2 text-xs text-stone-600">
             <span>{dailyData[0]?.day}</span>
             <span>{dailyData[14]?.day}</span>
             <span>{dailyData[29]?.day}</span>
@@ -299,57 +299,57 @@ export default function UsagePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.4 }}
-          className="rounded-xl border border-slate-200 bg-white p-6 mb-10"
+          className="rounded-xl border border-stone-200 bg-white p-6 mb-10"
         >
           <div className="flex items-center gap-2 mb-6">
             <CreditCard className="w-5 h-5 text-stone-600" />
-            <h2 className="text-base font-bold text-slate-800">Credit Balance</h2>
+            <h2 className="text-base font-bold text-stone-800">Credit Balance</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Big number */}
-            <div className="flex flex-col items-center justify-center bg-slate-50 rounded-xl p-6 border border-slate-200">
-              <div className="text-5xl font-black text-slate-800 mb-1">{stats.creditsRemaining.toLocaleString()}</div>
-              <div className="text-sm text-slate-600">credits remaining</div>
+            <div className="flex flex-col items-center justify-center bg-stone-50 rounded-xl p-6 border border-stone-200">
+              <div className="text-5xl font-black text-stone-800 mb-1">{stats.creditsRemaining.toLocaleString()}</div>
+              <div className="text-sm text-stone-600">credits remaining</div>
             </div>
 
             {/* Plan + limits */}
-            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+            <div className="bg-stone-50 rounded-xl p-6 border border-stone-200">
               <div className="flex items-center gap-2 mb-4">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                   stats.plan === "enterprise"
                     ? "bg-stone-50 text-stone-700"
                     : stats.plan === "pro"
                       ? "bg-stone-50 text-stone-700"
-                      : "bg-slate-100 text-slate-600"
+                      : "bg-stone-100 text-stone-600"
                 }`}>
                   {stats.plan} Plan
                 </span>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-slate-600">Generations</span>
-                  <span className="text-slate-800 font-medium">{currentLimits.generations}</span>
+                  <span className="text-stone-600">Generations</span>
+                  <span className="text-stone-800 font-medium">{currentLimits.generations}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">API Rate</span>
-                  <span className="text-slate-800 font-medium">{currentLimits.apiRate}</span>
+                  <span className="text-stone-600">API Rate</span>
+                  <span className="text-stone-800 font-medium">{currentLimits.apiRate}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">Storage</span>
-                  <span className="text-slate-800 font-medium">{currentLimits.storage}</span>
+                  <span className="text-stone-600">Storage</span>
+                  <span className="text-stone-800 font-medium">{currentLimits.storage}</span>
                 </div>
               </div>
             </div>
 
             {/* Progress + upgrade */}
-            <div className="bg-slate-50 rounded-xl p-6 border border-slate-200 flex flex-col justify-between">
+            <div className="bg-stone-50 rounded-xl p-6 border border-stone-200 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-slate-600">Used this period</span>
-                  <span className="text-slate-800 font-medium">{stats.creditsUsed.toLocaleString()} / {stats.creditsTotal.toLocaleString()}</span>
+                  <span className="text-stone-600">Used this period</span>
+                  <span className="text-stone-800 font-medium">{stats.creditsUsed.toLocaleString()} / {stats.creditsTotal.toLocaleString()}</span>
                 </div>
-                <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-stone-200 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-700 ${
                       creditPct > 90 ? "bg-red-400" : creditPct > 70 ? "bg-amber-400" : "bg-stone-500"
@@ -357,7 +357,7 @@ export default function UsagePage() {
                     style={{ width: `${creditPct}%` }}
                   />
                 </div>
-                <div className="text-xs text-slate-600 mt-1">{creditPct}% consumed</div>
+                <div className="text-xs text-stone-600 mt-1">{creditPct}% consumed</div>
               </div>
               <Link
                 href="/pricing"
@@ -375,38 +375,38 @@ export default function UsagePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.4 }}
-          className="rounded-xl border border-slate-200 bg-white p-6 mb-10"
+          className="rounded-xl border border-stone-200 bg-white p-6 mb-10"
         >
           <div className="flex items-center gap-2 mb-6">
             <Key className="w-5 h-5 text-stone-600" />
-            <h2 className="text-base font-bold text-slate-800">API Key Usage</h2>
+            <h2 className="text-base font-bold text-stone-800">API Key Usage</h2>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Key</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Label</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Today</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">This Month</th>
-                  <th className="text-right py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Rate Limit</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
+                <tr className="border-b border-stone-200">
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-stone-600 uppercase tracking-wider">Key</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-stone-600 uppercase tracking-wider">Label</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-stone-600 uppercase tracking-wider">Today</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-stone-600 uppercase tracking-wider">This Month</th>
+                  <th className="text-right py-3 px-4 text-xs font-semibold text-stone-600 uppercase tracking-wider">Rate Limit</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-stone-600 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {API_KEYS_DEMO.map((key) => (
-                  <tr key={key.prefix} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                    <td className="py-3 px-4 font-mono text-xs text-slate-600">{key.prefix}...</td>
-                    <td className="py-3 px-4 text-slate-600">{key.label}</td>
-                    <td className="py-3 px-4 text-right text-slate-800 font-medium">{key.requestsToday.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-right text-slate-800 font-medium">{key.requestsMonth.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-right text-slate-600">{key.rateLimit} req/min</td>
+                  <tr key={key.prefix} className="border-b border-stone-100 hover:bg-stone-50 transition-colors">
+                    <td className="py-3 px-4 font-mono text-xs text-stone-600">{key.prefix}...</td>
+                    <td className="py-3 px-4 text-stone-600">{key.label}</td>
+                    <td className="py-3 px-4 text-right text-stone-800 font-medium">{key.requestsToday.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right text-stone-800 font-medium">{key.requestsMonth.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right text-stone-600">{key.rateLimit} req/min</td>
                     <td className="py-3 px-4 text-center">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
                         key.status === "active"
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-slate-100 text-slate-600"
+                          ? "bg-amber-50 text-amber-700"
+                          : "bg-stone-100 text-stone-600"
                       }`}>
                         {key.status}
                       </span>
@@ -423,45 +423,45 @@ export default function UsagePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.65, duration: 0.4 }}
-          className="rounded-xl border border-slate-200 bg-white p-6"
+          className="rounded-xl border border-stone-200 bg-white p-6"
         >
           <div className="flex items-center gap-2 mb-6">
             <Activity className="w-5 h-5 text-stone-600" />
-            <h2 className="text-base font-bold text-slate-800">Recent Activity</h2>
+            <h2 className="text-base font-bold text-stone-800">Recent Activity</h2>
           </div>
 
           <div className="space-y-1">
             {activities.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-slate-50 transition-colors"
+                className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-stone-50 transition-colors"
               >
                 {/* Type badge */}
                 <span className={`flex-shrink-0 w-20 text-center px-2 py-1 rounded text-xs font-bold uppercase tracking-wider ${
                   item.type === "generate"
                     ? "bg-stone-50 text-stone-700"
                     : item.type === "deploy"
-                      ? "bg-emerald-50 text-emerald-700"
+                      ? "bg-amber-50 text-amber-700"
                       : "bg-amber-50 text-amber-700"
                 }`}>
                   {item.type}
                 </span>
 
                 {/* Description */}
-                <span className="flex-1 text-sm text-slate-600 truncate">{item.description}</span>
+                <span className="flex-1 text-sm text-stone-600 truncate">{item.description}</span>
 
                 {/* Model */}
-                <span className="hidden md:block text-xs text-slate-600 font-mono w-36 text-right truncate">
+                <span className="hidden md:block text-xs text-stone-600 font-mono w-36 text-right truncate">
                   {item.model}
                 </span>
 
                 {/* Status */}
                 <span className={`flex-shrink-0 w-2 h-2 rounded-full ${
-                  item.status === "success" ? "bg-emerald-400" : "bg-red-400"
+                  item.status === "success" ? "bg-amber-400" : "bg-red-400"
                 }`} />
 
                 {/* Timestamp */}
-                <span className="flex-shrink-0 flex items-center gap-1 text-xs text-slate-600 w-20 justify-end">
+                <span className="flex-shrink-0 flex items-center gap-1 text-xs text-stone-600 w-20 justify-end">
                   <Clock className="w-3 h-3" />
                   {formatRelative(item.timestamp)}
                 </span>

@@ -157,19 +157,19 @@ export default function AdminHealthPage() {
   }, []);
 
   const StatusIcon = ({ status }: { status: string }) => {
-    if (status === "pass") return <CheckCircle className="w-5 h-5 text-emerald-500" />;
+    if (status === "pass") return <CheckCircle className="w-5 h-5 text-amber-500" />;
     if (status === "fail") return <XCircle className="w-5 h-5 text-red-500" />;
     return <AlertTriangle className="w-5 h-5 text-amber-500" />;
   };
 
   const ResultCard = ({ title, result, isLoading }: { title: string; result: HealthResponse | null; isLoading: boolean }) => (
-    <div className="bg-white border border-slate-200 rounded-2xl p-6">
+    <div className="bg-white border border-stone-200 rounded-2xl p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
+        <h2 className="text-lg font-semibold text-stone-800">{title}</h2>
         {result && (
           <span className={`text-xs font-medium px-3 py-1 rounded-full ${
             result.status === "healthy"
-              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+              ? "bg-amber-50 text-amber-700 border border-amber-200"
               : "bg-red-50 text-red-700 border border-red-200"
           }`}>
             {result.status.toUpperCase()}
@@ -178,7 +178,7 @@ export default function AdminHealthPage() {
       </div>
 
       {isLoading && (
-        <div className="flex items-center gap-3 py-8 justify-center text-slate-700">
+        <div className="flex items-center gap-3 py-8 justify-center text-stone-700">
           <RefreshCw className="w-5 h-5 animate-spin" />
           <span>Running checks...</span>
         </div>
@@ -188,21 +188,21 @@ export default function AdminHealthPage() {
         <>
           <div className="space-y-3 mb-4">
             {result.checks.map((check, i) => (
-              <div key={i} className="flex items-start gap-3 py-2 border-b border-slate-100 last:border-0">
+              <div key={i} className="flex items-start gap-3 py-2 border-b border-stone-100 last:border-0">
                 <StatusIcon status={check.status} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-slate-800">{check.name}</span>
+                    <span className="text-sm font-medium text-stone-800">{check.name}</span>
                     {check.durationMs > 0 && (
-                      <span className="text-xs text-slate-600">{(check.durationMs / 1000).toFixed(1)}s</span>
+                      <span className="text-xs text-stone-600">{(check.durationMs / 1000).toFixed(1)}s</span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-600 mt-0.5 break-words">{check.message}</p>
+                  <p className="text-xs text-stone-600 mt-0.5 break-words">{check.message}</p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="text-xs text-slate-600 flex items-center justify-between">
+          <div className="text-xs text-stone-600 flex items-center justify-between">
             <span>Total: {(result.totalDurationMs / 1000).toFixed(1)}s</span>
             <span>{new Date(result.timestamp).toLocaleString()}</span>
           </div>
@@ -210,7 +210,7 @@ export default function AdminHealthPage() {
       )}
 
       {!isLoading && !result && (
-        <p className="text-sm text-slate-600 py-4 text-center">Click a button below to run</p>
+        <p className="text-sm text-stone-600 py-4 text-center">Click a button below to run</p>
       )}
     </div>
   );
@@ -218,7 +218,7 @@ export default function AdminHealthPage() {
   return (
     <div>
       <div className="max-w-3xl mx-auto px-6 py-12">
-        <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800 transition-colors mb-8">
+        <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-stone-800 transition-colors mb-8">
           <ArrowLeft className="w-4 h-4" />
           Back to Admin
         </Link>
@@ -228,35 +228,35 @@ export default function AdminHealthPage() {
             <Activity className="w-6 h-6 text-stone-500" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">System Health</h1>
-            <p className="text-sm text-slate-600">Monitor builder health, generation status, and API connectivity</p>
+            <h1 className="text-2xl font-bold text-stone-800">System Health</h1>
+            <p className="text-sm text-stone-600">Monitor builder health, generation status, and API connectivity</p>
           </div>
         </div>
 
         {/* Auto-monitoring info */}
         <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 mb-8">
-          <p className="text-sm text-slate-700">
+          <p className="text-sm text-stone-700">
             <strong>Auto-monitoring active.</strong> Vercel Cron runs a deep health check every 2 hours at <code className="text-xs bg-stone-100 px-1.5 py-0.5 rounded">/api/health?deep=true</code>.
             Add <code className="text-xs bg-stone-100 px-1.5 py-0.5 rounded">?webhook=YOUR_SLACK_URL</code> to get Hash alerts on failures.
           </p>
         </div>
 
         {/* Dependency dashboard — real-time state of every external provider */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-8">
+        <div className="bg-white border border-stone-200 rounded-2xl p-6 mb-8">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-stone-50 border border-stone-200 flex items-center justify-center">
                 <Zap className="w-5 h-5 text-stone-500" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-slate-800">Live Dependency Status</h2>
-                <p className="text-xs text-slate-700">Every external provider, pinged in parallel</p>
+                <h2 className="text-lg font-semibold text-stone-800">Live Dependency Status</h2>
+                <p className="text-xs text-stone-700">Every external provider, pinged in parallel</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               {depResult && (
                 <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${
-                  depResult.status === "healthy" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                  depResult.status === "healthy" ? "bg-amber-50 text-amber-700 border-amber-200" :
                   depResult.status === "degraded" ? "bg-amber-50 text-amber-700 border-amber-200" :
                   "bg-red-50 text-red-700 border-red-200"
                 }`}>
@@ -268,7 +268,7 @@ export default function AdminHealthPage() {
                 className={`text-xs px-3 py-1 rounded-full border transition-colors ${
                   autoRefresh
                     ? "bg-stone-50 text-stone-700 border-stone-200"
-                    : "bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300"
+                    : "bg-stone-50 text-stone-600 border-stone-200 hover:border-stone-300"
                 }`}
               >
                 {autoRefresh ? "Auto-refresh ON" : "Auto-refresh OFF"}
@@ -276,7 +276,7 @@ export default function AdminHealthPage() {
               <button
                 onClick={runDependencyCheck}
                 disabled={depLoading}
-                className="text-xs px-3 py-1 rounded-full bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 disabled:opacity-40"
+                className="text-xs px-3 py-1 rounded-full bg-stone-50 text-stone-700 border border-stone-200 hover:bg-stone-100 disabled:opacity-40"
               >
                 <RefreshCw className={`w-3 h-3 inline mr-1 ${depLoading ? "animate-spin" : ""}`} />
                 Refresh
@@ -287,13 +287,13 @@ export default function AdminHealthPage() {
           {depResult && (
             <>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                  <div className="text-xs text-slate-700">Total</div>
-                  <div className="text-xl font-semibold text-slate-800">{depResult.summary.total}</div>
+                <div className="bg-stone-50 border border-stone-200 rounded-lg p-3">
+                  <div className="text-xs text-stone-700">Total</div>
+                  <div className="text-xl font-semibold text-stone-800">{depResult.summary.total}</div>
                 </div>
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                  <div className="text-xs text-emerald-600">Passing</div>
-                  <div className="text-xl font-semibold text-emerald-700">{depResult.summary.passing}</div>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <div className="text-xs text-amber-600">Passing</div>
+                  <div className="text-xl font-semibold text-amber-700">{depResult.summary.passing}</div>
                 </div>
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
                   <div className="text-xs text-amber-600">Warnings</div>
@@ -303,9 +303,9 @@ export default function AdminHealthPage() {
                   <div className="text-xs text-red-600">Failures</div>
                   <div className="text-xl font-semibold text-red-700">{depResult.summary.failures}</div>
                 </div>
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                  <div className="text-xs text-slate-700">Required fails</div>
-                  <div className={`text-xl font-semibold ${depResult.summary.requiredFailures > 0 ? "text-red-700" : "text-emerald-700"}`}>
+                <div className="bg-stone-50 border border-stone-200 rounded-lg p-3">
+                  <div className="text-xs text-stone-700">Required fails</div>
+                  <div className={`text-xl font-semibold ${depResult.summary.requiredFailures > 0 ? "text-red-700" : "text-amber-700"}`}>
                     {depResult.summary.requiredFailures}
                   </div>
                 </div>
@@ -321,7 +321,7 @@ export default function AdminHealthPage() {
               <div className="space-y-5">
                 {Object.entries(depResult.byCategory).map(([cat, items]) => (
                   <div key={cat}>
-                    <div className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                    <div className="text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
                       {CATEGORY_LABELS[cat] || cat}
                     </div>
                     <div className="grid gap-2">
@@ -329,19 +329,19 @@ export default function AdminHealthPage() {
                         <div
                           key={c.name}
                           className={`flex items-start gap-3 p-3 rounded-lg border ${
-                            c.status === "pass" ? "bg-emerald-50 border-emerald-200" :
+                            c.status === "pass" ? "bg-amber-50 border-amber-200" :
                             c.status === "fail" ? "bg-red-50 border-red-200" :
                             "bg-amber-50 border-amber-200"
                           }`}
                         >
                           <div className="mt-0.5">
-                            {c.status === "pass" ? <CheckCircle className="w-4 h-4 text-emerald-500" /> :
+                            {c.status === "pass" ? <CheckCircle className="w-4 h-4 text-amber-500" /> :
                              c.status === "fail" ? <XCircle className="w-4 h-4 text-red-500" /> :
                              <AlertTriangle className="w-4 h-4 text-amber-500" />}
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-sm font-semibold text-slate-800">{c.name}</span>
+                              <span className="text-sm font-semibold text-stone-800">{c.name}</span>
                               {c.required && (
                                 <span className="text-xs px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200">REQUIRED</span>
                               )}
@@ -355,12 +355,12 @@ export default function AdminHealthPage() {
                                 </span>
                               )}
                               {c.latencyMs > 0 && (
-                                <span className="text-xs text-slate-600">{c.latencyMs}ms</span>
+                                <span className="text-xs text-stone-600">{c.latencyMs}ms</span>
                               )}
                             </div>
-                            <p className="text-xs text-slate-600 mt-0.5 break-words">{c.message}</p>
+                            <p className="text-xs text-stone-600 mt-0.5 break-words">{c.message}</p>
                             {c.envVar && c.status !== "pass" && (
-                              <p className="text-xs text-slate-600 mt-1 font-mono">env: {c.envVar}</p>
+                              <p className="text-xs text-stone-600 mt-1 font-mono">env: {c.envVar}</p>
                             )}
                           </div>
                         </div>
@@ -370,7 +370,7 @@ export default function AdminHealthPage() {
                 ))}
               </div>
 
-              <div className="text-xs text-slate-600 mt-4 flex items-center justify-between">
+              <div className="text-xs text-stone-600 mt-4 flex items-center justify-between">
                 <span>Total: {(depResult.totalDurationMs / 1000).toFixed(1)}s</span>
                 <span>{new Date(depResult.timestamp).toLocaleString()}</span>
               </div>
@@ -378,7 +378,7 @@ export default function AdminHealthPage() {
           )}
 
           {depLoading && !depResult && (
-            <div className="flex items-center gap-3 py-8 justify-center text-slate-700">
+            <div className="flex items-center gap-3 py-8 justify-center text-stone-700">
               <RefreshCw className="w-5 h-5 animate-spin" />
               <span>Pinging every provider...</span>
             </div>
@@ -409,30 +409,30 @@ export default function AdminHealthPage() {
           <button
             onClick={runDeepCheck}
             disabled={loading !== null}
-            className="flex-1 py-3 rounded-xl text-sm font-medium bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 py-3 rounded-xl text-sm font-medium bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loading === "deep" ? "Running..." : "Run Deep Check (~60-120s)"}
           </button>
         </div>
 
         {/* External monitoring setup guide */}
-        <div className="mt-12 bg-white border border-slate-200 rounded-2xl p-6">
-          <h3 className="text-base font-semibold text-slate-800 mb-3">External Monitoring Setup</h3>
-          <p className="text-sm text-slate-600 mb-4">For continuous monitoring while you&apos;re away, use any of these free services to ping your health endpoint:</p>
-          <div className="space-y-3 text-sm text-slate-700">
-            <div className="bg-slate-50 rounded-lg p-3">
-              <p className="font-medium text-slate-800 mb-1">UptimeRobot (free, 5-min intervals)</p>
-              <p className="text-xs text-slate-600">Add HTTP monitor: <code className="text-stone-600">GET https://zoobicon.com/api/health</code></p>
-              <p className="text-xs text-slate-600">Alert on non-200 status. Gets you email/SMS on failures.</p>
+        <div className="mt-12 bg-white border border-stone-200 rounded-2xl p-6">
+          <h3 className="text-base font-semibold text-stone-800 mb-3">External Monitoring Setup</h3>
+          <p className="text-sm text-stone-600 mb-4">For continuous monitoring while you&apos;re away, use any of these free services to ping your health endpoint:</p>
+          <div className="space-y-3 text-sm text-stone-700">
+            <div className="bg-stone-50 rounded-lg p-3">
+              <p className="font-medium text-stone-800 mb-1">UptimeRobot (free, 5-min intervals)</p>
+              <p className="text-xs text-stone-600">Add HTTP monitor: <code className="text-stone-600">GET https://zoobicon.com/api/health</code></p>
+              <p className="text-xs text-stone-600">Alert on non-200 status. Gets you email/SMS on failures.</p>
             </div>
-            <div className="bg-slate-50 rounded-lg p-3">
-              <p className="font-medium text-slate-800 mb-1">Hash Webhook Alerts</p>
-              <p className="text-xs text-slate-600">Create a Hash webhook, then set the cron URL to:</p>
+            <div className="bg-stone-50 rounded-lg p-3">
+              <p className="font-medium text-stone-800 mb-1">Hash Webhook Alerts</p>
+              <p className="text-xs text-stone-600">Create a Hash webhook, then set the cron URL to:</p>
               <code className="text-xs text-stone-600 break-all">/api/health?deep=true&webhook=https://hooks.slack.com/services/YOUR/WEBHOOK/URL</code>
             </div>
-            <div className="bg-slate-50 rounded-lg p-3">
-              <p className="font-medium text-slate-800 mb-1">Vercel Cron (already configured)</p>
-              <p className="text-xs text-slate-600">Runs every 2 hours automatically. Check Vercel dashboard &gt; Cron Jobs for logs.</p>
+            <div className="bg-stone-50 rounded-lg p-3">
+              <p className="font-medium text-stone-800 mb-1">Vercel Cron (already configured)</p>
+              <p className="text-xs text-stone-600">Runs every 2 hours automatically. Check Vercel dashboard &gt; Cron Jobs for logs.</p>
             </div>
           </div>
         </div>

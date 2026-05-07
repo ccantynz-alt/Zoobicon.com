@@ -107,8 +107,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   // Don't render anything until auth check completes
   if (checking || !isAdmin) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-slate-600 text-sm">Checking permissions...</div>
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="text-stone-600 text-sm">Checking permissions...</div>
       </div>
     );
   }
@@ -173,7 +173,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
         {SIDEBAR_SECTIONS.map((section) => (
           <div key={section.label}>
-            <div className="text-xs uppercase tracking-wider text-slate-600 font-semibold px-2 mb-2">
+            <div className="text-xs uppercase tracking-wider text-stone-600 font-semibold px-2 mb-2">
               {section.label}
             </div>
             <div className="space-y-0.5">
@@ -187,7 +187,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                     className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-150 ${
                       active
                         ? "text-stone-800 bg-stone-100/80 font-medium shadow-sm"
-                        : "text-slate-700 hover:text-slate-700 hover:bg-slate-100/80"
+                        : "text-stone-700 hover:text-stone-700 hover:bg-stone-100/80"
                     }`}
                   >
                     <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? "text-stone-600" : ""}`} />
@@ -201,19 +201,19 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       </nav>
 
       {/* User / Logout */}
-      <div className="border-t border-slate-200 px-3 py-3">
+      <div className="border-t border-stone-200 px-3 py-3">
         <div className="flex items-center gap-2.5 px-2.5 py-2 mb-1">
           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-stone-400 to-stone-500 flex items-center justify-center text-xs font-bold text-white shadow-sm">
             {userName ? userName.charAt(0).toUpperCase() : "A"}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-xs font-medium text-slate-700 truncate">{userName || "Admin"}</div>
-            <div className="text-xs text-slate-600">Administrator</div>
+            <div className="text-xs font-medium text-stone-700 truncate">{userName || "Admin"}</div>
+            <div className="text-xs text-stone-600">Administrator</div>
           </div>
         </div>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg text-sm text-slate-600 hover:text-stone-500 hover:bg-stone-50 transition-all duration-150"
+          className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg text-sm text-stone-600 hover:text-stone-500 hover:bg-stone-50 transition-all duration-150"
         >
           <LogOut className="w-4 h-4" />
           <span>Sign out</span>
@@ -223,7 +223,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex relative z-10">
+    <div className="min-h-screen bg-stone-50 text-stone-800 flex relative z-10">
       {/* Desktop sidebar — elevated cream so it separates from the bone page */}
       <aside
         className="hidden lg:flex lg:flex-col lg:w-60 lg:fixed lg:inset-y-0 z-40 shadow-sm"
@@ -256,7 +256,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       >
         <button
           onClick={() => setSidebarOpen(false)}
-          className="absolute top-4 right-3 p-1.5 rounded-lg text-slate-600 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+          className="absolute top-4 right-3 p-1.5 rounded-lg text-stone-600 hover:text-stone-600 hover:bg-stone-100 transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -275,17 +275,17 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         >
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg text-slate-600 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-lg text-stone-600 hover:text-stone-700 hover:bg-stone-100 transition-colors"
           >
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-stone-500" />
-            <span className="text-sm font-semibold text-slate-700">Admin</span>
+            <span className="text-sm font-semibold text-stone-700">Admin</span>
           </div>
           <button
             onClick={handleLogout}
-            className="p-2 rounded-lg text-slate-600 hover:text-stone-500 transition-colors"
+            className="p-2 rounded-lg text-stone-600 hover:text-stone-500 transition-colors"
           >
             <LogOut className="w-4 h-4" />
           </button>

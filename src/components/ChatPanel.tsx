@@ -470,7 +470,7 @@ export default function ChatPanel({
                       msg.status === "error"
                         ? "bg-red-500/15 border border-red-500/20"
                         : msg.status === "complete"
-                        ? "bg-emerald-500/15 border border-emerald-500/20"
+                        ? "bg-amber-500/15 border border-amber-500/20"
                         : "bg-stone-500/15 border border-stone-500/20"
                     }`}
                   >
@@ -479,7 +479,7 @@ export default function ChatPanel({
                     ) : msg.status === "error" ? (
                       <AlertCircle className="w-3 h-3 text-red-400" />
                     ) : msg.status === "complete" ? (
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                      <CheckCircle2 className="w-3 h-3 text-amber-400" />
                     ) : (
                       <Bot className="w-3 h-3 text-stone-400" />
                     )}
@@ -495,7 +495,7 @@ export default function ChatPanel({
                     : msg.status === "error"
                     ? "bg-red-500/8 border border-red-500/15 text-red-300/80 rounded-2xl rounded-tl-md px-3.5 py-2"
                     : msg.status === "complete"
-                    ? "bg-emerald-500/8 border border-emerald-500/15 rounded-2xl rounded-tl-md px-3.5 py-2"
+                    ? "bg-amber-500/8 border border-amber-500/15 rounded-2xl rounded-tl-md px-3.5 py-2"
                     : "bg-white/[0.04] border border-white/[0.06] rounded-2xl rounded-tl-md px-3.5 py-2"
                 }`}
               >
@@ -506,7 +506,7 @@ export default function ChatPanel({
                       : msg.status === "error"
                       ? "text-red-300/80"
                       : msg.status === "complete"
-                      ? "text-emerald-300/90"
+                      ? "text-amber-300/90"
                       : "text-white/60"
                   }`}
                 >
@@ -515,11 +515,11 @@ export default function ChatPanel({
 
                 {/* Changed files list */}
                 {msg.changedFiles && msg.changedFiles.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-emerald-500/10">
+                  <div className="mt-2 pt-2 border-t border-amber-500/10">
                     {msg.changedFiles.map((file) => (
                       <div
                         key={file}
-                        className="flex items-center gap-1.5 text-[10px] text-emerald-400/70 py-0.5"
+                        className="flex items-center gap-1.5 text-[10px] text-amber-400/70 py-0.5"
                       >
                         <FileEdit className="w-2.5 h-2.5" />
                         <span className="font-mono">{file}</span>
@@ -542,8 +542,8 @@ export default function ChatPanel({
                 {/* Duration badge */}
                 {msg.durationMs != null && msg.status === "complete" && (
                   <div className="mt-1.5 flex items-center gap-1">
-                    <Zap className="w-2.5 h-2.5 text-emerald-500/50" />
-                    <span className="text-[10px] text-emerald-500/50">
+                    <Zap className="w-2.5 h-2.5 text-amber-500/50" />
+                    <span className="text-[10px] text-amber-500/50">
                       {(msg.durationMs / 1000).toFixed(1)}s
                     </span>
                   </div>

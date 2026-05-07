@@ -13,8 +13,8 @@ function FeatureCell({ value, side }: { value: FeatureSide | string; side: "us" 
   }
   if (has) {
     return (
-      <div className="inline-flex w-7 h-7 items-center justify-center rounded-full bg-emerald-500/15 border border-emerald-400/30">
-        <Check className="w-4 h-4 text-emerald-300" />
+      <div className="inline-flex w-7 h-7 items-center justify-center rounded-full bg-amber-500/15 border border-amber-400/30">
+        <Check className="w-4 h-4 text-amber-300" />
       </div>
     );
   }
@@ -130,7 +130,7 @@ export default function ComparisonPage({ data }: { data: CompetitorComparison })
           <ul className="space-y-2.5">
             {data.theirStrengths.map((s, i) => (
               <li key={i} className="flex items-start gap-3 text-[14px] text-white/75">
-                <Check className="w-4 h-4 text-emerald-300 mt-0.5 flex-shrink-0" />
+                <Check className="w-4 h-4 text-amber-300 mt-0.5 flex-shrink-0" />
                 {s}
               </li>
             ))}
@@ -232,7 +232,7 @@ export default function ComparisonPage({ data }: { data: CompetitorComparison })
                   <ul className="text-[12px] text-white/55 space-y-1">
                     {t.highlights.map((h, i) => (
                       <li key={i} className="flex items-start gap-2">
-                        <Check className="w-3 h-3 text-emerald-400 mt-0.5 flex-shrink-0" />
+                        <Check className="w-3 h-3 text-amber-400 mt-0.5 flex-shrink-0" />
                         {h}
                       </li>
                     ))}

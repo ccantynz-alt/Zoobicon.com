@@ -481,7 +481,7 @@ export default function SiteNavigation() {
           <div className="px-4 py-4 space-y-5">
             {PRODUCT_SECTIONS.map((section) => (
               <div key={section.label}>
-                <h3 className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mb-2">{section.label}</h3>
+                <h3 className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold mb-2">{section.label}</h3>
                 <div className="space-y-0.5">
                   {section.items.map((item) => (
                     <Link
@@ -490,7 +490,7 @@ export default function SiteNavigation() {
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/[0.05] transition-colors"
                     >
-                      <item.icon className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                      <item.icon className="w-4 h-4 text-stone-500 flex-shrink-0" />
                       <div className="min-w-0 flex-1">
                         <span className="text-sm text-white/80 flex items-center gap-1.5">
                           {item.name}
@@ -498,7 +498,7 @@ export default function SiteNavigation() {
                             <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-stone-500/20 text-stone-300 font-semibold">{item.badge}</span>
                           )}
                         </span>
-                        <span className="text-[11px] text-slate-500 block">{item.desc}</span>
+                        <span className="text-[11px] text-stone-500 block">{item.desc}</span>
                       </div>
                     </Link>
                   ))}

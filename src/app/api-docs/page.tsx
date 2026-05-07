@@ -189,7 +189,7 @@ sites = JSON.parse(response.body)['sites']`,
 };
 
 const methodColors: Record<string, string> = {
-  GET: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  GET: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
   POST: 'bg-stone-500/20 text-stone-400 border-stone-500/30',
   PUT: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
   DELETE: 'bg-red-500/20 text-red-400 border-red-500/30',
@@ -325,7 +325,7 @@ export default function ApiDocsPage() {
                 All API requests require a Bearer token in the Authorization header. Get your API key from the dashboard.
               </p>
               <div className="bg-black/50 rounded-xl p-4 font-mono text-sm mb-4">
-                <span className="text-white/40">Authorization:</span> <span className="text-emerald-400">Bearer zbk_live_your_api_key</span>
+                <span className="text-white/40">Authorization:</span> <span className="text-amber-400">Bearer zbk_live_your_api_key</span>
               </div>
               <div className="grid grid-cols-3 gap-4">
                 {[
@@ -359,13 +359,13 @@ export default function ApiDocsPage() {
               </div>
               <div className="relative">
                 <pre className="bg-black/50 rounded-xl p-4 text-sm overflow-x-auto">
-                  <code className="text-green-400">{codeExample}</code>
+                  <code className="text-amber-400">{codeExample}</code>
                 </pre>
                 <button
                   onClick={() => handleCopy(codeExample)}
                   className="absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition"
                 >
-                  {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                  {copied ? <Check className="w-4 h-4 text-amber-400" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
             </div>
@@ -395,7 +395,7 @@ export default function ApiDocsPage() {
                 <div>
                   <label className="text-xs text-white/40 mb-1 block">Response</label>
                   <pre className="bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono h-48 overflow-auto">
-                    <code className={tryItResponse ? 'text-emerald-400' : 'text-white/20'}>
+                    <code className={tryItResponse ? 'text-amber-400' : 'text-white/20'}>
                       {tryItResponse || '// Response will appear here...'}
                     </code>
                   </pre>
@@ -416,7 +416,7 @@ export default function ApiDocsPage() {
                 ].map((err) => (
                   <div key={err.code} className="flex items-center gap-4 px-4 py-3 rounded-xl bg-white/[0.02] border border-white/5">
                     <span className={`px-2 py-0.5 rounded font-mono text-sm font-bold ${
-                      err.code < 500 ? (err.code < 400 ? 'text-emerald-400' : 'text-amber-400') : 'text-red-400'
+                      err.code < 500 ? (err.code < 400 ? 'text-amber-400' : 'text-amber-400') : 'text-red-400'
                     }`}>{err.code}</span>
                     <span className="font-medium text-sm w-32">{err.label}</span>
                     <span className="text-sm text-white/50">{err.desc}</span>

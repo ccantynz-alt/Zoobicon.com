@@ -113,7 +113,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   Payments: "text-stone-400 bg-stone-500/10 border-stone-500/20",
   Chat: "text-stone-400 bg-stone-500/10 border-stone-500/20",
   Email: "text-stone-400 bg-stone-500/10 border-stone-500/20",
-  Library: "text-slate-400 bg-slate-500/10 border-slate-500/20",
+  Library: "text-stone-400 bg-stone-500/10 border-stone-500/20",
   Animation: "text-stone-400 bg-stone-500/10 border-stone-500/20",
   "3D": "text-stone-400 bg-stone-500/10 border-stone-500/20",
   Monitoring: "text-stone-400 bg-stone-500/10 border-stone-500/20",

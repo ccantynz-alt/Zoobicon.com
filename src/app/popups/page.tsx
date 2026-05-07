@@ -55,7 +55,7 @@ const TEMPLATES: PopupTemplate[] = [
   { id: 't4', name: 'Free Trial', category: 'SaaS', type: 'scroll', conversionRate: 5.5, preview: { bg: 'from-stone-600 to-stone-700', headline: 'Try Pro Free for 14 Days', cta: 'Start Free Trial', ctaColor: 'bg-white text-stone-700' } },
   { id: 't5', name: 'Shipping Banner', category: 'E-Commerce', type: 'floating-bar', conversionRate: 2.9, preview: { bg: 'from-stone-500 to-stone-600', headline: 'Free Shipping on Orders $50+', cta: 'Shop Now', ctaColor: 'bg-black text-white' } },
   { id: 't6', name: 'Chat Prompt', category: 'Support', type: 'slide-in', conversionRate: 8.1, preview: { bg: 'from-stone-600 to-stone-700', headline: 'Need Help? Chat with Us', cta: 'Start Chat', ctaColor: 'bg-white text-stone-700' } },
-  { id: 't7', name: 'Lead Magnet', category: 'Lead Gen', type: 'timed', conversionRate: 7.3, preview: { bg: 'from-slate-700 to-slate-900', headline: 'Free Guide: 50 AI Prompts', cta: 'Download Now', ctaColor: 'bg-stone-500 text-white' } },
+  { id: 't7', name: 'Lead Magnet', category: 'Lead Gen', type: 'timed', conversionRate: 7.3, preview: { bg: 'from-stone-700 to-stone-900', headline: 'Free Guide: 50 AI Prompts', cta: 'Download Now', ctaColor: 'bg-stone-500 text-white' } },
   { id: 't8', name: 'Flash Sale', category: 'E-Commerce', type: 'timed', conversionRate: 9.2, preview: { bg: 'from-stone-600 to-stone-800', headline: '24-Hour Flash Sale: 40% Off', cta: 'Shop Sale', ctaColor: 'bg-stone-400 text-stone-900' } },
 ];
 
@@ -187,7 +187,7 @@ export default function PopupsPage() {
               <div>
                 <label className="text-sm text-gray-400 mb-1 block">Background</label>
                 <div className="grid grid-cols-4 gap-2">
-                  {['from-stone-600 to-stone-700', 'from-stone-600 to-stone-700', 'from-stone-600 to-stone-700', 'from-stone-600 to-stone-700', 'from-stone-500 to-stone-600', 'from-slate-700 to-slate-900', 'from-stone-600 to-stone-700', 'from-stone-600 to-stone-800'].map(bg => (
+                  {['from-stone-600 to-stone-700', 'from-stone-600 to-stone-700', 'from-stone-600 to-stone-700', 'from-stone-600 to-stone-700', 'from-stone-500 to-stone-600', 'from-stone-700 to-stone-900', 'from-stone-600 to-stone-700', 'from-stone-600 to-stone-800'].map(bg => (
                     <button key={bg} onClick={() => setEditorBg(bg)}
                       className={`h-8 rounded-lg bg-gradient-to-br ${bg} border-2 ${editorBg === bg ? 'border-white' : 'border-transparent'}`} />
                   ))}

@@ -737,7 +737,7 @@ export default function DomainFinderPage() {
               .com domain
             </span>
           </h1>
-          <p className="text-slate-400 text-lg mb-6 max-w-xl mx-auto">
+          <p className="text-stone-400 text-lg mb-6 max-w-xl mx-auto">
             Describe your business and AI generates up to 100 brandable names — then we
             instantly check which .com domains are actually available.
           </p>
@@ -749,7 +749,7 @@ export default function DomainFinderPage() {
                 key={p.id}
                 onClick={() => applyPreset(p)}
                 disabled={isRunning}
-                className="px-3 py-1.5 rounded-full text-xs font-medium border bg-white/[0.03] border-white/[0.08] text-slate-300 hover:border-violet-400/40 hover:bg-violet-500/10 hover:text-violet-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-full text-xs font-medium border bg-white/[0.03] border-white/[0.08] text-stone-300 hover:border-violet-400/40 hover:bg-violet-500/10 hover:text-violet-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1.5"
                 title={p.prompt}
               >
                 <span className="text-sm">{p.emoji}</span>
@@ -766,7 +766,7 @@ export default function DomainFinderPage() {
               onChange={(e) => setDescription(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               placeholder="e.g., AI scheduling tool for dentists"
-              className="flex-1 px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 focus:border-stone-500/50 transition-all"
+              className="flex-1 px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500/50 focus:border-stone-500/50 transition-all"
             />
             <button
               onClick={handleSearch}
@@ -790,7 +790,7 @@ export default function DomainFinderPage() {
           {/* Filter chips — count, word count, length, real vs invented */}
           <div className="mt-5 flex flex-col items-center gap-3">
             <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl">
-              <span className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold pr-1">Show</span>
+              <span className="text-[11px] uppercase tracking-widest text-stone-500 font-semibold pr-1">Show</span>
               {COUNT_OPTIONS.map((c) => (
                 <button
                   key={c}
@@ -799,7 +799,7 @@ export default function DomainFinderPage() {
                   className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                     count === c
                       ? "bg-stone-500/20 border-stone-400/40 text-stone-200"
-                      : "bg-white/[0.04] border-white/[0.08] text-slate-400 hover:border-stone-400/30 hover:text-slate-200"
+                      : "bg-white/[0.04] border-white/[0.08] text-stone-400 hover:border-stone-400/30 hover:text-stone-200"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {c} names
@@ -807,7 +807,7 @@ export default function DomainFinderPage() {
               ))}
             </div>
             <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl">
-              <span className="text-[11px] uppercase tracking-widest text-slate-500 font-semibold pr-1">Style</span>
+              <span className="text-[11px] uppercase tracking-widest text-stone-500 font-semibold pr-1">Style</span>
               {([
                 { v: "either" as WordCountChoice, label: "Any words" },
                 { v: 1 as WordCountChoice, label: "1 word only" },
@@ -820,7 +820,7 @@ export default function DomainFinderPage() {
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                     wordCount === opt.v
                       ? "bg-stone-500/15 border-stone-400/40 text-stone-200"
-                      : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:border-stone-400/30 hover:text-slate-200"
+                      : "bg-white/[0.03] border-white/[0.08] text-stone-400 hover:border-stone-400/30 hover:text-stone-200"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {opt.label}
@@ -833,7 +833,7 @@ export default function DomainFinderPage() {
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                   length === "short"
                     ? "bg-amber-500/15 border-amber-400/40 text-amber-200"
-                    : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:border-amber-400/30 hover:text-slate-200"
+                    : "bg-white/[0.03] border-white/[0.08] text-stone-400 hover:border-amber-400/30 hover:text-stone-200"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 Short ≤6 chars
@@ -850,8 +850,8 @@ export default function DomainFinderPage() {
                   disabled={isRunning}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
                     wordType === opt.v
-                      ? "bg-emerald-500/15 border-emerald-400/40 text-emerald-200"
-                      : "bg-white/[0.03] border-white/[0.08] text-slate-400 hover:border-emerald-400/30 hover:text-slate-200"
+                      ? "bg-amber-500/15 border-amber-400/40 text-amber-200"
+                      : "bg-white/[0.03] border-white/[0.08] text-stone-400 hover:border-amber-400/30 hover:text-stone-200"
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {opt.label}
@@ -874,14 +874,14 @@ export default function DomainFinderPage() {
         <div className="max-w-3xl mx-auto px-4 mb-8">
           <div className="bg-[#101a35]/85 backdrop-blur-sm border border-white/[0.12] rounded-xl p-4 shadow-[0_4px_16px_-8px_rgba(0,0,0,0.4)]">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-slate-300 flex items-center gap-2">
+              <span className="text-sm text-stone-300 flex items-center gap-2">
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-stone-400" />
                 {phase === "generating"
                   ? "AI is generating 25 brandable names..."
                   : `Checking .com availability — ${checkedCount} of ${totalCount} done`}
               </span>
               {phase === "checking" && checkedCount > 0 && (
-                <span className="text-xs text-emerald-400 font-mono">
+                <span className="text-xs text-amber-400 font-mono">
                   {availableCount} available so far
                 </span>
               )}
@@ -909,7 +909,7 @@ export default function DomainFinderPage() {
                   ? `${availableCount} available .com domain${availableCount !== 1 ? "s" : ""} found`
                   : "Checking availability…"}
               </h2>
-              <p className="text-sm text-slate-500 mt-0.5">
+              <p className="text-sm text-stone-500 mt-0.5">
                 {results.length} names generated for &ldquo;{description}&rdquo;
               </p>
             </div>
@@ -920,7 +920,7 @@ export default function DomainFinderPage() {
                   className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                     filter === "available"
                       ? "bg-violet-600 text-white"
-                      : "text-slate-400 hover:text-white"
+                      : "text-stone-400 hover:text-white"
                   }`}
                 >
                   Available
@@ -930,7 +930,7 @@ export default function DomainFinderPage() {
                   className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-1.5 ${
                     filter === "saved"
                       ? "bg-violet-600 text-white"
-                      : "text-slate-400 hover:text-white"
+                      : "text-stone-400 hover:text-white"
                   }`}
                 >
                   <Heart className={`w-3.5 h-3.5 ${savedCount > 0 ? "fill-current" : ""}`} />
@@ -941,7 +941,7 @@ export default function DomainFinderPage() {
                   className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                     filter === "all"
                       ? "bg-violet-600 text-white"
-                      : "text-slate-400 hover:text-white"
+                      : "text-stone-400 hover:text-white"
                   }`}
                 >
                   All ({results.length})
@@ -950,7 +950,7 @@ export default function DomainFinderPage() {
               <button
                 onClick={exportCsv}
                 title="Export the current view to CSV"
-                className="p-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 hover:border-cyan-400/30 hover:text-cyan-200 transition-colors"
+                className="p-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-stone-300 hover:border-cyan-400/30 hover:text-cyan-200 transition-colors"
               >
                 <Download className="w-4 h-4" />
               </button>
@@ -986,27 +986,27 @@ export default function DomainFinderPage() {
                         <div
                           className={`mt-0.5 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
                             isAvailable
-                              ? "bg-emerald-500/20"
+                              ? "bg-amber-500/20"
                               : isTaken
                               ? "bg-red-500/10"
                               : "bg-white/5"
                           }`}
                         >
                           {isPending ? (
-                            <Loader2 className="w-3.5 h-3.5 text-slate-400 animate-spin" />
+                            <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin" />
                           ) : isAvailable ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <Check className="w-3.5 h-3.5 text-amber-400" />
                           ) : isTaken ? (
-                            <X className="w-3.5 h-3.5 text-slate-500" />
+                            <X className="w-3.5 h-3.5 text-stone-500" />
                           ) : (
-                            <Globe className="w-3.5 h-3.5 text-slate-400" />
+                            <Globe className="w-3.5 h-3.5 text-stone-400" />
                           )}
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center flex-wrap gap-2">
                             <span
                               className={`font-bold text-lg tracking-tight ${
-                                isAvailable ? "text-white" : "text-slate-400"
+                                isAvailable ? "text-white" : "text-stone-400"
                               }`}
                             >
                               {r.slug}.com
@@ -1018,7 +1018,7 @@ export default function DomainFinderPage() {
                               </span>
                             )}
                             {isAvailable && r.price !== null && (
-                              <span className="text-xs px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-full font-medium">
+                              <span className="text-xs px-2 py-0.5 bg-amber-500/10 text-amber-400 rounded-full font-medium">
                                 ${r.price}/yr
                               </span>
                             )}
@@ -1035,7 +1035,7 @@ export default function DomainFinderPage() {
                                     ? "bg-violet-500/15 border-violet-400/40 text-violet-200"
                                     : r.score >= 60
                                     ? "bg-cyan-500/15 border-cyan-400/30 text-cyan-200"
-                                    : "bg-slate-500/15 border-slate-400/20 text-slate-300"
+                                    : "bg-stone-500/15 border-stone-400/20 text-stone-300"
                                 }`}
                                 title={`AI brand-quality score (memorability + distinctiveness + pronounceability)`}
                               >
@@ -1055,13 +1055,13 @@ export default function DomainFinderPage() {
                               </span>
                             )}
                             {isTaken && (
-                              <span className="text-xs text-slate-600">taken</span>
+                              <span className="text-xs text-stone-600">taken</span>
                             )}
                             {isPending && (
-                              <span className="text-xs text-slate-600">checking…</span>
+                              <span className="text-xs text-stone-600">checking…</span>
                             )}
                           </div>
-                          <p className="text-sm text-slate-500 mt-0.5 truncate">{r.tagline}</p>
+                          <p className="text-sm text-stone-500 mt-0.5 truncate">{r.tagline}</p>
                         </div>
                       </div>
 
@@ -1075,7 +1075,7 @@ export default function DomainFinderPage() {
                             className={`p-2 rounded-lg border transition-all ${
                               selected.has(r.slug)
                                 ? "bg-violet-500/20 border-violet-400/40 text-violet-200"
-                                : "bg-white/[0.03] border-white/[0.08] hover:border-violet-400/30 text-slate-400"
+                                : "bg-white/[0.03] border-white/[0.08] hover:border-violet-400/30 text-stone-400"
                             }`}
                           >
                             <Check className={`w-4 h-4 ${selected.has(r.slug) ? "" : "opacity-40"}`} />
@@ -1087,7 +1087,7 @@ export default function DomainFinderPage() {
                             className={`p-2 rounded-lg border transition-all ${
                               favorites.has(r.slug)
                                 ? "bg-rose-500/15 border-rose-400/40 text-rose-300"
-                                : "bg-white/[0.03] border-white/[0.08] hover:border-rose-400/30 text-slate-400"
+                                : "bg-white/[0.03] border-white/[0.08] hover:border-rose-400/30 text-stone-400"
                             }`}
                           >
                             <Heart className={`w-4 h-4 ${favorites.has(r.slug) ? "fill-current" : ""}`} />
@@ -1096,7 +1096,7 @@ export default function DomainFinderPage() {
                           <button
                             onClick={() => findSimilar(r)}
                             title="Find more names like this one"
-                            className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.08] hover:border-cyan-400/30 hover:text-cyan-200 text-slate-400 transition-all"
+                            className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.08] hover:border-cyan-400/30 hover:text-cyan-200 text-stone-400 transition-all"
                           >
                             <Wand2 className="w-4 h-4" />
                           </button>
@@ -1104,10 +1104,10 @@ export default function DomainFinderPage() {
                           <button
                             onClick={() => copyDomain(`${r.slug}.com`)}
                             title="Copy domain"
-                            className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.08] hover:border-white/20 text-slate-400 transition-colors"
+                            className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.08] hover:border-white/20 text-stone-400 transition-colors"
                           >
                             {copied === `${r.slug}.com` ? (
-                              <Check className="w-4 h-4 text-emerald-400" />
+                              <Check className="w-4 h-4 text-amber-400" />
                             ) : (
                               <Copy className="w-4 h-4" />
                             )}
@@ -1129,13 +1129,13 @@ export default function DomainFinderPage() {
                         {!r.expandedTlds ? (
                           <button
                             onClick={() => expandTlds(idx, r.slug)}
-                            className="text-xs text-slate-500 hover:text-stone-400 flex items-center gap-1 transition-colors"
+                            className="text-xs text-stone-500 hover:text-stone-400 flex items-center gap-1 transition-colors"
                           >
                             <ChevronDown className="w-3.5 h-3.5" />
                             Check .io, .ai, .dev, .app, .co
                           </button>
                         ) : r.checkingTlds ? (
-                          <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <div className="flex items-center gap-2 text-xs text-stone-500">
                             <Loader2 className="w-3 h-3 animate-spin" />
                             Checking other TLDs…
                           </div>
@@ -1152,7 +1152,7 @@ export default function DomainFinderPage() {
                                 className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
                                   t.available === true
                                     ? "bg-violet-500/15 border-violet-400/30 text-violet-200 hover:bg-violet-500/25"
-                                    : "bg-white/5 border-white/10 text-slate-500"
+                                    : "bg-white/5 border-white/10 text-stone-500"
                                 }`}
                               >
                                 {t.domain}
@@ -1174,7 +1174,7 @@ export default function DomainFinderPage() {
                     {isAvailable && (
                       r.handlesChecked && r.handles ? (
                         <div className="mt-3 pt-3 border-t border-white/5">
-                          <p className="text-[10px] uppercase tracking-widest font-semibold text-slate-500 mb-1.5">
+                          <p className="text-[10px] uppercase tracking-widest font-semibold text-stone-500 mb-1.5">
                             Social handles
                           </p>
                           <div className="flex flex-wrap gap-1.5 text-[11px]">
@@ -1189,10 +1189,10 @@ export default function DomainFinderPage() {
                               const v = r.handles?.[p.key] ?? null;
                               const cls =
                                 v === true
-                                  ? "bg-emerald-500/10 border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/20"
+                                  ? "bg-amber-500/10 border-amber-400/30 text-amber-300 hover:bg-amber-500/20"
                                   : v === false
-                                  ? "bg-white/[0.03] border-white/[0.08] text-slate-500"
-                                  : "bg-white/[0.03] border-white/[0.08] text-slate-500";
+                                  ? "bg-white/[0.03] border-white/[0.08] text-stone-500"
+                                  : "bg-white/[0.03] border-white/[0.08] text-stone-500";
                               const symbol = v === true ? "✓" : v === false ? "•" : "?";
                               return (
                                 <a
@@ -1217,7 +1217,7 @@ export default function DomainFinderPage() {
                           </div>
                         </div>
                       ) : (
-                        <div className="mt-3 pt-3 border-t border-white/5 flex items-center gap-2 text-[11px] text-slate-600">
+                        <div className="mt-3 pt-3 border-t border-white/5 flex items-center gap-2 text-[11px] text-stone-600">
                           <Loader2 className="w-3 h-3 animate-spin" />
                           Checking GitHub / X / Instagram / TikTok…
                         </div>
@@ -1233,7 +1233,7 @@ export default function DomainFinderPage() {
                             const availableVariants = r.variants.filter((v) => v.available === true);
                             return availableVariants.length > 0 ? (
                               <div>
-                                <p className="text-[10px] uppercase tracking-widest font-semibold text-emerald-400/70 mb-1.5 flex items-center gap-1">
+                                <p className="text-[10px] uppercase tracking-widest font-semibold text-amber-400/70 mb-1.5 flex items-center gap-1">
                                   <Sparkles className="w-3 h-3" />
                                   Available alternatives
                                 </p>
@@ -1242,7 +1242,7 @@ export default function DomainFinderPage() {
                                     <a
                                       key={v.domain}
                                       href={`/domains?q=${encodeURIComponent(v.slug)}`}
-                                      className="text-xs px-2.5 py-1 rounded-full border bg-emerald-500/10 border-emerald-400/30 text-emerald-200 hover:bg-emerald-500/20 transition-colors inline-flex items-center gap-1"
+                                      className="text-xs px-2.5 py-1 rounded-full border bg-amber-500/10 border-amber-400/30 text-amber-200 hover:bg-amber-500/20 transition-colors inline-flex items-center gap-1"
                                     >
                                       <Check className="w-3 h-3" />
                                       {v.domain}
@@ -1254,14 +1254,14 @@ export default function DomainFinderPage() {
                             ) : null;
                           })()
                         ) : (
-                          <div className="flex items-center gap-2 text-[11px] text-slate-600">
+                          <div className="flex items-center gap-2 text-[11px] text-stone-600">
                             <Loader2 className="w-3 h-3 animate-spin" />
                             Checking get/try/+ai/+app variants…
                           </div>
                         )}
 
                         {/* Marketplace + trademark links */}
-                        <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500">
+                        <div className="flex flex-wrap items-center gap-3 text-[11px] text-stone-500">
                           <a
                             href={`https://sedo.com/search/?keyword=${encodeURIComponent(r.slug + ".com")}&trackingId=&partnerid=&language=us`}
                             target="_blank"
@@ -1303,7 +1303,7 @@ export default function DomainFinderPage() {
             <div className="text-center py-12 rounded-2xl border border-amber-500/20 bg-amber-500/[0.04]">
               <Globe className="w-12 h-12 mx-auto mb-4 text-amber-400/60" />
               <p className="font-semibold text-amber-200">Registry temporarily unreachable</p>
-              <p className="text-sm text-slate-400 mt-1 max-w-md mx-auto">
+              <p className="text-sm text-stone-400 mt-1 max-w-md mx-auto">
                 We couldn&apos;t verify availability for any of these names — the .com registry
                 rate-limited or is slow right now. Please try again in a few seconds.
               </p>
@@ -1320,9 +1320,9 @@ export default function DomainFinderPage() {
           {/* No available .com state */}
           {checkedAll && !allUnverified && availableCount === 0 && filter === "available" && (
             <div className="text-center py-12">
-              <Globe className="w-12 h-12 mx-auto mb-4 text-slate-600" />
-              <p className="font-semibold text-slate-300">No .com domains available</p>
-              <p className="text-sm text-slate-500 mt-1">
+              <Globe className="w-12 h-12 mx-auto mb-4 text-stone-600" />
+              <p className="font-semibold text-stone-300">No .com domains available</p>
+              <p className="text-sm text-stone-500 mt-1">
                 Every name was taken on .com — try a more specific or creative description, or
                 check other TLDs below.
               </p>
@@ -1340,26 +1340,26 @@ export default function DomainFinderPage() {
       {/* Empty / example state */}
       {results.length === 0 && phase === "idle" && (
         <div className="max-w-3xl mx-auto px-4 pb-20">
-          <p className="text-slate-500 text-sm text-center mb-4">Try an example:</p>
+          <p className="text-stone-500 text-sm text-center mb-4">Try an example:</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {EXAMPLES.map((ex) => (
               <button
                 key={ex}
                 onClick={() => setDescription(ex)}
-                className="p-4 bg-[#101a35]/80 backdrop-blur-sm hover:bg-[#142046]/85 border border-white/[0.1] hover:border-stone-500/40 rounded-xl text-sm text-slate-300 hover:text-white text-left transition-all flex items-center gap-3"
+                className="p-4 bg-[#101a35]/80 backdrop-blur-sm hover:bg-[#142046]/85 border border-white/[0.1] hover:border-stone-500/40 rounded-xl text-sm text-stone-300 hover:text-white text-left transition-all flex items-center gap-3"
               >
-                <Search className="w-4 h-4 text-slate-600 flex-shrink-0" />
+                <Search className="w-4 h-4 text-stone-600 flex-shrink-0" />
                 {ex}
               </button>
             ))}
           </div>
-          <p className="text-slate-600 text-xs text-center mt-6">
+          <p className="text-stone-600 text-xs text-center mt-6">
             AI generates 25 brand-name ideas, then checks each .com in real time
           </p>
           {/* Recent searches */}
           {history.length > 0 && (
             <div className="mt-8">
-              <p className="text-[11px] uppercase tracking-widest font-semibold text-slate-500 text-center mb-3">
+              <p className="text-[11px] uppercase tracking-widest font-semibold text-stone-500 text-center mb-3">
                 Recent searches
               </p>
               <div className="flex flex-wrap items-center justify-center gap-2">
@@ -1367,7 +1367,7 @@ export default function DomainFinderPage() {
                   <button
                     key={h}
                     onClick={() => setDescription(h)}
-                    className="px-3 py-1.5 rounded-full text-xs text-slate-300 bg-white/[0.03] border border-white/[0.08] hover:border-violet-400/30 hover:text-white transition-colors max-w-xs truncate"
+                    className="px-3 py-1.5 rounded-full text-xs text-stone-300 bg-white/[0.03] border border-white/[0.08] hover:border-violet-400/30 hover:text-white transition-colors max-w-xs truncate"
                     title={h}
                   >
                     {h}
@@ -1393,7 +1393,7 @@ export default function DomainFinderPage() {
                 <p className="text-sm font-semibold text-white">
                   {selected.size} domain{selected.size > 1 ? "s" : ""} selected
                 </p>
-                <p className="text-[11px] text-slate-400 truncate">
+                <p className="text-[11px] text-stone-400 truncate">
                   {[...selected].slice(0, 4).map((s) => `${s}.com`).join(" · ")}
                   {selected.size > 4 ? ` +${selected.size - 4} more` : ""}
                 </p>
@@ -1402,7 +1402,7 @@ export default function DomainFinderPage() {
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 onClick={() => setSelected(new Set())}
-                className="px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                className="px-3 py-2 rounded-lg text-xs font-medium text-stone-300 hover:text-white hover:bg-white/[0.06] transition-colors"
               >
                 Clear
               </button>

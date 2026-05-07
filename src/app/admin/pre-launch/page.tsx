@@ -39,15 +39,15 @@ const CATEGORIES = [
   { key: "infrastructure", label: "Infrastructure & DevOps", icon: Server, color: "text-stone-500" },
   { key: "security", label: "Security & Auth", icon: Shield, color: "text-red-500" },
   { key: "email", label: "Email & Notifications", icon: Mail, color: "text-stone-500" },
-  { key: "payments", label: "Payments & Billing", icon: CreditCard, color: "text-emerald-500" },
+  { key: "payments", label: "Payments & Billing", icon: CreditCard, color: "text-amber-500" },
   { key: "seo", label: "SEO & Marketing", icon: Search, color: "text-orange-500" },
   { key: "performance", label: "Performance & Speed", icon: Zap, color: "text-amber-500" },
   { key: "quality", label: "Quality & Testing", icon: Bug, color: "text-rose-500" },
   { key: "ux", label: "UX & Accessibility", icon: Accessibility, color: "text-stone-500" },
   { key: "ai", label: "AI Pipeline & Models", icon: Bot, color: "text-stone-500" },
   { key: "competitive", label: "Competitive Edge", icon: Trophy, color: "text-yellow-500" },
-  { key: "legal", label: "Legal & Compliance", icon: FileText, color: "text-slate-700" },
-  { key: "monitoring", label: "Monitoring & Analytics", icon: BarChart3, color: "text-teal-500" },
+  { key: "legal", label: "Legal & Compliance", icon: FileText, color: "text-stone-700" },
+  { key: "monitoring", label: "Monitoring & Analytics", icon: BarChart3, color: "text-amber-500" },
 ];
 
 const CHECKLIST: ChecklistItem[] = [
@@ -200,19 +200,19 @@ export default function PreLaunchChecklistPage() {
     critical: "text-red-700 bg-red-50 border-red-200",
     high: "text-orange-700 bg-orange-50 border-orange-200",
     medium: "text-amber-700 bg-amber-50 border-amber-200",
-    low: "text-slate-600 bg-slate-100 border-slate-200",
+    low: "text-stone-600 bg-stone-100 border-stone-200",
   };
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
       {/* Breadcrumb */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2 text-sm text-slate-700">
+        <div className="flex items-center gap-2 text-sm text-stone-700">
           <span>Pre-Launch Checklist</span>
         </div>
         <div className="flex items-center gap-3 text-sm">
-          <span className="text-slate-700">{checkedItems}/{totalItems} complete</span>
-          <span className={`font-bold ${progress === 100 ? "text-emerald-600" : progress > 70 ? "text-emerald-500" : "text-amber-600"}`}>{progress}%</span>
+          <span className="text-stone-700">{checkedItems}/{totalItems} complete</span>
+          <span className={`font-bold ${progress === 100 ? "text-amber-600" : progress > 70 ? "text-amber-500" : "text-amber-600"}`}>{progress}%</span>
         </div>
       </div>
 
@@ -223,22 +223,22 @@ export default function PreLaunchChecklistPage() {
             <Rocket className="w-7 h-7 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-slate-800">Pre-Launch Checklist</h1>
-            <p className="text-slate-700 mt-1">
+            <h1 className="text-3xl font-bold text-stone-800">Pre-Launch Checklist</h1>
+            <p className="text-stone-700 mt-1">
               Everything that needs to be done before Zoobicon goes live. Complete all critical items before launch.
             </p>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="bg-white border border-slate-200 rounded-xl p-6 mb-6">
+        <div className="bg-white border border-stone-200 rounded-xl p-6 mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-slate-800">Overall Progress</h2>
-            <span className="text-2xl font-bold text-slate-800">{progress}%</span>
+            <h2 className="font-semibold text-stone-800">Overall Progress</h2>
+            <span className="text-2xl font-bold text-stone-800">{progress}%</span>
           </div>
-          <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden mb-4">
+          <div className="w-full h-3 bg-stone-200 rounded-full overflow-hidden mb-4">
             <motion.div
-              className={`h-full rounded-full ${progress === 100 ? "bg-emerald-500" : progress >= 70 ? "bg-emerald-400" : progress >= 40 ? "bg-amber-400" : "bg-red-400"}`}
+              className={`h-full rounded-full ${progress === 100 ? "bg-amber-500" : progress >= 70 ? "bg-amber-400" : progress >= 40 ? "bg-amber-400" : "bg-red-400"}`}
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
@@ -256,7 +256,7 @@ export default function PreLaunchChecklistPage() {
               </span>
             )}
             {criticalRemaining === 0 && highRemaining === 0 && (
-              <span className="flex items-center gap-1.5 text-emerald-600">
+              <span className="flex items-center gap-1.5 text-amber-600">
                 <CheckCircle2 className="w-4 h-4" /> All critical and high priority items complete!
               </span>
             )}
@@ -267,31 +267,31 @@ export default function PreLaunchChecklistPage() {
         <div className="bg-gradient-to-r from-stone-50 to-stone-50 border border-stone-200 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 mb-3">
             <Target className="w-5 h-5 text-stone-600" />
-            <h2 className="font-semibold text-slate-800">Competitive Position at Launch</h2>
+            <h2 className="font-semibold text-stone-800">Competitive Position at Launch</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-            <div className="bg-white rounded-lg p-3 border border-slate-200">
-              <div className="text-emerald-600 font-medium mb-1">We Beat</div>
-              <div className="text-slate-700">White-label agency, 43 generators, multi-LLM, full-stack gen, e-commerce gen, 21+ tools</div>
+            <div className="bg-white rounded-lg p-3 border border-stone-200">
+              <div className="text-amber-600 font-medium mb-1">We Beat</div>
+              <div className="text-stone-700">White-label agency, 43 generators, multi-LLM, full-stack gen, e-commerce gen, 21+ tools</div>
             </div>
-            <div className="bg-white rounded-lg p-3 border border-slate-200">
+            <div className="bg-white rounded-lg p-3 border border-stone-200">
               <div className="text-stone-600 font-medium mb-1">We Match</div>
-              <div className="text-slate-700">Visual editing, project mode, templates, multi-page sites, GitHub export</div>
+              <div className="text-stone-700">Visual editing, project mode, templates, multi-page sites, GitHub export</div>
             </div>
-            <div className="bg-white rounded-lg p-3 border border-slate-200">
+            <div className="bg-white rounded-lg p-3 border border-stone-200">
               <div className="text-amber-600 font-medium mb-1">Gap to Close</div>
-              <div className="text-slate-700">Build speed (95s vs Bolt 3-5s), in-browser runtime, real-time collab</div>
+              <div className="text-stone-700">Build speed (95s vs Bolt 3-5s), in-browser runtime, real-time collab</div>
             </div>
-            <div className="bg-white rounded-lg p-3 border border-slate-200">
+            <div className="bg-white rounded-lg p-3 border border-stone-200">
               <div className="text-stone-600 font-medium mb-1">Unique Moat</div>
-              <div className="text-slate-700">Agency platform, 43 specialized generators, Opus quality, WordPress plugin</div>
+              <div className="text-stone-700">Agency platform, 43 specialized generators, Opus quality, WordPress plugin</div>
             </div>
           </div>
         </div>
 
         {/* Filters */}
         <div className="flex items-center gap-2 mb-6 flex-wrap">
-          <span className="text-sm text-slate-700 mr-1">Filter:</span>
+          <span className="text-sm text-stone-700 mr-1">Filter:</span>
           {["all", "critical", "high", "medium", "low"].map((p) => (
             <button
               key={p}
@@ -299,7 +299,7 @@ export default function PreLaunchChecklistPage() {
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filterPriority === p
                   ? "bg-stone-500 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  : "bg-stone-100 text-stone-600 hover:bg-stone-200"
               }`}
             >
               {p === "all" ? "All" : p.charAt(0).toUpperCase() + p.slice(1)}
@@ -313,7 +313,7 @@ export default function PreLaunchChecklistPage() {
           <button
             onClick={() => setShowCompetitorNotes(!showCompetitorNotes)}
             className={`ml-auto px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              showCompetitorNotes ? "bg-stone-50 text-stone-600 border border-stone-200" : "bg-slate-100 text-slate-700"
+              showCompetitorNotes ? "bg-stone-50 text-stone-600 border border-stone-200" : "bg-stone-100 text-stone-700"
             }`}
           >
             <Trophy className="w-3 h-3 inline mr-1" />
@@ -331,30 +331,30 @@ export default function PreLaunchChecklistPage() {
             const Icon = cat.icon;
 
             return (
-              <div key={cat.key} className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+              <div key={cat.key} className="bg-white border border-stone-200 rounded-xl overflow-hidden">
                 <button
                   onClick={() => toggleCategory(cat.key)}
-                  className="w-full flex items-center gap-3 px-5 py-4 hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center gap-3 px-5 py-4 hover:bg-stone-50 transition-colors"
                 >
                   <Icon className={`w-5 h-5 ${cat.color}`} />
-                  <span className="font-semibold flex-1 text-left text-slate-800">{cat.label}</span>
-                  <span className="text-sm text-slate-700">{catChecked}/{items.length}</span>
-                  <div className="w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden mx-2">
+                  <span className="font-semibold flex-1 text-left text-stone-800">{cat.label}</span>
+                  <span className="text-sm text-stone-700">{catChecked}/{items.length}</span>
+                  <div className="w-24 h-1.5 bg-stone-200 rounded-full overflow-hidden mx-2">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${catChecked === items.length ? "bg-emerald-500" : "bg-stone-400"}`}
+                      className={`h-full rounded-full transition-all duration-500 ${catChecked === items.length ? "bg-amber-500" : "bg-stone-400"}`}
                       style={{ width: `${items.length > 0 ? (catChecked / items.length) * 100 : 0}%` }}
                     />
                   </div>
-                  {isExpanded ? <ChevronDown className="w-4 h-4 text-slate-600" /> : <ChevronRight className="w-4 h-4 text-slate-600" />}
+                  {isExpanded ? <ChevronDown className="w-4 h-4 text-stone-600" /> : <ChevronRight className="w-4 h-4 text-stone-600" />}
                 </button>
 
                 {isExpanded && (
-                  <div className="border-t border-slate-200">
+                  <div className="border-t border-stone-200">
                     {items.map((item) => (
                       <div
                         key={item.id}
-                        className={`flex items-start gap-3 px-5 py-3 border-b border-slate-100 last:border-0 transition-colors ${
-                          checked.has(item.id) ? "bg-emerald-50/30" : "hover:bg-slate-50"
+                        className={`flex items-start gap-3 px-5 py-3 border-b border-stone-100 last:border-0 transition-colors ${
+                          checked.has(item.id) ? "bg-amber-50/30" : "hover:bg-stone-50"
                         }`}
                       >
                         <button
@@ -362,14 +362,14 @@ export default function PreLaunchChecklistPage() {
                           className="mt-0.5 shrink-0"
                         >
                           {checked.has(item.id) ? (
-                            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                            <CheckCircle2 className="w-5 h-5 text-amber-500" />
                           ) : (
-                            <Circle className="w-5 h-5 text-slate-300 hover:text-slate-500 transition-colors" />
+                            <Circle className="w-5 h-5 text-stone-300 hover:text-stone-500 transition-colors" />
                           )}
                         </button>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className={`text-sm font-medium ${checked.has(item.id) ? "text-slate-600 line-through" : "text-slate-700"}`}>
+                            <span className={`text-sm font-medium ${checked.has(item.id) ? "text-stone-600 line-through" : "text-stone-700"}`}>
                               {item.label}
                             </span>
                             <span className={`text-xs px-1.5 py-0.5 rounded border font-medium ${priorityColor[item.priority]}`}>
@@ -381,7 +381,7 @@ export default function PreLaunchChecklistPage() {
                               </Link>
                             )}
                           </div>
-                          <p className={`text-xs mt-1 leading-relaxed ${checked.has(item.id) ? "text-slate-600" : "text-slate-700"}`}>
+                          <p className={`text-xs mt-1 leading-relaxed ${checked.has(item.id) ? "text-stone-600" : "text-stone-700"}`}>
                             {item.description}
                           </p>
                           {showCompetitorNotes && item.competitorNote && (
@@ -401,24 +401,24 @@ export default function PreLaunchChecklistPage() {
         </div>
 
         {/* Summary Footer */}
-        <div className="mt-8 bg-white border border-slate-200 rounded-xl p-6">
-          <h3 className="font-semibold text-slate-800 mb-3">Launch Readiness Summary</h3>
+        <div className="mt-8 bg-white border border-stone-200 rounded-xl p-6">
+          <h3 className="font-semibold text-stone-800 mb-3">Launch Readiness Summary</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
             {["critical", "high", "medium", "low"].map((p) => {
               const total = CHECKLIST.filter((i) => i.priority === p).length;
               const done = CHECKLIST.filter((i) => i.priority === p && checked.has(i.id)).length;
               return (
-                <div key={p} className="bg-slate-50 rounded-lg p-3">
-                  <div className={`text-lg font-bold ${done === total ? "text-emerald-600" : priorityColor[p].split(" ")[0]}`}>
+                <div key={p} className="bg-stone-50 rounded-lg p-3">
+                  <div className={`text-lg font-bold ${done === total ? "text-amber-600" : priorityColor[p].split(" ")[0]}`}>
                     {done}/{total}
                   </div>
-                  <div className="text-xs text-slate-700 capitalize mt-0.5">{p}</div>
+                  <div className="text-xs text-stone-700 capitalize mt-0.5">{p}</div>
                 </div>
               );
             })}
           </div>
-          <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-between">
-            <p className="text-sm text-slate-600">
+          <div className="mt-4 pt-4 border-t border-stone-200 flex items-center justify-between">
+            <p className="text-sm text-stone-600">
               {progress === 100
                 ? "All items complete! You are ready to launch."
                 : criticalRemaining > 0
@@ -426,7 +426,7 @@ export default function PreLaunchChecklistPage() {
                 : `${highRemaining} high priority items remaining. Critical items are done — launch is possible but not recommended.`}
             </p>
             {progress === 100 && (
-              <div className="flex items-center gap-2 text-emerald-600 font-bold">
+              <div className="flex items-center gap-2 text-amber-600 font-bold">
                 <Rocket className="w-5 h-5" /> READY TO LAUNCH
               </div>
             )}
@@ -434,15 +434,15 @@ export default function PreLaunchChecklistPage() {
         </div>
 
         {/* Quick Links */}
-        <div className="mt-6 border-t border-slate-200 pt-6">
-          <h3 className="text-sm font-medium text-slate-600 mb-3">Quick Links</h3>
+        <div className="mt-6 border-t border-stone-200 pt-6">
+          <h3 className="text-sm font-medium text-stone-600 mb-3">Quick Links</h3>
           <div className="flex flex-wrap gap-2">
-            <Link href="/admin" className="text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-600 transition-colors">Admin Dashboard</Link>
-            <Link href="/admin/health" className="text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-600 transition-colors">Health Check</Link>
-            <Link href="/admin/email-settings" className="text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-600 transition-colors">Email Settings</Link>
-            <Link href="/admin/integrations" className="text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-600 transition-colors">Integrations</Link>
-            <Link href="/admin/usage" className="text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-600 transition-colors">Usage & Credits</Link>
-            <Link href="/builder" className="text-xs bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-600 transition-colors">Builder</Link>
+            <Link href="/admin" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Admin Dashboard</Link>
+            <Link href="/admin/health" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Health Check</Link>
+            <Link href="/admin/email-settings" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Email Settings</Link>
+            <Link href="/admin/integrations" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Integrations</Link>
+            <Link href="/admin/usage" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Usage & Credits</Link>
+            <Link href="/builder" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Builder</Link>
           </div>
         </div>
       </div>

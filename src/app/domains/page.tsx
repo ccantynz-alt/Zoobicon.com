@@ -630,7 +630,7 @@ export default function DomainsPage() {
             {/* Available */}
             {availableResults.length > 0 && (
               <div className="mb-6">
-                <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-emerald-400/80 mb-3 flex items-center gap-2">
+                <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-amber-400/80 mb-3 flex items-center gap-2">
                   <Check className="w-3.5 h-3.5" />
                   {availableResults.length} available
                 </p>
@@ -649,8 +649,8 @@ export default function DomainsPage() {
                           borderColor: isComRec ? "rgba(232,212,176,0.22)" : "rgba(255,255,255,0.07)",
                         }}
                       >
-                        <div className="w-8 h-8 rounded-xl bg-emerald-500/15 flex items-center justify-center flex-shrink-0">
-                          <Check className="w-4 h-4 text-emerald-400" />
+                        <div className="w-8 h-8 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+                          <Check className="w-4 h-4 text-amber-400" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
@@ -667,7 +667,7 @@ export default function DomainsPage() {
                           onClick={() => inCart ? removeFromCart(r.domain) : addToCart(r)}
                           className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all whitespace-nowrap ${
                             inCart
-                              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-red-500/15 hover:text-red-300 hover:border-red-500/25"
+                              ? "bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-red-500/15 hover:text-red-300 hover:border-red-500/25"
                               : "bg-white/[0.06] text-white/80 border border-white/[0.1] hover:bg-white/[0.12] hover:text-white"
                           }`}
                         >

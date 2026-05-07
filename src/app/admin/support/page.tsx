@@ -186,7 +186,7 @@ export default function AdminSupportPage() {
     urgent: "bg-red-50 text-red-700 border-red-200",
     high: "bg-orange-50 text-orange-700 border-orange-200",
     medium: "bg-amber-50 text-amber-700 border-amber-200",
-    low: "bg-slate-100 text-slate-600 border-slate-200",
+    low: "bg-stone-100 text-stone-600 border-stone-200",
   };
 
   const statusIcon: Record<string, typeof AlertCircle> = {
@@ -219,14 +219,14 @@ export default function AdminSupportPage() {
   return (
     <div>
       {/* Header */}
-      <div className="border-b border-slate-200 bg-white backdrop-blur-2xl">
+      <div className="border-b border-stone-200 bg-white backdrop-blur-2xl">
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="p-2 rounded-lg hover:bg-slate-100 transition-colors">
-              <ArrowLeft className="w-5 h-5 text-slate-600" />
+            <Link href="/admin" className="p-2 rounded-lg hover:bg-stone-100 transition-colors">
+              <ArrowLeft className="w-5 h-5 text-stone-600" />
             </Link>
             <MessageSquare className="w-6 h-6 text-stone-500" />
-            <h1 className="text-lg font-semibold text-slate-800">Support Dashboard</h1>
+            <h1 className="text-lg font-semibold text-stone-800">Support Dashboard</h1>
             {stats.open > 0 && (
               <span className="bg-stone-50 text-stone-700 text-xs font-bold px-2 py-0.5 rounded-full border border-stone-200">
                 {stats.open} open
@@ -236,23 +236,23 @@ export default function AdminSupportPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/admin/support/knowledge"
-              className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors"
+              className="flex items-center gap-2 text-sm text-stone-600 hover:text-stone-800 px-3 py-2 rounded-lg hover:bg-stone-100 transition-colors"
             >
               <BookOpen className="w-4 h-4" />
               Knowledge Base
             </Link>
             <Link
               href="/admin/email"
-              className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-800 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors"
+              className="flex items-center gap-2 text-sm text-stone-600 hover:text-stone-800 px-3 py-2 rounded-lg hover:bg-stone-100 transition-colors"
             >
               <Inbox className="w-4 h-4" />
               Email Inbox
             </Link>
             <button
               onClick={fetchTickets}
-              className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              className="p-2 rounded-lg hover:bg-stone-100 transition-colors"
             >
-              <RefreshCw className={`w-5 h-5 text-slate-600 ${loading ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-5 h-5 text-stone-600 ${loading ? "animate-spin" : ""}`} />
             </button>
           </div>
         </div>
@@ -260,10 +260,10 @@ export default function AdminSupportPage() {
 
       <div className="max-w-[1400px] mx-auto flex" style={{ height: "calc(100vh - 60px)" }}>
         {/* Ticket List */}
-        <div className={`border-r border-slate-200 flex flex-col ${selectedTicket ? "w-96" : "flex-1 max-w-2xl"}`}>
+        <div className={`border-r border-stone-200 flex flex-col ${selectedTicket ? "w-96" : "flex-1 max-w-2xl"}`}>
           {/* Stats Bar */}
-          <div className="p-3 border-b border-slate-200 flex items-center gap-4">
-            <div className="flex items-center gap-1 text-xs text-slate-600">
+          <div className="p-3 border-b border-stone-200 flex items-center gap-4">
+            <div className="flex items-center gap-1 text-xs text-stone-600">
               <Bot className="w-3.5 h-3.5 text-stone-500" />
               <span>{stats.ai_handled} AI-handled</span>
             </div>
@@ -281,7 +281,7 @@ export default function AdminSupportPage() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   statusFilter === f.key
                     ? "bg-stone-50 text-stone-700 border border-stone-200"
-                    : "text-slate-600 hover:text-slate-800 hover:bg-slate-100 border border-transparent"
+                    : "text-stone-600 hover:text-stone-800 hover:bg-stone-100 border border-transparent"
                 }`}
               >
                 {f.label} ({f.count})
@@ -292,14 +292,14 @@ export default function AdminSupportPage() {
           {/* Search */}
           <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-600" />
               <input
                 type="text"
                 placeholder="Search tickets..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && fetchTickets()}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-stone-400"
+                className="w-full bg-stone-50 border border-stone-200 rounded-lg pl-10 pr-4 py-2 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:border-stone-400"
               />
             </div>
           </div>
@@ -311,7 +311,7 @@ export default function AdminSupportPage() {
                 <Loader2 className="w-6 h-6 text-stone-400 animate-spin" />
               </div>
             ) : tickets.length === 0 ? (
-              <div className="text-center py-20 text-slate-600">
+              <div className="text-center py-20 text-stone-600">
                 <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p>No tickets found</p>
                 <p className="text-sm mt-1">
@@ -325,8 +325,8 @@ export default function AdminSupportPage() {
                   <button
                     key={ticket.id}
                     onClick={() => selectTicket(ticket)}
-                    className={`w-full text-left px-4 py-3 border-b border-slate-100 hover:bg-slate-50 transition-colors ${
-                      selectedTicket?.id === ticket.id ? "bg-slate-100" : ""
+                    className={`w-full text-left px-4 py-3 border-b border-stone-100 hover:bg-stone-50 transition-colors ${
+                      selectedTicket?.id === ticket.id ? "bg-stone-100" : ""
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
@@ -336,10 +336,10 @@ export default function AdminSupportPage() {
                             ? "text-stone-500"
                             : ticket.status === "pending"
                             ? "text-amber-500"
-                            : "text-emerald-500"
+                            : "text-amber-500"
                         }`}
                       />
-                      <span className="text-xs text-slate-600 font-mono">
+                      <span className="text-xs text-stone-600 font-mono">
                         {ticket.ticket_number}
                       </span>
                       <span
@@ -352,22 +352,22 @@ export default function AdminSupportPage() {
                       {ticket.ai_auto_replied && (
                         <Bot className="w-3.5 h-3.5 text-stone-400 flex-shrink-0" />
                       )}
-                      <span className="text-xs text-slate-600 ml-auto">
+                      <span className="text-xs text-stone-600 ml-auto">
                         {formatDate(ticket.updated_at)}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-800 font-medium truncate">
+                    <p className="text-sm text-stone-800 font-medium truncate">
                       {ticket.subject}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-slate-600 truncate">
+                      <span className="text-xs text-stone-600 truncate">
                         {ticket.from_name || ticket.from_email}
                       </span>
-                      <span className="text-xs text-slate-600">
+                      <span className="text-xs text-stone-600">
                         &bull; {ticket.message_count} msgs
                       </span>
                       {ticket.ai_confidence !== null && (
-                        <span className="text-xs text-slate-600 ml-auto">
+                        <span className="text-xs text-stone-600 ml-auto">
                           AI: {Math.round(ticket.ai_confidence * 100)}%
                         </span>
                       )}
@@ -383,10 +383,10 @@ export default function AdminSupportPage() {
         {selectedTicket ? (
           <div className="flex-1 flex flex-col">
             {/* Ticket Header */}
-            <div className="p-4 border-b border-slate-200">
+            <div className="p-4 border-b border-stone-200">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-600 font-mono">
+                  <span className="text-xs text-stone-600 font-mono">
                     {selectedTicket.ticket_number}
                   </span>
                   <span
@@ -414,8 +414,8 @@ export default function AdminSupportPage() {
                             ? "bg-stone-50 text-stone-700"
                             : s === "pending"
                             ? "bg-amber-50 text-amber-700"
-                            : "bg-emerald-50 text-emerald-700"
-                          : "text-slate-700 hover:bg-slate-100"
+                            : "bg-amber-50 text-amber-700"
+                          : "text-stone-700 hover:bg-stone-100"
                       }`}
                     >
                       {s}
@@ -423,15 +423,15 @@ export default function AdminSupportPage() {
                   ))}
                 </div>
               </div>
-              <h2 className="text-lg font-medium text-slate-800 mb-1">{selectedTicket.subject}</h2>
-              <div className="flex items-center gap-2 text-sm text-slate-600">
+              <h2 className="text-lg font-medium text-stone-800 mb-1">{selectedTicket.subject}</h2>
+              <div className="flex items-center gap-2 text-sm text-stone-600">
                 <User className="w-3.5 h-3.5" />
                 <span>{selectedTicket.from_name}</span>
-                <span className="text-slate-600">&lt;{selectedTicket.from_email}&gt;</span>
+                <span className="text-stone-600">&lt;{selectedTicket.from_email}&gt;</span>
               </div>
               {/* Priority selector */}
               <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs text-slate-700">Priority:</span>
+                <span className="text-xs text-stone-700">Priority:</span>
                 {(["low", "medium", "high", "urgent"] as const).map((p) => (
                   <button
                     key={p}
@@ -439,7 +439,7 @@ export default function AdminSupportPage() {
                     className={`text-xs px-2 py-0.5 rounded border transition-colors ${
                       selectedTicket.priority === p
                         ? priorityColor[p]
-                        : "text-slate-600 border-slate-200 hover:border-slate-300"
+                        : "text-stone-600 border-stone-200 hover:border-stone-300"
                     }`}
                   >
                     {p}
@@ -460,7 +460,7 @@ export default function AdminSupportPage() {
                     key={msg.id}
                     className={`rounded-lg p-4 ${
                       msg.sender === "customer"
-                        ? "bg-slate-50 border border-slate-200"
+                        ? "bg-stone-50 border border-stone-200"
                         : msg.sender === "ai-draft"
                         ? "bg-stone-50 border border-stone-200 ml-8"
                         : msg.sender === "ai"
@@ -471,8 +471,8 @@ export default function AdminSupportPage() {
                     <div className="flex items-center gap-2 mb-2 text-xs">
                       {msg.sender === "customer" ? (
                         <>
-                          <User className="w-3.5 h-3.5 text-slate-600" />
-                          <span className="text-slate-600">
+                          <User className="w-3.5 h-3.5 text-stone-600" />
+                          <span className="text-stone-600">
                             {selectedTicket.from_name}
                           </span>
                         </>
@@ -480,7 +480,7 @@ export default function AdminSupportPage() {
                         <>
                           <Sparkles className="w-3.5 h-3.5 text-stone-500" />
                           <span className="text-stone-600">AI Draft</span>
-                          <span className="text-slate-600">(not sent)</span>
+                          <span className="text-stone-600">(not sent)</span>
                         </>
                       ) : msg.sender === "ai" ? (
                         <>
@@ -495,11 +495,11 @@ export default function AdminSupportPage() {
                           <span className="text-stone-600">Agent</span>
                         </>
                       )}
-                      <span className="text-slate-600 ml-auto">
+                      <span className="text-stone-600 ml-auto">
                         {formatDate(msg.created_at)}
                       </span>
                     </div>
-                    <div className="text-sm text-slate-700 whitespace-pre-wrap">
+                    <div className="text-sm text-stone-700 whitespace-pre-wrap">
                       {msg.body_text}
                     </div>
                     {msg.sender === "ai-draft" && (
@@ -516,7 +516,7 @@ export default function AdminSupportPage() {
             </div>
 
             {/* Reply Area */}
-            <div className="border-t border-slate-200 p-4">
+            <div className="border-t border-stone-200 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <button
                   onClick={generateAIDraft}
@@ -537,7 +537,7 @@ export default function AdminSupportPage() {
                   onChange={(e) => setReplyText(e.target.value)}
                   placeholder="Type your reply..."
                   rows={3}
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-stone-400 resize-none"
+                  className="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-4 py-3 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:border-stone-400 resize-none"
                 />
                 <button
                   onClick={sendReply}
@@ -554,11 +554,11 @@ export default function AdminSupportPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-slate-600">
+          <div className="flex-1 flex items-center justify-center text-stone-600">
             <div className="text-center">
               <MessageSquare className="w-16 h-16 mx-auto mb-4 opacity-20" />
               <p>Select a ticket to view</p>
-              <p className="text-sm mt-2 text-slate-600">
+              <p className="text-sm mt-2 text-stone-600">
                 Emails to support@zoobicon.com automatically create tickets
                 <br />
                 AI drafts responses and auto-replies when confident

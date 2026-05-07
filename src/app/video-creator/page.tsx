@@ -139,7 +139,7 @@ const PROJECT_TYPES = [
 ];
 
 const VISUAL_STYLES = [
-  { id: "modern-minimalist", label: "Modern / Minimalist", icon: Zap, color: "from-slate-400 to-slate-600" },
+  { id: "modern-minimalist", label: "Modern / Minimalist", icon: Zap, color: "from-stone-400 to-stone-600" },
   { id: "bold-dynamic", label: "Bold / Dynamic", icon: Sparkles, color: "from-stone-500 to-stone-500" },
   { id: "elegant-luxury", label: "Elegant / Luxury", icon: Crown, color: "from-stone-400 to-stone-600" },
   { id: "fun-playful", label: "Fun / Playful", icon: Smile, color: "from-stone-500 to-stone-500" },
@@ -892,7 +892,7 @@ SCRIPT_2:
                     <div className="text-center mb-8">
                       <div className="relative w-16 h-16 mx-auto mb-5">
                         <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-stone-500/20 to-stone-500/20 animate-pulse" />
-                        <div className="relative w-full h-full rounded-2xl bg-zinc-900/80 flex items-center justify-center border border-white/[0.08]">
+                        <div className="relative w-full h-full rounded-2xl bg-stone-900/80 flex items-center justify-center border border-white/[0.08]">
                           <Film className="w-7 h-7 text-stone-400" />
                         </div>
                       </div>

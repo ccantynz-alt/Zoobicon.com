@@ -37,7 +37,7 @@ const TEMPLATES = [
   { id: 'nature', name: 'Nature', preview: 'bg-gradient-to-br from-stone-500 to-stone-600', accent: '#10b981' },
   { id: 'ocean', name: 'Ocean', preview: 'bg-gradient-to-br from-stone-500 to-stone-500', accent: '#78716c' },
   { id: 'sunset', name: 'Sunset', preview: 'bg-gradient-to-br from-stone-500 to-stone-500', accent: '#f97316' },
-  { id: 'corporate', name: 'Corporate', preview: 'bg-slate-800', accent: '#64748b' },
+  { id: 'corporate', name: 'Corporate', preview: 'bg-stone-800', accent: '#64748b' },
   { id: 'neon', name: 'Neon', preview: 'bg-black', accent: '#22d3ee' },
 ];
 

@@ -175,8 +175,8 @@ const PLATFORM_CONFIG = [
     id: "twitter",
     name: "MessageCircle / X",
     Icon: TwitterIcon,
-    color: "from-zinc-800 to-zinc-900",
-    hoverColor: "hover:from-zinc-700 hover:to-zinc-800",
+    color: "from-stone-800 to-stone-900",
+    hoverColor: "hover:from-stone-700 hover:to-stone-800",
     textColor: "text-white",
     hasWebShare: true,
   },
@@ -211,8 +211,8 @@ const PLATFORM_CONFIG = [
     id: "tiktok",
     name: "TikTok",
     Icon: TikTokIcon,
-    color: "from-zinc-900 to-black",
-    hoverColor: "hover:from-zinc-800 hover:to-zinc-900",
+    color: "from-stone-900 to-black",
+    hoverColor: "hover:from-stone-800 hover:to-stone-900",
     textColor: "text-white",
     hasWebShare: false,
   },
@@ -345,7 +345,7 @@ export default function ShareModal({
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
+              className="absolute top-4 right-4 z-10 rounded-lg p-1.5 text-stone-400 transition-colors hover:bg-white/5 hover:text-white"
             >
               <X className="h-5 w-5" />
             </button>
@@ -365,7 +365,7 @@ export default function ShareModal({
                 <h2 className="text-xl font-bold text-white">
                   Your site is live!
                 </h2>
-                <p className="mt-1 text-sm text-zinc-400">
+                <p className="mt-1 text-sm text-stone-400">
                   Share your creation with the world
                 </p>
               </div>
@@ -411,7 +411,7 @@ export default function ShareModal({
                   href={siteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 rounded-lg bg-white/10 p-1.5 text-zinc-400 transition-colors hover:bg-white/15 hover:text-white"
+                  className="shrink-0 rounded-lg bg-white/10 p-1.5 text-stone-400 transition-colors hover:bg-white/15 hover:text-white"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>
@@ -431,7 +431,7 @@ export default function ShareModal({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a12]/60 to-transparent" />
                     <div className="absolute bottom-2 left-2">
-                      <span className="rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-medium text-zinc-300 backdrop-blur-sm">
+                      <span className="rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-medium text-stone-300 backdrop-blur-sm">
                         {siteName || "Untitled Site"}
                       </span>
                     </div>
@@ -445,7 +445,7 @@ export default function ShareModal({
                     className={`flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-all ${
                       showQR
                         ? "border-stone-500/30 bg-stone-500/10 text-stone-400"
-                        : "border-white/10 bg-white/5 text-zinc-400 hover:text-white"
+                        : "border-white/10 bg-white/5 text-stone-400 hover:text-white"
                     }`}
                   >
                     <QrCode className="h-3.5 w-3.5" />
@@ -469,28 +469,28 @@ export default function ShareModal({
 
               {/* Stats bar */}
               <div className="mb-5 flex items-center justify-center gap-6 rounded-lg border border-white/5 bg-white/[0.02] py-2.5">
-                <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                <div className="flex items-center gap-1.5 text-xs text-stone-400">
                   <Clock className="h-3.5 w-3.5 text-stone-500/70" />
-                  <span className="font-medium text-zinc-300">{buildTime ? `${buildTime}s` : "~95s"}</span>
-                  <span className="text-zinc-500">build</span>
+                  <span className="font-medium text-stone-300">{buildTime ? `${buildTime}s` : "~95s"}</span>
+                  <span className="text-stone-500">build</span>
                 </div>
                 <div className="h-3 w-px bg-white/10" />
-                <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                <div className="flex items-center gap-1.5 text-xs text-stone-400">
                   <Layers className="h-3.5 w-3.5 text-stone-500/70" />
-                  <span className="font-medium text-zinc-300">{pageCount}</span>
-                  <span className="text-zinc-500">{pageCount === 1 ? "page" : "pages"}</span>
+                  <span className="font-medium text-stone-300">{pageCount}</span>
+                  <span className="text-stone-500">{pageCount === 1 ? "page" : "pages"}</span>
                 </div>
                 <div className="h-3 w-px bg-white/10" />
-                <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                <div className="flex items-center gap-1.5 text-xs text-stone-400">
                   <FileCode className="h-3.5 w-3.5 text-stone-500/70" />
-                  <span className="font-medium text-zinc-300">{formatSize(siteSize)}</span>
-                  <span className="text-zinc-500">size</span>
+                  <span className="font-medium text-stone-300">{formatSize(siteSize)}</span>
+                  <span className="text-stone-500">size</span>
                 </div>
               </div>
 
               {/* Share buttons grid */}
               <div className="mb-4">
-                <p className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+                <p className="mb-3 text-xs font-medium uppercase tracking-wider text-stone-500">
                   Share on
                 </p>
                 <div className="grid grid-cols-3 gap-2">
@@ -511,7 +511,7 @@ export default function ShareModal({
                           : platform.name}
                       </span>
                       {!platform.hasWebShare && copiedPlatform !== platform.id && (
-                        <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-zinc-700 text-[8px] text-zinc-300">
+                        <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-stone-700 text-[8px] text-stone-300">
                           <Copy className="h-2.5 w-2.5" />
                         </span>
                       )}
@@ -522,14 +522,14 @@ export default function ShareModal({
 
               {/* Download OG image */}
               <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-4 py-2.5">
-                <div className="flex items-center gap-2 text-xs text-zinc-400">
+                <div className="flex items-center gap-2 text-xs text-stone-400">
                   <Download className="h-3.5 w-3.5" />
                   <span>Download share image</span>
                 </div>
                 <a
                   href={generateOGImageUrl(siteUrl) + `&name=${encodeURIComponent(siteName)}`}
                   download={`${siteName || "site"}-og.svg`}
-                  className="rounded-md bg-white/10 px-2.5 py-1 text-[10px] font-medium text-zinc-300 transition-colors hover:bg-white/15 hover:text-white"
+                  className="rounded-md bg-white/10 px-2.5 py-1 text-[10px] font-medium text-stone-300 transition-colors hover:bg-white/15 hover:text-white"
                 >
                   SVG
                 </a>

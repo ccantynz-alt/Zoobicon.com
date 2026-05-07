@@ -174,7 +174,7 @@ export default function VoiceToBuildButton({
                     </div>
                     <div className="text-white text-lg leading-snug font-medium truncate">
                       {interim || (
-                        <span className="text-slate-400">{placeholder}</span>
+                        <span className="text-stone-400">{placeholder}</span>
                       )}
                     </div>
                   </div>

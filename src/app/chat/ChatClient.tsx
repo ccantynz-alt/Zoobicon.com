@@ -471,7 +471,7 @@ export default function ChatClient() {
         <div className="h-14 shrink-0 px-4 flex items-center justify-between border-b border-white/10">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-zinc-900" />
+              <Sparkles className="w-4 h-4 text-stone-900" />
             </div>
             <span className="text-sm font-semibold">Chat</span>
           </div>
@@ -594,7 +594,7 @@ export default function ChatClient() {
             {!hasMessages && (
               <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mb-6">
-                  <Sparkles className="w-7 h-7 text-zinc-900" />
+                  <Sparkles className="w-7 h-7 text-stone-900" />
                 </div>
                 <h2 className="text-2xl font-semibold mb-2">What can I help with?</h2>
                 <p className="text-sm text-white/50 max-w-md">
@@ -657,7 +657,7 @@ export default function ChatClient() {
                 <button
                   onClick={send}
                   disabled={!input.trim()}
-                  className="shrink-0 h-9 w-9 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 disabled:from-white/10 disabled:to-white/10 disabled:text-white/30 text-zinc-900 flex items-center justify-center transition-all disabled:cursor-not-allowed"
+                  className="shrink-0 h-9 w-9 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 disabled:from-white/10 disabled:to-white/10 disabled:text-white/30 text-stone-900 flex items-center justify-center transition-all disabled:cursor-not-allowed"
                   title="Send (Enter)"
                 >
                   <Send className="w-4 h-4" />
@@ -741,7 +741,7 @@ function MessageBubble({ message }: { message: Message }) {
         className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-semibold ${
           isUser
             ? "bg-white/10 text-white"
-            : "bg-gradient-to-br from-amber-400 to-orange-500 text-zinc-900"
+            : "bg-gradient-to-br from-amber-400 to-orange-500 text-stone-900"
         }`}
       >
         {isUser ? "You" : <Sparkles className="w-4 h-4" />}

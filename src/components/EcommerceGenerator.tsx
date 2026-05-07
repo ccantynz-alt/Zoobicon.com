@@ -210,7 +210,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
       <div className="flex flex-col items-center justify-center py-24">
         <Loader2 className="w-12 h-12 text-stone-500 animate-spin mb-6" />
         <h2 className="text-2xl font-bold text-white mb-2">Building your store...</h2>
-        <p className="text-zinc-400 text-center max-w-md">
+        <p className="text-stone-400 text-center max-w-md">
           Generating a complete e-commerce storefront for your {effectiveBusinessType} business
           with {products.filter((p) => p.name.trim()).length} products and{" "}
           {selectedFeatures.length} features.
@@ -222,10 +222,10 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
   if (generatedHtml) {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+        <div className="flex items-center justify-between p-4 border-b border-stone-800">
           <div>
             <h2 className="text-lg font-bold text-white">Your Store Preview</h2>
-            <p className="text-sm text-zinc-400">
+            <p className="text-sm text-stone-400">
               {effectiveBusinessType} store with {products.filter((p) => p.name.trim()).length}{" "}
               products
             </p>
@@ -233,7 +233,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
           <div className="flex gap-3">
             <button
               onClick={() => setGeneratedHtml(null)}
-              className="px-4 py-2 rounded-lg border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition-colors text-sm"
+              className="px-4 py-2 rounded-lg border border-stone-700 text-stone-300 hover:bg-stone-800 transition-colors text-sm"
             >
               <ArrowLeft className="w-4 h-4 inline mr-1" />
               Back to Editor
@@ -271,14 +271,14 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
                   i <= currentStep
                     ? "bg-stone-600 text-white"
-                    : "bg-zinc-800 text-zinc-500"
+                    : "bg-stone-800 text-stone-500"
                 }`}
               >
                 {i + 1}
               </div>
               <span
                 className={`ml-2 text-sm hidden sm:inline ${
-                  i <= currentStep ? "text-white" : "text-zinc-500"
+                  i <= currentStep ? "text-white" : "text-stone-500"
                 }`}
               >
                 {step}
@@ -286,7 +286,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
               {i < STEPS.length - 1 && (
                 <div
                   className={`w-12 sm:w-20 h-0.5 mx-2 transition-colors ${
-                    i < currentStep ? "bg-stone-600" : "bg-zinc-800"
+                    i < currentStep ? "bg-stone-600" : "bg-stone-800"
                   }`}
                 />
               )}
@@ -305,7 +305,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
       {currentStep === 0 && (
         <div>
           <h2 className="text-2xl font-bold text-white mb-2">What type of business?</h2>
-          <p className="text-zinc-400 mb-6">
+          <p className="text-stone-400 mb-6">
             Choose a category that best describes your store.
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -316,7 +316,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
                 className={`p-4 rounded-xl border text-center transition-all ${
                   businessType === type.label
                     ? "border-stone-500 bg-stone-500/10 text-white"
-                    : "border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-zinc-600"
+                    : "border-stone-800 bg-stone-900 text-stone-300 hover:border-stone-600"
                 }`}
               >
                 <div className="text-2xl mb-2">{type.icon}</div>
@@ -330,7 +330,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
               placeholder="Enter your business type..."
               value={customBusinessType}
               onChange={(e) => setCustomBusinessType(e.target.value)}
-              className="mt-4 w-full p-3 rounded-lg bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:border-stone-500"
+              className="mt-4 w-full p-3 rounded-lg bg-stone-900 border border-stone-700 text-white placeholder-stone-500 focus:outline-none focus:border-stone-500"
             />
           )}
         </div>
@@ -343,19 +343,19 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
             <h2 className="text-2xl font-bold text-white">Add your products</h2>
             <button
               onClick={() => setShowCsvPaste(!showCsvPaste)}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm text-stone-400 hover:text-white border border-stone-700 hover:border-stone-500 transition-colors"
             >
               <Upload className="w-4 h-4" />
               CSV Paste
             </button>
           </div>
-          <p className="text-zinc-400 mb-6">
+          <p className="text-stone-400 mb-6">
             Add the products you want in your store. At least one product is required.
           </p>
 
           {showCsvPaste && (
-            <div className="mb-6 p-4 rounded-lg bg-zinc-900 border border-zinc-700">
-              <p className="text-sm text-zinc-400 mb-2">
+            <div className="mb-6 p-4 rounded-lg bg-stone-900 border border-stone-700">
+              <p className="text-sm text-stone-400 mb-2">
                 Paste CSV data (name, price, description per line):
               </p>
               <textarea
@@ -363,7 +363,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
                 onChange={(e) => setCsvText(e.target.value)}
                 placeholder={"T-Shirt, 29.99, Premium cotton tee\nJeans, 59.99, Slim fit denim"}
                 rows={5}
-                className="w-full p-3 rounded-lg bg-zinc-800 border border-zinc-600 text-white placeholder-zinc-500 focus:outline-none focus:border-stone-500 text-sm font-mono"
+                className="w-full p-3 rounded-lg bg-stone-800 border border-stone-600 text-white placeholder-stone-500 focus:outline-none focus:border-stone-500 text-sm font-mono"
               />
               <div className="flex gap-2 mt-2">
                 <button
@@ -377,7 +377,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
                     setShowCsvPaste(false);
                     setCsvText("");
                   }}
-                  className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white text-sm transition-colors"
+                  className="px-3 py-1.5 rounded-lg text-stone-400 hover:text-white text-sm transition-colors"
                 >
                   Cancel
                 </button>
@@ -389,16 +389,16 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
             {products.map((product, i) => (
               <div
                 key={i}
-                className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 space-y-3"
+                className="p-4 rounded-xl bg-stone-900 border border-stone-800 space-y-3"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-zinc-400">
+                  <span className="text-sm font-medium text-stone-400">
                     Product {i + 1}
                   </span>
                   {products.length > 1 && (
                     <button
                       onClick={() => removeProduct(i)}
-                      className="text-zinc-500 hover:text-stone-400 transition-colors"
+                      className="text-stone-500 hover:text-stone-400 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -410,7 +410,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
                     placeholder="Product name"
                     value={product.name}
                     onChange={(e) => updateProduct(i, "name", e.target.value)}
-                    className="p-2.5 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:border-stone-500 text-sm"
+                    className="p-2.5 rounded-lg bg-stone-800 border border-stone-700 text-white placeholder-stone-500 focus:outline-none focus:border-stone-500 text-sm"
                   />
                   <input
                     type="number"
@@ -421,7 +421,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
                     onChange={(e) =>
                       updateProduct(i, "price", parseFloat(e.target.value) || 0)
                     }
-                    className="p-2.5 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:border-stone-500 text-sm"
+                    className="p-2.5 rounded-lg bg-stone-800 border border-stone-700 text-white placeholder-stone-500 focus:outline-none focus:border-stone-500 text-sm"
                   />
                 </div>
                 <input
@@ -429,14 +429,14 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
                   placeholder="Description (optional)"
                   value={product.description}
                   onChange={(e) => updateProduct(i, "description", e.target.value)}
-                  className="w-full p-2.5 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:border-stone-500 text-sm"
+                  className="w-full p-2.5 rounded-lg bg-stone-800 border border-stone-700 text-white placeholder-stone-500 focus:outline-none focus:border-stone-500 text-sm"
                 />
               </div>
             ))}
           </div>
           <button
             onClick={addProduct}
-            className="mt-3 flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors text-sm w-full justify-center"
+            className="mt-3 flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-stone-700 text-stone-400 hover:text-white hover:border-stone-500 transition-colors text-sm w-full justify-center"
           >
             <Plus className="w-4 h-4" />
             Add Product
@@ -448,7 +448,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
       {currentStep === 2 && (
         <div>
           <h2 className="text-2xl font-bold text-white mb-2">Select features</h2>
-          <p className="text-zinc-400 mb-6">
+          <p className="text-stone-400 mb-6">
             Choose the functionality to include in your store.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -462,12 +462,12 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
                   className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
                     isSelected
                       ? "border-stone-500 bg-stone-500/10 text-white"
-                      : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-600"
+                      : "border-stone-800 bg-stone-900 text-stone-400 hover:border-stone-600"
                   }`}
                 >
                   <div
                     className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      isSelected ? "bg-stone-500/20" : "bg-zinc-800"
+                      isSelected ? "bg-stone-500/20" : "bg-stone-800"
                     }`}
                   >
                     <Icon className="w-5 h-5" />
@@ -477,7 +477,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
                     className={`ml-auto w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                       isSelected
                         ? "border-stone-500 bg-stone-500"
-                        : "border-zinc-600"
+                        : "border-stone-600"
                     }`}
                   >
                     {isSelected && (
@@ -507,7 +507,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
       {currentStep === 3 && (
         <div>
           <h2 className="text-2xl font-bold text-white mb-2">Choose a theme</h2>
-          <p className="text-zinc-400 mb-6">
+          <p className="text-stone-400 mb-6">
             Select the visual style for your storefront.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -518,20 +518,20 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
                 className={`p-4 rounded-xl border text-left transition-all ${
                   selectedTheme === theme.id
                     ? "border-stone-500 bg-stone-500/10"
-                    : "border-zinc-800 bg-zinc-900 hover:border-zinc-600"
+                    : "border-stone-800 bg-stone-900 hover:border-stone-600"
                 }`}
               >
                 <div className="flex gap-1.5 mb-3">
                   {theme.colors.map((color, i) => (
                     <div
                       key={i}
-                      className="w-8 h-8 rounded-lg border border-zinc-700"
+                      className="w-8 h-8 rounded-lg border border-stone-700"
                       style={{ backgroundColor: color }}
                     />
                   ))}
                 </div>
                 <div className="text-sm font-medium text-white">{theme.label}</div>
-                <div className="text-xs text-zinc-500 mt-1">{theme.description}</div>
+                <div className="text-xs text-stone-500 mt-1">{theme.description}</div>
               </button>
             ))}
           </div>
@@ -545,8 +545,8 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
           disabled={currentStep === 0}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
             currentStep === 0
-              ? "text-zinc-600 cursor-not-allowed"
-              : "text-zinc-300 hover:text-white border border-zinc-700 hover:border-zinc-500"
+              ? "text-stone-600 cursor-not-allowed"
+              : "text-stone-300 hover:text-white border border-stone-700 hover:border-stone-500"
           }`}
         >
           <ArrowLeft className="w-4 h-4" />
@@ -560,7 +560,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
             className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
               canProceed()
                 ? "bg-stone-600 hover:bg-stone-500 text-white"
-                : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                : "bg-stone-800 text-stone-500 cursor-not-allowed"
             }`}
           >
             Next
@@ -573,7 +573,7 @@ export default function EcommerceGenerator({ onGenerate }: EcommerceGeneratorPro
             className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-colors ${
               canProceed()
                 ? "bg-gradient-to-r from-stone-600 to-stone-700 hover:from-stone-500 hover:to-stone-600 text-white"
-                : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                : "bg-stone-800 text-stone-500 cursor-not-allowed"
             }`}
           >
             <ShoppingCart className="w-4 h-4" />

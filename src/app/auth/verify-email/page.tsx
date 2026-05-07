@@ -48,7 +48,7 @@ export default function VerifyEmailPage() {
             <>
               <AlertCircle className="w-16 h-16 text-stone-400 mx-auto mb-4" />
               <h1 className="text-2xl font-bold text-white mb-2">Link Expired</h1>
-              <p className="text-slate-400 mb-6">
+              <p className="text-stone-400 mb-6">
                 Your verification link has expired. Enter your email below to get a new one.
               </p>
             </>
@@ -56,7 +56,7 @@ export default function VerifyEmailPage() {
             <>
               <Mail className="w-16 h-16 text-stone-400 mx-auto mb-4" />
               <h1 className="text-2xl font-bold text-white mb-2">Check Your Email</h1>
-              <p className="text-slate-400 mb-6">
+              <p className="text-stone-400 mb-6">
                 We sent a verification link to your email. Click the link to activate your account and start building.
               </p>
             </>
@@ -68,7 +68,7 @@ export default function VerifyEmailPage() {
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
               placeholder="your@email.com"
-              className="w-full px-4 py-3 bg-[var(--paper)] border border-white/10 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-stone-500"
+              className="w-full px-4 py-3 bg-[var(--paper)] border border-white/10 rounded-lg text-white placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-500"
             />
 
             <button
@@ -85,14 +85,14 @@ export default function VerifyEmailPage() {
             </button>
 
             {resendMessage && (
-              <div className="flex items-center gap-2 text-sm text-slate-300 bg-[var(--paper)] rounded-lg p-3">
+              <div className="flex items-center gap-2 text-sm text-stone-300 bg-[var(--paper)] rounded-lg p-3">
                 <CheckCircle className="w-4 h-4 text-stone-400 flex-shrink-0" />
                 {resendMessage}
               </div>
             )}
           </div>
 
-          <p className="text-slate-500 text-sm mt-6">
+          <p className="text-stone-500 text-sm mt-6">
             Already verified?{" "}
             <Link href="/auth/login" className="text-stone-400 hover:text-stone-300">
               Sign in

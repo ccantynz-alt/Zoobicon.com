@@ -172,8 +172,8 @@ const INTEGRATIONS: IntegrationDef[] = [
 // ---------------------------------------------------------------------------
 function StatusBadge({ status }: { status: IntegrationStatus }) {
   const map = {
-    connected: { label: "Connected", bg: "bg-emerald-50", text: "text-emerald-700", dot: "bg-emerald-500" },
-    not_connected: { label: "Not Connected", bg: "bg-slate-100", text: "text-slate-600", dot: "bg-slate-400" },
+    connected: { label: "Connected", bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-500" },
+    not_connected: { label: "Not Connected", bg: "bg-stone-100", text: "text-stone-600", dot: "bg-stone-400" },
     coming_soon: { label: "Coming Soon", bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-500" },
   };
   const s = map[status];
@@ -220,7 +220,7 @@ function ConnectModal({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-md w-full p-6"
+        className="bg-white border border-stone-200 rounded-2xl shadow-2xl max-w-md w-full p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -233,11 +233,11 @@ function ConnectModal({
               <Icon className="w-5 h-5" style={{ color: integration.color }} />
             </div>
             <div>
-              <h3 className="text-slate-800 font-semibold">Connect {integration.name}</h3>
-              <p className="text-slate-600 text-xs">{integration.description}</p>
+              <h3 className="text-stone-800 font-semibold">Connect {integration.name}</h3>
+              <p className="text-stone-600 text-xs">{integration.description}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-slate-600 hover:text-slate-600 transition-colors">
+          <button onClick={onClose} className="text-stone-600 hover:text-stone-600 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -245,7 +245,7 @@ function ConnectModal({
         {/* OAuth method */}
         {integration.method === "oauth" && (
           <div className="space-y-4">
-            <p className="text-slate-700 text-sm">
+            <p className="text-stone-700 text-sm">
               Click below to authorize Zoobicon to access your {integration.name} account. You will be
               redirected to {integration.name} to grant permissions.
             </p>
@@ -264,13 +264,13 @@ function ConnectModal({
           <div className="space-y-4">
             {(integration.fields || []).map((f) => (
               <div key={f.key}>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">{f.label}</label>
+                <label className="block text-sm font-medium text-stone-700 mb-1.5">{f.label}</label>
                 <input
                   type="text"
                   placeholder={f.placeholder}
                   value={fields[f.key] || ""}
                   onChange={(e) => setFields({ ...fields, [f.key]: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
                 />
               </div>
             ))}
@@ -287,17 +287,17 @@ function ConnectModal({
         {/* Webhook method */}
         {integration.method === "webhook" && (
           <div className="space-y-4">
-            <p className="text-slate-700 text-sm">
+            <p className="text-stone-700 text-sm">
               Copy the webhook URL below and paste it into your {integration.name} setup. Zoobicon will
               send events to this endpoint.
             </p>
-            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl p-3">
-              <code className="text-sm text-slate-600 flex-1 truncate">{integration.webhookUrl}</code>
+            <div className="flex items-center gap-2 bg-stone-50 border border-stone-200 rounded-xl p-3">
+              <code className="text-sm text-stone-600 flex-1 truncate">{integration.webhookUrl}</code>
               <button
                 onClick={() => handleCopy(integration.webhookUrl || "")}
-                className="text-slate-600 hover:text-slate-600 transition-colors shrink-0"
+                className="text-stone-600 hover:text-stone-600 transition-colors shrink-0"
               >
-                {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                {copied ? <Check className="w-4 h-4 text-amber-500" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
             <button
@@ -444,7 +444,7 @@ export default function IntegrationsPage() {
             exit={{ opacity: 0, y: -40 }}
             className={`fixed top-6 right-6 z-[60] px-5 py-3 rounded-xl text-sm font-medium shadow-lg ${
               notification.type === "success"
-                ? "bg-emerald-600 text-white"
+                ? "bg-amber-600 text-white"
                 : "bg-red-600 text-white"
             }`}
           >
@@ -464,9 +464,9 @@ export default function IntegrationsPage() {
             <div className="w-10 h-10 rounded-xl bg-stone-50 flex items-center justify-center">
               <Plug className="w-5 h-5 text-stone-600" />
             </div>
-            <h1 className="text-3xl font-bold text-slate-800">Integrations</h1>
+            <h1 className="text-3xl font-bold text-stone-800">Integrations</h1>
           </div>
-          <p className="text-slate-600 max-w-2xl">
+          <p className="text-stone-600 max-w-2xl">
             Connect third-party services to enhance your AI website builder. Import data, receive
             notifications, track analytics, and automate workflows.
           </p>
@@ -480,17 +480,17 @@ export default function IntegrationsPage() {
           className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10"
         >
           {[
-            { label: "Total Available", value: integrations.length, color: "text-slate-800" },
-            { label: "Connected", value: connected.length, color: "text-emerald-600" },
-            { label: "Not Connected", value: available.filter((i) => i.status === "not_connected").length, color: "text-slate-600" },
+            { label: "Total Available", value: integrations.length, color: "text-stone-800" },
+            { label: "Connected", value: connected.length, color: "text-amber-600" },
+            { label: "Not Connected", value: available.filter((i) => i.status === "not_connected").length, color: "text-stone-600" },
             { label: "Coming Soon", value: available.filter((i) => i.status === "coming_soon").length, color: "text-amber-600" },
           ].map((s, i) => (
             <div
               key={i}
-              className="bg-white border border-slate-200 rounded-xl p-4 text-center"
+              className="bg-white border border-stone-200 rounded-xl p-4 text-center"
             >
               <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
-              <div className="text-xs text-slate-600 mt-1">{s.label}</div>
+              <div className="text-xs text-stone-600 mt-1">{s.label}</div>
             </div>
           ))}
         </motion.div>
@@ -502,9 +502,9 @@ export default function IntegrationsPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="text-lg font-semibold mb-4 flex items-center gap-2 text-slate-800"
+              className="text-lg font-semibold mb-4 flex items-center gap-2 text-stone-800"
             >
-              <Shield className="w-4 h-4 text-emerald-600" />
+              <Shield className="w-4 h-4 text-amber-600" />
               Connected Services
             </motion.h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-10">
@@ -516,7 +516,7 @@ export default function IntegrationsPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 + idx * 0.04 }}
-                    className="relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-slate-300 transition-all group"
+                    className="relative bg-white border border-stone-200 rounded-2xl overflow-hidden hover:border-stone-300 transition-all group"
                     style={{ borderLeftWidth: 3, borderLeftColor: integration.color }}
                   >
                     <div className="p-5">
@@ -529,14 +529,14 @@ export default function IntegrationsPage() {
                             <Icon className="w-5 h-5" style={{ color: integration.color }} />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-slate-800">{integration.name}</h3>
-                            <p className="text-xs text-slate-600 mt-0.5 line-clamp-1">{integration.description}</p>
+                            <h3 className="font-semibold text-stone-800">{integration.name}</h3>
+                            <p className="text-xs text-stone-600 mt-0.5 line-clamp-1">{integration.description}</p>
                           </div>
                         </div>
                         <StatusBadge status="connected" />
                       </div>
 
-                      <div className="flex items-center gap-4 text-xs text-slate-600 mb-4">
+                      <div className="flex items-center gap-4 text-xs text-stone-600 mb-4">
                         {integration.connectedAt && (
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
@@ -555,7 +555,7 @@ export default function IntegrationsPage() {
                         {integration.link && (
                           <Link
                             href={integration.link}
-                            className="flex-1 text-center py-2 rounded-xl text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all flex items-center justify-center gap-1.5"
+                            className="flex-1 text-center py-2 rounded-xl text-sm font-medium bg-stone-100 hover:bg-stone-200 text-stone-700 transition-all flex items-center justify-center gap-1.5"
                           >
                             Configure <ExternalLink className="w-3 h-3" />
                           </Link>
@@ -582,9 +582,9 @@ export default function IntegrationsPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.15 }}
-              className="text-lg font-semibold mb-4 flex items-center gap-2 text-slate-800"
+              className="text-lg font-semibold mb-4 flex items-center gap-2 text-stone-800"
             >
-              <Plug className="w-4 h-4 text-slate-600" />
+              <Plug className="w-4 h-4 text-stone-600" />
               Available Integrations
             </motion.h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-10">
@@ -597,7 +597,7 @@ export default function IntegrationsPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.15 + idx * 0.04 }}
-                    className="relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-slate-300 transition-all group"
+                    className="relative bg-white border border-stone-200 rounded-2xl overflow-hidden hover:border-stone-300 transition-all group"
                     style={{ borderLeftWidth: 3, borderLeftColor: isSoon ? "#f59e0b" : integration.color }}
                   >
                     <div className="p-5">
@@ -610,8 +610,8 @@ export default function IntegrationsPage() {
                             <Icon className="w-5 h-5" style={{ color: integration.color }} />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-slate-800">{integration.name}</h3>
-                            <p className="text-xs text-slate-600 mt-0.5 line-clamp-2">{integration.description}</p>
+                            <h3 className="font-semibold text-stone-800">{integration.name}</h3>
+                            <p className="text-xs text-stone-600 mt-0.5 line-clamp-2">{integration.description}</p>
                           </div>
                         </div>
                         <StatusBadge status={integration.status} />

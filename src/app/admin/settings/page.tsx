@@ -141,7 +141,7 @@ function StatusDot({ set }: { set: boolean }) {
   return (
     <span
       className={`inline-block w-2 h-2 rounded-full ${
-        set ? "bg-emerald-500" : "bg-red-400"
+        set ? "bg-amber-500" : "bg-red-400"
       }`}
       title={set ? "Key is set" : "Key not set"}
     />
@@ -163,8 +163,8 @@ function SectionHeader({
         <Icon className="w-5 h-5 text-stone-500" />
       </div>
       <div>
-        <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
-        <p className="text-sm text-slate-600 mt-0.5">{subtitle}</p>
+        <h2 className="text-lg font-semibold text-stone-800">{title}</h2>
+        <p className="text-sm text-stone-600 mt-0.5">{subtitle}</p>
       </div>
     </div>
   );
@@ -210,34 +210,34 @@ function ApiKeyRow({
   };
 
   return (
-    <div className="py-4 border-b border-slate-100 last:border-b-0">
+    <div className="py-4 border-b border-stone-100 last:border-b-0">
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-2">
           <StatusDot set={isSet} />
-          <span className="text-sm font-medium text-slate-700">{config.label}</span>
+          <span className="text-sm font-medium text-stone-700">{config.label}</span>
           {config.required && (
             <span className="text-xs uppercase tracking-wider font-semibold text-amber-600 bg-amber-50 border border-amber-200/60 rounded px-1.5 py-0.5">
               Required
             </span>
           )}
           {saved && (
-            <span className="flex items-center gap-1 text-xs text-emerald-600">
+            <span className="flex items-center gap-1 text-xs text-amber-600">
               <Check className="w-3 h-3" /> Saved
             </span>
           )}
         </div>
-        <code className="text-xs text-slate-600 font-mono">{config.envVar}</code>
+        <code className="text-xs text-stone-600 font-mono">{config.envVar}</code>
       </div>
-      <p className="text-xs text-slate-600 mb-3">{config.description}</p>
+      <p className="text-xs text-stone-600 mb-3">{config.description}</p>
 
       {isSet && !editing ? (
         <div className="flex items-center gap-2">
-          <div className="flex-1 bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-2 font-mono text-sm text-slate-700 tracking-widest">
+          <div className="flex-1 bg-stone-50 border border-stone-200/80 rounded-lg px-3 py-2 font-mono text-sm text-stone-700 tracking-widest">
             {visible ? value : "●●●●●●●●●●●●"}
           </div>
           <button
             onClick={() => setVisible(!visible)}
-            className="p-2 rounded-lg text-slate-600 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-lg text-stone-600 hover:text-stone-600 hover:bg-stone-100 transition-colors"
             title={visible ? "Hide" : "Show"}
           >
             {visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -266,7 +266,7 @@ function ApiKeyRow({
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder={`Paste your ${config.envVar} here...`}
-            className="flex-1 bg-slate-50 border border-slate-200/80 rounded-lg px-3 py-2 font-mono text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-stone-400/40 focus:border-stone-400 transition-all"
+            className="flex-1 bg-stone-50 border border-stone-200/80 rounded-lg px-3 py-2 font-mono text-sm text-stone-700 placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-stone-400/40 focus:border-stone-400 transition-all"
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSave();
               if (e.key === "Escape") {
@@ -278,7 +278,7 @@ function ApiKeyRow({
           />
           <button
             onClick={() => setVisible(!visible)}
-            className="p-2 rounded-lg text-slate-600 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-lg text-stone-600 hover:text-stone-600 hover:bg-stone-100 transition-colors"
           >
             {visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -296,7 +296,7 @@ function ApiKeyRow({
                 setEditing(false);
                 setDraft("");
               }}
-              className="p-2 rounded-lg text-slate-600 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              className="p-2 rounded-lg text-stone-600 hover:text-stone-600 hover:bg-stone-100 transition-colors"
               title="Cancel"
             >
               <X className="w-4 h-4" />
@@ -410,8 +410,8 @@ export default function AdminSettingsPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-8">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Settings</h1>
-        <p className="text-sm text-slate-600 mt-1">
+        <h1 className="text-2xl font-bold text-stone-800 tracking-tight">Settings</h1>
+        <p className="text-sm text-stone-600 mt-1">
           Manage API keys, AI memory, and review build history.
         </p>
       </div>
@@ -419,7 +419,7 @@ export default function AdminSettingsPage() {
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 1: API Keys */}
       {/* ------------------------------------------------------------------- */}
-      <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
+      <section className="bg-white rounded-2xl border border-stone-200/80 shadow-sm p-6">
         <SectionHeader
           icon={Key}
           title="API Keys"
@@ -434,7 +434,7 @@ export default function AdminSettingsPage() {
           </p>
         </div>
 
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-stone-100">
           {API_KEYS.map((cfg) => (
             <ApiKeyRow
               key={cfg.key}
@@ -450,14 +450,14 @@ export default function AdminSettingsPage() {
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 2: Flywheel Memory */}
       {/* ------------------------------------------------------------------- */}
-      <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
+      <section className="bg-white rounded-2xl border border-stone-200/80 shadow-sm p-6">
         <SectionHeader
           icon={Brain}
           title="Flywheel Memory"
           subtitle="Persistent AI context injected into every interaction."
         />
 
-        <p className="text-xs text-slate-600 mb-5 leading-relaxed">
+        <p className="text-xs text-stone-600 mb-5 leading-relaxed">
           These memories are injected into every AI interaction, making each
           conversation smarter than the last. Add brand guidelines, style
           preferences, or recurring instructions so the AI remembers them across
@@ -466,14 +466,14 @@ export default function AdminSettingsPage() {
 
         {/* Add memory form */}
         {showMemoryForm ? (
-          <div className="bg-slate-50 rounded-xl border border-slate-200/80 p-4 mb-5 space-y-3">
+          <div className="bg-stone-50 rounded-xl border border-stone-200/80 p-4 mb-5 space-y-3">
             <div className="flex items-center gap-3">
-              <label className="text-xs font-medium text-slate-700 whitespace-nowrap">Type</label>
+              <label className="text-xs font-medium text-stone-700 whitespace-nowrap">Type</label>
               <div className="relative">
                 <select
                   value={newMemoryType}
                   onChange={(e) => setNewMemoryType(e.target.value as MemoryEntry["type"])}
-                  className="appearance-none bg-white border border-slate-200 rounded-lg px-3 py-1.5 pr-8 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-stone-400/40 cursor-pointer"
+                  className="appearance-none bg-white border border-stone-200 rounded-lg px-3 py-1.5 pr-8 text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-400/40 cursor-pointer"
                 >
                   {MEMORY_TYPES.map((t) => (
                     <option key={t} value={t}>
@@ -481,7 +481,7 @@ export default function AdminSettingsPage() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-600 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <ChevronDown className="w-3.5 h-3.5 text-stone-600 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
             <textarea
@@ -489,7 +489,7 @@ export default function AdminSettingsPage() {
               onChange={(e) => setNewMemoryContent(e.target.value)}
               placeholder="e.g. Always use the brand color #57534e for primary buttons..."
               rows={3}
-              className="w-full bg-white border border-slate-200/80 rounded-lg px-3 py-2 text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-stone-400/40 resize-none"
+              className="w-full bg-white border border-stone-200/80 rounded-lg px-3 py-2 text-sm text-stone-700 placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-stone-400/40 resize-none"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                   handleAddMemory();
@@ -497,14 +497,14 @@ export default function AdminSettingsPage() {
               }}
             />
             <div className="flex items-center justify-between">
-              <span className="text-xs text-slate-600">Ctrl+Enter to save</span>
+              <span className="text-xs text-stone-600">Ctrl+Enter to save</span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => {
                     setShowMemoryForm(false);
                     setNewMemoryContent("");
                   }}
-                  className="px-3 py-1.5 rounded-lg text-xs text-slate-700 hover:bg-slate-100 transition-colors"
+                  className="px-3 py-1.5 rounded-lg text-xs text-stone-700 hover:bg-stone-100 transition-colors"
                 >
                   Cancel
                 </button>
@@ -531,10 +531,10 @@ export default function AdminSettingsPage() {
 
         {/* Memory list */}
         {memories.length === 0 ? (
-          <div className="text-center py-10 text-slate-300">
+          <div className="text-center py-10 text-stone-300">
             <Brain className="w-10 h-10 mx-auto mb-3 opacity-40" />
-            <p className="text-sm font-medium text-slate-600">No memories yet</p>
-            <p className="text-xs text-slate-600 mt-1">
+            <p className="text-sm font-medium text-stone-600">No memories yet</p>
+            <p className="text-xs text-stone-600 mt-1">
               Add preferences, brand info, or instructions above.
             </p>
           </div>
@@ -543,7 +543,7 @@ export default function AdminSettingsPage() {
             {memories.map((mem) => (
               <div
                 key={mem.id}
-                className="group flex items-start gap-3 px-4 py-3 rounded-xl bg-slate-50/60 border border-slate-100 hover:border-slate-200 transition-colors"
+                className="group flex items-start gap-3 px-4 py-3 rounded-xl bg-stone-50/60 border border-stone-100 hover:border-stone-200 transition-colors"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -554,24 +554,24 @@ export default function AdminSettingsPage() {
                           : mem.type === "brand"
                           ? "text-stone-600 bg-stone-50 border border-stone-200/60"
                           : mem.type === "instruction"
-                          ? "text-emerald-600 bg-emerald-50 border border-emerald-200/60"
+                          ? "text-amber-600 bg-amber-50 border border-amber-200/60"
                           : mem.type === "feedback"
                           ? "text-amber-600 bg-amber-50 border border-amber-200/60"
-                          : "text-slate-600 bg-slate-100 border border-slate-200/60"
+                          : "text-stone-600 bg-stone-100 border border-stone-200/60"
                       }`}
                     >
                       {mem.type}
                     </span>
-                    <span className="text-xs text-slate-300">{formatDate(mem.timestamp)}</span>
+                    <span className="text-xs text-stone-300">{formatDate(mem.timestamp)}</span>
                   </div>
-                  <p className="text-sm text-slate-600 leading-relaxed">{mem.content}</p>
+                  <p className="text-sm text-stone-600 leading-relaxed">{mem.content}</p>
                   {mem.source && mem.source !== "admin-manual" && (
-                    <p className="text-xs text-slate-300 mt-1">Source: {mem.source}</p>
+                    <p className="text-xs text-stone-300 mt-1">Source: {mem.source}</p>
                   )}
                 </div>
                 <button
                   onClick={() => handleDeleteMemory(mem.id)}
-                  className="p-1.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+                  className="p-1.5 rounded-lg text-stone-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
                   title="Delete memory"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -585,7 +585,7 @@ export default function AdminSettingsPage() {
       {/* ------------------------------------------------------------------- */}
       {/* SECTION 3: Build History */}
       {/* ------------------------------------------------------------------- */}
-      <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
+      <section className="bg-white rounded-2xl border border-stone-200/80 shadow-sm p-6">
         <SectionHeader
           icon={History}
           title="Build History"
@@ -593,10 +593,10 @@ export default function AdminSettingsPage() {
         />
 
         {builds.length === 0 ? (
-          <div className="text-center py-10 text-slate-300">
+          <div className="text-center py-10 text-stone-300">
             <History className="w-10 h-10 mx-auto mb-3 opacity-40" />
-            <p className="text-sm font-medium text-slate-600">No builds recorded</p>
-            <p className="text-xs text-slate-600 mt-1">
+            <p className="text-sm font-medium text-stone-600">No builds recorded</p>
+            <p className="text-xs text-stone-600 mt-1">
               Build history will appear here after your first AI generation.
             </p>
           </div>
@@ -604,20 +604,20 @@ export default function AdminSettingsPage() {
           <div className="overflow-x-auto -mx-6">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100">
-                  <th className="text-left text-xs uppercase tracking-wider text-slate-600 font-semibold px-6 py-2.5">
+                <tr className="border-b border-stone-100">
+                  <th className="text-left text-xs uppercase tracking-wider text-stone-600 font-semibold px-6 py-2.5">
                     Prompt
                   </th>
-                  <th className="text-left text-xs uppercase tracking-wider text-slate-600 font-semibold px-4 py-2.5 hidden sm:table-cell">
+                  <th className="text-left text-xs uppercase tracking-wider text-stone-600 font-semibold px-4 py-2.5 hidden sm:table-cell">
                     Model
                   </th>
-                  <th className="text-left text-xs uppercase tracking-wider text-slate-600 font-semibold px-4 py-2.5 hidden md:table-cell">
+                  <th className="text-left text-xs uppercase tracking-wider text-stone-600 font-semibold px-4 py-2.5 hidden md:table-cell">
                     Duration
                   </th>
-                  <th className="text-left text-xs uppercase tracking-wider text-slate-600 font-semibold px-4 py-2.5">
+                  <th className="text-left text-xs uppercase tracking-wider text-stone-600 font-semibold px-4 py-2.5">
                     Status
                   </th>
-                  <th className="text-left text-xs uppercase tracking-wider text-slate-600 font-semibold px-6 py-2.5 hidden lg:table-cell">
+                  <th className="text-left text-xs uppercase tracking-wider text-stone-600 font-semibold px-6 py-2.5 hidden lg:table-cell">
                     Date
                   </th>
                 </tr>
@@ -629,25 +629,25 @@ export default function AdminSettingsPage() {
                     <tr
                       key={build.id}
                       onClick={() => setExpandedBuild(isExpanded ? null : build.id)}
-                      className="border-b border-slate-50 hover:bg-slate-50/60 cursor-pointer transition-colors"
+                      className="border-b border-stone-50 hover:bg-stone-50/60 cursor-pointer transition-colors"
                     >
                       <td className="px-6 py-3">
-                        <span className="text-slate-700 font-medium">
+                        <span className="text-stone-700 font-medium">
                           {isExpanded ? build.prompt : truncate(build.prompt, 50)}
                         </span>
                         {build.filesGenerated !== undefined && (
-                          <span className="ml-2 text-xs text-slate-600">
+                          <span className="ml-2 text-xs text-stone-600">
                             {build.filesGenerated} file{build.filesGenerated !== 1 ? "s" : ""}
                           </span>
                         )}
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell">
-                        <code className="text-xs text-slate-700 font-mono bg-slate-50 px-1.5 py-0.5 rounded">
+                        <code className="text-xs text-stone-700 font-mono bg-stone-50 px-1.5 py-0.5 rounded">
                           {build.model}
                         </code>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
-                        <span className="text-xs text-slate-700">
+                        <span className="text-xs text-stone-700">
                           {build.duration < 1000
                             ? `${build.duration}ms`
                             : `${(build.duration / 1000).toFixed(1)}s`}
@@ -657,7 +657,7 @@ export default function AdminSettingsPage() {
                         <span
                           className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-0.5 ${
                             build.status === "success"
-                              ? "text-emerald-700 bg-emerald-50 border border-emerald-200/60"
+                              ? "text-amber-700 bg-amber-50 border border-amber-200/60"
                               : build.status === "error"
                               ? "text-red-700 bg-red-50 border border-red-200/60"
                               : "text-amber-700 bg-amber-50 border border-amber-200/60"
@@ -669,7 +669,7 @@ export default function AdminSettingsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-3 hidden lg:table-cell">
-                        <span className="text-xs text-slate-600">{formatDate(build.timestamp)}</span>
+                        <span className="text-xs text-stone-600">{formatDate(build.timestamp)}</span>
                       </td>
                     </tr>
                   );
@@ -677,7 +677,7 @@ export default function AdminSettingsPage() {
               </tbody>
             </table>
             {builds.length > 50 && (
-              <p className="text-center text-xs text-slate-600 py-3">
+              <p className="text-center text-xs text-stone-600 py-3">
                 Showing 50 of {builds.length} builds
               </p>
             )}

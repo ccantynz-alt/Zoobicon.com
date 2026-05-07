@@ -136,7 +136,7 @@ function statusColor(status: string): string {
       return "bg-stone-500/20 text-stone-400 border-stone-500/30";
     case "stopped":
     case "disabled":
-      return "bg-zinc-500/20 text-zinc-400 border-zinc-500/30";
+      return "bg-stone-500/20 text-stone-400 border-stone-500/30";
     default:
       return "bg-stone-500/20 text-stone-400 border-stone-500/30";
   }
@@ -365,24 +365,24 @@ export default function HostingDashboardPage() {
   // ── Loading / auth states ──
   if (!user) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-zinc-500 animate-spin" />
+      <div className="min-h-screen bg-stone-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-stone-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="min-h-screen bg-stone-950 text-stone-100">
       {/* ── Nav ── */}
-      <header className="border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur-xl sticky top-0 z-40">
+      <header className="border-b border-stone-800/60 bg-stone-950/80 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-xl font-bold tracking-tight">
               <span className="text-white">Zoo</span>
               <span className="text-stone-400">bicon</span>
             </Link>
-            <span className="text-zinc-600">/</span>
-            <span className="text-zinc-400 text-sm font-medium">Hosting Dashboard</span>
+            <span className="text-stone-600">/</span>
+            <span className="text-stone-400 text-sm font-medium">Hosting Dashboard</span>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -394,7 +394,7 @@ export default function HostingDashboardPage() {
             </Link>
             <Link
               href="/dashboard"
-              className="px-3 py-2 text-sm text-zinc-400 hover:text-white transition-colors"
+              className="px-3 py-2 text-sm text-stone-400 hover:text-white transition-colors"
             >
               Dashboard
             </Link>
@@ -448,13 +448,13 @@ export default function HostingDashboardPage() {
             <motion.div
               key={stat.label}
               variants={fadeInUp}
-              className="rounded-xl border border-zinc-800/60 bg-zinc-900/50 p-4"
+              className="rounded-xl border border-stone-800/60 bg-stone-900/50 p-4"
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className={`p-2 rounded-lg ${stat.bg}`}>
                   <stat.icon className={`w-4 h-4 ${stat.color}`} />
                 </div>
-                <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
+                <span className="text-xs text-stone-500 uppercase tracking-wider font-medium">
                   {stat.label}
                 </span>
               </div>
@@ -485,7 +485,7 @@ export default function HostingDashboardPage() {
         {loading && (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <Loader2 className="w-8 h-8 text-stone-400 animate-spin" />
-            <p className="text-zinc-500 text-sm">Loading your sites...</p>
+            <p className="text-stone-500 text-sm">Loading your sites...</p>
           </div>
         )}
 
@@ -496,12 +496,12 @@ export default function HostingDashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-24 gap-6"
           >
-            <div className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800/60">
-              <Globe className="w-12 h-12 text-zinc-600" />
+            <div className="p-6 rounded-2xl bg-stone-900/50 border border-stone-800/60">
+              <Globe className="w-12 h-12 text-stone-600" />
             </div>
             <div className="text-center">
               <h2 className="text-xl font-semibold text-white mb-2">No sites deployed yet</h2>
-              <p className="text-zinc-500 text-sm max-w-md">
+              <p className="text-stone-500 text-sm max-w-md">
                 Build your first website with our AI builder and deploy it instantly to get a live
                 URL on zoobicon.sh.
               </p>
@@ -532,7 +532,7 @@ export default function HostingDashboardPage() {
                 <motion.div
                   key={site.id}
                   variants={scaleIn}
-                  className="group rounded-xl border border-zinc-800/60 bg-zinc-900/50 hover:border-zinc-700/60 hover:bg-zinc-900/80 transition-all duration-300"
+                  className="group rounded-xl border border-stone-800/60 bg-stone-900/50 hover:border-stone-700/60 hover:bg-stone-900/80 transition-all duration-300"
                 >
                   {/* Card Header */}
                   <div className="p-5 pb-3">
@@ -543,7 +543,7 @@ export default function HostingDashboardPage() {
                         </h3>
                         <button
                           onClick={() => copyToClipboard(site.url)}
-                          className="flex items-center gap-1.5 mt-1 text-xs text-zinc-500 hover:text-stone-400 transition-colors group/url"
+                          className="flex items-center gap-1.5 mt-1 text-xs text-stone-500 hover:text-stone-400 transition-colors group/url"
                         >
                           <Globe className="w-3 h-3" />
                           <span className="truncate max-w-[200px]">
@@ -568,20 +568,20 @@ export default function HostingDashboardPage() {
 
                     {/* Analytics row */}
                     <div className="grid grid-cols-3 gap-2 mt-4">
-                      <div className="text-center p-2 rounded-lg bg-zinc-800/40">
-                        <p className="text-xs text-zinc-500 mb-0.5">Views</p>
+                      <div className="text-center p-2 rounded-lg bg-stone-800/40">
+                        <p className="text-xs text-stone-500 mb-0.5">Views</p>
                         <p className="text-sm font-semibold text-white">
                           {analytics ? formatNumber(analytics.pageViews.total) : "--"}
                         </p>
                       </div>
-                      <div className="text-center p-2 rounded-lg bg-zinc-800/40">
-                        <p className="text-xs text-zinc-500 mb-0.5">Visitors</p>
+                      <div className="text-center p-2 rounded-lg bg-stone-800/40">
+                        <p className="text-xs text-stone-500 mb-0.5">Visitors</p>
                         <p className="text-sm font-semibold text-white">
                           {analytics ? formatNumber(analytics.visitors.unique) : "--"}
                         </p>
                       </div>
-                      <div className="text-center p-2 rounded-lg bg-zinc-800/40">
-                        <p className="text-xs text-zinc-500 mb-0.5">Uptime</p>
+                      <div className="text-center p-2 rounded-lg bg-stone-800/40">
+                        <p className="text-xs text-stone-500 mb-0.5">Uptime</p>
                         <p className="text-sm font-semibold text-white">
                           {analytics ? `${analytics.performance.uptime}%` : "--"}
                         </p>
@@ -589,33 +589,33 @@ export default function HostingDashboardPage() {
                     </div>
 
                     {/* Meta */}
-                    <div className="flex items-center justify-between mt-3 text-[11px] text-zinc-600">
+                    <div className="flex items-center justify-between mt-3 text-[11px] text-stone-600">
                       <span>Plan: {site.plan || "free"}</span>
                       <span>Deployed {timeAgo(site.updated_at || site.created_at)}</span>
                     </div>
                   </div>
 
                   {/* Card Actions */}
-                  <div className="border-t border-zinc-800/40 px-3 py-2.5 flex items-center gap-1">
+                  <div className="border-t border-stone-800/40 px-3 py-2.5 flex items-center gap-1">
                     <a
                       href={site.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-zinc-400 hover:text-white hover:bg-zinc-800/60 rounded-lg transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-stone-400 hover:text-white hover:bg-stone-800/60 rounded-lg transition-colors"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                       Visit
                     </a>
                     <Link
                       href={`/edit/${site.slug}`}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-zinc-400 hover:text-white hover:bg-zinc-800/60 rounded-lg transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-stone-400 hover:text-white hover:bg-stone-800/60 rounded-lg transition-colors"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                       Edit
                     </Link>
                     <button
                       onClick={() => setSettingsModal(site)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-zinc-400 hover:text-white hover:bg-zinc-800/60 rounded-lg transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-stone-400 hover:text-white hover:bg-stone-800/60 rounded-lg transition-colors"
                     >
                       <Settings className="w-3.5 h-3.5" />
                       Settings
@@ -623,7 +623,7 @@ export default function HostingDashboardPage() {
                     <button
                       onClick={() => handleRedeploy(site)}
                       disabled={isRedeploying}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-zinc-400 hover:text-stone-400 hover:bg-stone-500/10 rounded-lg transition-colors disabled:opacity-50"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-medium text-stone-400 hover:text-stone-400 hover:bg-stone-500/10 rounded-lg transition-colors disabled:opacity-50"
                     >
                       {isRedeploying ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -657,21 +657,21 @@ export default function HostingDashboardPage() {
               animate="visible"
               exit="exit"
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl border border-zinc-800/60 bg-zinc-900 shadow-2xl"
+              className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl border border-stone-800/60 bg-stone-900 shadow-2xl"
             >
               {/* Modal Header */}
-              <div className="sticky top-0 z-10 bg-zinc-900 border-b border-zinc-800/60 px-6 py-4 flex items-center justify-between">
+              <div className="sticky top-0 z-10 bg-stone-900 border-b border-stone-800/60 px-6 py-4 flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-white">
                     {settingsModal.name}
                   </h2>
-                  <p className="text-xs text-zinc-500 mt-0.5">
+                  <p className="text-xs text-stone-500 mt-0.5">
                     {settingsModal.slug}.zoobicon.sh
                   </p>
                 </div>
                 <button
                   onClick={() => setSettingsModal(null)}
-                  className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-500 hover:text-white transition-colors"
+                  className="p-2 rounded-lg hover:bg-stone-800 text-stone-500 hover:text-white transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -686,12 +686,12 @@ export default function HostingDashboardPage() {
                   </div>
 
                   {domainsLoading ? (
-                    <div className="flex items-center gap-2 py-4 text-zinc-500 text-sm">
+                    <div className="flex items-center gap-2 py-4 text-stone-500 text-sm">
                       <Loader2 className="w-4 h-4 animate-spin" />
                       Loading domains...
                     </div>
                   ) : domains.length === 0 ? (
-                    <p className="text-sm text-zinc-500 py-2">
+                    <p className="text-sm text-stone-500 py-2">
                       No custom domains configured.
                     </p>
                   ) : (
@@ -699,7 +699,7 @@ export default function HostingDashboardPage() {
                       {domains.map((d) => (
                         <div
                           key={d.domain}
-                          className="flex items-center justify-between p-3 rounded-lg bg-zinc-800/50 border border-zinc-800/60"
+                          className="flex items-center justify-between p-3 rounded-lg bg-stone-800/50 border border-stone-800/60"
                         >
                           <div className="flex items-center gap-3">
                             <div className="flex items-center gap-1.5">
@@ -719,13 +719,13 @@ export default function HostingDashboardPage() {
                             >
                               {d.status}
                             </span>
-                            <span className="text-[10px] text-zinc-600 uppercase">
+                            <span className="text-[10px] text-stone-600 uppercase">
                               {d.type}
                             </span>
                           </div>
                           <button
                             onClick={() => handleRemoveDomain(d.domain)}
-                            className="p-1.5 rounded-lg text-zinc-600 hover:text-stone-400 hover:bg-stone-500/10 transition-colors"
+                            className="p-1.5 rounded-lg text-stone-600 hover:text-stone-400 hover:bg-stone-500/10 transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -741,7 +741,7 @@ export default function HostingDashboardPage() {
                       value={newDomain}
                       onChange={(e) => setNewDomain(e.target.value)}
                       placeholder="example.com"
-                      className="flex-1 px-3 py-2 text-sm rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-stone-500/40 focus:border-stone-500/40"
+                      className="flex-1 px-3 py-2 text-sm rounded-lg bg-stone-800/50 border border-stone-700/50 text-white placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-stone-500/40 focus:border-stone-500/40"
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleAddDomain();
                       }}
@@ -749,7 +749,7 @@ export default function HostingDashboardPage() {
                     <select
                       value={newDomainType}
                       onChange={(e) => setNewDomainType(e.target.value as "primary" | "redirect")}
-                      className="px-3 py-2 text-sm rounded-lg bg-zinc-800/50 border border-zinc-700/50 text-white focus:outline-none focus:ring-2 focus:ring-stone-500/40"
+                      className="px-3 py-2 text-sm rounded-lg bg-stone-800/50 border border-stone-700/50 text-white focus:outline-none focus:ring-2 focus:ring-stone-500/40"
                     >
                       <option value="primary">Primary</option>
                       <option value="redirect">Redirect</option>
@@ -784,13 +784,13 @@ export default function HostingDashboardPage() {
                     <Lock className="w-4 h-4 text-stone-400" />
                     <h3 className="text-sm font-semibold text-white">SSL Certificate</h3>
                   </div>
-                  <div className="p-3 rounded-lg bg-zinc-800/50 border border-zinc-800/60 flex items-center gap-3">
+                  <div className="p-3 rounded-lg bg-stone-800/50 border border-stone-800/60 flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-stone-500/10">
                       <Shield className="w-4 h-4 text-stone-400" />
                     </div>
                     <div>
                       <p className="text-sm text-white font-medium">Auto-SSL Enabled</p>
-                      <p className="text-xs text-zinc-500">
+                      <p className="text-xs text-stone-500">
                         Free SSL certificate via Let&apos;s Encrypt. Auto-renews every 90 days.
                       </p>
                     </div>
@@ -806,30 +806,30 @@ export default function HostingDashboardPage() {
                     <BarChart3 className="w-4 h-4 text-stone-400" />
                     <h3 className="text-sm font-semibold text-white">Analytics</h3>
                   </div>
-                  <div className="p-3 rounded-lg bg-zinc-800/50 border border-zinc-800/60">
+                  <div className="p-3 rounded-lg bg-stone-800/50 border border-stone-800/60">
                     {siteAnalytics[settingsModal.slug] ? (
                       <div className="grid grid-cols-3 gap-4">
                         <div>
-                          <p className="text-xs text-zinc-500">Page Views (30d)</p>
+                          <p className="text-xs text-stone-500">Page Views (30d)</p>
                           <p className="text-lg font-bold text-white">
                             {formatNumber(siteAnalytics[settingsModal.slug].pageViews.total)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-zinc-500">Unique Visitors</p>
+                          <p className="text-xs text-stone-500">Unique Visitors</p>
                           <p className="text-lg font-bold text-white">
                             {formatNumber(siteAnalytics[settingsModal.slug].visitors.unique)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-zinc-500">Bandwidth</p>
+                          <p className="text-xs text-stone-500">Bandwidth</p>
                           <p className="text-lg font-bold text-white">
                             {formatBytes(siteAnalytics[settingsModal.slug].bandwidth.total)}
                           </p>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-sm text-zinc-500">Analytics loading...</p>
+                      <p className="text-sm text-stone-500">Analytics loading...</p>
                     )}
                   </div>
                 </section>
@@ -925,7 +925,7 @@ function CDNSettings({ siteSlug }: { siteSlug: string }) {
 
   if (cdnLoading) {
     return (
-      <div className="flex items-center gap-2 py-3 text-zinc-500 text-sm">
+      <div className="flex items-center gap-2 py-3 text-stone-500 text-sm">
         <Loader2 className="w-4 h-4 animate-spin" />
         Loading CDN config...
       </div>
@@ -933,23 +933,23 @@ function CDNSettings({ siteSlug }: { siteSlug: string }) {
   }
 
   if (!cdnConfig) {
-    return <p className="text-sm text-zinc-500">CDN configuration unavailable.</p>;
+    return <p className="text-sm text-stone-500">CDN configuration unavailable.</p>;
   }
 
   return (
     <div className="space-y-3">
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="p-2.5 rounded-lg bg-zinc-800/50 border border-zinc-800/60 text-center">
-          <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Edge Locations</p>
+        <div className="p-2.5 rounded-lg bg-stone-800/50 border border-stone-800/60 text-center">
+          <p className="text-[10px] text-stone-500 uppercase tracking-wider">Edge Locations</p>
           <p className="text-lg font-bold text-white">{cdnConfig.edgeLocations}</p>
         </div>
-        <div className="p-2.5 rounded-lg bg-zinc-800/50 border border-zinc-800/60 text-center">
-          <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Cache Hit Rate</p>
+        <div className="p-2.5 rounded-lg bg-stone-800/50 border border-stone-800/60 text-center">
+          <p className="text-[10px] text-stone-500 uppercase tracking-wider">Cache Hit Rate</p>
           <p className="text-lg font-bold text-stone-400">{cdnConfig.cacheHitRate}%</p>
         </div>
-        <div className="p-2.5 rounded-lg bg-zinc-800/50 border border-zinc-800/60 text-center">
-          <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Status</p>
+        <div className="p-2.5 rounded-lg bg-stone-800/50 border border-stone-800/60 text-center">
+          <p className="text-[10px] text-stone-500 uppercase tracking-wider">Status</p>
           <p className="text-lg font-bold text-white capitalize">{cdnConfig.status}</p>
         </div>
       </div>
@@ -963,11 +963,11 @@ function CDNSettings({ siteSlug }: { siteSlug: string }) {
         ].map((toggle) => (
           <div
             key={toggle.key}
-            className="flex items-center justify-between p-3 rounded-lg bg-zinc-800/50 border border-zinc-800/60"
+            className="flex items-center justify-between p-3 rounded-lg bg-stone-800/50 border border-stone-800/60"
           >
             <div>
               <p className="text-sm text-white font-medium">{toggle.label}</p>
-              <p className="text-xs text-zinc-500">{toggle.desc}</p>
+              <p className="text-xs text-stone-500">{toggle.desc}</p>
             </div>
             <button
               onClick={() =>
@@ -980,7 +980,7 @@ function CDNSettings({ siteSlug }: { siteSlug: string }) {
               className={`relative w-10 h-5 rounded-full transition-colors ${
                 (cdnConfig.config as Record<string, boolean>)[toggle.key]
                   ? "bg-stone-600"
-                  : "bg-zinc-700"
+                  : "bg-stone-700"
               }`}
             >
               <span
@@ -999,7 +999,7 @@ function CDNSettings({ siteSlug }: { siteSlug: string }) {
       <button
         onClick={purgeCache}
         disabled={purging}
-        className="w-full py-2.5 text-sm font-medium rounded-lg border border-zinc-700/50 bg-zinc-800/50 text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2"
+        className="w-full py-2.5 text-sm font-medium rounded-lg border border-stone-700/50 bg-stone-800/50 text-stone-300 hover:text-white hover:bg-stone-800 transition-colors flex items-center justify-center gap-2"
       >
         {purging ? (
           <>
@@ -1014,7 +1014,7 @@ function CDNSettings({ siteSlug }: { siteSlug: string }) {
         )}
       </button>
       {cdnConfig.lastPurge && (
-        <p className="text-[10px] text-zinc-600 text-center">
+        <p className="text-[10px] text-stone-600 text-center">
           Last purge: {new Date(cdnConfig.lastPurge).toLocaleString()}
         </p>
       )}

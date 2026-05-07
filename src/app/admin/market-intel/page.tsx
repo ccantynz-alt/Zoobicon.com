@@ -78,7 +78,7 @@ const CATEGORY_META: Record<
 > = {
   "website-builder": { label: "Website Builders", icon: Globe, color: "text-stone-600" },
   "video-generator": { label: "Video Generators", icon: Video, color: "text-stone-600" },
-  "code-tool": { label: "Code Tools", icon: Code2, color: "text-slate-600" },
+  "code-tool": { label: "Code Tools", icon: Code2, color: "text-stone-600" },
 };
 
 // ---------------------------------------------------------------------------
@@ -211,8 +211,8 @@ export default function MarketIntelPage() {
               <Radar className="h-5 w-5 text-stone-600" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-800">Market Intelligence</h1>
-              <p className="text-xs text-slate-700">
+              <h1 className="text-xl font-bold text-stone-800">Market Intelligence</h1>
+              <p className="text-xs text-stone-700">
                 Product features, pricing, and positioning tracker
               </p>
             </div>
@@ -224,21 +224,21 @@ export default function MarketIntelPage() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value as CategoryFilter)}
-                className="appearance-none rounded-lg border border-slate-200 bg-white px-4 py-2 pr-8 text-sm text-slate-700 focus:border-stone-500 focus:outline-none"
+                className="appearance-none rounded-lg border border-stone-200 bg-white px-4 py-2 pr-8 text-sm text-stone-700 focus:border-stone-500 focus:outline-none"
               >
                 <option value="all">All Categories</option>
                 <option value="website-builder">Website Builders</option>
                 <option value="video-generator">Video Generators</option>
                 <option value="code-tool">Code Tools</option>
               </select>
-              <Filter className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-600" />
+              <Filter className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-600" />
             </div>
 
             {/* Refresh */}
             <button
               onClick={loadData}
               disabled={isLoading}
-              className="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 hover:bg-slate-50 hover:text-slate-600 transition-colors disabled:opacity-50"
+              className="rounded-lg border border-stone-200 bg-white p-2 text-stone-600 hover:bg-stone-50 hover:text-stone-600 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
             </button>
@@ -265,15 +265,15 @@ export default function MarketIntelPage() {
         </div>
 
         {/* Tabs */}
-        <div className="mt-4 flex gap-1 border-b border-slate-200">
+        <div className="mt-4 flex gap-1 border-b border-stone-200">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === tab.id
-                  ? "border-stone-500 text-slate-800"
-                  : "border-transparent text-slate-600 hover:text-slate-600"
+                  ? "border-stone-500 text-stone-800"
+                  : "border-transparent text-stone-600 hover:text-stone-600"
               }`}
             >
               <tab.icon className="h-4 w-4" />
@@ -295,15 +295,15 @@ export default function MarketIntelPage() {
 
         {/* Crawl result banner */}
         {crawlResult && (
-          <div className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+          <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                <CheckCircle2 className="h-5 w-5 text-amber-500" />
                 <div>
-                  <p className="text-sm font-medium text-emerald-700">
+                  <p className="text-sm font-medium text-amber-700">
                     Crawl Complete in {((crawlResult.duration || 0) / 1000).toFixed(1)}s
                   </p>
-                  <p className="text-xs text-slate-700">
+                  <p className="text-xs text-stone-700">
                     {crawlResult.tasksCompleted}/{crawlResult.tasksTotal} competitors crawled
                     {crawlResult.tasksFailed > 0 && ` (${crawlResult.tasksFailed} failed)`}
                   </p>
@@ -396,8 +396,8 @@ export default function MarketIntelPage() {
                 <div key={cat}>
                   <div className="mb-4 flex items-center gap-2">
                     <CatIcon className={`h-5 w-5 ${meta.color}`} />
-                    <h2 className="text-lg font-semibold text-slate-800">{meta.label}</h2>
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+                    <h2 className="text-lg font-semibold text-stone-800">{meta.label}</h2>
+                    <span className="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-700">
                       {items.length}
                     </span>
                   </div>
@@ -424,10 +424,10 @@ export default function MarketIntelPage() {
 
             {/* Empty state */}
             {filteredSnapshots.length === 0 && !isLoading && (
-              <div className="flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white py-20">
-                <Radar className="h-12 w-12 text-slate-300 mb-4" />
-                <p className="text-lg font-medium text-slate-600">No data yet</p>
-                <p className="mt-1 text-sm text-slate-600">
+              <div className="flex flex-col items-center justify-center rounded-lg border border-stone-200 bg-white py-20">
+                <Radar className="h-12 w-12 text-stone-300 mb-4" />
+                <p className="text-lg font-medium text-stone-600">No data yet</p>
+                <p className="mt-1 text-sm text-stone-600">
                   Click &quot;Crawl Now&quot; to start monitoring competitors
                 </p>
               </div>
@@ -438,16 +438,16 @@ export default function MarketIntelPage() {
         {/* Changes Tab */}
         {!isLoading && activeTab === "changes" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-800">Change Log</h2>
-            <p className="text-sm text-slate-700">
+            <h2 className="text-lg font-semibold text-stone-800">Change Log</h2>
+            <p className="text-sm text-stone-700">
               Timeline of detected changes across all monitored competitors.
             </p>
 
             {changes.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white py-16">
-                <TrendingUp className="h-10 w-10 text-slate-300 mb-3" />
-                <p className="text-slate-600">No changes detected yet</p>
-                <p className="mt-1 text-sm text-slate-600">
+              <div className="flex flex-col items-center justify-center rounded-lg border border-stone-200 bg-white py-16">
+                <TrendingUp className="h-10 w-10 text-stone-300 mb-3" />
+                <p className="text-stone-600">No changes detected yet</p>
+                <p className="mt-1 text-sm text-stone-600">
                   Changes appear after at least two crawl snapshots exist
                 </p>
               </div>
@@ -464,11 +464,11 @@ export default function MarketIntelPage() {
         {/* Competitors Tab */}
         {!isLoading && activeTab === "competitors" && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-800">All Competitors</h2>
+            <h2 className="text-lg font-semibold text-stone-800">All Competitors</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-left text-slate-700">
+                  <tr className="border-b border-stone-200 text-left text-stone-700">
                     <th className="pb-3 pr-4 font-medium">Competitor</th>
                     <th className="pb-3 pr-4 font-medium">Category</th>
                     <th className="pb-3 pr-4 font-medium">Title</th>
@@ -477,9 +477,9 @@ export default function MarketIntelPage() {
                     <th className="pb-3 font-medium">Last Crawl</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-stone-100">
                   {filteredSnapshots.map((snap) => (
-                    <tr key={snap.id} className="hover:bg-slate-50">
+                    <tr key={snap.id} className="hover:bg-stone-50">
                       <td className="py-3 pr-4 font-medium">
                         <a
                           href={snap.url}
@@ -498,29 +498,29 @@ export default function MarketIntelPage() {
                               ? "bg-stone-50 text-stone-600"
                               : snap.category === "video-generator"
                                 ? "bg-stone-50 text-stone-600"
-                                : "bg-slate-100 text-slate-600"
+                                : "bg-stone-100 text-stone-600"
                           }`}
                         >
                           {CATEGORY_META[snap.category]?.label || snap.category}
                         </span>
                       </td>
-                      <td className="py-3 pr-4 max-w-[200px] truncate text-slate-700">
+                      <td className="py-3 pr-4 max-w-[200px] truncate text-stone-700">
                         {snap.title || "-"}
                       </td>
                       <td className="py-3 pr-4">
                         {snap.pricing ? (
-                          <span className="flex items-center gap-1 text-emerald-600">
+                          <span className="flex items-center gap-1 text-amber-600">
                             <DollarSign className="h-3 w-3" />
                             <span className="max-w-[180px] truncate">{snap.pricing}</span>
                           </span>
                         ) : (
-                          <span className="text-slate-600">-</span>
+                          <span className="text-stone-600">-</span>
                         )}
                       </td>
                       <td className="py-3 pr-4">
-                        <span className="text-slate-600">{snap.features?.length || 0} detected</span>
+                        <span className="text-stone-600">{snap.features?.length || 0} detected</span>
                       </td>
-                      <td className="py-3 text-slate-600">
+                      <td className="py-3 text-stone-600">
                         {snap.crawled_at ? timeAgo(snap.crawled_at) : "-"}
                       </td>
                     </tr>
@@ -556,13 +556,13 @@ function StatCard({
     violet: "from-stone-50 to-stone-100/50 border-stone-200",
     blue: "from-stone-50 to-stone-100/50 border-stone-200",
     yellow: "from-yellow-50 to-yellow-100/50 border-yellow-200",
-    green: "from-green-50 to-green-100/50 border-green-200",
+    green: "from-amber-50 to-amber-100/50 border-amber-200",
   };
   const iconColor: Record<string, string> = {
     violet: "text-stone-500",
     blue: "text-stone-500",
     yellow: "text-yellow-600",
-    green: "text-green-500",
+    green: "text-amber-500",
   };
 
   return (
@@ -570,10 +570,10 @@ function StatCard({
       className={`rounded-xl border bg-gradient-to-br p-5 ${colorMap[color] || colorMap.violet}`}
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-700">{label}</p>
-        <Icon className={`h-5 w-5 ${iconColor[color] || "text-slate-600"}`} />
+        <p className="text-sm text-stone-700">{label}</p>
+        <Icon className={`h-5 w-5 ${iconColor[color] || "text-stone-600"}`} />
       </div>
-      <p className={`mt-2 ${isText ? "text-lg" : "text-3xl"} font-bold text-slate-800`}>{value}</p>
+      <p className={`mt-2 ${isText ? "text-lg" : "text-3xl"} font-bold text-stone-800`}>{value}</p>
     </div>
   );
 }
@@ -590,50 +590,50 @@ function CompetitorCard({
   const meta = CATEGORY_META[snapshot.category];
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+    <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
       <button
         onClick={onToggle}
-        className="flex w-full items-center justify-between p-4 text-left hover:bg-slate-50 transition-colors"
+        className="flex w-full items-center justify-between p-4 text-left hover:bg-stone-50 transition-colors"
       >
         <div className="flex items-center gap-3">
           <div
-            className={`flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100`}
+            className={`flex h-9 w-9 items-center justify-center rounded-lg bg-stone-100`}
           >
-            {meta ? <meta.icon className={`h-4 w-4 ${meta.color}`} /> : <Globe className="h-4 w-4 text-slate-600" />}
+            {meta ? <meta.icon className={`h-4 w-4 ${meta.color}`} /> : <Globe className="h-4 w-4 text-stone-600" />}
           </div>
           <div>
-            <p className="font-medium text-slate-800">{snapshot.competitor_name}</p>
-            <p className="text-xs text-slate-600">
+            <p className="font-medium text-stone-800">{snapshot.competitor_name}</p>
+            <p className="text-xs text-stone-600">
               {snapshot.crawled_at ? timeAgo(snapshot.crawled_at) : "Not crawled"}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {snapshot.features && snapshot.features.length > 0 && (
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+            <span className="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-600">
               {snapshot.features.length} features
             </span>
           )}
           {expanded ? (
-            <ChevronDown className="h-4 w-4 text-slate-600" />
+            <ChevronDown className="h-4 w-4 text-stone-600" />
           ) : (
-            <ChevronRight className="h-4 w-4 text-slate-600" />
+            <ChevronRight className="h-4 w-4 text-stone-600" />
           )}
         </div>
       </button>
 
       {expanded && (
-        <div className="border-t border-slate-200 p-4 space-y-3">
+        <div className="border-t border-stone-200 p-4 space-y-3">
           {snapshot.title && (
             <div>
-              <p className="text-xs font-medium text-slate-600 uppercase">Page Title</p>
-              <p className="mt-0.5 text-sm text-slate-700">{snapshot.title}</p>
+              <p className="text-xs font-medium text-stone-600 uppercase">Page Title</p>
+              <p className="mt-0.5 text-sm text-stone-700">{snapshot.title}</p>
             </div>
           )}
           {snapshot.description && (
             <div>
-              <p className="text-xs font-medium text-slate-600 uppercase">Description</p>
-              <p className="mt-0.5 text-sm text-slate-600">
+              <p className="text-xs font-medium text-stone-600 uppercase">Description</p>
+              <p className="mt-0.5 text-sm text-stone-600">
                 {snapshot.description.slice(0, 200)}
                 {snapshot.description.length > 200 ? "..." : ""}
               </p>
@@ -641,8 +641,8 @@ function CompetitorCard({
           )}
           {snapshot.pricing && (
             <div>
-              <p className="text-xs font-medium text-slate-600 uppercase">Pricing Detected</p>
-              <p className="mt-0.5 flex items-center gap-1 text-sm text-emerald-600">
+              <p className="text-xs font-medium text-stone-600 uppercase">Pricing Detected</p>
+              <p className="mt-0.5 flex items-center gap-1 text-sm text-amber-600">
                 <DollarSign className="h-3 w-3" />
                 {snapshot.pricing}
               </p>
@@ -650,12 +650,12 @@ function CompetitorCard({
           )}
           {snapshot.features && snapshot.features.length > 0 && (
             <div>
-              <p className="text-xs font-medium text-slate-600 uppercase">Features Detected</p>
+              <p className="text-xs font-medium text-stone-600 uppercase">Features Detected</p>
               <div className="mt-1 flex flex-wrap gap-1.5">
                 {snapshot.features.map((f) => (
                   <span
                     key={f}
-                    className="rounded-md bg-slate-100 px-2 py-0.5 text-xs text-slate-600"
+                    className="rounded-md bg-stone-100 px-2 py-0.5 text-xs text-stone-600"
                   >
                     {f}
                   </span>
@@ -686,15 +686,15 @@ function ChangeCard({ change }: { change: Change }) {
     JSON.stringify(change.prev_features) !== JSON.stringify(change.features);
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4">
+    <div className="rounded-lg border border-stone-200 bg-white p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
             <Zap className="h-4 w-4 text-amber-500" />
           </div>
           <div>
-            <p className="font-medium text-slate-800">{change.competitor_name}</p>
-            <p className="text-xs text-slate-600">{timeAgo(change.crawled_at)}</p>
+            <p className="font-medium text-stone-800">{change.competitor_name}</p>
+            <p className="text-xs text-stone-600">{timeAgo(change.crawled_at)}</p>
           </div>
         </div>
         <span
@@ -703,7 +703,7 @@ function ChangeCard({ change }: { change: Change }) {
               ? "bg-stone-50 text-stone-600"
               : change.category === "video-generator"
                 ? "bg-stone-50 text-stone-600"
-                : "bg-slate-100 text-slate-600"
+                : "bg-stone-100 text-stone-600"
           }`}
         >
           {CATEGORY_META[change.category]?.label || change.category}
@@ -712,11 +712,11 @@ function ChangeCard({ change }: { change: Change }) {
 
       <div className="mt-3 space-y-2">
         {titleChanged && (
-          <div className="rounded-md bg-slate-50 p-2 text-xs">
-            <span className="font-medium text-slate-700">Title:</span>{" "}
-            <span className="line-through text-slate-600">{change.prev_title}</span>
+          <div className="rounded-md bg-stone-50 p-2 text-xs">
+            <span className="font-medium text-stone-700">Title:</span>{" "}
+            <span className="line-through text-stone-600">{change.prev_title}</span>
             {" -> "}
-            <span className="text-slate-700">{change.title}</span>
+            <span className="text-stone-700">{change.title}</span>
           </div>
         )}
         {pricingChanged && (
@@ -730,7 +730,7 @@ function ChangeCard({ change }: { change: Change }) {
         {featuresChanged && (
           <div className="rounded-md bg-stone-50 border border-stone-200 p-2 text-xs">
             <span className="font-medium text-stone-600">Feature Change:</span>{" "}
-            <span className="text-slate-700">
+            <span className="text-stone-700">
               {change.features?.length || 0} features now (was{" "}
               {change.prev_features?.length || 0})
             </span>

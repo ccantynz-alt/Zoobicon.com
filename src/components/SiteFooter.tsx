@@ -129,7 +129,7 @@ export default function SiteFooter() {
                 className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px]"
                 style={{ border: "1px solid var(--rule)", background: "var(--paper)", color: "var(--ink-secondary)" }}
               >
-                <ShieldCheck className="h-3 w-3 text-emerald-600" /> SOC 2 aligned
+                <ShieldCheck className="h-3 w-3 text-amber-600" /> SOC 2 aligned
               </span>
               <span
                 className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px]"
@@ -154,8 +154,8 @@ export default function SiteFooter() {
               }}
             >
               <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500/60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500/60" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-500" />
               </span>
               All systems operational
               <ArrowRight className="h-3 w-3 opacity-60" />

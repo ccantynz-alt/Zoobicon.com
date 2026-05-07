@@ -167,7 +167,7 @@ const PROJECT_TYPES = [
 ];
 
 const VISUAL_STYLES = [
-  { id: "modern-minimalist", label: "Modern / Minimalist", icon: Zap, color: "from-slate-400 to-slate-600" },
+  { id: "modern-minimalist", label: "Modern / Minimalist", icon: Zap, color: "from-stone-400 to-stone-600" },
   { id: "bold-dynamic", label: "Bold / Dynamic", icon: Sparkles, color: "from-stone-500 to-stone-500" },
   { id: "elegant-luxury", label: "Elegant / Luxury", icon: Crown, color: "from-stone-400 to-stone-600" },
   { id: "fun-playful", label: "Fun / Playful", icon: Smile, color: "from-stone-500 to-stone-500" },

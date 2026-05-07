@@ -596,11 +596,11 @@ export default function BuilderPageWrapper() {
 
   if (crashed) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-8">
+      <div className="min-h-screen bg-stone-950 flex items-center justify-center p-8">
         <div className="max-w-lg text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Builder Error</h1>
           <p className="text-white/60 mb-4">The builder hit an error. Details below:</p>
-          <pre className="bg-zinc-900 border border-white/10 rounded-lg p-4 text-left text-sm text-stone-400 overflow-auto max-h-60 mb-6">{crashed}</pre>
+          <pre className="bg-stone-900 border border-white/10 rounded-lg p-4 text-left text-sm text-stone-400 overflow-auto max-h-60 mb-6">{crashed}</pre>
           <button onClick={() => { setCrashed(null); window.location.reload(); }} className="px-6 py-2 bg-stone-600 text-white rounded-lg hover:bg-stone-500 transition-colors">
             Reload
           </button>
@@ -610,7 +610,7 @@ export default function BuilderPageWrapper() {
   }
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-zinc-950 flex items-center justify-center"><div className="text-white/40">Loading builder...</div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-stone-950 flex items-center justify-center"><div className="text-white/40">Loading builder...</div></div>}>
       <ErrorCatcher onError={(e) => setCrashed(e)}>
         <BuilderPage />
       </ErrorCatcher>
@@ -2515,11 +2515,11 @@ root.render(React.createElement(App));
                   </div>
                 )}
                 {!isFreePlan && (
-                  <div className="mx-4 mt-3 mb-1 rounded-xl border border-emerald-400/25 bg-emerald-500/[0.06] px-3.5 py-2 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    <p className="text-[11px] text-emerald-200/85">
+                  <div className="mx-4 mt-3 mb-1 rounded-xl border border-amber-400/25 bg-amber-500/[0.06] px-3.5 py-2 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <p className="text-[11px] text-amber-200/85">
                       <span className="font-semibold">{planLabel(userPlan)} plan</span>
-                      <span className="text-emerald-200/55"> · no watermark, custom domains, full feature set.</span>
+                      <span className="text-amber-200/55"> · no watermark, custom domains, full feature set.</span>
                     </p>
                   </div>
                 )}
@@ -2580,7 +2580,7 @@ root.render(React.createElement(App));
                       </span>
                     )}
                     {saveStatus === "saved" && (
-                      <span className="text-[9px] text-emerald-400/60">Saved</span>
+                      <span className="text-[9px] text-amber-400/60">Saved</span>
                     )}
                   </div>
                   <div className="flex items-center gap-1">
@@ -2737,7 +2737,7 @@ root.render(React.createElement(App));
                 <button
                   type="button"
                   onClick={() => setUseWebContainers((v) => !v)}
-                  className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded-md bg-zinc-900/90 backdrop-blur-sm text-white/60 border border-white/[0.08] hover:bg-zinc-800/90 transition-colors"
+                  className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded-md bg-stone-900/90 backdrop-blur-sm text-white/60 border border-white/[0.08] hover:bg-stone-800/90 transition-colors"
                 >
                   {useWebContainers ? "WebContainers" : "Sandpack"}
                 </button>
@@ -2749,7 +2749,7 @@ root.render(React.createElement(App));
               {/* Build progress overlay on preview */}
               {activeTab === "preview" && status === "generating" && hasCode && pipelineAgents.length > 0 && (
                 <div className="absolute bottom-4 left-4 right-4 z-30 pointer-events-none">
-                  <div className="max-w-lg mx-auto px-4 py-3 rounded-2xl bg-zinc-950/80 backdrop-blur-2xl border border-white/[0.06] shadow-2xl shadow-black/40 pointer-events-auto">
+                  <div className="max-w-lg mx-auto px-4 py-3 rounded-2xl bg-stone-950/80 backdrop-blur-2xl border border-white/[0.06] shadow-2xl shadow-black/40 pointer-events-auto">
                     <div className="flex items-center gap-3 mb-1.5">
                       <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin flex-shrink-0" />
                       <span className="text-xs text-white/70 font-medium truncate">
