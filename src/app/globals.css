@@ -3088,3 +3088,152 @@ html, body {
 .builder-editorial [class*="hover:text-white/5"]:hover {
   color: var(--ink-secondary) !important;
 }
+
+/* ───────────────────────────────────────────────────────────────────────
+ * GREY/BLACK STRAGGLER SWEEP — 2026-05-07
+ * ───────────────────────────────────────────────────────────────────────
+ *
+ * Craig's report (May 7): "I don't know where the grey and black is
+ * coming from from shouldn't be there." Two failure modes were leaking
+ * past the existing override layers:
+ *
+ *   (1) Opacity-suffix dark navys — the override at line 2098 catches
+ *       `.bg-[#101a35]` but not `.bg-[#101a35]/80`. JIT emits both as
+ *       distinct selectors. Add the missing variants for every dark hex
+ *       already in the unsuffixed list.
+ *
+ *   (2) Tailwind's `stone` ramp (300/400/500/600/700/800/900) was used
+ *       as both a washed CTA fill (`bg-stone-600`) AND as muted text
+ *       on dark surfaces. With the page now white, both render as a
+ *       muddy grey-brown blob. Route them to ink scale + paper scale.
+ *
+ *   (3) Gold-on-cream pill backgrounds — `bg-amber-500/15` and
+ *       `bg-yellow-500/15` etc. with `text-amber-200` are the gold-on-
+ *       cream invisibility offender. Strengthen text to gold-deep so
+ *       the pill remains readable on the new light page.
+ */
+
+/* (1) Missing opacity-suffix variants of dark navy hex codes.
+ * Every value below appears in src/ as `bg-[#XXXXXX]/N`. The unsuffixed
+ * forms are already overridden at line 2098; this catches the variants. */
+.bg-\[\#101a35\]\/40, .bg-\[\#101a35\]\/60, .bg-\[\#101a35\]\/70,
+.bg-\[\#101a35\]\/80, .bg-\[\#101a35\]\/85, .bg-\[\#101a35\]\/90, .bg-\[\#101a35\]\/95,
+.bg-\[\#142046\]\/40, .bg-\[\#142046\]\/60, .bg-\[\#142046\]\/70,
+.bg-\[\#142046\]\/80, .bg-\[\#142046\]\/85, .bg-\[\#142046\]\/90, .bg-\[\#142046\]\/95,
+.bg-\[\#0f1830\]\/40, .bg-\[\#0f1830\]\/60, .bg-\[\#0f1830\]\/70,
+.bg-\[\#0f1830\]\/80, .bg-\[\#0f1830\]\/85, .bg-\[\#0f1830\]\/90, .bg-\[\#0f1830\]\/95,
+.bg-\[\#0a0f1e\]\/80, .bg-\[\#0a0f1e\]\/85, .bg-\[\#0a0f1e\]\/90, .bg-\[\#0a0f1e\]\/95,
+.bg-\[\#0d1321\]\/80, .bg-\[\#0d1321\]\/85, .bg-\[\#0d1321\]\/90,
+.bg-\[\#1a1340\]\/80, .bg-\[\#1a1340\]\/85, .bg-\[\#1a1340\]\/90, .bg-\[\#1a1340\]\/95,
+.bg-\[\#0f1f3d\]\/80, .bg-\[\#0f1f3d\]\/85, .bg-\[\#0f1f3d\]\/90, .bg-\[\#0f1f3d\]\/95,
+.bg-\[\#161f35\]\/80, .bg-\[\#161f35\]\/85, .bg-\[\#161f35\]\/90,
+.bg-\[\#0c0e14\]\/40, .bg-\[\#0c0e14\]\/60, .bg-\[\#0c0e14\]\/70,
+.bg-\[\#0e0e18\]\/80, .bg-\[\#0e0e18\]\/85, .bg-\[\#0e0e18\]\/90,
+.bg-\[\#1e293b\]\/40, .bg-\[\#1e293b\]\/60, .bg-\[\#1e293b\]\/80, .bg-\[\#1e293b\]\/90 {
+  background-color: rgba(244, 241, 230, 0.92) !important; /* paper-elevated */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Gradient stops for those same dark navy hex codes. Same fade-to-paper
+ * approach used for the existing `from-[#0b1530]` block. */
+.from-\[\#101a35\], .to-\[\#101a35\], .via-\[\#101a35\],
+.from-\[\#142046\], .to-\[\#142046\], .via-\[\#142046\],
+.from-\[\#0f1830\], .to-\[\#0f1830\], .via-\[\#0f1830\],
+.from-\[\#1a1340\], .to-\[\#1a1340\], .via-\[\#1a1340\],
+.from-\[\#0f1f3d\], .to-\[\#0f1f3d\], .via-\[\#0f1f3d\],
+.from-\[\#0a0f1e\], .to-\[\#0a0f1e\], .via-\[\#0a0f1e\],
+.from-\[\#1a1340\]\/95, .to-\[\#0f1f3d\]\/95,
+.from-\[\#101a35\]\/85, .to-\[\#101a35\]\/85,
+.from-\[\#142046\]\/85, .to-\[\#142046\]\/85,
+.from-\[\#0a0a0c\], .to-\[\#0a0a0c\],
+.from-\[\#0d0d10\], .to-\[\#0d0d10\] {
+  --tw-gradient-from: var(--paper-elevated) !important;
+  --tw-gradient-to: var(--paper-elevated) !important;
+  --tw-gradient-via: var(--paper-elevated) !important;
+}
+
+/* (2) Stone ramp — muddy grey-brown when stranded on white.
+ * 700/800/900 already routes to ink in the admin block at line 2647;
+ * extend to cover the lighter shades and the bg variants. */
+.text-stone-300, .text-stone-400 {
+  color: var(--ink-secondary) !important;
+}
+.text-stone-500, .text-stone-600 {
+  color: var(--ink-muted) !important;
+}
+/* Stone backgrounds were used as washed CTAs (`bg-stone-600`) and as
+ * recessed surfaces (`bg-stone-50/100`). Route to ink for CTAs and
+ * paper-elevated for surfaces. The ambiguity is unavoidable but the
+ * common case for stone-500+ is a darker-on-light filled pill, which
+ * we want to be the primary ink CTA. */
+.bg-stone-500, .bg-stone-600, .bg-stone-700, .bg-stone-800 {
+  background-color: var(--ink) !important;
+  color: var(--paper) !important;
+}
+.bg-stone-50, .bg-stone-100, .bg-stone-200 {
+  background-color: var(--paper-elevated) !important;
+}
+.from-stone-500, .to-stone-500, .via-stone-500,
+.from-stone-600, .to-stone-600, .via-stone-600,
+.from-stone-700, .to-stone-700, .via-stone-700 {
+  --tw-gradient-from: var(--ink) !important;
+  --tw-gradient-to: var(--ink) !important;
+  --tw-gradient-via: var(--ink) !important;
+}
+/* Stone borders that were meant to be subtle dividers */
+.border-stone-300, .border-stone-400, .border-stone-500,
+.border-stone-600, .border-stone-700, .border-stone-800 {
+  border-color: var(--rule) !important;
+}
+/* Stone opacity-suffix tints (`bg-stone-500/15`, `bg-stone-500/20`, etc.)
+ * were used as soft pill backgrounds. Route to gold-soft so the pill
+ * keeps its accent feel without rendering as muddy grey-brown on cream. */
+.bg-stone-400\/10, .bg-stone-400\/15, .bg-stone-400\/20,
+.bg-stone-500\/10, .bg-stone-500\/15, .bg-stone-500\/20,
+.bg-stone-500\/30, .bg-stone-500\/40,
+.bg-stone-600\/10, .bg-stone-600\/15, .bg-stone-600\/20 {
+  background-color: var(--paper-elevated) !important;
+}
+
+/* (3) Gold-on-cream pill safety — `text-amber-200` / `text-amber-300`
+ * on `bg-amber-500/15` reads as cream-on-cream on the new white page.
+ * Promote text to gold-deep so the pill stays legible. The `bg-amber-*`
+ * classes already render correctly because the bg-amber tints hold up
+ * against gold-deep text. */
+.text-amber-100, .text-amber-200, .text-amber-300, .text-amber-400 {
+  color: var(--gold-deep) !important;
+}
+.text-yellow-200, .text-yellow-300, .text-yellow-400 {
+  color: var(--gold-deep) !important;
+}
+/* Soft amber fills — push to gold-soft for consistent warmth */
+.bg-amber-500\/5, .bg-amber-500\/10, .bg-amber-500\/15, .bg-amber-500\/20,
+.bg-amber-400\/10, .bg-amber-400\/15, .bg-amber-400\/20,
+.bg-yellow-500\/10, .bg-yellow-500\/15, .bg-yellow-500\/20 {
+  background-color: var(--gold-soft) !important;
+}
+/* Amber borders → gold for a clean champagne hairline */
+.border-amber-300, .border-amber-400, .border-amber-500,
+.border-amber-400\/40, .border-amber-400\/30, .border-amber-400\/25,
+.border-amber-500\/40, .border-amber-500\/30, .border-amber-500\/25,
+.border-yellow-400, .border-yellow-500 {
+  border-color: var(--gold) !important;
+}
+
+/* (4) Black/near-black inline backgrounds that aren't real CTAs —
+ * `bg-black/40`, `bg-black/60`, `bg-black/70` etc. used as semi-
+ * transparent panel overlays. Route the chunky variants to paper-
+ * elevated so error/info panels read on cream. The /20 and /30 stay
+ * as they're transient overlays (modal scrims) where dark IS correct. */
+.bg-black\/40, .bg-black\/50, .bg-black\/60 {
+  background-color: rgba(244, 241, 230, 0.92) !important; /* paper-elevated alpha */
+}
+/* `bg-stone-900`, `bg-stone-950` already route to paper at line 2275-2280;
+ * extend to opacity variants so `bg-stone-900/80`, /90 land on cream. */
+.bg-stone-900\/40, .bg-stone-900\/50, .bg-stone-900\/60,
+.bg-stone-900\/70, .bg-stone-900\/80, .bg-stone-900\/90,
+.bg-stone-950\/40, .bg-stone-950\/50, .bg-stone-950\/60,
+.bg-stone-950\/70, .bg-stone-950\/80, .bg-stone-950\/90 {
+  background-color: rgba(244, 241, 230, 0.92) !important;
+}

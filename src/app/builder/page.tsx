@@ -182,7 +182,7 @@ function LaunchVideoPolaroid({ state, onRetry, onDismiss }: LaunchVideoPolaroidP
             <a
               href={state.videoUrl}
               download
-              className="px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider border border-[#c9a961]/40 bg-[#c9a961]/10 text-[#7a6535] hover:bg-[#c9a961]/20 transition"
+              className="px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider border border-[var(--gold)] bg-[var(--gold-soft)] text-[var(--gold-deep)] hover:bg-[var(--gold)]/25 transition"
             >
               <Download size={11} />
             </a>
@@ -596,12 +596,12 @@ export default function BuilderPageWrapper() {
 
   if (crashed) {
     return (
-      <div className="min-h-screen bg-stone-950 flex items-center justify-center p-8">
+      <div className="min-h-screen bg-[var(--paper)] flex items-center justify-center p-8">
         <div className="max-w-lg text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Builder Error</h1>
-          <p className="text-white/60 mb-4">The builder hit an error. Details below:</p>
-          <pre className="bg-stone-900 border border-white/10 rounded-lg p-4 text-left text-sm text-stone-400 overflow-auto max-h-60 mb-6">{crashed}</pre>
-          <button onClick={() => { setCrashed(null); window.location.reload(); }} className="px-6 py-2 bg-stone-600 text-white rounded-lg hover:bg-stone-500 transition-colors">
+          <h1 className="text-2xl font-bold text-[var(--ink)] mb-4">Builder Error</h1>
+          <p className="text-[var(--ink-secondary)] mb-4">The builder hit an error. Details below:</p>
+          <pre className="bg-[var(--paper-elevated)] border border-[var(--rule)] rounded-lg p-4 text-left text-sm text-[var(--ink-secondary)] overflow-auto max-h-60 mb-6">{crashed}</pre>
+          <button onClick={() => { setCrashed(null); window.location.reload(); }} className="px-6 py-2 bg-[var(--ink)] text-[var(--paper)] rounded-lg hover:bg-[var(--ink-secondary)] transition-colors">
             Reload
           </button>
         </div>
@@ -610,7 +610,7 @@ export default function BuilderPageWrapper() {
   }
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-stone-950 flex items-center justify-center"><div className="text-white/40">Loading builder...</div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--paper)] flex items-center justify-center"><div className="text-[var(--ink-muted)]">Loading builder...</div></div>}>
       <ErrorCatcher onError={(e) => setCrashed(e)}>
         <BuilderPage />
       </ErrorCatcher>
@@ -2405,10 +2405,9 @@ root.render(React.createElement(App));
                 disabled={isDeploying}
                 className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[11px] font-semibold transition-all border ${
                   isDeploying
-                    ? "border-stone-200 text-stone-400 cursor-wait bg-stone-50"
-                    : "text-white border-transparent"
+                    ? "border-[var(--rule)] text-[var(--ink-muted)] cursor-wait bg-[var(--paper-elevated)]"
+                    : "bg-[var(--ink)] hover:bg-[var(--ink-secondary)] text-[var(--paper)] border-[var(--ink)]"
                 }`}
-                style={!isDeploying ? { background: "linear-gradient(135deg, #c9a961 0%, #b8923f 100%)", boxShadow: "0 2px 8px rgba(184,146,63,0.3)" } : {}}
               >
                 <Rocket size={13} className={isDeploying ? "animate-pulse" : ""} />
                 {isDeploying ? "Deploying..." : "Deploy"}
@@ -2495,31 +2494,27 @@ root.render(React.createElement(App));
                     purely the conversion lever that explains why and offers
                     the fix. */}
                 {isFreePlan && (
-                  <div className="mx-4 mt-3 mb-1 rounded-xl border border-[#E8D4B0]/25 bg-gradient-to-r from-[#E8D4B0]/[0.07] to-transparent px-3.5 py-2.5 flex items-center gap-3">
+                  <div className="mx-4 mt-3 mb-1 rounded-xl border border-[var(--gold)] bg-[var(--gold-soft)] px-3.5 py-2.5 flex items-center gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] text-white/85">
-                        <span className="font-semibold text-[#E8D4B0]">Free plan</span>
-                        <span className="text-white/50"> · sites you build include a small &ldquo;Built with Zoobicon&rdquo; badge.</span>
+                      <p className="text-[12px] text-[var(--ink-secondary)]">
+                        <span className="font-semibold text-[var(--gold-deep)]">Free plan</span>
+                        <span className="text-[var(--ink-muted)]"> · sites you build include a small &ldquo;Built with Zoobicon&rdquo; badge.</span>
                       </p>
                     </div>
                     <Link
                       href="/pricing"
-                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[#0a1628] hover:brightness-110 transition-all whitespace-nowrap"
-                      style={{
-                        background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
-                        boxShadow: "0 4px 14px -4px rgba(232,212,176,0.45)",
-                      }}
+                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[var(--paper)] bg-[var(--ink)] hover:bg-[var(--ink-secondary)] transition-all whitespace-nowrap"
                     >
                       Remove badge
                     </Link>
                   </div>
                 )}
                 {!isFreePlan && (
-                  <div className="mx-4 mt-3 mb-1 rounded-xl border border-amber-400/25 bg-amber-500/[0.06] px-3.5 py-2 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    <p className="text-[11px] text-amber-200/85">
+                  <div className="mx-4 mt-3 mb-1 rounded-xl border border-[var(--gold)] bg-[var(--gold-soft)] px-3.5 py-2 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold)]" />
+                    <p className="text-[11px] text-[var(--gold-deep)]">
                       <span className="font-semibold">{planLabel(userPlan)} plan</span>
-                      <span className="text-amber-200/55"> · no watermark, custom domains, full feature set.</span>
+                      <span className="text-[var(--ink-muted)]"> · no watermark, custom domains, full feature set.</span>
                     </p>
                   </div>
                 )}
@@ -2850,17 +2845,17 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-20 flex items-center justify-center bg-[#f4f3ed]"
+                  className="absolute inset-0 z-20 flex items-center justify-center bg-[var(--paper)]"
                 >
                   <div className="max-w-md text-center px-8">
-                    <div className="w-14 h-14 rounded-2xl bg-stone-500/10 border border-stone-500/15 flex items-center justify-center mx-auto mb-5">
-                      <AlertTriangle className="w-7 h-7 text-stone-400" />
+                    <div className="w-14 h-14 rounded-2xl bg-[var(--gold-soft)] border border-[var(--gold)] flex items-center justify-center mx-auto mb-5">
+                      <AlertTriangle className="w-7 h-7 text-[var(--gold-deep)]" />
                     </div>
-                    <h3 className="text-lg font-semibold text-white/90 mb-2">Something went wrong</h3>
-                    <p className="text-white/35 text-sm mb-6 leading-relaxed">{error}</p>
+                    <h3 className="text-lg font-semibold text-[var(--ink)] mb-2">Something went wrong</h3>
+                    <p className="text-[var(--ink-muted)] text-sm mb-6 leading-relaxed">{error}</p>
                     <button
                       onClick={() => { setError(""); setStatus("idle"); }}
-                      className="px-6 py-2.5 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-stone-500/20"
+                      className="px-6 py-2.5 bg-[var(--ink)] hover:bg-[var(--ink-secondary)] text-[var(--paper)] text-sm font-semibold rounded-xl transition-all shadow-[var(--shadow-1)]"
                     >
                       Try Again
                     </button>

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function ComparisonsIndex() {
   const entries = Object.values(COMPARISONS);
   return (
-    <div className="relative z-10 min-h-screen bg-[#0b1530] text-white pt-[72px]">
+    <div className="relative z-10 min-h-screen bg-[var(--paper)] text-[var(--ink)] pt-[72px]">
       <section className="relative pt-20 md:pt-28 pb-12 px-4 overflow-hidden">
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           <div
