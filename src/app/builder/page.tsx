@@ -2431,7 +2431,7 @@ root.render(React.createElement(App));
 
       <div className="flex flex-1 overflow-hidden relative z-10">
         {/* ── Left Panel — Chat / Prompt ── */}
-        <div className="w-[380px] min-w-[320px] flex flex-col" style={{ background: "var(--paper-elevated)", borderRight: "1px solid var(--rule)", borderLeft: "1px solid var(--rule)" }}>
+        <div className="w-[380px] min-w-[320px] flex flex-col" style={{ background: "var(--paper-bright)", borderRight: "1px solid var(--rule)", borderLeft: "1px solid var(--rule)" }}>
           <AnimatePresence mode="wait">
             {!hasCode ? (
               <motion.div
@@ -2503,7 +2503,8 @@ root.render(React.createElement(App));
                     </div>
                     <Link
                       href="/pricing"
-                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-[var(--paper)] bg-[var(--ink)] hover:bg-[var(--ink-secondary)] transition-all whitespace-nowrap"
+                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-white transition-all whitespace-nowrap"
+                      style={{ background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)", boxShadow: "0 2px 6px rgba(184,146,63,0.3)", textShadow: "0 1px 1px rgba(80,55,15,0.35)" }}
                     >
                       Remove badge
                     </Link>

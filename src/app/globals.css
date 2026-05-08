@@ -15,12 +15,13 @@
    * stack — readability is unchanged.
    */
   --paper: #ffffff;          /* PURE WHITE page background */
-  --paper-elevated: #f4f1e6; /* warm cream cards — strong contrast against white */
+  --paper-elevated: #fbf9f1; /* very subtle warm cream — light cards on white, no muddy contrast */
+  --paper-bright: #fdfcf6;   /* even lighter — for panels that should sit between paper and paper-elevated */
   --paper-input: #fafaf6;    /* pale cream inputs — subtle recess on white */
-  --ink: #0a0a0b;            /* primary text — near-black */
+  --ink: #1a1a1c;            /* primary text — soft near-black, not harsh */
   --ink-secondary: #2a2a30;  /* secondary text */
   --ink-muted: #76767e;      /* muted text, captions */
-  --rule: #d8d3c0;           /* hairline border */
+  --rule: #ebe7d6;           /* hairline border — softer */
   --rule-strong: #a8a392;    /* primary border */
   --gold: #b8923f;           /* champagne accent */
   --gold-soft: rgba(184, 146, 63, 0.14);
