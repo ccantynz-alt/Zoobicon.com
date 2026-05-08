@@ -237,34 +237,29 @@ export default function PromptInput({
         <button
           onClick={() => onTierChange("standard")}
           className={`relative group flex flex-col items-start p-3 rounded-xl text-left transition-all duration-300 overflow-hidden ${
-            tier === "standard"
-              ? "bg-white/[0.08] border-2 border-white/20 shadow-lg"
-              : "bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-white/10"
+            tier === "standard" ? "border-2 shadow-lg" : "border hover:border-stone-300"
           }`}
+          style={tier === "standard"
+            ? { background: "var(--paper-elevated)", borderColor: "var(--ink)", boxShadow: "0 4px 16px -4px rgba(10,10,11,0.12)" }
+            : { background: "var(--paper-elevated)", borderColor: "var(--rule)" }}
         >
           <div className="flex items-center gap-2 mb-1.5">
-            <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
-              tier === "standard" ? "bg-white/15" : "bg-white/[0.06]"
-            }`}>
-              <Zap className={`w-3.5 h-3.5 ${tier === "standard" ? "text-white" : "text-white/50"}`} />
+            <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={tier === "standard" ? { background: "var(--ink)" } : { background: "var(--rule)" }}>
+              <Zap className="w-3.5 h-3.5" style={{ color: tier === "standard" ? "#ffffff" : "var(--ink-muted)" }} />
             </div>
-            <span className={`text-xs font-bold uppercase tracking-wider ${
-              tier === "standard" ? "text-white" : "text-white/50"
-            }`}>
+            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: tier === "standard" ? "var(--ink)" : "var(--ink-muted)" }}>
               Standard
             </span>
           </div>
           <div className="flex flex-col gap-0.5 mt-1">
             {STANDARD_FEATURES.map((f) => (
-              <span key={f} className={`text-[9px] flex items-center gap-1 ${
-                tier === "standard" ? "text-white/50" : "text-white/15"
-              }`}>
+              <span key={f} className="text-[9px] flex items-center gap-1" style={{ color: tier === "standard" ? "var(--ink-secondary)" : "var(--ink-muted)" }}>
                 <Check className="w-2.5 h-2.5" />{f}
               </span>
             ))}
           </div>
           {tier === "standard" && (
-            <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-white/60" />
+            <div className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style={{ background: "var(--ink)" }} />
           )}
         </button>
 
@@ -273,12 +268,14 @@ export default function PromptInput({
           onClick={() => onTierChange("premium")}
           className={`relative group flex flex-col items-start p-3 rounded-xl text-left transition-all duration-300 overflow-hidden ${
             tier === "premium"
-              ? "border-2 border-brand-500/40 shadow-lg shadow-brand-500/10"
-              : "bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-brand-500/20"
+              ? "border-2 shadow-lg"
+              : "border hover:border-stone-300"
           }`}
           style={tier === "premium" ? {
-            background: "linear-gradient(135deg, rgba(184,146,63,0.15), rgba(212,184,109,0.08), rgba(247,234,208,0.05))",
-          } : undefined}
+            background: "linear-gradient(135deg, rgba(184,146,63,0.18), rgba(212,184,109,0.10), rgba(247,234,208,0.06))",
+            borderColor: "var(--gold)",
+            boxShadow: "0 4px 16px -4px rgba(184,146,63,0.25)",
+          } : { background: "var(--paper-elevated)", borderColor: "var(--rule)" }}
         >
           {/* Animated shimmer on premium when selected */}
           {tier === "premium" && (
@@ -292,26 +289,16 @@ export default function PromptInput({
             />
           )}
           <div className="relative flex items-center gap-2 mb-1.5">
-            <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
-              tier === "premium"
-                ? "bg-gradient-to-br from-brand-500/30 to-accent-stone/20"
-                : "bg-white/[0.06]"
-            }`}>
-              <Sparkles className={`w-3.5 h-3.5 ${
-                tier === "premium" ? "text-brand-300" : "text-white/50"
-              }`} />
+            <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={tier === "premium" ? { background: "var(--gold)" } : { background: "var(--rule)" }}>
+              <Sparkles className="w-3.5 h-3.5" style={{ color: tier === "premium" ? "#ffffff" : "var(--ink-muted)" }} />
             </div>
-            <span className={`text-xs font-bold uppercase tracking-wider ${
-              tier === "premium" ? "text-brand-300" : "text-white/50"
-            }`}>
+            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: tier === "premium" ? "var(--gold-deep)" : "var(--ink-muted)" }}>
               Premium
             </span>
           </div>
           <div className="relative flex flex-col gap-0.5 mt-1">
             {PREMIUM_FEATURES.map((f) => (
-              <span key={f} className={`text-[9px] flex items-center gap-1 ${
-                tier === "premium" ? "text-brand-300/60" : "text-white/15"
-              }`}>
+              <span key={f} className="text-[9px] flex items-center gap-1" style={{ color: tier === "premium" ? "var(--ink-secondary)" : "var(--ink-muted)" }}>
                 <Check className="w-2.5 h-2.5" />{f}
               </span>
             ))}
@@ -503,11 +490,10 @@ export default function PromptInput({
 
       {/* Build button */}
       <button
-        className={`w-full py-3 rounded-xl text-sm font-bold text-white uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed transition-all ${
-          tier === "premium"
-            ? "bg-gradient-to-r from-brand-500 via-accent-stone to-brand-600 hover:shadow-glow"
-            : "btn-gradient"
-        }`}
+        className="w-full py-3 rounded-xl text-sm font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        style={tier === "premium"
+          ? { background: "linear-gradient(135deg, #c9a961 0%, #b8923f 50%, #9c7a2c 100%)", color: "#ffffff", boxShadow: "0 4px 16px -2px rgba(184,146,63,0.45)", textShadow: "0 1px 1px rgba(80,55,15,0.4)" }
+          : { background: "var(--ink)", color: "var(--paper)", boxShadow: "0 4px 16px -4px rgba(10,10,11,0.25)" }}
         onClick={handleGenerateWithCustomization}
         disabled={isGenerating || !prompt.trim()}
       >
