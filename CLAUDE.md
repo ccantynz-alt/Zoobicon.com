@@ -131,7 +131,7 @@ If Claude is uncertain whether something requires authorization: **default to as
 ### 3.3 Aggressive Components
 - **$100K+ agency quality or it doesn't ship.** Every component in the registry must look like a top-tier design agency built it. Animated, responsive, accessible, modern, luxurious.
 - **2026/2027 patterns only.** Bento grids. Spotlight cards. Text reveal. Scroll-linked animations. Cursor-tracking effects. Infinite marquees. Gradient borders. Static 2024 components are banned.
-- **114 components in the registry as of 2026-04-11** (up from claimed 60 — the count was stale). Target: 150+ by end of Q2. Every component assembled from the registry, not generated from scratch.
+- **118 components in the registry as of 2026-05-13** (up from 114 on 2026-04-11, was claimed at 60 in stale rows). Target: 150+ by end of Q2. Every component assembled from the registry, not generated from scratch.
 - **Mobile-first, WCAG AA, SEO-optimized by default.** If a component fails on mobile, it ships broken. If it has 3:1 contrast, it fails WCAG. Neither is acceptable.
 
 ### 3.4 Aggressive Procedures
@@ -350,10 +350,10 @@ These are never allowed under any circumstance without Craig explicitly saying "
 ---
 
 # LIVE REPO STATUS — READ THIS FIRST
-## Last updated: 2026-05-04 | Build: PASSING (470+ pages) | Branch: claude/explore-domain-providers-YhDVs
+## Last updated: 2026-05-13 | Build: PASSING (470+ pages) | Branch: claude/review-readme-docs-Wr1If
 
 ### QUICK FACTS
-- **141 pages** | **223 API routes** | **74 layouts** | **130 lib files**
+- **165 pages** | **576 API routes** | **87 layouts** | **254 lib files** | **77 shared components** | **118 registry components**
 - **Framework:** Next.js 14.2 + React 18.3 + TypeScript + Tailwind CSS 3.4
 - **AI:** Anthropic SDK 0.80, multi-LLM (Claude/GPT/Gemini) via `src/lib/llm-provider.ts`
 - **DB:** Neon serverless Postgres via `@neondatabase/serverless`
@@ -434,7 +434,7 @@ Payments:    src/app/pricing/page.tsx → /api/stripe/checkout → src/lib/strip
 ### DIRECTORY MAP
 ```
 src/
-  app/                    # 141 pages, 223 API routes, 74 layouts
+  app/                    # 165 pages, 576 API routes, 87 layouts
     api/                  # All backend endpoints
       generate/           # AI generation (react, react-stream, edit, pipeline, images)
       hosting/            # Deploy, serve, DNS, SSL, CDN
@@ -453,10 +453,10 @@ src/
     products/             # 10 product pages
     video-creator/        # AI video creator
     auth/                 # Login, signup, OAuth
-  lib/                    # 130 helper modules
+  lib/                    # 254 helper modules
     agents.ts             # 7-agent pipeline (51KB)
     llm-provider.ts       # Multi-LLM abstraction
-    component-registry/   # 60 React components for assembly (all $100K+ quality, 6 next-gen)
+    component-registry/   # 118 React components for assembly (all $100K+ quality, 6 next-gen)
     scaffold-engine.ts    # Instant scaffold system
     templates.ts          # Template library (108KB)
     stripe.ts             # Stripe integration
@@ -929,6 +929,7 @@ We have more features than anyone (75+ products). The gap is: does it work when 
 
 | # | Issue | Fixed | What Was Done |
 |---|-------|-------|---------------|
+| 28 | **Public-facing docs were 2+ months stale and contradicted CLAUDE.md.** README claimed "Early Development" + "AI: (Coming soon)" and listed 6 components. CHANGELOG was an unmodified Keep-a-Changelog template (dates 2023-2024, "your-org/your-repo" links). ZOOBICON-BLUEPRINT said the default model was "Claude Sonnet 4.6 (switched from Opus due to 529 overload)" — direct contradiction of Rule 4 (Opus 4.7 is canonical). BLUEPRINT also claimed 201 routes / 116 pages / 78 components / SDK 0.39 — reality was 576 / 165 / 118 / SDK 0.80. PRODUCT_ROADMAP statuses were dated 2026-03-14, two months stale. PLAN.md and HANDOVER.md referred to long-dead branches. CLAUDE.md LIVE REPO STATUS row itself said "141 pages / 223 API routes / 74 layouts / 130 lib files" — also stale. | 2026-05-13 | Re-counted everything via filesystem: 165 pages, 576 API routes, 87 layouts, 254 lib files, 77 shared components, 118 registry components. Rewrote README.md (real stack, real env vars, real architecture, no "Coming soon" lies). Rewrote CHANGELOG.md with real month-grouped Zoobicon shipping history from `git log` + RECENTLY FIXED. Rewrote ZOOBICON-BLUEPRINT.md (Opus 4.7 canonical, SDK 0.80, real counts, removed HeyGen-as-primary references per Rule 19, removed `/dominat8` route claims). Refreshed PRODUCT_ROADMAP.md statuses for domains/email/video/auth/export. Archived PLAN.md → `docs/archive/PLAN-2026-03.md` and HANDOVER.md → `docs/archive/HANDOVER-2026-03-19.md` with an explanatory archive README. Bumped CLAUDE.md LIVE REPO STATUS quick facts + directory map counts + component count line + branch line. |
 | 25 | **Sandpack pre-warm was cosmetic, not functional** — Craig: "I need the pre-booked steps and sandpack... I need edge runtime... I need all the WebContainers set up." Previous pre-warm rendered a placeholder App.tsx with a spinner but never pre-bundled the common dependencies, so first real preview still took 20-30s cold. | 2026-04-11 | Rewrote `src/components/SandpackPreview.tsx` pre-warm path: declares lucide-react/framer-motion/clsx/tailwind-merge in `customSetup.dependencies` during idle state, and the PREWARM_APP now imports+references each library at module level (wrapped in `if(false)` to prevent execution but force bundling). First real render target: <3s. Also scaffolded `src/lib/webcontainers-adapter.ts` (StackBlitz commercial integration — waiting on license key), `src/lib/gate-test-hook.ts` (browser AI test agent — matches Lovable 2.0 Browser Testing + Bolt V2 auto-error-fix pattern, runs built-in a11y/layout probes and hands off to Craig's external Gate Test API once admin is live), and `src/lib/crontech-adapter.ts` (Craig's combined backend+frontend serverless platform — waiting on API docs). |
 | 26 | **Component count discrepancy in CLAUDE.md** — rows claimed "60 components" while marketing copy said "100+". Craig noticed: "I could be wrong but I thought we had like 100+ components." | 2026-04-11 | Audited `src/lib/component-registry/` via Grep of `registerComponent(` calls: actual count is **114** across 7 content files (heroes 12 + navbars 8 + features 9 + testimonials 6 + footers 7 + extras 27 + sections 45). Reconciled all "60 components" mentions. Updated target to 150+ by end of Q2. |
 | 27 | **Claude was reactive instead of proactive** — Craig: "I ask Claude what we need to do to be aggressive in our building and I don't get any of that response." Root cause: "be aggressive" is a value, not a procedure. Values get ignored. | 2026-04-11 | Added §1.5 THE AGGRESSIVE OPENING PROTOCOL to THE IRON LAW. Converts "be aggressive" into a 5-step forcing function every session runs BEFORE the user types anything: gap analysis → top 5 moves (user-visible) → start on #1 automatically → commit-ready work only → update CLAUDE.md before ending. Every step has a concrete deliverable so skipping any step is observable. |
