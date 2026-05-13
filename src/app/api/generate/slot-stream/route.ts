@@ -63,6 +63,7 @@ import {
   HERO_PORTFOLIO_EDITORIAL_TEMPLATE,
   HERO_PORTFOLIO_EDITORIAL_EXAMPLE,
 } from "@/lib/slot-locked/templates/by-industry/hero-portfolio-editorial";
+import { planPageForIndustry } from "@/lib/slot-locked/industry-planner";
 import type { ComponentSchema, SlotValueMap } from "@/lib/slot-locked/types";
 
 export const maxDuration = 120;
@@ -70,11 +71,16 @@ export const maxDuration = 120;
 interface RequestBody {
   prompt?: string;
   brandName?: string;
-  /** Detected industry from the planner. Used for cache key + theme defaults. */
+  /** Detected industry (from /api/generate/predict or the legacy planner).
+   *  Used for cache key + auto-component-selection via industry-planner. */
   industry?: string;
-  /** Visual theme. Used for cache key. */
+  /** Visual theme. Used for cache key + planner. */
   theme?: string;
-  /** Which slot-locked component(s) to assemble. Today: ["hero-spotlight-slot"]. */
+  /** Whether to include a pricing section in auto-planned pages.
+   *  Defaults depend on industry (true for SaaS/agency/etc, false for
+   *  portfolio/restaurant). */
+  includePricing?: boolean;
+  /** Explicit component ids — overrides auto-planning. */
   componentIds?: string[];
   /** Skip the AI customiser and assemble using the example data — useful
    *  for previewing templates, smoke-testing the assembler, or warming
@@ -130,9 +136,27 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   const prompt = (body.prompt || "").trim();
   const brandName = (body.brandName || "").trim();
-  const componentIds = body.componentIds && body.componentIds.length > 0
-    ? body.componentIds
-    : ["hero-spotlight-slot"];
+
+  // Component selection priority:
+  //   1. Explicit componentIds in the request (legacy + power-user path)
+  //   2. Auto-plan from (industry, theme) via planPageForIndustry — B7 path
+  //   3. Default fallback: 5-component generic landing page
+  const componentIds =
+    body.componentIds && body.componentIds.length > 0
+      ? body.componentIds
+      : (body.industry || body.theme)
+        ? planPageForIndustry({
+            industry: body.industry,
+            theme: body.theme,
+            includePricing: body.includePricing,
+          })
+        : [
+            "navbar-minimal-slot",
+            "hero-spotlight-slot",
+            "features-bento-slot",
+            "pricing-tiers-slot",
+            "footer-editorial-slot",
+          ];
 
   if (!body.useExampleFill && !prompt) {
     return new Response(JSON.stringify({ error: "prompt is required (or set useExampleFill: true)" }), {
