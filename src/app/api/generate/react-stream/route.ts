@@ -23,6 +23,7 @@ import { NextRequest } from "next/server";
 import { callClaude, streamClaude } from "@/lib/anthropic-cached";
 import { runQualityLoop } from "@/lib/builder-critique";
 import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
+import { validateGeneratedComponent, detectRefusal } from "@/lib/llm-output-validator";
 import { getPlanFromRequest, shouldWatermark } from "@/lib/user-plan";
 import {
   detectSupabaseNeeds,
@@ -499,10 +500,13 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
         collected += delta.text;
       }
     }
-    if (collected.trim().length > 100) {
-      return { ok: true, code: stripFencesAndWrap(collected), modelUsed: args.model };
+    const stripped = stripFencesAndWrap(collected);
+    const validation = validateGeneratedComponent(stripped);
+    if (validation.ok) {
+      return { ok: true, code: stripped, modelUsed: args.model };
     }
-    attemptLog.push(`${args.model}: empty/short output`);
+    attemptLog.push(`${args.model}: ${validation.reason}`);
+    console.warn(`[react-stream] validation rejected ${args.category} from ${args.model}: ${validation.reason}`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     attemptLog.push(`${args.model}: ${msg.slice(0, 120)}`);
@@ -520,11 +524,13 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
       userMessage: userMsg,
       maxTokens: 4000,
     });
-    const text = (fb.text || "").trim();
-    if (text.length > 100) {
-      return { ok: true, code: stripFencesAndWrap(text), modelUsed: fb.model || args.model };
+    const stripped = stripFencesAndWrap(fb.text || "");
+    const validation = validateGeneratedComponent(stripped);
+    if (validation.ok) {
+      return { ok: true, code: stripped, modelUsed: fb.model || args.model };
     }
-    attemptLog.push(`failover: empty/short output`);
+    attemptLog.push(`${fb.model || "failover"}: ${validation.reason}`);
+    console.warn(`[react-stream] validation rejected ${args.category} from failover: ${validation.reason}`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     attemptLog.push(`failover: ${msg.slice(0, 120)}`);
