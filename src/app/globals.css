@@ -3478,3 +3478,65 @@ button.bg-black:hover, a.bg-black:hover,
 [role="button"].bg-black:hover {
   background-color: var(--gold-deep) !important;
 }
+
+/* ───────────────────────────────────────────────────────────────────────
+ * PAGE-WRAPPER WHITE-BACKGROUND SWEEP — 2026-05-13 (#3)
+ * ───────────────────────────────────────────────────────────────────────
+ *
+ * Craig: "a lot of the pages need the white background."
+ *
+ * Audit found three failure modes across ~80 pages:
+ *
+ * (1) `bg-[#0b1530]` — explicit dark navy on admin/setup/page.tsx. The
+ *     hex was missing from every prior override block.
+ * (2) `bg-dark-400` / 500 / 600 / 700 / 800 / 900 — references to
+ *     tailwind ramp keys that don't exist in the current config
+ *     (only dark.100/200/300 are defined). Tailwind silently emits no
+ *     bg-color, so what shows depends on inherited bg. Force to paper
+ *     to keep behavior predictable and white.
+ * (3) Pure `.text-white` (no opacity) on page wrappers — propagated
+ *     white text via CSS inheritance to every descendant, rendering
+ *     them invisible on the white body. The earlier override only
+ *     covered `.text-white/0.X` opacity variants. This one catches
+ *     the un-suffixed form and routes to ink.
+ * ────────────────────────────────────────────────────────────────────── */
+
+.bg-\[\#0b1530\], .bg-\[\#0a1730\], .bg-\[\#0a1628\] {
+  background-color: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* bg-dark-X above 300 — invalid in current tailwind config. Route to
+ * paper so wrappers default to white and their borders/cards still show. */
+.bg-dark-400, .bg-dark-500, .bg-dark-600, .bg-dark-700, .bg-dark-800, .bg-dark-900 {
+  background-color: var(--paper) !important;
+  color: var(--ink) !important;
+}
+.bg-dark-400\/30, .bg-dark-400\/40, .bg-dark-400\/50, .bg-dark-400\/60,
+.bg-dark-400\/70, .bg-dark-400\/80, .bg-dark-400\/90,
+.bg-dark-500\/30, .bg-dark-500\/40, .bg-dark-500\/50, .bg-dark-500\/60,
+.bg-dark-500\/70, .bg-dark-500\/80, .bg-dark-500\/90 {
+  background-color: rgba(252, 250, 243, 0.94) !important;
+  color: var(--ink) !important;
+}
+/* Gradient stops `from-dark-300/400/500` etc used on auth visual panels */
+.from-dark-300, .to-dark-300, .via-dark-300,
+.from-dark-400, .to-dark-400, .via-dark-400,
+.from-dark-500, .to-dark-500, .via-dark-500 {
+  --tw-gradient-from: var(--paper-elevated) !important;
+  --tw-gradient-to: var(--paper-bright) !important;
+  --tw-gradient-via: var(--paper-elevated) !important;
+}
+
+/* Pure `.text-white` (no opacity suffix) — the un-suffixed form was
+ * missed by the earlier `.text-white/0.X` block. On page-wrapper
+ * elements (`<div class="min-h-screen ... text-white">`) this
+ * propagated white-on-white text to every descendant. Route to ink.
+ *
+ * Buttons that genuinely need white-on-dark CTA text should use
+ * `text-[color:var(--paper)]` or inline `style={{color:'var(--paper)'}}`
+ * rather than relying on `text-white` to look right. The auth/login
+ * rewrite already follows that pattern. */
+.text-white {
+  color: var(--ink) !important;
+}
