@@ -3381,3 +3381,100 @@ html, body {
 .bg-gradient-zoo-subtle {
   background-image: linear-gradient(135deg, rgba(184, 146, 63, 0.14), rgba(140, 107, 37, 0.08)) !important;
 }
+
+/* ───────────────────────────────────────────────────────────────────────
+ * DARK HEX PANEL SWEEP — 2026-05-13 (#2)
+ * ───────────────────────────────────────────────────────────────────────
+ *
+ * Craig's follow-up (May 13): "I'm still finding some black buttons."
+ * Audit found 21 dark hex literals used as panel/surface/button backgrounds
+ * across 31 components that had NO override coverage:
+ *
+ *   #12121a — TopBar, BuildSuccessModal, PromptInput dropdown, FigmaImport
+ *   #0d0d10 — LiveBuildDemo frame
+ *   #131520 — SectionEditor
+ *   #0c0e14 — OnboardingFlow modal
+ *   #0f2148 — agencies dashboard cards
+ *   #0b1220 — AI page section
+ *   #1e1e2e / #1e1e25 / #1a1a24 — FigmaImport borders + panels
+ *   #0a0a0b, #0a0f1e, #0d1321, #0e0e18, #0f1830, #142046, #101a35,
+ *   #1a1340, #0f1f3d, #161f35, #0a1628, #0a1730 — assorted dark panels
+ *
+ * The existing override layer caught the OPACITY variants (`bg-[#101a35]/80`)
+ * but missed the SOLID forms. This block flips every solid + every
+ * gradient-stop variant to paper-elevated.
+ * ────────────────────────────────────────────────────────────────────── */
+
+.bg-\[\#12121a\], .bg-\[\#0d0d10\], .bg-\[\#131520\], .bg-\[\#0c0e14\],
+.bg-\[\#0f2148\], .bg-\[\#0b1220\], .bg-\[\#1e1e2e\], .bg-\[\#1e1e25\],
+.bg-\[\#1a1a24\], .bg-\[\#0a0a0b\], .bg-\[\#0a0f1e\], .bg-\[\#0d1321\],
+.bg-\[\#0e0e18\], .bg-\[\#0f1830\], .bg-\[\#142046\], .bg-\[\#101a35\],
+.bg-\[\#1a1340\], .bg-\[\#0f1f3d\], .bg-\[\#161f35\], .bg-\[\#0a1628\],
+.bg-\[\#0a1730\], .bg-\[\#11131c\], .bg-\[\#162044\] {
+  background-color: var(--paper-elevated) !important;
+  color: var(--ink) !important;
+}
+
+/* Opacity-suffix variants of the SAME hex codes — `bg-[#12121a]/80`,
+ * `bg-[#0d0d10]/90` etc. used as backdrop-blurred sticky headers. Route
+ * to the same paper-elevated with a slight alpha for the blur backdrop. */
+.bg-\[\#12121a\]\/40, .bg-\[\#12121a\]\/50, .bg-\[\#12121a\]\/60,
+.bg-\[\#12121a\]\/70, .bg-\[\#12121a\]\/80, .bg-\[\#12121a\]\/85,
+.bg-\[\#12121a\]\/90, .bg-\[\#12121a\]\/95,
+.bg-\[\#0d0d10\]\/40, .bg-\[\#0d0d10\]\/60, .bg-\[\#0d0d10\]\/80,
+.bg-\[\#0d0d10\]\/85, .bg-\[\#0d0d10\]\/90, .bg-\[\#0d0d10\]\/95,
+.bg-\[\#131520\]\/40, .bg-\[\#131520\]\/60, .bg-\[\#131520\]\/80,
+.bg-\[\#131520\]\/85, .bg-\[\#131520\]\/90, .bg-\[\#131520\]\/95,
+.bg-\[\#0c0e14\]\/40, .bg-\[\#0c0e14\]\/60, .bg-\[\#0c0e14\]\/80,
+.bg-\[\#0c0e14\]\/90, .bg-\[\#0c0e14\]\/95,
+.bg-\[\#0f2148\]\/40, .bg-\[\#0f2148\]\/60, .bg-\[\#0f2148\]\/80,
+.bg-\[\#0f2148\]\/85, .bg-\[\#0f2148\]\/90, .bg-\[\#0f2148\]\/95,
+.bg-\[\#0b1220\]\/40, .bg-\[\#0b1220\]\/60, .bg-\[\#0b1220\]\/80,
+.bg-\[\#0b1220\]\/85, .bg-\[\#0b1220\]\/90,
+.bg-\[\#1e1e2e\]\/40, .bg-\[\#1e1e2e\]\/60, .bg-\[\#1e1e2e\]\/80,
+.bg-\[\#1e1e2e\]\/90 {
+  background-color: rgba(252, 250, 243, 0.94) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: var(--ink) !important;
+}
+
+/* Gradient stops for the same hex codes — `from-[#12121a] to-[#0d0d10]`
+ * used as the LiveBuildDemo frame backdrop. Flatten to paper-elevated. */
+.from-\[\#12121a\], .to-\[\#12121a\], .via-\[\#12121a\],
+.from-\[\#0d0d10\], .to-\[\#0d0d10\], .via-\[\#0d0d10\],
+.from-\[\#131520\], .to-\[\#131520\], .via-\[\#131520\],
+.from-\[\#0c0e14\], .to-\[\#0c0e14\], .via-\[\#0c0e14\],
+.from-\[\#0f2148\], .to-\[\#0f2148\], .via-\[\#0f2148\],
+.from-\[\#0b1220\], .to-\[\#0b1220\], .via-\[\#0b1220\],
+.from-\[\#1e1e2e\], .to-\[\#1e1e2e\], .via-\[\#1e1e2e\],
+.from-\[\#0a0a0b\], .to-\[\#0a0a0b\], .via-\[\#0a0a0b\] {
+  --tw-gradient-from: var(--paper-elevated) !important;
+  --tw-gradient-to: var(--paper-elevated) !important;
+  --tw-gradient-via: var(--paper-elevated) !important;
+}
+
+/* Border versions — `border-[#1e1e2e]` etc. used as hairline borders
+ * on the dark panels above. Route to var(--rule) so the border still
+ * shows on the now-cream surface. */
+.border-\[\#1e1e2e\], .border-\[\#1e1e25\], .border-\[\#1a1a24\],
+.border-\[\#12121a\], .border-\[\#0d0d10\], .border-\[\#131520\],
+.border-\[\#0c0e14\], .border-\[\#0f2148\], .border-\[\#0b1220\] {
+  border-color: var(--rule) !important;
+}
+
+/* `.bg-black` flat — the existing override at line 2556 already routes
+ * this to var(--paper). But buttons that USE `bg-black` to act as an
+ * ink-on-paper CTA then become invisible (white-on-white). Promote
+ * `.bg-black` when on a clickable element via attribute selectors —
+ * <button> and <a> with `bg-black` get var(--ink) so they remain a
+ * visible CTA. Non-button uses stay as paper. */
+button.bg-black, a.bg-black,
+[role="button"].bg-black {
+  background-color: var(--ink) !important;
+  color: var(--paper) !important;
+}
+button.bg-black:hover, a.bg-black:hover,
+[role="button"].bg-black:hover {
+  background-color: var(--gold-deep) !important;
+}

@@ -179,21 +179,23 @@ export default function SiteNavigation() {
     <nav
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        // Soft-lift header — barely brighter than the bone page, defined
-        // mostly by the hairline bottom + soft shadow rather than by being
-        // a darker band. Craig: "the header is a little dark — lighten it
-        // a little bit so it's not so dark." Switched from paper-elevated
-        // (#ecebe1) to paper-bright (#faf9f4 ≈ paper +3%) so the bar reads
-        // as a lift, not a separate stratum.
+        // Craig (May 13): "The menu disappears when you start scrolling
+        // through the different pages." Root cause: previous rgba alphas
+        // (0.82/0.94) composited against the pure white page rendered as
+        // `~#fafaf6` — barely distinguishable from the body, so the header
+        // visually merged with content on scroll. Pulled the alpha up to
+        // 0.96/0.99 and shifted the tint slightly warmer so the bar reads
+        // as a defined stratum at all times. Stronger bottom shadow on
+        // scroll for an unmistakable edge.
         background: scrolled
-          ? "rgba(250, 249, 244, 0.94)"
-          : "rgba(250, 249, 244, 0.82)",
+          ? "rgba(252, 250, 243, 0.99)"
+          : "rgba(254, 252, 245, 0.96)",
         backdropFilter: "blur(24px) saturate(140%)",
         WebkitBackdropFilter: "blur(24px) saturate(140%)",
         borderBottom: "1px solid var(--rule)",
         boxShadow: scrolled
-          ? "0 4px 16px -6px rgba(10,10,11,0.06), 0 1px 0 0 rgba(184,179,160,0.28)"
-          : "0 1px 0 0 rgba(184,179,160,0.22)",
+          ? "0 8px 24px -8px rgba(10,10,11,0.10), 0 1px 0 0 rgba(184,146,63,0.32)"
+          : "0 2px 8px -4px rgba(10,10,11,0.04), 0 1px 0 0 rgba(184,146,63,0.22)",
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
