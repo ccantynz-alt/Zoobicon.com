@@ -24,6 +24,8 @@ import { callClaude, streamClaude } from "@/lib/anthropic-cached";
 import { runQualityLoop } from "@/lib/builder-critique";
 import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
 import { validateGeneratedComponent, detectRefusal } from "@/lib/llm-output-validator";
+import { TelemetryRecorder } from "@/lib/build-telemetry";
+import { checkBuildQuota, recordBuildQuotaUsage, type QuotaPlan } from "@/lib/build-quota";
 import { getPlanFromRequest, shouldWatermark } from "@/lib/user-plan";
 import {
   detectSupabaseNeeds,
@@ -684,9 +686,53 @@ export async function POST(req: NextRequest): Promise<Response> {
   const plan = getPlanFromRequest(req);
   const showWatermark = shouldWatermark(plan);
 
+  // KILLER-MOVES-BUILDER.md #5 + #6: per-user telemetry and cost ceiling.
+  // Anonymous builds still log (with userEmail=null) but skip quota.
+  const userEmail = req.headers.get("x-user-email") || null;
+  const quotaPlan: QuotaPlan = (plan === "pro" || plan === "agency" || plan === "free" || plan === "creator")
+    ? (plan as QuotaPlan)
+    : "free";
+  const quota = await checkBuildQuota(userEmail, quotaPlan);
+  if (!quota.ok) {
+    return new Response(
+      JSON.stringify({
+        error: quota.reason || "Daily build budget reached.",
+        resetsAt: quota.resetsAtIso,
+        buildsToday: quota.buildsToday,
+        costToday: quota.costToday,
+        hardCostUsd: quota.hardCostUsd,
+        hardBuildCount: quota.hardBuildCount,
+      }),
+      { status: 429, headers: { "content-type": "application/json", "retry-after": "3600" } },
+    );
+  }
+
+  // Telemetry recorder — every build, success or failure, gets one row
+  // in `builds` for failure-pattern analysis and cost tracking. We track
+  // the recorder via a closure so finally{} can finalise on both paths.
+  const buildId = `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+  const telemetry = new TelemetryRecorder({
+    buildId,
+    endpoint: "react-stream",
+    prompt,
+    userEmail,
+    userPlan: plan,
+    mode,
+    theme: body.theme ?? null,
+  });
+
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const writer = makeWriter(controller);
+      // Surface soft-quota crossings to the user so they know they're
+      // close to the daily cap before being blocked tomorrow.
+      if (quota.crossedSoft) {
+        writer.send("warning", {
+          kind: "quota-soft",
+          message: `You've used $${quota.costToday.toFixed(2)} of your $${quota.hardCostUsd.toFixed(2)} daily build budget.`,
+          resetsAt: quota.resetsAtIso,
+        });
+      }
       try {
         // ── FLYWHEEL: load accumulated context from previous builds ──
         let flywheelContext = "";
@@ -748,13 +794,17 @@ export async function POST(req: NextRequest): Promise<Response> {
           phase: "selecting",
           message: "Picking best components for each section…",
         });
+        const planStart = Date.now();
         const { components, brandName, primaryColor, bgColor } =
           await planComponents(prompt + flywheelContext);
+        telemetry.phase("plan", Date.now() - planStart);
+        telemetry.setComponents(components.map((c) => ({ category: c.category, variant: c.variant })));
 
         // Detect industry from the prompt once — drives imagery selection
         // for every component in this build (restaurants get warm hand/craft
         // imagery, SaaS gets workspace/dashboards, portfolio gets landscape).
         const industry = registry.detectIndustry(prompt);
+        telemetry.setIndustry(industry);
 
         // Detect the visual theme the prompt actually wants. This is the
         // critical fix for "every site comes out dark editorial". Consumer-
@@ -843,6 +893,7 @@ export async function POST(req: NextRequest): Promise<Response> {
                 variant: comp.variant,
                 reason: result.reason || "unknown",
               });
+              telemetry.fail({ id: comp.id, reason: result.reason || "unknown" });
               // Surface the failure to the client the moment it happens so the
               // UI can render a "this section used the base template" badge
               // instead of silently shipping placeholder copy (Law 8).
@@ -1032,10 +1083,44 @@ export async function POST(req: NextRequest): Promise<Response> {
           console.warn("[react-stream] Flywheel build save skipped:", flywheelErr);
         }
 
+        // Finalise telemetry on success path — failed sections are still
+        // tracked but the overall build counts as ok=true if any files
+        // shipped. recordBuildQuotaUsage runs regardless so partial
+        // builds still count against the daily cap.
+        await telemetry.finalize({
+          ok: true,
+          qualityScore: typeof finalScore === "number" ? Math.round(finalScore) : null,
+        });
+        await recordBuildQuotaUsage(userEmail, [
+          // Token counts not yet threaded through customise/plan paths;
+          // logged as zero so the build_count column increments. Token
+          // tracking lands in Q3 (Slot-Locked Composition) where we have
+          // structured model output to count.
+          { model: customiserModel, inputTokens: 0, outputTokens: 0 },
+        ]);
+
         writer.close();
       } catch (err) {
+        const { message, hint } = (() => {
+          try { return classifyError(err); }
+          catch { return { message: err instanceof Error ? err.message : "Unknown error", hint: "Please try again" }; }
+        })();
+        // Finalise telemetry on failure path so admin can see WHICH
+        // builds failed and WHY.
         try {
-          const { message, hint } = classifyError(err);
+          await telemetry.finalize({
+            ok: false,
+            errorKind: err instanceof Error ? err.constructor.name : "Unknown",
+            errorMessage: message,
+          });
+          await recordBuildQuotaUsage(userEmail, [
+            { model: "claude-haiku-4-5", inputTokens: 0, outputTokens: 0 },
+          ]);
+        } catch (telemetryErr) {
+          console.warn("[react-stream] telemetry finalise on error failed:", telemetryErr);
+        }
+
+        try {
           writer.send("error", { message, hint });
         } catch (classifyErr) {
           console.error("[react-stream] Error classification failed:", classifyErr);
