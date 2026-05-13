@@ -23,6 +23,7 @@ import { NextRequest } from "next/server";
 import { callClaude, streamClaude } from "@/lib/anthropic-cached";
 import { runQualityLoop } from "@/lib/builder-critique";
 import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
+import { validateGeneratedComponent, detectRefusal } from "@/lib/llm-output-validator";
 import { getPlanFromRequest, shouldWatermark } from "@/lib/user-plan";
 import {
   detectSupabaseNeeds,
@@ -91,6 +92,22 @@ function mapEvent(name: string, data: unknown): Record<string, unknown> {
       return { type: "status", message: "Backend provisioned", supabase: obj };
     case "score":
       return { type: "status", message: `Quality score: ${obj.score ?? "?"}`, ...obj };
+    case "fallback":
+      // Phase 2 (2026-05-13): when callLLMWithFailover switches providers
+      // mid-build, surface which model is being tried so the UI can
+      // show "Anthropic overloaded — switching to OpenAI" instead of a
+      // silent 10-second wait.
+      return {
+        type: "status",
+        message: obj.section
+          ? `Anthropic unavailable — switching to ${obj.model} (${obj.provider}) for ${obj.section}`
+          : `Switching to ${obj.model} (${obj.provider})`,
+        ...obj,
+      };
+    case "warning":
+      // Was previously dropped on the floor — client never saw partial-
+      // failure warnings emitted by customiseComponent.
+      return { type: "warning", ...obj };
     case "done":
       return { type: "done", ...obj };
     case "error":
@@ -100,9 +117,17 @@ function mapEvent(name: string, data: unknown): Record<string, unknown> {
   }
 }
 
-function makeWriter(controller: ReadableStreamDefaultController<Uint8Array>): SSEWriter {
+function makeWriter(controller: ReadableStreamDefaultController<Uint8Array>): SSEWriter & {
+  hasTerminated: () => boolean;
+} {
   const encoder = new TextEncoder();
   let closed = false;
+  // Phase 2 (2026-05-13): track whether a terminal event (done/error/
+  // fatal) was actually emitted before close(). The audit found cases
+  // where controller.enqueue silently fails mid-stream and the writer
+  // closes without the client ever seeing a terminal event — looks
+  // like a hang. close() now force-emits a synthetic fatal if needed.
+  let terminated = false;
   return {
     send(event, data) {
       if (closed) return;
@@ -110,12 +135,25 @@ function makeWriter(controller: ReadableStreamDefaultController<Uint8Array>): SS
       const sse = `data: ${JSON.stringify(payload)}\n\n`;
       try {
         controller.enqueue(encoder.encode(sse));
+        if (event === "done" || event === "error") terminated = true;
       } catch {
         closed = true;
       }
     },
     close() {
       if (closed) return;
+      if (!terminated) {
+        // Force a terminal event so the client never hangs.
+        try {
+          const payload = mapEvent("error", {
+            message: "Build stream closed unexpectedly.",
+            hint: "Please retry. If this keeps happening contact support@zoobicon.com.",
+          });
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+        } catch {
+          /* enqueue may already fail — nothing we can do */
+        }
+      }
       closed = true;
       try {
         controller.close();
@@ -123,6 +161,7 @@ function makeWriter(controller: ReadableStreamDefaultController<Uint8Array>): SS
         /* already closed */
       }
     },
+    hasTerminated: () => terminated,
   };
 }
 
@@ -387,6 +426,12 @@ interface CustomiseArgs {
     needsDatabase: boolean;
     needsStorage: boolean;
   };
+  /**
+   * Phase 2 (2026-05-13): called once if the primary model fails and
+   * callLLMWithFailover switches to another provider mid-build. Lets
+   * the caller emit a user-visible "switching to OpenAI" status event.
+   */
+  onFallback?: (provider: string, model: string) => void;
 }
 
 function stripFencesAndWrap(raw: string): string {
@@ -499,10 +544,13 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
         collected += delta.text;
       }
     }
-    if (collected.trim().length > 100) {
-      return { ok: true, code: stripFencesAndWrap(collected), modelUsed: args.model };
+    const stripped = stripFencesAndWrap(collected);
+    const validation = validateGeneratedComponent(stripped);
+    if (validation.ok) {
+      return { ok: true, code: stripped, modelUsed: args.model };
     }
-    attemptLog.push(`${args.model}: empty/short output`);
+    attemptLog.push(`${args.model}: ${validation.reason}`);
+    console.warn(`[react-stream] validation rejected ${args.category} from ${args.model}: ${validation.reason}`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     attemptLog.push(`${args.model}: ${msg.slice(0, 120)}`);
@@ -514,17 +562,25 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
   // with the raw base component as last-resort code so the build still completes,
   // and the caller surfaces a warning event to the UI (Law 8: never silent).
   try {
-    const fb = await callLLMWithFailover({
-      model: args.model,
-      system: systemPrompt,
-      userMessage: userMsg,
-      maxTokens: 4000,
-    });
-    const text = (fb.text || "").trim();
-    if (text.length > 100) {
-      return { ok: true, code: stripFencesAndWrap(text), modelUsed: fb.model || args.model };
+    const fb = await callLLMWithFailover(
+      {
+        model: args.model,
+        system: systemPrompt,
+        userMessage: userMsg,
+        maxTokens: 4000,
+      },
+      // Surface the provider switch to the caller so the UI shows
+      // "Anthropic unavailable — switching to OpenAI" instead of a
+      // silent 10-second pause.
+      (provider, model) => args.onFallback?.(provider, model),
+    );
+    const stripped = stripFencesAndWrap(fb.text || "");
+    const validation = validateGeneratedComponent(stripped);
+    if (validation.ok) {
+      return { ok: true, code: stripped, modelUsed: fb.model || args.model };
     }
-    attemptLog.push(`failover: empty/short output`);
+    attemptLog.push(`${fb.model || "failover"}: ${validation.reason}`);
+    console.warn(`[react-stream] validation rejected ${args.category} from failover: ${validation.reason}`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     attemptLog.push(`failover: ${msg.slice(0, 120)}`);
@@ -770,6 +826,14 @@ export async function POST(req: NextRequest): Promise<Response> {
               model: customiserModel,
               theme,
               supabase: customiserSupabase,
+              onFallback: (provider, model) => {
+                writer.send("fallback", {
+                  provider,
+                  model,
+                  section: comp.id,
+                  category: comp.category,
+                });
+              },
             });
             let updatedCode = result.code;
             if (!result.ok) {

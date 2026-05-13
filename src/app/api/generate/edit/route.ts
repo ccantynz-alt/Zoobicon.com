@@ -7,6 +7,7 @@ import {
   getAvailableProviders,
   isTransientLLMError,
 } from "@/lib/llm-provider";
+import { validateEditJson } from "@/lib/llm-output-validator";
 
 export const maxDuration = 120;
 
@@ -174,26 +175,15 @@ RULES:
         ):
           | { ok: true; files: Record<string, string> }
           | { ok: false; reason: string } => {
-          if (!text || !text.trim()) {
-            return { ok: false, reason: "AI returned empty response" };
-          }
-          const parsed = extractJSON(text);
-          if (!parsed) {
-            return { ok: false, reason: "AI response was not valid JSON" };
-          }
-          if (!parsed.files) {
-            return { ok: false, reason: "AI response missing 'files' key" };
-          }
-          const validFiles: Record<string, string> = {};
-          for (const [path, code] of Object.entries(parsed.files)) {
-            if (typeof code === "string" && code.trim().length > 10) {
-              validFiles[path] = code;
-            }
-          }
-          if (Object.keys(validFiles).length === 0) {
-            return { ok: false, reason: "AI returned empty or invalid file contents" };
-          }
-          return { ok: true, files: validFiles };
+          // Centralised validator catches:
+          //   - empty / whitespace-only responses
+          //   - AI refusals ("I can't help with that")
+          //   - markdown-fenced JSON
+          //   - prose surrounding the JSON object
+          //   - missing files key, non-string file values, suspiciously short files
+          const v = validateEditJson(text);
+          if (!v.ok || !v.data) return { ok: false, reason: v.reason || "validation failed" };
+          return { ok: true, files: v.data.files };
         };
 
         const errors: string[] = [];

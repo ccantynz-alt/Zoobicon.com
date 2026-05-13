@@ -221,17 +221,72 @@ export default function ChatPanel({
           const decoder = new TextDecoder();
           let lineBuffer = "";
 
+          // Phase 2 (2026-05-13): track whether ANY event was successfully
+          // parsed in this stream. If parse fails repeatedly we still want
+          // to know — silent JSON parse failures were causing edits to
+          // stall with no message and no recovery path.
+          let parseFailureCount = 0;
+
           const processLine = (line: string) => {
             if (!line.startsWith("data: ")) return;
             const jsonStr = line.slice(6).trim();
             if (!jsonStr) return;
 
-            const event = JSON.parse(jsonStr);
+            let event: { type?: string; message?: string; files?: Record<string, string>; fatal?: boolean; provider?: string; model?: string; section?: string };
+            try {
+              event = JSON.parse(jsonStr);
+            } catch (parseErr) {
+              parseFailureCount++;
+              // Log every malformed event — silently dropping them was
+              // the audit's #1 finding for edit-stall reports.
+              console.warn(
+                `[ChatPanel] malformed SSE event #${parseFailureCount}:`,
+                jsonStr.slice(0, 200),
+                parseErr instanceof Error ? parseErr.message : parseErr,
+              );
+              if (parseFailureCount >= 3) {
+                // After 3 consecutive parse failures, surface to the
+                // user — the stream is corrupted and no useful events
+                // will arrive.
+                throw new Error("Edit stream is corrupted (3 malformed events).");
+              }
+              return;
+            }
 
             if (event.type === "status") {
               setMessages((prev) =>
                 prev.map((m) =>
-                  m.id === assistantMsgId ? { ...m, content: event.message } : m
+                  m.id === assistantMsgId ? { ...m, content: event.message || m.content } : m
+                )
+              );
+            } else if (event.type === "warning") {
+              // Surface partial-failure warnings emitted by the server
+              // (e.g., a single section fell back to base template).
+              // These used to be silently dropped.
+              console.info("[ChatPanel] warning:", event);
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId
+                    ? {
+                        ...m,
+                        content: event.section
+                          ? `${m.content || ""}\n· Section "${event.section}" used base template (${event.message || "fallback"}).`
+                          : m.content,
+                      }
+                    : m
+                )
+              );
+            } else if (event.type === "fallback") {
+              // Failover provider switch — show the user we're switching
+              // so they don't think the build hung.
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId
+                    ? {
+                        ...m,
+                        content: `Anthropic unavailable — switching to ${event.model} (${event.provider}). One moment…`,
+                      }
+                    : m
                 )
               );
             } else if (event.type === "done" && event.files) {
@@ -271,12 +326,7 @@ export default function ChatPanel({
             const lines = lineBuffer.split("\n");
             lineBuffer = lines.pop() || "";
             for (const line of lines) {
-              try {
-                processLine(line);
-              } catch (e) {
-                if (e instanceof Error && e.message && !e.message.includes("JSON"))
-                  throw e;
-              }
+              processLine(line);
             }
           }
 

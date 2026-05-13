@@ -4,9 +4,85 @@ import {
   SandpackProvider,
   SandpackPreview as SandboxPreview,
   SandpackCodeEditor,
+  useSandpack,
 } from "@codesandbox/sandpack-react";
 import { useMemo } from "react";
 import { extractSandpackFiles } from "@/lib/sandpack-utils";
+
+/**
+ * Compile-error overlay (Phase 2, 2026-05-13).
+ *
+ * Sandpack silently shows a blank preview when a generated component
+ * has a syntax error, broken import, or runtime crash. The audit found
+ * users assume the whole build failed because there's no visible
+ * indicator anything went wrong. This overlay reads Sandpack's bundler
+ * error state via the useSandpack hook and renders an editorial-light
+ * panel naming the offending file with a Refresh action.
+ */
+function CompileErrorOverlay() {
+  const { sandpack } = useSandpack();
+  const error = sandpack.error;
+
+  if (!error) return null;
+
+  return (
+    <div
+      className="pointer-events-auto absolute inset-x-3 bottom-3 z-20 rounded-2xl border p-4 shadow-lg"
+      style={{
+        background: "var(--paper-elevated)",
+        borderColor: "var(--rule)",
+        color: "var(--ink)",
+      }}
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+          style={{ background: "var(--gold-soft)", color: "var(--gold-deep)" }}
+        >
+          !
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+            Preview compile error
+          </div>
+          {error.path && (
+            <div className="mt-0.5 truncate text-xs" style={{ color: "var(--ink-muted)" }}>
+              in {error.path}
+            </div>
+          )}
+          <div
+            className="mt-2 max-h-32 overflow-auto rounded-md p-2 font-mono text-[11px] leading-relaxed"
+            style={{
+              background: "var(--paper)",
+              border: "1px solid var(--rule)",
+              color: "var(--ink-secondary)",
+            }}
+          >
+            {error.message || "Unknown compile error"}
+          </div>
+          <div className="mt-3 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                // Trigger a Sandpack refresh — usually re-runs the
+                // bundler against the current files, which can clear
+                // transient errors caused by stale partial streams.
+                sandpack.runSandpack();
+              }}
+              className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              style={{ background: "var(--ink)", color: "var(--paper)" }}
+            >
+              Retry compile
+            </button>
+            <span className="text-[11px]" style={{ color: "var(--ink-muted)" }}>
+              The generation didn&apos;t fail — only this preview render. Edit the file or ask the chat to fix it.
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface SandpackPreviewPropsHTML {
   mode?: "html";
@@ -324,11 +400,14 @@ export default function App() {
               </div>
             )}
             <div className={showEditor ? "flex-[2] min-w-0" : "flex-1 min-w-0"} style={{ height: "100%" }}>
-              <SandboxPreview
-                showOpenInCodeSandbox={false}
-                showRefreshButton
-                style={{ height: "100%" }}
-              />
+              <div className="relative h-full w-full">
+                <SandboxPreview
+                  showOpenInCodeSandbox={false}
+                  showRefreshButton
+                  style={{ height: "100%" }}
+                />
+                {!isPrewarm && <CompileErrorOverlay />}
+              </div>
             </div>
           </div>
         </SandpackProvider>
