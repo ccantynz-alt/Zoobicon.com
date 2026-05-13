@@ -64,6 +64,7 @@ import {
   HERO_PORTFOLIO_EDITORIAL_EXAMPLE,
 } from "@/lib/slot-locked/templates/by-industry/hero-portfolio-editorial";
 import { planPageForIndustry } from "@/lib/slot-locked/industry-planner";
+import { critiquePanel, axesNeedingRepair } from "@/lib/builder-critique/multi-judge";
 import type { ComponentSchema, SlotValueMap } from "@/lib/slot-locked/types";
 
 export const maxDuration = 120;
@@ -89,6 +90,10 @@ interface RequestBody {
   /** Bypass the slot-fill cache. Useful for A/B testing or when the
    *  caller wants fresh AI output. Defaults to false (cache is on). */
   bypassCache?: boolean;
+  /** Skip the multi-judge critique pass. Useful for smoke tests and
+   *  warm-cache replays where critique adds latency without value.
+   *  Defaults to false (critique runs on every real build). */
+  skipCritique?: boolean;
 }
 
 // Schema registry. Seven slot-locked components shipped as of 2026-05-13.
@@ -369,14 +374,62 @@ export async function POST(req: NextRequest): Promise<Response> {
           });
         }
 
+        // ── PHASE 4: critique (B9 — multi-judge panel) ──
+        // Three small specialists (typography / copy / layout) score
+        // the assembled site in parallel. If any axis returns blockers
+        // or score <60, the verdict is surfaced via SSE warning events
+        // so the UI can show "Layout critic flagged 2 mobile issues —
+        // regenerating layout slots…". The actual targeted repair pass
+        // ships in the next commit; today we report.
+        let qualityScore: number | null = null;
+        if (okCount > 0 && !body.skipCritique) {
+          try {
+            send("phase", { phase: "critique", message: "Multi-judge critique (typography / copy / layout)…" });
+            // Build a compact site summary the critics can score against.
+            // Sending raw component code is too much input; instead we
+            // pass the slot-fills + component ids so the critic can
+            // reason about copy/structure without the JSX boilerplate.
+            const summary = JSON.stringify(
+              Object.entries(summarySlots).map(([id, slots]) => ({ component: id, slots })),
+              null,
+              2,
+            ).slice(0, 12_000);
+            const critiqueStart = Date.now();
+            const verdict = await critiquePanel(summary);
+            telemetry.phase("critique", Date.now() - critiqueStart);
+            qualityScore = verdict.overall;
+            for (const v of verdict.verdicts) {
+              if (v.skipped) continue;
+              send("critique", {
+                axis: v.axis,
+                score: v.score,
+                findings: v.findings,
+              });
+            }
+            const repairAxes = axesNeedingRepair(verdict);
+            if (repairAxes.length > 0) {
+              send("warning", {
+                kind: "needs-repair",
+                axes: repairAxes,
+                overall: verdict.overall,
+                message: `Critique flagged: ${repairAxes.join(", ")}. Targeted repair pass coming in next commit.`,
+              });
+            }
+          } catch (critErr) {
+            // Critique is best-effort — failure doesn't block ship.
+            console.warn("[slot-stream] critique panel failed:", critErr instanceof Error ? critErr.message : critErr);
+          }
+        }
+
         send("done", {
           files: filesOut,
           componentsOk: okCount,
           cacheHits,
           cacheHitRate: componentIds.length > 0 ? cacheHits / componentIds.length : 0,
           slots: summarySlots,
+          qualityScore,
         });
-        await telemetry.finalize({ ok: okCount > 0 });
+        await telemetry.finalize({ ok: okCount > 0, qualityScore });
         await recordBuildQuotaUsage(userEmail, [
           { model: "claude-haiku-4-5", inputTokens: 0, outputTokens: 0 },
         ]);
