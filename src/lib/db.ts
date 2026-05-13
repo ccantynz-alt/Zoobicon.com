@@ -690,4 +690,57 @@ export async function initSchema() {
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS site_data_project_collection_idx ON site_data (project_id, collection)`;
+
+  // ---- Build telemetry (KILLER-MOVES.md #3) ----
+  // Every AI builder request lands a row in `builds` so we can answer
+  // "which components fail most?", "what's p99 build duration?", "how
+  // often does failover trigger?". See src/lib/build-telemetry.ts for
+  // the writer + summary helpers.
+  await sql`
+    CREATE TABLE IF NOT EXISTS builds (
+      id                  BIGSERIAL PRIMARY KEY,
+      build_id            TEXT UNIQUE NOT NULL,
+      user_email          TEXT,
+      user_plan           TEXT,
+      endpoint            TEXT NOT NULL,
+      mode                TEXT,
+      theme               TEXT,
+      prompt_head         TEXT NOT NULL,
+      industry            TEXT,
+      component_count     INTEGER,
+      components_selected JSONB DEFAULT '[]'::jsonb,
+      failed_sections     JSONB DEFAULT '[]'::jsonb,
+      total_duration_ms   INTEGER NOT NULL,
+      phase_timings       JSONB DEFAULT '[]'::jsonb,
+      model_usage         JSONB DEFAULT '[]'::jsonb,
+      ok                  BOOLEAN NOT NULL,
+      error_kind          TEXT,
+      error_message       TEXT,
+      quality_score       INTEGER,
+      created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS builds_user_email_idx ON builds (user_email)`;
+  await sql`CREATE INDEX IF NOT EXISTS builds_created_at_idx ON builds (created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS builds_ok_idx ON builds (ok, created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS builds_endpoint_idx ON builds (endpoint, created_at DESC)`;
+
+  // ---- Per-user build quotas (KILLER-MOVES.md #5) ----
+  // Daily token budget per user to prevent cost runaway + abuse. Soft
+  // cap (warn) and hard cap (block) configured per plan tier in
+  // src/lib/build-quota.ts. Resets per UTC day.
+  await sql`
+    CREATE TABLE IF NOT EXISTS build_quotas (
+      user_email          TEXT NOT NULL,
+      day                 DATE NOT NULL,
+      build_count         INTEGER NOT NULL DEFAULT 0,
+      total_input_tokens  INTEGER NOT NULL DEFAULT 0,
+      total_output_tokens INTEGER NOT NULL DEFAULT 0,
+      estimated_cost_usd  NUMERIC(10, 4) NOT NULL DEFAULT 0,
+      blocked_at          TIMESTAMPTZ,
+      updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (user_email, day)
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS build_quotas_day_idx ON build_quotas (day DESC)`;
 }
