@@ -58,11 +58,14 @@ const BUILDS_PER_REFERRAL = 1;
 
 /* ========== Tier definitions ========== */
 
+// Rule 29 — tier badge colours flipped from cyan/yellow/emerald to the
+// editorial-light champagne ladder so the referral widget reads on the
+// cream page instead of throwing cool tints into the mix.
 const TIERS: ReferralTier[] = [
-  { name: "Newcomer", badge: "🌱", color: "text-gray-400", minReferrals: 0, nextTier: "Recruiter", nextTierAt: 1 },
-  { name: "Recruiter", badge: "🎯", color: "text-cyan-400", minReferrals: 1, nextTier: "Ambassador", nextTierAt: 5 },
-  { name: "Ambassador", badge: "⭐", color: "text-yellow-400", minReferrals: 5, nextTier: "Champion", nextTierAt: 20 },
-  { name: "Champion", badge: "🏆", color: "text-emerald-400", minReferrals: 20, nextTier: null, nextTierAt: null },
+  { name: "Newcomer", badge: "🌱", color: "text-[color:var(--ink-muted)]", minReferrals: 0, nextTier: "Recruiter", nextTierAt: 1 },
+  { name: "Recruiter", badge: "🎯", color: "text-[color:var(--gold-deep)]", minReferrals: 1, nextTier: "Ambassador", nextTierAt: 5 },
+  { name: "Ambassador", badge: "⭐", color: "text-[color:var(--gold)]", minReferrals: 5, nextTier: "Champion", nextTierAt: 20 },
+  { name: "Champion", badge: "🏆", color: "text-[color:var(--ink)]", minReferrals: 20, nextTier: null, nextTierAt: null },
 ];
 
 /* ========== Shared Helpers (work on client + server) ========== */

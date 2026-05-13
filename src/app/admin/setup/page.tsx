@@ -159,16 +159,16 @@ export default function SetupPage() {
 
             {/* Quick action: db init link if any DB tables missing */}
             {blockers.some((b) => b.id === "db.tables") && (
-              <div className="mb-6 p-4 rounded-xl border border-violet-400/30 bg-violet-500/[0.06] flex items-center justify-between gap-3">
+              <div className="mb-6 p-4 rounded-xl border border-[color:var(--gold)]/40 bg-[color:var(--gold-soft)] flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-violet-200">Database tables missing</p>
-                  <p className="text-xs text-violet-200/70">
+                  <p className="text-sm font-semibold text-[color:var(--ink)]">Database tables missing</p>
+                  <p className="text-xs text-[color:var(--ink-muted)]">
                     Run the schema initialiser once — it&apos;s safe to re-run.
                   </p>
                 </div>
                 <a
                   href="/api/db/init"
-                  className="px-3.5 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-sm font-semibold text-white inline-flex items-center gap-1.5 transition-colors"
+                  className="px-3.5 py-2 rounded-lg bg-[color:var(--ink)] hover:bg-[color:var(--gold-deep)] text-sm font-semibold text-[color:var(--paper)] inline-flex items-center gap-1.5 transition-colors"
                 >
                   Initialise DB <ArrowRight className="w-3.5 h-3.5" />
                 </a>
