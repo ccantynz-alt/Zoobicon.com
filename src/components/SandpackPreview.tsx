@@ -301,49 +301,69 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
     "tailwind-merge": "latest",
   };
 
-  // Pre-warm App that actually imports and references the common libraries.
-  // The `const _warm = ...` lines prevent tree-shaking — the bundler has to
-  // include the real library code. Wrapped in `if (false)` so they never
-  // execute but still get bundled.
+  // Pre-warm App that ACTUALLY uses the common libraries in live JSX,
+  // not just module-level dead references. The previous version had
+  // `const _warm = {motion, Sparkles, ...}` + `{false && <div>...</div>}`
+  // which the bundler tree-shook because the warm const was only used
+  // in unreachable code. Audit 2026-05-13 confirmed deps weren't bundled
+  // → first real prompt still cold-bundled for 15-20s.
+  //
+  // Fix: every pre-warm dep is referenced in active JSX that the
+  // bundler cannot prove dead. clsx + twMerge build className strings;
+  // Sparkles + Zap render real icons; framer-motion wraps the spinner
+  // wrapper in a motion.div. By the time the real component arrives,
+  // every dep is bundled and module-cached.
   const PREWARM_APP = `import { motion } from "framer-motion";
-import { Sparkles, Zap, ArrowRight } from "lucide-react";
+import { Sparkles, Zap } from "lucide-react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
-// Force bundler to include these libraries so the first real component
-// renders instantly. Never executes.
-const _warm = { motion, Sparkles, Zap, ArrowRight, clsx, twMerge };
-
 export default function App() {
+  // Active uses of clsx + twMerge so the bundler must include them.
+  const spinnerClass = twMerge(clsx("sp-spinner", "sp-rotate"));
+  const dotClass = twMerge(clsx("sp-dot"));
+
   return (
-    <div style={{
-      minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "#fafaf7",
-      color: "rgba(10,10,11,0.55)",
-      fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-      fontSize: "14px",
-    }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#ffffff",
+        color: "rgba(10, 10, 11, 0.55)",
+        fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+        fontSize: "14px",
+      }}
+    >
       <div style={{ textAlign: "center" }}>
-        <div style={{
+        <div className={spinnerClass} style={{
           width: "40px",
           height: "40px",
           margin: "0 auto 16px",
-          border: "3px solid rgba(109,93,252,0.2)",
-          borderTopColor: "#6d5dfc",
+          border: "3px solid rgba(184, 146, 63, 0.20)",
+          borderTopColor: "#b8923f",
           borderRadius: "50%",
           animation: "sp-spin 0.8s linear infinite",
-        }} />
-        <div>Preview ready — describe your site to begin</div>
-        <div style={{ fontSize: "11px", marginTop: "8px", opacity: 0.6 }}>
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          <Sparkles size={14} color="#b8923f" />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+          <Zap size={12} color="#8c6b25" />
+          <span>Preview ready — describe your site to begin</span>
+        </div>
+        <div className={dotClass} style={{ fontSize: "11px", marginTop: "8px", opacity: 0.6 }}>
           Pre-warming bundler & dependencies…
         </div>
         <style>{"@keyframes sp-spin { to { transform: rotate(360deg); } }"}</style>
       </div>
-      {false && <div>{JSON.stringify(_warm)}</div>}
-    </div>
+    </motion.div>
   );
 }`;
 
@@ -353,7 +373,7 @@ export default function App() {
   <meta charset="utf-8" />
   <style>
     body { margin: 0; background: #ffffff; color: #2a2a30; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 14px; text-align: center; }
-    .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid rgba(109,93,252,0.2); border-top-color: #6d5dfc; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid rgba(184, 146, 63, 0.20); border-top-color: #b8923f; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
