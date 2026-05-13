@@ -24,6 +24,7 @@ import { callClaude, streamClaude } from "@/lib/anthropic-cached";
 import { runQualityLoop } from "@/lib/builder-critique";
 import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
 import { validateGeneratedComponent, detectRefusal } from "@/lib/llm-output-validator";
+import { verifyGeneratedCode, buildRepairPrompt } from "@/lib/builder-critique/code-verifier";
 import { TelemetryRecorder } from "@/lib/build-telemetry";
 import { checkBuildQuota, recordBuildQuotaUsage, type QuotaPlan } from "@/lib/build-quota";
 import { getPlanFromRequest, shouldWatermark } from "@/lib/user-plan";
@@ -549,10 +550,42 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
     const stripped = stripFencesAndWrap(collected);
     const validation = validateGeneratedComponent(stripped);
     if (validation.ok) {
-      return { ok: true, code: stripped, modelUsed: args.model };
+      // B2 verification loop — even when the validator passes, run the
+      // deeper JSX-balance + tag-balance check. If THIS fails, send the
+      // error back to Haiku for ONE repair pass before falling through
+      // to the failover provider. Matches Bolt V2's auto-error-fixing.
+      const verified = verifyGeneratedCode(stripped);
+      if (verified.ok) {
+        return { ok: true, code: stripped, modelUsed: args.model };
+      }
+      attemptLog.push(`${args.model}: verifier flagged ${verified.issues.length} issues`);
+      console.warn(`[react-stream] verifier flagged ${args.category}: ${verified.issues.join("; ")}`);
+      // Repair attempt — one shot at fixing, then fall through to failover.
+      try {
+        const repairFb = await callLLMWithFailover({
+          model: args.model,
+          system: systemPrompt,
+          userMessage: buildRepairPrompt(stripped, verified.issues),
+          maxTokens: 4000,
+        });
+        const repairedCode = stripFencesAndWrap(repairFb.text || "");
+        const repairValidation = validateGeneratedComponent(repairedCode);
+        if (repairValidation.ok) {
+          const repairVerified = verifyGeneratedCode(repairedCode);
+          if (repairVerified.ok) {
+            console.info(`[react-stream] auto-repair succeeded for ${args.category}`);
+            return { ok: true, code: repairedCode, modelUsed: `${repairFb.model || args.model} (auto-repair)` };
+          }
+        }
+        attemptLog.push(`repair: still flagged after one pass`);
+      } catch (repairErr) {
+        const msg = repairErr instanceof Error ? repairErr.message : String(repairErr);
+        attemptLog.push(`repair: ${msg.slice(0, 80)}`);
+      }
+    } else {
+      attemptLog.push(`${args.model}: ${validation.reason}`);
+      console.warn(`[react-stream] validation rejected ${args.category} from ${args.model}: ${validation.reason}`);
     }
-    attemptLog.push(`${args.model}: ${validation.reason}`);
-    console.warn(`[react-stream] validation rejected ${args.category} from ${args.model}: ${validation.reason}`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     attemptLog.push(`${args.model}: ${msg.slice(0, 120)}`);
