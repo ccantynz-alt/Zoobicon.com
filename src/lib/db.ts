@@ -743,4 +743,25 @@ export async function initSchema() {
     )
   `;
   await sql`CREATE INDEX IF NOT EXISTS build_quotas_day_idx ON build_quotas (day DESC)`;
+
+  // ---- Slot-fill cache (KILLER-MOVES-BUILDER.md #B19) ----
+  // Semantically similar prompts produce the same normalised cache key.
+  // At scale ~30% of customer prompts hash to a previously seen key →
+  // cached JSON slot-fill returns in <50ms with zero AI cost. See
+  // src/lib/slot-locked/cache.ts for the lookup/persist helpers.
+  // TTL is enforced in the query (rows older than 7 days are ignored,
+  // not deleted — a nightly cron can prune in a separate job).
+  await sql`
+    CREATE TABLE IF NOT EXISTS slot_cache (
+      cache_key    TEXT NOT NULL,
+      component_id TEXT NOT NULL,
+      slot_fill    JSONB NOT NULL,
+      hit_count    INTEGER NOT NULL DEFAULT 0,
+      created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_hit_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (cache_key, component_id)
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS slot_cache_component_idx ON slot_cache (component_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS slot_cache_last_hit_idx ON slot_cache (last_hit_at DESC)`;
 }
