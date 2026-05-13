@@ -53,6 +53,16 @@ import {
   FOOTER_EDITORIAL_TEMPLATE,
   FOOTER_EDITORIAL_EXAMPLE,
 } from "@/lib/slot-locked/templates/footer-editorial";
+import {
+  HERO_RESTAURANT_WARM_SCHEMA,
+  HERO_RESTAURANT_WARM_TEMPLATE,
+  HERO_RESTAURANT_WARM_EXAMPLE,
+} from "@/lib/slot-locked/templates/by-industry/hero-restaurant-warm";
+import {
+  HERO_PORTFOLIO_EDITORIAL_SCHEMA,
+  HERO_PORTFOLIO_EDITORIAL_TEMPLATE,
+  HERO_PORTFOLIO_EDITORIAL_EXAMPLE,
+} from "@/lib/slot-locked/templates/by-industry/hero-portfolio-editorial";
 import type { ComponentSchema, SlotValueMap } from "@/lib/slot-locked/types";
 
 export const maxDuration = 120;
@@ -75,14 +85,18 @@ interface RequestBody {
   bypassCache?: boolean;
 }
 
-// Schema registry. Five slot-locked components shipped as of 2026-05-13.
+// Schema registry. Seven slot-locked components shipped as of 2026-05-13.
 // Migration target: all 118 registry components, ongoing.
 const SLOT_REGISTRY: Record<string, { schema: ComponentSchema; template: string; example: SlotValueMap }> = {
-  "hero-spotlight-slot":   { schema: HERO_SPOTLIGHT_SCHEMA,   template: HERO_SPOTLIGHT_TEMPLATE,   example: HERO_SPOTLIGHT_EXAMPLE },
-  "navbar-minimal-slot":   { schema: NAVBAR_MINIMAL_SCHEMA,   template: NAVBAR_MINIMAL_TEMPLATE,   example: NAVBAR_MINIMAL_EXAMPLE },
-  "features-bento-slot":   { schema: FEATURES_BENTO_SCHEMA,   template: FEATURES_BENTO_TEMPLATE,   example: FEATURES_BENTO_EXAMPLE },
-  "pricing-tiers-slot":    { schema: PRICING_TIERS_SCHEMA,    template: PRICING_TIERS_TEMPLATE,    example: PRICING_TIERS_EXAMPLE },
-  "footer-editorial-slot": { schema: FOOTER_EDITORIAL_SCHEMA, template: FOOTER_EDITORIAL_TEMPLATE, example: FOOTER_EDITORIAL_EXAMPLE },
+  // Generic — used when no industry-specific variant fits.
+  "hero-spotlight-slot":           { schema: HERO_SPOTLIGHT_SCHEMA,           template: HERO_SPOTLIGHT_TEMPLATE,           example: HERO_SPOTLIGHT_EXAMPLE },
+  "navbar-minimal-slot":           { schema: NAVBAR_MINIMAL_SCHEMA,           template: NAVBAR_MINIMAL_TEMPLATE,           example: NAVBAR_MINIMAL_EXAMPLE },
+  "features-bento-slot":           { schema: FEATURES_BENTO_SCHEMA,           template: FEATURES_BENTO_TEMPLATE,           example: FEATURES_BENTO_EXAMPLE },
+  "pricing-tiers-slot":            { schema: PRICING_TIERS_SCHEMA,            template: PRICING_TIERS_TEMPLATE,            example: PRICING_TIERS_EXAMPLE },
+  "footer-editorial-slot":         { schema: FOOTER_EDITORIAL_SCHEMA,         template: FOOTER_EDITORIAL_TEMPLATE,         example: FOOTER_EDITORIAL_EXAMPLE },
+  // Industry variants — the planner picks these when industry + theme match.
+  "hero-restaurant-warm-slot":     { schema: HERO_RESTAURANT_WARM_SCHEMA,     template: HERO_RESTAURANT_WARM_TEMPLATE,     example: HERO_RESTAURANT_WARM_EXAMPLE },
+  "hero-portfolio-editorial-slot": { schema: HERO_PORTFOLIO_EDITORIAL_SCHEMA, template: HERO_PORTFOLIO_EDITORIAL_TEMPLATE, example: HERO_PORTFOLIO_EDITORIAL_EXAMPLE },
 };
 
 function isSlotLockedEnabled(req: NextRequest): boolean {
