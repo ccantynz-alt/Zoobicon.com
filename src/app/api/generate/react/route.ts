@@ -333,13 +333,26 @@ Output the JSON object with "files" and "dependencies" keys. Start with { — no
             fileCount: Object.keys(parsed.files).length,
           });
         } catch (err) {
-          const message =
-            err instanceof Anthropic.AuthenticationError
-              ? "AI service is temporarily unavailable."
-              : err instanceof Anthropic.RateLimitError
-              ? "AI service is busy. Please wait a moment and try again."
-              : "React generation failed. Please try again.";
-          sendEvent({ type: "error", message });
+          const isAuth = err instanceof Anthropic.AuthenticationError;
+          const isRateLimit = err instanceof Anthropic.RateLimitError;
+          const status = (err as { status?: number })?.status;
+          const isOverloaded = status === 529;
+          let message: string;
+          let hint = "";
+          if (isAuth) {
+            message = "Anthropic API key missing or invalid.";
+            hint = "Set ANTHROPIC_API_KEY in Vercel env vars.";
+          } else if (isRateLimit) {
+            message = "Anthropic is rate-limiting (HTTP 429).";
+            hint = "Wait 30 seconds and retry, or set OPENAI_API_KEY + GOOGLE_AI_API_KEY for cross-provider failover.";
+          } else if (isOverloaded) {
+            message = "Anthropic is overloaded (HTTP 529).";
+            hint = "High traffic — wait 30-60 seconds and retry, or switch to STANDARD tier.";
+          } else {
+            message = err instanceof Error ? err.message : "React generation failed.";
+            hint = "Please try again. If this keeps happening contact support@zoobicon.com.";
+          }
+          sendEvent({ type: "error", message, hint });
         } finally {
           controller.close();
         }

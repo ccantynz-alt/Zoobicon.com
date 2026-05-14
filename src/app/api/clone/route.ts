@@ -212,8 +212,22 @@ Rules:
     }
     if (err instanceof Anthropic.RateLimitError) {
       return NextResponse.json(
-        { error: "AI service is busy. Please wait a moment and try again." },
+        {
+          error: "Anthropic is rate-limiting (HTTP 429). Wait 30 seconds and retry, or set OPENAI_API_KEY + GOOGLE_AI_API_KEY in Vercel for cross-provider failover.",
+          provider: "anthropic",
+          retryAfter: 30,
+        },
         { status: 429 }
+      );
+    }
+    if (err instanceof Anthropic.APIError && (err as { status?: number }).status === 529) {
+      return NextResponse.json(
+        {
+          error: "Anthropic is overloaded (HTTP 529). The site is experiencing high traffic. Wait 30-60 seconds and retry, or switch to STANDARD tier.",
+          provider: "anthropic",
+          retryAfter: 60,
+        },
+        { status: 503 }
       );
     }
     if (err instanceof Anthropic.APIError) {
