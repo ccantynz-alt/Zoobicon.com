@@ -191,6 +191,47 @@ Final tier. Own the compute. 2 × Hetzner H100 nodes = ~$3000/month for ~80 RPS 
 
 ---
 
+## Tier 5 — Flywheel (compounding intelligence: every build makes the next one cheaper + better)
+
+Craig (May 14): *"It's really important too that we have that flywheel set
+up and it has to be very intelligent and has to remember every keystroke
+and put it together and put boats together for us so we're not using API
+usage. There must be ways that work smarter."*
+
+The flywheel is the moat. Bolt and Lovable can't have one because their
+output is unique React code per build — nothing to compare against.
+We ship structured JSON slot-fills that ARE comparable, retrievable,
+and re-usable.
+
+### B26 — Successful-build retrieval (few-shot from past wins)
+Every build that scores ≥70 on the multi-judge panel gets its slot fills written to `flywheel_successful_builds`. New builds retrieve the top-3 most similar past fills (matching component + industry + theme + prompt-token overlap, weighted by recency decay) and inject them into the customiser's system prompt as worked examples.
+- **Beats them how:** They generate from scratch every time. We accumulate a library of "what works" and the model sees 3 examples before producing its own. After 1000 builds the example bank covers most prompt patterns. After 100k builds we have a competitive moat that compounds daily.
+- **Cost reduction:** ~30% fewer input tokens after the first few hundred builds (the customiser can produce good output with less prompt context when it has examples). Cache hits (B19) layer on top — after enough volume, most builds either cache-hit OR get strong few-shot. Either way, materially less LLM cost.
+- **Deliverable:** `src/lib/flywheel/successful-builds.ts` (shipped this session) — recordSuccessfulBuild() + retrieveFewShotExamples() + renderFewShotPrefix(). Slot-stream wired both ways.
+- **Status:** ✅ Library + DB schema + slot-stream wiring + tests shipped.
+
+### B26b — Keystroke-level event capture
+Every meaningful user interaction during a build journey lands in `flywheel_events`: prompt_typing, prompt_submit, components_picked, build_complete, build_failed, edit_request, edit_complete, preview_dwell, regenerate, deploy. Append-only, zero AI cost.
+- **Beats them how:** Lovable + Bolt capture some telemetry but not at this granularity, and don't feed it back into prompts. Our event log is the source for: time-to-first-deploy (a metric we want to trend DOWN as flywheel matures), regeneration rate per industry (signals "model gets this industry wrong often"), session success patterns (which prompt phrasings tend to lead to deploys).
+- **Privacy:** event captures buildId + sessionId, NOT the literal prompt (prompt lives in builds.prompt_head with 500-char truncation + anonymisation for cross-customer few-shot). User email tagged only on authenticated builds.
+- **Deliverable:** `src/lib/flywheel/events.ts` + `/api/flywheel/capture` edge endpoint for batched client-side capture.
+- **Status:** ✅ Library + endpoint + DB schema shipped. Client-side batch flusher in PromptInput.tsx queued for next commit.
+
+### B27 — Pattern-mining consolidation (nightly cron — queued)
+Cron job processes raw events into higher-level memories:
+- "Users in industry X typically pick component lineup Y in N% of builds."
+- "Prompt phrasing pattern 'modern * landing page' tends to produce qualityScore ≥85."
+- "Industry Z customers regenerate 2.3× per session on average — opportunity to improve our defaults for this vertical."
+- These memories feed back into the planner (industry-pref) + customiser (few-shot weights) over time.
+- **Status:** Queued. Vercel cron + consolidation script in `src/lib/flywheel/consolidate.ts`.
+
+### B28 — Cross-customer pattern bank (anonymous shared learnings — queued)
+Top-quality slot fills (≥90 score) from customers who opted into the shareable-anonymous TOS (default: yes for free/creator tiers) are aggregated into industry × theme × component pattern buckets. New customers in the same industry get those patterns as priors even on their first build.
+- **Beats them how:** Bolt + Lovable's "AI gets smarter over time" is just bigger models. Ours is: every customer benefits from every other customer's wins without any single customer's brand leaking. After 10k builds in a single industry, the patterns are essentially industry-tuned defaults.
+- **Status:** Queued. Anonymisation is already implemented in B26 record path; aggregation script outstanding.
+
+---
+
 ## Combined impact at full execution
 
 | Axis | Bolt/Lovable today | Zoobicon after all 20 moves |

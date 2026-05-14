@@ -764,4 +764,47 @@ export async function initSchema() {
   `;
   await sql`CREATE INDEX IF NOT EXISTS slot_cache_component_idx ON slot_cache (component_id)`;
   await sql`CREATE INDEX IF NOT EXISTS slot_cache_last_hit_idx ON slot_cache (last_hit_at DESC)`;
+
+  // ---- Flywheel: successful slot fills for few-shot retrieval (B26) ----
+  // Every successful build's slot fill lands here. New builds retrieve
+  // top-N most similar past fills and inject them as few-shot examples
+  // in the customiser system prompt. Result: builds get smarter +
+  // cheaper as the table grows.
+  await sql`
+    CREATE TABLE IF NOT EXISTS flywheel_successful_builds (
+      id                  BIGSERIAL PRIMARY KEY,
+      component_id        TEXT NOT NULL,
+      industry            TEXT NOT NULL DEFAULT 'other',
+      theme               TEXT NOT NULL DEFAULT 'editorial',
+      prompt_head         TEXT NOT NULL,
+      normalised_prompt   TEXT NOT NULL,
+      brand_name          TEXT NOT NULL DEFAULT '',
+      slot_fill           JSONB NOT NULL,
+      quality_score       INTEGER NOT NULL DEFAULT 0,
+      shareable_anonymous BOOLEAN NOT NULL DEFAULT true,
+      created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_sb_component_idx ON flywheel_successful_builds (component_id, created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_sb_industry_idx ON flywheel_successful_builds (industry, theme, created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_sb_quality_idx ON flywheel_successful_builds (quality_score DESC, created_at DESC)`;
+
+  // ---- Flywheel: keystroke-level event log (B26b) ----
+  // Every meaningful user interaction during a build journey lands
+  // here. Used to measure time-to-first-deploy, regeneration rate,
+  // and to feed pattern-mining for the flywheel's intelligence layer.
+  await sql`
+    CREATE TABLE IF NOT EXISTS flywheel_events (
+      id           BIGSERIAL PRIMARY KEY,
+      build_id     TEXT NOT NULL,
+      session_id   TEXT,
+      user_email   TEXT,
+      type         TEXT NOT NULL,
+      payload      JSONB NOT NULL DEFAULT '{}'::jsonb,
+      created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_events_build_idx ON flywheel_events (build_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_events_session_idx ON flywheel_events (session_id, created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_events_type_idx ON flywheel_events (type, created_at DESC)`;
 }
