@@ -293,7 +293,15 @@ import {
   Copy,
 } from "lucide-react";
 
-/** Sanitize raw API error messages for user display */
+/** Sanitize raw API error messages for user display.
+ *
+ * Phase 2 (2026-05-13): rate-limit errors used to flatten to a generic
+ * "AI service is busy" with no actionable next step. The validator +
+ * failover layer downstream now classify failures precisely; this
+ * function preserves the underlying cause and adds a recovery hint
+ * matching what the server will try next (cross-provider failover,
+ * lower tier, etc).
+ */
 function cleanErrorMessage(raw: string): string {
   // Try to extract message from JSON error strings like {"type":"error","error":{"type":"rate_limit_error","message":"..."}}
   try {
@@ -310,9 +318,22 @@ function cleanErrorMessage(raw: string): string {
         .trim();
     }
   } catch { /* not JSON */ }
-  // If it looks like a raw JSON blob, return a generic message
+  // Detect rate-limit / overload via raw signal — give the user a
+  // useful hint instead of the generic "service busy" stub.
+  if (raw.includes('"rate_limit_error"') || /\b429\b/.test(raw)) {
+    return "Anthropic is rate-limiting right now. Trying the next provider (OpenAI / Gemini) automatically — if those are also configured this build will recover. Set OPENAI_API_KEY + GOOGLE_AI_API_KEY in Vercel env to enable failover.";
+  }
+  if (raw.includes('"overloaded_error"') || /\b529\b/.test(raw)) {
+    return "Anthropic is overloaded (HTTP 529). Trying the next provider (OpenAI / Gemini) automatically. If those aren't configured: wait 30 seconds and retry, or switch to STANDARD tier (less compute-intensive).";
+  }
+  if (raw.includes('"authentication_error"') || /\b401\b/.test(raw)) {
+    return "Anthropic API key missing or invalid. Check ANTHROPIC_API_KEY in Vercel env vars.";
+  }
+  if (/\bECONN|ETIMEDOUT|EPROTO|fetch failed\b/i.test(raw)) {
+    return "Network error reaching the AI provider. Trying again with a different provider. If this keeps happening contact support@zoobicon.com.";
+  }
   if (raw.includes('"type":"error"') || raw.includes('"rate_limit_error"')) {
-    return "AI service is busy. Please wait a moment and try again.";
+    return "AI provider returned an error. Trying alternate providers — if the failover is configured this build will recover.";
   }
   return raw;
 }

@@ -155,8 +155,17 @@ Write the script as JSON now.`;
     console.error("[video-creator/script] Error:", err);
     const raw = err instanceof Error ? err.message : "";
     let message = "Script generation failed. Please try again.";
-    if (raw.toLowerCase().includes("rate limit") || raw.includes("429"))
-      message = "AI service is busy. Please wait a moment and try again.";
-    return Response.json({ error: message }, { status: 500 });
+    let hint = "";
+    if (raw.toLowerCase().includes("rate limit") || raw.includes("429")) {
+      message = "Anthropic is rate-limiting (HTTP 429).";
+      hint = "Wait 30 seconds and retry, or set OPENAI_API_KEY + GOOGLE_AI_API_KEY for cross-provider failover.";
+    } else if (raw.includes("529") || raw.toLowerCase().includes("overloaded")) {
+      message = "Anthropic is overloaded (HTTP 529).";
+      hint = "High traffic — wait 30-60 seconds and retry.";
+    } else if (raw.toLowerCase().includes("auth")) {
+      message = "Anthropic API key missing or invalid.";
+      hint = "Set ANTHROPIC_API_KEY in Vercel env vars.";
+    }
+    return Response.json({ error: message, hint }, { status: 500 });
   }
 }
