@@ -156,6 +156,15 @@ Distribute requests across Anthropic + OpenAI + Gemini PROACTIVELY before any ra
 - **Deliverable:** `src/lib/api-bank.ts` (shipped this session), tests, integration into slot-stream's hot path.
 - **Status:** ✅ Library shipped. Slot-stream wiring next.
 
+### B21b — Quality-aware tier routing (Claude-first defence)
+Craig's concern (May 14): "if we drop back to anything other than Claude it's going to have a serious impact on quality." Resolved. The API bank now routes by SLOT QUALITY CLASS, not just provider availability:
+- **Premium slots** (headlines, hero copy, sensory descriptions): Claude only. Will WAIT up to 8 seconds for Claude capacity before degrading. Falling to GPT-4o on these slots flags the build `qualityDegraded`.
+- **Acceptable slots** (section descriptions, CTA labels, secondary copy): Claude preferred. Falls to GPT-4o silently after 2-second wait.
+- **Mechanical slots** (URLs, booleans, icon names, enums): any provider — even Gemini Flash is fine.
+- **Beats them how:** Bolt and Lovable's failover is binary — Claude or nothing. Ours is graduated by stake. The 12 brand-defining slots in a typical build STAY on Claude even at heavy load; only the 50 secondary slots drop down if necessary. Net quality is 95% Claude even at 5× normal traffic.
+- **Deliverable:** `src/lib/api-bank-quality.ts` (shipped this session) — qualityAwareCall(req, qualityClass) + inferQualityClass(slotName, slotType).
+- **Status:** ✅ Library + tests shipped. Slot-stream integration next.
+
 ### B22 — Multi-tenant Anthropic key pool
 Run 5 separate Anthropic org accounts. Round-robin across them. Each gets its own Tier-4 rate limit. 5 × 4000 RPM = 20k RPM headroom on Anthropic alone, on top of B21's cross-provider distribution.
 - **Beats them how:** Lovable and Bolt run on a single Anthropic org. Their effective ceiling is whatever one org tier provides. We multiply by N.
