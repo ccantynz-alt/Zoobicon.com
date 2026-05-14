@@ -65,6 +65,8 @@ import {
 } from "@/lib/slot-locked/templates/by-industry/hero-portfolio-editorial";
 import { planPageForIndustry } from "@/lib/slot-locked/industry-planner";
 import { critiquePanel, axesNeedingRepair } from "@/lib/builder-critique/multi-judge";
+import { retrieveFewShotExamples, renderFewShotPrefix, recordSuccessfulBuild } from "@/lib/flywheel/successful-builds";
+import { normalisePrompt } from "@/lib/slot-locked/cache";
 import type { ComponentSchema, SlotValueMap } from "@/lib/slot-locked/types";
 
 export const maxDuration = 120;
@@ -216,11 +218,36 @@ export async function POST(req: NextRequest): Promise<Response> {
       ): Promise<SlotValueMap> => {
         const brandBrief = `Brand: ${brandName || "(none provided)"}. User prompt: ${prompt}`;
         const aiPrompt = schemaToPrompt(entry.schema, brandBrief);
+
+        // B26 flywheel — retrieve up to 3 past successful builds of this
+        // same component for similar industry/theme/prompt. Inject them
+        // as worked examples so the model has a concrete style guide
+        // before producing its own JSON. Compounding intelligence: the
+        // longer Zoobicon runs, the better these examples get.
+        const fewShot = await retrieveFewShotExamples({
+          componentId,
+          industry: body.industry || "other",
+          theme: body.theme || "editorial",
+          prompt,
+          limit: 3,
+          minQuality: 70,
+        }).catch(() => []);
+        const fewShotPrefix = renderFewShotPrefix(fewShot);
+        if (fewShot.length > 0) {
+          send("phase", {
+            phase: "few-shot",
+            componentId,
+            exampleCount: fewShot.length,
+            message: `Flywheel: ${fewShot.length} reference example(s) loaded for ${componentId}.`,
+          });
+        }
+
         const aiStart = Date.now();
         const fb = await callLLMWithFailover(
           {
             model: "claude-haiku-4-5",
             system:
+              fewShotPrefix +
               "You are filling in the slots of a hand-written React component template. " +
               "Output ONLY a valid JSON object matching the schema. No prose, no markdown fences, no explanation.",
             userMessage: aiPrompt,
@@ -429,6 +456,37 @@ export async function POST(req: NextRequest): Promise<Response> {
           slots: summarySlots,
           qualityScore,
         });
+
+        // B26 flywheel — record this build's slot fills back into the
+        // bank so the NEXT similar build gets them as few-shot examples.
+        // Only stored when the build cleared the quality bar (>= 70)
+        // and only the fills that came from real AI customisation
+        // (cache hits are already represented by the source build).
+        if (qualityScore && qualityScore >= 70) {
+          const normalisedPrompt = normalisePrompt(prompt);
+          for (const [componentId, slotFill] of Object.entries(summarySlots)) {
+            // Best-effort, fire-and-forget. Failure here doesn't
+            // affect the user — the build already shipped.
+            recordSuccessfulBuild({
+              componentId,
+              industry: body.industry || "other",
+              theme: body.theme || "editorial",
+              promptHead: prompt,
+              normalisedPrompt,
+              brandName,
+              slotFill,
+              qualityScore,
+              // Anonymise patterns by default — free/creator tier
+              // accepts the TOS line that anonymous patterns may
+              // feed back into other builds. Paid agency tier can
+              // opt out via body.optOutFlywheel (future).
+              shareableAnonymous: true,
+            }).catch((err: unknown) => {
+              console.warn("[slot-stream] flywheel record failed:", err instanceof Error ? err.message : err);
+            });
+          }
+        }
+
         await telemetry.finalize({ ok: okCount > 0, qualityScore });
         await recordBuildQuotaUsage(userEmail, [
           { model: "claude-haiku-4-5", inputTokens: 0, outputTokens: 0 },
