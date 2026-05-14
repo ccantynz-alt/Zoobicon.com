@@ -142,6 +142,46 @@ The 22 agents in `src/agents/` activated: SEO Auto-Fix runs weekly, Performance 
 
 ---
 
+## Tier 4 — Capacity (the "API bank" that lets us serve 1M builds/day)
+
+Craig (2026-05-14): *"There must be a way of building up an API bank
+storage to allow for the heavy load and flywheel system… we should be
+able to wipe this competition."* Yes. Eight layers compose into an
+architecture Bolt and Lovable structurally cannot match because they
+single-vendor on Anthropic.
+
+### B21 — Proactive multi-provider sharding (the API bank)
+Distribute requests across Anthropic + OpenAI + Gemini PROACTIVELY before any rate-limit hits — not reactively via failover. Per-provider rate-budget tracking with a sliding-minute window. Picker chooses the provider with the most headroom on every call.
+- **Beats them how:** Single-vendor on Anthropic means a 4000-RPM ceiling. Three providers in parallel = 14000+ RPM effective capacity with the same code path. They can't copy this without re-architecting their failover.
+- **Deliverable:** `src/lib/api-bank.ts` (shipped this session), tests, integration into slot-stream's hot path.
+- **Status:** ✅ Library shipped. Slot-stream wiring next.
+
+### B22 — Multi-tenant Anthropic key pool
+Run 5 separate Anthropic org accounts. Round-robin across them. Each gets its own Tier-4 rate limit. 5 × 4000 RPM = 20k RPM headroom on Anthropic alone, on top of B21's cross-provider distribution.
+- **Beats them how:** Lovable and Bolt run on a single Anthropic org. Their effective ceiling is whatever one org tier provides. We multiply by N.
+- **Deliverable:** Pool config + key rotation in `api-bank.ts`. Craig task: open 4 more Anthropic orgs at $5k/mo committed-spend tier each.
+- **Status:** Pool architecture lives in `api-bank.ts`; needs Craig to fund the additional orgs.
+
+### B23 — Overnight prebuild factory
+Cron job runs at off-peak hours generating slot-fills for the most common (industry × theme × prompt-pattern) combinations and seeding the slot-fill cache. By morning, ~70% of inbound customer prompts hit cache with zero API cost.
+- **Beats them how:** Bolt and Lovable can't cache free-form code outputs. Our JSON slot-fills are trivially cacheable. The prebuild factory is a pure cost-shifter — moves API spend to off-peak when rate limits are abundant.
+- **Deliverable:** `/api/cron/prebuild-factory` Vercel cron + seed list of (industry × theme × prompt-pattern) triples + bulk slot-fill generator.
+- **Status:** Queued. Foundation in B19 cache module.
+
+### B24 — Open-source model fallback (Groq Llama 3.3 70B)
+When Anthropic + OpenAI + Gemini all sideline, fall back to Llama 3.3 70B on Groq. ~$0.20/M tokens (cheaper than Haiku), ~750 tokens/second (faster than Anthropic). For the slot-fill job (structured JSON output from a schema), Llama is "good enough."
+- **Beats them how:** Bolt and Lovable have no public-cloud fallback. We have a 4th-line provider that doesn't share rate-limits with the big-three.
+- **Deliverable:** Groq provider in `llm-provider.ts` + budget config in `api-bank.ts`.
+- **Status:** Queued.
+
+### B25 — Self-hosted Llama on Hetzner GPU bank
+Final tier. Own the compute. 2 × Hetzner H100 nodes = ~$3000/month for ~80 RPS sustained Llama 3.3 70B inference. At 1M builds/day average, that's $0 marginal API cost — only fixed infrastructure cost.
+- **Beats them how:** Per-build cost trends to $0 as volume grows. They pay per token forever; we pay per server. Eventually we cross over and our unit economics dominate.
+- **Deliverable:** Terraform for Hetzner H100s + vLLM serving Llama 3.3 + provider integration in `llm-provider.ts`.
+- **Status:** Queued. Decision point: when monthly Anthropic+OpenAI+Gemini bill crosses ~$5000.
+
+---
+
 ## Combined impact at full execution
 
 | Axis | Bolt/Lovable today | Zoobicon after all 20 moves |
