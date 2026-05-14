@@ -1395,11 +1395,24 @@ function BuilderPage() {
       // 1. Quick Build (buildMode="instant", DEFAULT): Registry scaffold (<1s) + AI customization (~10s)
       // 2. Deep Build (buildMode="deep"): Opus generates everything from scratch (~30s)
       // 3. Full Build (buildMode="pipeline"): 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)
+      //
+      // Slot-locked composition (B1) — opt in via ?slotLocked=1 in the URL
+      // or window.__slotLocked = true in dev. When enabled, hits the new
+      // /api/generate/slot-stream endpoint with header x-slot-locked: 1
+      // so the feature flag in the route accepts the request.
+      const slotLockedEnabled =
+        typeof window !== "undefined" &&
+        (new URLSearchParams(window.location.search).get("slotLocked") === "1" ||
+          (window as { __slotLocked?: boolean }).__slotLocked === true);
+
       const useFastPath = instantMode;
-      const endpoint = buildMode === "pipeline"
-        ? "/api/generate/pipeline-stream"
-        : useFastPath ? "/api/generate/react-stream" : "/api/generate/react";
+      const endpoint = slotLockedEnabled
+        ? "/api/generate/slot-stream"
+        : buildMode === "pipeline"
+          ? "/api/generate/pipeline-stream"
+          : useFastPath ? "/api/generate/react-stream" : "/api/generate/react";
       setPipelineAgents([
+        slotLockedEnabled ? "Slot-locked composition — assembling hand-written templates with AI slot fills..." :
         buildMode === "pipeline" ? "Running 7-agent pipeline: Strategist, Brand, Copy, Architect, Developer, SEO, Animation..." :
         useFastPath ? "Assembling components from registry..." : "AI generating full application...",
       ]);
@@ -1407,7 +1420,10 @@ function BuilderPage() {
       try {
         const res = await fetch(endpoint, {
           method: "POST",
-          headers: authHeaders(),
+          headers: {
+            ...authHeaders(),
+            ...(slotLockedEnabled ? { "x-slot-locked": "1" } : {}),
+          },
           body: JSON.stringify({
             prompt: prompt.trim(),
             tier: useFastPath ? "standard" : "premium",
