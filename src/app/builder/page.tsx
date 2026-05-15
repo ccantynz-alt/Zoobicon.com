@@ -232,6 +232,7 @@ import DiffPanel from "@/components/DiffPanel";
 import ProjectTree from "@/components/ProjectTree";
 import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
 import { PlanReviewPanel } from "@/components/PlanReviewPanel";
+import { captureFlywheelEvent } from "@/lib/flywheel-client";
 import { downloadZip } from "@/lib/zip-export";
 import CollaborationBar from "@/components/CollaborationBar";
 import CursorOverlay from "@/components/CursorOverlay";
@@ -1377,6 +1378,18 @@ function BuilderPage() {
     }
 
     const currentGenId = ++generationIdRef.current;
+    const buildId = `build-${Date.now()}-${currentGenId}`;
+    // Flywheel: log the submit event the moment the user kicked the
+    // build off (before plan-mode or any network spend). If this is a
+    // re-roll within the same session, the type changes to regenerate.
+    const isRegenerate = currentGenId > 1;
+    captureFlywheelEvent(buildId, isRegenerate ? "regenerate" : "prompt_submit", {
+      promptHead: prompt.trim().slice(0, 200),
+      tier,
+      buildMode,
+      instantMode,
+      fullStack,
+    });
     setStatus("generating");
     setError("");
     setGeneratedCode("");
@@ -1580,6 +1593,14 @@ function BuilderPage() {
                   setBuildProgress(null);
                   receivedDone = true;
                   clearWatchdog();
+                  // Flywheel: build completed successfully — record metrics
+                  // for the consolidation cron to mine.
+                  captureFlywheelEvent(buildId, "build_complete", {
+                    componentsOk: typeof event.componentsOk === "number" ? event.componentsOk : undefined,
+                    qualityScore: typeof event.qualityScore === "number" ? event.qualityScore : undefined,
+                    cacheHitRate: typeof event.cacheHitRate === "number" ? event.cacheHitRate : undefined,
+                    durationMs: typeof event.durationMs === "number" ? event.durationMs : undefined,
+                  });
                   setSectionTimeline(prev => prev.map(s => s.status === "done" ? s : { ...s, status: "done", finishedAt: Date.now() }));
                   // Surface partial-fallback summary in the final pipeline log so the
                   // user knows some sections shipped as base templates (Law 8).
@@ -1712,6 +1733,10 @@ function BuilderPage() {
         if ((err as Error).name === "AbortError") { clearWatchdog(); return; }
         const errMsg = err instanceof Error ? err.message : String(err);
         console.error("[React Generate] Failed:", errMsg);
+        // Flywheel: failure event for the consolidation cron to mine.
+        captureFlywheelEvent(buildId, "build_failed", {
+          message: errMsg.slice(0, 200),
+        });
         setGeneratedCode("");
         setReactFiles(null);
         setBuildProgress(null);
