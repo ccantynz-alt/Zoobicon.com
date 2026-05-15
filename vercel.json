@@ -50,6 +50,10 @@
     {
       "path": "/api/cron/domain-crawl",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/flywheel-consolidate",
+      "schedule": "0 3 * * *"
     }
   ],
   "functions": {
@@ -122,6 +126,14 @@
       "memory": 1024
     },
     "src/app/api/video-creator/dub/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/cron/flywheel-consolidate/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/generate/slot-stream/route.ts": {
       "maxDuration": 300,
       "memory": 1024
     }

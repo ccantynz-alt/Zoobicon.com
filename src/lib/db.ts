@@ -807,4 +807,22 @@ export async function initSchema() {
   await sql`CREATE INDEX IF NOT EXISTS flywheel_events_build_idx ON flywheel_events (build_id)`;
   await sql`CREATE INDEX IF NOT EXISTS flywheel_events_session_idx ON flywheel_events (session_id, created_at DESC)`;
   await sql`CREATE INDEX IF NOT EXISTS flywheel_events_type_idx ON flywheel_events (type, created_at DESC)`;
+
+  // ---- Flywheel: consolidated memories (B27) ----
+  // Nightly cron rolls raw events + successful builds into higher-
+  // level memories the planner/customiser/admin dashboard read.
+  // Wiped + rebuilt fresh on every consolidation run for snapshot
+  // kinds; future "accumulating" kinds will keep history.
+  await sql`
+    CREATE TABLE IF NOT EXISTS flywheel_memories (
+      id              BIGSERIAL PRIMARY KEY,
+      kind            TEXT NOT NULL,
+      subject         TEXT NOT NULL,
+      content         JSONB NOT NULL,
+      sample_size     INTEGER NOT NULL DEFAULT 0,
+      consolidated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_memories_kind_idx ON flywheel_memories (kind, subject)`;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_memories_consolidated_idx ON flywheel_memories (consolidated_at DESC)`;
 }
