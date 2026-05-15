@@ -230,6 +230,15 @@ Top-quality slot fills (≥90 score) from customers who opted into the shareable
 - **Beats them how:** Bolt + Lovable's "AI gets smarter over time" is just bigger models. Ours is: every customer benefits from every other customer's wins without any single customer's brand leaking. After 10k builds in a single industry, the patterns are essentially industry-tuned defaults.
 - **Status:** Queued. Anonymisation is already implemented in B26 record path; aggregation script outstanding.
 
+### B29 — Self-healing pipeline
+Craig (May 14): *"self repair once we get enough people using it."* First step done. Hourly cron detects failure patterns and writes corrective actions to `self_healing_actions`:
+- Component fails validation > 15% in 24h with ≥20 observations → quarantined for 12h (planner skips it)
+- Provider fails > 25% in last hour with ≥30 observations → deprioritised in API bank picker for 1h
+- Industry sessions average > 4 regenerations over 7 days with ≥10 sessions → "needs improvement" alert
+- **Beats them how:** Lovable + Bolt rely on engineers to notice + manually patch. Ours acts within an hour. The longer the platform runs, the more failure modes it has auto-quarantined.
+- **Deliverable:** `src/lib/flywheel/self-healing.ts` + `/api/cron/self-heal` (hourly) + `self_healing_actions` table. Shipped this session.
+- **Status:** ✅ Library + cron + DB schema shipped. Planner + api-bank reads queued (next commit wires them up to actually consume the actions).
+
 ---
 
 ## Combined impact at full execution

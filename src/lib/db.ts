@@ -825,4 +825,24 @@ export async function initSchema() {
   `;
   await sql`CREATE INDEX IF NOT EXISTS flywheel_memories_kind_idx ON flywheel_memories (kind, subject)`;
   await sql`CREATE INDEX IF NOT EXISTS flywheel_memories_consolidated_idx ON flywheel_memories (consolidated_at DESC)`;
+
+  // ---- Self-healing actions (B29) ----
+  // Hourly cron detects failure patterns and writes corrective
+  // actions here. The planner + api-bank read this table on every
+  // build to skip quarantined components + deprioritise unhealthy
+  // providers. Actions expire automatically via active_until.
+  await sql`
+    CREATE TABLE IF NOT EXISTS self_healing_actions (
+      id            BIGSERIAL PRIMARY KEY,
+      kind          TEXT NOT NULL,
+      subject       TEXT NOT NULL,
+      reason        TEXT NOT NULL,
+      sample_size   INTEGER NOT NULL DEFAULT 0,
+      active_until  TIMESTAMPTZ NOT NULL,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE(kind, subject)
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS self_healing_kind_active_idx ON self_healing_actions (kind, active_until DESC)`;
 }

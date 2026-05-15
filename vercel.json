@@ -54,6 +54,10 @@
     {
       "path": "/api/cron/flywheel-consolidate",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/self-heal",
+      "schedule": "0 * * * *"
     }
   ],
   "functions": {
