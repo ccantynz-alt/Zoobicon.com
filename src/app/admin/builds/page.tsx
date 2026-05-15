@@ -11,6 +11,21 @@
 import Link from "next/link";
 import { sql } from "@/lib/db";
 import { getBuildMetricsSummary } from "@/lib/build-telemetry";
+import {
+  getFlywheelStats,
+} from "@/lib/flywheel/successful-builds";
+import {
+  getLatestSessionFunnel,
+  getCostTrendSeries,
+  getTopQualityPatterns,
+} from "@/lib/flywheel/consolidate";
+import {
+  getNeedsImprovementIndustries,
+} from "@/lib/flywheel/self-healing";
+import {
+  getPoolSnapshot,
+  getProviderCapacity,
+} from "@/lib/api-bank-pool";
 
 export const dynamic = "force-dynamic";
 
@@ -76,11 +91,23 @@ function formatPercent(n: number): string {
 }
 
 export default async function BuildsAdminPage() {
-  const [summary, recent, topFailing] = await Promise.all([
-    getBuildMetricsSummary(24),
-    getRecentBuilds(50),
-    getTopFailingComponents(24),
-  ]);
+  const [summary, recent, topFailing, flywheelStats, funnel, costTrend, topPatterns, needsImprovement] =
+    await Promise.all([
+      getBuildMetricsSummary(24),
+      getRecentBuilds(50),
+      getTopFailingComponents(24),
+      getFlywheelStats(),
+      getLatestSessionFunnel(),
+      getCostTrendSeries(),
+      getTopQualityPatterns(10),
+      getNeedsImprovementIndustries(),
+    ]);
+
+  // Pool snapshot is in-process state, sync read.
+  const poolSnapshot = getPoolSnapshot();
+  const claudeCapacity = getProviderCapacity("claude");
+  const openaiCapacity = getProviderCapacity("openai");
+  const geminiCapacity = getProviderCapacity("gemini");
 
   const noData = summary.totalBuilds === 0;
 
@@ -141,6 +168,147 @@ export default async function BuildsAdminPage() {
           <StatCard label="p95 duration" value={formatDuration(summary.p95DurationMs)} />
           <StatCard label="p99 duration" value={formatDuration(summary.p99DurationMs)} />
         </section>
+
+        {/* API capacity strip — the API bank pool (B22 extended) */}
+        <section className="mb-10">
+          <h2 className="mb-3 text-lg font-semibold" style={{ color: "var(--ink)" }}>
+            API capacity (current)
+          </h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <CapacityCard
+              label="Anthropic"
+              keys={claudeCapacity.keyCount}
+              tokensPerMin={claudeCapacity.tokensPerMin}
+              requestsPerMin={claudeCapacity.requestsPerMin}
+            />
+            <CapacityCard
+              label="OpenAI"
+              keys={openaiCapacity.keyCount}
+              tokensPerMin={openaiCapacity.tokensPerMin}
+              requestsPerMin={openaiCapacity.requestsPerMin}
+            />
+            <CapacityCard
+              label="Gemini"
+              keys={geminiCapacity.keyCount}
+              tokensPerMin={geminiCapacity.tokensPerMin}
+              requestsPerMin={geminiCapacity.requestsPerMin}
+            />
+          </div>
+          {poolSnapshot.length > 0 && (
+            <div className="mt-3 text-xs" style={{ color: "var(--ink-muted)" }}>
+              Pool: {poolSnapshot.map((p) => `${p.name} (${(p.headroom * 100).toFixed(0)}% headroom${p.sidelined ? " — SIDELINED" : ""})`).join(" · ")}
+            </div>
+          )}
+          <p className="mt-2 text-xs" style={{ color: "var(--ink-muted)" }}>
+            To add more Anthropic capacity: open a new Anthropic org, get its API key, set <code>ANTHROPIC_API_KEY_2</code> (or _3, _4, …) in Vercel env vars. Each org adds 400k tokens/min and 4k RPM.
+          </p>
+        </section>
+
+        {/* Flywheel — the compounding intelligence layer */}
+        <section className="mb-10">
+          <h2 className="mb-3 text-lg font-semibold" style={{ color: "var(--ink)" }}>
+            Flywheel
+          </h2>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+            <StatCard label="Successful builds banked" value={flywheelStats.totalBuilds.toLocaleString()} />
+            <StatCard label="Avg quality" value={`${flywheelStats.avgQuality}/100`} tone={flywheelStats.avgQuality >= 85 ? "good" : flywheelStats.avgQuality >= 70 ? "warn" : "bad"} />
+            <StatCard
+              label="Submit → Deploy"
+              value={funnel ? `${funnel.submitToDeployRate}%` : "—"}
+              tone={funnel && funnel.submitToDeployRate >= 40 ? "good" : "warn"}
+            />
+            <StatCard
+              label="Regen rate"
+              value={funnel ? `${funnel.regenerateRate}%` : "—"}
+              tone={funnel && funnel.regenerateRate <= 30 ? "good" : "warn"}
+            />
+            <StatCard label="Builds / session" value={funnel ? funnel.avgBuildsPerSession.toString() : "—"} />
+          </div>
+          <p className="mt-3 text-xs" style={{ color: "var(--ink-muted)" }}>
+            Every successful build adds to the few-shot example bank, making the next build cheaper + better. Funnel + regen rate are the proof. Consolidation runs nightly at 03:00 UTC.
+          </p>
+        </section>
+
+        {/* Industry needs improvement (B29 self-healing alerts) */}
+        {needsImprovement.length > 0 && (
+          <section className="mb-10">
+            <h2 className="mb-3 text-lg font-semibold" style={{ color: "var(--ink)" }}>
+              Industries needing improvement
+            </h2>
+            <div className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--rule)", background: "var(--paper-elevated)" }}>
+              <table className="w-full">
+                <thead>
+                  <tr style={{ borderBottom: "1px solid var(--rule)" }}>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--ink-muted)" }}>Industry</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--ink-muted)" }}>Reason</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--ink-muted)" }}>Sample</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {needsImprovement.map((row) => (
+                    <tr key={row.industry} style={{ borderBottom: "1px solid var(--rule)" }}>
+                      <td className="px-4 py-3 text-sm font-semibold" style={{ color: "var(--ink)" }}>{row.industry}</td>
+                      <td className="px-4 py-3 text-sm" style={{ color: "var(--ink-secondary)" }}>{row.reason}</td>
+                      <td className="px-4 py-3 text-right text-sm" style={{ color: "var(--ink-muted)" }}>{row.sampleSize}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-2 text-xs" style={{ color: "var(--ink-muted)" }}>
+              These industries show high regeneration rates — opportunity to ship better defaults / industry variants for them. Auto-updated hourly by self-heal cron.
+            </p>
+          </section>
+        )}
+
+        {/* Top quality patterns */}
+        {topPatterns.length > 0 && (
+          <section className="mb-10">
+            <h2 className="mb-3 text-lg font-semibold" style={{ color: "var(--ink)" }}>
+              Prompt patterns that score highest
+            </h2>
+            <div className="overflow-hidden rounded-xl border" style={{ borderColor: "var(--rule)", background: "var(--paper-elevated)" }}>
+              <table className="w-full">
+                <thead>
+                  <tr style={{ borderBottom: "1px solid var(--rule)" }}>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--ink-muted)" }}>Pattern</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--ink-muted)" }}>Avg score</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--ink-muted)" }}>Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topPatterns.map((row) => (
+                    <tr key={row.pattern} style={{ borderBottom: "1px solid var(--rule)" }}>
+                      <td className="px-4 py-3 text-sm font-mono" style={{ color: "var(--ink)" }}>{row.pattern}</td>
+                      <td className="px-4 py-3 text-right text-sm font-semibold" style={{ color: "var(--ink)" }}>{row.avgQuality}/100</td>
+                      <td className="px-4 py-3 text-right text-sm" style={{ color: "var(--ink-muted)" }}>{row.count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-2 text-xs" style={{ color: "var(--ink-muted)" }}>
+              Bigrams + trigrams from normalised prompts that correlated with quality ≥85. The customiser system prompt can use these as priors.
+            </p>
+          </section>
+        )}
+
+        {/* Cost trend chart (ASCII for now) */}
+        {costTrend.length > 0 && (
+          <section className="mb-10">
+            <h2 className="mb-3 text-lg font-semibold" style={{ color: "var(--ink)" }}>
+              Build duration trend (last 60 days)
+            </h2>
+            <div className="overflow-hidden rounded-xl border p-4" style={{ borderColor: "var(--rule)", background: "var(--paper-elevated)" }}>
+              <pre className="overflow-x-auto text-[11px] leading-tight" style={{ color: "var(--ink-secondary)" }}>
+{renderAsciiTrend(costTrend)}
+              </pre>
+              <p className="mt-2 text-xs" style={{ color: "var(--ink-muted)" }}>
+                The line should trend DOWN over time as the flywheel matures (cache hits + few-shot context shrinkage). If it trends up, something regressed.
+              </p>
+            </div>
+          </section>
+        )}
 
         {/* Top failure kinds */}
         {summary.topFailureKinds.length > 0 && (
@@ -292,4 +460,64 @@ function StatCard({ label, value, tone }: { label: string; value: string; tone?:
       </div>
     </div>
   );
+}
+
+function CapacityCard({
+  label,
+  keys,
+  tokensPerMin,
+  requestsPerMin,
+}: {
+  label: string;
+  keys: number;
+  tokensPerMin: number;
+  requestsPerMin: number;
+}) {
+  const fmtTokens = tokensPerMin >= 1_000_000
+    ? `${(tokensPerMin / 1_000_000).toFixed(1)}M`
+    : `${(tokensPerMin / 1000).toFixed(0)}k`;
+  const fmtReq = requestsPerMin >= 1000 ? `${(requestsPerMin / 1000).toFixed(1)}k` : String(requestsPerMin);
+  return (
+    <div
+      className="rounded-xl border p-4"
+      style={{ background: "var(--paper-elevated)", borderColor: "var(--rule)" }}
+    >
+      <div className="flex items-baseline justify-between">
+        <div className="text-sm font-semibold" style={{ color: "var(--ink)" }}>{label}</div>
+        <div className="text-xs" style={{ color: "var(--ink-muted)" }}>{keys} key{keys === 1 ? "" : "s"}</div>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <div>
+          <div className="text-[10px] uppercase tracking-[0.16em]" style={{ color: "var(--ink-muted)" }}>tokens/min</div>
+          <div className="text-xl font-bold tabular-nums" style={{ color: "var(--ink)" }}>{fmtTokens}</div>
+        </div>
+        <div>
+          <div className="text-[10px] uppercase tracking-[0.16em]" style={{ color: "var(--ink-muted)" }}>requests/min</div>
+          <div className="text-xl font-bold tabular-nums" style={{ color: "var(--ink)" }}>{fmtReq}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Tiny ASCII chart renderer — keeps the admin page dependency-free.
+ * If we later add a real chart lib, swap this for it.
+ */
+function renderAsciiTrend(series: Array<{ day: string; avgDurationMs: number; buildCount: number }>): string {
+  if (series.length === 0) return "(no data)";
+  const max = Math.max(...series.map((s) => s.avgDurationMs));
+  const min = Math.min(...series.map((s) => s.avgDurationMs));
+  const range = Math.max(1, max - min);
+  const height = 8;
+  const lines: string[] = [];
+  for (let row = height; row >= 0; row--) {
+    const threshold = min + (range * row) / height;
+    const line = series.map((s) => (s.avgDurationMs >= threshold ? "█" : " ")).join("");
+    const label = row === height ? max.toFixed(0).padStart(6) + "ms " : row === 0 ? min.toFixed(0).padStart(6) + "ms " : "       ";
+    lines.push(label + "│ " + line);
+  }
+  lines.push("       └" + "─".repeat(series.length));
+  lines.push("        " + series[0].day.slice(0, 10) + "  →  " + series[series.length - 1].day.slice(0, 10));
+  return lines.join("\n");
 }
