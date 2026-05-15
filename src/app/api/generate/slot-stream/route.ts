@@ -63,7 +63,7 @@ import {
   HERO_PORTFOLIO_EDITORIAL_TEMPLATE,
   HERO_PORTFOLIO_EDITORIAL_EXAMPLE,
 } from "@/lib/slot-locked/templates/by-industry/hero-portfolio-editorial";
-import { planPageForIndustry } from "@/lib/slot-locked/industry-planner";
+import { planPageForIndustry, planPageForIndustryAdaptive } from "@/lib/slot-locked/industry-planner";
 import { critiquePanel, axesNeedingRepair } from "@/lib/builder-critique/multi-judge";
 import { retrieveFewShotExamples, renderFewShotPrefix, recordSuccessfulBuild } from "@/lib/flywheel/successful-builds";
 import { normalisePrompt } from "@/lib/slot-locked/cache";
@@ -267,13 +267,15 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   // Component selection priority:
   //   1. Explicit componentIds in the request (legacy + power-user path)
-  //   2. Auto-plan from (industry, theme) via planPageForIndustry — B7 path
+  //   2. Auto-plan from (industry, theme) via planPageForIndustryAdaptive
+  //      — B7 + B27 + B29: respects industry preference memories AND
+  //      skips components quarantined by the self-healing layer.
   //   3. Default fallback: 5-component generic landing page
   const componentIds =
     body.componentIds && body.componentIds.length > 0
       ? body.componentIds
       : (body.industry || body.theme)
-        ? planPageForIndustry({
+        ? await planPageForIndustryAdaptive({
             industry: body.industry,
             theme: body.theme,
             includePricing: body.includePricing,
