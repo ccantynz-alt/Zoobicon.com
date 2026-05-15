@@ -58,6 +58,10 @@
     {
       "path": "/api/cron/self-heal",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/prebuild-factory",
+      "schedule": "30 3 * * *"
     }
   ],
   "functions": {
@@ -136,6 +140,14 @@
     "src/app/api/cron/flywheel-consolidate/route.ts": {
       "maxDuration": 300,
       "memory": 1024
+    },
+    "src/app/api/cron/prebuild-factory/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/cron/self-heal/route.ts": {
+      "maxDuration": 120,
+      "memory": 512
     },
     "src/app/api/generate/slot-stream/route.ts": {
       "maxDuration": 300,
