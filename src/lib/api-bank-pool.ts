@@ -60,6 +60,11 @@ const PER_KEY_BUDGET: Record<LLMProvider, { tokensPerMin: number; requestsPerMin
   claude: { tokensPerMin: 400_000, requestsPerMin: 4_000 },
   openai: { tokensPerMin: 800_000, requestsPerMin: 10_000 },
   gemini: { tokensPerMin: 200_000, requestsPerMin: 1_000 },
+  // Groq Llama 3.3 70B — generous limits on paid tier, ~750 tokens/sec.
+  groq: { tokensPerMin: 600_000, requestsPerMin: 6_000 },
+  // Self-hosted Hetzner GPU bank — limited by hardware, not vendor.
+  // 2× H100 nodes sustain ~80 RPS Llama 3.3 70B = ~4800 RPM.
+  selfhosted: { tokensPerMin: 2_000_000, requestsPerMin: 4_800 },
 };
 
 // ───────────────────────────────────────────────────────────────────────
@@ -107,6 +112,24 @@ function loadEnvKeys(): void {
     if (key) {
       POOL.push({ provider: "gemini", name: `gemini:org-${i}`, apiKey: key, origin: "env" });
     }
+  }
+
+  // Groq Llama (B24) — primary + numbered alternates.
+  const groqPrimary = process.env.GROQ_API_KEY;
+  if (groqPrimary) {
+    POOL.push({ provider: "groq", name: "groq:primary", apiKey: groqPrimary, origin: "env" });
+  }
+  for (let i = 2; i <= 20; i++) {
+    const key = process.env[`GROQ_API_KEY_${i}`];
+    if (key) {
+      POOL.push({ provider: "groq", name: `groq:org-${i}`, apiKey: key, origin: "env" });
+    }
+  }
+
+  // Self-hosted (B25) — URL-only; no rotation since it's our cluster.
+  const selfhostedUrl = process.env.SELFHOSTED_LLM_URL;
+  if (selfhostedUrl) {
+    POOL.push({ provider: "selfhosted", name: "selfhosted:primary", apiKey: process.env.SELFHOSTED_LLM_KEY || "", origin: "env" });
   }
 
   for (const k of POOL) {

@@ -180,14 +180,14 @@ Cron job runs at off-peak hours generating slot-fills for the most common (indus
 ### B24 — Open-source model fallback (Groq Llama 3.3 70B)
 When Anthropic + OpenAI + Gemini all sideline, fall back to Llama 3.3 70B on Groq. ~$0.20/M tokens (cheaper than Haiku), ~750 tokens/second (faster than Anthropic). For the slot-fill job (structured JSON output from a schema), Llama is "good enough."
 - **Beats them how:** Bolt and Lovable have no public-cloud fallback. We have a 4th-line provider that doesn't share rate-limits with the big-three.
-- **Deliverable:** Groq provider in `llm-provider.ts` + budget config in `api-bank.ts`.
-- **Status:** Queued.
+- **Deliverable:** Groq provider in `llm-provider.ts` + budget config in `api-bank-pool.ts` + numbered `GROQ_API_KEY_2..20` slots.
+- **Status:** ✅ Shipped this session. Set `GROQ_API_KEY` in Vercel and the picker starts using it as a 4th-line provider for mechanical-class slots.
 
 ### B25 — Self-hosted Llama on Hetzner GPU bank
-Final tier. Own the compute. 2 × Hetzner H100 nodes = ~$3000/month for ~80 RPS sustained Llama 3.3 70B inference. At 1M builds/day average, that's $0 marginal API cost — only fixed infrastructure cost.
-- **Beats them how:** Per-build cost trends to $0 as volume grows. They pay per token forever; we pay per server. Eventually we cross over and our unit economics dominate.
-- **Deliverable:** Terraform for Hetzner H100s + vLLM serving Llama 3.3 + provider integration in `llm-provider.ts`.
-- **Status:** Queued. Decision point: when monthly Anthropic+OpenAI+Gemini bill crosses ~$5000.
+Final tier. Own the compute. 2 × Hetzner GEX44 nodes (H100 80GB each) = ~$3,100/month for ~80 RPS sustained Llama 3.3 70B inference. At 100k+ builds/day average, that's structurally cheaper than any public-cloud API.
+- **Beats them how:** Per-build cost trends to $0 as volume grows. They pay per token forever; we pay per server. Crossover happens at ~100k builds/day; beyond that our unit economics dominate by 10-25×.
+- **Deliverable:** `src/lib/llm-provider.ts` `callSelfhosted()` path (uses `SELFHOSTED_LLM_URL` + `SELFHOSTED_LLM_KEY` env vars, model name prefix `zoo-`) + pool entry in `api-bank-pool.ts` + full deployment recipe in [`HETZNER-DEPLOY.md`](./HETZNER-DEPLOY.md).
+- **Status:** ✅ Provider integration shipped this session. Deployment infra waiting on Craig's go-ahead (decision criterion: monthly Anthropic+OpenAI+Gemini bill crosses ~$5,000/month, OR a strategic decision to own the compute earlier).
 
 ---
 
