@@ -350,7 +350,24 @@ These are never allowed under any circumstance without Craig explicitly saying "
 ---
 
 # LIVE REPO STATUS — READ THIS FIRST
-## Last updated: 2026-05-13 | Build: PASSING (470+ pages) | Branch: claude/review-readme-docs-Wr1If
+## Last updated: 2026-05-17 | Build: GREEN (Crontech pivot mid-flight) | Branch: claude/review-readme-docs-Wr1If
+
+### CRONTECH PIVOT (RULE 31) — STATUS
+- §1 AUTH — DONE (1fbcb40). auth-guard.ts is a Crontech-SSO shim.
+- §2 PAYMENTS — STRIPE STAYS (5060535 amendment) — direct AI Builder purchase.
+- §3 EMAIL — DONE (7962fee). admin-notify, audit-middleware are stubs.
+- §4 HOSTING + DEPLOY — DONE (fd128db). Cloudflare/Vercel/Supabase/WebContainers libs deleted.
+- §5 CDN/EDGE — DONE with §4.
+- §6 STORAGE — DONE (73eb0aa).
+- §7 SMS/Discord/Slack/Push — DONE (a6d43de).
+- §8 eSIM/VPN provider layer — DONE (73eb0aa). Marketing pages kept.
+- §9 BOOKING — DONE (73eb0aa).
+- §10-12, 14 CRM/Invoicing/Email Marketing/Contracts/Support/Analytics/Audit — DONE (e3988e1).
+- §13 CRON JOBS — DONE (7e71c4e). Vercel crons array removed; HTTP endpoints survive.
+- §15 BACKGROUND AGENTS — DONE (da26551). Infra agents unregistered.
+- §16 PUBLIC API v1 — DONE (1fbcb40). Entire /api/v1/* surface deleted.
+- §17 zoobicon.sh — DONE (7e71c4e). Removed from middleware/brand/robots/sitemap.
+- Pending: UI sweep (dead /hosting links in nav/footer/marketing pages), DB table migration plan, positioning + pricing copy refresh.
 
 ### QUICK FACTS
 - **165 pages** | **576 API routes** | **87 layouts** | **254 lib files** | **77 shared components** | **118 registry components**
@@ -367,20 +384,16 @@ These are never allowed under any circumstance without Craig explicitly saying "
 
 | Feature | Status | Key Files | What Works | What's Missing |
 |---------|--------|-----------|------------|----------------|
-| **AI Website Builder** | WORKING | `src/app/builder/page.tsx`, `src/lib/agents.ts`, `src/app/api/generate/react-stream/route.ts` | React generation via Sandpack, streaming SSE, 100-component registry, **diff editing fully wired** (PromptInput + ChatPanel → /api/generate/edit → merge changed files → Sandpack updates) | Streaming could be smoother, pre-warm Sandpack for faster first preview |
-| **Domain Search** | WORKING | `src/app/domains/page.tsx`, `src/app/api/domains/search/route.ts`, `src/lib/opensrs.ts` | Real OpenSRS registry checks, AI name generator, TLD pages | Checkout needs Stripe products |
-| **Video Creator** | PARTIAL | `src/app/video-creator/page.tsx`, `src/lib/video-pipeline.ts`, `src/lib/video-render.ts` | Chat-based 3-step flow, script generation | Pipeline UNTESTED on Replicate, needs end-to-end test |
-| **Pricing** | WORKING | `src/app/pricing/page.tsx`, `src/lib/stripe.ts` | Page renders with tiers | Needs Craig to create Stripe products + price IDs |
-| **Auth** | WORKING | `src/app/auth/*/page.tsx`, `src/app/api/auth/*/route.ts` | Login, signup, OAuth (Google/GitHub), email verify, password reset | Needs DATABASE_URL for persistence |
-| **12 Free Tools** | WORKING | `src/app/tools/*/page.tsx` | All client-side, no API needed | Fully functional |
-| **10 Product Pages** | WORKING | `src/app/products/*/page.tsx` | eSIM, VPN, dictation, storage, booking, hosting, builder, video, SEO, email | Most are showcase pages |
-| **50 eSIM Country Pages** | WORKING | `src/app/esim/[country]/page.tsx` | SEO pages with structured data | Needs CELITECH_API_KEY for real data |
-| **Admin Dashboard** | WORKING | `src/app/admin/*/page.tsx` | 16+ admin pages, mobile command centre | Uses mock data without DB |
-| **Hosting/Deploy** | PARTIAL | `src/app/api/hosting/deploy/route.ts`, `src/app/api/hosting/serve/[slug]/route.ts` | Deploy to DB, serve at zoobicon.sh | Needs polish |
-| **CRM** | SHELL | `src/app/crm/page.tsx` | Pretty UI | 100% hardcoded mock data |
-| **Email Marketing** | SHELL | `src/app/email-marketing/page.tsx` | Pretty UI | 100% hardcoded mock data |
-| **Invoicing** | SHELL | `src/app/invoicing/page.tsx` | Pretty UI | 100% hardcoded mock data |
-| **Analytics** | SHELL | `src/app/analytics/page.tsx` | Pretty UI | localStorage only |
+| **AI Website Builder** | WORKING | `src/app/builder/page.tsx`, `src/lib/agents.ts`, `src/app/api/generate/react-stream/route.ts` | React generation via Sandpack, streaming SSE, 118-component registry, slot-locked composition, diff editing wired | Crontech wire-up for sandbox + Stripe products for direct purchase |
+| **AI Video Creator** | PARTIAL | `src/app/video-creator/page.tsx`, `src/lib/video-pipeline.ts`, `src/lib/video-render.ts` | Chat-based 3-step flow, script generation, Replicate pipeline | UNTESTED end-to-end — needs one real video produced |
+| **Domain Search** | WORKING | `src/app/domains/page.tsx`, `src/app/api/domains/search/route.ts`, `src/lib/opensrs.ts` | Real OpenSRS registry checks, AI name generator, TLD pages | Revenue stream — stays in Zoobicon |
+| **Pricing** | WORKING | `src/app/pricing/page.tsx`, `src/lib/stripe.ts` | Direct AI Builder purchase via Stripe (Rule 31 amendment — Stripe stays) | Craig: create Stripe products + price IDs |
+| **Auth** | CRONTECH SSO | `src/lib/auth-guard.ts` (shim) | `authenticateRequest()` reads `x-crontech-token` claims, anonymous fallthrough | Crontech SSO endpoint wire-up |
+| **Email** | CRONTECH | `src/lib/admin-notify.ts` (no-op stub) | Stubs return early; Crontech BLK-030 owns delivery | Crontech email ingest wire-up |
+| **Hosting** | CRONTECH | — | Deleted /api/hosting/*, /api/deploy/vercel, /hosting/* | Crontech BLK-040 owns hosting |
+| **Audit Logs** | CRONTECH | `src/lib/audit-middleware.ts` (no-op stub) | Stripe webhook still calls auditLog — no-op until Crontech audit ingest wired |
+| **12 Free Tools** | WORKING | `src/app/tools/*/page.tsx` | All client-side | Fully functional |
+| **Admin Dashboard** | WORKING | `src/app/admin/*/page.tsx` | Mobile command centre, agents view | Uses mock data without DB |
 
 ### BUILD PIPELINE
 ```
