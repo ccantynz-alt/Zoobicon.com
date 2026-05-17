@@ -2,11 +2,11 @@ import { MetadataRoute } from 'next'
 import { headers } from 'next/headers'
 
 // Domain-to-sitemap mapping for multi-domain support
+// Rule 31 — zoobicon.sh retired (hosting delegated to Crontech).
 const DOMAIN_MAP: Record<string, string> = {
   'zoobicon.com': 'https://zoobicon.com',
   'zoobicon.ai': 'https://zoobicon.ai',
   'zoobicon.io': 'https://zoobicon.io',
-  'zoobicon.sh': 'https://zoobicon.sh',
   'dominat8.io': 'https://dominat8.io',
   'dominat8.com': 'https://dominat8.com',
 }
