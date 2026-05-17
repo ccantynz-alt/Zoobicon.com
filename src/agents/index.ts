@@ -70,23 +70,16 @@ export {
 } from "./registry";
 
 // Built-in agents (import triggers registration)
-import "./site-monitor";
-import "./support-responder";
-import "./intel-monitor";
-import "./email-campaign";
-import "./daily-todo-sender";
-import "./abuse-detector";
-import "./revenue-monitor";
-import "./quality-auditor";
-import "./uptime-monitor";
-
-// Wave 2 agents — Green Ecosystem (zero-error autonomous platform)
-import "./error-prevention";
-import "./auto-healer";
-import "./performance-guardian";
-import "./onboarding-watchdog";
-import "./billing-guardian";
-import "./security-sentinel";
-import "./seo-auto-fix";
-import "./deployment-guardian";
-import "./market-crawler";
+// Rule 31 — Infrastructure-monitoring agents (site-monitor, uptime-monitor,
+// performance-guardian, deployment-guardian, auto-healer, security-sentinel,
+// abuse-detector, billing-guardian, revenue-monitor, onboarding-watchdog,
+// error-prevention) are owned by Crontech RUM + AI Gateway. They no longer
+// register here. The agent files remain on disk for the migration window
+// in case Crontech needs the implementation as reference.
+import "./support-responder";          // builder-side support reply
+import "./intel-monitor";              // competitive intelligence
+import "./email-campaign";             // queued via Crontech BLK-030
+import "./daily-todo-sender";          // Craig's todo digest
+import "./quality-auditor";            // builder output quality
+import "./seo-auto-fix";               // generated-site SEO
+import "./market-crawler";             // competitor scanning
