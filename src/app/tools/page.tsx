@@ -35,7 +35,7 @@ export default function ToolsPage() {
             </div>
             <span className="text-sm font-bold">Zoobicon</span>
           </Link>
-          <Link href="/auth/signup" className="text-xs text-brand-400 hover:text-brand-300">Get Started</Link>
+          <Link href="/builder" className="text-xs text-brand-400 hover:text-brand-300">Get Started</Link>
         </div>
       </nav>
 

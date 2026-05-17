@@ -216,7 +216,7 @@ export default function ComparePage() {
           <h2 className="text-3xl font-bold mb-4">Ready to Build Something Amazing?</h2>
           <p className="text-stone-400 mb-8">Start free. No credit card required. Build your first website in 60 seconds.</p>
           <Link
-            href="/auth/signup"
+            href="/builder"
             className="inline-flex items-center gap-2 px-8 py-4 bg-stone-600 hover:bg-stone-500 text-white rounded-xl font-semibold text-lg transition-colors"
           >
             Start Building Free <ArrowRight className="w-5 h-5" />

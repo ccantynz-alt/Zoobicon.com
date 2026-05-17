@@ -447,7 +447,7 @@ export default function SeoAgentPage() {
               </Link>
               <div className="hidden md:flex items-center gap-1">
                 <Link
-                  href="/dashboard"
+                  href="/admin"
                   className="px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
                 >
                   <LayoutDashboard className="w-4 h-4" />

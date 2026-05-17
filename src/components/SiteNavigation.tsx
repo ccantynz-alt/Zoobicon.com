@@ -8,7 +8,6 @@ import {
   Globe,
   Video,
   Layout,
-  Code,
   Bot,
   ChevronDown,
   Menu,
@@ -59,9 +58,8 @@ const PRODUCT_SECTIONS = [
     label: "Scale",
     items: [
       { name: "Agency Platform", href: "/agencies", icon: Shield, desc: "White-label for agencies" },
-      { name: "API & Developers", href: "/developers", icon: Code, desc: "REST API & CLI" },
       { name: "AI Agents", href: "/agents", icon: Bot, desc: "Agent framework" },
-      { name: "Documentation", href: "/documentation", icon: BookOpen, desc: "Guides & reference" },
+      { name: "Changelog", href: "/changelog", icon: BookOpen, desc: "What's new" },
     ],
   },
 ];

@@ -29,17 +29,17 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       {
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/admin', '/api', '/dashboard', '/edit', '/auth/callback', '/auth/reset-password', '/auth/forgot-password', '/auth/settings', '/email-support'],
+        disallow: ['/admin', '/api', '/edit'],
       },
       {
         userAgent: 'Bingbot',
         allow: '/',
-        disallow: ['/admin', '/api', '/dashboard', '/edit', '/auth/callback', '/auth/reset-password', '/auth/forgot-password', '/auth/settings', '/email-support'],
+        disallow: ['/admin', '/api', '/edit'],
       },
       {
         userAgent: 'DuckDuckBot',
         allow: '/',
-        disallow: ['/admin', '/api', '/dashboard', '/edit'],
+        disallow: ['/admin', '/api', '/edit'],
       },
       // Block competitor crawlers and AI scrapers that steal our content
       {
@@ -97,7 +97,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       // Block all other bots by default — only explicitly allowed ones get through
       {
         userAgent: '*',
-        disallow: ['/admin', '/api', '/dashboard', '/edit', '/auth/callback', '/auth/reset-password', '/auth/forgot-password', '/auth/settings', '/email-support', '/builder'],
+        disallow: ['/admin', '/api', '/edit', '/builder'],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

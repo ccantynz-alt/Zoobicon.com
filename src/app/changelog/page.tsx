@@ -184,7 +184,7 @@ export default function ChangelogPage() {
           </div>
           <div className="flex items-center gap-3">
             <Link href="/roadmap" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Roadmap</Link>
-            <Link href="/feature-requests" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Feature Requests</Link>
+            <Link href="/support" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Feature Requests</Link>
           </div>
         </div>
       </header>
@@ -296,7 +296,7 @@ export default function ChangelogPage() {
           <h2 className="text-3xl font-bold mb-4">Building the Future of Web Creation</h2>
           <p className="text-gray-400 mb-6">Want to shape what we build next? Submit a feature request or vote on upcoming features.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/feature-requests" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold hover:opacity-90 transition-opacity">
+            <Link href="/support" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-stone-600 to-stone-600 font-semibold hover:opacity-90 transition-opacity">
               Request a Feature <ArrowRight className="w-4 h-4" />
             </Link>
             <Link href="/roadmap" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/20 font-semibold hover:bg-white/5 transition-colors">

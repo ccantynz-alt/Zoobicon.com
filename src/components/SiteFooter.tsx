@@ -144,9 +144,8 @@ export default function SiteFooter() {
                 <Zap className="h-3 w-3" style={{ color: "var(--gold-deep)" }} /> Stripe Verified
               </span>
             </div>
-            <Link
-              href="/launch-status"
-              className="mt-6 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-medium transition-all"
+            <div
+              className="mt-6 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-medium"
               style={{
                 border: "1px solid rgba(16, 185, 129, 0.3)",
                 background: "rgba(16, 185, 129, 0.06)",
@@ -158,8 +157,7 @@ export default function SiteFooter() {
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-500" />
               </span>
               All systems operational
-              <ArrowRight className="h-3 w-3 opacity-60" />
-            </Link>
+            </div>
           </div>
 
           {/* Link columns */}
@@ -187,9 +185,9 @@ export default function SiteFooter() {
               label="Scale"
               links={[
                 { name: "Agencies", href: "/agencies" },
-                { name: "API & Developers", href: "/developers" },
-                { name: "Documentation", href: "/documentation" },
+                { name: "AI Agents", href: "/agents" },
                 { name: "Changelog", href: "/changelog" },
+                { name: "Status", href: "/" },
               ]}
             />
             <FooterColumn

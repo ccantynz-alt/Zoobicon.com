@@ -347,7 +347,7 @@ export default function GalleryPage() {
             {isLoggedIn ? (
               <>
                 <Link
-                  href="/dashboard"
+                  href="/admin"
                   className="flex items-center gap-1.5 text-sm text-white/50 hover:text-white/80 transition-colors"
                 >
                   <LayoutDashboard className="w-4 h-4" />
@@ -367,7 +367,7 @@ export default function GalleryPage() {
             ) : (
               <>
                 <Link
-                  href="/auth/login"
+                  href="/builder"
                   className="text-sm text-white/50 hover:text-white/80 transition-colors"
                 >
                   Sign in

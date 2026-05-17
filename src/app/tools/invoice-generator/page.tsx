@@ -525,7 +525,7 @@ export default function InvoiceGeneratorPage() {
             Stop creating invoices manually. Our AI booking and payment system handles scheduling, invoicing, and payments automatically.
           </p>
           <Link
-            href="/products/booking"
+            href="/builder"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-stone-600 hover:bg-stone-500 font-semibold transition-colors"
           >
             Try AI Booking System <ArrowRight className="w-4 h-4" />

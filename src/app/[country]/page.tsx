@@ -117,7 +117,7 @@ function PricingCard({
         ))}
       </ul>
       <Link
-        href="/auth/signup"
+        href="/builder"
         className={`block w-full text-center py-3 rounded-xl font-semibold transition-all ${
           featured
             ? 'bg-stone-600 hover:bg-stone-500 text-white'

@@ -54,16 +54,16 @@ const CHECKLIST: ChecklistItem[] = [
   // Infrastructure & DevOps
   { id: "inf-1", label: "Production environment configured on Vercel", description: "Deploy to Vercel with production environment variables. Verify all env vars are set (API keys, DB URL, secrets).", priority: "critical", category: "infrastructure", link: "https://vercel.com" },
   { id: "inf-2", label: "Database (Neon) production instance", description: "Ensure Neon Postgres is on a production-tier plan with connection pooling enabled and backup schedule.", priority: "critical", category: "infrastructure" },
-  { id: "inf-3", label: "Custom domains configured", description: "zoobicon.com, zoobicon.ai, zoobicon.sh all pointing to Vercel. SSL certificates auto-provisioned.", priority: "critical", category: "infrastructure", link: "/admin/health" },
+  { id: "inf-3", label: "Custom domains configured", description: "zoobicon.com, zoobicon.ai, zoobicon.sh all pointing to Vercel. SSL certificates auto-provisioned.", priority: "critical", category: "infrastructure", link: "/admin" },
   { id: "inf-4", label: "CDN & edge caching enabled", description: "Vercel Edge Network active. Static assets cached at edge. Generated sites served via zoobicon.sh with cache headers.", priority: "high", category: "infrastructure" },
   { id: "inf-5", label: "Cloudflare integration live", description: "DNS management, SSL provisioning, and CDN caching via Cloudflare API for hosted sites.", priority: "high", category: "infrastructure", link: "/admin/integrations" },
   { id: "inf-6", label: "CI/CD pipeline running", description: "GitHub Actions: lint, type-check, build on every PR. Auto-deploy main branch to production.", priority: "high", category: "infrastructure" },
-  { id: "inf-7", label: "Database migrations verified", description: "All tables exist: users, sites, deployments, projects, agency_*, collab_*, email_*. Run schema check.", priority: "critical", category: "infrastructure", link: "/admin/health" },
+  { id: "inf-7", label: "Database migrations verified", description: "All tables exist: users, sites, deployments, projects, agency_*, collab_*, email_*. Run schema check.", priority: "critical", category: "infrastructure", link: "/admin" },
   { id: "inf-8", label: "Backup & disaster recovery plan", description: "Neon PITR (point-in-time recovery) enabled. Document recovery procedure. Test restore.", priority: "high", category: "infrastructure" },
 
   // Security & Auth
   { id: "sec-1", label: "All API keys rotated for production", description: "Generate fresh API keys for Anthropic, OpenAI, Google AI, Stripe, Resend, Mailgun. Remove dev keys.", priority: "critical", category: "security" },
-  { id: "sec-2", label: "Admin credentials secured", description: "Change default admin password (Zoobicon2024!Admin). Set strong ADMIN_EMAIL and ADMIN_PASSWORD in env.", priority: "critical", category: "security", link: "/admin/email-settings" },
+  { id: "sec-2", label: "Admin credentials secured", description: "Change default admin password (Zoobicon2024!Admin). Set strong ADMIN_EMAIL and ADMIN_PASSWORD in env.", priority: "critical", category: "security", link: "/admin" },
   { id: "sec-3", label: "OAuth credentials (Google/GitHub) configured", description: "Production OAuth app with correct redirect URIs: /api/auth/callback/google, /api/auth/callback/github.", priority: "critical", category: "security" },
   { id: "sec-4", label: "Rate limiting active on all API routes", description: "Verify rate limits: Free 10/min, Pro 60/min, Enterprise 600/min. Test with rapid requests.", priority: "high", category: "security" },
   { id: "sec-5", label: "CORS headers configured", description: "Only allow requests from zoobicon.com, zoobicon.ai, zoobicon.sh domains. Block other origins.", priority: "high", category: "security" },
@@ -72,8 +72,8 @@ const CHECKLIST: ChecklistItem[] = [
   { id: "sec-8", label: "API key validation (zbk_live_*) tested", description: "Test HMAC-SHA256 stateless key validation. Verify invalid keys are rejected.", priority: "high", category: "security" },
 
   // Email & Notifications
-  { id: "email-1", label: "Admin email address configured", description: "Set ADMIN_EMAIL and ADMIN_NOTIFICATION_EMAIL in production env vars.", priority: "critical", category: "email", link: "/admin/email-settings" },
-  { id: "email-2", label: "Mailgun API key and domain configured", description: "MAILGUN_API_KEY and MAILGUN_DOMAIN set. All emails (notifications, support, password resets) route through Mailgun.", priority: "critical", category: "email", link: "/admin/email-settings" },
+  { id: "email-1", label: "Admin email address configured", description: "Set ADMIN_EMAIL and ADMIN_NOTIFICATION_EMAIL in production env vars.", priority: "critical", category: "email", link: "/admin" },
+  { id: "email-2", label: "Mailgun API key and domain configured", description: "MAILGUN_API_KEY and MAILGUN_DOMAIN set. All emails (notifications, support, password resets) route through Mailgun.", priority: "critical", category: "email", link: "/admin" },
   { id: "email-3", label: "Mailgun inbound webhook registered", description: "Inbound webhook URL registered at Mailgun dashboard for receiving support ticket emails.", priority: "high", category: "email" },
   { id: "email-4", label: "Email templates tested", description: "Send test emails for all notification types: signup, deploy, contact, waitlist. Verify HTML rendering.", priority: "high", category: "email" },
   { id: "email-5", label: "SPF/DKIM/DMARC DNS records", description: "Email authentication records set for zoobicon.com to prevent emails landing in spam.", priority: "high", category: "email" },
@@ -106,7 +106,7 @@ const CHECKLIST: ChecklistItem[] = [
 
   // Quality & Testing
   { id: "qa-1", label: "All 30 page routes verified working", description: "Visit every page route. No 404s, no white screens, no console errors.", priority: "critical", category: "quality" },
-  { id: "qa-2", label: "All 90+ API routes returning valid responses", description: "Hit every API endpoint with valid/invalid data. Verify error handling.", priority: "critical", category: "quality", link: "/admin/health" },
+  { id: "qa-2", label: "All 90+ API routes returning valid responses", description: "Hit every API endpoint with valid/invalid data. Verify error handling.", priority: "critical", category: "quality", link: "/admin" },
   { id: "qa-3", label: "Builder generates valid HTML", description: "Generate 10+ sites with different prompts. Verify valid HTML, no broken CSS, no JS errors.", priority: "critical", category: "quality", link: "/builder" },
   { id: "qa-4", label: "Multi-page generation tested", description: "Generate 3-6 page sites. Verify consistent navigation, shared design, all pages render.", priority: "high", category: "quality" },
   { id: "qa-5", label: "Full-stack generation tested", description: "Generate app with DB schema + API + CRUD UI. Verify schema is valid SQL, endpoints are correct.", priority: "high", category: "quality" },
@@ -153,9 +153,9 @@ const CHECKLIST: ChecklistItem[] = [
   // Monitoring & Analytics
   { id: "mon-1", label: "Error tracking (Sentry) configured", description: "Sentry DSN set. Source maps uploaded. Alert rules for critical errors.", priority: "high", category: "monitoring" },
   { id: "mon-2", label: "Uptime monitoring active", description: "Monitor homepage, /api/v1/status, /api/hosting/serve. Alert on downtime.", priority: "high", category: "monitoring" },
-  { id: "mon-3", label: "API usage tracking", description: "Log generation counts, model usage, response times. Dashboard for trends.", priority: "medium", category: "monitoring", link: "/admin/usage" },
+  { id: "mon-3", label: "API usage tracking", description: "Log generation counts, model usage, response times. Dashboard for trends.", priority: "medium", category: "monitoring", link: "/admin" },
   { id: "mon-4", label: "Cost monitoring for AI APIs", description: "Track spend per provider (Anthropic, OpenAI, Google). Set budget alerts. Monitor Opus token usage.", priority: "high", category: "monitoring" },
-  { id: "mon-5", label: "Health check endpoint verified", description: "/admin/health shows all systems green. DB, API, email services all connected.", priority: "high", category: "monitoring", link: "/admin/health" },
+  { id: "mon-5", label: "Health check endpoint verified", description: "/admin shows all systems green. DB, API, email services all connected.", priority: "high", category: "monitoring", link: "/admin" },
 ];
 
 export default function PreLaunchChecklistPage() {
@@ -438,10 +438,10 @@ export default function PreLaunchChecklistPage() {
           <h3 className="text-sm font-medium text-stone-600 mb-3">Quick Links</h3>
           <div className="flex flex-wrap gap-2">
             <Link href="/admin" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Admin Dashboard</Link>
-            <Link href="/admin/health" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Health Check</Link>
-            <Link href="/admin/email-settings" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Email Settings</Link>
+            <Link href="/admin" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Health Check</Link>
+            <Link href="/admin" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Email Settings</Link>
             <Link href="/admin/integrations" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Integrations</Link>
-            <Link href="/admin/usage" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Usage & Credits</Link>
+            <Link href="/admin" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Usage & Credits</Link>
             <Link href="/builder" className="text-xs bg-stone-50 hover:bg-stone-100 border border-stone-200 px-3 py-1.5 rounded-lg text-stone-600 transition-colors">Builder</Link>
           </div>
         </div>

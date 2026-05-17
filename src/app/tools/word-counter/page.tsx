@@ -332,7 +332,7 @@ export default function WordCounterPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link
-              href="/products/dictation"
+              href="/tools/word-counter"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-stone-600 hover:bg-stone-500 font-semibold text-sm transition-colors"
             >
               <Mic className="w-4 h-4" /> Try AI Dictation

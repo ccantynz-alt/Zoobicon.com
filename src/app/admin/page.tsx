@@ -300,7 +300,7 @@ export default function AdminPage() {
           <Link href="/builder" className="text-xs text-stone-700 hover:text-stone-700 px-3 py-1.5 rounded-xl bg-white border border-stone-200 hover:border-stone-300 hover:bg-white backdrop-blur-sm transition-all shadow-sm">
             Builder
           </Link>
-          <Link href="/dashboard" className="text-xs text-white px-3 py-1.5 rounded-xl bg-gradient-to-r from-stone-500 to-stone-600 hover:from-stone-400 hover:to-stone-500 shadow-md shadow-stone-500/20 transition-all">
+          <Link href="/admin" className="text-xs text-white px-3 py-1.5 rounded-xl bg-gradient-to-r from-stone-500 to-stone-600 hover:from-stone-400 hover:to-stone-500 shadow-md shadow-stone-500/20 transition-all">
             Dashboard
           </Link>
         </div>
@@ -337,10 +337,10 @@ export default function AdminPage() {
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {[
-                  { icon: Mail, label: "Email Inbox", href: "/admin/email", desc: "Read & manage email", gradient: "from-stone-700 to-stone-800" },
-                  { icon: Inbox, label: "Mailboxes", href: "/admin/mailboxes", desc: "Manage mailboxes & routing", gradient: "from-stone-600 to-stone-700" },
-                  { icon: Settings, label: "Email Settings", href: "/admin/email-settings", desc: "Configure admin email", gradient: "from-stone-500 to-stone-600" },
-                  { icon: HeadphonesIcon, label: "Support", href: "/admin/support", desc: "Support tickets & knowledge", gradient: "from-stone-700 to-stone-800" },
+                  { icon: Mail, label: "Email Inbox", href: "/admin", desc: "Read & manage email", gradient: "from-stone-700 to-stone-800" },
+                  { icon: Inbox, label: "Mailboxes", href: "/admin", desc: "Manage mailboxes & routing", gradient: "from-stone-600 to-stone-700" },
+                  { icon: Settings, label: "Email Settings", href: "/admin", desc: "Configure admin email", gradient: "from-stone-500 to-stone-600" },
+                  { icon: HeadphonesIcon, label: "Support", href: "/admin", desc: "Support tickets & knowledge", gradient: "from-stone-700 to-stone-800" },
                   { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness", gradient: "from-stone-600 to-stone-700" },
                   { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder", gradient: "from-stone-800 to-stone-900" },
                   { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", gradient: "from-stone-500 to-stone-600", external: true },

@@ -623,13 +623,13 @@ await monitor.run();`}
           </div>
 
           <nav className="flex flex-wrap justify-center gap-6 text-sm text-stone-400">
-            <Link href="/developers" className="hover:text-white transition-colors">
+            <Link href="/builder" className="hover:text-white transition-colors">
               Developers
             </Link>
             <Link href="/pricing" className="hover:text-white transition-colors">
               Pricing
             </Link>
-            <Link href="/api-docs" className="hover:text-white transition-colors">
+            <Link href="/builder" className="hover:text-white transition-colors">
               API Docs
             </Link>
             <a

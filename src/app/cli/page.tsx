@@ -363,11 +363,11 @@ export default function CLIPage() {
             {copied === "cta" ? <Check className="w-4 h-4 text-accent-stone" /> : <Copy className="w-4 h-4 text-white/50 group-hover:text-white/65" />}
           </button>
           <div className="flex justify-center gap-4">
-            <Link href="/auth/signup" className="btn-gradient px-8 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2">
+            <Link href="/builder" className="btn-gradient px-8 py-3 rounded-xl text-sm font-bold text-white flex items-center gap-2">
               <span>Get API Key</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/developers" className="px-8 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all">
+            <Link href="/builder" className="px-8 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all">
               API Docs
             </Link>
           </div>
@@ -380,7 +380,7 @@ export default function CLIPage() {
           <div className="text-xs text-white/50">&copy; 2026 Zoobicon. All rights reserved.</div>
           <div className="flex gap-4">
             <Link href="/" className="text-xs text-white/50 hover:text-white/60">Home</Link>
-            <Link href="/developers" className="text-xs text-white/50 hover:text-white/60">Developers</Link>
+            <Link href="/builder" className="text-xs text-white/50 hover:text-white/60">Developers</Link>
             <Link href="/agencies" className="text-xs text-white/50 hover:text-white/60">Agencies</Link>
           </div>
         </div>

@@ -9,7 +9,7 @@ import { isReplicatePoisoned } from "@/lib/video-pipeline";
  *
  * Pings EVERY external dependency in parallel with aggressive timeouts,
  * reports circuit-breaker state, surfaces poisoned-token state, and returns
- * a structured JSON response the /admin/health dashboard can render.
+ * a structured JSON response the /admin dashboard can render.
  *
  * Why this exists: prior to today, a single bad SUPABASE_ACCESS_TOKEN would
  * cascade into every builder request and users saw "JWT could not be

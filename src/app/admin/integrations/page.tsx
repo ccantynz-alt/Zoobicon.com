@@ -101,7 +101,7 @@ const INTEGRATIONS: IntegrationDef[] = [
     bgColor: "rgba(99,91,255,0.1)",
     status: "connected",
     method: "oauth",
-    link: "/admin/usage",
+    link: "/admin",
     connectedAccount: "acct_1abc...xyz",
     connectedAt: "2025-11-14",
   },
