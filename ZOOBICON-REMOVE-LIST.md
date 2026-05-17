@@ -114,34 +114,31 @@ Crontech SSO. Zoobicon hits `/auth/sso?to=zoobicon` on Crontech, receives a sign
 
 ---
 
-## 2. PAYMENTS / BILLING — REMOVE EVERYTHING. USE CRONTECH BILLING.
+## 2. PAYMENTS / BILLING — REVERSED 2026-05-17 — STRIPE STAYS.
 
-### API routes to delete
+Craig (May 17): *"Sorry Stripe we need to keep because people still need to purchase the AI builder section from us."*
+
+**This section is reversed.** Stripe stays in Zoobicon for direct AI Builder purchases (subscription tiers + domain checkout + video credit packs). The original "delegate billing to Crontech" plan only makes sense once Crontech billing supports SaaS subscriptions for non-Crontech products — until then, customers pay Zoobicon directly via Stripe.
+
+### KEEP (was previously marked for deletion)
 - `/api/billing/checkout/create`
 - `/api/billing/portal`
 - `/api/billing/upgrade`
 - `/api/stripe/webhook`
 - `/api/stripe/checkout`
+- `src/lib/stripe.ts`
+- `src/lib/billing-plans.ts`
+- `src/lib/user-plan.ts`
+- Env vars: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_*_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`
+
+### Still REMOVE (only Stripe Connect for agency reseller payouts — Crontech handles unified empire billing for agency tiers)
 - `/api/agency/connect/onboard`
 - `/api/agency/connect/payout`
 - `/api/agency/billing`
-
-### Lib modules to delete
-- `src/lib/stripe.ts`
 - `src/lib/stripe-connect.ts`
-- `src/lib/billing-plans.ts`
-- `src/lib/user-plan.ts`
 
-### Env vars to remove
-- `STRIPE_SECRET_KEY`
-- `STRIPE_PUBLISHABLE_KEY`
-- `STRIPE_CREATOR_PRICE_ID`
-- `STRIPE_PRO_PRICE_ID`
-- `STRIPE_AGENCY_PRICE_ID`
-- `STRIPE_WEBHOOK_SECRET`
-
-### Replacement
-Crontech billing. Zoobicon meters usage events to Crontech. Crontech generates one unified invoice covering all empire products. Zoobicon plan tiers (Starter/Pro/Agency/White-label) become Crontech billing line items under the hood.
+### Replacement (partial — agency tier only)
+For agency white-label tier ($499/mo), reseller payouts route through Crontech's unified empire billing. For all other tiers (Starter $49, Pro $129, Agency $299 single-tenant), customers pay Zoobicon directly via Stripe.
 
 ---
 
@@ -537,12 +534,6 @@ REMOVE (no longer needed).
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
 - `ADMIN_NOTIFICATION_EMAIL`
-- `STRIPE_SECRET_KEY`
-- `STRIPE_PUBLISHABLE_KEY`
-- `STRIPE_CREATOR_PRICE_ID`
-- `STRIPE_PRO_PRICE_ID`
-- `STRIPE_AGENCY_PRICE_ID`
-- `STRIPE_WEBHOOK_SECRET`
 - `MAILGUN_API_KEY`
 - `MAILGUN_DOMAIN`
 - `CLOUDFLARE_API_TOKEN`
@@ -572,7 +563,13 @@ REMOVE (no longer needed).
 ### ADD
 - `CRONTECH_API_KEY` — tenant API key for talking to Crontech
 
-### KEEP (Zoobicon-specific)
+### KEEP (Zoobicon-specific) — INCLUDING STRIPE (reversed §2)
+- `STRIPE_SECRET_KEY` — direct AI Builder purchases
+- `STRIPE_PUBLISHABLE_KEY`
+- `STRIPE_CREATOR_PRICE_ID`
+- `STRIPE_PRO_PRICE_ID`
+- `STRIPE_AGENCY_PRICE_ID`
+- `STRIPE_WEBHOOK_SECRET`
 - `ANTHROPIC_API_KEY` (and `_2..20`)
 - `OPENAI_API_KEY` (and `_2..20`)
 - `GOOGLE_AI_API_KEY` (and `_2..20`)
