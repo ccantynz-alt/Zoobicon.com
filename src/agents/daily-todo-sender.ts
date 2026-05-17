@@ -12,12 +12,12 @@ import { formatTodoEmail, getTodoList, CRAIG_EMAIL, SEND_HOUR_UTC } from "@/lib/
 // Rule 31 — email delegated to Crontech BLK-030. Stub sendMail in place
 // of the deleted src/lib/zoobicon-mail.ts. When Crontech BLK-030 is
 // wired, replace this with a fetch to https://api.crontech.ai/api/v1/email.
-async function sendMail(opts: { to: string; subject: string; html: string; text?: string }) {
+async function sendMail(opts: { to: string; from?: string; subject: string; html: string; text?: string }) {
   console.log(
     `[daily-todo-sender:stubbed] to=${opts.to} subject="${opts.subject.slice(0, 80)}" ` +
     `(delegated to Crontech BLK-030 — not wired)`,
   );
-  return { provider: "crontech-stub", messageId: `stub-${Date.now()}` };
+  return { success: false as const, provider: "crontech-stub", messageId: `stub-${Date.now()}` };
 }
 
 // ---------------------------------------------------------------------------

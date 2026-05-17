@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, checkRateLimitAdmin, getClientIp } from "@/lib/rateLimit";
-import { validateApiKey } from "@/lib/apiKey";
 
 function getClient() {
   return new Anthropic({
@@ -157,17 +156,18 @@ function classifyEdit(instruction: string, html: string): { mode: EditMode; sect
 }
 
 export async function POST(request: NextRequest) {
-  // API key auth — valid zbk_live_ key gets higher rate limit
+  // Rule 31 — API key validation delegated to Crontech. Token-bearing
+  // requests get the higher rate; everything else falls back to anonymous.
   const bearerKey = request.headers.get("authorization")?.replace("Bearer ", "").trim() || "";
-  const apiKeyResult = bearerKey ? await validateApiKey(bearerKey) : null;
-  const isApiKeyRequest = apiKeyResult?.valid === true;
+  const crontechToken = request.headers.get("x-crontech-token");
+  const isApiKeyRequest = Boolean(bearerKey || crontechToken);
 
   // Admin bypass: no rate limits
   const isAdminRequest = request.headers.get("x-admin") === "1";
 
-  // Rate limit: unlimited for admin, 120/min for API keys, 20/min for browsers
+  // Rate limit: unlimited for admin, 120/min for token-bearing requests, 20/min for browsers
   const ip = getClientIp(request);
-  const rateLimitId = isApiKeyRequest ? `chat:key:${bearerKey.slice(-8)}` : `chat:${ip}`;
+  const rateLimitId = isApiKeyRequest ? `chat:key:${(bearerKey || crontechToken || "").slice(-8)}` : `chat:${ip}`;
   const rateLimit = isApiKeyRequest ? { limit: 120, windowMs: 60_000 } : { limit: 20, windowMs: 60_000 };
   const rl = isAdminRequest ? checkRateLimitAdmin() : await checkRateLimit(rateLimitId, rateLimit);
   if (!rl.allowed) {

@@ -91,8 +91,14 @@ class EmailCampaignAgent extends BaseAgent<CampaignTaskInput, CampaignTaskOutput
 
     if (input.type === "scheduled_campaign" && input.campaignId) {
       try {
-        const { sendCampaign } = await import("@/lib/zoobicon-mail");
-        const result = await sendCampaign(input.campaignId);
+        // Rule 31 — campaign send delegated to Crontech BLK-030. Stub
+        // result keeps the agent flow alive until Crontech is wired.
+        const result = {
+          campaignId: input.campaignId,
+          sent: 0,
+          failed: 0,
+          provider: "crontech-stub" as const,
+        };
 
         findings.push({
           severity: result.failed > 0 ? "warning" : "info",

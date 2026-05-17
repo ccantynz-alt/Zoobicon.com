@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCommandCenterSnapshot } from "@/lib/command-center";
-import { requireAdmin } from "@/lib/admin-auth";
+import { authenticateRequest } from "@/lib/auth-guard";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  const denied = requireAdmin(req);
-  if (denied) return denied;
+  const { user, error } = await authenticateRequest(req, { requireAuth: true });
+  if (error) return error as NextResponse;
+  if (user.role !== "admin") {
+    return NextResponse.json({ error: "Admin required" }, { status: 403 });
+  }
 
   try {
     const snapshot = await getCommandCenterSnapshot();

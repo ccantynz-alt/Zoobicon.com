@@ -169,13 +169,10 @@ class SupportResponderAgent extends BaseAgent<SupportTicketInput, SupportRespons
       // Auto-send if conditions met
       if (canAutoSend) {
         try {
-          const { sendViaMailgun } = await import("@/lib/mailgun");
-          const result = await sendViaMailgun({
-            from: `Zoobicon Support <support@${process.env.MAILGUN_DOMAIN || "zoobicon.com"}>`,
-            to: input.fromEmail,
-            subject: `Re: ${input.subject}`,
-            text: draft,
-          });
+          // Rule 31 — support reply send delegated to Crontech BLK-030.
+          // Until wired, auto-send is a no-op so the draft just sits on the
+          // ticket for a human to send.
+          const result = { success: false as const, reason: "crontech-stub" };
 
           if (result.success) {
             autoSent = true;
