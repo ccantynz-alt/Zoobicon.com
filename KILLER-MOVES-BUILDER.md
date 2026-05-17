@@ -241,6 +241,53 @@ Craig (May 14): *"self repair once we get enough people using it."* First step d
 
 ---
 
+## Tier 6 — Onboarding Wow (the first 30 seconds is the demo)
+
+Craig (May 15): *"these are good ideas I'm boarding as hugely important
+and we don't have much of that to offer at the moment."*
+
+Adapted from the "first 30 seconds" spec — each one designed to make a
+new user say *"wait, it just did that?"* before they've even reached
+the dashboard. Bolt and Lovable show you a prompt box on signup; we
+show you a live URL with a working site that's already YOURS.
+
+### B30 — Pre-deployed starter site live in 30 seconds (Wave A)
+The moment a user signs up, the onboarding orchestrator fires a slot-stream build with sensible defaults for their declared stack/industry + deploys to `<username>.zoobicon.sh` before they reach the dashboard. First dashboard view shows: "Your site is live at <URL>."
+- **Beats them how:** Every other AI builder asks you to type a prompt. We hand you a working URL on signup. Zero typing.
+- **Deliverable:** `src/lib/onboarding/auto-deploy.ts` + signup hook + `/api/onboarding/auto-deploy` endpoint + dashboard surface.
+
+### B31 — AI-cloned starter from company email domain (Wave A)
+User signs up as `craig@gluecron.com` → background job fetches `gluecron.com` via existing `/api/clone` → slot-stream generates a Zoobicon-flavoured clone → deploys to `<username>.zoobicon.sh`. They see their own logo on their own URL within ~15 seconds of signup.
+- **Beats them how:** No competitor generates a starter from your existing website's REALITY. v0/Bolt/Lovable all generate from prompts. We generate from observation. For B2B/SaaS signups this is the closer — they see "you understand my business" before they've described it.
+- **Deliverable:** `src/lib/onboarding/email-clone.ts` (domain extraction + clone + style-port pipeline) + integration into auto-deploy orchestrator. Leverages existing `/api/clone` endpoint.
+
+### B32 — Engineering transparency page on signup (Wave A)
+Right after signup, an interstitial shows: the actual `users` row that got inserted, the cookie that was set, the audit events that fired, the latency breakdown of every layer the signup request passed through (WAF check, password hash, DB insert, email queue). Real values from THEIR signup.
+- **Beats them how:** Engineers don't trust marketing copy, they trust traces. No competitor shows their internals. We make engineering transparency the headline feature on signup. Converts skeptical senior engineers from "I'll test later" to "I'm migrating my team."
+- **Deliverable:** `src/lib/onboarding/transparency.ts` (collect signup trace data) + `/onboarding/under-the-hood` route + dashboard tab to revisit.
+
+### B33 — Verification IS your first API call (Wave A, bonus)
+Signup sends verification email + SMS via Zoobicon's own Mailgun + (future) SMS pipeline. The dashboard shows: *"That verification email? Here's the curl your API key would send to reproduce it."* Zero-click first API call.
+- **Beats them how:** Most platforms make you read docs then write your first request. We make verification itself the demo. Copy-paste curl, run, send your own email. Done.
+- **Deliverable:** Update verification email send path to expose its own curl-snippet on the dashboard.
+
+### B34 — AI deploy diagnostician for first failure (Wave B)
+First deploy to `*.zoobicon.sh` fails (build error, missing dep, wrong Node version) → AI reads the error, explains in plain English, suggests the exact one-line fix, offers to apply as a PR. Customer's reaction: *"wait, it just fixed it?"*
+- **Beats them how:** Vercel/Render/Netlify show you the log + walk away. We diagnose, explain, and offer to repair. Turns the WORST moment in onboarding into the WOW moment.
+- **Deliverable:** `src/lib/onboarding/deploy-doctor.ts` + integration into deploy webhook + UI for "Apply Fix" button.
+
+### B35 — Live cost estimator from connected GitHub repo (Wave B)
+User signs in with GitHub → scan top 3 most-recently-pushed repos → for each, run `bun build` in a sandboxed runner, measure build time, project monthly hosting cost based on their last 30 days of traffic at their current host. Show: *"Your acme-store repo would deploy on Zoobicon in 18s. Estimated monthly cost: $14 vs your current $47."*
+- **Beats them how:** Vercel pricing needs a calculator. AWS pricing needs a degree. We tell you with YOUR real numbers in the moment you sign up.
+- **Deliverable:** `src/lib/onboarding/cost-estimator.ts` + sandboxed build runner + connected-host detection.
+
+### B36 — Live performance proof on welcome screen (Wave B)
+Welcome screen shows: *"You signed up at 8:32pm UTC. Your signup POST took 47ms end-to-end. That's faster than 92% of signups in the last hour, and 3.4× faster than the same request shape on a typical platform. Breakdown: 12ms edge, 8ms auth, 4ms DB, 23ms queue."*
+- **Beats them how:** Real numbers from the actual request they just made, compared against measured baselines. Not marketing. Not estimates. Their signup IS the benchmark.
+- **Deliverable:** `src/lib/onboarding/perf-proof.ts` + per-request latency capture in signup handler + welcome surface.
+
+---
+
 ## Combined impact at full execution
 
 | Axis | Bolt/Lovable today | Zoobicon after all 20 moves |
