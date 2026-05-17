@@ -367,10 +367,13 @@ These are never allowed under any circumstance without Craig explicitly saying "
 - §15 BACKGROUND AGENTS — DONE (da26551). Infra agents unregistered.
 - §16 PUBLIC API v1 — DONE (1fbcb40). Entire /api/v1/* surface deleted.
 - §17 zoobicon.sh — DONE (7e71c4e). Removed from middleware/brand/robots/sitemap.
-- Pending: UI sweep (dead /hosting links in nav/footer/marketing pages), DB table migration plan, positioning + pricing copy refresh.
+- UI SWEEP — DONE (6342760 + 1cff11c). Deleted ~340 files: 50 orphan top-level pages, 13 sunset product/admin pages, ~100 orphan API routes, /developers, /api-docs, /documentation, /.well-known/ai-plugin.json. Mass sed swept all dead hrefs (/auth/*, /dashboard, /hosting, /products/{esim,vpn,hosting,cloud-storage,dictation,dubbing,email-support,booking}, /email-marketing, /crm, /analytics, /booking, /invoicing, /admin/{health,email,usage,support,operations,etc.}). SiteNavigation now 4 columns (Build/Domains/Free Tools/Scale). SiteFooter Scale column rebuilt. AdminShell sidebar simplified to 5 sections. Sitemap rewritten 78 → 47 URLs. Robots disallow list simplified to /admin /api /edit.
+- Pending: DB table migration plan, positioning + pricing copy refresh in ZOOBICON-SPEC.md.
 
-### QUICK FACTS
-- **165 pages** | **576 API routes** | **87 layouts** | **254 lib files** | **77 shared components** | **118 registry components**
+### QUICK FACTS (post-Crontech sweep 2026-05-17)
+- **67 pages** (was 165) | **178 API routes** (was 576) | **43 layouts** | **237 lib files** | **79 shared components** | **118 registry components**
+- **45 API top-level dirs** (was 146) — only AI Builder + Video + Domains + Free Tools + admin + cron + intel + stripe + support survive
+- **Pure scope:** AI Builder + AI Video Creator + Domain Search + 12 Free Tools. Everything else delegated to Crontech or deleted entirely.
 - **Framework:** Next.js 14.2 + React 18.3 + TypeScript + Tailwind CSS 3.4
 - **AI:** Anthropic SDK 0.80, multi-LLM (Claude/GPT/Gemini) via `src/lib/llm-provider.ts`
 - **DB:** Neon serverless Postgres via `@neondatabase/serverless`
