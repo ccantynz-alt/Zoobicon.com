@@ -398,7 +398,7 @@ export default function PricingPage() {
                         </a>
                       ) : (
                         <Link
-                          href="/auth/signup"
+                          href="/builder"
                           className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
                           style={plan.featured ? {
                             background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
@@ -591,7 +591,7 @@ export default function PricingPage() {
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                   <Link
-                    href="/auth/signup"
+                    href="/builder"
                     className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-4 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
                   >
                     Create free account

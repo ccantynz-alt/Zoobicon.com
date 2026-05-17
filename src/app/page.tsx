@@ -81,9 +81,9 @@ const AI_FEATURES = [
   {
     icon: Zap,
     title: "One-click deploy.",
-    desc: "Ship to zoobicon.sh in five seconds. Free SSL, global CDN, custom domain. No config.",
-    tag: "Hosting",
-    href: "/hosting",
+    desc: "Ship your generated site to the cloud in seconds. Free SSL, global CDN, custom domain. No config.",
+    tag: "Deploy",
+    href: "/builder",
   },
 ];
 
