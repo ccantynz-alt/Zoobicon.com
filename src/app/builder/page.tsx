@@ -1956,28 +1956,28 @@ root.render(React.createElement(App));
     return generatedCode;
   }, [generatedCode, reactFiles]);
 
-  /** Called by DeployModal when user confirms deploy */
-  const handleDeployWithName = useCallback(async (siteName: string, provider: "zoobicon" | "crontech" = "zoobicon"): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
-    const deployCode = buildDeployCode(siteName);
-    if (!deployCode) throw new Error("No code to deploy");
+  /** Called by DeployModal when user confirms deploy.
+   *  Rule 31 — all deploy paths go through Crontech now. The provider
+   *  arg is retained for DeployModal compatibility but both options
+   *  resolve to /api/crontech/deploy. */
+  const handleDeployWithName = useCallback(async (siteName: string, _provider: "zoobicon" | "crontech" = "crontech"): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
+    if (!reactFiles || Object.keys(reactFiles).length === 0) {
+      throw new Error("No files to deploy");
+    }
 
     setIsDeploying(true);
     setDeployStatus("deploying");
+    const t0 = Date.now();
 
     try {
-      const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
-      const user = userStr ? JSON.parse(userStr) : null;
-      const email = user?.email || "anonymous@zoobicon.com";
+      // Prefer the saved projectId — Crontech then has authoritative
+      // metadata (creator, visibility, prompt). Fall back to inline
+      // files for anonymous builds that haven't saved yet.
+      const body = projectId
+        ? { projectId }
+        : { name: siteName, files: reactFiles, deps: reactDeps, prompt };
 
-      const endpoint = provider === "crontech"
-        ? "/api/hosting/deploy-crontech"
-        : "/api/hosting/deploy";
-
-      const body = provider === "crontech"
-        ? { name: siteName, code: deployCode, files: reactFiles ?? undefined, dependencies: reactDeps }
-        : { name: siteName, email, code: deployCode };
-
-      const res = await fetch(endpoint, {
+      const res = await fetch("/api/crontech/deploy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -1995,7 +1995,9 @@ root.render(React.createElement(App));
       trackEvent("deploy");
       notifyDeploy(siteName, data.url);
 
-      return { url: data.url, slug: data.slug ?? data.siteSlug, deployTimeMs: data.deployTimeMs };
+      // Derive slug from url for downstream consumers that still expect it.
+      const slug = (data.url || "").replace(/^https?:\/\//, "").split(".")[0] || siteName;
+      return { url: data.url, slug, deployTimeMs: Date.now() - t0 };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deploy failed");
       setDeployStatus("error");
@@ -2003,7 +2005,7 @@ root.render(React.createElement(App));
     } finally {
       setIsDeploying(false);
     }
-  }, [buildDeployCode, reactFiles, reactDeps]);
+  }, [reactFiles, reactDeps, projectId, prompt]);
 
   /** Quick deploy handler for inline button and BuildSuccessModal */
   const handleDeploy = useCallback(() => {

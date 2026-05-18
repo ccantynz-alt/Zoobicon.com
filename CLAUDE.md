@@ -417,14 +417,14 @@ User Prompt → Haiku classifies intent (<1s) → Select from 100-component regi
 |----------|-----|--------|
 | ANTHROPIC_API_KEY | AI generation | SET |
 | DATABASE_URL | Neon Postgres | CHECK |
-| STRIPE_SECRET_KEY | Payments | CHECK |
+| STRIPE_SECRET_KEY | Payments (kept per Rule 31 amendment) | CHECK |
 | STRIPE_WEBHOOK_SECRET | Stripe webhooks | NOT SET |
-| OPENSRS_API_KEY | Domain registration | CHECK |
+| OPENSRS_API_KEY | Domain registration (revenue stream) | CHECK |
 | REPLICATE_API_TOKEN | Video pipeline | ✅ SET |
-| SUPABASE_ACCESS_TOKEN | Auto-provisioning | NOT SET |
-| CELITECH_API_KEY | eSIM product | NOT SET |
-| DEEPGRAM_API_KEY | AI Dictation | NOT SET |
-| MAILGUN_API_KEY | Transactional email | CHECK |
+| **CRONTECH_PAT** | **Project hand-off to Crontech for hosting** | **NOT SET (mocked)** |
+| CRONTECH_API_BASE | Crontech API base URL (default https://api.crontech.ai) | OPTIONAL |
+| FAL_KEY | Video fallback chain | NOT SET |
+| ELEVENLABS_API_KEY | Voice fallback chain | NOT SET |
 
 ### WHAT TO BUILD NEXT (priority order)
 1. ~~**Wire diff editing into builder UI**~~ ✅ DONE — PromptInput + ChatPanel both call `/api/generate/edit`, merge changed files, Sandpack auto-updates. Improved: smart context truncation, 16K tokens, admin auth headers.
