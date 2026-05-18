@@ -180,14 +180,14 @@ Cron job runs at off-peak hours generating slot-fills for the most common (indus
 ### B24 — Open-source model fallback (Groq Llama 3.3 70B)
 When Anthropic + OpenAI + Gemini all sideline, fall back to Llama 3.3 70B on Groq. ~$0.20/M tokens (cheaper than Haiku), ~750 tokens/second (faster than Anthropic). For the slot-fill job (structured JSON output from a schema), Llama is "good enough."
 - **Beats them how:** Bolt and Lovable have no public-cloud fallback. We have a 4th-line provider that doesn't share rate-limits with the big-three.
-- **Deliverable:** Groq provider in `llm-provider.ts` + budget config in `api-bank.ts`.
-- **Status:** Queued.
+- **Deliverable:** Groq provider in `llm-provider.ts` + budget config in `api-bank-pool.ts` + numbered `GROQ_API_KEY_2..20` slots.
+- **Status:** ✅ Shipped this session. Set `GROQ_API_KEY` in Vercel and the picker starts using it as a 4th-line provider for mechanical-class slots.
 
 ### B25 — Self-hosted Llama on Hetzner GPU bank
-Final tier. Own the compute. 2 × Hetzner H100 nodes = ~$3000/month for ~80 RPS sustained Llama 3.3 70B inference. At 1M builds/day average, that's $0 marginal API cost — only fixed infrastructure cost.
-- **Beats them how:** Per-build cost trends to $0 as volume grows. They pay per token forever; we pay per server. Eventually we cross over and our unit economics dominate.
-- **Deliverable:** Terraform for Hetzner H100s + vLLM serving Llama 3.3 + provider integration in `llm-provider.ts`.
-- **Status:** Queued. Decision point: when monthly Anthropic+OpenAI+Gemini bill crosses ~$5000.
+Final tier. Own the compute. 2 × Hetzner GEX44 nodes (H100 80GB each) = ~$3,100/month for ~80 RPS sustained Llama 3.3 70B inference. At 100k+ builds/day average, that's structurally cheaper than any public-cloud API.
+- **Beats them how:** Per-build cost trends to $0 as volume grows. They pay per token forever; we pay per server. Crossover happens at ~100k builds/day; beyond that our unit economics dominate by 10-25×.
+- **Deliverable:** `src/lib/llm-provider.ts` `callSelfhosted()` path (uses `SELFHOSTED_LLM_URL` + `SELFHOSTED_LLM_KEY` env vars, model name prefix `zoo-`) + pool entry in `api-bank-pool.ts` + full deployment recipe in [`HETZNER-DEPLOY.md`](./HETZNER-DEPLOY.md).
+- **Status:** ✅ Provider integration shipped this session. Deployment infra waiting on Craig's go-ahead (decision criterion: monthly Anthropic+OpenAI+Gemini bill crosses ~$5,000/month, OR a strategic decision to own the compute earlier).
 
 ---
 
@@ -229,6 +229,62 @@ Cron job processes raw events into higher-level memories:
 Top-quality slot fills (≥90 score) from customers who opted into the shareable-anonymous TOS (default: yes for free/creator tiers) are aggregated into industry × theme × component pattern buckets. New customers in the same industry get those patterns as priors even on their first build.
 - **Beats them how:** Bolt + Lovable's "AI gets smarter over time" is just bigger models. Ours is: every customer benefits from every other customer's wins without any single customer's brand leaking. After 10k builds in a single industry, the patterns are essentially industry-tuned defaults.
 - **Status:** Queued. Anonymisation is already implemented in B26 record path; aggregation script outstanding.
+
+### B29 — Self-healing pipeline
+Craig (May 14): *"self repair once we get enough people using it."* First step done. Hourly cron detects failure patterns and writes corrective actions to `self_healing_actions`:
+- Component fails validation > 15% in 24h with ≥20 observations → quarantined for 12h (planner skips it)
+- Provider fails > 25% in last hour with ≥30 observations → deprioritised in API bank picker for 1h
+- Industry sessions average > 4 regenerations over 7 days with ≥10 sessions → "needs improvement" alert
+- **Beats them how:** Lovable + Bolt rely on engineers to notice + manually patch. Ours acts within an hour. The longer the platform runs, the more failure modes it has auto-quarantined.
+- **Deliverable:** `src/lib/flywheel/self-healing.ts` + `/api/cron/self-heal` (hourly) + `self_healing_actions` table. Shipped this session.
+- **Status:** ✅ Library + cron + DB schema shipped. Planner + api-bank reads queued (next commit wires them up to actually consume the actions).
+
+---
+
+## Tier 6 — Onboarding Wow (the first 30 seconds is the demo)
+
+Craig (May 15): *"these are good ideas I'm boarding as hugely important
+and we don't have much of that to offer at the moment."*
+
+Adapted from the "first 30 seconds" spec — each one designed to make a
+new user say *"wait, it just did that?"* before they've even reached
+the dashboard. Bolt and Lovable show you a prompt box on signup; we
+show you a live URL with a working site that's already YOURS.
+
+### B30 — Pre-deployed starter site live in 30 seconds (Wave A)
+The moment a user signs up, the onboarding orchestrator fires a slot-stream build with sensible defaults for their declared stack/industry + deploys to `<username>.zoobicon.sh` before they reach the dashboard. First dashboard view shows: "Your site is live at <URL>."
+- **Beats them how:** Every other AI builder asks you to type a prompt. We hand you a working URL on signup. Zero typing.
+- **Deliverable:** `src/lib/onboarding/auto-deploy.ts` + signup hook + `/api/onboarding/auto-deploy` endpoint + dashboard surface.
+
+### B31 — AI-cloned starter from company email domain (Wave A)
+User signs up as `craig@gluecron.com` → background job fetches `gluecron.com` via existing `/api/clone` → slot-stream generates a Zoobicon-flavoured clone → deploys to `<username>.zoobicon.sh`. They see their own logo on their own URL within ~15 seconds of signup.
+- **Beats them how:** No competitor generates a starter from your existing website's REALITY. v0/Bolt/Lovable all generate from prompts. We generate from observation. For B2B/SaaS signups this is the closer — they see "you understand my business" before they've described it.
+- **Deliverable:** `src/lib/onboarding/email-clone.ts` (domain extraction + clone + style-port pipeline) + integration into auto-deploy orchestrator. Leverages existing `/api/clone` endpoint.
+
+### B32 — Engineering transparency page on signup (Wave A)
+Right after signup, an interstitial shows: the actual `users` row that got inserted, the cookie that was set, the audit events that fired, the latency breakdown of every layer the signup request passed through (WAF check, password hash, DB insert, email queue). Real values from THEIR signup.
+- **Beats them how:** Engineers don't trust marketing copy, they trust traces. No competitor shows their internals. We make engineering transparency the headline feature on signup. Converts skeptical senior engineers from "I'll test later" to "I'm migrating my team."
+- **Deliverable:** `src/lib/onboarding/transparency.ts` (collect signup trace data) + `/onboarding/under-the-hood` route + dashboard tab to revisit.
+
+### B33 — Verification IS your first API call (Wave A, bonus)
+Signup sends verification email + SMS via Zoobicon's own Mailgun + (future) SMS pipeline. The dashboard shows: *"That verification email? Here's the curl your API key would send to reproduce it."* Zero-click first API call.
+- **Beats them how:** Most platforms make you read docs then write your first request. We make verification itself the demo. Copy-paste curl, run, send your own email. Done.
+- **Deliverable:** Update verification email send path to expose its own curl-snippet on the dashboard.
+
+### B34 — AI deploy diagnostician for first failure (Wave B)
+First deploy to `*.zoobicon.sh` fails (build error, missing dep, wrong Node version) → AI reads the error, explains in plain English, suggests the exact one-line fix, offers to apply as a PR. Customer's reaction: *"wait, it just fixed it?"*
+- **Beats them how:** Vercel/Render/Netlify show you the log + walk away. We diagnose, explain, and offer to repair. Turns the WORST moment in onboarding into the WOW moment.
+- **Deliverable:** `src/lib/onboarding/deploy-doctor.ts` + integration into deploy webhook + UI for "Apply Fix" button.
+
+### B35 — Live cost estimator from connected GitHub repo (Wave B)
+User signs in with GitHub → scan top 3 most-recently-pushed repos → for each, run `bun build` in a sandboxed runner, measure build time, project monthly hosting cost based on their last 30 days of traffic at their current host. Show: *"Your acme-store repo would deploy on Zoobicon in 18s. Estimated monthly cost: $14 vs your current $47."*
+- **Beats them how:** Vercel pricing needs a calculator. AWS pricing needs a degree. We tell you with YOUR real numbers in the moment you sign up.
+- **Deliverable:** `src/lib/onboarding/cost-estimator.ts` + sandboxed build runner + connected-host detection.
+
+### B36 — Live performance proof on welcome screen (Wave B)
+Welcome screen shows: *"You signed up at 8:32pm UTC. Your signup POST took 47ms end-to-end. That's faster than 92% of signups in the last hour, and 3.4× faster than the same request shape on a typical platform. Breakdown: 12ms edge, 8ms auth, 4ms DB, 23ms queue."*
+- **Beats them how:** Real numbers from the actual request they just made, compared against measured baselines. Not marketing. Not estimates. Their signup IS the benchmark.
+- **Deliverable:** `src/lib/onboarding/perf-proof.ts` + per-request latency capture in signup handler + welcome surface.
 
 ---
 

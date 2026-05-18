@@ -539,7 +539,7 @@ SCRIPT_2:
           </div>
 
           <div className="flex items-center gap-1">
-            <Link href="/dashboard" className="text-[12px] text-white/50 hover:text-white/90 px-3 py-1.5 rounded-full hover:bg-white/[0.04] flex items-center gap-1.5 transition-all">
+            <Link href="/admin" className="text-[12px] text-white/50 hover:text-white/90 px-3 py-1.5 rounded-full hover:bg-white/[0.04] flex items-center gap-1.5 transition-all">
               <LayoutDashboard className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Dashboard</span>
             </Link>
             <button onClick={handleLogout} className="text-[12px] text-white/50 hover:text-white/90 px-2 py-1.5 rounded-full hover:bg-white/[0.04] transition-all">

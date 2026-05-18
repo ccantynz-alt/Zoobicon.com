@@ -185,9 +185,13 @@ class IntelMonitorAgent extends BaseAgent<IntelTarget, IntelOutput> {
     // Push alerts to notification system
     if (alerts.length > 0) {
       try {
-        const { notifyCompetitorAlert } = await import("@/lib/notifications");
+        // Rule 31 — competitor alerts will route through Crontech once
+        // its notification ingest is wired. For now we log them so they
+        // surface in the agent run history.
         for (const alert of alerts) {
-          notifyCompetitorAlert(alert.competitor, alert.type, alert.summary);
+          console.log(
+            `[intel-monitor] competitor alert: ${alert.competitor} / ${alert.type} — ${alert.summary}`,
+          );
         }
       } catch {
         // Notification system not available

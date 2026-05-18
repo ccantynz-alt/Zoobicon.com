@@ -9,7 +9,7 @@
  * - Framework deprecations
  * - New technology opportunities (from ADOPT/EVALUATE lists)
  *
- * Reports findings to /admin/health and optionally sends alerts.
+ * Reports findings to /admin and optionally sends alerts.
  *
  * Schedule: runs every 24 hours via cron
  *
@@ -306,7 +306,7 @@ function getLatestModel(oldModel: string): string {
 
 /**
  * Run a quick tech currency check without the full agent framework.
- * Used by /api/admin/tech-check and /admin/health
+ * Used by /api/admin/tech-check and /admin
  */
 export async function quickTechCheck(): Promise<{
   score: number;
@@ -339,7 +339,7 @@ export async function quickTechCheck(): Promise<{
     models: [],
     recommendations: [
       "Run full tech currency agent for detailed analysis",
-      "Check /admin/health for real-time stack status",
+      "Check /admin for real-time stack status",
     ],
   };
 }

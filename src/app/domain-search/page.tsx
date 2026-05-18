@@ -476,7 +476,7 @@ export default function DomainSearchPage() {
               Domain Search Tool
             </Link>
             <span className="text-white/10">|</span>
-            <Link href="/hosting" className="hover:text-stone-300 transition-colors">
+            <Link href="/builder" className="hover:text-stone-300 transition-colors">
               Hosting
             </Link>
             <span className="text-white/10">|</span>

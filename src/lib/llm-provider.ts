@@ -6,7 +6,7 @@
  * in the pipeline for maximum flexibility.
  */
 
-export type LLMProvider = "claude" | "openai" | "gemini";
+export type LLMProvider = "claude" | "openai" | "gemini" | "groq" | "selfhosted";
 
 export interface LLMModel {
   provider: LLMProvider;
@@ -51,6 +51,11 @@ function getProviderForModel(modelId: string): LLMProvider {
   if (modelId.startsWith("claude")) return "claude";
   if (modelId.startsWith("gpt") || modelId.startsWith("o3") || modelId.startsWith("o1")) return "openai";
   if (modelId.startsWith("gemini")) return "gemini";
+  // Groq hosts Llama 3.3 + others under their public model names.
+  if (modelId.startsWith("llama") || modelId.includes("groq")) return "groq";
+  // Self-hosted convention: model names start with "zoo-" so we route
+  // them to our own inference cluster (B25).
+  if (modelId.startsWith("zoo-")) return "selfhosted";
   return "claude"; // default
 }
 
@@ -239,6 +244,143 @@ async function callGemini(req: LLMRequest): Promise<LLMResponse> {
   };
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Groq — KILLER-MOVES-BUILDER.md #B24
+//
+// Hosts Llama 3.3 70B + other open-source models. ~$0.20/M input tokens,
+// $0.40/M output (cheaper than Anthropic Haiku) and serves 750+ tokens/sec
+// (faster than any Anthropic tier). Compatible with the OpenAI Chat
+// Completions API shape.
+//
+// For slot-fills the structured-JSON job is well within Llama 3.3 70B's
+// capability. We use Groq as a 4th-line fallback when Anthropic +
+// OpenAI + Gemini all sideline — capacity that doesn't share rate
+// limits with the big three.
+// ─────────────────────────────────────────────────────────────────────────────
+async function callGroq(req: LLMRequest): Promise<LLMResponse> {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) throw new Error("Groq is not configured (set GROQ_API_KEY).");
+
+  // Map our friendly model names to Groq's actual ids.
+  const groqModelMap: Record<string, string> = {
+    "llama-3.3-70b": "llama-3.3-70b-versatile",
+    "llama-3.1-70b": "llama-3.1-70b-versatile",
+    "llama-3.1-8b": "llama-3.1-8b-instant",
+    "mixtral-8x7b": "mixtral-8x7b-32768",
+  };
+  const groqModel = groqModelMap[req.model] || "llama-3.3-70b-versatile";
+
+  const data = await retryTransient(
+    async () => {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: groqModel,
+          max_tokens: req.maxTokens || 4000,
+          messages: [
+            { role: "system", content: req.system },
+            { role: "user", content: req.userMessage },
+          ],
+          // Groq Llama tends to hallucinate JSON unless we explicitly
+          // request strict mode. Best-effort — Groq's strict-mode
+          // implementation varies by model.
+          response_format: req.maxTokens && req.userMessage.includes("JSON") ? { type: "json_object" } : undefined,
+        }),
+        signal: AbortSignal.timeout(60000),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`Groq ${res.status}: ${err?.error?.message || res.statusText}`);
+      }
+      return (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+        usage?: { prompt_tokens?: number; completion_tokens?: number };
+      };
+    },
+    { label: `groq:${groqModel}` },
+  );
+
+  const text = data.choices?.[0]?.message?.content || "";
+  return {
+    text,
+    model: req.model,
+    provider: "groq",
+    inputTokens: data.usage?.prompt_tokens,
+    outputTokens: data.usage?.completion_tokens,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Self-hosted — KILLER-MOVES-BUILDER.md #B25
+//
+// Our own Hetzner GPU bank running vLLM-served Llama 3.3 70B (or
+// equivalent open-source model). Same OpenAI-compatible API shape.
+// Endpoint configured via SELFHOSTED_LLM_URL env var.
+//
+// When deployed, this gives us $0 marginal API cost beyond the fixed
+// monthly infrastructure spend (~$3k/mo for 2× H100 nodes capable of
+// ~80 RPS sustained). The decision-point criterion: switch this on
+// when monthly Anthropic + OpenAI + Gemini bill crosses ~$5k/mo.
+//
+// Model names use the `zoo-` prefix convention (zoo-llama-70b,
+// zoo-llama-8b, etc) so router knows to send them here.
+// ─────────────────────────────────────────────────────────────────────────────
+async function callSelfhosted(req: LLMRequest): Promise<LLMResponse> {
+  const baseUrl = process.env.SELFHOSTED_LLM_URL;
+  if (!baseUrl) {
+    throw new Error("Self-hosted LLM not configured (set SELFHOSTED_LLM_URL).");
+  }
+  const apiKey = process.env.SELFHOSTED_LLM_KEY || "";
+
+  // Strip the "zoo-" prefix to get the actual vLLM model name.
+  const modelName = req.model.startsWith("zoo-") ? req.model.slice(4) : req.model;
+
+  const data = await retryTransient(
+    async () => {
+      const res = await fetch(`${baseUrl.replace(/\/$/, "")}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+        },
+        body: JSON.stringify({
+          model: modelName,
+          max_tokens: req.maxTokens || 4000,
+          messages: [
+            { role: "system", content: req.system },
+            { role: "user", content: req.userMessage },
+          ],
+        }),
+        signal: AbortSignal.timeout(90000),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`Self-hosted ${res.status}: ${err?.error?.message || res.statusText}`);
+      }
+      return (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+        usage?: { prompt_tokens?: number; completion_tokens?: number };
+      };
+    },
+    { label: `selfhosted:${modelName}` },
+  );
+
+  const text = data.choices?.[0]?.message?.content || "";
+  return {
+    text,
+    model: req.model,
+    provider: "selfhosted",
+    inputTokens: data.usage?.prompt_tokens,
+    outputTokens: data.usage?.completion_tokens,
+  };
+}
+
 /**
  * Unified LLM call — automatically routes to the right provider
  */
@@ -252,6 +394,10 @@ export async function callLLM(req: LLMRequest): Promise<LLMResponse> {
       return callOpenAI(req);
     case "gemini":
       return callGemini(req);
+    case "groq":
+      return callGroq(req);
+    case "selfhosted":
+      return callSelfhosted(req);
     default:
       return callClaude(req);
   }
@@ -332,6 +478,8 @@ export function getAvailableProviders(): LLMProvider[] {
   if (process.env.ANTHROPIC_API_KEY) providers.push("claude");
   if (process.env.OPENAI_API_KEY) providers.push("openai");
   if (process.env.GOOGLE_AI_API_KEY) providers.push("gemini");
+  if (process.env.GROQ_API_KEY) providers.push("groq");
+  if (process.env.SELFHOSTED_LLM_URL) providers.push("selfhosted");
   return providers;
 }
 

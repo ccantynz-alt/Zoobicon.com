@@ -231,6 +231,8 @@ import PipelinePanel from "@/components/PipelinePanel";
 import DiffPanel from "@/components/DiffPanel";
 import ProjectTree from "@/components/ProjectTree";
 import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
+import { PlanReviewPanel } from "@/components/PlanReviewPanel";
+import { captureFlywheelEvent } from "@/lib/flywheel-client";
 import { downloadZip } from "@/lib/zip-export";
 import CollaborationBar from "@/components/CollaborationBar";
 import CursorOverlay from "@/components/CursorOverlay";
@@ -700,6 +702,11 @@ function BuilderPage() {
   const [buildProgress, setBuildProgress] = useState<{ current: number; total: number; section: string } | null>(null);
   const [sectionTimeline, setSectionTimeline] = useState<Array<{ section: string; label: string; status: "pending" | "scaffolding" | "customizing" | "done"; startedAt: number; finishedAt?: number }>>([]);
   const [buildError, setBuildError] = useState<{ message: string; suggestion: string } | null>(null);
+  // Plan Mode (B12) — mistake-protection layer. When slotLocked is
+  // enabled, the build click first fetches a structured plan; the
+  // user reviews + confirms before the expensive build fires.
+  const [planReview, setPlanReview] = useState<import("@/components/PlanReviewPanel").PlanReviewPlan | null>(null);
+  const [planLoading, setPlanLoading] = useState(false);
   const [streamWarning, setStreamWarning] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
   const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Opus, pipeline=7-agent
@@ -1371,6 +1378,18 @@ function BuilderPage() {
     }
 
     const currentGenId = ++generationIdRef.current;
+    const buildId = `build-${Date.now()}-${currentGenId}`;
+    // Flywheel: log the submit event the moment the user kicked the
+    // build off (before plan-mode or any network spend). If this is a
+    // re-roll within the same session, the type changes to regenerate.
+    const isRegenerate = currentGenId > 1;
+    captureFlywheelEvent(buildId, isRegenerate ? "regenerate" : "prompt_submit", {
+      promptHead: prompt.trim().slice(0, 200),
+      tier,
+      buildMode,
+      instantMode,
+      fullStack,
+    });
     setStatus("generating");
     setError("");
     setGeneratedCode("");
@@ -1405,6 +1424,36 @@ function BuilderPage() {
         (new URLSearchParams(window.location.search).get("slotLocked") === "1" ||
           (window as { __slotLocked?: boolean }).__slotLocked === true);
 
+      // Plan Mode (B12) — when slot-locked is enabled AND the user hasn't
+      // already confirmed a plan, fetch a structured plan first so they
+      // can audit before the expensive build fires. Cost: ~$0.0008. Saves
+      // ~$0.04 every time a misclick gets caught.
+      const skipPlanReview =
+        typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("skipPlan") === "1";
+      if (slotLockedEnabled && !planReview && !skipPlanReview) {
+        try {
+          setPlanLoading(true);
+          const planRes = await fetch("/api/generate/plan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", ...authHeaders() },
+            body: JSON.stringify({ prompt: prompt.trim() }),
+          });
+          if (planRes.ok) {
+            const planData = await planRes.json();
+            setPlanReview(planData);
+            setPlanLoading(false);
+            return; // Halt here — wait for user to confirm via PlanReviewPanel
+          }
+          // Plan endpoint failed — degrade silently to direct build
+          console.warn("[builder] plan endpoint failed; proceeding to direct build");
+        } catch (err) {
+          console.warn("[builder] plan fetch threw; proceeding to direct build:", err);
+        } finally {
+          setPlanLoading(false);
+        }
+      }
+
       const useFastPath = instantMode;
       const endpoint = slotLockedEnabled
         ? "/api/generate/slot-stream"
@@ -1428,6 +1477,18 @@ function BuilderPage() {
             prompt: prompt.trim(),
             tier: useFastPath ? "standard" : "premium",
             fullStack,
+            // Plan Mode payoff: pass the confirmed plan to slot-stream
+            // so it doesn't re-classify. Saves a Haiku round trip and
+            // guarantees the build matches what the user just approved.
+            ...(planReview
+              ? {
+                  industry: planReview.plan.industry,
+                  theme: planReview.plan.theme,
+                  brandName: planReview.plan.brandName,
+                  componentIds: planReview.plan.componentIds,
+                  includePricing: planReview.plan.includePricing,
+                }
+              : {}),
           }),
           signal: controller.signal,
         });
@@ -1532,6 +1593,14 @@ function BuilderPage() {
                   setBuildProgress(null);
                   receivedDone = true;
                   clearWatchdog();
+                  // Flywheel: build completed successfully — record metrics
+                  // for the consolidation cron to mine.
+                  captureFlywheelEvent(buildId, "build_complete", {
+                    componentsOk: typeof event.componentsOk === "number" ? event.componentsOk : undefined,
+                    qualityScore: typeof event.qualityScore === "number" ? event.qualityScore : undefined,
+                    cacheHitRate: typeof event.cacheHitRate === "number" ? event.cacheHitRate : undefined,
+                    durationMs: typeof event.durationMs === "number" ? event.durationMs : undefined,
+                  });
                   setSectionTimeline(prev => prev.map(s => s.status === "done" ? s : { ...s, status: "done", finishedAt: Date.now() }));
                   // Surface partial-fallback summary in the final pipeline log so the
                   // user knows some sections shipped as base templates (Law 8).
@@ -1664,6 +1733,10 @@ function BuilderPage() {
         if ((err as Error).name === "AbortError") { clearWatchdog(); return; }
         const errMsg = err instanceof Error ? err.message : String(err);
         console.error("[React Generate] Failed:", errMsg);
+        // Flywheel: failure event for the consolidation cron to mine.
+        captureFlywheelEvent(buildId, "build_failed", {
+          message: errMsg.slice(0, 200),
+        });
         setGeneratedCode("");
         setReactFiles(null);
         setBuildProgress(null);
@@ -1675,7 +1748,43 @@ function BuilderPage() {
       }
       return;
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection, includeLaunchVideo, generateLaunchVideo]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection, includeLaunchVideo, generateLaunchVideo, planReview, authHeaders]);
+
+  // Plan Mode (B12) callback handlers — used by the PlanReviewPanel.
+  const handlePlanConfirm = useCallback(() => {
+    // planReview is already set; handleGenerate's branching condition
+    // (!planReview) will be false → skips plan-fetch → proceeds directly
+    // to the slot-stream call with the confirmed plan in the body.
+    void handleGenerate();
+  }, [handleGenerate]);
+
+  const handlePlanEdit = useCallback(() => {
+    setPlanReview(null);
+    // Focus the prompt textarea so the user can refine.
+    if (typeof document !== "undefined") {
+      const ta = document.querySelector<HTMLTextAreaElement>('textarea[name="prompt"]');
+      ta?.focus();
+    }
+  }, []);
+
+  const handlePlanCancel = useCallback(() => {
+    setPlanReview(null);
+    setStatus("idle");
+    setBuildProgress(null);
+  }, []);
+
+  const handlePlanClarify = useCallback(
+    (amb: import("@/components/PlanReviewPanel").PlanReviewPlan["ambiguities"][number]) => {
+      // Append the clarifying question to the prompt as an additional
+      // detail and re-fetch the plan. The user gets a refined plan
+      // without typing — single click cost.
+      const clarified = `${prompt.trim()}\n\nClarification — ${amb.clarifyingQuestion}: ${amb.currentDefault}`;
+      setPrompt(clarified);
+      setPlanReview(null);
+      void handleGenerate();
+    },
+    [prompt, handleGenerate],
+  );
 
   // Edit existing React files via the same streaming endpoint
   const handleEdit = useCallback(async () => {
@@ -2246,6 +2355,35 @@ root.render(React.createElement(App));
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />
+      )}
+
+      {/* Plan Mode review (B12) — sits between prompt submission and the
+          expensive build. Renders only when planReview is set. */}
+      {planReview && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center p-6"
+          style={{ background: "rgba(10, 10, 11, 0.45)", backdropFilter: "blur(8px)" }}
+        >
+          <PlanReviewPanel
+            plan={planReview}
+            onConfirm={handlePlanConfirm}
+            onEdit={handlePlanEdit}
+            onCancel={handlePlanCancel}
+            onClarify={handlePlanClarify}
+          />
+        </div>
+      )}
+
+      {/* Plan-loading toast — quick feedback while the cheap pre-flight
+          runs. Stays visible <1s on healthy network. */}
+      {planLoading && !planReview && (
+        <div
+          className="fixed bottom-6 right-6 z-[70] rounded-xl px-4 py-3 text-sm shadow-lg"
+          style={{ background: "var(--paper-elevated)", border: "1px solid var(--gold)", color: "var(--ink)" }}
+        >
+          <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full" style={{ background: "var(--gold-deep)" }} />
+          Reviewing your plan before building…
+        </div>
       )}
       {showOnboarding && (
         <OnboardingFlow onComplete={(prompt) => {

@@ -43,7 +43,7 @@ const REPLICATE_API = "https://api.replicate.com/v1";
 // Now: one 401 → poison → every subsequent call throws immediately with the
 // exact reason. The health/deep endpoint surfaces the poisoned state so Craig
 // sees "Replicate token rotated — update REPLICATE_API_TOKEN" the moment he
-// opens /admin/health, not after 5 failed video renders.
+// opens /admin, not after 5 failed video renders.
 
 let _replicatePoisoned = false;
 let _replicatePoisonReason = "";
@@ -1305,7 +1305,7 @@ export async function generatePremiumVideo(spec: PipelineSpec): Promise<Pipeline
         );
       }
     } catch (e) {
-      // Per Bible Law 8: surface the real reason so /admin/health can show it.
+      // Per Bible Law 8: surface the real reason so /admin can show it.
       warnings.push(
         `[captions-burn] failed (returning un-captioned video): ${errMessage(e)}`
       );

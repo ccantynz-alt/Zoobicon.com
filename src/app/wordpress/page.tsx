@@ -76,8 +76,8 @@ export default function WordPressPage() {
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/builder" className="text-sm text-white/60 hover:text-white transition-colors">Builder</Link>
-            <Link href="/developers" className="text-sm text-white/60 hover:text-white transition-colors">API</Link>
-            <Link href="/auth/signup" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
+            <Link href="/builder" className="text-sm text-white/60 hover:text-white transition-colors">API</Link>
+            <Link href="/builder" className="btn-gradient px-5 py-2 rounded-xl text-sm font-semibold text-white">
               Get Started
             </Link>
           </div>
@@ -115,7 +115,7 @@ export default function WordPressPage() {
                 Start Building
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link href="/hosting" className="px-6 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 hover:text-white/70 transition-all flex items-center gap-2">
+              <Link href="/builder" className="px-6 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 hover:text-white/70 transition-all flex items-center gap-2">
                 Free Hosting on zoobicon.sh
               </Link>
             </motion.div>
@@ -207,7 +207,7 @@ export default function WordPressPage() {
 
             <motion.div variants={fadeInUp} className="mt-6 bg-accent-stone/5 border border-accent-stone/10 rounded-xl p-4">
               <p className="text-sm text-white/60 leading-relaxed">
-                <span className="text-accent-stone font-semibold">Recommendation:</span> For the fastest, easiest experience, host directly on <Link href="/hosting" className="text-accent-stone hover:underline">zoobicon.sh</Link> — free hosting with SSL, CDN, and instant deploys. No WordPress needed.
+                <span className="text-accent-stone font-semibold">Recommendation:</span> For the fastest, easiest experience, host directly on <Link href="/builder" className="text-accent-stone hover:underline">zoobicon.sh</Link> — free hosting with SSL, CDN, and instant deploys. No WordPress needed.
               </p>
             </motion.div>
           </motion.div>
@@ -231,7 +231,7 @@ export default function WordPressPage() {
               <Zap className="w-4 h-4" />
               Start Building
             </Link>
-            <Link href="/hosting" className="px-8 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all">
+            <Link href="/builder" className="px-8 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 transition-all">
               Free Hosting
             </Link>
           </div>
@@ -244,7 +244,7 @@ export default function WordPressPage() {
           <div className="text-xs text-white/50">&copy; 2026 Zoobicon. All rights reserved.</div>
           <div className="flex gap-4">
             <Link href="/" className="text-xs text-white/50 hover:text-white/60">Home</Link>
-            <Link href="/developers" className="text-xs text-white/50 hover:text-white/60">API</Link>
+            <Link href="/builder" className="text-xs text-white/50 hover:text-white/60">API</Link>
             <Link href="/support" className="text-xs text-white/50 hover:text-white/60">Support</Link>
           </div>
         </div>

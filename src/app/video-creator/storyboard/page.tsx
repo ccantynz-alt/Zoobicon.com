@@ -1471,7 +1471,7 @@ export default function VideoCreatorDashboard() {
             <span className="text-sm text-white/80 font-medium tracking-tight">Video Creator</span>
           </div>
           <div className="flex items-center gap-1">
-            <Link href="/dashboard" className="text-[13px] text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/[0.06] flex items-center gap-1.5">
+            <Link href="/admin" className="text-[13px] text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/[0.06] flex items-center gap-1.5">
               <LayoutDashboard className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Dashboard</span>
             </Link>

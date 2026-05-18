@@ -215,7 +215,7 @@ export default function AiPage() {
             <Link href="/" className="hover:text-white transition-colors">
               zoobicon.com
             </Link>
-            <Link href="/developers" className="hover:text-white transition-colors">
+            <Link href="/builder" className="hover:text-white transition-colors">
               zoobicon.io
             </Link>
             <Link href="/cli" className="hover:text-white transition-colors">
@@ -696,7 +696,7 @@ export default function AiPage() {
 
           <div className="flex items-center gap-6 text-sm text-gray-300">
             <Link href="/" className="hover:text-white transition-colors">zoobicon.com</Link>
-            <Link href="/developers" className="hover:text-white transition-colors">zoobicon.io</Link>
+            <Link href="/builder" className="hover:text-white transition-colors">zoobicon.io</Link>
             <Link href="/cli" className="hover:text-white transition-colors">zoobicon.sh</Link>
             <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>

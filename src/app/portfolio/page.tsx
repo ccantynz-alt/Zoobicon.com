@@ -137,7 +137,7 @@ export default function PortfolioPage() {
           </div>
           <div className="flex items-center gap-3">
             <Link href="/builder" className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors">Builder</Link>
-            <Link href="/dashboard" className="px-4 py-2 text-sm bg-stone-600 hover:bg-stone-500 rounded-lg transition-colors">Dashboard</Link>
+            <Link href="/admin" className="px-4 py-2 text-sm bg-stone-600 hover:bg-stone-500 rounded-lg transition-colors">Dashboard</Link>
           </div>
         </div>
       </header>
@@ -394,7 +394,7 @@ export default function PortfolioPage() {
           <div className="flex items-center justify-center gap-6 mt-4">
             <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Pricing</Link>
             <Link href="/builder" className="text-sm text-white/50 hover:text-white transition-colors">Builder</Link>
-            <Link href="/dashboard" className="text-sm text-white/50 hover:text-white transition-colors">Dashboard</Link>
+            <Link href="/admin" className="text-sm text-white/50 hover:text-white transition-colors">Dashboard</Link>
           </div>
         </div>
       </footer>

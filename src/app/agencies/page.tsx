@@ -210,7 +210,7 @@ export default function AgenciesPage() {
 
           <div className="flex flex-wrap items-center justify-center gap-3 mb-16">
             <Link
-              href="/auth/signup"
+              href="/builder"
               className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
               style={PRIMARY_CTA}
             >
@@ -430,7 +430,7 @@ export default function AgenciesPage() {
                   </a>
                 ) : (
                   <Link
-                    href="/auth/signup"
+                    href="/builder"
                     className={`block text-center rounded-full py-3 text-[13px] font-semibold transition-all ${
                       tier.featured ? "" : "border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
                     }`}
@@ -460,7 +460,7 @@ export default function AgenciesPage() {
             Join hundreds of agencies using Zoobicon to 10x their output.
           </p>
           <Link
-            href="/auth/signup"
+            href="/builder"
             className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
             style={PRIMARY_CTA}
           >

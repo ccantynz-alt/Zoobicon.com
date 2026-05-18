@@ -469,7 +469,7 @@ export default function BusinessNameGeneratorPage() {
             <Link href="/builder" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-stone-600 hover:bg-stone-500 font-semibold text-sm transition-colors">
               <Zap className="w-4 h-4" /> Build Website
             </Link>
-            <Link href="/products/booking" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.08] font-semibold text-sm transition-colors">
+            <Link href="/builder" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/[0.05] border border-white/[0.1] hover:bg-white/[0.08] font-semibold text-sm transition-colors">
               <ArrowRight className="w-4 h-4" /> Set Up Booking
             </Link>
           </div>

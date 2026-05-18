@@ -7,42 +7,25 @@ import {
   Zap,
   Globe,
   Video,
-  Server,
   Layout,
-  Search,
-  ShoppingBag,
-  Users,
-  Code,
-  BarChart3,
-  Mail,
-  Palette,
   Bot,
   ChevronDown,
   Menu,
   X,
   ArrowRight,
   LogOut,
-  LayoutDashboard,
-  Rocket,
   Shield,
   BookOpen,
   Sparkles,
-  Wifi,
-  Lock,
-  HardDrive,
-  Mic,
-  Calendar,
   Wrench,
   KeyRound,
-  FileText,
   QrCode,
-  Hash,
-  Type,
   FileCode,
-  Smartphone,
 } from "lucide-react";
 
-// ── Product categories for mega menu — 6 columns ──
+// ── Product categories for mega menu — 4 columns (post-Crontech pivot) ──
+// Rule 31 — Zoobicon is now pure AI Builder + AI Video + Domains + Tools.
+// Hosting/email/CRM/analytics/CRM/marketplace all delegated to Crontech.
 
 const PRODUCT_SECTIONS = [
   {
@@ -55,31 +38,10 @@ const PRODUCT_SECTIONS = [
     ],
   },
   {
-    label: "Launch",
+    label: "Domains",
     items: [
-      { name: "Hosting", href: "/hosting", icon: Server, desc: "Deploy to zoobicon.sh" },
-      { name: "Domains", href: "/domains", icon: Globe, desc: "Search & register domains" },
-      { name: "Domain Finder", href: "/domain-finder", icon: Search, desc: "AI domain discovery" },
-      { name: "SEO Dashboard", href: "/seo", icon: BarChart3, desc: "Optimize rankings" },
-    ],
-  },
-  {
-    label: "Grow",
-    items: [
-      { name: "Email Marketing", href: "/email-marketing", icon: Mail, desc: "Campaigns & automation" },
-      { name: "CRM", href: "/crm", icon: Users, desc: "Manage contacts & leads" },
-      { name: "Analytics", href: "/analytics", icon: BarChart3, desc: "Track your traffic" },
-      { name: "Marketplace", href: "/marketplace", icon: ShoppingBag, desc: "Add-ons & extensions" },
-    ],
-  },
-  {
-    label: "Products",
-    items: [
-      { name: "eSIM", href: "/products/esim", icon: Wifi, desc: "190+ countries", badge: "New" },
-      { name: "VPN", href: "/products/vpn", icon: Lock, desc: "Secure browsing" },
-      { name: "Cloud Storage", href: "/products/cloud-storage", icon: HardDrive, desc: "S3-compatible" },
-      { name: "AI Dictation", href: "/products/dictation", icon: Mic, desc: "Speech to text" },
-      { name: "Booking", href: "/products/booking", icon: Calendar, desc: "Scheduling & appointments" },
+      { name: "Domain Search", href: "/domains", icon: Globe, desc: "Search & register domains" },
+      { name: "Pricing", href: "/pricing", icon: Sparkles, desc: "Subscription tiers" },
     ],
   },
   {
@@ -96,17 +58,17 @@ const PRODUCT_SECTIONS = [
     label: "Scale",
     items: [
       { name: "Agency Platform", href: "/agencies", icon: Shield, desc: "White-label for agencies" },
-      { name: "API & Developers", href: "/developers", icon: Code, desc: "REST API & CLI" },
       { name: "AI Agents", href: "/agents", icon: Bot, desc: "Agent framework" },
-      { name: "Documentation", href: "/documentation", icon: BookOpen, desc: "Guides & reference" },
+      { name: "Changelog", href: "/changelog", icon: BookOpen, desc: "What's new" },
     ],
   },
 ];
 
 const TOP_NAV_LINKS = [
-  { name: "Pricing", href: "/pricing" },
+  { name: "Builder", href: "/builder" },
+  { name: "Video", href: "/video-creator" },
   { name: "Domains", href: "/domains" },
-  { name: "eSIM", href: "/products/esim" },
+  { name: "Pricing", href: "/pricing" },
   { name: "Free Tools", href: "/tools/business-name-generator" },
 ];
 
@@ -275,7 +237,7 @@ export default function SiteNavigation() {
                   }}
                 >
                   <div className="relative max-w-7xl mx-auto px-6 py-10">
-                    <div className="grid grid-cols-6 gap-8">
+                    <div className="grid grid-cols-4 gap-8">
                       {PRODUCT_SECTIONS.map((section) => (
                         <div key={section.label}>
                           <h3
@@ -389,34 +351,20 @@ export default function SiteNavigation() {
             })}
           </div>
 
-          {/* Right side: Auth + CTA */}
+          {/* Right side: CTA only. Rule 31 — auth delegated to Crontech SSO.
+              Builder runs anonymously; signed-in identity comes from the
+              Crontech token forwarded on SSO callback. Until SSO is wired,
+              no "Sign in" button surfaces in the public nav. Admin access
+              is URL-only (/admin) per Craig's directive. */}
           <div className="hidden lg:flex items-center gap-2">
-            {isLoggedIn ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="px-3.5 py-2 text-[13px] text-white/70 hover:text-white rounded-full hover:bg-white/[0.04] transition-colors flex items-center gap-1.5"
-                >
-                  <LayoutDashboard className="w-3.5 h-3.5" /> Dashboard
-                </Link>
-                {/* Admin link intentionally hidden from the public nav.
-                    Craig accesses /admin by typing it in the address
-                    bar so customers never see it. (2026-05-06) */}
-                <button
-                  onClick={handleLogout}
-                  className="p-2 text-white/40 hover:text-white/70 rounded-full hover:bg-white/[0.04] transition-colors"
-                  aria-label="Sign out"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/auth/login"
-                className="px-4 py-2 text-[13px] text-white/70 hover:text-white rounded-full transition-colors"
+            {isLoggedIn && (
+              <button
+                onClick={handleLogout}
+                className="p-2 text-white/40 hover:text-white/70 rounded-full hover:bg-white/[0.04] transition-colors"
+                aria-label="Sign out"
               >
-                Sign in
-              </Link>
+                <LogOut className="w-4 h-4" />
+              </button>
             )}
             <Link
               href="/builder"
@@ -515,15 +463,8 @@ export default function SiteNavigation() {
               <Link href="/compare" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]">
                 Compare
               </Link>
-              {isLoggedIn ? (
-                <>
-                  <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]">Dashboard</Link>
-                  {/* Admin link intentionally hidden from mobile nav too —
-                      access /admin by URL only. */}
-                </>
-              ) : (
-                <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]">Sign in</Link>
-              )}
+              {/* Rule 31 — auth delegated to Crontech SSO; no in-product
+                  sign-in link until SSO is wired. */}
               <Link
                 href="/builder"
                 onClick={() => setMobileOpen(false)}

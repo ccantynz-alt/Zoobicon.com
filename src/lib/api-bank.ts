@@ -29,6 +29,7 @@
 
 import type { LLMRequest, LLMResponse, LLMProvider } from "@/lib/llm-provider";
 import { callLLM, getAvailableProviders, isTransientLLMError } from "@/lib/llm-provider";
+import { getDeprioritisedProviders } from "@/lib/flywheel/self-healing";
 
 // ───────────────────────────────────────────────────────────────────────
 // Per-provider configuration
@@ -217,6 +218,11 @@ export async function bankedCall(req: LLMRequest): Promise<BankedCallResult> {
   const estTokensOut = req.maxTokens || 2000;
   const estTokensTotal = estTokensIn + estTokensOut;
 
+  // B29 self-healing — read the deprioritised set once per call. If
+  // any providers are quarantined by the hourly self-heal cron, the
+  // picker treats them as already sidelined.
+  const deprioritised = await getDeprioritisedProviders().catch(() => new Set<string>());
+
   const preferredProvider = guessProviderFromModel(req.model);
   const triedProviders = new Set<LLMProvider>();
   let attempt = 0;
@@ -224,6 +230,15 @@ export async function bankedCall(req: LLMRequest): Promise<BankedCallResult> {
 
   while (attempt < 3) {
     const pick = pickProvider({ preferredModel: req.model });
+    // Self-healing kicks in: if the picker chose a deprioritised
+    // provider, force-skip it and try the next attempt (which will
+    // pick a different one because we sideline it locally).
+    if (deprioritised.has(pick.provider) && !triedProviders.has(pick.provider)) {
+      STATE[pick.provider].cooldownUntilMs = Date.now() + 60_000;
+      triedProviders.add(pick.provider);
+      attempt++;
+      continue;
+    }
     if (triedProviders.has(pick.provider)) {
       // Picker keeps recommending the same exhausted provider — bail.
       break;

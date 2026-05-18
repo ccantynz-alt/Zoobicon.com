@@ -144,9 +144,8 @@ export default function SiteFooter() {
                 <Zap className="h-3 w-3" style={{ color: "var(--gold-deep)" }} /> Stripe Verified
               </span>
             </div>
-            <Link
-              href="/launch-status"
-              className="mt-6 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-medium transition-all"
+            <div
+              className="mt-6 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-medium"
               style={{
                 border: "1px solid rgba(16, 185, 129, 0.3)",
                 background: "rgba(16, 185, 129, 0.06)",
@@ -158,8 +157,7 @@ export default function SiteFooter() {
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-500" />
               </span>
               All systems operational
-              <ArrowRight className="h-3 w-3 opacity-60" />
-            </Link>
+            </div>
           </div>
 
           {/* Link columns */}
@@ -175,39 +173,36 @@ export default function SiteFooter() {
               ]}
             />
             <FooterColumn
-              label="Launch"
+              label="Domains & Tools"
               links={[
-                { name: "Hosting", href: "/hosting" },
-                { name: "Domains", href: "/domains" },
+                { name: "Domain Search", href: "/domains" },
+                { name: "Pricing", href: "/pricing" },
+                { name: "Free Tools", href: "/tools/business-name-generator" },
                 { name: "SEO Dashboard", href: "/seo" },
-                { name: "Email Marketing", href: "/email-marketing" },
-                { name: "Status", href: "/launch-status" },
               ]}
             />
             <FooterColumn
               label="Scale"
               links={[
-                { name: "Pricing", href: "/pricing" },
                 { name: "Agencies", href: "/agencies" },
-                { name: "API & Developers", href: "/developers" },
-                { name: "Marketplace", href: "/marketplace" },
-                { name: "Documentation", href: "/documentation" },
+                { name: "AI Agents", href: "/agents" },
+                { name: "Changelog", href: "/changelog" },
+                { name: "Status", href: "/" },
               ]}
             />
             <FooterColumn
               label="Company"
               links={[
-                { name: "Sign in", href: "/auth/login" },
-                { name: "Create account", href: "/auth/signup" },
                 { name: "Contact", href: "/support" },
                 { name: "Legal", href: "/disclaimers" },
                 { name: "Privacy", href: "/privacy" },
+                { name: "Terms", href: "/terms" },
               ]}
             />
           </div>
         </div>
 
-        {/* Four-domain signature + copyright (rule 11) */}
+        {/* Three-domain signature + copyright. Rule 31 — zoobicon.sh retired. */}
         <div
           className="mt-16 pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
           style={{ borderTop: "1px solid var(--rule)" }}
@@ -215,7 +210,7 @@ export default function SiteFooter() {
           <div className="text-[11px] flex items-center gap-1.5" style={{ color: "var(--ink-muted)" }}>
             <Globe2 className="h-3 w-3" />
             <span className="font-mono tracking-tight">
-              zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh
+              zoobicon.com · zoobicon.ai · zoobicon.io
             </span>
           </div>
           <div className="text-[11px]" style={{ color: "var(--ink-muted)" }}>

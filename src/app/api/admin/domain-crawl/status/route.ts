@@ -12,7 +12,7 @@
  * already re-checked names we paid OpenSRS for last week.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin-auth";
+import { authenticateRequest } from "@/lib/auth-guard";
 import { getCrawlerStatus, CRAWL_TLDS } from "@/lib/domain-crawler";
 
 export const runtime = "nodejs";
@@ -74,8 +74,11 @@ interface StatusResponse {
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  const guard = requireAdmin(req);
-  if (guard) return guard;
+  const { user, error } = await authenticateRequest(req, { requireAuth: true });
+  if (error) return error as NextResponse;
+  if (user.role !== "admin") {
+    return NextResponse.json({ error: "Admin required" }, { status: 403 });
+  }
 
   const rows = await getCrawlerStatus();
 

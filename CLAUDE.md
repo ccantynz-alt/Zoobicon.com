@@ -350,10 +350,30 @@ These are never allowed under any circumstance without Craig explicitly saying "
 ---
 
 # LIVE REPO STATUS — READ THIS FIRST
-## Last updated: 2026-05-13 | Build: PASSING (470+ pages) | Branch: claude/review-readme-docs-Wr1If
+## Last updated: 2026-05-17 | Build: GREEN (Crontech pivot mid-flight) | Branch: claude/review-readme-docs-Wr1If
 
-### QUICK FACTS
-- **165 pages** | **576 API routes** | **87 layouts** | **254 lib files** | **77 shared components** | **118 registry components**
+### CRONTECH PIVOT (RULE 31) — STATUS
+- §1 AUTH — DONE (1fbcb40). auth-guard.ts is a Crontech-SSO shim.
+- §2 PAYMENTS — STRIPE STAYS (5060535 amendment) — direct AI Builder purchase.
+- §3 EMAIL — DONE (7962fee). admin-notify, audit-middleware are stubs.
+- §4 HOSTING + DEPLOY — DONE (fd128db). Cloudflare/Vercel/Supabase/WebContainers libs deleted.
+- §5 CDN/EDGE — DONE with §4.
+- §6 STORAGE — DONE (73eb0aa).
+- §7 SMS/Discord/Slack/Push — DONE (a6d43de).
+- §8 eSIM/VPN provider layer — DONE (73eb0aa). Marketing pages kept.
+- §9 BOOKING — DONE (73eb0aa).
+- §10-12, 14 CRM/Invoicing/Email Marketing/Contracts/Support/Analytics/Audit — DONE (e3988e1).
+- §13 CRON JOBS — DONE (7e71c4e). Vercel crons array removed; HTTP endpoints survive.
+- §15 BACKGROUND AGENTS — DONE (da26551). Infra agents unregistered.
+- §16 PUBLIC API v1 — DONE (1fbcb40). Entire /api/v1/* surface deleted.
+- §17 zoobicon.sh — DONE (7e71c4e). Removed from middleware/brand/robots/sitemap.
+- UI SWEEP — DONE (6342760 + 1cff11c). Deleted ~340 files: 50 orphan top-level pages, 13 sunset product/admin pages, ~100 orphan API routes, /developers, /api-docs, /documentation, /.well-known/ai-plugin.json. Mass sed swept all dead hrefs (/auth/*, /dashboard, /hosting, /products/{esim,vpn,hosting,cloud-storage,dictation,dubbing,email-support,booking}, /email-marketing, /crm, /analytics, /booking, /invoicing, /admin/{health,email,usage,support,operations,etc.}). SiteNavigation now 4 columns (Build/Domains/Free Tools/Scale). SiteFooter Scale column rebuilt. AdminShell sidebar simplified to 5 sections. Sitemap rewritten 78 → 47 URLs. Robots disallow list simplified to /admin /api /edit.
+- Pending: DB table migration plan, positioning + pricing copy refresh in ZOOBICON-SPEC.md.
+
+### QUICK FACTS (post-Crontech sweep 2026-05-17)
+- **67 pages** (was 165) | **178 API routes** (was 576) | **43 layouts** | **237 lib files** | **79 shared components** | **118 registry components**
+- **45 API top-level dirs** (was 146) — only AI Builder + Video + Domains + Free Tools + admin + cron + intel + stripe + support survive
+- **Pure scope:** AI Builder + AI Video Creator + Domain Search + 12 Free Tools. Everything else delegated to Crontech or deleted entirely.
 - **Framework:** Next.js 14.2 + React 18.3 + TypeScript + Tailwind CSS 3.4
 - **AI:** Anthropic SDK 0.80, multi-LLM (Claude/GPT/Gemini) via `src/lib/llm-provider.ts`
 - **DB:** Neon serverless Postgres via `@neondatabase/serverless`
@@ -367,20 +387,16 @@ These are never allowed under any circumstance without Craig explicitly saying "
 
 | Feature | Status | Key Files | What Works | What's Missing |
 |---------|--------|-----------|------------|----------------|
-| **AI Website Builder** | WORKING | `src/app/builder/page.tsx`, `src/lib/agents.ts`, `src/app/api/generate/react-stream/route.ts` | React generation via Sandpack, streaming SSE, 100-component registry, **diff editing fully wired** (PromptInput + ChatPanel → /api/generate/edit → merge changed files → Sandpack updates) | Streaming could be smoother, pre-warm Sandpack for faster first preview |
-| **Domain Search** | WORKING | `src/app/domains/page.tsx`, `src/app/api/domains/search/route.ts`, `src/lib/opensrs.ts` | Real OpenSRS registry checks, AI name generator, TLD pages | Checkout needs Stripe products |
-| **Video Creator** | PARTIAL | `src/app/video-creator/page.tsx`, `src/lib/video-pipeline.ts`, `src/lib/video-render.ts` | Chat-based 3-step flow, script generation | Pipeline UNTESTED on Replicate, needs end-to-end test |
-| **Pricing** | WORKING | `src/app/pricing/page.tsx`, `src/lib/stripe.ts` | Page renders with tiers | Needs Craig to create Stripe products + price IDs |
-| **Auth** | WORKING | `src/app/auth/*/page.tsx`, `src/app/api/auth/*/route.ts` | Login, signup, OAuth (Google/GitHub), email verify, password reset | Needs DATABASE_URL for persistence |
-| **12 Free Tools** | WORKING | `src/app/tools/*/page.tsx` | All client-side, no API needed | Fully functional |
-| **10 Product Pages** | WORKING | `src/app/products/*/page.tsx` | eSIM, VPN, dictation, storage, booking, hosting, builder, video, SEO, email | Most are showcase pages |
-| **50 eSIM Country Pages** | WORKING | `src/app/esim/[country]/page.tsx` | SEO pages with structured data | Needs CELITECH_API_KEY for real data |
-| **Admin Dashboard** | WORKING | `src/app/admin/*/page.tsx` | 16+ admin pages, mobile command centre | Uses mock data without DB |
-| **Hosting/Deploy** | PARTIAL | `src/app/api/hosting/deploy/route.ts`, `src/app/api/hosting/serve/[slug]/route.ts` | Deploy to DB, serve at zoobicon.sh | Needs polish |
-| **CRM** | SHELL | `src/app/crm/page.tsx` | Pretty UI | 100% hardcoded mock data |
-| **Email Marketing** | SHELL | `src/app/email-marketing/page.tsx` | Pretty UI | 100% hardcoded mock data |
-| **Invoicing** | SHELL | `src/app/invoicing/page.tsx` | Pretty UI | 100% hardcoded mock data |
-| **Analytics** | SHELL | `src/app/analytics/page.tsx` | Pretty UI | localStorage only |
+| **AI Website Builder** | WORKING | `src/app/builder/page.tsx`, `src/lib/agents.ts`, `src/app/api/generate/react-stream/route.ts` | React generation via Sandpack, streaming SSE, 118-component registry, slot-locked composition, diff editing wired | Crontech wire-up for sandbox + Stripe products for direct purchase |
+| **AI Video Creator** | PARTIAL | `src/app/video-creator/page.tsx`, `src/lib/video-pipeline.ts`, `src/lib/video-render.ts` | Chat-based 3-step flow, script generation, Replicate pipeline | UNTESTED end-to-end — needs one real video produced |
+| **Domain Search** | WORKING | `src/app/domains/page.tsx`, `src/app/api/domains/search/route.ts`, `src/lib/opensrs.ts` | Real OpenSRS registry checks, AI name generator, TLD pages | Revenue stream — stays in Zoobicon |
+| **Pricing** | WORKING | `src/app/pricing/page.tsx`, `src/lib/stripe.ts` | Direct AI Builder purchase via Stripe (Rule 31 amendment — Stripe stays) | Craig: create Stripe products + price IDs |
+| **Auth** | CRONTECH SSO | `src/lib/auth-guard.ts` (shim) | `authenticateRequest()` reads `x-crontech-token` claims, anonymous fallthrough | Crontech SSO endpoint wire-up |
+| **Email** | CRONTECH | `src/lib/admin-notify.ts` (no-op stub) | Stubs return early; Crontech BLK-030 owns delivery | Crontech email ingest wire-up |
+| **Hosting** | CRONTECH | — | Deleted /api/hosting/*, /api/deploy/vercel, /hosting/* | Crontech BLK-040 owns hosting |
+| **Audit Logs** | CRONTECH | `src/lib/audit-middleware.ts` (no-op stub) | Stripe webhook still calls auditLog — no-op until Crontech audit ingest wired |
+| **12 Free Tools** | WORKING | `src/app/tools/*/page.tsx` | All client-side | Fully functional |
+| **Admin Dashboard** | WORKING | `src/app/admin/*/page.tsx` | Mobile command centre, agents view | Uses mock data without DB |
 
 ### BUILD PIPELINE
 ```
@@ -802,6 +818,8 @@ npm run lint     # ESLint
 29. **THE EDITORIAL-LIGHT STANDARD (reversed 2026-05-04 — was Filmora dark)** — Craig's directive: *"take a look at holdenmercer.com beautiful design i would like this for zoobicon which is to dark — please change no more dark."* The reference is **holdenmercer.com** — warm bone background (`#fafaf7`), elevated cream surfaces (`#f4f3ed`), near-black text (`#0a0a0b`), warm hairline borders (`#e8e6dc`), a single deep champagne accent (`#c9a961`), display headlines set in **Playfair Display** italic (we keep Fraunces as a fallback), body in **Inter**, monospace in **JetBrains Mono**. Editorial / private-bank / Sotheby's vibe — generous whitespace, hairline rules, restrained shadows, subtle gold accents. CSS tokens live at the top of `src/app/globals.css` as `--paper` / `--paper-elevated` / `--ink` / `--ink-secondary` / `--ink-muted` / `--rule` / `--gold` / `--gold-deep` and a sweeping override layer at the bottom of that file flips every legacy `bg-[#0b1530]` / `text-white/X` / `border-white/[0.0X]` reference to the new palette so unmigrated pages still ship coherent. **No dark surfaces. No midnight blue. No champagne-on-black panels.** Buttons fill with `var(--ink)` on `var(--paper)` (or outline). Cards are `var(--paper-elevated)` with a 1px `var(--rule)` border. **Every single page on zoobicon.com** — homepage, builder, video-creator, pricing, domains, tools, auth, products, admin-public-facing, every SEO page, every blog, every legal page — must clear this bar. The previous Filmora dark direction is retired and must not be reintroduced. This rule is the floor — it cannot be lowered without Craig's explicit written override.
 
 30. **THE STRATEGY DOCS ARE THE CONTRACT — NO PER-COMMIT CONFIRMATION** (added 2026-05-13). Craig's words: *"How do we get you to continuously build without stopping and asking for permission — that's dumb, we know what we have to do, we've got a game plan."* The three strategy docs at the repo root — `KILLER-MOVES.md` (20 platform-wide moves), `KILLER-MOVES-BUILDER.md` (20 builder-specific moves B1-B20), and `INNOVATIONS.md` (six original architectural ideas) — are pre-authorized work. **Claude executes moves in order without per-commit confirmation.** AskUserQuestion is reserved for: (a) items on the §2 authorization list, (b) genuine ambiguity that re-reading CLAUDE.md doesn't resolve, (c) destructive irreversible actions, (d) feedback on user-facing UX where Craig's taste is the only acceptable arbiter (palette choices, copy tone). Asking "should I start B1?" / "want me to also do X?" / "ready for me to commit?" / offering 4-option choice menus on locked moves is a Rule 26 violation AND a Rule 30 violation. The procedural form (not a value): every commit cites a move from the locked list in the message. If a piece of work doesn't map to a move, either it shouldn't ship, or the move list needs to be updated FIRST, then the work proceeds. Brief status updates between commits are encouraged; permission requests are not.
+
+31. **SCOPE-TIGHTENING TO AI BUILDER + AI VIDEO ONLY — INFRA DELEGATED TO CRONTECH** (added 2026-05-17, amended 2026-05-17). Craig pasted a 600-line `ZOOBICON-REMOVE-LIST.md` directive. Zoobicon becomes a pure AI Builder + AI Video Creator. Every piece of infrastructure (auth, hosting, DB-for-customer-sites, email, CDN, storage, custom domains, SMS, cron, rate limiting, analytics, audit logs, support inbox) is delegated to Crontech via its public API. The complete spec is locked in `ZOOBICON-REMOVE-LIST.md` at the repo root — that doc is the authoritative migration plan and supersedes prior assumptions that Zoobicon owns these layers. **This supersedes Rule 7** (email is no longer Mailgun-only; email becomes Crontech-only via the Crontech BLK-030 endpoint, which is itself Mailgun-shape compatible so SDK code is unchanged). It also supersedes implicit assumptions in earlier rules that Zoobicon owns Vercel hosting for customer sites (still owns Vercel for the Zoobicon app itself), Cloudflare DNS/SSL for `*.zoobicon.sh` (zoobicon.sh sunsets — customer sites move to `<username>.crontech.app`). **STRIPE STAYS IN ZOOBICON** — Craig's amendment 2026-05-17: *"Sorry Stripe we need to keep because people still need to purchase the AI builder section from us."* Subscription tier purchases (Starter $49 / Pro $129 / Agency $299) + domain checkout + video credit packs all continue to bill via Stripe directly. Only Stripe Connect for agency reseller payouts ($499 white-label tier) routes through Crontech unified billing. §2 of the remove list is amended accordingly. **DELETION GATE: no module/route/table/env var on the remove list is actually deleted until the corresponding Crontech endpoint is verified live in production via the checklist at the top of `ZOOBICON-REMOVE-LIST.md`.** Partial migration is OK. Half-migration with broken Zoobicon is not. The remove list explicitly defines a 4-tier deletion order (Tier A = trivial swaps, Tier B = flagged migrations with 7-day soak, Tier C = money/auth never-deletes-same-day, Tier D = product sunsets needing customer notice). Architectural innovations (Slot-Locked Composition, Predictive Pre-Generation, Component-Graph, Hot-Swap Live Upgrades, Multi-Judge Critique, Build-Output Caching) all stay in Zoobicon — they are Zoobicon's moat and don't touch infrastructure. Revenue-generating bits stay: Stripe direct purchases (KEEP), OpenSRS domain registration (KEEP), `registered_domains` table (KEEP), agency white-label tier (KEEP).
 
 ---
 

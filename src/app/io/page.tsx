@@ -130,7 +130,7 @@ function DomainSearch() {
                     ${r.price?.toFixed(2)}/yr
                   </span>
                   <Link
-                    href="/auth/signup"
+                    href="/builder"
                     className="px-3 py-1.5 bg-zoo-500/10 text-zoo-400 rounded-lg text-xs font-semibold hover:bg-zoo-500/20 transition-colors"
                   >
                     Register
@@ -531,14 +531,14 @@ export default function ZoobiconIOPage() {
             className="flex flex-wrap justify-center gap-4 mb-16"
           >
             <Link
-              href="/auth/signup"
+              href="/builder"
               className="btn-zoo inline-flex items-center gap-2 px-8 py-4 text-white font-bold rounded-xl text-lg"
             >
               Start Free
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              href="/developers"
+              href="/builder"
               className="btn-zoo-outline inline-flex items-center gap-2 px-6 py-3 rounded-lg font-mono text-sm"
             >
               View API Docs
@@ -1087,7 +1087,7 @@ export default function ZoobiconIOPage() {
                   <h3 className="font-semibold text-white mb-2">Generate an API key</h3>
                   <p className="text-sm text-gray-300 mb-3">
                     Navigate to{" "}
-                    <Link href="/auth/settings" className="text-zoo-400 hover:underline">
+                    <Link href="/builder" className="text-zoo-400 hover:underline">
                       Settings
                     </Link>{" "}
                     and create a new API key. Keys use the format:
@@ -1263,14 +1263,14 @@ export default function ZoobiconIOPage() {
             className="flex flex-wrap justify-center gap-4"
           >
             <Link
-              href="/auth/signup"
+              href="/builder"
               className="btn-zoo inline-flex items-center gap-2 px-8 py-4 text-white font-bold rounded-xl text-lg"
             >
               Get Started Free
               <Mail className="w-5 h-5" />
             </Link>
             <Link
-              href="/developers"
+              href="/builder"
               className="btn-zoo-outline inline-flex items-center gap-2 px-8 py-4 rounded-lg font-semibold"
             >
               API Documentation
@@ -1377,7 +1377,7 @@ export default function ZoobiconIOPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/developers" className="hover:text-gray-300">
+                  <Link href="/builder" className="hover:text-gray-300">
                     Developer Docs
                   </Link>
                 </li>

@@ -14,11 +14,11 @@ import { getRateLimitConfig } from "@/lib/rateLimitConfig";
  * @upstash/redis uses fetch (REST) — safe on Vercel edge runtime.
  */
 
+// Rule 31 — zoobicon.sh removed (hosting delegated to Crontech).
 const ALLOWED_ORIGINS = new Set([
   "https://zoobicon.com",
   "https://zoobicon.ai",
   "https://zoobicon.io",
-  "https://zoobicon.sh",
   "https://dominat8.io",
   "https://dominat8.com",
   "http://localhost:3000",
@@ -98,8 +98,6 @@ export async function middleware(request: NextRequest) {
       domainLabel = "ai";
     } else if (domain === "zoobicon.io" || domain.endsWith(".zoobicon.io")) {
       domainLabel = "io";
-    } else if (domain === "zoobicon.sh" || domain.endsWith(".zoobicon.sh")) {
-      domainLabel = "sh";
     }
 
     const apiResponse = NextResponse.next();
@@ -134,9 +132,6 @@ export async function middleware(request: NextRequest) {
   } else if (domain === "zoobicon.io" || domain.endsWith(".zoobicon.io")) {
     rewritePath = "/io";
     domainLabel = "io";
-  } else if (domain === "zoobicon.sh" || domain.endsWith(".zoobicon.sh")) {
-    rewritePath = "/sh";
-    domainLabel = "sh";
   }
 
   // Only rewrite the root path; everything else passes through

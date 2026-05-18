@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCircuitState } from "@/lib/resilience";
-import { isTokenPoisoned as isSupabasePoisoned } from "@/lib/supabase-provisioner";
 import { isReplicatePoisoned } from "@/lib/video-pipeline";
 
 /**
@@ -10,7 +9,7 @@ import { isReplicatePoisoned } from "@/lib/video-pipeline";
  *
  * Pings EVERY external dependency in parallel with aggressive timeouts,
  * reports circuit-breaker state, surfaces poisoned-token state, and returns
- * a structured JSON response the /admin/health dashboard can render.
+ * a structured JSON response the /admin dashboard can render.
  *
  * Why this exists: prior to today, a single bad SUPABASE_ACCESS_TOKEN would
  * cascade into every builder request and users saw "JWT could not be
@@ -265,44 +264,9 @@ async function checkFishAudio(): Promise<ProviderCheck> {
   };
 }
 
-async function checkSupabaseManagement(): Promise<ProviderCheck> {
-  const poison = isSupabasePoisoned();
-  if (poison.poisoned) {
-    return {
-      name: "Supabase Management",
-      category: "database",
-      status: "fail",
-      message: `Token poisoned this cold start — ${poison.reason}`,
-      latencyMs: 0,
-      circuitState: "open",
-      envVar: "SUPABASE_ACCESS_TOKEN",
-      required: false,
-    };
-  }
-  const key = process.env.SUPABASE_ACCESS_TOKEN;
-  if (!key) return missingEnv("Supabase Management", "SUPABASE_ACCESS_TOKEN", "database", false);
-  const { err, ms } = await timed(async () => {
-    const res = await pingJson("https://api.supabase.com/v1/organizations", {
-      Authorization: `Bearer ${key}`,
-    });
-    if (!res.ok) {
-      // Supabase returns "JWT could not be decoded" in the body on bad token
-      throw new Error(`HTTP ${res.status}: ${res.body}`);
-    }
-  });
-  return {
-    name: "Supabase Management",
-    category: "database",
-    status: err ? "fail" : "pass",
-    message: err
-      ? `Supabase Management API rejected token: ${err instanceof Error ? err.message : String(err)}`
-      : "Supabase Management API accepting personal access token",
-    latencyMs: ms,
-    circuitState: "closed",
-    envVar: "SUPABASE_ACCESS_TOKEN",
-    required: false,
-  };
-}
+// Rule 31 — Supabase/Cloudflare/Mailgun delegated to Crontech. The deep
+// health orchestrator no longer probes those providers directly; their
+// status is owned by the Crontech platform health endpoint.
 
 async function checkNeon(): Promise<ProviderCheck> {
   const url = process.env.DATABASE_URL;
@@ -370,57 +334,14 @@ async function checkOpenSRS(): Promise<ProviderCheck> {
   };
 }
 
-async function checkMailgun(): Promise<ProviderCheck> {
-  const key = process.env.MAILGUN_API_KEY;
-  const domain = process.env.MAILGUN_DOMAIN;
-  if (!key) return missingEnv("Mailgun", "MAILGUN_API_KEY", "email", false);
-  const { err, ms } = await timed(async () => {
-    const url = domain
-      ? `https://api.mailgun.net/v3/${domain}`
-      : "https://api.mailgun.net/v3/domains";
-    const auth = Buffer.from(`api:${key}`).toString("base64");
-    const res = await pingJson(url, { Authorization: `Basic ${auth}` });
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.body}`);
-  });
-  return {
-    name: "Mailgun",
-    category: "email",
-    status: err ? "fail" : "pass",
-    message: err ? `Mailgun auth failed: ${err instanceof Error ? err.message : String(err)}` : "Mailgun reachable",
-    latencyMs: ms,
-    circuitState: classify("mailgun"),
-    envVar: "MAILGUN_API_KEY",
-    required: false,
-  };
-}
-
-async function checkCloudflare(): Promise<ProviderCheck> {
-  const token = process.env.CLOUDFLARE_API_TOKEN;
-  if (!token) return missingEnv("Cloudflare", "CLOUDFLARE_API_TOKEN", "infra", false);
-  const { err, ms } = await timed(async () => {
-    const res = await pingJson("https://api.cloudflare.com/client/v4/user/tokens/verify", {
-      Authorization: `Bearer ${token}`,
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.body}`);
-  });
-  return {
-    name: "Cloudflare",
-    category: "infra",
-    status: err ? "fail" : "pass",
-    message: err ? `Cloudflare token invalid: ${err instanceof Error ? err.message : String(err)}` : "Cloudflare token valid",
-    latencyMs: ms,
-    circuitState: classify("cloudflare"),
-    envVar: "CLOUDFLARE_API_TOKEN",
-    required: false,
-  };
-}
-
 // ── Orchestrator ─────────────────────────────────────────────────────────
 
 export async function GET(req: NextRequest) {
   const overallStart = Date.now();
 
   // Run EVERY check in parallel. Worst case we wait CHECK_TIMEOUT + a little.
+  // Supabase/Mailgun/Cloudflare removed per Rule 31 — those are Crontech's
+  // responsibility now; this endpoint only covers what Zoobicon owns directly.
   const checks = await Promise.all([
     checkAnthropic(),
     checkOpenAI(),
@@ -429,12 +350,9 @@ export async function GET(req: NextRequest) {
     checkFal(),
     checkElevenLabs(),
     checkFishAudio(),
-    checkSupabaseManagement(),
     checkNeon(),
     checkStripe(),
     checkOpenSRS(),
-    checkMailgun(),
-    checkCloudflare(),
   ]);
 
   // Aggregate by category

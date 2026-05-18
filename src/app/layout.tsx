@@ -126,7 +126,6 @@ export default function RootLayout({
         <link rel="alternate" hrefLang="x-default" href="https://zoobicon.com" />
         <link rel="alternate" href="https://zoobicon.ai" title="Zoobicon AI" />
         <link rel="alternate" href="https://zoobicon.io" title="Zoobicon for Developers" />
-        <link rel="alternate" href="https://zoobicon.sh" title="Zoobicon Hosting & CLI" />
         {/* Critical inline styles — paints the warm bone palette before the CSS bundle loads */}
         <style dangerouslySetInnerHTML={{ __html: `html,body{background:#ffffff;color:#0a0a0b;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em;-webkit-overflow-scrolling:touch}body{overflow-x:hidden;overscroll-behavior:none}` }} />
         {/* Preconnect to Google Fonts CDN */}
@@ -178,7 +177,6 @@ export default function RootLayout({
             "sameAs": [
               "https://zoobicon.ai",
               "https://zoobicon.io",
-              "https://zoobicon.sh",
               "https://dominat8.io"
             ],
             "contactPoint": {
@@ -232,18 +230,6 @@ export default function RootLayout({
                   "name": "AI Video Creator",
                   "description": "AI-powered video script, storyboard, and scene generation pipeline",
                   "url": "https://zoobicon.com/products/video-creator"
-                },
-                {
-                  "@type": "OfferCatalog",
-                  "name": "Email Support System",
-                  "description": "AI-powered email ticketing and support system with Mailgun integration",
-                  "url": "https://zoobicon.com/products/email-support"
-                },
-                {
-                  "@type": "OfferCatalog",
-                  "name": "Website Hosting",
-                  "description": "One-click deploy to zoobicon.sh with SSL, CDN, and custom domains",
-                  "url": "https://zoobicon.com/products/hosting"
                 },
                 {
                   "@type": "OfferCatalog",
@@ -339,7 +325,7 @@ export default function RootLayout({
                 "name": "Where are Zoobicon sites hosted?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Generated sites are deployed to zoobicon.sh with free hosting. You can also connect a custom domain, export as HTML/ZIP/React, or export as a WordPress theme."
+                  "text": "Generated sites deploy to the Crontech cloud with free SSL and global CDN. You can also connect a custom domain, export as HTML/ZIP/React, or export as a WordPress theme."
                 }
               }
             ]

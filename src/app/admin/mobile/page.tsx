@@ -173,7 +173,7 @@ export default function MobileAdminDashboard() {
                   </p>
                 </div>
               </div>
-              <Link href="/admin/health" className="p-1.5 rounded-lg active:bg-stone-100">
+              <Link href="/admin" className="p-1.5 rounded-lg active:bg-stone-100">
                 <ChevronRight className="w-4 h-4 text-stone-600" />
               </Link>
             </div>
@@ -287,11 +287,11 @@ export default function MobileAdminDashboard() {
             </div>
             <div className="divide-y divide-stone-100">
               <QuickLink href="/admin" icon={LayoutDashboard} label="Full Admin Panel" />
-              <QuickLink href="/admin/health" icon={Activity} label="System Health" />
-              <QuickLink href="/admin/support" icon={Mail} label="Support Inbox" />
+              <QuickLink href="/admin" icon={Activity} label="System Health" />
+              <QuickLink href="/admin" icon={Mail} label="Support Inbox" />
               <QuickLink href="/admin/intel" icon={Shield} label="Market Intel" />
-              <QuickLink href="/admin/usage" icon={BarChart3} label="Usage & Billing" />
-              <QuickLink href="/admin/operations" icon={Server} label="Operations" />
+              <QuickLink href="/admin" icon={BarChart3} label="Usage & Billing" />
+              <QuickLink href="/admin" icon={Server} label="Operations" />
             </div>
           </div>
 

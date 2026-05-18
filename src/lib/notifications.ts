@@ -146,26 +146,12 @@ async function sendEmail(notif: NotificationInput): Promise<DispatchResult> {
   }
 }
 
-async function sendSmsChannel(notif: NotificationInput): Promise<DispatchResult> {
-  try {
-    if (!notif.phone) {
-      return { channel: "sms", ok: false, error: "no recipient phone" };
-    }
-    const mod = (await import("@/lib/twilio-sms")) as {
-      sendSms: (req: { to: string; body: string }) => Promise<{ sid: string; status: string }>;
-    };
-    const text = notif.link
-      ? `${notif.title}: ${notif.body} ${notif.link}`
-      : `${notif.title}: ${notif.body}`;
-    await mod.sendSms({ to: notif.phone, body: text });
-    return { channel: "sms", ok: true };
-  } catch (err) {
-    return {
-      channel: "sms",
-      ok: false,
-      error: err instanceof Error ? err.message : String(err),
-    };
-  }
+async function sendSmsChannel(_notif: NotificationInput): Promise<DispatchResult> {
+  // Rule 31 — SMS delegated to Crontech BLK-031. Caller should route
+  // SMS notifications through the Crontech SMS endpoint at
+  // https://api.crontech.ai/api/v1/sms (Twilio-shape compatible).
+  // This channel is a no-op until Crontech SMS is wired in.
+  return { channel: "sms", ok: false, error: "SMS delegated to Crontech BLK-031" };
 }
 
 async function sendPush(): Promise<DispatchResult> {

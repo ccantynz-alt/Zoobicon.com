@@ -204,7 +204,7 @@ export default function Dominat8Page() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link href="/auth/login" className="hidden sm:block text-sm text-white/65 hover:text-white transition-colors">
+            <Link href="/builder" className="hidden sm:block text-sm text-white/65 hover:text-white transition-colors">
               Log in
             </Link>
             <Link
@@ -530,7 +530,7 @@ export default function Dominat8Page() {
               <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>
               <Link href="/terms" className="hover:text-white/60 transition-colors">Terms</Link>
               <Link href="/support" className="hover:text-white/60 transition-colors">Support</Link>
-              <Link href="/developers" className="hover:text-white/60 transition-colors">API</Link>
+              <Link href="/builder" className="hover:text-white/60 transition-colors">API</Link>
             </div>
             <p className="text-xs text-white/60">
               © {new Date().getFullYear()} Dominat8. All rights reserved.

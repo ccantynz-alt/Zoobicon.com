@@ -485,7 +485,7 @@ export default function PasswordGeneratorPage() {
               Prevent attackers from intercepting your passwords on public Wi-Fi.
             </p>
             <Link
-              href="/products/vpn"
+              href="/domains"
               className="inline-flex items-center gap-2 bg-stone-500 hover:bg-stone-400 text-black font-bold px-6 py-3 rounded-xl transition-colors"
             >
               <Shield className="w-5 h-5" />

@@ -2,7 +2,8 @@
  * White-Label Brand Configuration
  *
  * Supports multiple brands from a single codebase:
- * - zoobicon.com / zoobicon.ai / zoobicon.sh — Primary brand
+ * - zoobicon.com / zoobicon.ai / zoobicon.io — Primary brand
+ *   (zoobicon.sh retired 2026-05-17 — hosting delegated to Crontech)
  * - dominat8.io / dominat8.com — Secondary income stream brand
  *
  * Usage:
@@ -61,7 +62,7 @@ const ZOOBICON_CONFIG: BrandConfig = {
   name: "Zoobicon",
   tagline: "Build anything with AI",
   description: "The AI platform that generates production-ready websites, apps, dashboards, and marketing assets in seconds.",
-  domains: ["zoobicon.com", "zoobicon.ai", "zoobicon.io", "zoobicon.sh", "localhost"],
+  domains: ["zoobicon.com", "zoobicon.ai", "zoobicon.io", "localhost"],
   logo: {
     text: "Zoobicon",
     icon: "Zap",

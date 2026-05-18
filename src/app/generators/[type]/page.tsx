@@ -2192,14 +2192,14 @@ export default function GeneratorTypePage() {
             </Link>
             {isLoggedIn ? (
               <Link
-                href="/dashboard"
+                href="/admin"
                 className="text-sm bg-white text-gray-950 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition"
               >
                 Dashboard
               </Link>
             ) : (
               <Link
-                href="/auth/signup"
+                href="/builder"
                 className="text-sm bg-white text-gray-950 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition"
               >
                 Get Started

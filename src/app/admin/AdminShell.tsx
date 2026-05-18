@@ -6,73 +6,56 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Activity,
-  Heart,
   Globe,
   Shield,
-  HeadphonesIcon,
-  BarChart3,
   CheckCircle,
   Puzzle,
-  Mail,
-  Inbox,
   LogOut,
   Menu,
   X,
   Zap,
   Smartphone,
-  Wifi,
-  Calendar,
   Settings,
 } from "lucide-react";
 
+// Rule 31 — post-Crontech pivot admin only covers what Zoobicon still owns:
+// builder/video/domains/intel. Hosting, email, mailboxes, support tickets,
+// usage analytics, eSIM, booking — all delegated to Crontech, sidebar items
+// removed. Crontech admin panel covers those domains.
 const SIDEBAR_SECTIONS = [
   {
     label: "OVERVIEW",
     items: [
       { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
       { name: "Mobile", href: "/admin/mobile", icon: Smartphone },
-      { name: "Operations", href: "/admin/operations", icon: Activity },
     ],
   },
   {
     label: "MONITORING",
     items: [
-      { name: "Health", href: "/admin/health", icon: Heart },
       { name: "Market Intel", href: "/admin/market-intel", icon: Globe },
       { name: "Competitive Intel", href: "/admin/intel", icon: Shield },
     ],
   },
   {
-    label: "PRODUCTS",
+    label: "DOMAINS",
     items: [
-      { name: "My Domains", href: "/my-domains", icon: Globe },
       { name: "Domain Admin", href: "/admin/domains", icon: Globe },
       { name: "Register Domain", href: "/domains", icon: Globe },
-      { name: "eSIM", href: "/admin/esim", icon: Wifi },
-      { name: "Booking", href: "/admin/booking", icon: Calendar },
     ],
   },
   {
-    label: "USERS & SUPPORT",
+    label: "BUILDS",
     items: [
-      { name: "Support Tickets", href: "/admin/support", icon: HeadphonesIcon },
-      { name: "Usage & Analytics", href: "/admin/usage", icon: BarChart3 },
-    ],
-  },
-  {
-    label: "CONTENT",
-    items: [
+      { name: "Builds", href: "/admin/builds", icon: Activity },
       { name: "Pre-Launch Checklist", href: "/admin/pre-launch", icon: CheckCircle },
+    ],
+  },
+  {
+    label: "PLATFORM",
+    items: [
       { name: "Integrations", href: "/admin/integrations", icon: Puzzle },
       { name: "Settings", href: "/admin/settings", icon: Settings },
-    ],
-  },
-  {
-    label: "EMAIL",
-    items: [
-      { name: "Email Dashboard", href: "/admin/email", icon: Mail },
-      { name: "Email Settings", href: "/admin/email-settings", icon: Mail },
-      { name: "Mailboxes", href: "/admin/mailboxes", icon: Inbox },
     ],
   },
 ];
@@ -85,21 +68,25 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    // Rule 31 — auth delegated to Crontech SSO. localStorage payload is
+    // populated on SSO callback; until SSO is wired, the dev path is to
+    // manually set {role:"admin"} in DevTools. Non-admin (or unset) users
+    // get bounced home rather than to a deleted /auth/login route.
     try {
       const raw = localStorage.getItem("zoobicon_user");
       if (!raw) {
-        window.location.href = "/auth/login";
+        window.location.href = "/";
         return;
       }
       const user = JSON.parse(raw);
       if (user.role !== "admin") {
-        window.location.href = "/dashboard";
+        window.location.href = "/";
         return;
       }
       setUserName(user.name || user.email || "Admin");
       setIsAdmin(true);
     } catch {
-      window.location.href = "/auth/login";
+      window.location.href = "/";
     }
     setChecking(false);
   }, []);

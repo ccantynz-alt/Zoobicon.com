@@ -33,6 +33,8 @@ import { PRICING_TIERS_SCHEMA } from "./templates/pricing-tiers";
 import { FOOTER_EDITORIAL_SCHEMA } from "./templates/footer-editorial";
 import { HERO_RESTAURANT_WARM_SCHEMA } from "./templates/by-industry/hero-restaurant-warm";
 import { HERO_PORTFOLIO_EDITORIAL_SCHEMA } from "./templates/by-industry/hero-portfolio-editorial";
+import { getQuarantinedComponents } from "@/lib/flywheel/self-healing";
+import { getIndustryPreferences } from "@/lib/flywheel/consolidate";
 
 interface PlannerSchema extends ComponentSchema {
   /** How well this schema matches a given context — computed at pick time. */
@@ -148,4 +150,80 @@ export function planPageForIndustry(ctx: {
  */
 export function listSlotLockedSchemas(): PlannerSchema[] {
   return ALL_SCHEMAS.slice();
+}
+
+/**
+ * Async variant that consults flywheel intelligence:
+ *   - Skips quarantined components (B29 — self-healing)
+ *   - Prefers components that the flywheel has observed >50% share in
+ *     this industry (B27 — consolidation memories)
+ *
+ * Falls through to the synchronous picker if the DB is unavailable
+ * or returns no relevant intelligence. This is the planner
+ * production builds should call going forward.
+ */
+export async function pickComponentForIndustryAdaptive(ctx: PickContext): Promise<string | null> {
+  // Step 1: figure out the synchronous best-match candidate ranking.
+  const candidates = ALL_SCHEMAS.filter((s) => s.category === ctx.category);
+  if (candidates.length === 0) return null;
+
+  // Step 2: pull the in-flight intelligence (best-effort).
+  const [quarantined, preferences] = await Promise.all([
+    getQuarantinedComponents().catch(() => new Set<string>()),
+    ctx.industry ? getIndustryPreferences(ctx.industry).catch(() => []) : Promise.resolve([]),
+  ]);
+
+  const healthy = candidates.filter((s) => !quarantined.has(s.id));
+  if (healthy.length === 0) {
+    // Every candidate is quarantined — fall back to anything that fits
+    // (better degraded site than no site).
+    return pickComponentForIndustry(ctx);
+  }
+
+  // Step 3: if we have a strong preference from past builds and that
+  // preferred component is healthy, pick it.
+  for (const pref of preferences) {
+    if (pref.sharePercent < 50) break; // preferences are sorted desc
+    if (healthy.find((s) => s.id === pref.componentId)) {
+      return pref.componentId;
+    }
+  }
+
+  // Step 4: fall through to synchronous scoring with the quarantined
+  // set filtered out.
+  const baseline = pickComponentForIndustry(ctx);
+  if (baseline && !quarantined.has(baseline)) return baseline;
+
+  // Last resort: pick the first healthy candidate of any rank.
+  return healthy[0]?.id || null;
+}
+
+/**
+ * Async variant of planPageForIndustry that uses the adaptive picker.
+ * Slot-stream should call this — it's the path that benefits from
+ * self-healing + flywheel intelligence.
+ */
+export async function planPageForIndustryAdaptive(ctx: {
+  industry?: string;
+  theme?: string;
+  includePricing?: boolean;
+}): Promise<string[]> {
+  const PRICING_INDUSTRIES = new Set([
+    "saas", "agency", "startup", "education", "ecommerce", "fitness", "hospitality",
+  ]);
+
+  const includePricing =
+    ctx.includePricing ?? (ctx.industry ? PRICING_INDUSTRIES.has(ctx.industry) : true);
+
+  const picks = await Promise.all([
+    pickComponentForIndustryAdaptive({ category: "navbar", industry: ctx.industry, theme: ctx.theme }),
+    pickComponentForIndustryAdaptive({ category: "hero", industry: ctx.industry, theme: ctx.theme }),
+    pickComponentForIndustryAdaptive({ category: "features", industry: ctx.industry, theme: ctx.theme }),
+    includePricing
+      ? pickComponentForIndustryAdaptive({ category: "pricing", industry: ctx.industry, theme: ctx.theme })
+      : Promise.resolve(null),
+    pickComponentForIndustryAdaptive({ category: "footer", industry: ctx.industry, theme: ctx.theme }),
+  ]);
+
+  return picks.filter((id): id is string => id !== null);
 }
