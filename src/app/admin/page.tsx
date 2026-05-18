@@ -37,18 +37,8 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 
-type AdminTab = "overview" | "users" | "templates" | "analytics";
-
-interface UserRecord {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-  plan: string;
-  subscription_status: string | null;
-  created_at: string;
-  projectCount: number;
-}
+// Rule 31 — Users + Analytics tabs delegated to Crontech.
+type AdminTab = "overview" | "templates";
 
 interface TemplateRecord {
   id: string;
@@ -61,13 +51,6 @@ interface TemplateRecord {
   featured: boolean;
 }
 
-interface Analytics {
-  stats: { totalUsers: number; totalProjects: number; totalSites: number; totalDeployments: number };
-  recentUsers: Array<{ email: string; name: string; plan: string; created_at: string }>;
-  recentProjects: Array<{ name: string; user_email: string; created_at: string }>;
-  planDistribution: Array<{ plan: string; count: number }>;
-}
-
 export default function AdminPage() {
   // AdminShell is the single auth gate — see src/app/admin/AdminShell.tsx.
   // A duplicated check here used to race against it and flash redirects.
@@ -77,18 +60,9 @@ export default function AdminPage() {
   const [apiTest, setApiTest] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [apiError, setApiError] = useState("");
 
-  // Data states
-  const [users, setUsers] = useState<UserRecord[]>([]);
-  const [usersLoading, setUsersLoading] = useState(false);
+  // Rule 31 — users/analytics state removed (delegated to Crontech).
   const [templates, setTemplates] = useState<TemplateRecord[]>([]);
   const [templatesLoading, setTemplatesLoading] = useState(false);
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
-  const [analyticsLoading, setAnalyticsLoading] = useState(false);
-
-  // Edit states
-  const [editingUser, setEditingUser] = useState<string | null>(null);
-  const [editRole, setEditRole] = useState("");
-  const [editPlan, setEditPlan] = useState("");
 
   const copyToClipboard = (text: string, key: string) => {
     navigator.clipboard.writeText(text).catch(() => {});
@@ -119,16 +93,6 @@ export default function AdminPage() {
 
   // ── Data fetchers ──
 
-  const fetchUsers = useCallback(async () => {
-    setUsersLoading(true);
-    try {
-      const res = await fetch("/api/admin/users");
-      const data = await res.json();
-      setUsers(data.users || []);
-    } catch { setUsers([]); }
-    setUsersLoading(false);
-  }, []);
-
   const fetchTemplates = useCallback(async () => {
     setTemplatesLoading(true);
     try {
@@ -139,47 +103,19 @@ export default function AdminPage() {
     setTemplatesLoading(false);
   }, []);
 
-  const fetchAnalytics = useCallback(async () => {
-    setAnalyticsLoading(true);
-    try {
-      const res = await fetch("/api/admin/analytics");
-      const data = await res.json();
-      setAnalytics(data);
-    } catch { setAnalytics(null); }
-    setAnalyticsLoading(false);
-  }, []);
-
   useEffect(() => {
     if (!isAdmin) return;
-    if (activeTab === "users") fetchUsers();
     if (activeTab === "templates") fetchTemplates();
-    if (activeTab === "analytics") fetchAnalytics();
-  }, [activeTab, isAdmin, fetchUsers, fetchTemplates, fetchAnalytics]);
+  }, [activeTab, isAdmin, fetchTemplates]);
 
-  // ── User actions ──
-
-  const updateUser = async (id: string) => {
-    await fetch(`/api/admin/users?id=${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ role: editRole || undefined, plan: editPlan || undefined }),
-    });
-    setEditingUser(null);
-    fetchUsers();
-  };
-
-  const deleteUser = async (id: string, email: string) => {
-    if (!confirm(`Delete user ${email}? This cannot be undone.`)) return;
-    await fetch(`/api/admin/users?id=${id}`, { method: "DELETE" });
-    fetchUsers();
-  };
+  // Rule 31 — user CRUD lives in Crontech; updateUser/deleteUser removed.
 
   if (!isAdmin) return null;
 
+  // Rule 31 — Users + Analytics tabs removed (delegated to Crontech).
+  // Overview + Templates only — both Zoobicon-owned.
   const tabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
     { id: "overview", label: "Overview", icon: <Zap className="w-4 h-4" /> },
-    { id: "analytics", label: "Analytics", icon: <BarChart3 className="w-4 h-4" /> },
-    { id: "users", label: "Users", icon: <Users className="w-4 h-4" /> },
     { id: "templates", label: "Templates", icon: <Layout className="w-4 h-4" /> },
   ];
 
@@ -281,10 +217,7 @@ export default function AdminPage() {
     { method: "POST", path: "/api/clone", desc: "Clone & upgrade any website", limit: "—" },
     { method: "POST", path: "/api/chat", desc: "Stream AI code editing", limit: "20/min" },
     { method: "POST", path: "/api/support", desc: "Stream Zoe support chat", limit: "30/min" },
-    { method: "GET",  path: "/api/admin/users", desc: "User management", limit: "admin" },
-    { method: "GET",  path: "/api/admin/analytics", desc: "Platform analytics", limit: "admin" },
     { method: "GET",  path: "/api/admin/templates", desc: "Template management", limit: "admin" },
-    { method: "POST", path: "/api/hosting/deploy", desc: "Deploy site", limit: "—" },
   ];
 
   return (
@@ -570,238 +503,6 @@ export default function AdminPage() {
                 ))}
               </div>
             </motion.div>
-          </>
-        )}
-
-        {/* ═══════ ANALYTICS TAB ═══════ */}
-        {activeTab === "analytics" && (
-          <>
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-black tracking-tight text-stone-800">Analytics</h1>
-              <button onClick={fetchAnalytics} className="flex items-center gap-1.5 text-xs text-stone-600 hover:text-stone-700 border border-stone-200 bg-stone-50 hover:bg-stone-100 rounded-xl px-3 py-1.5 transition-all shadow-sm">
-                <RefreshCw className={`w-3 h-3 ${analyticsLoading ? "animate-spin" : ""}`} />
-                Refresh
-              </button>
-            </div>
-
-            {/* Stat cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { label: "Total Users", value: analytics?.stats.totalUsers || 0, icon: Users, iconGradient: "from-stone-700 to-stone-900" },
-                { label: "Projects", value: analytics?.stats.totalProjects || 0, icon: FolderOpen, iconGradient: "from-stone-600 to-stone-800" },
-                { label: "Sites Deployed", value: analytics?.stats.totalSites || 0, icon: Rocket, iconGradient: "from-stone-700 to-stone-800" },
-                { label: "Deployments", value: analytics?.stats.totalDeployments || 0, icon: TrendingUp, iconGradient: "from-stone-600 to-stone-700" },
-              ].map((s) => (
-                <motion.div
-                  key={s.label}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="rounded-2xl p-5 bg-white border border-stone-200/80 backdrop-blur-xl shadow-sm hover:shadow-lg hover:shadow-stone-100/30 hover:scale-[1.03] transition-all duration-300"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.iconGradient} flex items-center justify-center shadow-lg`}>
-                      <s.icon className="w-5 h-5 text-white" />
-                    </div>
-                  </div>
-                  <div className="text-3xl font-black text-stone-800">{s.value}</div>
-                  <div className="text-xs text-stone-600 mt-1 font-medium">{s.label}</div>
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-6">
-              {/* Plan Distribution */}
-              <div className="rounded-2xl p-6 border border-stone-200/80 bg-white backdrop-blur-xl shadow-sm">
-                <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-stone-700">
-                  <Crown className="w-4 h-4 text-stone-500" />
-                  Plan Distribution
-                </h2>
-                {analytics?.planDistribution && analytics.planDistribution.length > 0 ? (
-                  <div className="space-y-3">
-                    {analytics.planDistribution.map((p) => (
-                      <div key={p.plan} className="space-y-1.5">
-                        <div className="flex justify-between text-xs">
-                          <span className="text-stone-600 capitalize font-medium">{p.plan || "free"}</span>
-                          <span className="text-stone-600">{p.count} users</span>
-                        </div>
-                        <div className="h-2.5 bg-stone-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-stone-500 to-stone-700 rounded-full"
-                            style={{ width: `${Math.max(5, (p.count / (analytics.stats.totalUsers || 1)) * 100)}%` }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-stone-600">No user data available yet.</p>
-                )}
-              </div>
-
-              {/* Recent signups */}
-              <div className="rounded-2xl p-6 border border-stone-200/80 bg-white backdrop-blur-xl shadow-sm">
-                <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-stone-700">
-                  <UserPlus className="w-4 h-4 text-stone-500" />
-                  Recent Signups
-                </h2>
-                {analytics?.recentUsers && analytics.recentUsers.length > 0 ? (
-                  <div className="space-y-3">
-                    {analytics.recentUsers.slice(0, 8).map((u, i) => (
-                      <div key={i} className="flex items-center justify-between py-2 border-b border-stone-100 last:border-0">
-                        <div>
-                          <div className="text-xs font-semibold text-stone-700">{u.name || u.email}</div>
-                          <div className="text-xs text-stone-600">{u.email}</div>
-                        </div>
-                        <div className="text-xs text-stone-600 font-medium">
-                          {new Date(u.created_at).toLocaleDateString()}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-stone-600">No users yet. They&apos;ll show up here once people sign up.</p>
-                )}
-              </div>
-            </div>
-
-            {/* Recent projects */}
-            <div className="rounded-2xl p-6 border border-stone-200/80 bg-white backdrop-blur-xl shadow-sm">
-              <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-stone-700">
-                <FolderOpen className="w-4 h-4 text-stone-500" />
-                Recent Projects
-              </h2>
-              {analytics?.recentProjects && analytics.recentProjects.length > 0 ? (
-                <div className="grid md:grid-cols-2 gap-3">
-                  {analytics.recentProjects.map((p, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white border border-stone-200/80 hover:bg-stone-50 hover:border-stone-200 transition-all">
-                      <div>
-                        <div className="text-xs font-semibold text-stone-700">{p.name}</div>
-                        <div className="text-xs text-stone-600">{p.user_email}</div>
-                      </div>
-                      <div className="text-xs text-stone-600 font-medium">
-                        {new Date(p.created_at).toLocaleDateString()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-stone-600">No projects created yet.</p>
-              )}
-            </div>
-          </>
-        )}
-
-        {/* ═══════ USERS TAB ═══════ */}
-        {activeTab === "users" && (
-          <>
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-black tracking-tight text-stone-800">User Management</h1>
-                <p className="text-stone-600 text-sm mt-1 font-medium">{users.length} registered users</p>
-              </div>
-              <button onClick={fetchUsers} className="flex items-center gap-1.5 text-xs text-stone-600 hover:text-stone-700 border border-stone-200 bg-stone-50 hover:bg-stone-100 rounded-xl px-3 py-1.5 transition-all shadow-sm">
-                <RefreshCw className={`w-3 h-3 ${usersLoading ? "animate-spin" : ""}`} />
-                Refresh
-              </button>
-            </div>
-
-            {users.length > 0 ? (
-              <div className="rounded-2xl border border-stone-200/80 bg-white overflow-hidden backdrop-blur-xl shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-stone-100 bg-stone-50">
-                        <th className="text-left text-xs uppercase tracking-wider text-stone-600 px-4 py-3 font-bold">User</th>
-                        <th className="text-left text-xs uppercase tracking-wider text-stone-600 px-4 py-3 font-bold">Role</th>
-                        <th className="text-left text-xs uppercase tracking-wider text-stone-600 px-4 py-3 font-bold">Plan</th>
-                        <th className="text-left text-xs uppercase tracking-wider text-stone-600 px-4 py-3 font-bold">Projects</th>
-                        <th className="text-left text-xs uppercase tracking-wider text-stone-600 px-4 py-3 font-bold">Joined</th>
-                        <th className="text-right text-xs uppercase tracking-wider text-stone-600 px-4 py-3 font-bold">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.map((user) => (
-                        <tr key={user.id} className="border-b border-stone-100 hover:bg-stone-50 transition-colors">
-                          <td className="px-4 py-3">
-                            <div className="text-sm font-semibold text-stone-700">{user.name || "—"}</div>
-                            <div className="text-xs text-stone-600">{user.email}</div>
-                          </td>
-                          <td className="px-4 py-3">
-                            {editingUser === user.id ? (
-                              <select value={editRole} onChange={(e) => setEditRole(e.target.value)}
-                                className="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700">
-                                <option value="user">User</option>
-                                <option value="admin">Admin</option>
-                              </select>
-                            ) : (
-                              <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
-                                user.role === "admin"
-                                  ? "bg-stone-50 text-stone-700 border border-stone-200"
-                                  : "bg-stone-50 text-stone-700 border border-stone-200"
-                              }`}>
-                                {user.role === "admin" && <Crown className="w-3 h-3 inline mr-1" />}
-                                {user.role}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3">
-                            {editingUser === user.id ? (
-                              <select value={editPlan} onChange={(e) => setEditPlan(e.target.value)}
-                                className="bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs text-stone-700">
-                                <option value="free">Free</option>
-                                <option value="pro">Pro</option>
-                                <option value="unlimited">Unlimited</option>
-                              </select>
-                            ) : (
-                              <span className="text-xs text-stone-700 capitalize font-medium">{user.plan || "free"}</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="text-xs text-stone-700 font-medium">{user.projectCount}</span>
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className="text-xs text-stone-600">
-                              {new Date(user.created_at).toLocaleDateString()}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-right">
-                            {editingUser === user.id ? (
-                              <div className="flex items-center justify-end gap-1.5">
-                                <button onClick={() => updateUser(user.id)}
-                                  className="text-xs text-stone-600 hover:text-stone-700 px-3 py-1.5 rounded-xl border border-stone-200 hover:bg-stone-50 transition-all font-semibold">
-                                  Save
-                                </button>
-                                <button onClick={() => setEditingUser(null)}
-                                  className="text-xs text-stone-600 hover:text-stone-600 px-3 py-1.5 rounded-xl border border-stone-200 transition-all">
-                                  Cancel
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="flex items-center justify-end gap-1.5">
-                                <button onClick={() => { setEditingUser(user.id); setEditRole(user.role); setEditPlan(user.plan); }}
-                                  className="text-stone-600 hover:text-stone-600 p-1.5 rounded-lg hover:bg-stone-50 transition-all" title="Edit">
-                                  <Edit3 className="w-3.5 h-3.5" />
-                                </button>
-                                <button onClick={() => deleteUser(user.id, user.email)}
-                                  className="text-stone-600 hover:text-stone-500 p-1.5 rounded-lg hover:bg-stone-50 transition-all" title="Delete">
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-stone-200 bg-white p-12 text-center">
-                <Users className="w-14 h-14 text-stone-200 mx-auto mb-4" />
-                <h3 className="text-sm font-bold mb-1 text-stone-600">No users yet</h3>
-                <p className="text-xs text-stone-600">
-                  {usersLoading ? "Loading..." : "Users will appear here once they sign up. Make sure DATABASE_URL is configured."}
-                </p>
-              </div>
-            )}
           </>
         )}
 

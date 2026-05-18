@@ -52,11 +52,9 @@ export default function MobileAdminDashboard() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [analyticsRes, healthRes] = await Promise.all([
-        fetch("/api/admin/analytics").then(r => r.json()).catch(() => null),
-        fetch("/api/health").then(r => r.json()).catch(() => null),
-      ]);
-      if (analyticsRes) setAnalytics(analyticsRes);
+      // Rule 31 — platform analytics live in Crontech; mobile dashboard
+      // only pulls /api/health which Zoobicon still owns.
+      const healthRes = await fetch("/api/health").then(r => r.json()).catch(() => null);
       if (healthRes) setHealth(healthRes);
       setLastRefresh(new Date());
     } catch {
@@ -297,7 +295,7 @@ export default function MobileAdminDashboard() {
 
           {/* Footer */}
           <div className="text-center py-6">
-            <p className="text-xs text-stone-600">zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh</p>
+            <p className="text-xs text-stone-600">zoobicon.com · zoobicon.ai · zoobicon.io</p>
             <button
               onClick={() => {
                 try { localStorage.removeItem("zoobicon_user"); } catch {}

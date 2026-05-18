@@ -48,7 +48,7 @@ export default function TermsPage() {
             <h2 className="text-xl font-bold text-white mb-3">1. Acceptance of Terms</h2>
             <p>
               By accessing or using any Zoobicon platform — including zoobicon.com, zoobicon.ai,
-              zoobicon.io, and zoobicon.sh (collectively, the &ldquo;Platform&rdquo;) — you agree to be bound
+              zoobicon.io (collectively, the &ldquo;Platform&rdquo;) — you agree to be bound
               by these Terms of Service (&ldquo;Terms&rdquo;). If you do not agree to all of these Terms, you
               may not access or use the Platform.
             </p>

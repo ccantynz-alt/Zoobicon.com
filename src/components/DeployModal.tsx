@@ -125,9 +125,13 @@ export default function DeployModal({
     ? siteName.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40)
     : "my-site";
 
+  // Rule 31 — both deploy targets are Crontech now; legacy zoobicon.sh
+  // was retired. We keep two provider entries for the time being so the
+  // UI still hints that fast-tier vs preview-tier exists, but both URLs
+  // resolve to Crontech-owned subdomains until the tiers diverge.
   const previewUrl = provider === "crontech"
-    ? `https://${previewSlug}.crontech.io`
-    : `https://${previewSlug}.zoobicon.sh`;
+    ? `https://${previewSlug}.crontech.app`
+    : `https://${previewSlug}.crontech.app`;
 
   const providers: Array<{
     id: DeployProvider;
@@ -151,8 +155,8 @@ export default function DeployModal({
     },
     {
       id: "zoobicon",
-      label: "Zoobicon Cloud",
-      tagline: "Instant preview at zoobicon.sh — always available",
+      label: "Preview Cloud",
+      tagline: "Instant preview URL — always available",
       icon: Server,
       enabled: true,
       gradient: "from-stone-500/15 to-stone-500/10",

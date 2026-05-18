@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Zoobicon CLI — Terminal Website Builder",
   description:
-    "Build and deploy websites from your terminal. npm install -g zoobicon, describe your site, deploy to zoobicon.sh. Developer-first AI website generation.",
+    "Build and deploy websites from your terminal. npm install -g zoobicon, describe your site, deploy through our partner cloud. Developer-first AI website generation.",
   openGraph: {
     title: "Zoobicon CLI — Terminal Website Builder",
     description:
-      "Build and deploy websites from your terminal. npm install -g zoobicon, describe your site, deploy to zoobicon.sh. Developer-first AI website generation.",
+      "Build and deploy websites from your terminal. npm install -g zoobicon, describe your site, deploy through our partner cloud. Developer-first AI website generation.",
     url: "https://zoobicon.com/cli",
     siteName: "Zoobicon",
     type: "website",

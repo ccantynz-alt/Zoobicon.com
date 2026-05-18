@@ -57,7 +57,7 @@ const FEATURES = [
   { icon: Globe, title: "SEO Included", desc: "Meta titles, descriptions, and OG tags baked into the theme. Yoast SEO compatible out of the box." },
   { icon: Shield, title: "No Plugin Required", desc: "Pure theme export — works on any WordPress installation. Self-hosted, WordPress.com Business, any host." },
   { icon: RefreshCw, title: "WXR Content Import", desc: "WordPress XML import file included. Import your pages and content in one step via Tools → Import." },
-  { icon: Zap, title: "Or Just Host on Zoobicon", desc: "Skip WordPress entirely. Deploy instantly to zoobicon.sh with free hosting, SSL, and CDN included." },
+  { icon: Zap, title: "Or skip WordPress entirely", desc: "Generate your site in the Zoobicon builder and deploy it instantly via our partner cloud — free SSL and global CDN included." },
 ];
 
 export default function WordPressPage() {
@@ -103,7 +103,7 @@ export default function WordPressPage() {
 
             <motion.p variants={fadeInUp} className="max-w-2xl mx-auto text-lg text-white/60 leading-relaxed mb-10">
               Generate with AI. Export as a WordPress theme. Upload and go. Build your site in
-              Zoobicon, then take it to WordPress — or host it free on zoobicon.sh.
+              Zoobicon, then take it to WordPress — or deploy it instantly through our partner cloud.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-3">
@@ -116,7 +116,7 @@ export default function WordPressPage() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link href="/builder" className="px-6 py-3 rounded-xl text-sm font-medium text-white/65 border border-white/[0.12] hover:border-white/20 hover:text-white/70 transition-all flex items-center gap-2">
-                Free Hosting on zoobicon.sh
+                Try the AI builder
               </Link>
             </motion.div>
           </motion.div>
@@ -192,7 +192,7 @@ export default function WordPressPage() {
                   { platform: "Self-hosted (WordPress.org)", theme: true, plugin: true, note: "Full support — themes, plugins, custom code" },
                   { platform: "WordPress.com Business+", theme: true, plugin: true, note: "Full support — upload themes and plugins" },
                   { platform: "WordPress.com Personal/Premium", theme: false, plugin: false, note: "Limited — no custom themes or plugins" },
-                  { platform: "WordPress.com Free", theme: false, plugin: false, note: "Very limited — use zoobicon.sh hosting instead" },
+                  { platform: "WordPress.com Free", theme: false, plugin: false, note: "Very limited — deploy through our partner cloud instead" },
                 ].map((row, i) => (
                   <div key={i} className="flex items-center gap-3 px-5 py-3.5 hover:bg-white/[0.03]">
                     <span className="text-sm text-white/80 font-medium min-w-[200px]">{row.platform}</span>
@@ -207,7 +207,7 @@ export default function WordPressPage() {
 
             <motion.div variants={fadeInUp} className="mt-6 bg-accent-stone/5 border border-accent-stone/10 rounded-xl p-4">
               <p className="text-sm text-white/60 leading-relaxed">
-                <span className="text-accent-stone font-semibold">Recommendation:</span> For the fastest, easiest experience, host directly on <Link href="/builder" className="text-accent-stone hover:underline">zoobicon.sh</Link> — free hosting with SSL, CDN, and instant deploys. No WordPress needed.
+                <span className="text-accent-stone font-semibold">Recommendation:</span> For the fastest, easiest experience, generate in the <Link href="/builder" className="text-accent-stone hover:underline">Zoobicon builder</Link> and deploy through our partner cloud — free SSL, global CDN, instant publish. No WordPress needed.
               </p>
             </motion.div>
           </motion.div>
@@ -221,7 +221,7 @@ export default function WordPressPage() {
             Ready to <span className="gradient-text">Build</span>?
           </h2>
           <p className="text-lg text-white/60 mb-8">
-            Build your site with AI, then export to WordPress or host free on zoobicon.sh.
+            Build your site with AI, then export to WordPress — or deploy through our partner cloud.
           </p>
           <div className="flex justify-center gap-3">
             <Link

@@ -195,9 +195,8 @@ export default function RootLayout({
             "knowsAbout": [
               "AI website generation",
               "Multi-agent AI pipelines",
-              "Website hosting and deployment",
-              "E-commerce storefront generation",
-              "Full-stack application generation",
+              "AI video generation",
+              "Domain registration",
               "SEO optimization",
               "AI-powered web design",
               "White-label website builder platforms",
@@ -206,7 +205,6 @@ export default function RootLayout({
               "AI code generation",
               "Responsive web design",
               "Website templates",
-              "SaaS application development",
               "Agency website management"
             ],
             "hasOfferCatalog": {

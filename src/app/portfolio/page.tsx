@@ -347,7 +347,7 @@ export default function PortfolioPage() {
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { label: 'Download HTML', desc: 'Standalone HTML file', icon: <Download className="w-5 h-5" /> },
-                  { label: 'Deploy to zoobicon.sh', desc: 'Live portfolio site', icon: <Globe className="w-5 h-5" /> },
+                  { label: 'Deploy to.crontech.app', desc: 'Live portfolio site', icon: <Globe className="w-5 h-5" /> },
                   { label: 'Export as React', desc: 'React components', icon: <Copy className="w-5 h-5" /> },
                   { label: 'Generate PDF', desc: 'Print-ready portfolio', icon: <Briefcase className="w-5 h-5" /> },
                 ].map((opt, i) => (

@@ -694,7 +694,7 @@ export default function AgencyDashboard() {
                               <Pencil size={14} />
                             </Link>
                             <a
-                              href={`https://${site.slug}.zoobicon.sh`}
+                              href={`https://${site.slug}.crontech.app`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-stone-400 hover:text-stone-300 text-xs"
@@ -813,7 +813,7 @@ export default function AgencyDashboard() {
 
                 <div className="flex items-center gap-2 mt-2">
                   <a
-                    href={`https://${site.slug}.zoobicon.sh`}
+                    href={`https://${site.slug}.crontech.app`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1 bg-white/5 hover:bg-white/10 text-white/70 text-xs px-3 py-1.5 rounded-lg transition-colors"

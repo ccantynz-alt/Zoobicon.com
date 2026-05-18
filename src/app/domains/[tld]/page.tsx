@@ -108,10 +108,10 @@ const TLD_DATA: Record<string, TldInfo> = {
     facts: [
       "Originally the country code for Saint Helena",
       "Adopted by developers because .sh = shell script",
-      "Used by major platforms like deno.sh, bun.sh, and zoobicon.sh",
+      "Used by major platforms like deno.sh, bun.sh",
       "Short URLs make great CLI tool names",
     ],
-    examples: ["deno.sh", "bun.sh", "warp.sh", "zoobicon.sh", "railway.sh", "render.sh"],
+    examples: ["deno.sh", "bun.sh", "warp.sh", .crontech.app", "railway.sh", "render.sh"],
   },
   dev: {
     tld: "dev",
@@ -375,7 +375,7 @@ export default function TldPage() {
               { icon: Zap, title: "Instant Activation", desc: "Your domain goes live in seconds, not hours or days" },
               { icon: Globe, title: "DNS Management", desc: "Full DNS control — A, CNAME, MX, TXT records and more" },
               { icon: Sparkles, title: "AI Website Builder", desc: "Build a full website for your domain in 60 seconds with AI" },
-              { icon: Server, title: "Free Hosting", desc: "Deploy to zoobicon.sh — fast, reliable, included in the price" },
+              { icon: Server, title: "Free Hosting", desc: "Deploy to.crontech.app — fast, reliable, included in the price" },
             ].map((f) => (
               <div key={f.title} className="p-5 rounded-2xl border border-white/[0.06] bg-white/[0.03] text-left">
                 <f.icon className="w-5 h-5 text-stone-400 mb-3" />

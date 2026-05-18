@@ -24,7 +24,7 @@ const FEATURES = [
   { icon: Layout, title: "12+ Templates", desc: "Start from SaaS, portfolio, e-commerce, restaurant, agency, blog, and more. All customizable." },
   { icon: RefreshCw, title: "Streaming Generation", desc: "Watch your code appear in real-time. See the site building itself character by character." },
   { icon: Palette, title: "Style Presets", desc: "Modern dark, clean minimal, bold colorful, corporate — choose a style or let AI decide." },
-  { icon: Download, title: "One-Click Export", desc: "Download as HTML, copy to clipboard, or deploy directly to a zoobicon.sh subdomain." },
+  { icon: Download, title: "One-Click Export", desc: "Download as HTML, copy to clipboard, or deploy directly to a.crontech.app subdomain." },
   { icon: Search, title: "Built-in SEO", desc: "Auto-generated meta tags, semantic HTML5, structured data, and accessibility compliance." },
 ];
 
@@ -107,7 +107,7 @@ export default function WebsiteBuilderPage() {
         "name": "Can I export or self-host the websites Zoobicon generates?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes. You can deploy to zoobicon.sh with one click (free hosting included), download as standalone HTML, export as a React/Next.js project, push to GitHub, or export as a WordPress theme. The generated code is yours with no lock-in."
+          "text": "Yes. You can deploy through our partner cloud with one click (free hosting included), download as standalone HTML, export as a React/Next.js project, push to GitHub, or export as a WordPress theme. The generated code is yours with no lock-in."
         }
       },
       {
