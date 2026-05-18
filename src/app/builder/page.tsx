@@ -660,6 +660,11 @@ function BuilderPage() {
   const [activeTool, setActiveTool] = useState<ToolId>(null);
   const [tier, setTier] = useState<Tier>("premium");
   const [isAdmin, setIsAdmin] = useState(false);
+  // Admin-private builds (Rule 31, 2026-05-17). Toggle only visible when
+  // isAdmin is true. When checked, the save call stamps visibility =
+  // 'admin_private' so the project never surfaces in gallery, showcase,
+  // intel exports, or the future Crontech project map.
+  const [adminPrivate, setAdminPrivate] = useState<boolean>(true);
   const [useWebContainers, setUseWebContainers] = useState<boolean>(true);
   const [userPlan, setUserPlan] = useState<Plan>("free");
 
@@ -1100,6 +1105,10 @@ function BuilderPage() {
               email: userEmail,
               prompt,
               code: JSON.stringify(reactFiles),
+              // Admin-private visibility flag. Server double-checks the
+              // role claim before honouring it — non-admins always save
+              // as 'public' regardless of what they POST.
+              visibility: isAdmin && adminPrivate ? "admin_private" : "public",
             }),
           });
           if (res.ok) {
@@ -2265,13 +2274,31 @@ root.render(React.createElement(App));
           onDismiss={() => setLaunchVideo({ status: "idle", step: "" })}
         />
         {isAdmin && (
-          <button
-            type="button"
-            onClick={() => setUseWebContainers((v) => !v)}
-            className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
-          >
-            Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
-          </button>
+          <div className="absolute top-2 right-2 z-50 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setAdminPrivate((v) => !v)}
+              className={`px-2 py-1 text-[10px] rounded border ${
+                adminPrivate
+                  ? "bg-amber-500/90 text-black border-amber-400"
+                  : "bg-black/70 text-white border-white/20"
+              }`}
+              title={
+                adminPrivate
+                  ? "This build is private — only you (admin) can see it. Click to make it public."
+                  : "This build is public — anyone can see it in showcase/gallery. Click to make it admin-private."
+              }
+            >
+              {adminPrivate ? "🔒 Admin Private" : "🌐 Public"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setUseWebContainers((v) => !v)}
+              className="px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
+            >
+              Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
+            </button>
+          </div>
         )}
 
         {/* Prompt input overlay at bottom — for recording demo sequences */}
