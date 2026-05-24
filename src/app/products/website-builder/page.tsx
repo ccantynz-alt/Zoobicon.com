@@ -24,7 +24,7 @@ const FEATURES = [
   { icon: Layout, title: "12+ Templates", desc: "Start from SaaS, portfolio, e-commerce, restaurant, agency, blog, and more. All customizable." },
   { icon: RefreshCw, title: "Streaming Generation", desc: "Watch your code appear in real-time. See the site building itself character by character." },
   { icon: Palette, title: "Style Presets", desc: "Modern dark, clean minimal, bold colorful, corporate — choose a style or let AI decide." },
-  { icon: Download, title: "One-Click Export", desc: "Download as HTML, copy to clipboard, or deploy directly to a.crontech.app subdomain." },
+  { icon: Download, title: "One-Click Export", desc: "Download as HTML, copy to clipboard, or deploy directly to a Crontech subdomain." },
   { icon: Search, title: "Built-in SEO", desc: "Auto-generated meta tags, semantic HTML5, structured data, and accessibility compliance." },
 ];
 

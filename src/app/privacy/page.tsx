@@ -47,8 +47,8 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-white mb-3">1. Introduction</h2>
             <p>
-              Zoobicon (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) operates zoobicon.com, zoobicon.ai, zoobicon.io, and
-             .crontech.app (collectively, the &ldquo;Platform&rdquo;). This Privacy Policy explains how we collect,
+              Zoobicon (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) operates zoobicon.com, zoobicon.ai, and
+              zoobicon.io (collectively, the &ldquo;Platform&rdquo;). This Privacy Policy explains how we collect,
               use, disclose, and safeguard your information when you use our Platform and services.
             </p>
             <p className="mt-3">

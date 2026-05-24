@@ -1185,10 +1185,10 @@ export default function ZoobiconIOPage() {
                 icon: Bot,
               },
               {
-                domain: .crontech.app",
+                domain: "crontech.app",
                 tagline: "Host it",
-                desc: "Deploy to.crontech.app with CDN, SSL, and custom domains. One-click from the builder.",
-                href: "/sh",
+                desc: "Deploy through our partner cloud — CDN, SSL, and custom domains, one-click from the builder.",
+                href: "/cli",
                 icon: Server,
               },
               {
@@ -1372,8 +1372,8 @@ export default function ZoobiconIOPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/sh" className="hover:text-gray-300">
-                   .crontech.app
+                  <Link href="/cli" className="hover:text-gray-300">
+                    CLI
                   </Link>
                 </li>
                 <li>

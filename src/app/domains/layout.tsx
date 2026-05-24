@@ -86,7 +86,7 @@ const jsonLd = {
           "name": "What's included with every domain?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Every domain registered through Zoobicon includes free WHOIS privacy protection, a free SSL certificate via Cloudflare, DNS management, instant activation, auto-renewal, and access to the Zoobicon AI website builder and hosting on.crontech.app.",
+            "text": "Every domain registered through Zoobicon includes free WHOIS privacy protection, a free SSL certificate via Cloudflare, DNS management, instant activation, auto-renewal, and access to the Zoobicon AI website builder. Hosting is delivered through our partner cloud.",
           },
         },
       ],

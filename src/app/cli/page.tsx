@@ -38,7 +38,7 @@ const CLI_COMMANDS = [
   { cmd: "zb generate --framework react", desc: "Output as React components", category: "Generate" },
   { cmd: "zb edit \"make the header sticky\"", desc: "AI-powered code editing with natural language", category: "Edit" },
   { cmd: "zb preview", desc: "Launch local preview server with hot-reload", category: "Preview" },
-  { cmd: "zb deploy", desc: "Deploy to.crontech.app subdomain (free)", category: "Deploy" },
+  { cmd: "zb deploy", desc: "Deploy to a Crontech subdomain (free)", category: "Deploy" },
   { cmd: "zb deploy --domain mysite.com", desc: "Deploy to custom domain with SSL", category: "Deploy" },
   { cmd: "zb seo audit", desc: "Run a full SEO audit on your site", category: "SEO" },
   { cmd: "zb seo campaign --mode aggressive", desc: "Launch autonomous SEO campaign", category: "SEO" },
@@ -114,7 +114,7 @@ jobs:
 
 const FEATURES = [
   { icon: Zap, title: "Instant Generation", desc: "Generate full websites from your terminal in seconds. Pipe output, redirect to files, chain with Unix tools." },
-  { icon: FolderUp, title: "One-Command Deploy", desc: "Deploy to a free.crontech.app subdomain or your custom domain. SSL included, CDN included." },
+  { icon: FolderUp, title: "One-Command Deploy", desc: "Deploy to a free Crontech subdomain or your custom domain. SSL included, CDN included." },
   { icon: Globe, title: "Multi-Framework Output", desc: "Output as HTML, React, Next.js, Vue, Svelte, or Astro. Framework flag on every command." },
   { icon: RefreshCw, title: "Watch & Rebuild", desc: "Watch mode re-generates your site whenever you update the prompt file. Live reload included." },
   { icon: GitBranch, title: "Git Integration", desc: "Auto-commit generated code. Branch per generation. Diff between versions." },
@@ -172,7 +172,7 @@ export default function CLIPage() {
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-stone-500/20 bg-stone-500/5 mb-6">
               <Terminal className="w-3 h-3 text-stone-400" />
               <span className="text-xs font-medium text-stone-400">Command Line Interface</span>
-              <span className="text-xs text-white/50 font-mono".crontech.app</span>
+              <span className="text-xs text-white/50 font-mono">v1.0</span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-6">

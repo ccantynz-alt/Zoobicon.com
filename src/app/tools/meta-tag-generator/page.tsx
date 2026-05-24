@@ -478,8 +478,7 @@ export default function MetaTagGeneratorPage() {
         {/* Footer */}
         <div className="mt-16 text-center">
           <p className="text-[10px] text-white/15">
-            zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot;
-           .crontech.app
+            zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io
           </p>
         </div>
       </div>

@@ -111,7 +111,7 @@ const CHECKLIST: ChecklistItem[] = [
   { id: "qa-4", label: "Multi-page generation tested", description: "Generate 3-6 page sites. Verify consistent navigation, shared design, all pages render.", priority: "high", category: "quality" },
   { id: "qa-5", label: "Full-stack generation tested", description: "Generate app with DB schema + API + CRUD UI. Verify schema is valid SQL, endpoints are correct.", priority: "high", category: "quality" },
   { id: "qa-6", label: "E-commerce generation tested", description: "Generate storefront with cart, checkout, product grid. Verify all interactive features.", priority: "high", category: "quality" },
-  { id: "qa-7", label: "Deploy and serve flow tested", description: "Generate -> Deploy -> Visit.crontech.app slug -> Verify live site. Edit -> Redeploy -> Verify update.", priority: "critical", category: "quality" },
+  { id: "qa-7", label: "Deploy and serve flow tested", description: "Generate -> Deploy -> Visit the Crontech subdomain -> Verify live site. Edit -> Redeploy -> Verify update.", priority: "critical", category: "quality" },
   { id: "qa-8", label: "No broken links on any page", description: "Crawl all internal links. Every href points to a real page. No href='#' remaining.", priority: "high", category: "quality" },
   { id: "qa-9", label: "Cross-browser testing", description: "Test on Chrome, Firefox, Safari, Edge. Verify builder, preview panel, visual editor work.", priority: "high", category: "quality" },
   { id: "qa-10", label: "Mobile responsiveness verified", description: "Test all pages on mobile viewport (375px). Builder sidebar collapses. Forms are usable.", priority: "high", category: "quality" },

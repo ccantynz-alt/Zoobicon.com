@@ -150,7 +150,7 @@ export default async function OGImage() {
           </span>
           <span style={{ fontSize: "16px", color: "rgba(255, 255, 255, 0.15)" }}>•</span>
           <span style={{ fontSize: "16px", color: "rgba(255, 255, 255, 0.35)" }}>
-           .crontech.app
+            zoobicon.io
           </span>
         </div>
       </div>

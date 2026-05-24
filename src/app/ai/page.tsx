@@ -162,7 +162,7 @@ const HOW_IT_WORKS = [
     step: "03",
     icon: Rocket,
     title: "Deploy",
-    subtitle: "One-click publish to your.crontech.app or custom domain",
+    subtitle: "One-click publish to a Crontech subdomain or your custom domain",
     description: "Hit deploy and your site goes live instantly. Free hosting on or connect your own domain in one click.",
     color: "from-accent-stone to-stone-600",
     glowColor: "shadow-stone-500/30",
@@ -219,7 +219,7 @@ export default function AiPage() {
               zoobicon.io
             </Link>
             <Link href="/cli" className="hover:text-white transition-colors">
-             .crontech.app
+              CLI
             </Link>
             <Link
               href="/builder"
@@ -697,7 +697,7 @@ export default function AiPage() {
           <div className="flex items-center gap-6 text-sm text-gray-300">
             <Link href="/" className="hover:text-white transition-colors">zoobicon.com</Link>
             <Link href="/builder" className="hover:text-white transition-colors">zoobicon.io</Link>
-            <Link href="/cli" className="hover:text-white transition-colors".crontech.app</Link>
+            <Link href="/cli" className="hover:text-white transition-colors">CLI</Link>
             <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
