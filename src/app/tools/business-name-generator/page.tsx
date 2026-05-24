@@ -500,7 +500,7 @@ export default function BusinessNameGeneratorPage() {
 
         {/* Footer */}
         <div className="mt-16 text-center">
-          <p className="text-[10px] text-white/15">zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh</p>
+          <p className="text-[10px] text-white/15">zoobicon.com · zoobicon.ai · zoobicon.io</p>
         </div>
       </div>
     </div>

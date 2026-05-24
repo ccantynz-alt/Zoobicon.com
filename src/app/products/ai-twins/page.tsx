@@ -1359,7 +1359,7 @@ export default function AITwinsPage() {
               fontFamily: "JetBrains Mono, ui-monospace, monospace",
             }}
           >
-            zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh
+            zoobicon.com · zoobicon.ai · zoobicon.io
           </p>
         </div>
       </section>

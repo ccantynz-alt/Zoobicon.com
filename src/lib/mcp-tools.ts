@@ -289,33 +289,16 @@ const deploySiteTool: MCPTool = {
         }
       }
 
-      // Try Vercel deploy module first
-      try {
-        const vercelMod: any = await import("@/lib/vercel-deploy");
-        const deployFn =
-          vercelMod.deployToVercel || vercelMod.deploy || vercelMod.default;
-        if (typeof deployFn === "function") {
-          const result = await deployFn({
-            siteId,
-            files,
-            projectName: projectName || (obj as any).projectName,
-          });
-          return {
-            ok: true,
-            url: result?.url,
-            deploymentId: result?.deploymentId || result?.id,
-          };
-        }
-      } catch {
-        // module not present yet — fall through
-      }
-
-      // Fallback: zoobicon.sh hosting deploy
+      // Rule 31 — Vercel/hosting deploy modules were retired (delegated to
+      // Crontech). MCP deploy now routes through /api/crontech/deploy.
       const baseUrl = getBaseUrl();
-      const res = await fetch(`${baseUrl}/api/hosting/deploy`, {
+      const res = await fetch(`${baseUrl}/api/crontech/deploy`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ siteId, files, projectName }),
+        body: JSON.stringify({
+          name: projectName || (obj as any).projectName || siteId,
+          files,
+        }),
       });
       if (!res.ok) {
         return { ok: false, error: `deploy failed: ${res.status} ${res.statusText}` };

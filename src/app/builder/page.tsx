@@ -660,6 +660,11 @@ function BuilderPage() {
   const [activeTool, setActiveTool] = useState<ToolId>(null);
   const [tier, setTier] = useState<Tier>("premium");
   const [isAdmin, setIsAdmin] = useState(false);
+  // Admin-private builds (Rule 31, 2026-05-17). Toggle only visible when
+  // isAdmin is true. When checked, the save call stamps visibility =
+  // 'admin_private' so the project never surfaces in gallery, showcase,
+  // intel exports, or the future Crontech project map.
+  const [adminPrivate, setAdminPrivate] = useState<boolean>(true);
   const [useWebContainers, setUseWebContainers] = useState<boolean>(true);
   const [userPlan, setUserPlan] = useState<Plan>("free");
 
@@ -1100,6 +1105,10 @@ function BuilderPage() {
               email: userEmail,
               prompt,
               code: JSON.stringify(reactFiles),
+              // Admin-private visibility flag. Server double-checks the
+              // role claim before honouring it — non-admins always save
+              // as 'public' regardless of what they POST.
+              visibility: isAdmin && adminPrivate ? "admin_private" : "public",
             }),
           });
           if (res.ok) {
@@ -1947,28 +1956,28 @@ root.render(React.createElement(App));
     return generatedCode;
   }, [generatedCode, reactFiles]);
 
-  /** Called by DeployModal when user confirms deploy */
-  const handleDeployWithName = useCallback(async (siteName: string, provider: "zoobicon" | "crontech" = "zoobicon"): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
-    const deployCode = buildDeployCode(siteName);
-    if (!deployCode) throw new Error("No code to deploy");
+  /** Called by DeployModal when user confirms deploy.
+   *  Rule 31 — all deploy paths go through Crontech now. The provider
+   *  arg is retained for DeployModal compatibility but both options
+   *  resolve to /api/crontech/deploy. */
+  const handleDeployWithName = useCallback(async (siteName: string, _provider: "zoobicon" | "crontech" = "crontech"): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
+    if (!reactFiles || Object.keys(reactFiles).length === 0) {
+      throw new Error("No files to deploy");
+    }
 
     setIsDeploying(true);
     setDeployStatus("deploying");
+    const t0 = Date.now();
 
     try {
-      const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
-      const user = userStr ? JSON.parse(userStr) : null;
-      const email = user?.email || "anonymous@zoobicon.com";
+      // Prefer the saved projectId — Crontech then has authoritative
+      // metadata (creator, visibility, prompt). Fall back to inline
+      // files for anonymous builds that haven't saved yet.
+      const body = projectId
+        ? { projectId }
+        : { name: siteName, files: reactFiles, deps: reactDeps, prompt };
 
-      const endpoint = provider === "crontech"
-        ? "/api/hosting/deploy-crontech"
-        : "/api/hosting/deploy";
-
-      const body = provider === "crontech"
-        ? { name: siteName, code: deployCode, files: reactFiles ?? undefined, dependencies: reactDeps }
-        : { name: siteName, email, code: deployCode };
-
-      const res = await fetch(endpoint, {
+      const res = await fetch("/api/crontech/deploy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -1986,7 +1995,9 @@ root.render(React.createElement(App));
       trackEvent("deploy");
       notifyDeploy(siteName, data.url);
 
-      return { url: data.url, slug: data.slug ?? data.siteSlug, deployTimeMs: data.deployTimeMs };
+      // Derive slug from url for downstream consumers that still expect it.
+      const slug = (data.url || "").replace(/^https?:\/\//, "").split(".")[0] || siteName;
+      return { url: data.url, slug, deployTimeMs: Date.now() - t0 };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deploy failed");
       setDeployStatus("error");
@@ -1994,7 +2005,7 @@ root.render(React.createElement(App));
     } finally {
       setIsDeploying(false);
     }
-  }, [buildDeployCode, reactFiles, reactDeps]);
+  }, [reactFiles, reactDeps, projectId, prompt]);
 
   /** Quick deploy handler for inline button and BuildSuccessModal */
   const handleDeploy = useCallback(() => {
@@ -2265,13 +2276,31 @@ root.render(React.createElement(App));
           onDismiss={() => setLaunchVideo({ status: "idle", step: "" })}
         />
         {isAdmin && (
-          <button
-            type="button"
-            onClick={() => setUseWebContainers((v) => !v)}
-            className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
-          >
-            Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
-          </button>
+          <div className="absolute top-2 right-2 z-50 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setAdminPrivate((v) => !v)}
+              className={`px-2 py-1 text-[10px] rounded border ${
+                adminPrivate
+                  ? "bg-amber-500/90 text-black border-amber-400"
+                  : "bg-black/70 text-white border-white/20"
+              }`}
+              title={
+                adminPrivate
+                  ? "This build is private — only you (admin) can see it. Click to make it public."
+                  : "This build is public — anyone can see it in showcase/gallery. Click to make it admin-private."
+              }
+            >
+              {adminPrivate ? "🔒 Admin Private" : "🌐 Public"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setUseWebContainers((v) => !v)}
+              className="px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
+            >
+              Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
+            </button>
+          </div>
         )}
 
         {/* Prompt input overlay at bottom — for recording demo sequences */}

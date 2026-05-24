@@ -38,7 +38,7 @@ const CLI_COMMANDS = [
   { cmd: "zb generate --framework react", desc: "Output as React components", category: "Generate" },
   { cmd: "zb edit \"make the header sticky\"", desc: "AI-powered code editing with natural language", category: "Edit" },
   { cmd: "zb preview", desc: "Launch local preview server with hot-reload", category: "Preview" },
-  { cmd: "zb deploy", desc: "Deploy to zoobicon.sh subdomain (free)", category: "Deploy" },
+  { cmd: "zb deploy", desc: "Deploy to.crontech.app subdomain (free)", category: "Deploy" },
   { cmd: "zb deploy --domain mysite.com", desc: "Deploy to custom domain with SSL", category: "Deploy" },
   { cmd: "zb seo audit", desc: "Run a full SEO audit on your site", category: "SEO" },
   { cmd: "zb seo campaign --mode aggressive", desc: "Launch autonomous SEO campaign", category: "SEO" },
@@ -114,7 +114,7 @@ jobs:
 
 const FEATURES = [
   { icon: Zap, title: "Instant Generation", desc: "Generate full websites from your terminal in seconds. Pipe output, redirect to files, chain with Unix tools." },
-  { icon: FolderUp, title: "One-Command Deploy", desc: "Deploy to a free zoobicon.sh subdomain or your custom domain. SSL included, CDN included." },
+  { icon: FolderUp, title: "One-Command Deploy", desc: "Deploy to a free.crontech.app subdomain or your custom domain. SSL included, CDN included." },
   { icon: Globe, title: "Multi-Framework Output", desc: "Output as HTML, React, Next.js, Vue, Svelte, or Astro. Framework flag on every command." },
   { icon: RefreshCw, title: "Watch & Rebuild", desc: "Watch mode re-generates your site whenever you update the prompt file. Live reload included." },
   { icon: GitBranch, title: "Git Integration", desc: "Auto-commit generated code. Branch per generation. Diff between versions." },
@@ -172,7 +172,7 @@ export default function CLIPage() {
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-stone-500/20 bg-stone-500/5 mb-6">
               <Terminal className="w-3 h-3 text-stone-400" />
               <span className="text-xs font-medium text-stone-400">Command Line Interface</span>
-              <span className="text-xs text-white/50 font-mono">zoobicon.sh</span>
+              <span className="text-xs text-white/50 font-mono".crontech.app</span>
             </motion.div>
 
             <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] mb-6">
@@ -324,7 +324,7 @@ export default function CLIPage() {
                 <span className="text-xs font-medium text-accent-stone">Free Hosting</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4">
-                Every Site Gets a<br /><span className="text-stone-400">yourname.zoobicon.sh</span> Domain
+                Every Site Gets a<br /><span className="text-stone-400">yourname.crontech.app</span> Domain
               </h2>
               <p className="text-lg text-white/60 max-w-2xl mx-auto mb-8">
                 Instant deployment to our global CDN. Free SSL, DDoS protection, and 99.9% uptime.
@@ -332,13 +332,13 @@ export default function CLIPage() {
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 <div className="bg-dark-400 border border-white/[0.10] rounded-lg px-4 py-2 font-mono text-sm text-white/65">
-                  <span className="text-accent-stone">myportfolio</span>.zoobicon.sh
+                  <span className="text-accent-stone">myportfolio</span>.crontech.app
                 </div>
                 <div className="bg-dark-400 border border-white/[0.10] rounded-lg px-4 py-2 font-mono text-sm text-white/65">
-                  <span className="text-accent-stone">client-store</span>.zoobicon.sh
+                  <span className="text-accent-stone">client-store</span>.crontech.app
                 </div>
                 <div className="bg-dark-400 border border-white/[0.10] rounded-lg px-4 py-2 font-mono text-sm text-white/65">
-                  <span className="text-accent-stone">my-startup</span>.zoobicon.sh
+                  <span className="text-accent-stone">my-startup</span>.crontech.app
                 </div>
               </div>
             </motion.div>

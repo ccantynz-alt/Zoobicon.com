@@ -480,7 +480,7 @@ export default function ColorPaletteGeneratorPage() {
         <div className="mt-16 text-center">
           <p className="text-[10px] text-white/15">
             zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot;
-            zoobicon.sh
+           .crontech.app
           </p>
         </div>
       </div>

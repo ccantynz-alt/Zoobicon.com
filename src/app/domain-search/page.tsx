@@ -489,7 +489,7 @@ export default function DomainSearchPage() {
             </Link>
           </div>
           <div className="text-stone-600">
-            zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh
+            zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io
           </div>
         </div>
       </footer>

@@ -49,7 +49,7 @@ export default function DMCAPage() {
               Zoobicon respects the intellectual property rights of others and expects its users to do
               the same. In accordance with the Digital Millennium Copyright Act of 1998 (&ldquo;DMCA&rdquo;),
               17 U.S.C. &sect; 512, we will respond expeditiously to claims of copyright infringement
-              committed using the Zoobicon platform (zoobicon.com, zoobicon.ai, zoobicon.io, zoobicon.sh).
+              committed using the Zoobicon platform (zoobicon.com, zoobicon.ai, zoobicon.io).
             </p>
             <p className="mt-3">
               Because Zoobicon uses AI to generate content, it is possible that generated output may

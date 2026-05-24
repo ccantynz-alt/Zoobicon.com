@@ -579,7 +579,7 @@ export default function QRCodeGeneratorPage() {
             {" · "}
             <a href="https://zoobicon.io" className="hover:text-white transition">zoobicon.io</a>
             {" · "}
-            <a href="https://zoobicon.sh" className="hover:text-white transition">zoobicon.sh</a>
+            <a href="https://zoobicon.com" className="hover:text-white transition".crontech.app</a>
           </p>
         </footer>
       </div>

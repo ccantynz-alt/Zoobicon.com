@@ -180,9 +180,9 @@ export default function HomePage() {
                 login.
               </h2>
               <p className="mt-5 text-[16px] leading-relaxed text-white/55 max-w-2xl">
-                Every tool you need to launch a business — builder, video, domains,
-                hosting, email, SEO, CRM, invoicing, analytics — working together
-                from the same login, the same dashboard, the same subscription.
+                The fastest way to ship a beautiful site — AI Website Builder,
+                AI Video Creator, Domain Search, and a deck of free tools, all
+                under the same login and the same subscription.
               </p>
             </motion.div>
 

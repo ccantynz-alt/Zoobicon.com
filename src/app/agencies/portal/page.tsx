@@ -127,7 +127,7 @@ export default function ClientPortal() {
             </nav>
           </div>
           <a
-            href={`https://${previewSite.slug}.zoobicon.sh`}
+            href={`https://${previewSite.slug}.crontech.app`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-colors text-white/60 hover:text-white hover:bg-white/[0.06]"
@@ -305,7 +305,7 @@ export default function ClientPortal() {
 
                 <div className="p-4">
                   <h3 className="text-white font-medium text-sm truncate">{site.name}</h3>
-                  <p className="text-white/50 text-xs mt-1 truncate">{site.slug}.zoobicon.sh</p>
+                  <p className="text-white/50 text-xs mt-1 truncate">{site.slug}.crontech.app</p>
                   <div className="flex items-center justify-between mt-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       site.status === "published" ? "bg-stone-500/20 text-stone-400" :
@@ -323,7 +323,7 @@ export default function ClientPortal() {
                         <Eye size={14} />
                       </button>
                       <a
-                        href={`https://${site.slug}.zoobicon.sh`}
+                        href={`https://${site.slug}.crontech.app`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-white/50 hover:text-white transition-colors"

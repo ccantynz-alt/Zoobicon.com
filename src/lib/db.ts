@@ -144,6 +144,14 @@ export async function initSchema() {
   await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS current_version INTEGER DEFAULT 0`;
   await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS sections JSONB DEFAULT '[]'`;
 
+  // Admin-private builds (added 2026-05-17). Default 'public' so existing
+  // rows are untouched; admin builds get tagged 'admin_private' at save
+  // time and filtered out of every public listing (gallery, showcase,
+  // intel exports, agency client views). Sites equivalent runs after
+  // the CREATE TABLE sites block below.
+  await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS visibility TEXT NOT NULL DEFAULT 'public'`;
+  await sql`CREATE INDEX IF NOT EXISTS projects_visibility_idx ON projects (visibility)`;
+
   // ---- Project versions: every edit creates a snapshot ----
 
   await sql`
@@ -193,6 +201,8 @@ export async function initSchema() {
 
   await sql`CREATE INDEX IF NOT EXISTS sites_email_idx ON sites (email)`;
   await sql`CREATE INDEX IF NOT EXISTS sites_slug_idx  ON sites (slug)`;
+  await sql`ALTER TABLE sites ADD COLUMN IF NOT EXISTS visibility TEXT NOT NULL DEFAULT 'public'`;
+  await sql`CREATE INDEX IF NOT EXISTS sites_visibility_idx ON sites (visibility)`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS deployments (

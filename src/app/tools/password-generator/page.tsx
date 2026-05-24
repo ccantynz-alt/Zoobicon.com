@@ -498,7 +498,7 @@ export default function PasswordGeneratorPage() {
         <footer className="border-t border-white/10 py-10 text-center text-sm text-gray-500">
           <div className="max-w-6xl mx-auto px-4 space-y-3">
             <p className="font-medium text-gray-400">
-              zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh
+              zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io
             </p>
             <p>&copy; {new Date().getFullYear()} Zoobicon. All rights reserved.</p>
           </div>

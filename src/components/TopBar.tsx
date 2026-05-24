@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import NotificationInbox from "@/components/NotificationInbox";
 import QuotaBar from "@/components/QuotaBar";
-import { useEmailNotifications } from "@/hooks/useEmailNotifications";
 
 interface AgencyBrand {
   agencyName: string;
@@ -14,13 +13,12 @@ interface AgencyBrand {
   logoUrl?: string;
 }
 
+// Rule 31 — useEmailNotifications removed (email + inbox delegated to Crontech).
+
 export default function TopBar() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAgency, setIsAgency] = useState(false);
   const [agencyBrand, setAgencyBrand] = useState<AgencyBrand | null>(null);
-
-  // Real-time email notifications — sound + browser push for admin users
-  useEmailNotifications();
 
   useEffect(() => {
     try {

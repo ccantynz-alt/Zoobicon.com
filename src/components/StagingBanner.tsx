@@ -15,7 +15,6 @@ export default function StagingBanner() {
     hostname === "zoobicon.com" ||
     hostname === "zoobicon.ai" ||
     hostname === "zoobicon.io" ||
-    hostname === "zoobicon.sh" ||
     hostname === "dominat8.io" ||
     hostname === "dominat8.com" ||
     hostname === "www.zoobicon.com";
