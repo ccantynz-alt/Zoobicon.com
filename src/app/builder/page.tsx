@@ -1402,6 +1402,14 @@ function BuilderPage() {
     setStatus("generating");
     setError("");
     setGeneratedCode("");
+    // Clear stale react state so a re-roll doesn't leave the PREVIOUS
+    // build visible in Sandpack while the new one is in flight. Without
+    // this, when the new build fails (auth/quota/timeout), the user sees
+    // an error overlay on top of an unrelated previously-generated site —
+    // looks like the build "kind of worked" when it actually failed.
+    setReactFiles(null);
+    setReactDeps({});
+    setReactSource(null);
     setActiveTab("preview");
     setPipelineAgents([]);
     setBuildProgress(null);

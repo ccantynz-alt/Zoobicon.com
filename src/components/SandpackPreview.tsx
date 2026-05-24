@@ -294,11 +294,17 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
   // BEFORE the first real component arrives. Keep this list tight — every
   // extra dep adds to the pre-warm cost. Only include things >80% of generated
   // sites use.
+  //
+  // PINNED versions (not "latest"): "latest" forces Sandpack to re-resolve
+  // from npm on every cold cache, which is the difference between a 2s and
+  // a 25s first preview. Pinned versions are reproducible AND cached
+  // aggressively by Sandpack's CDN. If a generated component imports a
+  // newer API, react-stream's package.json overrides this map.
   const PREWARM_DEPS: Record<string, string> = {
-    "lucide-react": "latest",
-    "framer-motion": "latest",
-    "clsx": "latest",
-    "tailwind-merge": "latest",
+    "lucide-react": "^1.7.0",
+    "framer-motion": "^12.38.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.5",
   };
 
   // Pre-warm App that ACTUALLY uses the common libraries in live JSX,
