@@ -499,8 +499,9 @@ export default function HomePage() {
                 included.
               </h2>
               <p className="mt-5 text-[15px] text-white/55 leading-relaxed">
-                Replaces $923/mo in scattered SaaS tools. Cancel any time. 14-day
-                free trial on paid plans.
+                AI Builder, AI Video Creator, Domain Search, and 12 free tools —
+                one login, one subscription. Cancel any time. 14-day free trial
+                on paid plans.
               </p>
             </motion.div>
 

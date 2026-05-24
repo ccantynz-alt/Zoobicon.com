@@ -302,9 +302,9 @@ export default function SiteNavigation() {
                       style={{ borderTop: "1px solid var(--rule)" }}
                     >
                       <span className="text-[12px]" style={{ color: "var(--ink-secondary)" }}>
-                        75+ products bundled.{" "}
+                        AI Builder, AI Video, Domains, Free Tools.{" "}
                         <span style={{ color: "var(--ink)", fontWeight: 600 }}>
-                          Replaces $923/mo in SaaS subscriptions.
+                          One subscription. One login.
                         </span>
                       </span>
                       <div className="flex items-center gap-5">
