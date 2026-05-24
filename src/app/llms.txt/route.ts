@@ -23,7 +23,7 @@ Zoobicon is an AI-powered website builder that uses a multi-agent pipeline (7 sp
 - Generation time: ~60-95 seconds for a complete website
 - Templates: 100+ across 13 categories
 - Generators: 43 specialized website generators
-- Hosting:.crontech.app (one-click deploy, SSL, CDN)
+- Hosting: Crontech partner cloud (one-click deploy, SSL, CDN)
 
 ## Pricing
 - Free: 1 build/month (Sonnet model)
