@@ -2481,9 +2481,9 @@ root.render(React.createElement(App));
       )}
 
       {/* Full-Site Mode review — multi-page plan. Renders when sitePlan
-          is set. Phase 1: read-only display + Cancel works; Approve
-          flagged as "coming next session" until the parallel build
-          orchestrator ships. */}
+          is set. Approve triggers the parallel build orchestrator via
+          /api/generate/site-build (SSE), which emits per-page progress
+          + a final merged file tree that drops into Sandpack. */}
       {sitePlan && (
         <div
           className="fixed inset-0 z-[80] flex items-center justify-center p-6 overflow-y-auto"
@@ -2494,18 +2494,130 @@ root.render(React.createElement(App));
             source={sitePlan.source}
             modelUsed={sitePlan.modelUsed}
             onCancel={() => setSitePlan(null)}
-            onApprove={() => {
-              // Phase 2 wires the parallel build orchestrator here.
-              // For now we just dismiss + warn so the click does
-              // something instead of nothing.
-              setStreamWarning(
-                "Multi-page build orchestrator ships next session. " +
-                "For now, switch off ?siteMode=full to run a single-page build.",
-              );
+            onApprove={async () => {
+              // Hand the approved plan to the parallel orchestrator.
+              // The orchestrator streams per-page progress + a final
+              // merged file tree. Errors surface via the standard
+              // streamWarning / buildError channels.
+              const planToBuild = sitePlan.plan;
               setSitePlan(null);
+              setStatus("generating");
+              setError("");
+              setGeneratedCode("");
+              setReactFiles(null);
+              setReactDeps({});
+              setReactSource(null);
+              setActiveTab("preview");
+              setPipelineAgents([`Full-Site Mode: building ${planToBuild.pages.length} pages in parallel…`]);
+              setBuildProgress({ current: 0, total: planToBuild.meta.componentCount, section: "" });
+              setSectionTimeline([]);
+              setBuildError(null);
+              setStreamWarning(null);
+
+              abortRef.current?.abort();
+              const controller = new AbortController();
+              abortRef.current = controller;
+
+              try {
+                const res = await fetch("/api/generate/site-build", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", ...authHeaders() },
+                  body: JSON.stringify({ plan: planToBuild }),
+                  signal: controller.signal,
+                });
+                if (!res.ok) {
+                  const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+                  throw new Error(errData.error || `HTTP ${res.status}`);
+                }
+                const reader = res.body?.getReader();
+                if (!reader) throw new Error("No response stream");
+                const decoder = new TextDecoder();
+                let lineBuffer = "";
+                let receivedDone = false;
+                let pagesDone = 0;
+                let sectionsDone = 0;
+                while (true) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
+                  lineBuffer += decoder.decode(value, { stream: true });
+                  const lines = lineBuffer.split("\n");
+                  lineBuffer = lines.pop() || "";
+                  for (const line of lines) {
+                    if (!line.startsWith("data: ")) continue;
+                    const jsonStr = line.slice(6).trim();
+                    if (!jsonStr) continue;
+                    try {
+                      const event = JSON.parse(jsonStr);
+                      if (event.type === "phase") {
+                        setPipelineAgents(prev => [...prev, event.message]);
+                      } else if (event.type === "page") {
+                        if (event.status === "building") {
+                          setPipelineAgents(prev => [...prev, `Building page: ${event.name} (${event.slug})…`]);
+                        } else if (event.status === "done") {
+                          pagesDone++;
+                          setPipelineAgents(prev => [...prev, `✓ Page complete: ${event.name}`]);
+                        } else if (event.status === "failed") {
+                          setStreamWarning(`Page ${event.slug} failed: ${event.error || "unknown"}`);
+                        }
+                      } else if (event.type === "section") {
+                        sectionsDone++;
+                        setBuildProgress({
+                          current: sectionsDone,
+                          total: planToBuild.meta.componentCount,
+                          section: `${event.pageSlug} · ${event.category}`,
+                        });
+                      } else if (event.type === "files" && event.files) {
+                        // Progressive: show the current state in Sandpack.
+                        setReactFiles(event.files);
+                        setGeneratedCode("<!-- react-app-mode -->");
+                      } else if (event.type === "done") {
+                        receivedDone = true;
+                        if (event.files) {
+                          setReactFiles(event.files);
+                          setReactDeps(event.dependencies || {});
+                          setReactSource(event.files);
+                          setGeneratedCode("<!-- react-app-mode -->");
+                        }
+                        setPipelineAgents(prev => [
+                          ...prev,
+                          `Site complete — ${event.pageCount}/${event.totalPages} pages in ${Math.round((event.durationMs || 0) / 1000)}s`,
+                        ]);
+                        if (Array.isArray(event.failedSections) && event.failedSections.length > 0) {
+                          setStreamWarning(
+                            `${event.failedSections.length} section(s) fell back to base component. Build is still usable.`,
+                          );
+                        }
+                        setStatus("complete");
+                        setBuildProgress(null);
+                        trackEvent("build");
+                      } else if (event.type === "error") {
+                        if (event.fatal === false) {
+                          setStreamWarning(cleanErrorMessage(event.message || ""));
+                        } else {
+                          throw new Error(event.message || "Multi-page build failed");
+                        }
+                      }
+                    } catch (e) {
+                      if (e instanceof SyntaxError) continue;
+                      throw e;
+                    }
+                  }
+                }
+                if (!receivedDone) {
+                  setStreamWarning("Stream ended without a done event — showing what arrived.");
+                  setStatus("complete");
+                }
+              } catch (err) {
+                if ((err as Error).name === "AbortError") return;
+                const msg = err instanceof Error ? err.message : String(err);
+                console.error("[site-build] failed:", msg);
+                const cleaned = cleanErrorMessage(msg);
+                setError(cleaned);
+                setBuildError({ message: cleaned, suggestion: errorSuggestion(msg) });
+                setStatus("error");
+                setBuildProgress(null);
+              }
             }}
-            approveDisabled
-            approveDisabledReason="Build runs next session"
           />
         </div>
       )}
