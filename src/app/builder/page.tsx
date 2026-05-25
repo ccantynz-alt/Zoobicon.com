@@ -232,6 +232,8 @@ import DiffPanel from "@/components/DiffPanel";
 import ProjectTree from "@/components/ProjectTree";
 import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
 import { PlanReviewPanel } from "@/components/PlanReviewPanel";
+import SitePlanPanel from "@/components/SitePlanPanel";
+import type { SitePlan } from "@/lib/site-planner";
 import { captureFlywheelEvent } from "@/lib/flywheel-client";
 import { downloadZip } from "@/lib/zip-export";
 import CollaborationBar from "@/components/CollaborationBar";
@@ -712,6 +714,16 @@ function BuilderPage() {
   // user reviews + confirms before the expensive build fires.
   const [planReview, setPlanReview] = useState<import("@/components/PlanReviewPanel").PlanReviewPlan | null>(null);
   const [planLoading, setPlanLoading] = useState(false);
+  // Full-Site Mode (Phase 1): multi-page plan + review. Triggered via
+  // ?siteMode=full URL flag. Phase 2 wires the parallel build orchestrator
+  // to consume the approved plan; for now the Approve button is disabled
+  // with a clear "coming next session" message so the UX shape is locked.
+  const [sitePlan, setSitePlan] = useState<{
+    plan: SitePlan;
+    source: "llm" | "fallback";
+    modelUsed?: string;
+  } | null>(null);
+  const [sitePlanLoading, setSitePlanLoading] = useState(false);
   const [streamWarning, setStreamWarning] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
   const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Opus, pipeline=7-agent
@@ -1371,6 +1383,39 @@ function BuilderPage() {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
+    // FULL-SITE MODE — fork BEFORE any single-page logic. Detected via
+    // ?siteMode=full or window.__siteMode === "full" (dev override).
+    // When active, we fetch a multi-page plan first and halt for review.
+    // The user can approve (Phase 2 build) or cancel back to single-page.
+    const wantsFullSite =
+      typeof window !== "undefined" &&
+      (new URLSearchParams(window.location.search).get("siteMode") === "full" ||
+        (window as { __siteMode?: string }).__siteMode === "full");
+    if (wantsFullSite && !sitePlan && !sitePlanLoading) {
+      try {
+        setSitePlanLoading(true);
+        const res = await fetch("/api/generate/site-plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...authHeaders() },
+          body: JSON.stringify({ prompt: prompt.trim() }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setSitePlan(data);
+          setSitePlanLoading(false);
+          return; // Halt — SitePlanPanel renders, awaits Approve/Cancel.
+        }
+        // Plan endpoint failed — surface warning and continue to single-page.
+        const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        setStreamWarning(`Full-site plan unavailable (${err.error || "unknown error"}). Falling back to single-page build.`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setStreamWarning(`Full-site plan threw: ${msg.slice(0, 120)}. Falling back to single-page build.`);
+      } finally {
+        setSitePlanLoading(false);
+      }
+    }
+
     // CHECK AUTH FIRST — don't waste the user's time
     const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
     if (!userStr) {
@@ -1765,7 +1810,7 @@ function BuilderPage() {
       }
       return;
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection, includeLaunchVideo, generateLaunchVideo, planReview, authHeaders]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection, includeLaunchVideo, generateLaunchVideo, planReview, sitePlan, sitePlanLoading, authHeaders]);
 
   // Plan Mode (B12) callback handlers — used by the PlanReviewPanel.
   const handlePlanConfirm = useCallback(() => {
@@ -2303,6 +2348,30 @@ root.render(React.createElement(App));
             </button>
             <button
               type="button"
+              onClick={() => {
+                if (typeof window === "undefined") return;
+                const url = new URL(window.location.href);
+                const isFull = url.searchParams.get("siteMode") === "full";
+                if (isFull) url.searchParams.delete("siteMode");
+                else url.searchParams.set("siteMode", "full");
+                window.history.replaceState({}, "", url.toString());
+                // Soft re-render — toggle a state to force the prompt
+                // path to re-read the URL on next submit.
+                setSitePlan(null);
+              }}
+              className="px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
+              title={
+                typeof window !== "undefined" && new URLSearchParams(window.location.search).get("siteMode") === "full"
+                  ? "Full-Site Mode ON — next prompt fetches a multi-page plan for review"
+                  : "Click to enable Full-Site Mode (multi-page plan + review before build)"
+              }
+            >
+              {typeof window !== "undefined" && new URLSearchParams(window.location.search).get("siteMode") === "full"
+                ? "🌐 Full-Site ON"
+                : "📄 Single-page"}
+            </button>
+            <button
+              type="button"
               onClick={() => setUseWebContainers((v) => !v)}
               className="px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
             >
@@ -2408,6 +2477,46 @@ root.render(React.createElement(App));
             onCancel={handlePlanCancel}
             onClarify={handlePlanClarify}
           />
+        </div>
+      )}
+
+      {/* Full-Site Mode review — multi-page plan. Renders when sitePlan
+          is set. Phase 1: read-only display + Cancel works; Approve
+          flagged as "coming next session" until the parallel build
+          orchestrator ships. */}
+      {sitePlan && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center p-6 overflow-y-auto"
+          style={{ background: "rgba(10, 10, 11, 0.45)", backdropFilter: "blur(8px)" }}
+        >
+          <SitePlanPanel
+            plan={sitePlan.plan}
+            source={sitePlan.source}
+            modelUsed={sitePlan.modelUsed}
+            onCancel={() => setSitePlan(null)}
+            onApprove={() => {
+              // Phase 2 wires the parallel build orchestrator here.
+              // For now we just dismiss + warn so the click does
+              // something instead of nothing.
+              setStreamWarning(
+                "Multi-page build orchestrator ships next session. " +
+                "For now, switch off ?siteMode=full to run a single-page build.",
+              );
+              setSitePlan(null);
+            }}
+            approveDisabled
+            approveDisabledReason="Build runs next session"
+          />
+        </div>
+      )}
+
+      {/* Full-Site plan-loading toast */}
+      {sitePlanLoading && !sitePlan && (
+        <div
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-[81] px-4 py-2 rounded-full text-xs font-medium shadow-lg"
+          style={{ background: "var(--ink)", color: "var(--paper)" }}
+        >
+          Planning your site…
         </div>
       )}
 
