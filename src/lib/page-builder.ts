@@ -31,6 +31,9 @@ export interface BuildPageInput {
   components: RegistryComponent[];
   /** Component file names already taken on the project (collision avoidance). */
   takenNames?: Set<string>;
+  /** True when lib/session.tsx is emitted — sections that render auth
+   *  UI should call signIn/signOut/useSession instead of dead buttons. */
+  authAvailable?: boolean;
 }
 
 export interface BuildPageResult {
@@ -141,6 +144,31 @@ interface CustomiseOneArgs {
   page: SitePlanPage;
   section: PageSection;
   slugList: string[];
+  /** True when the orchestrator emitted lib/session.tsx — sections
+   *  with login/signup UI should wire to it instead of dead buttons. */
+  authAvailable?: boolean;
+}
+
+function buildAuthBrief(): string {
+  return [
+    "",
+    "AUTH WIRED — DO NOT LEAVE DEAD BUTTONS",
+    "This site has lib/session.tsx with a real session provider.",
+    "If this component renders a Sign In / Sign Up / Sign Out / login form,",
+    "import the helpers and wire real handlers:",
+    "",
+    '  import { useSession, signIn, signUp, signOut } from "../../lib/session";',
+    "",
+    "Patterns:",
+    "- Navbar: const { user } = useSession();",
+    "  show user.email + Sign Out when user, else Sign In/Sign Up.",
+    "- Login form: onSubmit calls await signIn(email, password); show .error if returned.",
+    "- Signup form: same but signUp(email, password, name).",
+    "- Logged-in pages: const { user, loading } = useSession();",
+    "  if (loading) return spinner; if (!user) return redirect/login prompt.",
+    "Use useState for form fields. Always show errors from the helper return.",
+    "",
+  ].join("\n");
 }
 
 async function customiseOne(args: CustomiseOneArgs): Promise<{ code: string; ok: boolean }> {
@@ -148,6 +176,7 @@ async function customiseOne(args: CustomiseOneArgs): Promise<{ code: string; ok:
   const slugLine = args.slugList.length
     ? `Live pages on this site (use ONLY these for navbar links): ${args.slugList.join(", ")}`
     : "No other pages yet.";
+  const authBrief = args.authAvailable ? buildAuthBrief() : "";
   const userMessage =
     `BRAND: ${args.brand.name}\n` +
     `PRIMARY COLOR: ${args.brand.primaryColor}\n` +
@@ -157,6 +186,7 @@ async function customiseOne(args: CustomiseOneArgs): Promise<{ code: string; ok:
     `SECTION: ${args.section.category}\n` +
     `SECTION BRIEF: ${args.section.brief}\n` +
     `\n${slugLine}\n` +
+    `${authBrief}\n` +
     `\nBASE COMPONENT:\n${args.baseCode}\n\n` +
     `Output the full updated TypeScript file only.`;
 
@@ -241,6 +271,7 @@ export async function buildPage(
       page,
       section,
       slugList,
+      authAvailable: input.authAvailable,
     });
     customisationCount++;
     if (!ok) failedSections.push(`${page.slug}::${section.category}`);
@@ -279,6 +310,7 @@ export async function buildSharedChrome(
   navbarComponent: RegistryComponent | null,
   footerComponent: RegistryComponent | null,
   slugList: string[],
+  opts?: { authAvailable?: boolean },
 ): Promise<{
   files: Record<string, string>;
   failedNames: string[];
@@ -304,6 +336,7 @@ export async function buildSharedChrome(
       },
       section: { category: "navbar", brief: "Shared site navbar — links to all live pages with primary CTA." },
       slugList,
+      authAvailable: opts?.authAvailable,
     });
     if (!ok) failedNames.push("navbar");
     out["components/SharedNavbar.tsx"] = code.includes("export default function SharedNavbar")
@@ -329,6 +362,7 @@ export async function buildSharedChrome(
       },
       section: { category: "footer", brief: "Shared site footer — secondary links + contact." },
       slugList,
+      authAvailable: opts?.authAvailable,
     });
     if (!ok) failedNames.push("footer");
     out["components/SharedFooter.tsx"] = code.includes("export default function SharedFooter")
@@ -343,20 +377,34 @@ export async function buildSharedChrome(
  * Build the top-level App.tsx that wires react-router to the page
  * exports. Uses HashRouter so the preview iframe (which doesn't run
  * a real server) handles navigation without 404s.
+ *
+ * When opts.wrapWithAuth is set, the orchestrator has emitted
+ * lib/session.tsx. We import SessionProvider from it and wrap the
+ * router so useSession() is available everywhere.
  */
 export function buildAppRouter(
   pages: Array<{ slug: string; exportName: string; importPath: string }>,
   brand: SitePlanBrand,
+  opts?: { wrapWithAuth?: boolean },
 ): string {
+  const wrapAuth = Boolean(opts?.wrapWithAuth);
   const imports = pages
-    .map((p, i) => `import ${p.exportName} from "${p.importPath}";`)
+    .map((p) => `import ${p.exportName} from "${p.importPath}";`)
     .join("\n");
   const routes = pages
     .map((p) => `        <Route path="${p.slug}" element={<${p.exportName} />} />`)
     .join("\n");
+  const authImport = wrapAuth ? `import { SessionProvider } from "./lib/session";\n` : "";
+  const openShell = wrapAuth ? "<SessionProvider>\n      " : "";
+  const closeShell = wrapAuth ? "\n    </SessionProvider>" : "";
+  const routerBlock = `<HashRouter>
+        <Routes>
+${routes}
+        </Routes>
+      </HashRouter>`;
   return `import React from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
-import "./styles.css";
+${authImport}import "./styles.css";
 ${imports}
 
 /**
@@ -367,11 +415,9 @@ ${imports}
  */
 export default function App() {
   return (
-    <HashRouter>
-      <Routes>
-${routes}
-      </Routes>
-    </HashRouter>
+    <>
+      ${openShell}${routerBlock}${closeShell}
+    </>
   );
 }
 `;

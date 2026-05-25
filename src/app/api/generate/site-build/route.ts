@@ -60,17 +60,227 @@ const GENERATED_SITE_DEPS: Record<string, string> = {
   "tailwind-merge": "^2.5.5",
 };
 
+const GENERATED_SITE_DEV_DEPS: Record<string, string> = {
+  "@types/react": "^18.3.12",
+  "@types/react-dom": "^18.3.1",
+  "@vitejs/plugin-react": "^4.3.4",
+  autoprefixer: "^10.4.20",
+  postcss: "^8.4.49",
+  tailwindcss: "^3.4.16",
+  typescript: "^5.6.3",
+  vite: "^5.4.11",
+};
+
 function buildPackageJson(brandName: string): string {
   return JSON.stringify(
     {
       name: brandName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "zoobicon-site",
       version: "1.0.0",
       private: true,
+      type: "module",
+      scripts: {
+        // Crontech's build pipeline runs `npm install && npm run build`
+        // by default. Vite outputs a static SPA into ./dist that
+        // Crontech can serve directly — no SSR config needed.
+        dev: "vite",
+        build: "vite build",
+        preview: "vite preview",
+      },
       dependencies: GENERATED_SITE_DEPS,
+      devDependencies: GENERATED_SITE_DEV_DEPS,
     },
     null,
     2,
   );
+}
+
+function buildViteConfig(): string {
+  return `import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    outDir: "dist",
+    sourcemap: false,
+  },
+});
+`;
+}
+
+function buildPostcssConfig(): string {
+  return `export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+`;
+}
+
+function buildTsConfig(): string {
+  return JSON.stringify(
+    {
+      compilerOptions: {
+        target: "ES2020",
+        useDefineForClassFields: true,
+        lib: ["ES2020", "DOM", "DOM.Iterable"],
+        module: "ESNext",
+        skipLibCheck: true,
+        moduleResolution: "bundler",
+        allowImportingTsExtensions: false,
+        resolveJsonModule: true,
+        isolatedModules: true,
+        noEmit: true,
+        jsx: "react-jsx",
+        strict: false,
+        noUnusedLocals: false,
+        noUnusedParameters: false,
+        noFallthroughCasesInSwitch: true,
+      },
+      include: ["**/*.ts", "**/*.tsx"],
+      exclude: ["node_modules", "dist"],
+    },
+    null,
+    2,
+  );
+}
+
+function buildIndexHtml(brandName: string): string {
+  const safeName = brandName.replace(/[<>&"]/g, "");
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${safeName}</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
+`;
+}
+
+/**
+ * Client-side session module. Emitted into the generated site whenever
+ * the plan flags backend.needsAuth=true. Wraps Crontech's session API
+ * (POST /api/auth/login, /api/auth/logout, /api/auth/me) which is the
+ * standard contract Crontech's hosting layer provides. Pages import:
+ *
+ *   import { useSession, signIn, signOut } from "./lib/session";
+ *
+ * Locally (dev / Sandpack preview) the endpoints don't exist — the
+ * module degrades to a no-op so login pages render their forms
+ * without runtime errors.
+ */
+function buildSessionModule(): string {
+  return `import React, { createContext, useContext, useEffect, useState } from "react";
+
+export interface SessionUser {
+  id: string;
+  email: string;
+  name?: string;
+  role?: string;
+}
+
+interface SessionState {
+  user: SessionUser | null;
+  loading: boolean;
+  error: string | null;
+}
+
+interface SessionContextValue extends SessionState {
+  refresh: () => Promise<void>;
+}
+
+const SessionContext = createContext<SessionContextValue>({
+  user: null,
+  loading: true,
+  error: null,
+  refresh: async () => {},
+});
+
+async function fetchMe(): Promise<SessionUser | null> {
+  try {
+    const res = await fetch("/api/auth/me", { credentials: "include" });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.user || null;
+  } catch {
+    return null;
+  }
+}
+
+export function SessionProvider({ children }: { children: React.ReactNode }) {
+  const [state, setState] = useState<SessionState>({ user: null, loading: true, error: null });
+
+  const refresh = async () => {
+    setState((s) => ({ ...s, loading: true, error: null }));
+    const user = await fetchMe();
+    setState({ user, loading: false, error: null });
+  };
+
+  useEffect(() => {
+    void refresh();
+  }, []);
+
+  return (
+    <SessionContext.Provider value={{ ...state, refresh }}>
+      {children}
+    </SessionContext.Provider>
+  );
+}
+
+export function useSession() {
+  return useContext(SessionContext);
+}
+
+export async function signIn(email: string, password: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { ok: false, error: data.error || "Sign in failed" };
+    }
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Network error" };
+  }
+}
+
+export async function signUp(email: string, password: string, name?: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password, name }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { ok: false, error: data.error || "Sign up failed" };
+    }
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Network error" };
+  }
+}
+
+export async function signOut(): Promise<void> {
+  try {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+  } catch {
+    /* no-op — session will be cleared on next refresh */
+  }
+}
+`;
 }
 
 function buildTailwindConfig(): string {
@@ -223,7 +433,10 @@ export async function POST(req: NextRequest): Promise<Response> {
           || registry.REGISTRY.find((c) => c.category === "footer")
           || null;
 
-        const sharedRes = await buildSharedChrome(plan.brand, navbarReg, footerReg, slugList);
+        const wrapWithAuth = plan.backend.needsAuth;
+        const sharedRes = await buildSharedChrome(plan.brand, navbarReg, footerReg, slugList, {
+          authAvailable: wrapWithAuth,
+        });
         const failedShared = sharedRes.failedNames.slice();
 
         // ── PHASE 2: pages, 2-wide parallel ──
@@ -254,7 +467,12 @@ export async function POST(req: NextRequest): Promise<Response> {
           writer.send("page", { slug: page.slug, name: page.name, status: "building" });
           try {
             const result = await buildPage(
-              { page, brand: plan.brand, components: resolvedPerPage[idx] },
+              {
+                page,
+                brand: plan.brand,
+                components: resolvedPerPage[idx],
+                authAvailable: wrapWithAuth,
+              },
               {
                 slugList,
                 onSectionDone: (section, _i, ok) => {
@@ -305,14 +523,38 @@ export async function POST(req: NextRequest): Promise<Response> {
           throw new Error("Every page in the plan failed to build. Try again or simplify the prompt.");
         }
 
-        const appFile = buildAppRouter(validRoutes, plan.brand);
+        // Auth provider — when the plan flagged needsAuth, wrap the
+        // router with a real session provider so login/signup pages
+        // actually authenticate. We emit a small client module that
+        // talks to Crontech's session endpoint via fetch (no SDK
+        // dependency). Pages can import { useSession, signIn, signOut }
+        // from "./lib/session".
+        // wrapWithAuth is hoisted to the top of the route so the shared
+        // chrome + per-page builds can pass it as authAvailable to the
+        // customiser. Re-using it here to gate the auth helper module
+        // + the SessionProvider wrap in App.tsx.
+        const authFiles: Record<string, string> = {};
+        if (wrapWithAuth) {
+          authFiles["lib/session.tsx"] = buildSessionModule();
+        }
+
+        const appFile = buildAppRouter(validRoutes, plan.brand, {
+          wrapWithAuth,
+        });
 
         const finalFiles: Record<string, string> = {
+          // Build pipeline scaffolding so Crontech can run
+          // `npm install && npm run build` and serve ./dist.
           "package.json": buildPackageJson(plan.brand.name),
+          "vite.config.ts": buildViteConfig(),
+          "tsconfig.json": buildTsConfig(),
+          "postcss.config.js": buildPostcssConfig(),
           "tailwind.config.js": buildTailwindConfig(),
+          "index.html": buildIndexHtml(plan.brand.name),
           "styles.css": buildStylesFile(plan.brand.primaryColor),
           "index.tsx": buildIndexFile(),
           "App.tsx": appFile,
+          ...authFiles,
           ...sharedRes.files,
           ...allPageFiles,
         };

@@ -65,6 +65,20 @@ export interface CrontechSyncInput {
     prompt?: string;
     template?: string | null;
     visibility?: "public" | "admin_private";
+    /** Project structure hint for Crontech's build pipeline:
+     *   "vite-spa"        single-page Vite app (Full-Site Mode output)
+     *   "sandpack-react"  Sandpack-style React project (single-page mode)
+     *   "static"          plain index.html + assets (legacy HTML mode)
+     *  If omitted Crontech auto-detects from package.json scripts. */
+    framework?: "vite-spa" | "sandpack-react" | "static";
+    /** Hint that this is a multi-page React SPA — Crontech will rewrite
+     *  unknown routes to / so HashRouter (or BrowserRouter) handles
+     *  client-side navigation without 404s. */
+    isMultiPage?: boolean;
+    /** Suggested build command. Crontech defaults to npm run build. */
+    buildCommand?: string;
+    /** Directory to serve after build. Crontech defaults to dist/ or build/. */
+    outputDir?: string;
   };
 }
 
@@ -99,11 +113,39 @@ export function toCrontechSlug(name: string): string {
 }
 
 /**
+ * Auto-detect the project shape from the file tree so callers don't have
+ * to set framework/isMultiPage/buildCommand explicitly. Full-Site Mode
+ * output is distinguishable by the presence of vite.config.ts +
+ * HashRouter usage in App.tsx.
+ */
+function detectFrameworkHints(input: CrontechSyncInput): Partial<NonNullable<CrontechSyncInput["meta"]>> {
+  const files = input.files || {};
+  const hasVite = "vite.config.ts" in files || "vite.config.js" in files;
+  const appCode = files["App.tsx"] || files["src/App.tsx"] || "";
+  const hasRouter = /HashRouter|BrowserRouter|createBrowserRouter/.test(appCode);
+  if (hasVite) {
+    return {
+      framework: "vite-spa",
+      isMultiPage: hasRouter,
+      buildCommand: "npm run build",
+      outputDir: "dist",
+    };
+  }
+  // No build pipeline — Sandpack-style React project.
+  return { framework: "sandpack-react" };
+}
+
+/**
  * Push a built project to Crontech. Mocked until CRONTECH_PAT is set —
  * returns a fake live URL so the UI/end-to-end test still works locally.
  */
 export async function pushToCrontech(input: CrontechSyncInput): Promise<CrontechSyncResult> {
   const slug = toCrontechSlug(input.name);
+  // Merge auto-detected framework hints with any caller-provided ones.
+  // Caller takes precedence — Full-Site Mode can set isMultiPage=true
+  // explicitly even when App.tsx hasn't been streamed in yet.
+  const detected = detectFrameworkHints(input);
+  const mergedMeta = { ...detected, ...(input.meta || {}) };
 
   if (!crontechAvailable()) {
     return {
@@ -129,7 +171,7 @@ export async function pushToCrontech(input: CrontechSyncInput): Promise<Crontech
         deps: input.deps || {},
         meta: {
           source: "zoobicon-ai-builder",
-          ...input.meta,
+          ...mergedMeta,
         },
       }),
       // 30s budget — Crontech provisioning can take a moment on cold tenants
