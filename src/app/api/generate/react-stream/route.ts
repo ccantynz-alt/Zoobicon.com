@@ -40,6 +40,12 @@ import type { RegistryComponent, ComponentCategory } from "@/lib/component-regis
 
 async function getRegistry() {
   const mod = await import("@/lib/component-registry");
+  // CRITICAL — REGISTRY is empty until ensureRegistryLoaded() runs the
+  // side-effect imports for navbars/heroes/features/etc. Without this
+  // call, any direct REGISTRY.map / REGISTRY.filter on the returned
+  // module reads an empty array — which silently broke planComponents
+  // (it kept falling through to the heuristic selector). 2026-05-26 fix.
+  mod.ensureRegistryLoaded();
   return mod;
 }
 

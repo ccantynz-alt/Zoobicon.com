@@ -415,8 +415,10 @@ export async function POST(req: NextRequest): Promise<Response> {
       const writer = makeWriter(controller);
       const slugList = plan.pages.map((p) => p.slug);
       // Lazy-load registry to avoid TDZ at module init time (same pattern
-      // as react-stream).
+      // as react-stream). MUST call ensureRegistryLoaded() — REGISTRY is
+      // [] until the side-effect imports for navbars/heroes/etc. fire.
       const registry = await import("@/lib/component-registry");
+      registry.ensureRegistryLoaded();
 
       try {
         // ── PHASE 1: shared chrome (navbar + footer) ──

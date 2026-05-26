@@ -14,12 +14,19 @@
  */
 
 import { REGISTRY } from "@/lib/component-registry/store";
+import { ensureRegistryLoaded } from "@/lib/component-registry";
 
 export const runtime = "nodejs";
 export const dynamic = "force-static";
 export const revalidate = 300;
 
 export async function GET(): Promise<Response> {
+  // REGISTRY is populated by side-effect imports inside
+  // ensureRegistryLoaded() (see component-registry/index.ts). Reading
+  // REGISTRY before calling this returns an empty array — a real
+  // 2026-05-26 bug that made this endpoint return zero components.
+  ensureRegistryLoaded();
+
   // Group registry rows by category for cheap client-side lookup.
   const byCategory: Record<string, Array<{
     id: string;
