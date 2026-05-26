@@ -33,10 +33,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/products/ai-twins', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/products/seo-agent', priority: 0.8, changeFrequency: 'weekly' },
 
-    // SEO marketing
+    // SEO marketing — gallery + challenges removed 2026-05-26 (no real
+    // customer sites yet; honest "we're new" stance per Founder's note).
     { path: '/seo', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/showcase', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/gallery', priority: 0.8, changeFrequency: 'daily' },
     { path: '/agencies', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/wordpress', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/cli', priority: 0.8, changeFrequency: 'weekly' },

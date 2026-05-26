@@ -1416,13 +1416,20 @@ function BuilderPage() {
       }
     }
 
-    // CHECK AUTH FIRST — don't waste the user's time
+    // Rule 31 — /auth/signup was deleted (auth delegated to Crontech)
+    // but the builder used to hard-redirect anonymous users there on
+    // every Generate click. That meant every first-time visitor hit a
+    // 404 instead of seeing a site — and "no site has ever shipped"
+    // (Craig, 2026-05-26) traced back to exactly this. Until Crontech
+    // SSO is wired live, anonymous users can build with the same per-
+    // IP quota the API enforces. We save the prompt to localStorage so
+    // if/when a real signup flow lands they can resume.
     const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
     if (!userStr) {
-      // Save their prompt so it's not lost after signup
       try { localStorage.setItem("zoobicon_pending_prompt", prompt.trim()); } catch {}
-      window.location.href = `/auth/signup?redirect=/builder&prompt=${encodeURIComponent(prompt.trim().slice(0, 200))}`;
-      return;
+      // Don't block — proceed anonymously. The server-side quota gate
+      // (lib/build-quota.ts) handles abuse via the userEmail = null
+      // path (anonymous baseline, no DB writes).
     }
 
     // Close welcome modal if open

@@ -183,7 +183,7 @@ export default function ComparePage() {
       {/* Why Choose Zoobicon */}
       <section className="py-20 px-4 bg-white/[0.02]">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Why 10,000+ Builders Choose Zoobicon</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">What sets Zoobicon apart</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-14 h-14 rounded-xl bg-stone-500/10 flex items-center justify-center mx-auto mb-4">
