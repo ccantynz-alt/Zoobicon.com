@@ -64,6 +64,13 @@ export default function AdminPage() {
   const [templates, setTemplates] = useState<TemplateRecord[]>([]);
   const [templatesLoading, setTemplatesLoading] = useState(false);
 
+  // Real env-var presence — `Required` was a static label that the
+  // user (rightly) read as "this is missing", but it actually only
+  // expressed intent. We now ask the server which keys are actually
+  // set in Vercel and render Set / Missing instead.
+  const [envStatus, setEnvStatus] = useState<Record<string, boolean> | null>(null);
+  const [envStatusError, setEnvStatusError] = useState("");
+
   const copyToClipboard = (text: string, key: string) => {
     navigator.clipboard.writeText(text).catch(() => {});
     setCopied(key);
@@ -107,6 +114,34 @@ export default function AdminPage() {
     if (!isAdmin) return;
     if (activeTab === "templates") fetchTemplates();
   }, [activeTab, isAdmin, fetchTemplates]);
+
+  // Read the admin email from localStorage so we can authenticate
+  // to /api/admin/env-status. The endpoint returns booleans only,
+  // never the values, so this is purely a UI affordance.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const raw = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
+        if (!raw) return;
+        const user = JSON.parse(raw);
+        if (!user?.email) return;
+        const res = await fetch("/api/admin/env-status", {
+          headers: { "x-admin-email": user.email },
+          cache: "no-store",
+        });
+        if (!res.ok) {
+          if (!cancelled) setEnvStatusError(`HTTP ${res.status}`);
+          return;
+        }
+        const data = await res.json();
+        if (!cancelled) setEnvStatus(data.status || {});
+      } catch (e) {
+        if (!cancelled) setEnvStatusError(e instanceof Error ? e.message : "Failed to load env status");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Rule 31 — user CRUD lives in Crontech; updateUser/deleteUser removed.
 
@@ -270,15 +305,15 @@ export default function AdminPage() {
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {[
-                  { icon: Mail, label: "Email Inbox", href: "/admin", desc: "Read & manage email", gradient: "from-stone-700 to-stone-800" },
-                  { icon: Inbox, label: "Mailboxes", href: "/admin", desc: "Manage mailboxes & routing", gradient: "from-stone-600 to-stone-700" },
-                  { icon: Settings, label: "Email Settings", href: "/admin", desc: "Configure admin email", gradient: "from-stone-500 to-stone-600" },
-                  { icon: HeadphonesIcon, label: "Support", href: "/admin", desc: "Support tickets & knowledge", gradient: "from-stone-700 to-stone-800" },
-                  { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness", gradient: "from-stone-600 to-stone-700" },
-                  { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder", gradient: "from-stone-800 to-stone-900" },
-                  { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", gradient: "from-stone-500 to-stone-600", external: true },
-                  { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Account settings", gradient: "from-stone-600 to-stone-700" },
-                  { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard", gradient: "from-stone-700 to-stone-800" },
+                  { icon: Mail, label: "Email Inbox", href: "/admin", desc: "Read & manage email" },
+                  { icon: Inbox, label: "Mailboxes", href: "/admin", desc: "Manage mailboxes & routing" },
+                  { icon: Settings, label: "Email Settings", href: "/admin", desc: "Configure admin email" },
+                  { icon: HeadphonesIcon, label: "Support", href: "/admin", desc: "Support tickets & knowledge" },
+                  { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness" },
+                  { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder" },
+                  { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", external: true },
+                  { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Account settings" },
+                  { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard" },
                 ].map((a, i) => (
                   <motion.div
                     key={a.label}
@@ -291,8 +326,21 @@ export default function AdminPage() {
                       target={(a as { external?: boolean }).external ? "_blank" : undefined}
                       className="group relative overflow-hidden rounded-2xl border border-stone-200/80 hover:border-stone-300 bg-white hover:bg-white backdrop-blur-xl p-5 flex items-start gap-4 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-stone-100/50 hover:scale-[1.02]"
                     >
-                      <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${a.gradient} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform`}>
-                        <a.icon className="w-5 h-5 text-white" />
+                      {/* Editorial-light icon medallion: cream surface + gold
+                          hairline + ink glyph. The previous dark stone
+                          gradient + `text-white` glyph rendered as solid
+                          black under the Rule 29 override (globals.css:2354
+                          rewrites .text-white → var(--ink)), making every
+                          icon invisible on a near-black background. */}
+                      <div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                        style={{
+                          background: "var(--paper)",
+                          border: "1px solid var(--gold-soft, rgba(184,146,63,0.35))",
+                          boxShadow: "0 1px 3px rgba(140,107,37,0.10)",
+                        }}
+                      >
+                        <a.icon className="w-5 h-5" style={{ color: "var(--gold-deep, #8c6b25)" }} />
                       </div>
                       <div className="min-w-0">
                         <div className="text-sm font-semibold truncate text-stone-700 group-hover:text-stone-900 transition-colors">{a.label}</div>
@@ -308,9 +356,9 @@ export default function AdminPage() {
             {/* ── Feature Highlights ── */}
             <div className="grid md:grid-cols-3 gap-4">
               {[
-                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers.", iconGradient: "from-stone-700 to-stone-900" },
-                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Contextual AI images.", iconGradient: "from-stone-600 to-stone-800" },
-                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium site.", iconGradient: "from-stone-700 to-stone-800" },
+                { icon: Workflow, title: "10-Agent Pipeline", desc: "Strategist, Brand, Copywriter, Architect, Developer, Animator, SEO, Forms, Integrations, QA — 3 tiers." },
+                { icon: ImagePlus, title: "AI Image Generation", desc: "DALL-E 3, Stability AI, and Unsplash integration. Contextual AI images." },
+                { icon: Globe, title: "Website Cloner", desc: "Paste any URL to analyze, extract content, and rebuild as a premium site." },
               ].map((f, i) => (
                 <motion.div
                   key={f.title}
@@ -319,8 +367,15 @@ export default function AdminPage() {
                   transition={{ delay: 0.2 + i * 0.1 }}
                   className="rounded-2xl p-6 bg-white border border-stone-200/80 backdrop-blur-xl shadow-sm hover:shadow-lg hover:shadow-stone-100/30 hover:border-stone-200 hover:scale-[1.02] transition-all duration-300"
                 >
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.iconGradient} flex items-center justify-center mb-4 shadow-lg`}>
-                    <f.icon className="w-6 h-6 text-white" />
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                    style={{
+                      background: "var(--paper)",
+                      border: "1px solid var(--gold-soft, rgba(184,146,63,0.35))",
+                      boxShadow: "0 1px 3px rgba(140,107,37,0.10)",
+                    }}
+                  >
+                    <f.icon className="w-6 h-6" style={{ color: "var(--gold-deep, #8c6b25)" }} />
                   </div>
                   <h3 className="text-sm font-bold mb-1.5 text-stone-700">{f.title}</h3>
                   <p className="text-xs text-stone-600 leading-relaxed">{f.desc}</p>
@@ -394,13 +449,50 @@ export default function AdminPage() {
                   <Database className="w-4 h-4 text-stone-500" />
                   Environment Variables
                 </h2>
-                <p className="text-xs text-stone-600 mb-5">Set in <span className="text-stone-600 font-medium">Vercel → Environment Variables</span> · {envKeys.length} total</p>
+                <p className="text-xs text-stone-600 mb-1">
+                  Set in <span className="text-stone-600 font-medium">Vercel → Environment Variables</span> · {envKeys.length} total
+                </p>
+                {envStatus && (
+                  <p className="text-xs text-stone-500 mb-5">
+                    {Object.values(envStatus).filter(Boolean).length} of {envKeys.length} configured
+                    {envKeys.filter((e) => e.required && envStatus[e.key] === false).length > 0 && (
+                      <span className="ml-2 text-rose-700 font-medium">
+                        · {envKeys.filter((e) => e.required && envStatus[e.key] === false).length} required missing
+                      </span>
+                    )}
+                  </p>
+                )}
+                {envStatusError && (
+                  <p className="text-xs text-rose-700 mb-5">Could not load env status — {envStatusError}. Falling back to required/optional labels.</p>
+                )}
                 <div className="space-y-1 max-h-[420px] overflow-y-auto pr-1 custom-scrollbar">
                   {(() => {
                     let lastGroup = "";
                     return envKeys.map((e) => {
                       const showGroup = e.group !== lastGroup;
                       lastGroup = e.group;
+                      // Three rendered states: real status (Set / Missing /
+                      // Optional-missing) when we have it, fallback to the
+                      // intent label (Required / Optional) when the env
+                      // endpoint failed or hasn't returned yet.
+                      let badgeLabel: string;
+                      let badgeClass: string;
+                      if (envStatus) {
+                        const isSet = envStatus[e.key] === true;
+                        if (isSet) {
+                          badgeLabel = "Set";
+                          badgeClass = "bg-emerald-50 text-emerald-700 border border-emerald-200";
+                        } else if (e.required) {
+                          badgeLabel = "Missing";
+                          badgeClass = "bg-rose-50 text-rose-700 border border-rose-200";
+                        } else {
+                          badgeLabel = "Not set";
+                          badgeClass = "bg-stone-50 text-stone-500 border border-stone-200";
+                        }
+                      } else {
+                        badgeLabel = e.required ? "Required" : "Optional";
+                        badgeClass = "bg-stone-50 text-stone-600 border border-stone-200";
+                      }
                       return (
                         <div key={e.key}>
                           {showGroup && (
@@ -411,12 +503,8 @@ export default function AdminPage() {
                               <div className="text-xs font-mono text-stone-600 truncate">{e.key}</div>
                               <div className="text-xs text-stone-600">{e.label}</div>
                             </div>
-                            <div className={`text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${
-                              e.required
-                                ? "bg-stone-50 text-stone-700 border border-stone-200"
-                                : "bg-stone-50 text-stone-600 border border-stone-200"
-                            }`}>
-                              {e.required ? "Required" : "Optional"}
+                            <div className={`text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 ${badgeClass}`}>
+                              {badgeLabel}
                             </div>
                           </div>
                         </div>
