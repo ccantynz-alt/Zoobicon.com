@@ -560,9 +560,15 @@ function BuilderPage() {
   // iframe that renders the project via Babel-standalone + esm.sh —
   // no codesandbox.io dependency. Persisted in localStorage so the
   // user's choice survives reloads.
+  // 2026-05-26: DEFAULT ON. Craig: "we need to be the most reliable
+  // possible so we can't have a flaky sandbox." Sandpack flakes too
+  // often to be the default. Users who explicitly want hot-reload
+  // can flip the toggle.
   const [useEscapeHatch, setUseEscapeHatch] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("zoobicon_use_escape_hatch") === "1";
+    if (typeof window === "undefined") return true;
+    const stored = localStorage.getItem("zoobicon_use_escape_hatch");
+    if (stored === "0") return false;  // explicit opt-out
+    return true;  // default + "1" both → escape hatch
   });
   const [userPlan, setUserPlan] = useState<Plan>("free");
 
