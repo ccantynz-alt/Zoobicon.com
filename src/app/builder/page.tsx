@@ -1967,55 +1967,6 @@ function BuilderPage() {
     []
   );
 
-  /** Build the deployable HTML code from current state (React files or raw HTML) */
-  const buildDeployCode = useCallback((siteName: string): string | null => {
-    const files = reactFiles ?? {};
-    const hasReactFiles = Object.keys(files).length > 0;
-    const hasHtml = generatedCode && generatedCode !== "<!-- react-app-mode -->";
-
-    if (!hasReactFiles && !hasHtml) return null;
-
-    if (hasReactFiles && !hasHtml) {
-      // React mode: combine all files into a single deployable HTML page
-      const appCode = files["App.tsx"] || "";
-      const cssCode = files["styles.css"] || "";
-      const componentCodes = Object.entries(files)
-        .filter(([path]) => path.startsWith("components/") && path.endsWith(".tsx"))
-        .map(([path, code]) => {
-          const name = path.replace("components/", "").replace(".tsx", "");
-          return `// --- ${name} ---\n${code}`;
-        })
-        .join("\n\n");
-
-      return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${siteName}</title>
-  <script src="https://cdn.tailwindcss.com"><\/script>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"><\/script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"><\/script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
-  <style>${cssCode}</style>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="text/babel">
-${componentCodes}
-
-${appCode}
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(React.createElement(App));
-  <\/script>
-</body>
-</html>`;
-    }
-
-    return generatedCode;
-  }, [generatedCode, reactFiles]);
-
   /** Called by DeployModal when user confirms deploy.
    *  Rule 31 — all deploy paths go through Crontech now. The provider
    *  arg is retained for DeployModal compatibility but both options
