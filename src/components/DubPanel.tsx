@@ -558,7 +558,7 @@ export default function DubPanel({
                 className="block text-sm font-medium"
                 style={{ color: "var(--ink, #0a0a0b)" }}
               >
-                Match the source narrator's voice
+                Match the source narrator&apos;s voice
               </span>
               <span
                 className="block text-xs mt-0.5"

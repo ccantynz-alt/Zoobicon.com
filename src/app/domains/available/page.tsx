@@ -497,7 +497,7 @@ export default function AvailableDomainsPage() {
                 className="font-semibold mb-1"
                 style={{ color: "var(--ink)" }}
               >
-                Couldn't load the available list
+                Couldn&apos;t load the available list
               </div>
               <div
                 className="text-sm"
