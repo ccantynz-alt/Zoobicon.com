@@ -75,134 +75,6 @@ function PreviewSwitcher({ useWebContainers, onWebContainersFail, files, reactDe
 // Editorial-light palette: warm bone surfaces, near-black text, deep
 // champagne accent. NO dark gradients, NO champagne-on-black.
 // ───────────────────────────────────────────────────────────────────────────
-interface LaunchVideoState {
-  status: "idle" | "running" | "ready" | "error";
-  step: string;
-  videoUrl?: string;
-  durationSec?: number;
-  script?: string;
-  error?: string;
-}
-
-interface LaunchVideoPolaroidProps {
-  state: LaunchVideoState;
-  onRetry: () => void;
-  onDismiss: () => void;
-}
-
-function LaunchVideoPolaroid({ state, onRetry, onDismiss }: LaunchVideoPolaroidProps): JSX.Element | null {
-  const [copied, setCopied] = useState(false);
-  if (state.status === "idle") return null;
-
-  const embedSnippet = state.videoUrl
-    ? `<video src="${state.videoUrl}" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover" />`
-    : "";
-
-  async function handleCopy() {
-    if (!embedSnippet) return;
-    try {
-      await navigator.clipboard.writeText(embedSnippet);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // Clipboard blocked — surface the snippet via prompt() as a last resort.
-      window.prompt("Copy embed code:", embedSnippet);
-    }
-  }
-
-  return (
-    <div
-      className="absolute right-4 bottom-4 z-40 w-[280px] rounded-2xl shadow-[0_24px_60px_-20px_rgba(10,10,11,0.45)] border border-[#e8e6dc] bg-[#fafaf7] overflow-hidden"
-      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
-    >
-      {/* Polaroid header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-[#e8e6dc] bg-[#f4f3ed]">
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-md bg-[#c9a961]/15 flex items-center justify-center">
-            <Video size={12} className="text-[#a8884b]" />
-          </div>
-          <span className="text-[11px] font-semibold tracking-wide text-[#0a0a0b]">
-            Launch video
-          </span>
-          {state.status === "ready" && state.durationSec ? (
-            <span className="text-[10px] text-[#6b6b6b]">{state.durationSec}s</span>
-          ) : null}
-        </div>
-        <button
-          type="button"
-          onClick={onDismiss}
-          aria-label="Dismiss launch video"
-          className="p-1 rounded hover:bg-[#e8e6dc] text-[#6b6b6b]"
-        >
-          <X size={12} />
-        </button>
-      </div>
-
-      {/* Body */}
-      <div className="p-3">
-        <div className="aspect-video rounded-lg overflow-hidden bg-[#f4f3ed] border border-[#e8e6dc] relative flex items-center justify-center">
-          {state.status === "running" ? (
-            <div className="flex flex-col items-center gap-2 px-4 text-center">
-              <Loader2 size={20} className="animate-spin text-[#c9a961]" />
-              <span className="text-[10px] text-[#0a0a0b]/70 leading-snug">
-                {state.step || "Crafting your launch video..."}
-              </span>
-            </div>
-          ) : state.status === "ready" && state.videoUrl ? (
-            <video
-              src={state.videoUrl}
-              autoPlay
-              muted
-              loop
-              playsInline
-              controls={false}
-              className="w-full h-full object-cover"
-            />
-          ) : state.status === "error" ? (
-            <div className="flex flex-col items-center gap-2 px-4 text-center">
-              <AlertTriangle size={20} className="text-[#a8884b]" />
-              <span className="text-[10px] text-[#0a0a0b]/80 leading-snug">
-                Video generation failed: {state.error || "unknown error"}
-              </span>
-            </div>
-          ) : null}
-        </div>
-
-        {/* Footer actions */}
-        {state.status === "ready" && state.videoUrl ? (
-          <div className="mt-3 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="flex-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider border border-[#e8e6dc] bg-[#fafaf7] text-[#0a0a0b] hover:bg-[#f4f3ed] transition flex items-center justify-center gap-1.5"
-            >
-              <Copy size={11} />
-              {copied ? "Copied" : "Copy embed code"}
-            </button>
-            <a
-              href={state.videoUrl}
-              download
-              className="px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider border border-[var(--gold)] bg-[var(--gold-soft)] text-[var(--gold-deep)] hover:bg-[var(--gold)]/25 transition"
-            >
-              <Download size={11} />
-            </a>
-          </div>
-        ) : state.status === "error" ? (
-          <div className="mt-3 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onRetry}
-              className="flex-1 px-3 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider border border-[#e8e6dc] bg-[#fafaf7] text-[#0a0a0b] hover:bg-[#f4f3ed] transition flex items-center justify-center gap-1.5"
-            >
-              <RotateCcw size={11} />
-              Retry
-            </button>
-          </div>
-        ) : null}
-      </div>
-    </div>
-  );
-}
 import CodePanel from "@/components/CodePanel";
 import ChatPanel from "@/components/ChatPanel";
 import SectionEditor from "@/components/SectionEditor";
@@ -293,7 +165,6 @@ import {
   Zap,
   Loader2,
   Layout,
-  Video,
   Copy,
 } from "lucide-react";
 
@@ -729,18 +600,8 @@ function BuilderPage() {
   const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Opus, pipeline=7-agent
   const instantMode = buildMode === "instant"; // back-compat
   const [fullStack, setFullStack] = useState(false); // Full-stack mode: auto-provisions Supabase backend (auth, database, storage)
-  // Launch video combo — same prompt produces site + 30s hero launch video.
-  // No competitor (Lovable/Bolt/v0/HeyGen) has this combo. Default ON.
-  const [includeLaunchVideo, setIncludeLaunchVideo] = useState(true);
-  const [launchVideo, setLaunchVideo] = useState<{
-    status: "idle" | "running" | "ready" | "error";
-    step: string;
-    videoUrl?: string;
-    durationSec?: number;
-    script?: string;
-    error?: string;
-  }>({ status: "idle", step: "" });
-  const launchVideoAbortRef = useRef<AbortController | null>(null);
+  // Launch video combo removed 2026-05-26 — AI Video Creator (and its
+  // /api/generate/launch-video sub-feature) cut from launch scope.
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [reactFiles, setReactFiles] = useState<Record<string, string> | null>(null);
@@ -1293,92 +1154,6 @@ function BuilderPage() {
    * Declared BEFORE handleGenerate so handleGenerate's dep array can
    * reference it without hitting a temporal dead zone at component init.
    */
-  const generateLaunchVideo = useCallback(async (sitePrompt: string) => {
-    if (!sitePrompt.trim()) return;
-    // Cancel any in-flight launch video request from a previous build.
-    launchVideoAbortRef.current?.abort();
-    const controller = new AbortController();
-    launchVideoAbortRef.current = controller;
-
-    setLaunchVideo({ status: "running", step: "Preparing launch video…" });
-
-    // Best-effort brand inference — first capitalised word in prompt.
-    const brandMatch = sitePrompt.match(/(?:called|named|for|brand(?:ed)?)\s+([A-Z][A-Za-z0-9]{1,30})/);
-    const fallbackBrand = sitePrompt
-      .split(/[^A-Za-z0-9]+/)
-      .find((t) => /^[A-Z]/.test(t) && t.length >= 3);
-    const brandName = (brandMatch?.[1] || fallbackBrand || "").trim();
-
-    try {
-      const res = await fetch("/api/generate/launch-video", {
-        method: "POST",
-        headers: authHeaders(),
-        body: JSON.stringify({
-          tagline: sitePrompt.trim().slice(0, 200),
-          valueProp: sitePrompt.trim(),
-          brandName: brandName || undefined,
-          stream: true,
-        }),
-        signal: controller.signal,
-      });
-
-      if (!res.ok || !res.body) {
-        const errBody = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-        throw new Error(errBody.error || `Video service returned HTTP ${res.status}`);
-      }
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buf += decoder.decode(value, { stream: true });
-        const lines = buf.split("\n");
-        buf = lines.pop() || "";
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const jsonStr = line.slice(6).trim();
-          if (!jsonStr) continue;
-          try {
-            const event = JSON.parse(jsonStr);
-            if (event.type === "step" && event.message) {
-              setLaunchVideo((prev) => ({ ...prev, status: "running", step: event.message }));
-            } else if (event.type === "script" && event.script) {
-              setLaunchVideo((prev) => ({ ...prev, script: event.script }));
-            } else if (event.type === "video" && event.videoUrl) {
-              setLaunchVideo((prev) => ({
-                ...prev,
-                status: "ready",
-                videoUrl: event.videoUrl,
-                durationSec: event.durationSec,
-              }));
-            } else if (event.type === "done") {
-              setLaunchVideo((prev) => ({
-                ...prev,
-                status: "ready",
-                step: "Launch video ready",
-                videoUrl: event.videoUrl || prev.videoUrl,
-                durationSec: event.durationSec || prev.durationSec,
-                script: event.script || prev.script,
-              }));
-            } else if (event.type === "error") {
-              const msg = typeof event.message === "string" ? event.message : "Launch video failed";
-              setLaunchVideo({ status: "error", step: "", error: msg });
-              return;
-            }
-          } catch (e) {
-            if (e instanceof SyntaxError) continue;
-            throw e;
-          }
-        }
-      }
-    } catch (err) {
-      if ((err as Error).name === "AbortError") return;
-      const msg = err instanceof Error ? err.message : String(err);
-      setLaunchVideo({ status: "error", step: "", error: msg });
-    }
-  }, []);
 
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
@@ -1680,11 +1455,7 @@ function BuilderPage() {
                   }
                   setPipelineAgents(prev => [...prev, "Build complete"]);
                   trackEvent("build");
-                  // Cross-product moat: kick off the launch video pipeline now
-                  // that the site is finished. Never blocks the site flow.
-                  if (includeLaunchVideo) {
-                    void generateLaunchVideo(prompt);
-                  }
+                  // Launch-video side-effect removed 2026-05-26 (Rule 19).
                 }
               } else if (event.type === "warning") {
                 // Non-fatal in-flight warning (section-fallback, etc.) — show it
@@ -1762,9 +1533,7 @@ function BuilderPage() {
                 setBuildProgress(null);
                 setPipelineAgents(prev => [...prev, "Build complete"]);
                 trackEvent("build");
-                if (includeLaunchVideo) {
-                  void generateLaunchVideo(prompt);
-                }
+                // Launch-video side-effect removed 2026-05-26 (Rule 19).
               } else if (event.type === "warning") {
                 const kind = event.kind || "warning";
                 const section = event.section || "";
@@ -1817,7 +1586,7 @@ function BuilderPage() {
       }
       return;
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection, includeLaunchVideo, generateLaunchVideo, planReview, sitePlan, sitePlanLoading, authHeaders]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection, planReview, sitePlan, sitePlanLoading, authHeaders]);
 
   // Plan Mode (B12) callback handlers — used by the PlanReviewPanel.
   const handlePlanConfirm = useCallback(() => {
@@ -2280,12 +2049,7 @@ function BuilderPage() {
           files={reactFiles || {}}
           reactDeps={reactDeps}
         />
-        {/* Launch video polaroid — floats over preview, never blocks site flow */}
-        <LaunchVideoPolaroid
-          state={launchVideo}
-          onRetry={() => generateLaunchVideo(prompt)}
-          onDismiss={() => setLaunchVideo({ status: "idle", step: "" })}
-        />
+        {/* Launch-video polaroid removed 2026-05-26 (Rule 19 retired). */}
         {isAdmin && (
           <div className="absolute top-2 right-2 z-50 flex items-center gap-2">
             <button
@@ -2380,23 +2144,7 @@ function BuilderPage() {
                 <Database size={12} className="inline mr-1" />
                 {fullStack ? "Full-Stack" : "Frontend"}
               </button>
-              <button
-                onClick={() => setIncludeLaunchVideo((v) => !v)}
-                aria-pressed={includeLaunchVideo}
-                className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
-                  includeLaunchVideo
-                    ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
-                    : "bg-white/5 border-white/10 text-white/40"
-                }`}
-                title={
-                  includeLaunchVideo
-                    ? "Launch video: 30-second hero spokesperson video auto-generates after the site"
-                    : "Launch video off — site only"
-                }
-              >
-                <Video size={12} className="inline mr-1" />
-                {includeLaunchVideo ? "+ Launch Video" : "Site Only"}
-              </button>
+              {/* Launch-video toggle removed 2026-05-26 (Rule 19 retired). */}
               <button
                 onClick={handleGenerate}
                 disabled={!prompt.trim() || status === "generating"}

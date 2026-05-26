@@ -203,8 +203,8 @@ export default function ComparePage() {
               <div className="w-14 h-14 rounded-xl bg-stone-500/10 flex items-center justify-center mx-auto mb-4">
                 <Globe className="w-7 h-7 text-stone-400" />
               </div>
-              <h3 className="font-semibold mb-2">Builder + Video + Domains</h3>
-              <p className="text-sm text-stone-400">AI Website Builder, AI Video Creator, real Domain Search, and 12 free tools — one login, one subscription.</p>
+              <h3 className="font-semibold mb-2">Builder + Domains + Tools</h3>
+              <p className="text-sm text-stone-400">AI Website Builder, real Domain Search, and 12 free tools — one login, one subscription.</p>
             </div>
           </div>
         </div>

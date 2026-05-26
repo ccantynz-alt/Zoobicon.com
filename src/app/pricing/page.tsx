@@ -46,7 +46,7 @@ const PLANS = [
     description: "For creators and businesses ready to scale with the full AI toolkit.",
     features: [
       "3 AI-generated websites",
-      "AI builder + video creator",
+      "AI builder (Claude Opus 4.7)",
       "3 custom domains included",
       "10 email mailboxes",
       "SEO monitor & optimizer",
@@ -224,7 +224,7 @@ export default function PricingPage() {
               variants={fadeUp}
               className="mt-8 text-[17px] sm:text-lg text-white/55 max-w-2xl mx-auto leading-relaxed"
             >
-              One platform for AI websites, domains, hosting, email, and video.
+              One platform for AI websites and domains. Hosting via partner cloud.
               Start with a 14-day free trial. No credit card required.
             </motion.p>
 

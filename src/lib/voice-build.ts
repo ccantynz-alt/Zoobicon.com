@@ -302,12 +302,9 @@ interface InstantOnboardingModule {
   }) => Promise<{ projectId?: string; previewUrl?: string }>;
 }
 
-interface VideoPipelineModule {
-  generateSpokespersonVideo?: (input: {
-    script: string;
-    voiceStyle?: string;
-  }) => Promise<unknown>;
-}
+// VideoPipelineModule removed 2026-05-26 — AI Video Creator retired
+// from launch scope (Rule 19). routeGenerateVideo() now returns a
+// deferred-feature response without dynamic-importing anything.
 
 interface DomainHookModule {
   searchDomain?: (query: string, tld?: string) => Promise<unknown>;
@@ -395,37 +392,19 @@ async function routeEditExisting(
 }
 
 async function routeGenerateVideo(
-  classification: VoiceClassification,
+  _classification: VoiceClassification,
 ): Promise<VoiceRouteResult> {
-  const topic = classification.params.topic ?? classification.originalText;
-  try {
-    const mod = (await import("@/lib/video-pipeline")) as VideoPipelineModule;
-    if (typeof mod.generateSpokespersonVideo === "function") {
-      const data = await mod.generateSpokespersonVideo({
-        script: topic,
-        voiceStyle: classification.params.style,
-      });
-      return {
-        module: "video-pipeline",
-        ok: true,
-        data: data as unknown as Record<string, unknown>,
-      };
-    }
-    return {
-      module: "video-pipeline",
-      ok: false,
-      error: "video-pipeline missing generateSpokespersonVideo",
-      hint: "Video pipeline not exporting expected function.",
-    };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "unknown error";
-    return {
-      module: "video-pipeline",
-      ok: false,
-      error: message,
-      hint: "Video generation failed — check REPLICATE_API_TOKEN.",
-    };
-  }
+  // Rule 19 retired 2026-05-26 — AI Video Creator removed from launch
+  // scope. Voice-command "generate video" intent now resolves with a
+  // clear "feature deferred" message instead of throwing on a missing
+  // module. The voice classifier can still recognise the intent so we
+  // get clean analytics about how often it's asked for.
+  return {
+    module: "video-pipeline",
+    ok: false,
+    error: "AI Video Creator was removed from launch scope",
+    hint: "Video generation is deferred. Try the AI Builder or Domain Search instead.",
+  };
 }
 
 async function routeRegisterDomain(

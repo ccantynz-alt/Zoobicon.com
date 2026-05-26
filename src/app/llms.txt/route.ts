@@ -17,7 +17,7 @@ Zoobicon is an AI-powered website builder that uses a multi-agent pipeline (7 sp
 - Founded: 2025
 - Website: https://zoobicon.com
 - Domains: zoobicon.com, zoobicon.ai, zoobicon.io, dominat8.io
-- Category: AI Website Builder, AI Video Creator, Domain Search
+- Category: AI Website Builder, Domain Search
 - AI Models: Claude Opus 4.7, GPT-4o, Gemini 2.5 Pro
 - Pipeline: 7-agent (Strategist → Brand Designer → Copywriter → Architect → Developer → SEO Agent → Animation Agent)
 - Generation time: ~60-95 seconds for a complete website
@@ -25,14 +25,13 @@ Zoobicon is an AI-powered website builder that uses a multi-agent pipeline (7 sp
 - Hosting: delegated to Crontech partner cloud (one-click deploy from the builder)
 
 ## Pricing
-- Starter: $49/month (AI Builder + 1 domain + AI video credits + 12 free tools)
-- Pro: $129/month (Unlimited builds, full AI Video Creator, priority models, 5 sites)
+- Starter: $49/month (AI Builder + 1 domain + 12 free tools)
+- Pro: $129/month (Unlimited builds, priority models, 5 sites)
 - Agency: $299/month (Everything in Pro + 20 sites, priority support, client portal)
 - White-label: $499/month (Full reseller licence, custom branding)
 
 ## Products
 - AI Website Builder: https://zoobicon.com/builder
-- AI Video Creator: https://zoobicon.com/video-creator
 - Domain Search: https://zoobicon.com/domains
 - 12 Free Tools: https://zoobicon.com/tools
 - Agency White-Label Platform: https://zoobicon.com/agencies

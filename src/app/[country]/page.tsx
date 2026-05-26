@@ -13,7 +13,7 @@ const RESERVED_ROUTES = new Set([
   'for', 'gallery', 'generators', 'hosting', 'invoicing', 'io', 'marketplace',
   'pricing', 'privacy', 'products', 'profile', 'publisher', 'referral', 'seo',
   'sh', 'shared', 'showcase', 'starter-kits', 'store', 'support', 'terms',
-  'video-creator', 'wordpress',
+  'wordpress',
 ]);
 
 function isValidCountry(code: string): boolean {

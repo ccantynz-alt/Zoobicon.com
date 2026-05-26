@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCircuitState } from "@/lib/resilience";
-import { isReplicatePoisoned } from "@/lib/video-pipeline";
+// Rule 19 retired 2026-05-26 — video-pipeline removed with AI Video
+// Creator. Local stub keeps the deep-health check honest about the
+// retired surface without re-introducing the dependency.
+function isReplicatePoisoned(): { poisoned: boolean; reason?: string } {
+  return { poisoned: false };
+}
 
 /**
  * GET /api/health/deep

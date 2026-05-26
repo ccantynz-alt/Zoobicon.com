@@ -10,7 +10,6 @@ import {
   Send,
   Globe,
   Search,
-  Video,
   Server,
   CreditCard,
   Code2,
@@ -59,7 +58,6 @@ interface UsageData {
 const QUICK_TOPICS = [
   { icon: Globe, label: "How do I build a website?", category: "Builder" },
   { icon: Search, label: "How does the SEO Agent work?", category: "SEO" },
-  { icon: Video, label: "How do I create AI videos?", category: "Video" },
   { icon: Server, label: "Help with DNS configuration", category: "DNS" },
   { icon: CreditCard, label: "What are the pricing plans?", category: "Billing" },
   { icon: Code2, label: "How do I use the API?", category: "Developer" },
@@ -68,7 +66,6 @@ const QUICK_TOPICS = [
 const HELP_CATEGORIES = [
   { icon: Globe, title: "Website Builder", desc: "Build, edit, and publish AI-generated websites", href: "/products/website-builder" },
   { icon: Search, title: "SEO Agent", desc: "Set up and manage autonomous SEO campaigns", href: "/products/seo-agent" },
-  { icon: Video, title: "Video Creator", desc: "Generate videos for social media platforms", href: "/products/video-creator" },
   { icon: Server, title: "Domains & DNS", desc: "Domain registration, DNS records, transfers", href: "/domains" },
   { icon: Code2, title: "API & Developer Tools", desc: "REST API, SDKs, CLI, and integrations", href: "/developers" },
   { icon: BookOpen, title: "Marketplace", desc: "Browse and install add-ons and templates", href: "/marketplace" },

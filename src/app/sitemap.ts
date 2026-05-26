@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 // Rule 31 — post-Crontech pivot. Sitemap reflects what Zoobicon still
-// owns: AI Builder, AI Video Creator, Domain Search, Free Tools, and the
+// owns: AI Builder, Domain Search, Free Tools, and the
 // supporting marketing/SEO surfaces. All sunset routes (hosting, email,
 // CRM, analytics, booking, eSIM, etc.) and their /api/v1/* docs pages
 // removed in the May 2026 cleanup batch.
@@ -22,15 +22,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Core products
     { path: '/builder', priority: 0.9, changeFrequency: 'daily' },
-    { path: '/video-creator', priority: 0.9, changeFrequency: 'daily' },
     { path: '/domains', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/pricing', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/generators', priority: 0.9, changeFrequency: 'weekly' },
 
     // Product detail pages
     { path: '/products/website-builder', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/products/video-creator', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/products/ai-twins', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/products/seo-agent', priority: 0.8, changeFrequency: 'weekly' },
 
     // SEO marketing — gallery + challenges removed 2026-05-26 (no real
@@ -41,7 +38,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/wordpress', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/cli', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/compare', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/challenges', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/changelog', priority: 0.7, changeFrequency: 'weekly' },
     { path: '/crawl', priority: 0.7, changeFrequency: 'weekly' },
     { path: '/agents', priority: 0.7, changeFrequency: 'weekly' },

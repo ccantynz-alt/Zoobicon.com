@@ -6,7 +6,6 @@ import {
   ArrowRight,
   ChevronRight,
   Wand2,
-  Video,
   Globe2,
   Sparkles,
   Zap,
@@ -16,7 +15,6 @@ import {
   Check,
 } from "lucide-react";
 import HeroBuilder from "@/components/HeroBuilder";
-import AutoplayVideo from "@/components/AutoplayVideo";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -33,9 +31,7 @@ const TRUST_ITEMS = [
   { label: "Neon Serverless", sub: "Postgres 16" },
   { label: "Cloudflare", sub: "5 domains" },
   { label: "OpenSRS", sub: "Domain registry" },
-  { label: "Replicate", sub: "Video pipeline" },
-  { label: "Fish Audio S1", sub: "#1 TTS" },
-  { label: "Mailgun", sub: "Transactional" },
+  { label: "Crontech", sub: "Partner cloud" },
 ];
 
 // ── AI feature bento (Filmora 2×2 pattern, extended to 2×3) ──
@@ -48,14 +44,9 @@ const AI_FEATURES = [
     href: "/builder",
     size: "lg",
   },
-  {
-    icon: Video,
-    title: "Script → face → video.",
-    desc: "Type a sentence. Fish Audio S1 narrates, our avatar engine lip-syncs, captions burn in. 30 seconds of broadcast-grade spokesperson video.",
-    tag: "Video Creator",
-    href: "/video-creator",
-    size: "lg",
-  },
+  // AI Video Creator entry removed 2026-05-26. Rule 19 retired —
+  // quality bar (HeyGen-grade) wasn't reachable as a side feature and
+  // it was diluting the AI Builder pitch.
   {
     icon: Globe2,
     title: "500+ TLDs, real-time.",
@@ -141,7 +132,7 @@ export default function HomePage() {
                 The whole platform
               </div>
               <h2 className="fs-display-md text-white">
-                Builder, Video, Domains.{" "}
+                Builder, Domains, Free Tools.{" "}
                 <span
                   className="text-display-sand"
                   style={{
@@ -156,8 +147,8 @@ export default function HomePage() {
               </h2>
               <p className="mt-5 text-[16px] leading-relaxed text-white/55 max-w-2xl">
                 The fastest way to ship a beautiful site — AI Website Builder,
-                AI Video Creator, Domain Search, and a deck of free tools, all
-                under the same login and the same subscription.
+                real domain search, and a deck of free tools, all under the
+                same login and the same subscription.
               </p>
             </motion.div>
 
@@ -206,86 +197,7 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* ── Product showcase — editorial split with autoplay video ── */}
-        <section className="relative py-28 px-6 border-t border-white/[0.05]">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            variants={stagger}
-            className="mx-auto max-w-7xl"
-          >
-            <div className="grid items-center gap-14 lg:grid-cols-[1fr,1.1fr]">
-              <motion.div variants={fadeUp}>
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90">
-                  <Video className="h-3 w-3" />
-                  Spokesperson video
-                </div>
-                <h2 className="fs-display-md text-white mb-6">
-                  From a sentence to a{" "}
-                  <span
-                    className="text-display-sand"
-                    style={{
-                      fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                      fontStyle: "italic",
-                      fontWeight: 400,
-                    }}
-                  >
-                    face
-                  </span>{" "}
-                  in thirty seconds.
-                </h2>
-                <p className="text-[16px] leading-relaxed text-white/55 mb-8 max-w-md">
-                  Describe the video. Our AI writes two script drafts. You pick one
-                  or tweak it. A real-looking avatar reads the script with natural
-                  intonation, captions burn in, music ducks under the voice.
-                </p>
-
-                <div className="space-y-3 mb-10">
-                  {[
-                    "Fish Audio S1 voice — #1 on TTS-Arena2",
-                    "Burned-in captions, not separate files",
-                    "Background music from MusicGen on Replicate",
-                    "30s / 60s / 90s — square, 9:16 or 16:9",
-                  ].map((f) => (
-                    <div key={f} className="flex items-center gap-3">
-                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#E8D4B0]/10 border border-[#E8D4B0]/25 flex-shrink-0">
-                        <Check className="h-3 w-3 text-[#E8D4B0]" strokeWidth={3} />
-                      </div>
-                      <span className="text-[13px] text-white/65">{f}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Link href="/video-creator" className="fs-btn-primary">
-                    Open the video creator
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                  <Link href="/video-creator/samples" className="fs-btn-ghost">
-                    See samples
-                  </Link>
-                </div>
-              </motion.div>
-
-              <motion.div variants={fadeUp}>
-                <div
-                  className="relative overflow-hidden border border-white/[0.08]"
-                  style={{
-                    borderRadius: "40px",
-                    background: "var(--paper-elevated)",
-                    boxShadow:
-                      "0 60px 120px -30px rgba(0,0,0,0.6), 0 30px 60px -20px rgba(232,212,176,0.15)",
-                  }}
-                >
-                  <AutoplayVideo />
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
-        </section>
-
-        {/* ── Three product cards — Builder · Video · Domains ── */}
+        {/* ── Product cards — Builder · Domains · Tools (video section retired 2026-05-26) ── */}
         <section className="relative py-32 px-6 border-t border-white/[0.05]">
           <motion.div
             initial="hidden"
@@ -324,14 +236,6 @@ export default function HomePage() {
                   href: "/builder",
                   cta: "Open the builder",
                   icon: Wand2,
-                },
-                {
-                  title: "Video",
-                  lede: "A sentence becomes a 30-second spokesperson video.",
-                  desc: "Realistic face, your voice (optional), burned-in captions. No stock footage.",
-                  href: "/video-creator",
-                  cta: "Make a video",
-                  icon: Video,
                 },
                 {
                   title: "Domains",
@@ -413,8 +317,9 @@ export default function HomePage() {
                 <p>
                   Zoobicon is built and run by one person alongside a 24/7
                   physical business. The platform is in active development. The
-                  AI Builder, AI Video Creator and Domain Search work end-to-end
-                  today. The rest is being shipped weekly in public — every
+                  AI Builder and Domain Search are the launch products today.
+                  AI Video is parked — we&rsquo;d rather not ship it than ship
+                  a HeyGen-grade product that&rsquo;s not HeyGen-grade. Every
                   commit is visible on{" "}
                   <a
                     href="https://github.com/ccantynz-alt/Zoobicon.com"
@@ -485,9 +390,8 @@ export default function HomePage() {
                 included.
               </h2>
               <p className="mt-5 text-[15px] text-white/55 leading-relaxed">
-                AI Builder, AI Video Creator, Domain Search, and 12 free tools —
-                one login, one subscription. Cancel any time. 14-day free trial
-                on paid plans.
+                AI Builder, Domain Search, and 12 free tools — one login, one
+                subscription. Cancel any time. 14-day free trial on paid plans.
               </p>
             </motion.div>
 
