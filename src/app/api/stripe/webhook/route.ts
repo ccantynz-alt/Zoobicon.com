@@ -4,7 +4,9 @@ import { stripe } from "@/lib/stripe";
 import { sql } from "@/lib/db";
 import { getRedis } from "@/lib/redis";
 import { recordPurchase } from "@/lib/addon-delivery";
-import { OVERAGE_PACKS, addOverageCredits } from "@/lib/video-usage";
+// Rule 19 retired 2026-05-26 — AI Video Creator removed from launch
+// scope; video_overage Stripe path retained as a no-op so any inflight
+// webhooks don't 500. New checkouts won't carry video_overage metadata.
 import { registerWithFallback, type ContactInfo } from "@/lib/registrar";
 import { auditLog } from "@/lib/audit-middleware";
 
@@ -268,14 +270,12 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const addonId = session.metadata?.addonId;
   const addonName = session.metadata?.addonName;
 
-  // Video overage credit pack purchase
+  // Video overage credit pack purchase — DEPRECATED 2026-05-26.
+  // AI Video Creator was cut from launch scope. Any in-flight webhook
+  // carrying type=video_overage gets a logged no-op so retries don't
+  // 500. Customers were never charged for this in production.
   if (session.metadata?.type === "video_overage") {
-    const packId = session.metadata?.packId;
-    const pack = OVERAGE_PACKS.find((p) => p.id === packId);
-    if (pack) {
-      await safeDb("addOverageCredits", () => addOverageCredits(email, pack, session.id));
-      console.log(`[stripe-webhook] Video credits fulfilled: ${pack.name} for ${email}`);
-    }
+    console.warn(`[stripe-webhook] video_overage received for ${email} session=${session.id} — product retired, no fulfilment`);
     return;
   }
 

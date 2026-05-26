@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import {
   Zap,
   Globe,
-  Video,
   Layout,
   Bot,
   ChevronDown,
@@ -24,17 +23,18 @@ import {
 } from "lucide-react";
 
 // ── Product categories for mega menu — 4 columns (post-Crontech pivot) ──
-// Rule 31 — Zoobicon is now pure AI Builder + AI Video + Domains + Tools.
-// Hosting/email/CRM/analytics/CRM/marketplace all delegated to Crontech.
+// Rule 31 — Zoobicon is now pure AI Builder + Domains + Free Tools.
+// Hosting/email/CRM/analytics all delegated to Crontech.
+// Rule 19 retired 2026-05-26 — AI Video Creator removed from launch
+// scope. Quality bar (HeyGen-grade) wasn't reachable as a side feature.
 
 const PRODUCT_SECTIONS = [
   {
     label: "Build",
     items: [
       { name: "AI Website Builder", href: "/builder", icon: Zap, desc: "Build sites in 60 seconds", badge: "Core" },
-      { name: "Generators", href: "/generators", icon: Sparkles, desc: "43 specialized generators" },
+      { name: "Generators", href: "/generators", icon: Sparkles, desc: "Specialized site generators" },
       { name: "Templates", href: "/starter-kits", icon: Layout, desc: "100+ ready-made templates" },
-      { name: "Video Creator", href: "/video-creator", icon: Video, desc: "AI video production" },
     ],
   },
   {
@@ -66,7 +66,6 @@ const PRODUCT_SECTIONS = [
 
 const TOP_NAV_LINKS = [
   { name: "Builder", href: "/builder" },
-  { name: "Video", href: "/video-creator" },
   { name: "Domains", href: "/domains" },
   { name: "Pricing", href: "/pricing" },
   { name: "Free Tools", href: "/tools/business-name-generator" },
@@ -302,7 +301,7 @@ export default function SiteNavigation() {
                       style={{ borderTop: "1px solid var(--rule)" }}
                     >
                       <span className="text-[12px]" style={{ color: "var(--ink-secondary)" }}>
-                        AI Builder, AI Video, Domains, Free Tools.{" "}
+                        AI Builder, Domains, Free Tools.{" "}
                         <span style={{ color: "var(--ink)", fontWeight: 600 }}>
                           One subscription. One login.
                         </span>

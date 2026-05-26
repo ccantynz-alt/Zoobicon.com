@@ -156,56 +156,28 @@ const generateSiteTool: MCPTool = {
   },
 };
 
-// ── Tool: zoobicon.generate_video ─────────────────────────────────────────
+// ── Tool: zoobicon.generate_video — RETIRED 2026-05-26 ─────────────────────
+// AI Video Creator was cut from launch scope (Rule 19 retired). MCP
+// clients that still call this tool get a clear "feature deferred"
+// response instead of a missing-module crash. The tool remains
+// registered (rather than removed) so the MCP catalog change is
+// reversible if the product comes back.
 
 const generateVideoTool: MCPTool = {
   name: "zoobicon.generate_video",
   description:
-    "Kick off an AI video generation job using the Zoobicon Replicate pipeline (Fish Speech + FLUX + OmniHuman).",
+    "DEPRECATED: AI Video Creator was removed from launch scope. Returns a deferred-feature response.",
   inputSchema: {
     type: "object",
     properties: {
-      script: { type: "string", description: "Spoken script for the video" },
-      voiceStyle: {
-        type: "string",
-        enum: ["professional", "warm", "energetic", "calm"],
-        description: "Optional voice style",
-      },
+      script: { type: "string", description: "Spoken script (ignored)" },
     },
     required: ["script"],
   },
-  handler: async (args) => {
-    try {
-      const obj = asRecord(args);
-      const script = asString(obj.script, "script");
-      if (script.length > 2000) {
-        return { ok: false, error: "script must be 1-2000 chars" };
-      }
-      const voiceStyle = asStringOpt(obj.voiceStyle, "voiceStyle");
-      const allowed = ["professional", "warm", "energetic", "calm"] as const;
-      if (voiceStyle && !allowed.includes(voiceStyle as typeof allowed[number])) {
-        return { ok: false, error: `voiceStyle must be one of ${allowed.join(", ")}` };
-      }
-      const mod: any = await import("@/lib/video-pipeline");
-      const fn = mod.generateFullVideo || mod.default;
-      if (typeof fn !== "function") {
-        return { ok: false, error: "video pipeline unavailable" };
-      }
-      const result = await fn({
-        script,
-        voiceStyle: (voiceStyle as any) ?? "professional",
-      });
-      return {
-        ok: true,
-        videoUrl: result?.videoUrl,
-        audioUrl: result?.audioUrl,
-        duration: result?.duration,
-        cost: result?.cost,
-      };
-    } catch (e) {
-      return { ok: false, error: e instanceof Error ? e.message : String(e) };
-    }
-  },
+  handler: async () => ({
+    ok: false,
+    error: "AI Video Creator was removed from Zoobicon's launch scope. Use zoobicon.generate_site or zoobicon.search_domain.",
+  }),
 };
 
 // ── Tool: zoobicon.list_components ────────────────────────────────────────
@@ -611,26 +583,25 @@ const suggestBusinessNamesTool: MCPTool = {
   },
 };
 
-// ── Tool: generate_voiceover ──────────────────────────────────────────────
+// ── Tool: generate_voiceover — RETIRED 2026-05-26 ─────────────────────────
+// Voiceover lived under /api/video-creator/voiceover which was deleted
+// when AI Video Creator was cut from launch scope (Rule 19 retired).
+// Tool kept registered for reversibility; handler returns a deferred
+// response.
 
 const generateVoiceoverTool: MCPTool = {
   name: "zoobicon.generate_voiceover",
   description:
-    "Generate a TTS voiceover via the Zoobicon Replicate fallback chain (Kokoro → Fish Speech → Orpheus → XTTS v2).",
+    "DEPRECATED: voiceover was part of AI Video Creator which was removed from launch scope.",
   inputSchema: {
     type: "object",
-    properties: {
-      text: { type: "string", description: "Text to speak" },
-      voice: { type: "string", description: "Optional voice id/style" },
-    },
+    properties: { text: { type: "string", description: "Text to speak (ignored)" } },
     required: ["text"],
   },
-  handler: async (args) => {
-    const obj = asRecord(args);
-    const text = asString(obj.text, "text");
-    const voice = asStringOpt(obj.voice, "voice");
-    return await postJson("/api/video-creator/voiceover", { text, voice });
-  },
+  handler: async () => ({
+    ok: false,
+    error: "Voiceover generation was removed from Zoobicon's launch scope.",
+  }),
 };
 
 // ── Tool: analyze_seo ─────────────────────────────────────────────────────

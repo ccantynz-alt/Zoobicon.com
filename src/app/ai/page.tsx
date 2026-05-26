@@ -9,7 +9,6 @@ import {
   Globe,
   Palette,
   Bot,
-  Video,
   Mail,
   Search,
   Bug,
@@ -90,14 +89,7 @@ const AI_TOOLS = [
     tag: "Agent",
     href: "/chatbot-widget",
   },
-  {
-    icon: Video,
-    name: "AI Video Creator",
-    description: "Transform text scripts into professional marketing videos in minutes.",
-    color: "from-accent-stone to-stone-700",
-    glowColor: "shadow-stone-500/25",
-    tag: "Video",
-  },
+  // AI Video Creator entry removed 2026-05-26 — Rule 19 retired.
   {
     icon: Mail,
     name: "AI Email Writer",
@@ -255,8 +247,8 @@ export default function AiPage() {
             </motion.h1>
 
             <motion.p variants={fadeInUp} className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed">
-              The most powerful AI creation suite on the internet. Generate websites, brands, videos,
-              emails, and entire businesses — all from a single prompt.
+              The most powerful AI website builder on the internet. Generate sites,
+              brands, and entire businesses — all from a single prompt.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">

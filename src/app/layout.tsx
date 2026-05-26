@@ -195,7 +195,6 @@ export default function RootLayout({
             "knowsAbout": [
               "AI website generation",
               "Multi-agent AI pipelines",
-              "AI video generation",
               "Domain registration",
               "SEO optimization",
               "AI-powered web design",
@@ -222,12 +221,6 @@ export default function RootLayout({
                   "name": "AI SEO Agent",
                   "description": "Automated SEO analysis and optimization for websites",
                   "url": "https://zoobicon.com/products/seo-agent"
-                },
-                {
-                  "@type": "OfferCatalog",
-                  "name": "AI Video Creator",
-                  "description": "AI-powered video script, storyboard, and scene generation pipeline",
-                  "url": "https://zoobicon.com/products/video-creator"
                 },
                 {
                   "@type": "OfferCatalog",

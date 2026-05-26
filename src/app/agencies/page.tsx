@@ -39,7 +39,7 @@ const AGENCY_TOOLS = [
   },
   {
     title: "Client Dashboard",
-    desc: "Each client gets their own branded portal to view their sites, SEO reports, and video content.",
+    desc: "Each client gets their own branded portal to view their sites and SEO reports.",
     stat: "∞ clients",
     icon: FolderOpen,
   },
@@ -90,7 +90,6 @@ const TIERS = [
       "Full white-label platform",
       "Unlimited site generation",
       "Unlimited SEO campaigns",
-      "AI Video Creator",
       "Bulk generation (CSV upload)",
       "Team roles & permissions",
       "Priority chat support",
