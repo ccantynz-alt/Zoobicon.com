@@ -68,11 +68,11 @@ export default function ComparisonPage({ data }: { data: CompetitorComparison })
           <h1 className="text-5xl md:text-7xl font-bold tracking-[-0.03em] leading-[1.05] mb-6">
             Zoobicon{" "}
             <span
+              className="text-display-sand"
               style={{
                 fontFamily: "Fraunces, ui-serif, Georgia, serif",
                 fontStyle: "italic",
                 fontWeight: 400,
-                color: "#E8D4B0",
               }}
             >
               vs
@@ -207,8 +207,8 @@ export default function ComparisonPage({ data }: { data: CompetitorComparison })
       <section className="max-w-5xl mx-auto px-4 py-14">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 tracking-tight">Pricing</h2>
         <p className="text-center text-white/45 mb-10 max-w-2xl mx-auto">
-          List prices as published April 2026. The bundle math matters — adding domains, hosting,
-          email, and video to a single-product builder typically lands somewhere north of $200/mo.
+          List prices as published April 2026. The bundle math matters — adding real domain registration
+          and an AI video tool to a single-product builder typically lands somewhere north of $200/mo.
         </p>
         <div className="grid md:grid-cols-2 gap-6">
           <div

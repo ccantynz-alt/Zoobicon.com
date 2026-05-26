@@ -209,11 +209,10 @@ export default function PricingPage() {
             >
               Build smarter.{" "}
               <span
-                className="font-normal"
+                className="font-normal text-display-sand"
                 style={{
                   fontFamily: "Fraunces, ui-serif, Georgia, serif",
                   fontStyle: "italic",
-                  color: "#E8D4B0",
                 }}
               >
                 Pay&nbsp;less.
@@ -470,8 +469,8 @@ export default function PricingPage() {
                 >
                   Frequently{" "}
                   <span
-                    className="font-normal"
-                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                    className="font-normal text-display-sand"
+                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic" }}
                   >
                     asked.
                   </span>
@@ -567,8 +566,8 @@ export default function PricingPage() {
                 <h2 className="fs-display-md text-white">
                   Build something{" "}
                   <span
-                    className="font-normal"
-                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                    className="font-normal text-display-sand"
+                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic" }}
                   >
                     extraordinary.
                   </span>

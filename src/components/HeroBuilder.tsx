@@ -475,7 +475,7 @@ export default function HeroBuilder() {
           </p>
           <h1 className="text-5xl sm:text-6xl lg:text-[6.5rem] leading-[1.02] font-semibold tracking-[-0.035em] text-white">
             Describe it.{" "}
-            <span className="font-serif italic font-normal text-[#E8D4B0]">
+            <span className="font-serif italic font-normal text-display-sand">
               Watch
             </span>{" "}
             it build.

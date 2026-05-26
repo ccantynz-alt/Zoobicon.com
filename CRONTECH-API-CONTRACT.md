@@ -40,10 +40,33 @@ Body:
     "createdBy": "craig@zoobicon.com",       // Crontech SSO subject if known
     "prompt": "saas landing for a dog-walking app",
     "template": null,
-    "visibility": "public"                   // or "admin_private"
+    "visibility": "public",                  // or "admin_private"
+    "framework": "vite-spa",                 // optional hint — vite-spa | sandpack-react | static
+    "isMultiPage": true,                     // optional — Full-Site Mode output. Crontech rewrites unknown routes to / so HashRouter handles them
+    "buildCommand": "npm run build",         // optional — defaults to npm run build
+    "outputDir": "dist"                      // optional — defaults to dist/ then build/
   }
 }
 ```
+
+### Framework hints (Full-Site Mode)
+
+The AI Builder ships two output shapes:
+
+| `framework`        | When emitted | Build pipeline expected |
+|--------------------|--------------|-------------------------|
+| `sandpack-react`   | Single-page builds (default mode) | No-build; serve files as-is (Crontech bundles transparently) |
+| `vite-spa`         | Full-Site Mode (multi-page) | `npm install && npm run build`; serve `dist/` |
+| `static`           | Legacy HTML mode | No-build; serve `index.html` |
+
+When `isMultiPage: true` Crontech should fall back to `/` for any
+unknown route so HashRouter (or BrowserRouter) can take over client-
+side. Equivalent to a `try_files $uri /index.html;` rewrite.
+
+If `framework` is omitted, auto-detect from package.json: `scripts.build`
+present + `vite` in `devDependencies` → treat as `vite-spa`; no scripts
+→ treat as `sandpack-react`.
+
 
 **Returns `201 Created`:**
 

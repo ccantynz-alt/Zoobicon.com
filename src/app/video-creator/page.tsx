@@ -588,11 +588,10 @@ SCRIPT_2:
               <h1 className="fs-display-lg text-white">
                 Make a video that{" "}
                 <span
-                  className="font-normal"
+                  className="font-normal text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
-                    color: "#E8D4B0",
                   }}
                 >
                   converts.
@@ -692,8 +691,8 @@ SCRIPT_2:
               <h2 className="fs-display-sm text-white">
                 Choose your{" "}
                 <span
-                  className="font-normal"
-                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                  className="font-normal text-display-sand"
+                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic" }}
                 >
                   script.
                 </span>
@@ -795,8 +794,8 @@ SCRIPT_2:
               <h2 className="fs-display-sm text-white">
                 Production{" "}
                 <span
-                  className="font-normal"
-                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                  className="font-normal text-display-sand"
+                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic" }}
                 >
                   settings.
                 </span>
@@ -1015,8 +1014,8 @@ SCRIPT_2:
               <h2 className="fs-display-sm text-white">
                 Your video is{" "}
                 <span
-                  className="font-normal"
-                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                  className="font-normal text-display-sand"
+                  style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic" }}
                 >
                   ready.
                 </span>

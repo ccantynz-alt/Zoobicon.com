@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Send,
@@ -36,6 +36,58 @@ interface ChatPanelProps {
   projectId?: string | null;
   initialMessages?: ChatMessage[];
   onSectionEdit?: (sectionName: string) => void;
+}
+
+/**
+ * Detect Full-Site Mode multi-page projects from the file map.
+ * Returns the set of page directories (e.g. ["Landing", "Pricing"])
+ * that the user can scope edits to. Single-page projects have no
+ * pages/<X>/ folders, so we return [] and the scope pill stays hidden.
+ */
+function detectPageScopes(files?: Record<string, string> | null): string[] {
+  if (!files) return [];
+  const scopes = new Set<string>();
+  for (const path of Object.keys(files)) {
+    // Normalise leading slashes — Sandpack keys are usually /pages/X/...
+    const cleaned = path.replace(/^\/+/, "");
+    const match = cleaned.match(/^pages\/([^/]+)\//);
+    if (match) scopes.add(match[1]);
+  }
+  return Array.from(scopes).sort();
+}
+
+/**
+ * Filter the file map down to just one page's files + the shared
+ * chrome. Used when the chat scope is set to a specific page so the
+ * LLM sees a smaller context (faster, more focused edits).
+ *
+ * Always keeps: App.tsx, styles.css, package.json, lib/*, components/Shared*
+ * Plus: pages/<scope>/**
+ */
+function filterFilesForScope(
+  files: Record<string, string>,
+  scope: string,
+): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [path, content] of Object.entries(files)) {
+    const cleaned = path.replace(/^\/+/, "");
+    const keepAlways =
+      cleaned === "App.tsx"
+      || cleaned === "styles.css"
+      || cleaned === "package.json"
+      || cleaned === "tailwind.config.js"
+      || cleaned === "tsconfig.json"
+      || cleaned === "vite.config.ts"
+      || cleaned === "index.html"
+      || cleaned === "index.tsx"
+      || cleaned.startsWith("lib/")
+      || cleaned.startsWith("components/Shared");
+    const inScope = cleaned.startsWith(`pages/${scope}/`);
+    if (keepAlways || inScope) {
+      out[path] = content;
+    }
+  }
+  return out;
 }
 
 const SUGGESTION_PROMPTS = [
@@ -95,6 +147,20 @@ export default function ChatPanel({
   const isReactMode = !!(reactFiles && Object.keys(reactFiles).length > 0 && onFilesUpdate);
   const isLegacyMode = !isReactMode && !!currentCode && !!onCodeUpdate;
   const hasFiles = isReactMode || isLegacyMode;
+
+  // Page-scoped editing for Full-Site Mode projects. `null` = edit all
+  // pages (current behaviour). Setting it to a page directory name
+  // ("Landing", "Pricing") restricts the edit to that page's files +
+  // the shared chrome — faster, more focused, and avoids the LLM
+  // accidentally touching unrelated pages.
+  const pageScopes = useMemo(() => detectPageScopes(reactFiles), [reactFiles]);
+  const [scope, setScope] = useState<string | null>(null);
+
+  // If the project changes (new build with different pages) and the
+  // current scope no longer exists, reset to "all pages".
+  useEffect(() => {
+    if (scope && !pageScopes.includes(scope)) setScope(null);
+  }, [pageScopes, scope]);
 
   useEffect(() => {
     if (initialMessages && initialMessages.length > 0) {
@@ -199,13 +265,23 @@ export default function ChatPanel({
         if (isReactMode) {
           const conversationContext = buildConversationContext(messages);
 
+          // Page-scoped editing: if the user picked a specific page
+          // from the scope dropdown, send only that page's files +
+          // shared chrome. Server-side the scope name is passed through
+          // so the system prompt can warn the LLM not to touch
+          // unrelated files.
+          const filesToSend = scope
+            ? filterFilesForScope(reactFiles!, scope)
+            : reactFiles!;
+
           const res = await fetch("/api/generate/edit", {
             method: "POST",
             headers,
             body: JSON.stringify({
               instruction: text,
-              files: reactFiles,
+              files: filesToSend,
               conversationContext,
+              ...(scope ? { pageScope: scope } : {}),
             }),
             signal: controller.signal,
           });
@@ -633,6 +709,43 @@ export default function ChatPanel({
 
       {/* Input area */}
       <div className="p-3 border-t border-white/[0.06]">
+        {/* Page scope pill — only shown for multi-page Full-Site Mode
+            projects. Single-page builds (where pageScopes is empty)
+            never see this row. */}
+        {pageScopes.length > 0 && (
+          <div className="mb-2 flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] uppercase tracking-wider text-white/30">
+              Editing:
+            </span>
+            <button
+              type="button"
+              onClick={() => setScope(null)}
+              className={`px-2 py-0.5 text-[10px] rounded-full border transition ${
+                scope === null
+                  ? "bg-white/[0.08] text-white border-white/20"
+                  : "text-white/45 border-white/[0.08] hover:text-white/70 hover:border-white/15"
+              }`}
+              title="Send all project files to the AI — touches any page"
+            >
+              All pages
+            </button>
+            {pageScopes.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setScope(s)}
+                className={`px-2 py-0.5 text-[10px] rounded-full border transition ${
+                  scope === s
+                    ? "bg-amber-500/20 text-amber-200 border-amber-400/40"
+                    : "text-white/45 border-white/[0.08] hover:text-white/70 hover:border-white/15"
+                }`}
+                title={`Only send the ${s} page (and shared chrome) to the AI`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="relative">
           <textarea
             ref={inputRef}

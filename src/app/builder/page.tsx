@@ -232,6 +232,8 @@ import DiffPanel from "@/components/DiffPanel";
 import ProjectTree from "@/components/ProjectTree";
 import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
 import { PlanReviewPanel } from "@/components/PlanReviewPanel";
+import SitePlanPanel from "@/components/SitePlanPanel";
+import type { SitePlan } from "@/lib/site-planner";
 import { captureFlywheelEvent } from "@/lib/flywheel-client";
 import { downloadZip } from "@/lib/zip-export";
 import CollaborationBar from "@/components/CollaborationBar";
@@ -712,6 +714,16 @@ function BuilderPage() {
   // user reviews + confirms before the expensive build fires.
   const [planReview, setPlanReview] = useState<import("@/components/PlanReviewPanel").PlanReviewPlan | null>(null);
   const [planLoading, setPlanLoading] = useState(false);
+  // Full-Site Mode (Phase 1): multi-page plan + review. Triggered via
+  // ?siteMode=full URL flag. Phase 2 wires the parallel build orchestrator
+  // to consume the approved plan; for now the Approve button is disabled
+  // with a clear "coming next session" message so the UX shape is locked.
+  const [sitePlan, setSitePlan] = useState<{
+    plan: SitePlan;
+    source: "llm" | "fallback";
+    modelUsed?: string;
+  } | null>(null);
+  const [sitePlanLoading, setSitePlanLoading] = useState(false);
   const [streamWarning, setStreamWarning] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
   const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Opus, pipeline=7-agent
@@ -1371,13 +1383,53 @@ function BuilderPage() {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
-    // CHECK AUTH FIRST — don't waste the user's time
+    // FULL-SITE MODE — fork BEFORE any single-page logic. Detected via
+    // ?siteMode=full or window.__siteMode === "full" (dev override).
+    // When active, we fetch a multi-page plan first and halt for review.
+    // The user can approve (Phase 2 build) or cancel back to single-page.
+    const wantsFullSite =
+      typeof window !== "undefined" &&
+      (new URLSearchParams(window.location.search).get("siteMode") === "full" ||
+        (window as { __siteMode?: string }).__siteMode === "full");
+    if (wantsFullSite && !sitePlan && !sitePlanLoading) {
+      try {
+        setSitePlanLoading(true);
+        const res = await fetch("/api/generate/site-plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...authHeaders() },
+          body: JSON.stringify({ prompt: prompt.trim() }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setSitePlan(data);
+          setSitePlanLoading(false);
+          return; // Halt — SitePlanPanel renders, awaits Approve/Cancel.
+        }
+        // Plan endpoint failed — surface warning and continue to single-page.
+        const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        setStreamWarning(`Full-site plan unavailable (${err.error || "unknown error"}). Falling back to single-page build.`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setStreamWarning(`Full-site plan threw: ${msg.slice(0, 120)}. Falling back to single-page build.`);
+      } finally {
+        setSitePlanLoading(false);
+      }
+    }
+
+    // Rule 31 — /auth/signup was deleted (auth delegated to Crontech)
+    // but the builder used to hard-redirect anonymous users there on
+    // every Generate click. That meant every first-time visitor hit a
+    // 404 instead of seeing a site — and "no site has ever shipped"
+    // (Craig, 2026-05-26) traced back to exactly this. Until Crontech
+    // SSO is wired live, anonymous users can build with the same per-
+    // IP quota the API enforces. We save the prompt to localStorage so
+    // if/when a real signup flow lands they can resume.
     const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
     if (!userStr) {
-      // Save their prompt so it's not lost after signup
       try { localStorage.setItem("zoobicon_pending_prompt", prompt.trim()); } catch {}
-      window.location.href = `/auth/signup?redirect=/builder&prompt=${encodeURIComponent(prompt.trim().slice(0, 200))}`;
-      return;
+      // Don't block — proceed anonymously. The server-side quota gate
+      // (lib/build-quota.ts) handles abuse via the userEmail = null
+      // path (anonymous baseline, no DB writes).
     }
 
     // Close welcome modal if open
@@ -1402,6 +1454,14 @@ function BuilderPage() {
     setStatus("generating");
     setError("");
     setGeneratedCode("");
+    // Clear stale react state so a re-roll doesn't leave the PREVIOUS
+    // build visible in Sandpack while the new one is in flight. Without
+    // this, when the new build fails (auth/quota/timeout), the user sees
+    // an error overlay on top of an unrelated previously-generated site —
+    // looks like the build "kind of worked" when it actually failed.
+    setReactFiles(null);
+    setReactDeps({});
+    setReactSource(null);
     setActiveTab("preview");
     setPipelineAgents([]);
     setBuildProgress(null);
@@ -1757,7 +1817,7 @@ function BuilderPage() {
       }
       return;
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection, includeLaunchVideo, generateLaunchVideo, planReview, authHeaders]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection, includeLaunchVideo, generateLaunchVideo, planReview, sitePlan, sitePlanLoading, authHeaders]);
 
   // Plan Mode (B12) callback handlers — used by the PlanReviewPanel.
   const handlePlanConfirm = useCallback(() => {
@@ -2295,6 +2355,30 @@ root.render(React.createElement(App));
             </button>
             <button
               type="button"
+              onClick={() => {
+                if (typeof window === "undefined") return;
+                const url = new URL(window.location.href);
+                const isFull = url.searchParams.get("siteMode") === "full";
+                if (isFull) url.searchParams.delete("siteMode");
+                else url.searchParams.set("siteMode", "full");
+                window.history.replaceState({}, "", url.toString());
+                // Soft re-render — toggle a state to force the prompt
+                // path to re-read the URL on next submit.
+                setSitePlan(null);
+              }}
+              className="px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
+              title={
+                typeof window !== "undefined" && new URLSearchParams(window.location.search).get("siteMode") === "full"
+                  ? "Full-Site Mode ON — next prompt fetches a multi-page plan for review"
+                  : "Click to enable Full-Site Mode (multi-page plan + review before build)"
+              }
+            >
+              {typeof window !== "undefined" && new URLSearchParams(window.location.search).get("siteMode") === "full"
+                ? "🌐 Full-Site ON"
+                : "📄 Single-page"}
+            </button>
+            <button
+              type="button"
               onClick={() => setUseWebContainers((v) => !v)}
               className="px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
             >
@@ -2400,6 +2484,158 @@ root.render(React.createElement(App));
             onCancel={handlePlanCancel}
             onClarify={handlePlanClarify}
           />
+        </div>
+      )}
+
+      {/* Full-Site Mode review — multi-page plan. Renders when sitePlan
+          is set. Approve triggers the parallel build orchestrator via
+          /api/generate/site-build (SSE), which emits per-page progress
+          + a final merged file tree that drops into Sandpack. */}
+      {sitePlan && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center p-6 overflow-y-auto"
+          style={{ background: "rgba(10, 10, 11, 0.45)", backdropFilter: "blur(8px)" }}
+        >
+          <SitePlanPanel
+            plan={sitePlan.plan}
+            source={sitePlan.source}
+            modelUsed={sitePlan.modelUsed}
+            onCancel={() => setSitePlan(null)}
+            onApprove={async (approvedPlan) => {
+              // Hand the approved (possibly edited) plan to the parallel
+              // orchestrator. The orchestrator streams per-page progress
+              // + a final merged file tree. Errors surface via the
+              // standard streamWarning / buildError channels.
+              const planToBuild = approvedPlan;
+              setSitePlan(null);
+              setStatus("generating");
+              setError("");
+              setGeneratedCode("");
+              setReactFiles(null);
+              setReactDeps({});
+              setReactSource(null);
+              setActiveTab("preview");
+              setPipelineAgents([`Full-Site Mode: building ${planToBuild.pages.length} pages in parallel…`]);
+              setBuildProgress({ current: 0, total: planToBuild.meta.componentCount, section: "" });
+              setSectionTimeline([]);
+              setBuildError(null);
+              setStreamWarning(null);
+
+              abortRef.current?.abort();
+              const controller = new AbortController();
+              abortRef.current = controller;
+
+              try {
+                const res = await fetch("/api/generate/site-build", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", ...authHeaders() },
+                  body: JSON.stringify({ plan: planToBuild }),
+                  signal: controller.signal,
+                });
+                if (!res.ok) {
+                  const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+                  throw new Error(errData.error || `HTTP ${res.status}`);
+                }
+                const reader = res.body?.getReader();
+                if (!reader) throw new Error("No response stream");
+                const decoder = new TextDecoder();
+                let lineBuffer = "";
+                let receivedDone = false;
+                let pagesDone = 0;
+                let sectionsDone = 0;
+                while (true) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
+                  lineBuffer += decoder.decode(value, { stream: true });
+                  const lines = lineBuffer.split("\n");
+                  lineBuffer = lines.pop() || "";
+                  for (const line of lines) {
+                    if (!line.startsWith("data: ")) continue;
+                    const jsonStr = line.slice(6).trim();
+                    if (!jsonStr) continue;
+                    try {
+                      const event = JSON.parse(jsonStr);
+                      if (event.type === "phase") {
+                        setPipelineAgents(prev => [...prev, event.message]);
+                      } else if (event.type === "page") {
+                        if (event.status === "building") {
+                          setPipelineAgents(prev => [...prev, `Building page: ${event.name} (${event.slug})…`]);
+                        } else if (event.status === "done") {
+                          pagesDone++;
+                          setPipelineAgents(prev => [...prev, `✓ Page complete: ${event.name}`]);
+                        } else if (event.status === "failed") {
+                          setStreamWarning(`Page ${event.slug} failed: ${event.error || "unknown"}`);
+                        }
+                      } else if (event.type === "section") {
+                        sectionsDone++;
+                        setBuildProgress({
+                          current: sectionsDone,
+                          total: planToBuild.meta.componentCount,
+                          section: `${event.pageSlug} · ${event.category}`,
+                        });
+                      } else if (event.type === "files" && event.files) {
+                        // Progressive: show the current state in Sandpack.
+                        setReactFiles(event.files);
+                        setGeneratedCode("<!-- react-app-mode -->");
+                      } else if (event.type === "done") {
+                        receivedDone = true;
+                        if (event.files) {
+                          setReactFiles(event.files);
+                          setReactDeps(event.dependencies || {});
+                          setReactSource(event.files);
+                          setGeneratedCode("<!-- react-app-mode -->");
+                        }
+                        setPipelineAgents(prev => [
+                          ...prev,
+                          `Site complete — ${event.pageCount}/${event.totalPages} pages in ${Math.round((event.durationMs || 0) / 1000)}s`,
+                        ]);
+                        if (Array.isArray(event.failedSections) && event.failedSections.length > 0) {
+                          setStreamWarning(
+                            `${event.failedSections.length} section(s) fell back to base component. Build is still usable.`,
+                          );
+                        }
+                        setStatus("complete");
+                        setBuildProgress(null);
+                        trackEvent("build");
+                      } else if (event.type === "error") {
+                        if (event.fatal === false) {
+                          setStreamWarning(cleanErrorMessage(event.message || ""));
+                        } else {
+                          throw new Error(event.message || "Multi-page build failed");
+                        }
+                      }
+                    } catch (e) {
+                      if (e instanceof SyntaxError) continue;
+                      throw e;
+                    }
+                  }
+                }
+                if (!receivedDone) {
+                  setStreamWarning("Stream ended without a done event — showing what arrived.");
+                  setStatus("complete");
+                }
+              } catch (err) {
+                if ((err as Error).name === "AbortError") return;
+                const msg = err instanceof Error ? err.message : String(err);
+                console.error("[site-build] failed:", msg);
+                const cleaned = cleanErrorMessage(msg);
+                setError(cleaned);
+                setBuildError({ message: cleaned, suggestion: errorSuggestion(msg) });
+                setStatus("error");
+                setBuildProgress(null);
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {/* Full-Site plan-loading toast */}
+      {sitePlanLoading && !sitePlan && (
+        <div
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-[81] px-4 py-2 rounded-full text-xs font-medium shadow-lg"
+          style={{ background: "var(--ink)", color: "var(--paper)" }}
+        >
+          Planning your site…
         </div>
       )}
 

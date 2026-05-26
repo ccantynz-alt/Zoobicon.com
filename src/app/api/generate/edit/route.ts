@@ -42,14 +42,14 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: { instruction?: string; files?: Record<string, string>; targetFile?: string; conversationContext?: string };
+  let body: { instruction?: string; files?: Record<string, string>; targetFile?: string; conversationContext?: string; pageScope?: string };
   try {
     body = await req.json();
   } catch {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const { instruction, files, targetFile, conversationContext } = body;
+  const { instruction, files, targetFile, conversationContext, pageScope } = body;
 
   if (!instruction || !files || Object.keys(files).length === 0) {
     return Response.json({ error: "Instruction and files required" }, { status: 400 });
@@ -126,6 +126,16 @@ export async function POST(req: NextRequest) {
     }).join("\n\n");
   }
 
+  // Page-scope hint for Full-Site Mode multi-page projects. Only added
+  // when the client sent pageScope (a directory name under pages/). The
+  // client also pre-filters `files` so the LLM only sees in-scope files
+  // + shared chrome, but the explicit instruction below is what stops
+  // the model from "helpfully" touching a shared component when the
+  // user only asked about one page.
+  const scopeHint = pageScope
+    ? `\n\nSCOPE: The user is editing the "${pageScope}" page only. Only modify files under pages/${pageScope}/. Do NOT touch shared files in components/Shared* or lib/* unless the instruction EXPLICITLY asks to change something shared (e.g. "in the shared navbar"). If the instruction is ambiguous, prefer the in-scope change.`
+    : "";
+
   const systemPrompt = `You are a code editor. You receive existing React/TypeScript files and an instruction to modify them.
 
 RULES:
@@ -137,7 +147,7 @@ RULES:
 - Output the COMPLETE file content for each changed file (not a diff/patch)
 - Do NOT wrap the JSON in markdown code fences
 - Do NOT include any text before or after the JSON object
-- Start your response with { and end with }${flywheelContext}${conversationContext ? `\n\nPrevious edits in this session (use this to understand context and maintain consistency):\n${conversationContext}` : ""}`;
+- Start your response with { and end with }${scopeHint}${flywheelContext}${conversationContext ? `\n\nPrevious edits in this session (use this to understand context and maintain consistency):\n${conversationContext}` : ""}`;
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({

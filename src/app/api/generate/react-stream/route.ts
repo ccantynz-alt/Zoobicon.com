@@ -40,6 +40,12 @@ import type { RegistryComponent, ComponentCategory } from "@/lib/component-regis
 
 async function getRegistry() {
   const mod = await import("@/lib/component-registry");
+  // CRITICAL — REGISTRY is empty until ensureRegistryLoaded() runs the
+  // side-effect imports for navbars/heroes/features/etc. Without this
+  // call, any direct REGISTRY.map / REGISTRY.filter on the returned
+  // module reads an empty array — which silently broke planComponents
+  // (it kept falling through to the heuristic selector). 2026-05-26 fix.
+  mod.ensureRegistryLoaded();
   return mod;
 }
 
@@ -629,17 +635,27 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
   };
 }
 
+// Common deps every generated site uses. PINNED versions match the
+// SandpackPreview pre-warm map (src/components/SandpackPreview.tsx)
+// so the bundler's cache hits 100% of the time on the first real
+// component arrival. Unpinned "latest" was the difference between a 2s
+// and 25s first preview — see KNOWN ISSUES #builder-prewarm-drift.
+const GENERATED_SITE_DEPS: Record<string, string> = {
+  react: "^18.3.1",
+  "react-dom": "^18.3.1",
+  "lucide-react": "^1.7.0",
+  "framer-motion": "^12.38.0",
+  clsx: "^2.1.1",
+  "tailwind-merge": "^2.5.5",
+};
+
 function buildPackageJson(): string {
-  const deps: Record<string, string> = {
-    react: "^18.3.1",
-    "react-dom": "^18.3.1",
-  };
   return JSON.stringify(
     {
       name: "zoobicon-generated-site",
       version: "1.0.0",
       private: true,
-      dependencies: deps,
+      dependencies: GENERATED_SITE_DEPS,
     },
     null,
     2,
@@ -1094,6 +1110,12 @@ export async function POST(req: NextRequest): Promise<Response> {
           // the last progressive partial (usually fine) but also preventing
           // the post-build file replacement in premium critique mode.
           files: finalFiles,
+          // Surface the pinned dep map to the client so SandpackPreview's
+          // customSetup.dependencies gets the same versions the package.json
+          // already declares. Without this, the client passes {} and Sandpack
+          // auto-detects + downloads "latest" at iframe render time → cold
+          // bundle, flicker, occasional API-version mismatches.
+          dependencies: GENERATED_SITE_DEPS,
           score: finalScore,
           durationMs,
           failedSections,

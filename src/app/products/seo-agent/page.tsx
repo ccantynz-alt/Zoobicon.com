@@ -49,11 +49,18 @@ const PRIMARY_CTA = {
   color: "#0a1628",
   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
 } as const;
+// SERIF accent — Fraunces italic in the brand sand→champagne→bronze
+// gradient. Used as the prominent word in every hero h1/h2 on this
+// page. Single source of truth so the brand pass cascades site-wide.
 const SERIF: React.CSSProperties = {
   fontFamily: "Fraunces, ui-serif, Georgia, serif",
   fontStyle: "italic",
   fontWeight: 400,
-  color: "#E8D4B0",
+  background: "linear-gradient(180deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  backgroundClip: "text",
+  color: "transparent",
 };
 
 export default function SEOAgentPage() {

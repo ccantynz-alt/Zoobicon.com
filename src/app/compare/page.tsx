@@ -183,7 +183,7 @@ export default function ComparePage() {
       {/* Why Choose Zoobicon */}
       <section className="py-20 px-4 bg-white/[0.02]">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Why 10,000+ Builders Choose Zoobicon</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">What sets Zoobicon apart</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-14 h-14 rounded-xl bg-stone-500/10 flex items-center justify-center mx-auto mb-4">
@@ -203,8 +203,8 @@ export default function ComparePage() {
               <div className="w-14 h-14 rounded-xl bg-stone-500/10 flex items-center justify-center mx-auto mb-4">
                 <Globe className="w-7 h-7 text-stone-400" />
               </div>
-              <h3 className="font-semibold mb-2">Full Business OS</h3>
-              <p className="text-sm text-stone-400">Website builder + video creator + SEO agent + email support + marketplace + hosting. Replace 6 subscriptions with one.</p>
+              <h3 className="font-semibold mb-2">Builder + Video + Domains</h3>
+              <p className="text-sm text-stone-400">AI Website Builder, AI Video Creator, real Domain Search, and 12 free tools — one login, one subscription.</p>
             </div>
           </div>
         </div>

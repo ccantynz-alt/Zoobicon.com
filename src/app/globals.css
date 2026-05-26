@@ -380,6 +380,34 @@ pre code {
   background-clip: text;
 }
 
+/**
+ * Brand display gradient — sand → champagne → bronze, vertically.
+ * Use on the ONE accent word inside a hero h1/h2 (e.g. <em>One</em>,
+ * <em>Sandy</em>, the 404 numeral). Reads as Zoobicon at a glance,
+ * works on both #ffffff and #f4f3ed grounds. Pair with serif italic
+ * (Fraunces) for the editorial weight or keep the inherited weight
+ * for a sans accent.
+ */
+.text-display-sand {
+  background: linear-gradient(180deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/**
+ * 45° variant for the cases where a vertical fall reads too heavy
+ * (long horizontal headlines). Same palette, diagonal sweep.
+ */
+.text-display-sand-diag {
+  background: linear-gradient(135deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
 /* Sharp heading font for dark fog aesthetic */
 .font-sharp {
   font-family: "Space Grotesk", "Inter", system-ui, sans-serif;

@@ -87,37 +87,13 @@ const AI_FEATURES = [
   },
 ];
 
-// ── Testimonials (real, attributed — never fabricated) ──
-const TESTIMONIALS = [
-  {
-    quote:
-      "Built our entire marketing site in the time it used to take to brief a designer.",
-    author: "Dental clinic owner",
-    location: "Auckland, NZ",
-    rating: 5,
-  },
-  {
-    quote:
-      "The video creator wrote a better script than my last agency. And it shipped the same afternoon.",
-    author: "Wedding photographer",
-    location: "Melbourne, AU",
-    rating: 5,
-  },
-  {
-    quote:
-      "I bought the domain, launched the site, and had email forwarding working — all in one session.",
-    author: "Specialty coffee roaster",
-    location: "Brooklyn, NY",
-    rating: 5,
-  },
-  {
-    quote:
-      "We replaced Framer, HeyGen and GoDaddy with one $49 subscription.",
-    author: "Law firm partner",
-    location: "London, UK",
-    rating: 5,
-  },
-];
+// Testimonials block deliberately removed (2026-05-26). The previous
+// entries were fabricated personas ("Dental clinic owner / Auckland",
+// "Wedding photographer / Melbourne", etc.) — we don't have real
+// customers yet, so claiming we do was dishonest. The Founder's-Note
+// section below replaces it with a truthful "we're new" pitch and a
+// "tell us what's broken" CTA. Restore real, attributed quotes here
+// when actual customers ship sites and give consent.
 
 export default function HomePage() {
   return (
@@ -166,13 +142,13 @@ export default function HomePage() {
                 The whole platform
               </div>
               <h2 className="fs-display-md text-white">
-                Seventy-five products.{" "}
+                Builder, Video, Domains.{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
                   One
@@ -249,11 +225,11 @@ export default function HomePage() {
                 <h2 className="fs-display-md text-white mb-6">
                   From a sentence to a{" "}
                   <span
+                    className="text-display-sand"
                     style={{
                       fontFamily: "Fraunces, ui-serif, Georgia, serif",
                       fontStyle: "italic",
                       fontWeight: 400,
-                      color: "#E8D4B0",
                     }}
                   >
                     face
@@ -327,11 +303,11 @@ export default function HomePage() {
               <h2 className="fs-display-md text-white">
                 Not a hundred features.{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
                   Three
@@ -400,73 +376,84 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* ── Testimonials marquee ── */}
+        {/* ── Founder's note (honest replacement for fabricated testimonials) ── */}
         <section className="relative py-28 border-t border-white/[0.05]">
-          <div className="mx-auto max-w-7xl px-6 mb-14">
+          <div className="mx-auto max-w-3xl px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-80px" }}
               variants={stagger}
-              className="max-w-2xl"
             >
               <motion.div
                 variants={fadeUp}
-                className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90"
+                className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90"
               >
                 <ShieldCheck className="h-3 w-3" />
-                What customers say
+                Founder&rsquo;s note
               </motion.div>
-              <motion.h2 variants={fadeUp} className="fs-display-md text-white">
-                Shipped by people{" "}
+              <motion.h2 variants={fadeUp} className="fs-display-md text-white mb-8">
+                We&rsquo;re{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
-                  who built
+                  new.
                 </span>{" "}
-                real businesses.
+                Here&rsquo;s the honest pitch.
               </motion.h2>
-            </motion.div>
-          </div>
-
-          <div className="fs-marquee-paused relative overflow-hidden">
-            <div className="fs-marquee" style={{ animationDuration: "80s" }}>
-              {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
-                <div
-                  key={`${t.author}-${i}`}
-                  className="flex-shrink-0 w-[420px] sm:w-[480px]"
-                >
-                  <div
-                    className="h-full rounded-[30px] border border-white/[0.08] p-8"
-                    style={{
-                      background:
-                        "var(--paper-elevated)",
-                      boxShadow: "0 30px 60px -30px rgba(0,0,0,0.5)",
-                    }}
+              <motion.div variants={fadeUp} className="space-y-5 text-[16px] leading-relaxed text-white/65">
+                <p>
+                  Most builder sites at this stage would put fake testimonials
+                  here from people who don&rsquo;t exist. We won&rsquo;t.
+                </p>
+                <p>
+                  Zoobicon is built and run by one person alongside a 24/7
+                  physical business. The platform is in active development. The
+                  AI Builder, AI Video Creator and Domain Search work end-to-end
+                  today. The rest is being shipped weekly in public — every
+                  commit is visible on{" "}
+                  <a
+                    href="https://github.com/ccantynz-alt/Zoobicon.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline decoration-[#E8D4B0]/40 hover:decoration-[#E8D4B0]"
                   >
-                    <div className="flex items-center gap-1 mb-5">
-                      {[0, 1, 2, 3, 4].map((j) => (
-                        <Star key={j} className="h-4 w-4 fill-[#E8D4B0] text-[#E8D4B0]" />
-                      ))}
-                    </div>
-                    <p className="text-[16px] leading-relaxed text-white/80 mb-6 font-medium">
-                      &ldquo;{t.quote}&rdquo;
-                    </p>
-                    <div>
-                      <div className="text-[13px] font-semibold text-white">{t.author}</div>
-                      <div className="text-[12px] text-white/40">{t.location}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#f4f3ed] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#f4f3ed] to-transparent" />
+                    GitHub
+                  </a>
+                  .
+                </p>
+                <p>
+                  We&rsquo;d rather have ten real customers than a hundred fake
+                  quotes. If you try it and something&rsquo;s broken, email{" "}
+                  <a
+                    href="mailto:hello@zoobicon.com"
+                    className="underline decoration-[#E8D4B0]/40 hover:decoration-[#E8D4B0]"
+                  >
+                    hello@zoobicon.com
+                  </a>{" "}
+                  and you&rsquo;ll hear back the same day — usually from Craig.
+                </p>
+              </motion.div>
+              <motion.div variants={fadeUp} className="mt-10 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/builder"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#E8D4B0] px-6 py-3 text-[13px] font-semibold text-[#1a1a1c] hover:bg-[#d4b86d] transition-colors"
+                >
+                  Try the builder
+                </Link>
+                <a
+                  href="mailto:hello@zoobicon.com"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-6 py-3 text-[13px] font-medium text-white/75 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0] transition-all"
+                >
+                  Tell us what&rsquo;s broken
+                </a>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
@@ -487,11 +474,11 @@ export default function HomePage() {
               <h2 className="fs-display-md text-white">
                 One subscription.{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
                   Everything
@@ -499,8 +486,9 @@ export default function HomePage() {
                 included.
               </h2>
               <p className="mt-5 text-[15px] text-white/55 leading-relaxed">
-                Replaces $923/mo in scattered SaaS tools. Cancel any time. 14-day
-                free trial on paid plans.
+                AI Builder, AI Video Creator, Domain Search, and 12 free tools —
+                one login, one subscription. Cancel any time. 14-day free trial
+                on paid plans.
               </p>
             </motion.div>
 
@@ -612,11 +600,11 @@ export default function HomePage() {
             >
               Stop reading.{" "}
               <span
+                className="text-display-sand"
                 style={{
                   fontFamily: "Fraunces, ui-serif, Georgia, serif",
                   fontStyle: "italic",
                   fontWeight: 400,
-                  color: "#E8D4B0",
                 }}
               >
                 Start building.

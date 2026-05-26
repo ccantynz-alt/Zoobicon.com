@@ -47,6 +47,17 @@ const COMPARISON: Array<[string, string | boolean, string | boolean, string | bo
   ["Price", "Free tier", "$16+/mo", "$0 + time"],
 ];
 
+const SERIF: React.CSSProperties = {
+  fontFamily: "Fraunces, ui-serif, Georgia, serif",
+  fontStyle: "italic",
+  fontWeight: 400,
+  background: "linear-gradient(180deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  backgroundClip: "text",
+  color: "transparent",
+};
+
 export default function WebsiteBuilderPage() {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -150,12 +161,7 @@ export default function WebsiteBuilderPage() {
           <h1 className="fs-display-xl mb-6">
             Describe it.{" "}
             <span
-              style={{
-                fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                fontStyle: "italic",
-                fontWeight: 400,
-                color: "#E8D4B0",
-              }}
+              style={SERIF}
             >
               Build it.
             </span>
@@ -200,12 +206,7 @@ export default function WebsiteBuilderPage() {
             <h2 className="fs-display-lg mb-4">
               Four steps to{" "}
               <span
-                style={{
-                  fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                  fontStyle: "italic",
-                  fontWeight: 400,
-                  color: "#E8D4B0",
-                }}
+                style={SERIF}
               >
                 launch.
               </span>
@@ -251,12 +252,7 @@ export default function WebsiteBuilderPage() {
             <h2 className="fs-display-lg mb-4">
               Every feature{" "}
               <span
-                style={{
-                  fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                  fontStyle: "italic",
-                  fontWeight: 400,
-                  color: "#E8D4B0",
-                }}
+                style={SERIF}
               >
                 you need.
               </span>
@@ -301,12 +297,7 @@ export default function WebsiteBuilderPage() {
             <h2 className="fs-display-lg mb-4">
               Why{" "}
               <span
-                style={{
-                  fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                  fontStyle: "italic",
-                  fontWeight: 400,
-                  color: "#E8D4B0",
-                }}
+                style={SERIF}
               >
                 Zoobicon.
               </span>
@@ -367,12 +358,7 @@ export default function WebsiteBuilderPage() {
           <h2 className="fs-display-lg mb-5">
             Your next website is{" "}
             <span
-              style={{
-                fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                fontStyle: "italic",
-                fontWeight: 400,
-                color: "#E8D4B0",
-              }}
+              style={SERIF}
             >
               one prompt away.
             </span>
