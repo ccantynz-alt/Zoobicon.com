@@ -16,6 +16,8 @@ import {
   Zap,
   Smartphone,
   Settings,
+  Loader2,
+  ArrowLeft,
 } from "lucide-react";
 
 // Rule 31 — post-Crontech pivot admin only covers what Zoobicon still owns:
@@ -67,35 +69,224 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const [isAdmin, setIsAdmin] = useState(false);
   const [checking, setChecking] = useState(true);
 
+  // Inline sign-in form state — replaces the old window.location.href = "/"
+  // bounce. Pressing return on /admin used to escape the preview iframe and
+  // dump the user on whatever the parent origin's root was (claude.ai when
+  // viewed inside a Claude Code session). Rendering a form keeps navigation
+  // local and shows the user why they can't get in.
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loginSubmitting, setLoginSubmitting] = useState(false);
+
   useEffect(() => {
-    // Rule 31 — auth delegated to Crontech SSO. localStorage payload is
-    // populated on SSO callback; until SSO is wired, the dev path is to
-    // manually set {role:"admin"} in DevTools. Non-admin (or unset) users
-    // get bounced home rather than to a deleted /auth/login route.
     try {
       const raw = localStorage.getItem("zoobicon_user");
-      if (!raw) {
-        window.location.href = "/";
-        return;
+      if (raw) {
+        const user = JSON.parse(raw);
+        if (user.role === "admin") {
+          setUserName(user.name || user.email || "Admin");
+          setIsAdmin(true);
+        }
       }
-      const user = JSON.parse(raw);
-      if (user.role !== "admin") {
-        window.location.href = "/";
-        return;
-      }
-      setUserName(user.name || user.email || "Admin");
-      setIsAdmin(true);
     } catch {
-      window.location.href = "/";
+      // Corrupt payload — fall through to the sign-in form.
     }
     setChecking(false);
   }, []);
 
-  // Don't render anything until auth check completes
-  if (checking || !isAdmin) {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loginSubmitting) return;
+    setLoginError("");
+    setLoginSubmitting(true);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: loginEmail.trim(), password: loginPassword }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setLoginError(data.error || `Sign-in failed (HTTP ${res.status}).`);
+        setLoginSubmitting(false);
+        return;
+      }
+      try {
+        localStorage.setItem("zoobicon_user", JSON.stringify(data.user));
+      } catch {
+        // Private mode / quota — surface it instead of silently failing.
+        setLoginError("Could not store session. Check your browser's privacy settings.");
+        setLoginSubmitting(false);
+        return;
+      }
+      setUserName(data.user.name || data.user.email || "Admin");
+      setIsAdmin(true);
+      setLoginSubmitting(false);
+    } catch {
+      setLoginError("Network error. Check your connection and try again.");
+      setLoginSubmitting(false);
+    }
+  };
+
+  if (checking) {
     return (
       <div className="min-h-screen bg-stone-50 flex items-center justify-center">
         <div className="text-stone-600 text-sm">Checking permissions...</div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center px-6"
+        style={{ background: "var(--paper)", color: "var(--ink)" }}
+      >
+        <div className="w-full max-w-md">
+          <div
+            className="rounded-2xl border p-7 shadow-sm"
+            style={{
+              background: "var(--paper-elevated)",
+              borderColor: "var(--rule)",
+            }}
+          >
+            <div className="flex items-center gap-2.5 mb-5">
+              <div
+                className="relative w-9 h-9 rounded-full flex items-center justify-center"
+                style={{
+                  background: "var(--paper)",
+                  border: "1.5px solid var(--gold)",
+                  boxShadow: "0 2px 6px -2px rgba(140,107,37,0.18), inset 0 0 0 2.5px var(--paper)",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+                    fontStyle: "italic",
+                    fontWeight: 600,
+                    fontSize: "17px",
+                    lineHeight: 1,
+                    color: "var(--ink)",
+                  }}
+                >
+                  Z
+                </span>
+              </div>
+              <div>
+                <div
+                  className="text-base font-semibold tracking-tight"
+                  style={{ color: "var(--ink)" }}
+                >
+                  Zoobicon Admin
+                </div>
+                <div className="text-[11px]" style={{ color: "var(--ink-muted)" }}>
+                  Sign in to access the command centre
+                </div>
+              </div>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-3">
+              <div>
+                <label
+                  htmlFor="admin-email"
+                  className="block text-[11px] font-medium mb-1.5 uppercase tracking-wider"
+                  style={{ color: "var(--ink-muted)" }}
+                >
+                  Email
+                </label>
+                <input
+                  id="admin-email"
+                  type="email"
+                  autoComplete="username"
+                  autoFocus
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="admin@zoobicon.com"
+                  className="w-full rounded-lg border px-3.5 py-2.5 text-sm focus:outline-none transition"
+                  style={{
+                    background: "var(--paper)",
+                    borderColor: "var(--rule)",
+                    color: "var(--ink)",
+                  }}
+                  required
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="admin-password"
+                  className="block text-[11px] font-medium mb-1.5 uppercase tracking-wider"
+                  style={{ color: "var(--ink-muted)" }}
+                >
+                  Password
+                </label>
+                <input
+                  id="admin-password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-lg border px-3.5 py-2.5 text-sm focus:outline-none transition"
+                  style={{
+                    background: "var(--paper)",
+                    borderColor: "var(--rule)",
+                    color: "var(--ink)",
+                  }}
+                  required
+                />
+              </div>
+
+              {loginError && (
+                <div
+                  className="rounded-lg border px-3 py-2 text-[12px]"
+                  style={{
+                    background: "rgba(184, 38, 38, 0.06)",
+                    borderColor: "rgba(184, 38, 38, 0.25)",
+                    color: "#9a1a1a",
+                  }}
+                >
+                  {loginError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loginSubmitting || !loginEmail || !loginPassword}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60"
+                style={{ background: "var(--ink)", color: "var(--paper)" }}
+              >
+                {loginSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Signing in…
+                  </>
+                ) : (
+                  "Sign in"
+                )}
+              </button>
+            </form>
+
+            <div className="mt-5 pt-4" style={{ borderTop: "1px solid var(--rule)" }}>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 text-[12px] font-medium transition hover:opacity-70"
+                style={{ color: "var(--ink-muted)" }}
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back to home
+              </Link>
+            </div>
+          </div>
+          <p
+            className="mt-4 text-[11px] text-center"
+            style={{ color: "var(--ink-muted)" }}
+          >
+            Set <code style={{ color: "var(--ink)" }}>ADMIN_EMAIL</code> and{" "}
+            <code style={{ color: "var(--ink)" }}>ADMIN_PASSWORD</code> in Vercel to
+            enable sign-in.
+          </p>
+        </div>
       </div>
     );
   }
