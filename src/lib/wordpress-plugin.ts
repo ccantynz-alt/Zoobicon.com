@@ -205,9 +205,19 @@ async function handleSEOOperation(operation: string, input: Record<string, unkno
 // Image operations
 async function handleImageOperation(operation: string, input: Record<string, unknown>): Promise<unknown> {
   if (operation === "image.generate") {
-    const { generateAvatar } = await import("./video-pipeline");
-    const result = await generateAvatar(input.prompt as string || "professional photo");
-    return { imageUrl: result.imageUrl };
+    // Rule 19 retired 2026-05-26 — video-pipeline deleted. Image
+    // generation moved to /api/generate/images (uses Stability/DALL-E
+    // direct). Fall back to that endpoint via fetch so the WordPress
+    // plugin's image.generate operation keeps working.
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://zoobicon.com";
+    const res = await fetch(`${baseUrl}/api/generate/images`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: input.prompt || "professional photo" }),
+    });
+    if (!res.ok) throw new Error(`image generation failed: ${res.status}`);
+    const data = await res.json();
+    return { imageUrl: data.imageUrl || data.url };
   }
 
   if (operation === "image.alt") {
