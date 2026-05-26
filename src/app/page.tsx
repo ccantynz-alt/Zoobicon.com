@@ -13,7 +13,6 @@ import {
   Bot,
   Layers,
   ShieldCheck,
-  Star,
   Check,
 } from "lucide-react";
 import HeroBuilder from "@/components/HeroBuilder";
