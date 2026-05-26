@@ -16,8 +16,14 @@ export default function NotFound() {
         <div
           className="text-[120px] md:text-[160px] font-black tracking-[-0.06em] leading-none mb-4"
           style={{
-            color: "var(--ink)",
-            textShadow: "0 1px 0 rgba(201, 169, 97, 0.18)",
+            // The display numeral IS the brand — sandy champagne gradient
+            // (lighter sand at top → deeper bronze at bottom) so it reads
+            // as Zoobicon on first glance, not as a generic 404.
+            background: "linear-gradient(180deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+            WebkitTextFillColor: "transparent",
           }}
         >
           404
