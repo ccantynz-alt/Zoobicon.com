@@ -361,6 +361,16 @@ Hard rules:
 - Output ONLY the full updated TypeScript file. No prose. No markdown fences.
 - Keep the same default export name and signature.
 - Keep imports identical unless you genuinely need a new one.
+- IMPORTS ARE LIMITED. You may only import from these packages:
+    react, react-dom, lucide-react, framer-motion, clsx, tailwind-merge
+  PLUS relative imports (./, ../) for sibling components and the
+  generated './lib/zoobicon' client when auth/database is wired.
+  NEVER import @supabase/*, @auth/*, react-countup, embla-carousel,
+  react-icons, react-spring, swr, axios, lodash, date-fns, or ANY
+  other npm package. The Sandpack runtime cannot resolve them and the
+  preview will fail to compile. If you need an icon, use lucide-react.
+  If you need motion, use framer-motion. If you need a carousel,
+  build it with framer-motion + state instead of importing a library.
 - Replace AI-slop words ("revolutionary", "unleash", "empower", "synergy", "next-generation", "game-changer", "leverage", "elevate", "seamless", "cutting-edge") with specific copy.
 - Use real-sounding metrics, not "10,000+ users".
 - Add aria-labels to icon-only buttons. Add alt text to images. Keep responsive classes.
@@ -913,8 +923,19 @@ export async function POST(req: NextRequest): Promise<Response> {
         let completedCount = 0;
         const failedSections: Array<{ id: string; category: string; variant: string; reason: string }> = [];
 
+        // Narrate every section start so the user sees continuous progress
+        // instead of staring at "Customising N components for X…" for 30
+        // seconds. This is the single biggest UX gap vs Lovable/Bolt
+        // (audit 2026-05-26): users describe silence > 3s as "broken".
         await Promise.all(
           components.map(async (comp, i) => {
+            writer.send("status", {
+              message: `Writing ${comp.category} (${comp.variant})…`,
+              section: comp.id,
+              current: i,
+              total: components.length,
+              phase: "building",
+            });
             const result = await customiseComponent({
               baseCode: comp.code,
               brandName,
@@ -1033,6 +1054,23 @@ export async function POST(req: NextRequest): Promise<Response> {
             `Every section fell back to base template — no LLM provider produced customised output. ` +
             `Providers available: [${providers.join(", ") || "none"}]. Last reasons: ${reasons}`,
           );
+        }
+
+        // Partial-failure warning — 2026-05-26 fix. If >30% of sections
+        // dropped to base templates, the site shipped is materially
+        // worse than the intent. Surface a loud warning so the user
+        // knows to regenerate rather than thinking it just worked.
+        if (
+          failedSections.length > 0 &&
+          components.length > 0 &&
+          failedSections.length / components.length >= 0.3
+        ) {
+          writer.send("warning", {
+            kind: "section-fallback",
+            fatal: false,
+            message: `${failedSections.length} of ${components.length} sections used base templates (LLM unavailable). The site is usable but less personalised than intended — consider regenerating.`,
+            reason: failedSections.slice(0, 2).map((f) => `${f.category}: ${f.reason.slice(0, 60)}`).join(" · "),
+          });
         }
 
         writer.send("files", { files });

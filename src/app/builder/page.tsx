@@ -1339,7 +1339,23 @@ function BuilderPage() {
 
         if (!res.ok) {
           const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-          throw new Error(errData.error || `HTTP ${res.status}`);
+          // 2026-05-26 fix: wrap raw HTTP codes with actionable context.
+          // Users were seeing "HTTP 429" with no explanation. Now they
+          // see "Rate limited — try again in 60s" with a reset timestamp
+          // when the server provides one.
+          let friendly = errData.error || `HTTP ${res.status}`;
+          if (res.status === 429) {
+            const resetIso = errData.resetsAt;
+            const resetMsg = resetIso ? ` (resets ${new Date(resetIso).toLocaleTimeString()})` : "";
+            friendly = `You've hit today's build limit${resetMsg}. ${errData.error || "Wait a bit and try again, or upgrade for more capacity."}`;
+          } else if (res.status === 503) {
+            friendly = `AI service temporarily unavailable. ${errData.error || "Try again in 30 seconds — the failover chain should pick up."}`;
+          } else if (res.status === 401 || res.status === 403) {
+            friendly = `Auth issue (${res.status}). ${errData.error || "If this persists, an API key may be missing or invalid in Vercel env vars."}`;
+          } else if (res.status >= 500) {
+            friendly = `Server error ${res.status}. ${errData.error || "This is on us — please retry."}`;
+          }
+          throw new Error(friendly);
         }
 
         // Read SSE stream — update preview as files arrive
@@ -1392,7 +1408,7 @@ function BuilderPage() {
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
-                  receivedFiles = true;
+                  if (Object.keys(event.files).length > 0) receivedFiles = true;
                   setPipelineAgents(prev => [...prev, `Scaffold ready — ${event.componentCount} components assembled`]);
                 }
               } else if (event.type === "customization" && event.data) {
@@ -1405,14 +1421,19 @@ function BuilderPage() {
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
-                  receivedFiles = true;
+                  if (Object.keys(event.files).length > 0) receivedFiles = true;
                 }
               } else if (event.type === "partial" && event.files) {
-                // Progressive streaming: each partial carries the full file map so far
+                // Progressive streaming: each partial carries the full file map so far.
+                // 2026-05-26 fix: only mark receivedFiles when the map actually
+                // has content. An empty `{}` partial was tripping the safety
+                // net into thinking the build had succeeded.
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
-                  receivedFiles = true;
+                  if (Object.keys(event.files).length > 0) {
+                    receivedFiles = true;
+                  }
                   // Update progress indicator
                   if (event.fileCount != null && event.totalComponents != null) {
                     setBuildProgress({ current: event.fileCount, total: event.totalComponents, section: event.section || "" });
@@ -1469,6 +1490,16 @@ function BuilderPage() {
                 if (kind === "section-fallback") {
                   setStreamWarning(`One or more sections fell back to base templates — the LLM provider couldn't customise them.`);
                 }
+              } else if (event.type === "fallback") {
+                // 2026-05-26 fix: surface provider failover so the user knows
+                // when Anthropic became Sonnet, OpenAI, or Gemini mid-build.
+                // Was silent (server console.log only) — looked like Anthropic
+                // handled the whole request when actually OpenAI saved it.
+                const provider = event.provider || "alternate provider";
+                const model = event.model || "";
+                const section = event.section || "";
+                const where = section ? ` (${section})` : "";
+                setPipelineAgents(prev => [...prev, `↪ Switched to ${provider}${model ? ` / ${model}` : ""}${where}`]);
               } else if (event.type === "error") {
                 const msg = event.message || "Generation failed";
                 // Soft warnings ship with fatal:false. They mean "this step was
