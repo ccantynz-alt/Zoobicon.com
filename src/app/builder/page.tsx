@@ -2494,12 +2494,12 @@ root.render(React.createElement(App));
             source={sitePlan.source}
             modelUsed={sitePlan.modelUsed}
             onCancel={() => setSitePlan(null)}
-            onApprove={async () => {
-              // Hand the approved plan to the parallel orchestrator.
-              // The orchestrator streams per-page progress + a final
-              // merged file tree. Errors surface via the standard
-              // streamWarning / buildError channels.
-              const planToBuild = sitePlan.plan;
+            onApprove={async (approvedPlan) => {
+              // Hand the approved (possibly edited) plan to the parallel
+              // orchestrator. The orchestrator streams per-page progress
+              // + a final merged file tree. Errors surface via the
+              // standard streamWarning / buildError channels.
+              const planToBuild = approvedPlan;
               setSitePlan(null);
               setStatus("generating");
               setError("");
