@@ -15,6 +15,7 @@ import dynamic from "next/dynamic";
 
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
 const WebContainerPreview = dynamic(() => import("@/components/WebContainerPreview"), { ssr: false });
+const EscapeHatchPreview = dynamic(() => import("@/components/EscapeHatchPreview"), { ssr: false });
 
 // Pre-warm WebContainers the moment this module loads (before React mounts).
 // The dynamic import of WebContainerPreview above is async, so we also fire
@@ -51,12 +52,20 @@ class WebContainerErrorBoundary extends Component<WCErrorBoundaryProps, WCErrorB
 
 interface PreviewSwitcherProps {
   useWebContainers: boolean;
+  useEscapeHatch: boolean;
   onWebContainersFail: () => void;
   files: Record<string, string>;
   reactDeps: Record<string, string>;
   onDownload?: () => void;
 }
-function PreviewSwitcher({ useWebContainers, onWebContainersFail, files, reactDeps, onDownload }: PreviewSwitcherProps): JSX.Element {
+function PreviewSwitcher({ useWebContainers, useEscapeHatch, onWebContainersFail, files, reactDeps, onDownload }: PreviewSwitcherProps): JSX.Element {
+  // EscapeHatch wins if explicitly set — it bypasses Sandpack's
+  // hosted bundler entirely (codesandbox.io infra) and renders via
+  // Babel-standalone + esm.sh inside a plain iframe. Used when
+  // Sandpack times out, which is a known reliability issue.
+  if (useEscapeHatch) {
+    return <EscapeHatchPreview files={files} onDownload={onDownload} />;
+  }
   const sandpack = (
     <SandpackPreview
       mode="react"
@@ -546,6 +555,15 @@ function BuilderPage() {
   // intel exports, or the future Crontech project map.
   const [adminPrivate, setAdminPrivate] = useState<boolean>(true);
   const [useWebContainers, setUseWebContainers] = useState<boolean>(true);
+  // Escape-hatch preview: when Sandpack's hosted bundler is flaky
+  // (known TIME_OUT issue), this swaps the preview to a self-contained
+  // iframe that renders the project via Babel-standalone + esm.sh —
+  // no codesandbox.io dependency. Persisted in localStorage so the
+  // user's choice survives reloads.
+  const [useEscapeHatch, setUseEscapeHatch] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("zoobicon_use_escape_hatch") === "1";
+  });
   const [userPlan, setUserPlan] = useState<Plan>("free");
 
   // Resolve the user's plan from localStorage so the UI knows whether to
@@ -2083,6 +2101,7 @@ function BuilderPage() {
         {/* Fullscreen preview */}
         <PreviewSwitcher
           useWebContainers={useWebContainers}
+          useEscapeHatch={useEscapeHatch}
           onWebContainersFail={handleWebContainersFail}
           files={reactFiles || {}}
           reactDeps={reactDeps}
@@ -2153,6 +2172,30 @@ function BuilderPage() {
               className="px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
             >
               Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setUseEscapeHatch((v) => {
+                  const next = !v;
+                  try {
+                    localStorage.setItem("zoobicon_use_escape_hatch", next ? "1" : "0");
+                  } catch { /* sessionStorage disabled */ }
+                  return next;
+                });
+              }}
+              className={`px-2 py-1 text-[10px] rounded border ${
+                useEscapeHatch
+                  ? "bg-amber-500/90 text-black border-amber-400"
+                  : "bg-black/70 text-white border-white/20"
+              }`}
+              title={
+                useEscapeHatch
+                  ? "Direct preview ON — bypassing Sandpack's bundler. Reliable but no hot-reload."
+                  : "Click to bypass Sandpack and use the direct in-browser preview. Use this when Sandpack times out."
+              }
+            >
+              {useEscapeHatch ? "🪂 Direct preview" : "📦 Sandpack"}
             </button>
           </div>
         )}
@@ -2919,6 +2962,7 @@ function BuilderPage() {
             >
               <PreviewSwitcher
                 useWebContainers={useWebContainers}
+                useEscapeHatch={useEscapeHatch}
                 onWebContainersFail={handleWebContainersFail}
                 files={reactFiles || {}}
                 reactDeps={reactDeps}
