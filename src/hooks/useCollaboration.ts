@@ -41,7 +41,8 @@ export function useCollaboration({
 }: UseCollaborationOptions) {
   const [room, setRoom] = useState<CollabRoom | null>(null);
   const [participantId, setParticipantId] = useState<string | null>(null);
-  const [myColor, setMyColor] = useState("#3b82f6");
+  // Rule 29 — default cursor is champagne, not cobalt blue.
+  const [myColor, setMyColor] = useState("#b8923f");
   const [participants, setParticipants] = useState<RemoteParticipant[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [transport, setTransport] = useState<TransportMode>("polling");

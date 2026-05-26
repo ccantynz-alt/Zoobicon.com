@@ -1,28 +1,55 @@
 import Link from "next/link";
 
+/**
+ * 404 — Rule 29 editorial-light palette only.
+ * Background: --paper (warm bone). Display numeral: ink with a soft
+ * champagne shadow. CTAs: filled ink + outlined hairline. No
+ * gradients, no purple, no neon shadows.
+ */
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#f4f3ed] text-white flex items-center justify-center px-6">
+    <div
+      className="min-h-screen flex items-center justify-center px-6"
+      style={{ background: "var(--paper)", color: "var(--ink)" }}
+    >
       <div className="text-center max-w-lg">
-        <div className="text-[120px] md:text-[160px] font-black tracking-[-0.06em] leading-none mb-4 text-transparent bg-clip-text bg-gradient-to-r from-[#7c5aff] to-[#b794ff]">
+        <div
+          className="text-[120px] md:text-[160px] font-black tracking-[-0.06em] leading-none mb-4"
+          style={{
+            color: "var(--ink)",
+            textShadow: "0 1px 0 rgba(201, 169, 97, 0.18)",
+          }}
+        >
           404
         </div>
-        <h1 className="text-2xl md:text-3xl font-bold mb-3 tracking-tight">
+        <h1
+          className="text-2xl md:text-3xl font-bold mb-3 tracking-tight"
+          style={{ color: "var(--ink)" }}
+        >
           Page not found
         </h1>
-        <p className="text-white/50 mb-8 leading-relaxed">
+        <p
+          className="mb-8 leading-relaxed"
+          style={{ color: "var(--ink-muted)" }}
+        >
           The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#7c5aff] text-white text-sm font-semibold hover:bg-[#6d3bff] transition-all shadow-[0_0_30px_rgba(124,90,255,0.25)]"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all"
+            style={{ background: "var(--ink)", color: "var(--paper)" }}
           >
             Back to Home
           </Link>
           <Link
             href="/builder"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold text-white/70 bg-white/[0.06] border border-white/[0.1] hover:bg-white/[0.1] transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all border"
+            style={{
+              color: "var(--ink)",
+              background: "var(--paper-elevated)",
+              borderColor: "var(--rule)",
+            }}
           >
             Try the Builder
           </Link>

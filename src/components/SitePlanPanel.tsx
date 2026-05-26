@@ -33,9 +33,26 @@ import {
   Trash2,
   RotateCcw,
   GripVertical,
+  Wand2,
+  Loader2,
 } from "lucide-react";
 import type { SitePlan, SitePlanPage, PageSection } from "@/lib/site-planner";
 import type { ComponentCategory } from "@/lib/component-registry/store";
+
+/**
+ * Lightweight catalog entry returned by /api/components/catalog —
+ * keeps just enough to render the variant picker dropdown.
+ */
+interface CatalogEntry {
+  id: string;
+  name: string;
+  variant: string;
+  description: string;
+  tags: string[];
+}
+interface Catalog {
+  byCategory: Record<string, CatalogEntry[]>;
+}
 
 interface SitePlanPanelProps {
   plan: SitePlan;
@@ -111,6 +128,7 @@ interface PageCardProps {
   isFirst: boolean;
   isLast: boolean;
   expanded: boolean;
+  catalog: Catalog | null;
   onToggle: () => void;
   onChange: (next: SitePlanPage) => void;
   onDelete: () => void;
@@ -118,7 +136,7 @@ interface PageCardProps {
 }
 
 function PageCard({
-  page, isFirst, isLast, expanded,
+  page, isFirst, isLast, expanded, catalog,
   onToggle, onChange, onDelete, onMove,
 }: PageCardProps) {
   const setField = <K extends keyof SitePlanPage>(field: K, value: SitePlanPage[K]) => {

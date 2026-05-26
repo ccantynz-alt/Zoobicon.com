@@ -3,6 +3,8 @@ import { ImageResponse } from "next/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
+// Rule 29 editorial-light apple-touch-icon — ink Z on champagne ground.
+// Previously a purple gradient that contradicted the brand on every home-screen install.
 export default function AppleIcon() {
   return new ImageResponse(
     (
@@ -10,7 +12,7 @@ export default function AppleIcon() {
         style={{
           width: 180,
           height: 180,
-          background: "linear-gradient(135deg, #7c5aff 0%, #b794ff 100%)",
+          background: "linear-gradient(135deg, #d4b86d 0%, #b8923f 100%)",
           borderRadius: 40,
           display: "flex",
           alignItems: "center",
@@ -21,7 +23,7 @@ export default function AppleIcon() {
           style={{
             fontSize: 110,
             fontWeight: 900,
-            color: "white",
+            color: "#0a0a0b",
             lineHeight: 1,
           }}
         >
