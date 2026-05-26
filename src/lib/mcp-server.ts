@@ -307,18 +307,14 @@ const TOOLS: InternalTool[] = [
           };
         }
       } catch {
-        // Deepgram not available, try video-captions
+        // Deepgram module unavailable — video-creator fallback retired
+        // 2026-05-26 (Rule 19). MCP transcription only works when
+        // DEEPGRAM_API_KEY is set + the deepgram module is reachable.
       }
-      // Fallback: try the video-creator voiceover/transcription endpoint
-      try {
-        const result = await internalPost("/api/video-creator/voiceover", {
-          mode: "transcribe",
-          audioUrl,
-        });
-        return result;
-      } catch {
-        return { ok: false, error: "Transcription service not available. Ensure DEEPGRAM_API_KEY is set." };
-      }
+      return {
+        ok: false,
+        error: "Transcription service not available. Set DEEPGRAM_API_KEY in env vars.",
+      };
     },
   },
 

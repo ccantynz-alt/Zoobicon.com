@@ -26,112 +26,19 @@ import { NextRequest } from "next/server";
 
 export const maxDuration = 300;
 
-// Track which models were last pinged
-const modelWarmupState: Record<string, number> = {};
-const WARMUP_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+// modelWarmupState + WARMUP_INTERVAL_MS removed 2026-05-26 — Rule 19
+// retired, no Replicate video models to keep warm.
 
 /**
- * Warm up Replicate models by sending minimal predictions.
+ * Warm up Replicate models — RETIRED 2026-05-26.
  * Called by cron job every 5 minutes to prevent cold starts.
  */
 export async function warmupModels(): Promise<{ warmed: string[]; failed: string[] }> {
-  const token = process.env.REPLICATE_API_TOKEN || process.env.REPLICATE_API_KEY || process.env.REPLICATE_TOKEN || process.env.REPLICATE_KEY;
-  if (!token) return { warmed: [], failed: [] };
-
-  const models = [
-    {
-      name: "fish-speech",
-      version: "11f3e0394c06dcc099c0cbaf75f4a6e7da84cb4aaa5d53bedfc3234b5c8aaefc",
-      input: { text: "warmup" },
-    },
-    {
-      name: "flux-schnell",
-      endpoint: "https://api.replicate.com/v1/models/black-forest-labs/flux-schnell/predictions",
-      input: { prompt: "test", num_outputs: 1 },
-    },
-    {
-      name: "sadtalker",
-      version: "3aa3dac9353cc4d6bd62a8f95957bd844003b401ca4e4a9b33baa574c549d376",
-      // SadTalker needs image+audio, can't do minimal warmup — skip actual prediction
-      // Just hitting the versions endpoint keeps the container pool aware
-      pingOnly: true,
-    },
-  ];
-
-  const warmed: string[] = [];
-  const failed: string[] = [];
-
-  for (const model of models) {
-    const lastWarmup = modelWarmupState[model.name] || 0;
-    if (Date.now() - lastWarmup < WARMUP_INTERVAL_MS) {
-      warmed.push(`${model.name} (still warm)`);
-      continue;
-    }
-
-    try {
-      if (model.pingOnly) {
-        // Just check the model exists — keeps Replicate aware we use it
-        await fetch(`https://api.replicate.com/v1/models/cjwbw/sadtalker`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        warmed.push(model.name);
-      } else if (model.endpoint) {
-        // Official models — use /models/ endpoint, cancel immediately
-        const res = await fetch(model.endpoint, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ input: model.input }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          // Cancel the prediction immediately — we just wanted to warm the container
-          if (data.urls?.cancel) {
-            await fetch(data.urls.cancel, {
-              method: "POST",
-              headers: { Authorization: `Bearer ${token}` },
-            }).catch(() => {});
-          }
-          warmed.push(model.name);
-        } else {
-          failed.push(model.name);
-        }
-      } else {
-        // Community models — use version hash, cancel immediately
-        const res = await fetch("https://api.replicate.com/v1/predictions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            version: model.version,
-            input: model.input,
-          }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.urls?.cancel) {
-            await fetch(data.urls.cancel, {
-              method: "POST",
-              headers: { Authorization: `Bearer ${token}` },
-            }).catch(() => {});
-          }
-          warmed.push(model.name);
-        } else {
-          failed.push(model.name);
-        }
-      }
-
-      modelWarmupState[model.name] = Date.now();
-    } catch {
-      failed.push(model.name);
-    }
-  }
-
-  return { warmed, failed };
+  // Rule 19 retired 2026-05-26 — AI Video Creator removed from launch
+  // scope. Replicate model warm-up (fish-speech, flux-schnell, sadtalker)
+  // is no longer relevant. Returning an empty result keeps the cron
+  // endpoint (/api/cron/warmup) happy without touching Replicate.
+  return { warmed: [], failed: [] };
 }
 
 /**
@@ -146,9 +53,14 @@ export async function routeRequest(
   try {
     switch (service) {
       case "video":
-        const { generateSpokespersonVideo } = await import("./video-pipeline");
-        const video = await generateSpokespersonVideo(params as any);
-        return { success: true, data: video };
+        // Rule 19 retired 2026-05-26 — AI Video Creator removed from
+        // launch scope. video-pipeline module was deleted in the cut.
+        // Route kept registered so the API surface stays consistent
+        // and we get clean analytics on how often video is requested.
+        return {
+          success: false,
+          error: "AI Video Creator was removed from Zoobicon's launch scope. Try /api/generate/react for site generation.",
+        };
 
       case "site":
         // Site generation handled by /api/generate/react
