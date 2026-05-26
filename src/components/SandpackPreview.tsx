@@ -19,11 +19,22 @@ import { extractSandpackFiles } from "@/lib/sandpack-utils";
  * error state via the useSandpack hook and renders an editorial-light
  * panel naming the offending file with a Refresh action.
  */
-function CompileErrorOverlay() {
+function CompileErrorOverlay({ onDownload }: { onDownload?: () => void }) {
   const { sandpack } = useSandpack();
   const error = sandpack.error;
 
   if (!error) return null;
+
+  // Differentiate Sandpack bundler-infrastructure errors (TIME_OUT,
+  // network) from real generated-code compile errors. The bundler
+  // service is hosted by codesandbox.io and can be flaky — when it
+  // fails the user should know "your build is fine, the preview just
+  // can't reach the bundler service" and have a download fallback.
+  // 2026-05-26 fix: was previously just "Preview compile error" for
+  // EVERYTHING, which made bundler timeouts look like build failures.
+  const message = error.message || "Unknown compile error";
+  const isInfraError =
+    /TIME_OUT|TIMEOUT|connect to (server|runtime)|sandpack-bundler|create-react-app/i.test(message);
 
   return (
     <div
@@ -43,12 +54,20 @@ function CompileErrorOverlay() {
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
-            Preview compile error
+            {isInfraError
+              ? "Preview bundler timed out"
+              : "Preview compile error"}
           </div>
-          {error.path && (
-            <div className="mt-0.5 truncate text-xs" style={{ color: "var(--ink-muted)" }}>
-              in {error.path}
+          {isInfraError ? (
+            <div className="mt-0.5 text-xs" style={{ color: "var(--ink-muted)" }}>
+              Your site built fine — the in-browser preview service just couldn&apos;t reach its bundler. This is on the upstream sandbox provider (codesandbox.io), not your build.
             </div>
+          ) : (
+            error.path && (
+              <div className="mt-0.5 truncate text-xs" style={{ color: "var(--ink-muted)" }}>
+                in {error.path}
+              </div>
+            )
           )}
           <div
             className="mt-2 max-h-32 overflow-auto rounded-md p-2 font-mono text-[11px] leading-relaxed"
@@ -58,24 +77,35 @@ function CompileErrorOverlay() {
               color: "var(--ink-secondary)",
             }}
           >
-            {error.message || "Unknown compile error"}
+            {message}
           </div>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => {
-                // Trigger a Sandpack refresh — usually re-runs the
-                // bundler against the current files, which can clear
-                // transient errors caused by stale partial streams.
-                sandpack.runSandpack();
-              }}
+              onClick={() => sandpack.runSandpack()}
               className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
               style={{ background: "var(--ink)", color: "var(--paper)" }}
             >
-              Retry compile
+              {isInfraError ? "Retry connection" : "Retry compile"}
             </button>
+            {isInfraError && onDownload && (
+              <button
+                type="button"
+                onClick={onDownload}
+                className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+                style={{
+                  background: "var(--paper)",
+                  borderColor: "var(--rule)",
+                  color: "var(--ink)",
+                }}
+              >
+                Download project as ZIP
+              </button>
+            )}
             <span className="text-[11px]" style={{ color: "var(--ink-muted)" }}>
-              The generation didn&apos;t fail — only this preview render. Edit the file or ask the chat to fix it.
+              {isInfraError
+                ? "Or wait 30s and retry — the bundler usually recovers."
+                : "The generation didn't fail — only this preview render. Edit the file or ask the chat to fix it."}
             </span>
           </div>
         </div>
@@ -88,6 +118,10 @@ interface SandpackPreviewPropsHTML {
   mode?: "html";
   html: string;
   showEditor?: boolean;
+  /** Called when the user clicks "Download project" in the error
+   *  overlay. Builder passes a handler that exports the current files
+   *  as a ZIP so failed previews don't strand the user. */
+  onDownload?: () => void;
 }
 
 interface SandpackPreviewPropsReact {
@@ -95,6 +129,7 @@ interface SandpackPreviewPropsReact {
   files: Record<string, string>;
   dependencies?: Record<string, string>;
   showEditor?: boolean;
+  onDownload?: () => void;
 }
 
 type SandpackPreviewProps = SandpackPreviewPropsHTML | SandpackPreviewPropsReact;
@@ -254,7 +289,7 @@ const SANDPACK_FULL_HEIGHT_CSS = `
  * fills the entire available space regardless of Sandpack's internal layout.
  */
 export default function SandpackPreview(props: SandpackPreviewProps) {
-  const { showEditor = false } = props;
+  const { showEditor = false, onDownload } = props;
   const mode = props.mode || "html";
 
   // Extract the mode-specific input into a stable value so the useMemo
@@ -432,7 +467,7 @@ export default function App() {
                   showRefreshButton
                   style={{ height: "100%" }}
                 />
-                {!isPrewarm && <CompileErrorOverlay />}
+                {!isPrewarm && <CompileErrorOverlay onDownload={onDownload} />}
               </div>
             </div>
           </div>

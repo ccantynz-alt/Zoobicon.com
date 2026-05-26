@@ -54,10 +54,17 @@ interface PreviewSwitcherProps {
   onWebContainersFail: () => void;
   files: Record<string, string>;
   reactDeps: Record<string, string>;
+  onDownload?: () => void;
 }
-function PreviewSwitcher({ useWebContainers, onWebContainersFail, files, reactDeps }: PreviewSwitcherProps): JSX.Element {
+function PreviewSwitcher({ useWebContainers, onWebContainersFail, files, reactDeps, onDownload }: PreviewSwitcherProps): JSX.Element {
   const sandpack = (
-    <SandpackPreview mode="react" files={files} dependencies={reactDeps} showEditor={false} />
+    <SandpackPreview
+      mode="react"
+      files={files}
+      dependencies={reactDeps}
+      showEditor={false}
+      onDownload={onDownload}
+    />
   );
   if (!useWebContainers) return sandpack;
   return (
@@ -2079,6 +2086,23 @@ function BuilderPage() {
           onWebContainersFail={handleWebContainersFail}
           files={reactFiles || {}}
           reactDeps={reactDeps}
+          onDownload={() => {
+            // Fallback when Sandpack's bundler service times out
+            // (codesandbox.io infra). The user's build is fine — just
+            // hand them the file tree as a ZIP so they're not stuck.
+            const files = reactFiles || {};
+            const entries = Object.entries(files).map(([path, content]) => ({
+              path: path.replace(/^\/+/, ""),
+              content,
+            }));
+            if (entries.length === 0) return;
+            const slug = (projectName || prompt.slice(0, 40) || "zoobicon-build")
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-+|-+$/g, "")
+              .slice(0, 50);
+            downloadZip(entries, slug);
+          }}
         />
         {/* Launch-video polaroid removed 2026-05-26 (Rule 19 retired). */}
         {isAdmin && (
@@ -2898,6 +2922,20 @@ function BuilderPage() {
                 onWebContainersFail={handleWebContainersFail}
                 files={reactFiles || {}}
                 reactDeps={reactDeps}
+                onDownload={() => {
+                  const files = reactFiles || {};
+                  const entries = Object.entries(files).map(([path, content]) => ({
+                    path: path.replace(/^\/+/, ""),
+                    content,
+                  }));
+                  if (entries.length === 0) return;
+                  const slug = (projectName || prompt.slice(0, 40) || "zoobicon-build")
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/^-+|-+$/g, "")
+                    .slice(0, 50);
+                  downloadZip(entries, slug);
+                }}
               />
               {activeTab === "preview" && isAdmin && (
                 <button
