@@ -166,13 +166,13 @@ export default function HomePage() {
                 The whole platform
               </div>
               <h2 className="fs-display-md text-white">
-                Seventy-five products.{" "}
+                Builder, Video, Domains.{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
                   One
@@ -249,11 +249,11 @@ export default function HomePage() {
                 <h2 className="fs-display-md text-white mb-6">
                   From a sentence to a{" "}
                   <span
+                    className="text-display-sand"
                     style={{
                       fontFamily: "Fraunces, ui-serif, Georgia, serif",
                       fontStyle: "italic",
                       fontWeight: 400,
-                      color: "#E8D4B0",
                     }}
                   >
                     face
@@ -327,11 +327,11 @@ export default function HomePage() {
               <h2 className="fs-display-md text-white">
                 Not a hundred features.{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
                   Three
@@ -420,11 +420,11 @@ export default function HomePage() {
               <motion.h2 variants={fadeUp} className="fs-display-md text-white">
                 Shipped by people{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
                   who built
@@ -487,11 +487,11 @@ export default function HomePage() {
               <h2 className="fs-display-md text-white">
                 One subscription.{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
                   Everything
@@ -613,11 +613,11 @@ export default function HomePage() {
             >
               Stop reading.{" "}
               <span
+                className="text-display-sand"
                 style={{
                   fontFamily: "Fraunces, ui-serif, Georgia, serif",
                   fontStyle: "italic",
                   fontWeight: 400,
-                  color: "#E8D4B0",
                 }}
               >
                 Start building.

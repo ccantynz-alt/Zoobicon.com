@@ -57,11 +57,17 @@ const PRIMARY_CTA = {
   color: "#0a1628",
   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
 } as const;
+// SERIF accent — Fraunces italic in the brand sand→champagne→bronze
+// gradient. Single source of truth for every hero accent on this page.
 const SERIF: React.CSSProperties = {
   fontFamily: "Fraunces, ui-serif, Georgia, serif",
   fontStyle: "italic",
   fontWeight: 400,
-  color: "#E8D4B0",
+  background: "linear-gradient(180deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  backgroundClip: "text",
+  color: "transparent",
 };
 
 const GENERATOR_CATEGORIES = [

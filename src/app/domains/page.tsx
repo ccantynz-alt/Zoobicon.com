@@ -466,7 +466,7 @@ export default function DomainsPage() {
             style={{ color: "var(--ink)" }}
           >
             Find your perfect{" "}
-            <span className="display-italic font-normal" style={{ color: "var(--gold-deep)" }}>
+            <span className="display-italic font-normal text-display-sand">
               domain.
             </span>
           </h1>

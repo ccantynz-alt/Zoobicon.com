@@ -68,11 +68,11 @@ export default function ComparisonPage({ data }: { data: CompetitorComparison })
           <h1 className="text-5xl md:text-7xl font-bold tracking-[-0.03em] leading-[1.05] mb-6">
             Zoobicon{" "}
             <span
+              className="text-display-sand"
               style={{
                 fontFamily: "Fraunces, ui-serif, Georgia, serif",
                 fontStyle: "italic",
                 fontWeight: 400,
-                color: "#E8D4B0",
               }}
             >
               vs
