@@ -381,7 +381,19 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       {/* User / Logout */}
       <div className="border-t border-stone-200 px-3 py-3">
         <div className="flex items-center gap-2.5 px-2.5 py-2 mb-1">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-stone-400 to-stone-500 flex items-center justify-center text-xs font-bold text-white shadow-sm">
+          {/* Editorial medallion: cream surface + gold ring + ink initial.
+              The previous stone gradient + text-white initial rendered as
+              a solid black blob with no visible letter — the Rule 29
+              override in globals.css forces .text-white to var(--ink). */}
+          <div
+            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+            style={{
+              background: "var(--paper)",
+              border: "1.5px solid var(--gold)",
+              color: "var(--ink)",
+              boxShadow: "0 1px 3px rgba(140,107,37,0.12)",
+            }}
+          >
             {userName ? userName.charAt(0).toUpperCase() : "A"}
           </div>
           <div className="min-w-0 flex-1">
