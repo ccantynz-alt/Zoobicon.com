@@ -27,7 +27,7 @@ CLAUDE.md is a static file. The AI landscape is not. Models ship weekly. Competi
 The quality bar is not "match what CLAUDE.md says." The quality bar is "be the most advanced on earth." CLAUDE.md is the record of that target — not the cap on it.
 
 ## 0. THE SINGLE PURPOSE
-Zoobicon exists to **dominate and annihilate every competitor in the AI builder + domains + hosting + video + ecosystem space**. Not "compete with." Not "be comparable to." **Dominate. Annihilate.** If a decision doesn't move us toward market domination, it is the wrong decision.
+Zoobicon exists to **dominate and annihilate every competitor in the AI Website Builder space — Lovable, Bolt, v0, Emergent, Google Stitch.** Per Rule 32 (2026-05-27), this is our ONE product. Not "compete with." Not "be comparable to." **Dominate. Annihilate.** Our wedge is the domain-in-checkout flow that no competitor has + slot-locked composition + Crontech-delegated infra letting us pour 100% of engineering into builder quality. If a decision doesn't move us toward AI Builder domination, it is the wrong decision.
 
 Craig is the boss. Craig runs a 24/7 physical business. Craig cannot monitor every commit. Claude is the engineering team, the QA team, the SRE team, and the security team. Claude's job is to **ship the most advanced platform on earth and keep it shipped** — without Craig having to chase, debug, or babysit.
 
@@ -93,7 +93,7 @@ Before ending the session, add what shipped to RECENTLY FIXED, move completed it
 
 **Claude MUST STOP and get Craig's explicit written authorization before:**
 1. **Major version dependency upgrades** — Next.js major (14 → 15), React major (18 → 19), TypeScript major, Tailwind major. These break APIs.
-2. **Removing or replacing a core product** — video creator, builder, domains, email marketing, CRM, invoicing, analytics, hosting.
+2. **Removing or replacing the core product (AI Website Builder)** — the builder itself, its generation pipeline, its component registry, its preview surface (Sandpack), its checkout flow (including OpenSRS domain registration wired into it), or its pricing tiers. Per Rule 32, the builder is the only product Zoobicon sells; any change that breaks it or removes a piece of its end-to-end flow needs Craig's authorization.
 3. **Changing the framework** (Next.js → anything else), runtime (Node → Bun/Deno), or primary database (Neon → anything else).
 4. **Changing the AI model strategy** — dropping Claude, swapping the Opus-for-builds rule, removing multi-LLM abstraction.
 5. **Changing the hosting stack** — leaving Vercel, leaving Cloudflare, leaving Neon.
@@ -153,11 +153,11 @@ If Claude is uncertain whether something requires authorization: **default to as
 ### A. AI BUILDER COMPETITORS
 | Competitor | ARR/Value | Latest (April 2026) | Our edge | ALERT |
 |---|---|---|---|---|
-| Lovable | $400M ARR, $6.6B | **Lovable 2.0**: Plan Mode, Prompt Queue (batch 50), Browser Testing (auto QA), expanding beyond apps into data analysis + presentations + marketing | 75+ products vs their expanding-but-still-narrow platform | They're becoming a general-purpose AI work platform |
-| Bolt.new | $40M ARR, 5M users | **Bolt V2**: Plan Mode, auto-DB creation, auto-error-fixing agent, Figma import, Team Templates, Opus 4.6. Handles 1000x larger projects. Native auth + payments + SEO + storage. | Our domains + email + video. But they've CLOSED the full-stack gap with Lovable. | **CRITICAL: Bolt now has full-stack. Our speed must beat theirs.** |
-| v0 (Vercel) | 6M devs, $3.5B+ | **v0.app**: Full agentic builder now. Auto-connects DBs, web search mid-build, multi-step planning, deploys to Vercel, syncs GitHub. No longer frontend-only. | Our ecosystem breadth. But they have Vercel lock-in. | They closed the backend gap too |
-| Emergent | $100M ARR, 6M signups | **MCP integration LIVE** (Notion, GitHub, Figma). Fork Feature for session continuity. Multi-LLM switching. Google Play app. | Our white-label + agency multiplier. | **MCP is live. We have a stub. Ship it.** |
-| **Google Stitch** ⚠️ NEW | FREE (Google Labs) | Natural language → high-fidelity UI. Infinite canvas, voice-driven design critiques, multi-screen gen (5 at once), DESIGN.md export, Figma/React/HTML export. Currently FREE. | Our ecosystem (domains, hosting, email, video). Stitch is UI-only, no backend, no deploy. | **HIGH THREAT: Google distribution + FREE. Monthly comparison mandatory.** |
+| Lovable | $400M ARR, $6.6B | **Lovable 2.0**: Plan Mode, Prompt Queue (batch 50), Browser Testing (auto QA), expanding beyond apps into data analysis + presentations + marketing | Slot-locked composition + 118-component registry + domain registration baked into the build checkout (OpenSRS — they don't have this). | They're becoming a general-purpose AI work platform |
+| Bolt.new | $40M ARR, 5M users | **Bolt V2**: Plan Mode, auto-DB creation, auto-error-fixing agent, Figma import, Team Templates, Opus 4.6. Handles 1000x larger projects. Native auth + payments + SEO + storage. | Domain bought in the same flow as the build; Crontech-backed hosting/auth/DB means we don't reinvent those layers and can pour all engineering into builder quality. | **CRITICAL: Bolt now has full-stack. Our speed must beat theirs.** |
+| v0 (Vercel) | 6M devs, $3.5B+ | **v0.app**: Full agentic builder now. Auto-connects DBs, web search mid-build, multi-step planning, deploys to Vercel, syncs GitHub. No longer frontend-only. | Domain registration inside the build flow (unique). They have Vercel lock-in. | They closed the backend gap too |
+| Emergent | $100M ARR, 6M signups | **MCP integration LIVE** (Notion, GitHub, Figma). Fork Feature for session continuity. Multi-LLM switching. Google Play app. | Domain-in-checkout funnel + Crontech-delegated infra. | **MCP is live. We have a stub. Ship it.** |
+| **Google Stitch** ⚠️ NEW | FREE (Google Labs) | Natural language → high-fidelity UI. Infinite canvas, voice-driven design critiques, multi-screen gen (5 at once), DESIGN.md export, Figma/React/HTML export. Currently FREE. | Domain registration + deployable React (not just UI export). Stitch is UI-only, no backend, no deploy. | **HIGH THREAT: Google distribution + FREE. Monthly comparison mandatory.** |
 
 ### B. AI VIDEO COMPETITORS
 | Competitor | ARR/Value/Users | What they do | Our edge | What to steal |
@@ -350,7 +350,7 @@ These are never allowed under any circumstance without Craig explicitly saying "
 ---
 
 # LIVE REPO STATUS — READ THIS FIRST
-## Last updated: 2026-05-17 | Build: GREEN (Crontech pivot mid-flight) | Branch: claude/review-readme-docs-Wr1If
+## Last updated: 2026-05-27 | Build: GREEN | Scope: AI WEBSITE BUILDER ONLY (Rule 32) | Branch: claude/relaxed-lamport-lC5Wp
 
 ### CRONTECH PIVOT (RULE 31) — STATUS
 - §1 AUTH — DONE (1fbcb40). auth-guard.ts is a Crontech-SSO shim.
@@ -373,7 +373,7 @@ These are never allowed under any circumstance without Craig explicitly saying "
 ### QUICK FACTS (post-Crontech sweep 2026-05-17)
 - **67 pages** (was 165) | **178 API routes** (was 576) | **43 layouts** | **237 lib files** | **79 shared components** | **118 registry components**
 - **45 API top-level dirs** (was 146) — only AI Builder + Video + Domains + Free Tools + admin + cron + intel + stripe + support survive
-- **Pure scope:** AI Builder + AI Video Creator + Domain Search + 12 Free Tools. Everything else delegated to Crontech or deleted entirely.
+- **Pure scope (Rule 32, 2026-05-27):** **AI Website Builder. That's it.** Domain registration via OpenSRS is a feature of the builder checkout (not a product). Video retired (Rule 19). 12 Free Tools to be deleted (Rule 32 punchlist). Infra delegated to Crontech (Rule 31). One product, one input box, one CTA.
 - **Framework:** Next.js 14.2 + React 18.3 + TypeScript + Tailwind CSS 3.4
 - **AI:** Anthropic SDK 0.80, multi-LLM (Claude/GPT/Gemini) via `src/lib/llm-provider.ts`
 - **DB:** Neon serverless Postgres via `@neondatabase/serverless`
@@ -387,16 +387,17 @@ These are never allowed under any circumstance without Craig explicitly saying "
 
 | Feature | Status | Key Files | What Works | What's Missing |
 |---------|--------|-----------|------------|----------------|
-| **AI Website Builder** | WORKING | `src/app/builder/page.tsx`, `src/lib/agents.ts`, `src/app/api/generate/react-stream/route.ts` | React generation via Sandpack, streaming SSE, 118-component registry, slot-locked composition, diff editing wired | Crontech wire-up for sandbox + Stripe products for direct purchase |
-| **AI Video Creator** | PARTIAL | `src/app/video-creator/page.tsx`, `src/lib/video-pipeline.ts`, `src/lib/video-render.ts` | Chat-based 3-step flow, script generation, Replicate pipeline | UNTESTED end-to-end — needs one real video produced |
-| **Domain Search** | WORKING | `src/app/domains/page.tsx`, `src/app/api/domains/search/route.ts`, `src/lib/opensrs.ts` | Real OpenSRS registry checks, AI name generator, TLD pages | Revenue stream — stays in Zoobicon |
-| **Pricing** | WORKING | `src/app/pricing/page.tsx`, `src/lib/stripe.ts` | Direct AI Builder purchase via Stripe (Rule 31 amendment — Stripe stays) | Craig: create Stripe products + price IDs |
+| **AI Website Builder** (THE PRODUCT) | WORKING | `src/app/builder/page.tsx`, `src/lib/agents.ts`, `src/app/api/generate/react-stream/route.ts` | React generation via Sandpack, streaming SSE, 118-component registry, slot-locked composition, diff editing wired | Crontech wire-up for sandbox + Stripe products for direct purchase + OpenSRS domain-buy step inside builder finalize flow |
+| **Domain Registration** (FEATURE OF BUILDER, NOT A PRODUCT) | WORKING (backend) / TO-DELETE (frontend) | `src/lib/opensrs.ts`, `src/app/api/domains/*` (keep), `src/app/domains/page.tsx` (delete per Rule 32), TLD landing pages (delete) | Real OpenSRS registry checks + AI name generator API — to be wired into builder checkout | Delete `/domains` standalone page; wire domain-buy into builder finalize step |
+| **Pricing** | WORKING | `src/app/pricing/page.tsx`, `src/lib/stripe.ts` | Direct AI Builder purchase via Stripe (Rule 31 amendment — Stripe stays) | Craig: create Stripe products + price IDs; copy update to describe builder tiers + included domain registrations |
 | **Auth** | CRONTECH SSO | `src/lib/auth-guard.ts` (shim) | `authenticateRequest()` reads `x-crontech-token` claims, anonymous fallthrough | Crontech SSO endpoint wire-up |
 | **Email** | CRONTECH | `src/lib/admin-notify.ts` (no-op stub) | Stubs return early; Crontech BLK-030 owns delivery | Crontech email ingest wire-up |
 | **Hosting** | CRONTECH | — | Deleted /api/hosting/*, /api/deploy/vercel, /hosting/* | Crontech BLK-040 owns hosting |
 | **Audit Logs** | CRONTECH | `src/lib/audit-middleware.ts` (no-op stub) | Stripe webhook still calls auditLog — no-op until Crontech audit ingest wired |
-| **12 Free Tools** | WORKING | `src/app/tools/*/page.tsx` | All client-side | Fully functional |
-| **Admin Dashboard** | WORKING | `src/app/admin/*/page.tsx` | Mobile command centre, agents view | Uses mock data without DB |
+| ~~**AI Video Creator**~~ | RETIRED (Rule 19, 2026-05-26) | — | Pipeline, pages, API routes deleted; MCP handler returns "feature retired" | Out of scope. Only revives as a separate focused product per Rule 19. |
+| ~~**12 Free Tools**~~ | TO-DELETE (Rule 32, 2026-05-27) | `src/app/tools/*/page.tsx` | All client-side, currently still on disk | Delete `src/app/tools/*` + remove from nav/footer/sitemap/robots |
+| ~~**Domain Search (standalone)**~~ | TO-DELETE (Rule 32) | `src/app/domains/page.tsx` + TLD pages | Currently live, must come down | Delete standalone pages; OpenSRS lives on as builder-checkout backend only |
+| **Admin Dashboard** | WORKING (internal only) | `src/app/admin/*/page.tsx` | Mobile command centre, agents view | Internal tool — not part of public product surface |
 
 ### BUILD PIPELINE
 ```
@@ -461,14 +462,12 @@ src/
       email/              # Send, inbox, support, marketing
       intel/              # Competitor crawling, technology tracking
       v1/                 # Public API (booking, eSIM, VPN, storage, video)
-    builder/              # AI website builder
-    domains/              # Domain search + TLD pages
-    pricing/              # Subscription tiers
-    admin/                # 16+ admin pages
-    tools/                # 12 free SEO tools
-    products/             # 10 product pages
-    video-creator/        # AI video creator
-    auth/                 # Login, signup, OAuth
+    builder/              # AI website builder — THE PRODUCT
+    pricing/              # Builder subscription tiers (Starter/Pro/Agency)
+    admin/                # Internal admin dashboard (not part of public product)
+    auth/                 # Login, signup, OAuth (Crontech SSO shim per Rule 31)
+    # DELETED per Rule 19: video-creator/
+    # TO-DELETE per Rule 32: domains/ (standalone page), tools/ (12 free tools), products/ (10 product pages)
   lib/                    # 254 helper modules
     agents.ts             # 7-agent pipeline (51KB)
     llm-provider.ts       # Multi-LLM abstraction
@@ -819,7 +818,9 @@ npm run lint     # ESLint
 
 30. **THE STRATEGY DOCS ARE THE CONTRACT — NO PER-COMMIT CONFIRMATION** (added 2026-05-13). Craig's words: *"How do we get you to continuously build without stopping and asking for permission — that's dumb, we know what we have to do, we've got a game plan."* The three strategy docs at the repo root — `KILLER-MOVES.md` (20 platform-wide moves), `KILLER-MOVES-BUILDER.md` (20 builder-specific moves B1-B20), and `INNOVATIONS.md` (six original architectural ideas) — are pre-authorized work. **Claude executes moves in order without per-commit confirmation.** AskUserQuestion is reserved for: (a) items on the §2 authorization list, (b) genuine ambiguity that re-reading CLAUDE.md doesn't resolve, (c) destructive irreversible actions, (d) feedback on user-facing UX where Craig's taste is the only acceptable arbiter (palette choices, copy tone). Asking "should I start B1?" / "want me to also do X?" / "ready for me to commit?" / offering 4-option choice menus on locked moves is a Rule 26 violation AND a Rule 30 violation. The procedural form (not a value): every commit cites a move from the locked list in the message. If a piece of work doesn't map to a move, either it shouldn't ship, or the move list needs to be updated FIRST, then the work proceeds. Brief status updates between commits are encouraged; permission requests are not.
 
-31. **SCOPE-TIGHTENING TO AI BUILDER + AI VIDEO ONLY — INFRA DELEGATED TO CRONTECH** (added 2026-05-17, amended 2026-05-17). Craig pasted a 600-line `ZOOBICON-REMOVE-LIST.md` directive. Zoobicon becomes a pure AI Builder + AI Video Creator. Every piece of infrastructure (auth, hosting, DB-for-customer-sites, email, CDN, storage, custom domains, SMS, cron, rate limiting, analytics, audit logs, support inbox) is delegated to Crontech via its public API. The complete spec is locked in `ZOOBICON-REMOVE-LIST.md` at the repo root — that doc is the authoritative migration plan and supersedes prior assumptions that Zoobicon owns these layers. **This supersedes Rule 7** (email is no longer Mailgun-only; email becomes Crontech-only via the Crontech BLK-030 endpoint, which is itself Mailgun-shape compatible so SDK code is unchanged). It also supersedes implicit assumptions in earlier rules that Zoobicon owns Vercel hosting for customer sites (still owns Vercel for the Zoobicon app itself), Cloudflare DNS/SSL for `*.zoobicon.sh` (zoobicon.sh sunsets — customer sites move to `<username>.crontech.app`). **STRIPE STAYS IN ZOOBICON** — Craig's amendment 2026-05-17: *"Sorry Stripe we need to keep because people still need to purchase the AI builder section from us."* Subscription tier purchases (Starter $49 / Pro $129 / Agency $299) + domain checkout + video credit packs all continue to bill via Stripe directly. Only Stripe Connect for agency reseller payouts ($499 white-label tier) routes through Crontech unified billing. §2 of the remove list is amended accordingly. **DELETION GATE: no module/route/table/env var on the remove list is actually deleted until the corresponding Crontech endpoint is verified live in production via the checklist at the top of `ZOOBICON-REMOVE-LIST.md`.** Partial migration is OK. Half-migration with broken Zoobicon is not. The remove list explicitly defines a 4-tier deletion order (Tier A = trivial swaps, Tier B = flagged migrations with 7-day soak, Tier C = money/auth never-deletes-same-day, Tier D = product sunsets needing customer notice). Architectural innovations (Slot-Locked Composition, Predictive Pre-Generation, Component-Graph, Hot-Swap Live Upgrades, Multi-Judge Critique, Build-Output Caching) all stay in Zoobicon — they are Zoobicon's moat and don't touch infrastructure. Revenue-generating bits stay: Stripe direct purchases (KEEP), OpenSRS domain registration (KEEP), `registered_domains` table (KEEP), agency white-label tier (KEEP).
+31. **SCOPE-TIGHTENING TO AI BUILDER + AI VIDEO ONLY — INFRA DELEGATED TO CRONTECH** (added 2026-05-17, amended 2026-05-17, scope narrowed further by Rule 32 on 2026-05-27). Craig pasted a 600-line `ZOOBICON-REMOVE-LIST.md` directive. Zoobicon becomes a pure AI Builder + AI Video Creator. Every piece of infrastructure (auth, hosting, DB-for-customer-sites, email, CDN, storage, custom domains, SMS, cron, rate limiting, analytics, audit logs, support inbox) is delegated to Crontech via its public API. The complete spec is locked in `ZOOBICON-REMOVE-LIST.md` at the repo root — that doc is the authoritative migration plan and supersedes prior assumptions that Zoobicon owns these layers. **This supersedes Rule 7** (email is no longer Mailgun-only; email becomes Crontech-only via the Crontech BLK-030 endpoint, which is itself Mailgun-shape compatible so SDK code is unchanged). It also supersedes implicit assumptions in earlier rules that Zoobicon owns Vercel hosting for customer sites (still owns Vercel for the Zoobicon app itself), Cloudflare DNS/SSL for `*.zoobicon.sh` (zoobicon.sh sunsets — customer sites move to `<username>.crontech.app`). **STRIPE STAYS IN ZOOBICON** — Craig's amendment 2026-05-17: *"Sorry Stripe we need to keep because people still need to purchase the AI builder section from us."* Subscription tier purchases (Starter $49 / Pro $129 / Agency $299) + domain checkout + video credit packs all continue to bill via Stripe directly. Only Stripe Connect for agency reseller payouts ($499 white-label tier) routes through Crontech unified billing. §2 of the remove list is amended accordingly. **DELETION GATE: no module/route/table/env var on the remove list is actually deleted until the corresponding Crontech endpoint is verified live in production via the checklist at the top of `ZOOBICON-REMOVE-LIST.md`.** Partial migration is OK. Half-migration with broken Zoobicon is not. The remove list explicitly defines a 4-tier deletion order (Tier A = trivial swaps, Tier B = flagged migrations with 7-day soak, Tier C = money/auth never-deletes-same-day, Tier D = product sunsets needing customer notice). Architectural innovations (Slot-Locked Composition, Predictive Pre-Generation, Component-Graph, Hot-Swap Live Upgrades, Multi-Judge Critique, Build-Output Caching) all stay in Zoobicon — they are Zoobicon's moat and don't touch infrastructure. Revenue-generating bits stay: Stripe direct purchases (KEEP), OpenSRS domain registration (KEEP), `registered_domains` table (KEEP), agency white-label tier (KEEP).
+
+32. **SCOPE LOCK — AI WEBSITE BUILDER ONLY** (added 2026-05-27). Craig's words: *"I think we should just be at AI Builder now."* Third and final narrowing. Rule 19 (2026-05-26) retired AI Video. Rule 31 (2026-05-17) delegated infra to Crontech. **This rule retires Domain Search as a standalone product and the 12 Free Tools as marketed products.** Zoobicon sells ONE thing: the AI Website Builder. Homepage says "AI Website Builder." Nav has one product item. Pricing page sells one product (Starter / Pro / Agency tiers all gated to builder usage + included domain registrations). Domain registration via OpenSRS **survives as a backend integration wired into the builder checkout** — when a user generates a site, they buy the matching domain in the same flow. There is no `/domains` standalone page, no `/tools/*` SEO pages, no "products" nav menu, no marketing copy implying we sell anything but the builder. **Deletion punchlist for next session:** (a) delete `src/app/domains/page.tsx` and the TLD landing pages, (b) delete `src/app/tools/*` (all 12 free tools), (c) remove `/domains` and `/tools/*` from nav/footer/sitemap/robots, (d) **KEEP** `src/lib/opensrs.ts` + `src/app/api/domains/*` API routes (used by the builder checkout), (e) wire the domain-buy step into the builder finalize flow, (f) rewrite homepage hero copy to "AI Website Builder. Describe it. Ship it." with one input box and one CTA, (g) update pricing copy so the three tiers describe builder usage + included domain registrations. **This supersedes Rule 19's launch scope** ("AI Website Builder + Domain Search + 12 Free Tools" → just AI Website Builder) and **supersedes Rule 31's pure-scope line** ("AI Builder + AI Video Creator" → just AI Builder; video stays retired per Rule 19). The Emergent/Lovable lesson: one product, one input box, one CTA. Confused visitors don't pay. The architectural moats (slot-locked composition, predictive pre-gen, component-graph, hot-swap live upgrades, multi-judge critique, build-output caching) all stay — they were never products, they're how the builder wins. Revenue lines that stay (because they're attached to the builder, not separate products): domain registration via OpenSRS in the builder checkout, Stripe direct purchase of builder tiers, agency white-label tier ($499/mo).
 
 ---
 
@@ -878,13 +879,13 @@ Plain English always. Never "I refactored the middleware." Say "I fixed the perm
 | **CapCut** | Free editor, Seedance 2.0, ByteDance-backed | ByteDance ($300B+) | Unknown | **300M MAU** | $0-8/mo |
 | **Runway** | Gen-4 Turbo video models, creative suite | **$4B** | Unknown | Growing | $12-76/mo |
 
-**Where Zoobicon dominates:**
-- 75+ products in one ecosystem (competitors have 1)
-- Real domain search + registration (unique — nobody else has this)
-- Own AI video pipeline (nobody in builder space has video)
-- White-label agency at $499/mo (unique multiplier)
-- 100-component registry = consistent quality (competitors generate from scratch)
-- Price bundling: $49/mo for everything vs $200+/mo buying separately
+**Where Zoobicon dominates (post-Rule-31 scope: AI Builder + AI Video + Domains + 12 Free Tools):**
+- **Real domain search + registration in the build funnel** (unique — nobody else has this; OpenSRS is live, this is the wedge)
+- **118-component registry + slot-locked composition** (consistent $100K-agency quality; competitors generate from scratch every time)
+- **Architectural moat:** Predictive pre-generation, component-graph, hot-swap live upgrades, multi-judge critique, build-output caching (Rule 31 — these are ours)
+- **Crontech-delegated infra** = we don't reinvent auth/hosting/DB/email; we focus 100% on builder+video+domain quality while competitors juggle infra
+- **Agency white-label tier ($499/mo)** — unique multiplier, each reseller brings 20-50 end users
+- **Price clarity:** $49 / $129 / $299 for the builder (vs Lovable $20-100, Bolt $0-20, Emergent $0-200) — domain registration billed direct on top
 
 **Where competitors lead (MUST FIX):**
 - Preview speed — Bolt 3-5s vs our ~20-30s (pre-warm Sandpack plan targets 3s)
@@ -897,8 +898,8 @@ Plain English always. Never "I refactored the middleware." Say "I fixed the perm
 **Craig's response: "That's just not acceptable. How many agents can you get us to 110%?"**
 **TARGET: 110%. Not 80%. Not 90%. 110%. Ahead of EVERY competitor on EVERY axis.**
 
-**THE GAP IS NOT FEATURES — IT'S WIRING.**
-We have more features than anyone (75+ products). The gap is: does it work when a customer clicks the button?
+**THE GAP IS DEPTH, NOT BREADTH.**
+Post-Rule-31, scope is 4 things: AI Builder, AI Video, Domain Search, 12 Free Tools. The bar is "does the builder produce a $100K-agency site in <10s and can the customer pay for the domain in the same checkout?" Every other "product" was deleted or delegated to Crontech. The question is no longer "do we have it" — it's "is it best-in-class when a customer clicks the button?"
 
 | What | Status | Gap to 110% | Fix |
 |---|---|---|---|
@@ -1293,7 +1294,7 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 
 **Blockers:** Database tables (Craig must visit /api/db/init) and Stripe webhook setup.
 
-**MANDATE: Lovable is at $400M ARR with 146 employees. They added $100M in a single month. The market is MASSIVE. But they have ONE product. We have 75+. Their moat is polish on one feature. Our moat is the ecosystem. A customer who uses Zoobicon for domains + hosting + email + builder + video is never leaving.**
+**MANDATE: Lovable is at $400M ARR with 146 employees. They added $100M in a single month. The market is MASSIVE. They have one product (builder) and dominate. Post-Rule-31, we have ~four (AI Builder, AI Video, Domain Search, 12 Free Tools) — and the moat is not "more products," it's the domain-to-site funnel + architectural innovations (slot-locked composition, predictive pre-gen, component-graph, hot-swap upgrades, multi-judge critique, build-output caching) + Crontech-delegated infra so we never spend a session reinventing auth or hosting. Win on builder quality, video quality, and the domain wedge. Lose on infra-we-don't-own.**
 
 **IP STRATEGY:**
 - File NZ provisional patent on domain-to-website pipeline (~NZD $3,000)
@@ -1316,21 +1317,23 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 
 **The 80-90% rule applies to EVERY item. If a competitor has it, we must have it better.**
 
-### TIER 0: THE ONLY TWO THINGS THAT MAKE MONEY (do these FIRST or nothing else matters)
+### TIER 0: THE ONE PRODUCT THAT MAKES MONEY (do this FIRST or nothing else matters)
 
 > **Craig's words (April 8): "We're chasing the market instead of releasing the product and making money."**
 > **"The current website doesn't feel AI. It feels like a run of the mill website made up as we go along."**
-> **He's right. 200 API routes mean nothing if the 2 revenue products don't work flawlessly.**
+> **Craig (May 27): "I think we should just be at AI Builder now."**
+> **Rule 32 locks the scope: AI Website Builder is the only product. Domain registration is a feature of its checkout.**
 
 | # | Task | Deadline | What "done" looks like | Status |
 |---|------|----------|----------------------|--------|
-| 0A | **FULL SITE REDESIGN — AI-native look and feel** | IMMEDIATE | The entire zoobicon.com feels like a $6.6B AI platform, not a developer project. Homepage, builder, video creator, pricing, domains — every page redesigned with 2026/2027 design patterns. Bento grids, glass morphism, gradient mesh, scroll-linked animations, dark mode, cinematic hero sections. Study Lovable.dev, bolt.new, v0.app, runway.com, hedra.com for reference. The site must make a visitor say "this is the future" within 2 seconds of landing. | NOT STARTED |
-| 0B | **AI BUILDER — works perfectly end-to-end** | IMMEDIATE | User types prompt → sees site in <10s → can edit with chat → can deploy with 1 click. That's the ENTIRE scope. No MCP, no collab, no code formatter. Just: prompt → beautiful site → deploy. Match Bolt V2 speed + Lovable 2.0 quality. | BROKEN (merge damage, UI is "80s") |
-| 0C | **AI VIDEO CREATOR — works perfectly end-to-end** | IMMEDIATE | User types description → gets 30s spokesperson video with professional voice + realistic face + burned-in captions → downloads it. Match HeyGen quality + Hedra Character-3 speed. Pipeline: Fish Audio S1 (TTS) → Hedra Character-3 or fal.ai avatar → Whisper captions → download. | UNTESTED (pipeline rebuilt, never produced a real video) |
-| 0D | **DOMAIN PURCHASE — works end-to-end** | IMMEDIATE | User searches → sees availability → enters payment → domain registers. Currently needs Stripe products + webhook + DB init. | Needs Craig: Stripe products + /api/db/init |
-| 0E | **AUTH — login works** | IMMEDIATE | Admin login, Google OAuth, GitHub OAuth all functional. Currently needs env vars in Vercel. | Needs Craig: env vars (see /api/auth/diagnose) |
+| 0A | **DELETE OUT-OF-SCOPE PAGES (Rule 32 punchlist)** | IMMEDIATE | `src/app/domains/page.tsx` + TLD landing pages deleted. `src/app/tools/*` (all 12 free tools) deleted. `src/app/products/*` deleted. `/domains`, `/tools/*`, `/products/*` removed from nav, footer, sitemap.xml, robots.txt. **KEEP** `src/lib/opensrs.ts` + `src/app/api/domains/*` API routes — they're the backend for the builder checkout. | NOT STARTED |
+| 0B | **HOMEPAGE — one product, one input, one CTA** | IMMEDIATE | Hero copy: "AI Website Builder. Describe it. Ship it." One input box. One "Build it now" CTA. No nav menu of products. No "what we offer" grid. Match Lovable/Emergent's one-product clarity. Site must say what it does in 2 seconds. | NOT STARTED |
+| 0C | **AI BUILDER — works perfectly end-to-end** | IMMEDIATE | User types prompt → sees site in <10s → can edit with chat → can deploy with 1 click. That's the ENTIRE scope. No MCP, no collab, no code formatter. Just: prompt → beautiful site → deploy. Match Bolt V2 speed + Lovable 2.0 quality. | BROKEN (merge damage, UI is "80s") |
+| 0D | **DOMAIN-IN-CHECKOUT — wire OpenSRS into builder finalize flow** | IMMEDIATE | At the end of a build, user sees "Buy `[generated-name].com` for $14.99/yr" as part of the deploy step. One Stripe checkout pays for the builder tier AND the domain. Domain registers via OpenSRS on webhook success. Replaces the deleted standalone `/domains` page. | NOT STARTED |
+| 0E | **AUTH — login works** | IMMEDIATE | Crontech SSO endpoint wired. Google OAuth, GitHub OAuth functional for the builder. | Needs Craig: env vars (see /api/auth/diagnose) |
+| 0F | **PRICING — builder tiers only** | IMMEDIATE | Pricing page sells one product: Starter $49 / Pro $129 / Agency $299. Each tier describes builder usage limits + included domain registrations. No "video credit packs," no "12 free tools." | Needs Craig: create Stripe products + price IDs |
 
-**RULE: Nothing in Tier 1/2/3 gets touched until ALL of Tier 0 is GREEN. Revenue first. Features second.**
+**RULE: Nothing in Tier 1/2/3 gets touched until ALL of Tier 0 is GREEN. One product, working, paying customers. Then features.**
 
 ### TIER 1: BUILD IMMEDIATELY (blocks revenue and competitiveness)
 
@@ -1455,12 +1458,12 @@ Each reseller at $499/mo typically brings 20-50 of their own clients. 10 reselle
 - Descript: 6M users. Text-based video editing. Underlord AI editor. $24-65/mo.
 - Kling 3.0: Native 4K 60fps. Motion Brush. AI Director.
 
-**Where we lead:**
-- 75+ products in one platform (nobody else does this)
-- Real domain search with AI name generation (unique)
-- Price: $49/mo for everything vs $200+/mo buying separately
-- White-label agency platform (nobody else across all products)
-- Own video pipeline (10-20x cheaper than HeyGen)
+**Where we lead (post-Rule-31, March 2026 snapshot — re-evaluate every session):**
+- **Real domain search + registration in the build funnel** (unique — OpenSRS is live; no competitor has this)
+- **118-component registry + slot-locked composition** (consistent $100K-agency quality)
+- **Architectural innovations preserved through the Crontech pivot:** predictive pre-gen, component-graph, hot-swap live upgrades, multi-judge critique, build-output caching
+- **Agency white-label tier ($499/mo)** — each reseller brings 20-50 end users; no equivalent in builder space
+- **Crontech-delegated infra** — we don't reinvent auth/hosting/DB/email; full focus stays on builder + video + domain quality
 
 **Where we trail (closing):**
 - Builder speed (Bolt 3-5s vs our 20-30s) — diff editing + parallel generation closing this
