@@ -627,6 +627,17 @@ function BuilderPage() {
   } | null>(null);
   const [sitePlanLoading, setSitePlanLoading] = useState(false);
   const [streamWarning, setStreamWarning] = useState<string | null>(null);
+  // Post-build smoke check — server validates the file tree against
+  // the import allow-list + syntax balance + entry-point existence
+  // BEFORE the user's preview tries to render. Catches the 80% case
+  // of "blank preview, no error" that Sandpack times out on. Real
+  // headless Chrome can layer on top (Phase 2) for runtime errors.
+  const [validation, setValidation] = useState<{
+    ok: boolean;
+    issues: Array<{ severity: "error" | "warning"; file: string; line?: number; rule: string; message: string }>;
+    summary: string;
+  } | null>(null);
+  const [validating, setValidating] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
   const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Opus, pipeline=7-agent
   const instantMode = buildMode === "instant"; // back-compat
@@ -1274,6 +1285,7 @@ function BuilderPage() {
     setSectionTimeline([]);
     setBuildError(null);
     setStreamWarning(null);
+    setValidation(null);  // clear previous build's smoke check
     resetWatchdog();
     pendingLabelRef.current = `Build: ${prompt.trim().slice(0, 50)}`;
 
@@ -1507,6 +1519,32 @@ function BuilderPage() {
                   }
                   setPipelineAgents(prev => [...prev, "Build complete"]);
                   trackEvent("build");
+                  // Post-build smoke check — non-blocking. Fires the
+                  // server-side validator with the final file tree.
+                  // Surfaces import/syntax/entry-point issues BEFORE
+                  // the user stares at a blank preview wondering what
+                  // broke.
+                  if (event.files) {
+                    setValidating(true);
+                    fetch("/api/builds/validate", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ files: event.files }),
+                    })
+                      .then((r) => r.json())
+                      .then((v) => {
+                        if (v && typeof v.ok === "boolean") {
+                          setValidation(v);
+                          if (!v.ok) {
+                            setPipelineAgents((prev) => [...prev, `⚠ Smoke check: ${v.summary}`]);
+                          }
+                        }
+                      })
+                      .catch((err) => {
+                        console.warn("[builder] validate failed:", err);
+                      })
+                      .finally(() => setValidating(false));
+                  }
                   // Launch-video side-effect removed 2026-05-26 (Rule 19).
                 }
               } else if (event.type === "warning") {
@@ -2095,6 +2133,69 @@ function BuilderPage() {
                 <button
                   onClick={() => setBuildError(null)}
                   className="p-1.5 rounded-lg hover:bg-stone-500/20 text-stone-300 transition"
+                  aria-label="Dismiss"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Post-build smoke check banner — shown only when the server
+            validator found real issues. The preview still mounts (so
+            the user can see what DID render), but they get a clear
+            list of what's broken before they wonder if the iframe is
+            just slow. Phase 1: static-analysis issues only. Phase 2
+            adds runtime errors via headless Chrome. */}
+        {validation && !validation.ok && validation.issues.length > 0 && (
+          <div className="absolute top-16 left-6 right-6 z-40">
+            <div
+              className="max-w-2xl mx-auto rounded-xl border p-4 shadow-lg"
+              style={{
+                background: "var(--paper-elevated)",
+                borderColor: "var(--rule)",
+                color: "var(--ink)",
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                  style={{ background: "var(--gold-soft)", color: "var(--gold-deep)" }}
+                >
+                  !
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+                    Smoke check found {validation.issues.filter(i => i.severity === "error").length} error{validation.issues.filter(i => i.severity === "error").length === 1 ? "" : "s"}
+                  </div>
+                  <div className="text-[12px]" style={{ color: "var(--ink-muted)" }}>
+                    {validation.summary}
+                  </div>
+                  <ul className="mt-2 space-y-1.5 max-h-40 overflow-auto">
+                    {validation.issues.slice(0, 6).map((issue, i) => (
+                      <li
+                        key={`${issue.file}-${i}`}
+                        className="text-[11px] font-mono leading-snug"
+                        style={{
+                          color: issue.severity === "error" ? "#9a1f1f" : "var(--ink-secondary)",
+                        }}
+                      >
+                        <span style={{ opacity: 0.6 }}>{issue.file}{issue.line ? `:${issue.line}` : ""}</span>{" "}
+                        <span style={{ color: "var(--ink)" }}>{issue.message}</span>
+                      </li>
+                    ))}
+                    {validation.issues.length > 6 && (
+                      <li className="text-[11px]" style={{ color: "var(--ink-muted)" }}>
+                        … and {validation.issues.length - 6} more
+                      </li>
+                    )}
+                  </ul>
+                </div>
+                <button
+                  onClick={() => setValidation(null)}
+                  className="p-1.5 rounded-lg transition"
+                  style={{ color: "var(--ink-muted)" }}
                   aria-label="Dismiss"
                 >
                   <X className="w-4 h-4" />
