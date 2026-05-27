@@ -28,6 +28,15 @@ export const AVAILABLE_MODELS: LLMModel[] = [
   // Gemini (Google)
   { provider: "gemini", id: "gemini-2.5-pro", label: "Gemini 2.5 Pro", maxTokens: 65536, tier: "premium" },
   { provider: "gemini", id: "gemini-2.5-flash", label: "Gemini 2.5 Flash", maxTokens: 65536, tier: "fast" },
+  // Selfhosted (Zoobicon Substrate — Hetzner GPU bank, OpenAI-compatible API).
+  // Model IDs use the `zoo-` prefix; callSelfhosted() strips it before
+  // forwarding to vLLM/Ollama (so `zoo-llama-3.3-70b` → `llama-3.3-70b`
+  // on the wire). Without these entries the failover loop in
+  // callLLMWithFailover() finds no models for `selfhosted` and skips
+  // it even when the env var is set — that's why the safety net was
+  // dead. Registering them here turns it on.
+  { provider: "selfhosted", id: "zoo-llama-3.3-70b", label: "Zoo Llama 3.3 70B (substrate)", maxTokens: 32000, tier: "balanced" },
+  { provider: "selfhosted", id: "zoo-llama-3.1-8b", label: "Zoo Llama 3.1 8B (substrate, fast)", maxTokens: 8192, tier: "fast" },
 ];
 
 export interface LLMRequest {
@@ -512,6 +521,9 @@ export function checkProviderHealth(options?: { log?: boolean; throwIfNone?: boo
     { provider: "claude", available: Boolean(process.env.ANTHROPIC_API_KEY), envVar: "ANTHROPIC_API_KEY" },
     { provider: "openai", available: Boolean(process.env.OPENAI_API_KEY), envVar: "OPENAI_API_KEY" },
     { provider: "gemini", available: Boolean(process.env.GOOGLE_AI_API_KEY), envVar: "GOOGLE_AI_API_KEY" },
+    // Substrate is intentionally last so it remains a safety net rather
+    // than competing with commercial providers for routing priority.
+    { provider: "selfhosted", available: Boolean(process.env.SELFHOSTED_LLM_URL), envVar: "SELFHOSTED_LLM_URL" },
   ];
 
   const shouldLog = options?.log ?? true;
