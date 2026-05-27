@@ -157,6 +157,9 @@ export default function AdminPage() {
     { key: "GITHUB_TOKEN", label: "GitHub token (import feature)", required: false, group: "Integrations" },
     { key: "SLACK_BOT_TOKEN", label: "Hash bot token", required: false, group: "Integrations" },
     { key: "SLACK_SIGNING_SECRET", label: "Hash signing secret", required: false, group: "Integrations" },
+    // Substrate (self-hosted LLM fallback — see docs/substrate-deploy.md)
+    { key: "SELFHOSTED_LLM_URL", label: "Substrate base URL (Hetzner vLLM)", required: false, group: "Substrate (LLM fallback)" },
+    { key: "SELFHOSTED_LLM_KEY", label: "Substrate API key", required: false, group: "Substrate (LLM fallback)" },
   ];
 
   const launchChecklist = [
