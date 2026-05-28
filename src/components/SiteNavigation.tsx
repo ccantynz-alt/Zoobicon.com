@@ -28,6 +28,8 @@ import {
 // Rule 19 retired 2026-05-26 — AI Video Creator removed from launch
 // scope. Quality bar (HeyGen-grade) wasn't reachable as a side feature.
 
+// Rule 32 — one product: AI Website Builder. Domain registration is a
+// feature of the builder checkout, not a separate product in the nav.
 const PRODUCT_SECTIONS = [
   {
     label: "Build",
@@ -38,20 +40,10 @@ const PRODUCT_SECTIONS = [
     ],
   },
   {
-    label: "Domains",
+    label: "Pricing",
     items: [
-      { name: "Domain Search", href: "/domains", icon: Globe, desc: "Search & register domains" },
-      { name: "Pricing", href: "/pricing", icon: Sparkles, desc: "Subscription tiers" },
-    ],
-  },
-  {
-    label: "Free Tools",
-    items: [
-      { name: "Business Name Generator", href: "/tools/business-name-generator", icon: Sparkles, desc: "AI-powered names" },
-      { name: "Password Generator", href: "/tools/password-generator", icon: KeyRound, desc: "Secure passwords" },
-      { name: "QR Code Generator", href: "/tools/qr-code-generator", icon: QrCode, desc: "Create QR codes" },
-      { name: "Meta Tag Generator", href: "/tools/meta-tag-generator", icon: FileCode, desc: "SEO meta tags" },
-      { name: "More Tools", href: "/tools/word-counter", icon: Wrench, desc: "12 free tools" },
+      { name: "Plans & Pricing", href: "/pricing", icon: Sparkles, desc: "Starter · Pro · Agency" },
+      { name: "Compare", href: "/compare", icon: Layout, desc: "vs Lovable, Bolt, v0" },
     ],
   },
   {
@@ -59,16 +51,15 @@ const PRODUCT_SECTIONS = [
     items: [
       { name: "Agency Platform", href: "/agencies", icon: Shield, desc: "White-label for agencies" },
       { name: "AI Agents", href: "/agents", icon: Bot, desc: "Agent framework" },
-      { name: "Changelog", href: "/changelog", icon: BookOpen, desc: "What's new" },
+      { name: "Changelog", href: "/changelog", icon: BookOpen, desc: "What&apos;s new" },
     ],
   },
 ];
 
 const TOP_NAV_LINKS = [
   { name: "Builder", href: "/builder" },
-  { name: "Domains", href: "/domains" },
   { name: "Pricing", href: "/pricing" },
-  { name: "Free Tools", href: "/tools/business-name-generator" },
+  { name: "Agencies", href: "/agencies" },
 ];
 
 export default function SiteNavigation() {
@@ -308,12 +299,12 @@ export default function SiteNavigation() {
                       </span>
                       <div className="flex items-center gap-5">
                         <Link
-                          href="/domains"
+                          href="/builder"
                           className="group text-[12px] flex items-center gap-1.5 transition-colors"
                           style={{ color: "var(--ink-secondary)" }}
                           onClick={() => setMegaOpen(false)}
                         >
-                          Search domains
+                          Open builder
                           <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
                         </Link>
                         <Link

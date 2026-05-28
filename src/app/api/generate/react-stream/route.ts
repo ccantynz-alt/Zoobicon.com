@@ -175,6 +175,8 @@ function makeWriter(controller: ReadableStreamDefaultController<Uint8Array>): SS
 }
 
 const MODEL_HAIKU = "claude-haiku-4-5";
+// Sonnet 4.6 outperforms Opus on coding tasks — better structured output,
+// faster, cheaper. Confirmed by Craig 2026-05-28.
 const MODEL_SONNET = "claude-sonnet-4-6";
 
 /** Build the cacheable registry catalog the planner sees. */

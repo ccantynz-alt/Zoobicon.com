@@ -24,14 +24,14 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 
 // ── Trust strip data (verifiable, never inflated) ──
 const TRUST_ITEMS = [
-  { label: "Opus 4.6", sub: "Latest Claude" },
-  { label: "Next.js 15", sub: "App Router" },
+  { label: "Opus 4.7", sub: "Latest Claude" },
+  { label: "Next.js 14", sub: "App Router" },
   { label: "Vercel Edge", sub: "iad1 region" },
   { label: "Stripe Verified", sub: "Live Connect" },
   { label: "Neon Serverless", sub: "Postgres 16" },
   { label: "Cloudflare", sub: "5 domains" },
   { label: "OpenSRS", sub: "Domain registry" },
-  { label: "Crontech", sub: "Partner cloud" },
+  { label: "121 Components", sub: "Registry" },
 ];
 
 // ── AI feature bento (Filmora 2×2 pattern, extended to 2×3) ──
@@ -44,15 +44,12 @@ const AI_FEATURES = [
     href: "/builder",
     size: "lg",
   },
-  // AI Video Creator entry removed 2026-05-26. Rule 19 retired —
-  // quality bar (HeyGen-grade) wasn't reachable as a side feature and
-  // it was diluting the AI Builder pitch.
   {
     icon: Globe2,
-    title: "500+ TLDs, real-time.",
-    desc: "Live OpenSRS registry checks. AI-generated name shortlist. Register and point to your new site in one transaction.",
+    title: "Domain included in checkout.",
+    desc: "Register the matching .com, .ai, or .io in the same flow as your build. Real OpenSRS registry checks — no leaving the page.",
     tag: "Domains",
-    href: "/domains",
+    href: "/builder",
   },
   {
     icon: Bot,
@@ -63,10 +60,10 @@ const AI_FEATURES = [
   },
   {
     icon: Layers,
-    title: "Sixty hand-polished sections.",
+    title: "121 hand-polished sections.",
     desc: "Bento grids, spotlight cards, text reveal, marquee logos — every component assembled from a registry of $100K+ quality primitives.",
     tag: "Components",
-    href: "/components",
+    href: "/builder",
   },
   {
     icon: Zap,
@@ -129,10 +126,10 @@ export default function HomePage() {
             <motion.div variants={fadeUp} className="mb-16 max-w-3xl">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90">
                 <Sparkles className="h-3 w-3" />
-                The whole platform
+                What&rsquo;s inside
               </div>
               <h2 className="fs-display-md text-white">
-                Builder, Domains, Free Tools.{" "}
+                Everything a website needs.{" "}
                 <span
                   className="text-display-sand"
                   style={{
@@ -143,12 +140,12 @@ export default function HomePage() {
                 >
                   One
                 </span>{" "}
-                login.
+                prompt.
               </h2>
               <p className="mt-5 text-[16px] leading-relaxed text-white/55 max-w-2xl">
-                The fastest way to ship a beautiful site — AI Website Builder,
-                real domain search, and a deck of free tools, all under the
-                same login and the same subscription.
+                The AI Website Builder generates your site, registers your
+                domain, and deploys to the cloud — in a single flow. No
+                switching tabs. No separate accounts.
               </p>
             </motion.div>
 
@@ -197,22 +194,22 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* ── Product cards — Builder · Domains · Tools (video section retired 2026-05-26) ── */}
+        {/* ── How it works — 3-step flow ── */}
         <section className="relative py-32 px-6 border-t border-white/[0.05]">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
             variants={stagger}
-            className="mx-auto max-w-6xl"
+            className="mx-auto max-w-5xl"
           >
             <motion.div variants={fadeUp} className="mb-16 text-center max-w-2xl mx-auto">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90">
-                <Layers className="h-3 w-3" />
-                Three things, built deeply
+                <Zap className="h-3 w-3" />
+                How it works
               </div>
               <h2 className="fs-display-md text-white">
-                Not a hundred features.{" "}
+                Type one sentence.{" "}
                 <span
                   className="text-display-sand"
                   style={{
@@ -221,50 +218,57 @@ export default function HomePage() {
                     fontWeight: 400,
                   }}
                 >
-                  Three
-                </span>{" "}
-                that replace a studio.
+                  Ship.
+                </span>
               </h2>
             </motion.div>
 
             <div className="grid gap-5 md:grid-cols-3">
               {[
                 {
-                  title: "Builder",
-                  lede: "Describe your business.",
-                  desc: "Six agents collaborate live to ship a complete, responsive site in under a minute. Edit anything with chat.",
+                  step: "01",
+                  title: "Describe it.",
+                  desc: "Tell the builder what your business does. One sentence is enough. Six AI agents handle the rest — brand, copy, structure, code.",
                   href: "/builder",
                   cta: "Open the builder",
                   icon: Wand2,
                 },
                 {
-                  title: "Domains",
-                  lede: "Real-time availability across 500+ TLDs.",
-                  desc: "AI-generated name shortlist. Register and point to your new site in a single transaction.",
-                  href: "/domains",
-                  cta: "Find a domain",
+                  step: "02",
+                  title: "Watch it build.",
+                  desc: "Components stream in live. Navbar, hero, features, pricing, footer — assembled from 121 hand-polished sections, customised to your brand.",
+                  href: "/builder",
+                  cta: "See it work",
+                  icon: Layers,
+                },
+                {
+                  step: "03",
+                  title: "Register & deploy.",
+                  desc: "Buy the matching domain and ship to the cloud in the same checkout. Real OpenSRS registry. Free SSL. One click.",
+                  href: "/builder",
+                  cta: "Try it free",
                   icon: Globe2,
                 },
               ].map((c) => {
                 const Icon = c.icon;
                 return (
-                  <motion.div key={c.title} variants={fadeUp}>
+                  <motion.div key={c.step} variants={fadeUp}>
                     <Link href={c.href} className="fs-card group relative block p-8 h-full">
-                      <div
-                        className="mb-8 inline-flex h-14 w-14 items-center justify-center rounded-[20px] transition-all duration-500 group-hover:scale-[1.04]"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, rgba(232,212,176,0.18) 0%, rgba(232,212,176,0.04) 100%)",
-                          border: "1px solid rgba(232,212,176,0.22)",
-                        }}
-                      >
-                        <Icon className="h-6 w-6 text-[#E8D4B0]" strokeWidth={2} />
-                      </div>
-                      <div className="mb-2 text-[10px] uppercase tracking-[0.2em] text-[#E8D4B0]/80 font-semibold">
-                        {c.title}
+                      <div className="mb-6 flex items-center gap-3">
+                        <div
+                          className="inline-flex h-12 w-12 items-center justify-center rounded-[18px] transition-all duration-500 group-hover:scale-[1.04]"
+                          style={{
+                            background:
+                              "linear-gradient(135deg, rgba(232,212,176,0.18) 0%, rgba(232,212,176,0.04) 100%)",
+                            border: "1px solid rgba(232,212,176,0.22)",
+                          }}
+                        >
+                          <Icon className="h-5 w-5 text-[#E8D4B0]" strokeWidth={2} />
+                        </div>
+                        <span className="text-[11px] font-mono text-[#E8D4B0]/40 tracking-widest">{c.step}</span>
                       </div>
                       <h3 className="mb-4 text-[22px] font-semibold leading-tight tracking-[-0.02em] text-white">
-                        {c.lede}
+                        {c.title}
                       </h3>
                       <p className="text-[13px] leading-relaxed text-white/50">{c.desc}</p>
                       <div className="mt-8 inline-flex items-center gap-1.5 text-[12px] font-medium text-white/60 transition-colors group-hover:text-[#E8D4B0]">
@@ -316,11 +320,10 @@ export default function HomePage() {
                 </p>
                 <p>
                   Zoobicon is built and run by one person alongside a 24/7
-                  physical business. The platform is in active development. The
-                  AI Builder and Domain Search are the launch products today.
-                  AI Video is parked — we&rsquo;d rather not ship it than ship
-                  a HeyGen-grade product that&rsquo;s not HeyGen-grade. Every
-                  commit is visible on{" "}
+                  physical business. The platform is in active development. We
+                  ship one product: the AI Website Builder — generate, register
+                  your domain, and deploy in a single flow. Every commit is
+                  visible on{" "}
                   <a
                     href="https://github.com/ccantynz-alt/Zoobicon.com"
                     target="_blank"
@@ -390,8 +393,9 @@ export default function HomePage() {
                 included.
               </h2>
               <p className="mt-5 text-[15px] text-white/55 leading-relaxed">
-                AI Builder, Domain Search, and 12 free tools — one login, one
-                subscription. Cancel any time. 14-day free trial on paid plans.
+                One product. One subscription. AI Website Builder with domain
+                registration and one-click deploy included. Cancel any time.
+                14-day free trial on paid plans.
               </p>
             </motion.div>
 
@@ -407,11 +411,11 @@ export default function HomePage() {
                 {
                   n: "Pro",
                   p: "$129",
-                  d: "Three sites, video, SEO, AI auto-reply",
+                  d: "Three sites, Sonnet deep builds, SEO, AI auto-reply",
                   f: true,
                   features: [
                     "3 websites",
-                    "AI video creator",
+                    "Sonnet 4.6 deep builds",
                     "SEO dashboard",
                     "AI email auto-reply",
                     "Priority support",
@@ -518,8 +522,8 @@ export default function HomePage() {
               className="text-[16px] text-white/55 mb-12 max-w-xl mx-auto leading-relaxed"
             >
               Scroll back up and type one sentence into the hero. Sixty seconds
-              later you have a complete, responsive site with a working backend,
-              a registered domain and a spokesperson video.
+              later you have a complete, responsive site with a working backend
+              and a registered domain — all in one flow.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-wrap items-center justify-center gap-3">
               <Link href="/builder" className="fs-btn-primary">
