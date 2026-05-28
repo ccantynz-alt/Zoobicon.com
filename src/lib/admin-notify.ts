@@ -26,48 +26,13 @@ interface NotifyResult {
   messageId?: string;
 }
 
-const CRONTECH_PAT = process.env.CRONTECH_PAT || "";
-const CRONTECH_API_BASE = process.env.CRONTECH_API_BASE || "https://api.crontech.ai";
-const ADMIN_EMAIL = process.env.ADMIN_NOTIFY_EMAIL || "admin@zoobicon.com";
-
 async function deliveryStub(opts: NotifyOptions): Promise<NotifyResult> {
-  // When Crontech BLK-030 is available, route via their Mailgun-shape endpoint.
-  if (CRONTECH_PAT) {
-    try {
-      const res = await fetch(`${CRONTECH_API_BASE}/api/v1/email`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${CRONTECH_PAT}`,
-          "Content-Type": "application/json",
-          "X-Crontech-Source": "zoobicon-admin-notify",
-        },
-        body: JSON.stringify({
-          to: ADMIN_EMAIL,
-          subject: opts.subject,
-          html: opts.html,
-          text: opts.text || opts.subject,
-          tags: [opts.category || "general"],
-          priority: opts.priority || "normal",
-        }),
-        signal: AbortSignal.timeout(8_000),
-      });
-      if (res.ok) {
-        const d = (await res.json()) as { messageId?: string };
-        return { ok: true, messageId: d.messageId };
-      }
-      const err = await res.text().catch(() => "");
-      console.warn(`[admin-notify] Crontech BLK-030 ${res.status}: ${err.slice(0, 120)}`);
-    } catch (e) {
-      console.warn("[admin-notify] Crontech BLK-030 unreachable:", e instanceof Error ? e.message : e);
-    }
-  }
-
   console.log(
     `[admin-notify:stubbed] subject="${opts.subject.slice(0, 80)}" ` +
     `category=${opts.category || "general"} priority=${opts.priority || "normal"} ` +
-    `(CRONTECH_PAT unset — set it to enable live delivery)`,
+    `(Crontech built-in mail not yet wired — set CRONTECH_PAT + confirm email endpoint)`,
   );
-  return { ok: false, reason: "CRONTECH_PAT not set — email not delivered" };
+  return { ok: false, reason: "Crontech mail endpoint not yet confirmed" };
 }
 
 export async function notifyAdmin(opts: NotifyOptions): Promise<NotifyResult> {
