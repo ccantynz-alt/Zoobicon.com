@@ -11,6 +11,7 @@ import { getClientPlan, isPaidPlan, planLabel } from "@/lib/user-plan";
 import type { Plan } from "@/lib/user-plan";
 import DomainHookModal from "@/components/DomainHookModal";
 import VoiceToBuildButton from "@/components/VoiceToBuildButton";
+import PrewarmFrame from "@/components/PrewarmFrame";
 import dynamic from "next/dynamic";
 
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
@@ -669,6 +670,7 @@ function BuilderPage() {
   const [showBuildSuccess, setShowBuildSuccess] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [crontechAvailable, setCrontechAvailable] = useState(false);
+  const [crontechProjectId, setCrontechProjectId] = useState<string | null>(null);
 
   // Recording mode — ?record=1 hides all chrome for clean screen captures
   const [recordingMode, setRecordingMode] = useState(false);
@@ -686,7 +688,7 @@ function BuilderPage() {
 
   // Check CronTech availability on mount
   useEffect(() => {
-    fetch("/api/hosting/deploy-crontech")
+    fetch("/api/crontech/availability")
       .then(r => r.json())
       .then(d => setCrontechAvailable(Boolean(d.available)))
       .catch(() => {});
@@ -740,6 +742,12 @@ function BuilderPage() {
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
   const watchdogSlowRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const watchdogStuckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Throttle preview refreshes during streaming so the user sees components
+  // slot in progressively (~every 1.2s) rather than all batched at once.
+  // React 18 auto-batching + Vercel SSE buffering would otherwise collapse
+  // all partial setReactFiles calls into a single render.
+  const previewThrottleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingPreviewFilesRef = useRef<Record<string, string> | null>(null);
   const timelineScrollRef = useRef<HTMLDivElement | null>(null);
 
   const clearWatchdog = useCallback(() => {
@@ -1287,6 +1295,9 @@ function BuilderPage() {
     setStreamWarning(null);
     setValidation(null);  // clear previous build's smoke check
     resetWatchdog();
+    // Clear any pending preview throttle from a previous build.
+    if (previewThrottleRef.current) { clearTimeout(previewThrottleRef.current); previewThrottleRef.current = null; }
+    pendingPreviewFilesRef.current = null;
     pendingLabelRef.current = `Build: ${prompt.trim().slice(0, 50)}`;
 
     abortRef.current?.abort();
@@ -1468,30 +1479,49 @@ function BuilderPage() {
                 }
               } else if (event.type === "partial" && event.files) {
                 // Progressive streaming: each partial carries the full file map so far.
-                // 2026-05-26 fix: only mark receivedFiles when the map actually
-                // has content. An empty `{}` partial was tripping the safety
-                // net into thinking the build had succeeded.
+                // Only mark receivedFiles when the map actually has content — an empty
+                // {} partial would trip the safety net into thinking build succeeded.
                 if (generationIdRef.current === currentGenId) {
-                  setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
                   if (Object.keys(event.files).length > 0) {
                     receivedFiles = true;
+                    // Throttle preview refreshes to ~1.2s intervals so the user sees
+                    // components slot in progressively. React 18 auto-batching + Vercel
+                    // SSE buffering would otherwise collapse all partials into one render.
+                    pendingPreviewFilesRef.current = event.files as Record<string, string>;
+                    if (!previewThrottleRef.current) {
+                      // First content — apply immediately so something appears fast.
+                      setReactFiles(event.files as Record<string, string>);
+                      previewThrottleRef.current = setTimeout(() => {
+                        previewThrottleRef.current = null;
+                        if (pendingPreviewFilesRef.current) {
+                          setReactFiles(pendingPreviewFilesRef.current);
+                          pendingPreviewFilesRef.current = null;
+                        }
+                      }, 1200);
+                    }
                   }
                   // Update progress indicator
                   if (event.fileCount != null && event.totalComponents != null) {
-                    setBuildProgress({ current: event.fileCount, total: event.totalComponents, section: event.section || "" });
+                    setBuildProgress({ current: event.fileCount as number, total: event.totalComponents as number, section: (event.section as string) || "" });
                   }
                   if (event.section && event.customized) {
-                    upsertSection(event.section, "done");
+                    upsertSection(event.section as string, "done");
                   } else if (event.section) {
-                    upsertSection(event.section, "scaffolding");
+                    upsertSection(event.section as string, "scaffolding");
                   }
                 }
               } else if ((event.type === "done" && event.files) || (event.type === "done")) {
                 // Generation complete
                 if (generationIdRef.current === currentGenId) {
+                  // Flush any pending throttled preview update and clear the timer.
+                  if (previewThrottleRef.current) {
+                    clearTimeout(previewThrottleRef.current);
+                    previewThrottleRef.current = null;
+                  }
+                  pendingPreviewFilesRef.current = null;
                   if (event.files) {
-                    setReactFiles(event.files);
+                    setReactFiles(event.files as Record<string, string>);
                     setReactDeps(event.dependencies || {});
                     setReactSource(event.files);
                     receivedFiles = true;
@@ -1839,7 +1869,10 @@ function BuilderPage() {
   /** Called by DeployModal when user confirms deploy.
    *  Rule 31 — all deploy paths go through Crontech now. The provider
    *  arg is retained for DeployModal compatibility but both options
-   *  resolve to /api/crontech/deploy. */
+   *  resolve to /api/crontech/deploy (first deploy) or /api/crontech/update
+   *  (re-deploy when a crontechProjectId already exists). After the initial
+   *  POST, if Crontech returns status "provisioning" we poll
+   *  /api/crontech/status every 3s until it flips to "live" or "failed". */
   const handleDeployWithName = useCallback(async (siteName: string, _provider: "zoobicon" | "crontech" = "crontech"): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
     if (!reactFiles || Object.keys(reactFiles).length === 0) {
       throw new Error("No files to deploy");
@@ -1850,34 +1883,63 @@ function BuilderPage() {
     const t0 = Date.now();
 
     try {
-      // Prefer the saved projectId — Crontech then has authoritative
-      // metadata (creator, visibility, prompt). Fall back to inline
-      // files for anonymous builds that haven't saved yet.
-      const body = projectId
-        ? { projectId }
-        : { name: siteName, files: reactFiles, deps: reactDeps, prompt };
+      let data: { ok: boolean; projectId?: string; url: string; status: string; error?: string };
 
-      const res = await fetch("/api/crontech/deploy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      if (crontechProjectId) {
+        // Re-deploy: PATCH the existing project instead of creating a new one.
+        const res = await fetch("/api/crontech/update", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projectId: crontechProjectId, files: reactFiles, deps: reactDeps }),
+          signal: AbortSignal.timeout(60_000),
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Re-deploy failed");
+      } else {
+        // First deploy: POST to create a new Crontech project.
+        // Prefer the saved Zoobicon projectId so Crontech has authoritative
+        // metadata. Fall back to inline files for anonymous builds.
+        const body = projectId
+          ? { projectId }
+          : { name: siteName, files: reactFiles, deps: reactDeps, prompt };
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Deploy failed");
+        const res = await fetch("/api/crontech/deploy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(60_000),
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Deploy failed");
       }
 
-      const data = await res.json();
-      setDeployUrl(data.url);
+      // Save the Crontech project ID for future re-deploys.
+      if (data.projectId) setCrontechProjectId(data.projectId);
+
+      // Poll until Crontech flips from "provisioning" to "live".
+      let liveUrl = data.url;
+      if (data.status === "provisioning" && data.projectId) {
+        const maxWait = 60_000;
+        const interval = 3_000;
+        const start = Date.now();
+        while (Date.now() - start < maxWait) {
+          await new Promise(r => setTimeout(r, interval));
+          const poll = await fetch(`/api/crontech/status?projectId=${encodeURIComponent(data.projectId)}`)
+            .then(r => r.json())
+            .catch(() => null);
+          if (!poll) continue;
+          if (poll.status === "live") { liveUrl = poll.url || liveUrl; break; }
+          if (poll.status === "failed") throw new Error("Crontech deploy failed during provisioning");
+        }
+      }
+
+      setDeployUrl(liveUrl);
       setDeployStatus("deployed");
-
       trackEvent("deploy");
-      notifyDeploy(siteName, data.url);
+      notifyDeploy(siteName, liveUrl);
 
-      // Derive slug from url for downstream consumers that still expect it.
-      const slug = (data.url || "").replace(/^https?:\/\//, "").split(".")[0] || siteName;
-      return { url: data.url, slug, deployTimeMs: Date.now() - t0 };
+      const slug = (liveUrl || "").replace(/^https?:\/\//, "").split(".")[0] || siteName;
+      return { url: liveUrl, slug, deployTimeMs: Date.now() - t0 };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deploy failed");
       setDeployStatus("error");
@@ -1885,7 +1947,7 @@ function BuilderPage() {
     } finally {
       setIsDeploying(false);
     }
-  }, [reactFiles, reactDeps, projectId, prompt]);
+  }, [reactFiles, reactDeps, projectId, prompt, crontechProjectId]);
 
   /** Quick deploy handler for inline button and BuildSuccessModal */
   const handleDeploy = useCallback(() => {
@@ -2369,6 +2431,10 @@ function BuilderPage() {
       className="builder-editorial flex flex-col h-screen relative overflow-hidden"
       style={{ background: "var(--paper)" }}
     >
+      {/* Pre-warm the esm.sh HTTP cache the moment the builder page loads.
+          This cuts EscapeHatchPreview's first-render latency from ~3-5s
+          (cold Babel + React fetch) to ~100ms (cache hit). */}
+      <PrewarmFrame />
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />

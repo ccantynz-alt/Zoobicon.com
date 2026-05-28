@@ -1,16 +1,16 @@
 /**
- * Admin Notification Service — STUBBED 2026-05-17.
+ * Admin Notification Service — Rule 31 (2026-05-17).
  *
- * Rule 31 — email delegated to Crontech BLK-030. Caller should route
- * admin notifications through the Crontech email endpoint at
- * https://api.crontech.ai/api/v1/email (Mailgun-shape compatible) once
- * the integration is wired.
+ * Routes through Crontech's own email service (services/email-send,
+ * BLK-030) via src/lib/email-send.ts. Set EMAIL_SEND_TOKEN in Vercel
+ * to enable live delivery; falls back to console log when unset.
  *
- * This module previously sent rich HTML notifications via Mailgun for
- * agent failures, daily summaries, security alerts, etc. All callers
- * are preserved with their original signatures so the codebase compiles;
- * the underlying delivery is now a no-op that logs to console.
+ * Recipient: ADMIN_NOTIFY_EMAIL env var (defaults to admin@zoobicon.com).
  */
+
+import { sendEmail } from "@/lib/email-send";
+
+const ADMIN_EMAIL = process.env.ADMIN_NOTIFY_EMAIL || "admin@zoobicon.com";
 
 interface NotifyOptions {
   subject: string;
@@ -26,17 +26,22 @@ interface NotifyResult {
   messageId?: string;
 }
 
-async function deliveryStub(opts: NotifyOptions): Promise<NotifyResult> {
-  console.log(
-    `[admin-notify:stubbed] subject="${opts.subject.slice(0, 80)}" ` +
-    `category=${opts.category || "general"} priority=${opts.priority || "normal"} ` +
-    `(delegated to Crontech BLK-030 — not yet wired)`,
-  );
-  return { ok: false, reason: "Email delegated to Crontech BLK-030 (not wired)" };
+async function deliver(opts: NotifyOptions): Promise<NotifyResult> {
+  const result = await sendEmail({
+    to: ADMIN_EMAIL,
+    subject: opts.subject,
+    html: opts.html,
+    text: opts.text,
+    messageId: opts.category
+      ? `admin-notify-${opts.category}-${Date.now()}`
+      : undefined,
+  });
+  if (result.ok) return { ok: true, messageId: result.id };
+  return { ok: false, reason: result.error };
 }
 
 export async function notifyAdmin(opts: NotifyOptions): Promise<NotifyResult> {
-  return deliveryStub(opts);
+  return deliver(opts);
 }
 
 export async function notifyAgentFailure(
@@ -44,7 +49,7 @@ export async function notifyAgentFailure(
   error: string,
   context?: Record<string, unknown>,
 ): Promise<NotifyResult> {
-  return deliveryStub({
+  return deliver({
     subject: `Agent failed: ${agentName}`,
     html: `<p>Agent <strong>${agentName}</strong> failed: ${error}</p><pre>${JSON.stringify(context, null, 2)}</pre>`,
     category: "agent-failure",
@@ -56,7 +61,7 @@ export async function notifySecurityEvent(
   event: string,
   details: Record<string, unknown>,
 ): Promise<NotifyResult> {
-  return deliveryStub({
+  return deliver({
     subject: `Security event: ${event}`,
     html: `<p>${event}</p><pre>${JSON.stringify(details, null, 2)}</pre>`,
     category: "security",
@@ -65,7 +70,7 @@ export async function notifySecurityEvent(
 }
 
 export async function notifyDailySummary(summary: string): Promise<NotifyResult> {
-  return deliveryStub({
+  return deliver({
     subject: "Zoobicon daily summary",
     html: summary,
     category: "daily-summary",
@@ -77,7 +82,7 @@ export async function notifyDeployFailure(
   buildId: string,
   reason: string,
 ): Promise<NotifyResult> {
-  return deliveryStub({
+  return deliver({
     subject: `Deploy failed: ${buildId}`,
     html: `<p>Build ${buildId} failed to deploy: ${reason}</p>`,
     category: "deploy-failure",
