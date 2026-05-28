@@ -670,6 +670,7 @@ function BuilderPage() {
   const [showBuildSuccess, setShowBuildSuccess] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [crontechAvailable, setCrontechAvailable] = useState(false);
+  const [crontechProjectId, setCrontechProjectId] = useState<string | null>(null);
 
   // Recording mode — ?record=1 hides all chrome for clean screen captures
   const [recordingMode, setRecordingMode] = useState(false);
@@ -687,7 +688,7 @@ function BuilderPage() {
 
   // Check CronTech availability on mount
   useEffect(() => {
-    fetch("/api/hosting/deploy-crontech")
+    fetch("/api/crontech/availability")
       .then(r => r.json())
       .then(d => setCrontechAvailable(Boolean(d.available)))
       .catch(() => {});
@@ -1868,7 +1869,10 @@ function BuilderPage() {
   /** Called by DeployModal when user confirms deploy.
    *  Rule 31 — all deploy paths go through Crontech now. The provider
    *  arg is retained for DeployModal compatibility but both options
-   *  resolve to /api/crontech/deploy. */
+   *  resolve to /api/crontech/deploy (first deploy) or /api/crontech/update
+   *  (re-deploy when a crontechProjectId already exists). After the initial
+   *  POST, if Crontech returns status "provisioning" we poll
+   *  /api/crontech/status every 3s until it flips to "live" or "failed". */
   const handleDeployWithName = useCallback(async (siteName: string, _provider: "zoobicon" | "crontech" = "crontech"): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
     if (!reactFiles || Object.keys(reactFiles).length === 0) {
       throw new Error("No files to deploy");
@@ -1879,34 +1883,63 @@ function BuilderPage() {
     const t0 = Date.now();
 
     try {
-      // Prefer the saved projectId — Crontech then has authoritative
-      // metadata (creator, visibility, prompt). Fall back to inline
-      // files for anonymous builds that haven't saved yet.
-      const body = projectId
-        ? { projectId }
-        : { name: siteName, files: reactFiles, deps: reactDeps, prompt };
+      let data: { ok: boolean; projectId?: string; url: string; status: string; error?: string };
 
-      const res = await fetch("/api/crontech/deploy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      if (crontechProjectId) {
+        // Re-deploy: PATCH the existing project instead of creating a new one.
+        const res = await fetch("/api/crontech/update", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projectId: crontechProjectId, files: reactFiles, deps: reactDeps }),
+          signal: AbortSignal.timeout(60_000),
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Re-deploy failed");
+      } else {
+        // First deploy: POST to create a new Crontech project.
+        // Prefer the saved Zoobicon projectId so Crontech has authoritative
+        // metadata. Fall back to inline files for anonymous builds.
+        const body = projectId
+          ? { projectId }
+          : { name: siteName, files: reactFiles, deps: reactDeps, prompt };
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Deploy failed");
+        const res = await fetch("/api/crontech/deploy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(60_000),
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Deploy failed");
       }
 
-      const data = await res.json();
-      setDeployUrl(data.url);
+      // Save the Crontech project ID for future re-deploys.
+      if (data.projectId) setCrontechProjectId(data.projectId);
+
+      // Poll until Crontech flips from "provisioning" to "live".
+      let liveUrl = data.url;
+      if (data.status === "provisioning" && data.projectId) {
+        const maxWait = 60_000;
+        const interval = 3_000;
+        const start = Date.now();
+        while (Date.now() - start < maxWait) {
+          await new Promise(r => setTimeout(r, interval));
+          const poll = await fetch(`/api/crontech/status?projectId=${encodeURIComponent(data.projectId)}`)
+            .then(r => r.json())
+            .catch(() => null);
+          if (!poll) continue;
+          if (poll.status === "live") { liveUrl = poll.url || liveUrl; break; }
+          if (poll.status === "failed") throw new Error("Crontech deploy failed during provisioning");
+        }
+      }
+
+      setDeployUrl(liveUrl);
       setDeployStatus("deployed");
-
       trackEvent("deploy");
-      notifyDeploy(siteName, data.url);
+      notifyDeploy(siteName, liveUrl);
 
-      // Derive slug from url for downstream consumers that still expect it.
-      const slug = (data.url || "").replace(/^https?:\/\//, "").split(".")[0] || siteName;
-      return { url: data.url, slug, deployTimeMs: Date.now() - t0 };
+      const slug = (liveUrl || "").replace(/^https?:\/\//, "").split(".")[0] || siteName;
+      return { url: liveUrl, slug, deployTimeMs: Date.now() - t0 };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deploy failed");
       setDeployStatus("error");
@@ -1914,7 +1947,7 @@ function BuilderPage() {
     } finally {
       setIsDeploying(false);
     }
-  }, [reactFiles, reactDeps, projectId, prompt]);
+  }, [reactFiles, reactDeps, projectId, prompt, crontechProjectId]);
 
   /** Quick deploy handler for inline button and BuildSuccessModal */
   const handleDeploy = useCallback(() => {

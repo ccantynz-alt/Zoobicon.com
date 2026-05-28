@@ -197,6 +197,41 @@ export async function pushToCrontech(input: CrontechSyncInput): Promise<Crontech
 }
 
 /**
+ * Push an updated file tree to an existing Crontech project.
+ * Called by the builder when the user edits a site that was previously
+ * deployed — avoids creating a new projectId on every save.
+ * Mock-safe: returns ok:true immediately when CRONTECH_PAT is unset.
+ */
+export async function patchCrontech(
+  projectId: string,
+  input: Pick<CrontechSyncInput, "files" | "deps">,
+): Promise<CrontechSyncResult> {
+  if (!crontechAvailable() || projectId.startsWith("mock-")) {
+    return { ok: true, mocked: true, projectId, status: "provisioning" };
+  }
+  try {
+    const res = await fetch(`${CRONTECH_API_BASE}/api/v1/projects/${projectId}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${CRONTECH_PAT}`,
+        "Content-Type": "application/json",
+        "X-Crontech-Source": "zoobicon-builder",
+      },
+      body: JSON.stringify({ files: input.files, deps: input.deps || {} }),
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      return { ok: false, error: `Crontech ${res.status}: ${text.slice(0, 200) || res.statusText}` };
+    }
+    const data = (await res.json()) as { projectId: string; url: string; status: "provisioning" | "live" };
+    return { ok: true, projectId: data.projectId, url: data.url, status: data.status };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Crontech patch failed" };
+  }
+}
+
+/**
  * Poll a Crontech project's status. Used after the initial POST when
  * Crontech returns `status: "provisioning"` — the UI shows a spinner
  * and re-checks every few seconds until status flips to `"live"`.
