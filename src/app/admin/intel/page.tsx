@@ -252,6 +252,13 @@ export default function IntelPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <a
+            href="/admin/intel/hn"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-colors text-sm font-medium"
+          >
+            <TrendingUp className="w-4 h-4" />
+            HN Flywheel
+          </a>
           <button
             onClick={triggerFullIntel}
             disabled={isLoading || isCrawling}
