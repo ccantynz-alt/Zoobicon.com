@@ -741,6 +741,12 @@ function BuilderPage() {
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
   const watchdogSlowRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const watchdogStuckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Throttle preview refreshes during streaming so the user sees components
+  // slot in progressively (~every 1.2s) rather than all batched at once.
+  // React 18 auto-batching + Vercel SSE buffering would otherwise collapse
+  // all partial setReactFiles calls into a single render.
+  const previewThrottleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingPreviewFilesRef = useRef<Record<string, string> | null>(null);
   const timelineScrollRef = useRef<HTMLDivElement | null>(null);
 
   const clearWatchdog = useCallback(() => {
@@ -1288,6 +1294,9 @@ function BuilderPage() {
     setStreamWarning(null);
     setValidation(null);  // clear previous build's smoke check
     resetWatchdog();
+    // Clear any pending preview throttle from a previous build.
+    if (previewThrottleRef.current) { clearTimeout(previewThrottleRef.current); previewThrottleRef.current = null; }
+    pendingPreviewFilesRef.current = null;
     pendingLabelRef.current = `Build: ${prompt.trim().slice(0, 50)}`;
 
     abortRef.current?.abort();
@@ -1469,30 +1478,49 @@ function BuilderPage() {
                 }
               } else if (event.type === "partial" && event.files) {
                 // Progressive streaming: each partial carries the full file map so far.
-                // 2026-05-26 fix: only mark receivedFiles when the map actually
-                // has content. An empty `{}` partial was tripping the safety
-                // net into thinking the build had succeeded.
+                // Only mark receivedFiles when the map actually has content — an empty
+                // {} partial would trip the safety net into thinking build succeeded.
                 if (generationIdRef.current === currentGenId) {
-                  setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
                   if (Object.keys(event.files).length > 0) {
                     receivedFiles = true;
+                    // Throttle preview refreshes to ~1.2s intervals so the user sees
+                    // components slot in progressively. React 18 auto-batching + Vercel
+                    // SSE buffering would otherwise collapse all partials into one render.
+                    pendingPreviewFilesRef.current = event.files as Record<string, string>;
+                    if (!previewThrottleRef.current) {
+                      // First content — apply immediately so something appears fast.
+                      setReactFiles(event.files as Record<string, string>);
+                      previewThrottleRef.current = setTimeout(() => {
+                        previewThrottleRef.current = null;
+                        if (pendingPreviewFilesRef.current) {
+                          setReactFiles(pendingPreviewFilesRef.current);
+                          pendingPreviewFilesRef.current = null;
+                        }
+                      }, 1200);
+                    }
                   }
                   // Update progress indicator
                   if (event.fileCount != null && event.totalComponents != null) {
-                    setBuildProgress({ current: event.fileCount, total: event.totalComponents, section: event.section || "" });
+                    setBuildProgress({ current: event.fileCount as number, total: event.totalComponents as number, section: (event.section as string) || "" });
                   }
                   if (event.section && event.customized) {
-                    upsertSection(event.section, "done");
+                    upsertSection(event.section as string, "done");
                   } else if (event.section) {
-                    upsertSection(event.section, "scaffolding");
+                    upsertSection(event.section as string, "scaffolding");
                   }
                 }
               } else if ((event.type === "done" && event.files) || (event.type === "done")) {
                 // Generation complete
                 if (generationIdRef.current === currentGenId) {
+                  // Flush any pending throttled preview update and clear the timer.
+                  if (previewThrottleRef.current) {
+                    clearTimeout(previewThrottleRef.current);
+                    previewThrottleRef.current = null;
+                  }
+                  pendingPreviewFilesRef.current = null;
                   if (event.files) {
-                    setReactFiles(event.files);
+                    setReactFiles(event.files as Record<string, string>);
                     setReactDeps(event.dependencies || {});
                     setReactSource(event.files);
                     receivedFiles = true;
