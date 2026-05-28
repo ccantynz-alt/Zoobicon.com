@@ -168,17 +168,16 @@ export default function SiteFooter() {
                 { name: "AI Builder", href: "/builder" },
                 { name: "Generators", href: "/generators" },
                 { name: "Templates", href: "/starter-kits" },
-                { name: "Video Creator", href: "/video-creator" },
-                { name: "Components", href: "/components" },
+                { name: "Showcase", href: "/showcase" },
               ]}
             />
             <FooterColumn
-              label="Domains & Tools"
+              label="Platform"
               links={[
-                { name: "Domain Search", href: "/domains" },
                 { name: "Pricing", href: "/pricing" },
-                { name: "Free Tools", href: "/tools/business-name-generator" },
+                { name: "Compare", href: "/compare" },
                 { name: "SEO Dashboard", href: "/seo" },
+                { name: "Changelog", href: "/changelog" },
               ]}
             />
             <FooterColumn
@@ -186,8 +185,7 @@ export default function SiteFooter() {
               links={[
                 { name: "Agencies", href: "/agencies" },
                 { name: "AI Agents", href: "/agents" },
-                { name: "Changelog", href: "/changelog" },
-                { name: "Status", href: "/" },
+                { name: "WordPress", href: "/wordpress" },
               ]}
             />
             <FooterColumn
