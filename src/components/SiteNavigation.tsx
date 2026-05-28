@@ -292,9 +292,9 @@ export default function SiteNavigation() {
                       style={{ borderTop: "1px solid var(--rule)" }}
                     >
                       <span className="text-[12px]" style={{ color: "var(--ink-secondary)" }}>
-                        AI Builder, Domains, Free Tools.{" "}
+                        AI Website Builder.{" "}
                         <span style={{ color: "var(--ink)", fontWeight: 600 }}>
-                          One subscription. One login.
+                          Domain registration baked into the checkout.
                         </span>
                       </span>
                       <div className="flex items-center gap-5">

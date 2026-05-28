@@ -70,8 +70,9 @@ export default function SiteFooter() {
                 </span>
               </h2>
               <p className="mt-4 text-[15px] leading-relaxed max-w-md" style={{ color: "var(--ink-secondary)" }}>
-                One sentence. Sixty seconds. A complete, responsive site, domain,
-                email and video in a single flow. No templates. No code.
+                One sentence. Sixty seconds. A complete, responsive site
+                with the matching domain bought in the same checkout.
+                No templates. No code.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
@@ -121,8 +122,9 @@ export default function SiteFooter() {
               </span>
             </Link>
             <p className="text-[13px] leading-relaxed max-w-sm mb-6" style={{ color: "var(--ink-secondary)" }}>
-              The AI platform for building websites, making videos, registering
-              domains and launching a business. Seventy-five tools, one price.
+              The AI Website Builder that buys you the domain in the same
+              checkout. Describe your business, watch six agents build it,
+              ship it under your own name.
             </p>
             <div className="flex flex-wrap items-center gap-2.5">
               <span
