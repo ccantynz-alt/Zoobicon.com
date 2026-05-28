@@ -147,6 +147,11 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://js.stripe.com" />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
         <link rel="dns-prefetch" href="https://github.com" />
+        {/* Preconnect for builder preview: warms TCP/TLS before the user's
+            first build so esm.sh package fetches start instantly. */}
+        <link rel="preconnect" href="https://esm.sh" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://esm.sh" />
+        <link rel="dns-prefetch" href="https://cdn.tailwindcss.com" />
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="theme-color" content="#ffffff" />
         <meta name="msapplication-config" content="none" />

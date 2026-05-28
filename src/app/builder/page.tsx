@@ -11,6 +11,7 @@ import { getClientPlan, isPaidPlan, planLabel } from "@/lib/user-plan";
 import type { Plan } from "@/lib/user-plan";
 import DomainHookModal from "@/components/DomainHookModal";
 import VoiceToBuildButton from "@/components/VoiceToBuildButton";
+import PrewarmFrame from "@/components/PrewarmFrame";
 import dynamic from "next/dynamic";
 
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
@@ -2369,6 +2370,10 @@ function BuilderPage() {
       className="builder-editorial flex flex-col h-screen relative overflow-hidden"
       style={{ background: "var(--paper)" }}
     >
+      {/* Pre-warm the esm.sh HTTP cache the moment the builder page loads.
+          This cuts EscapeHatchPreview's first-render latency from ~3-5s
+          (cold Babel + React fetch) to ~100ms (cache hit). */}
+      <PrewarmFrame />
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />
