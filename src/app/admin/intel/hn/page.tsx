@@ -11,6 +11,7 @@ import {
   Zap,
   Target,
   Sparkles,
+  Mail,
 } from "lucide-react";
 
 type PainkillerType = "pain" | "feature" | "competitor_weakness" | "viral_demo";
@@ -56,6 +57,8 @@ export default function HnFlywheelPage() {
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
   const [running, setRunning] = useState(false);
   const [runResult, setRunResult] = useState<string | null>(null);
+  const [emailing, setEmailing] = useState(false);
+  const [emailResult, setEmailResult] = useState<string | null>(null);
 
   const loadDigest = useCallback(async () => {
     try {
@@ -105,6 +108,21 @@ export default function HnFlywheelPage() {
     }
   };
 
+  const emailDigest = async () => {
+    setEmailing(true);
+    setEmailResult(null);
+    try {
+      const res = await fetch("/api/intel/hn/email", { cache: "no-store" });
+      const data = (await res.json()) as { ok: boolean; sent: boolean; reason?: string };
+      if (!res.ok || !data.ok) throw new Error(data.reason || `HTTP ${res.status}`);
+      setEmailResult(`✓ Digest emailed`);
+    } catch (err) {
+      setEmailResult(`✗ ${err instanceof Error ? err.message : "Email failed"}`);
+    } finally {
+      setEmailing(false);
+    }
+  };
+
   const updateStatus = async (id: string, status: Status) => {
     // optimistic
     setPainkillers((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
@@ -137,21 +155,49 @@ export default function HnFlywheelPage() {
             <span style={{ color: "var(--ink)" }}>What developers complain about → what we build next.</span>
           </p>
         </div>
-        <button
-          onClick={runNow}
-          disabled={running}
-          className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all disabled:opacity-50"
-          style={{
-            background: "var(--ink)",
-            color: "var(--paper)",
-          }}
-        >
-          {running ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-          {running ? "Running…" : "Run pipeline now"}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={emailDigest}
+            disabled={emailing || !digest}
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all disabled:opacity-50"
+            style={{
+              background: "var(--paper-elevated)",
+              color: "var(--ink)",
+              border: "1px solid var(--rule-strong)",
+            }}
+          >
+            {emailing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
+            {emailing ? "Sending…" : "Email digest"}
+          </button>
+          <button
+            onClick={runNow}
+            disabled={running}
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all disabled:opacity-50"
+            style={{
+              background: "var(--ink)",
+              color: "var(--paper)",
+            }}
+          >
+            {running ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+            {running ? "Running…" : "Run pipeline now"}
+          </button>
+        </div>
       </div>
 
       {runResult && (
+        <div
+          className="mb-3 px-4 py-3 rounded-xl text-[13px]"
+          style={{
+            background: "var(--paper-elevated)",
+            border: "1px solid var(--rule)",
+            color: "var(--ink-secondary)",
+          }}
+        >
+          {runResult}
+        </div>
+      )}
+
+      {emailResult && (
         <div
           className="mb-6 px-4 py-3 rounded-xl text-[13px]"
           style={{
@@ -160,7 +206,7 @@ export default function HnFlywheelPage() {
             color: "var(--ink-secondary)",
           }}
         >
-          {runResult}
+          {emailResult}
         </div>
       )}
 

@@ -22,6 +22,7 @@ import {
   harvestNextThreads,
   extractNextThreads,
   buildDigest,
+  sendDigestEmail,
 } from "@/lib/hn-flywheel";
 
 export const maxDuration = 300;
@@ -40,6 +41,8 @@ export async function GET(request: Request) {
   const harvestN = Math.min(Math.max(parseInt(searchParams.get("harvest") || "10", 10), 0), 50);
   const extractN = Math.min(Math.max(parseInt(searchParams.get("extract") || "10", 10), 0), 50);
   const doDigest = searchParams.get("digest") !== "0";
+  const doEmail = searchParams.get("email") === "1";
+  const emailTo = searchParams.get("emailTo") || undefined;
 
   try {
     await ensureHnTables();
@@ -48,6 +51,7 @@ export async function GET(request: Request) {
     const harvest = harvestN > 0 ? await harvestNextThreads(harvestN) : { harvested: 0, failures: 0 };
     const extract = extractN > 0 ? await extractNextThreads(extractN) : { processed: 0, extracted: 0 };
     const digest = doDigest ? await buildDigest() : null;
+    const email = doEmail && doDigest ? await sendDigestEmail({ to: emailTo }) : null;
 
     return NextResponse.json({
       success: true,
@@ -63,6 +67,7 @@ export async function GET(request: Request) {
             summaryPreview: digest.summary.slice(0, 400),
           }
         : null,
+      email,
     });
   } catch (err) {
     console.error("[intel/hn/run] failed:", err);

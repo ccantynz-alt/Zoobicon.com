@@ -25,6 +25,7 @@
 
 import { neon } from "@neondatabase/serverless";
 import { callLLMWithFailover } from "@/lib/llm-provider";
+import { sendEmail, emailSendAvailable } from "@/lib/email-send";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DB
@@ -686,4 +687,148 @@ export async function setPainkillerStatus(id: string, status: string): Promise<v
   const sql = getDb();
   if (!sql) return;
   await sql`UPDATE hn_painkillers SET status = ${status} WHERE id = ${id}::uuid`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. EMAIL — send the daily digest via Crontech email service
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Tiny purpose-built markdown → HTML for the constrained digest format
+// (h1/h2, bullets, blockquotes, bold, italic, links). Keeps the dep
+// surface zero — no `marked` / `markdown-it` pulled in just for this.
+function digestMarkdownToHtml(md: string): string {
+  const escape = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  const lines = md.split("\n");
+  const out: string[] = [];
+  let inList = false;
+
+  const closeList = () => {
+    if (inList) {
+      out.push("</ul>");
+      inList = false;
+    }
+  };
+
+  const renderInline = (s: string): string => {
+    let r = escape(s);
+    // links [text](url)
+    r = r.replace(
+      /\[([^\]]+)\]\(([^)]+)\)/g,
+      (_m, text: string, url: string) =>
+        `<a href="${url}" style="color:#8c6b25;text-decoration:underline">${text}</a>`
+    );
+    // bold **text**
+    r = r.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    // italic _text_
+    r = r.replace(/(^|\s)_([^_]+)_/g, "$1<em>$2</em>");
+    // inline code `text`
+    r = r.replace(
+      /`([^`]+)`/g,
+      '<code style="background:#f4f3ed;padding:1px 5px;border-radius:4px;font-size:0.92em">$1</code>'
+    );
+    return r;
+  };
+
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+    if (!line.trim()) {
+      closeList();
+      continue;
+    }
+    if (line.startsWith("# ")) {
+      closeList();
+      out.push(
+        `<h1 style="font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#0a0a0b;margin:24px 0 12px">${renderInline(line.slice(2))}</h1>`
+      );
+    } else if (line.startsWith("## ")) {
+      closeList();
+      out.push(
+        `<h2 style="font-size:16px;font-weight:600;letter-spacing:-0.01em;color:#0a0a0b;margin:28px 0 8px;padding-top:12px;border-top:1px solid #e8e6dc">${renderInline(line.slice(3))}</h2>`
+      );
+    } else if (line.startsWith("- ")) {
+      if (!inList) {
+        out.push('<ul style="padding-left:18px;margin:8px 0">');
+        inList = true;
+      }
+      out.push(
+        `<li style="margin:6px 0;line-height:1.55;color:#36363a">${renderInline(line.slice(2))}</li>`
+      );
+    } else if (line.startsWith("  > ")) {
+      // continuation blockquote — folded under the previous list item
+      out.push(
+        `<div style="margin:4px 0 8px 20px;padding:6px 12px;border-left:2px solid #c9a961;color:#6b6b70;font-style:italic;font-size:13px">${renderInline(line.slice(4))}</div>`
+      );
+    } else if (line.startsWith("  ")) {
+      // sub-paragraph for list item (e.g. the thread link line)
+      out.push(
+        `<div style="margin:2px 0 6px 20px;color:#9b9ba0;font-size:12px">${renderInline(line.trim())}</div>`
+      );
+    } else {
+      closeList();
+      out.push(
+        `<p style="margin:8px 0;line-height:1.6;color:#36363a">${renderInline(line)}</p>`
+      );
+    }
+  }
+  closeList();
+
+  return `<!doctype html>
+<html><body style="margin:0;padding:0;background:#fafaf7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+  <div style="max-width:640px;margin:0 auto;padding:32px 24px;background:#fafaf7">
+    <div style="padding:32px;background:#ffffff;border:1px solid #e8e6dc;border-radius:16px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.22em;font-weight:600;color:#8c6b25;margin-bottom:4px">Intel Flywheel · HN</div>
+      ${out.join("\n")}
+    </div>
+    <div style="text-align:center;padding:16px;font-size:11px;color:#9b9ba0">
+      Zoobicon · <a href="https://zoobicon.com/admin/intel/hn" style="color:#8c6b25">Open the dashboard</a>
+    </div>
+  </div>
+</body></html>`;
+}
+
+export async function sendDigestEmail(opts?: {
+  to?: string;
+  date?: Date;
+}): Promise<{ ok: boolean; sent: boolean; reason?: string }> {
+  if (!emailSendAvailable()) {
+    return { ok: false, sent: false, reason: "EMAIL_SEND_TOKEN not configured" };
+  }
+
+  const to = opts?.to || process.env.ADMIN_NOTIFY_EMAIL || "admin@zoobicon.com";
+  const digest = await getLatestDigest();
+  if (!digest) {
+    return { ok: false, sent: false, reason: "no digest available — run the pipeline first" };
+  }
+
+  // Skip if the latest digest isn't from today's window — avoids
+  // re-sending yesterday's news if the pipeline didn't run.
+  const targetDate = (opts?.date || new Date()).toISOString().slice(0, 10);
+  if (digest.digest_date !== targetDate) {
+    return {
+      ok: false,
+      sent: false,
+      reason: `latest digest is ${digest.digest_date}, not today (${targetDate})`,
+    };
+  }
+
+  const html = digestMarkdownToHtml(digest.summary_md);
+  const subject = `HN Flywheel · ${digest.digest_date} · ${digest.painkiller_count} painkillers from ${digest.thread_count} threads`;
+
+  const result = await sendEmail({
+    to,
+    subject,
+    html,
+    text: digest.summary_md,
+    // Idempotency key — Crontech deduplicates within 24h, so even if
+    // the cron runs twice the same morning, only one email lands.
+    messageId: `hn-digest-${digest.digest_date}-${to}`,
+  });
+
+  return {
+    ok: result.ok,
+    sent: result.ok,
+    reason: result.ok ? undefined : result.error,
+  };
 }
