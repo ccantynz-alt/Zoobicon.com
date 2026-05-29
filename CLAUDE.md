@@ -352,7 +352,7 @@ These are never allowed under any circumstance without Craig explicitly saying "
 # LIVE REPO STATUS — READ THIS FIRST
 ## Last updated: 2026-05-28 | Build: GREEN | Scope: AI WEBSITE BUILDER ONLY (Rule 32) | Branch: main (PR #391 merged)
 
-**NEXT ACTION:** Pre-warm Sandpack for <3s first preview (currently ~20-30s cold — Bolt is 3-5s). This is our biggest speed gap. Then: expose Quality mode toggle in builder UI (Sonnet vs deep pipeline). Domain-in-checkout (0D) is DONE.
+**NEXT ACTION:** Builder quality mode toggle is DONE (segmented Quick/Deep/Full pill, gold-lit active segment, latency subtitles). Pre-warm Sandpack initial work shipped (RECENTLY FIXED #32 PrewarmFrame + esm.sh cache pre-fill) — speed audit needed to verify whether we're at <3s yet or still need more. Domain-in-checkout (0D) is DONE. Intel Flywheel is DONE end-to-end (HN + Reddit + email + Promote/Export roadmap). Likely next: builder UX audit + MCP integration (Emergent has it LIVE, we have a stub) + Tier 0F pricing/Stripe products (Craig task).
 
 ### CRONTECH PIVOT (RULE 31) — STATUS
 - §1 AUTH — DONE (1fbcb40). auth-guard.ts is a Crontech-SSO shim.
