@@ -12,6 +12,9 @@ import {
   Target,
   Sparkles,
   Mail,
+  ListChecks,
+  ClipboardCopy,
+  Check,
 } from "lucide-react";
 
 type PainkillerType = "pain" | "feature" | "competitor_weakness" | "viral_demo";
@@ -59,6 +62,9 @@ export default function HnFlywheelPage() {
   const [runResult, setRunResult] = useState<string | null>(null);
   const [emailing, setEmailing] = useState(false);
   const [emailResult, setEmailResult] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const [exportResult, setExportResult] = useState<string | null>(null);
+  const [promotingId, setPromotingId] = useState<string | null>(null);
 
   const loadDigest = useCallback(async () => {
     try {
@@ -137,6 +143,35 @@ export default function HnFlywheelPage() {
     }
   };
 
+  const promote = async (id: string) => {
+    setPromotingId(id);
+    try {
+      await updateStatus(id, "triaged");
+    } finally {
+      setPromotingId(null);
+    }
+  };
+
+  const exportRoadmap = async () => {
+    setExporting(true);
+    setExportResult(null);
+    try {
+      const res = await fetch("/api/intel/hn/roadmap-md?as=json", { cache: "no-store" });
+      const data = (await res.json()) as { markdown: string; count: number };
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      await navigator.clipboard.writeText(data.markdown);
+      setExportResult(`✓ Copied ${data.count} roadmap item${data.count === 1 ? "" : "s"} to clipboard — paste into CLAUDE.md`);
+    } catch (err) {
+      setExportResult(`✗ ${err instanceof Error ? err.message : "Export failed"}`);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const roadmapCount = painkillers.filter(
+    (p) => p.status === "triaged" || p.status === "building"
+  ).length;
+
   return (
     <div className="px-6 py-8 max-w-7xl mx-auto" style={{ color: "var(--ink)" }}>
       {/* Header */}
@@ -155,7 +190,21 @@ export default function HnFlywheelPage() {
             <span style={{ color: "var(--ink)" }}>What developers complain about → what we build next.</span>
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={exportRoadmap}
+            disabled={exporting}
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all disabled:opacity-50"
+            style={{
+              background: "var(--paper-elevated)",
+              color: "var(--ink)",
+              border: "1px solid var(--rule-strong)",
+            }}
+            title="Copy triaged + building items as markdown for CLAUDE.md"
+          >
+            {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ClipboardCopy className="w-3.5 h-3.5" />}
+            {exporting ? "Copying…" : "Export roadmap"}
+          </button>
           <button
             onClick={emailDigest}
             disabled={emailing || !digest}
@@ -199,7 +248,7 @@ export default function HnFlywheelPage() {
 
       {emailResult && (
         <div
-          className="mb-6 px-4 py-3 rounded-xl text-[13px]"
+          className="mb-3 px-4 py-3 rounded-xl text-[13px]"
           style={{
             background: "var(--paper-elevated)",
             border: "1px solid var(--rule)",
@@ -207,6 +256,48 @@ export default function HnFlywheelPage() {
           }}
         >
           {emailResult}
+        </div>
+      )}
+
+      {exportResult && (
+        <div
+          className="mb-6 px-4 py-3 rounded-xl text-[13px]"
+          style={{
+            background: "var(--paper-elevated)",
+            border: "1px solid var(--rule)",
+            color: "var(--ink-secondary)",
+          }}
+        >
+          {exportResult}
+        </div>
+      )}
+
+      {/* Roadmap strip — shows count of items already promoted */}
+      {roadmapCount > 0 && (
+        <div
+          className="mb-6 flex items-center justify-between rounded-xl px-5 py-3"
+          style={{
+            background: "var(--gold-soft)",
+            border: "1px solid var(--gold)",
+            color: "var(--ink)",
+          }}
+        >
+          <div className="flex items-center gap-2.5">
+            <ListChecks className="w-4 h-4" style={{ color: "var(--gold-deep)" }} />
+            <span className="text-[13px]">
+              <strong>{roadmapCount}</strong> painkiller{roadmapCount === 1 ? "" : "s"} promoted to roadmap
+              <span className="ml-1.5" style={{ color: "var(--ink-secondary)" }}>
+                (triaged + building)
+              </span>
+            </span>
+          </div>
+          <button
+            onClick={() => setStatusFilter("triaged")}
+            className="text-[12px] underline"
+            style={{ color: "var(--gold-deep)" }}
+          >
+            View triaged →
+          </button>
         </div>
       )}
 
@@ -376,23 +467,56 @@ export default function HnFlywheelPage() {
                   </a>
                 </div>
 
-                {/* Status selector */}
-                <select
-                  value={p.status}
-                  onChange={(e) => void updateStatus(p.id, e.target.value as Status)}
-                  className="text-[11px] px-2 py-1 rounded-md flex-shrink-0"
-                  style={{
-                    background: "var(--paper)",
-                    border: "1px solid var(--rule)",
-                    color: "var(--ink)",
-                  }}
-                >
-                  {STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
+                {/* Right-side action column: one-click promote + status dropdown */}
+                <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                  {p.status === "new" ? (
+                    <button
+                      onClick={() => void promote(p.id)}
+                      disabled={promotingId === p.id}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all disabled:opacity-50"
+                      style={{
+                        background: "var(--ink)",
+                        color: "var(--paper)",
+                      }}
+                      title="Mark as triaged — adds to the export-able roadmap"
+                    >
+                      {promotingId === p.id ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <ListChecks className="w-3 h-3" />
+                      )}
+                      Promote
+                    </button>
+                  ) : p.status === "triaged" || p.status === "building" ? (
+                    <span
+                      className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider"
+                      style={{
+                        background: "var(--gold-soft)",
+                        color: "var(--gold-deep)",
+                        border: "1px solid var(--gold)",
+                      }}
+                    >
+                      <Check className="w-2.5 h-2.5" />
+                      On roadmap
+                    </span>
+                  ) : null}
+                  <select
+                    value={p.status}
+                    onChange={(e) => void updateStatus(p.id, e.target.value as Status)}
+                    className="text-[11px] px-2 py-1 rounded-md"
+                    style={{
+                      background: "var(--paper)",
+                      border: "1px solid var(--rule)",
+                      color: "var(--ink)",
+                    }}
+                  >
+                    {STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </article>
           );
