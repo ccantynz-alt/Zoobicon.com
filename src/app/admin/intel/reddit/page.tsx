@@ -12,9 +12,7 @@ import {
   Zap,
   Target,
   Sparkles,
-  Mail,
   ListChecks,
-  ClipboardCopy,
   Check,
 } from "lucide-react";
 
@@ -23,7 +21,7 @@ type Status = "new" | "triaged" | "building" | "shipped" | "dismissed";
 
 interface Painkiller {
   id: string;
-  thread_hn_id: number;
+  thread_reddit_id: string;
   type: PainkillerType;
   competitor: string | null;
   summary: string;
@@ -35,6 +33,7 @@ interface Painkiller {
   created_at: string;
   thread_title: string;
   thread_url: string;
+  subreddit: string;
 }
 
 interface Digest {
@@ -45,31 +44,27 @@ interface Digest {
   created_at: string;
 }
 
-const TYPE_META: Record<PainkillerType, { label: string; icon: typeof Heart; color: string }> = {
-  pain: { label: "Pain", icon: Heart, color: "rose" },
-  feature: { label: "Feature gap", icon: Sparkles, color: "amber" },
-  competitor_weakness: { label: "Competitor weakness", icon: Target, color: "emerald" },
-  viral_demo: { label: "Viral demo", icon: Zap, color: "violet" },
+const TYPE_META: Record<PainkillerType, { label: string; icon: typeof Heart }> = {
+  pain: { label: "Pain", icon: Heart },
+  feature: { label: "Feature gap", icon: Sparkles },
+  competitor_weakness: { label: "Competitor weakness", icon: Target },
+  viral_demo: { label: "Viral demo", icon: Zap },
 };
 
 const STATUSES: Status[] = ["new", "triaged", "building", "shipped", "dismissed"];
 
-export default function HnFlywheelPage() {
+export default function RedditFlywheelPage() {
   const [digest, setDigest] = useState<Digest | null>(null);
   const [painkillers, setPainkillers] = useState<Painkiller[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
   const [running, setRunning] = useState(false);
   const [runResult, setRunResult] = useState<string | null>(null);
-  const [emailing, setEmailing] = useState(false);
-  const [emailResult, setEmailResult] = useState<string | null>(null);
-  const [exporting, setExporting] = useState(false);
-  const [exportResult, setExportResult] = useState<string | null>(null);
   const [promotingId, setPromotingId] = useState<string | null>(null);
 
   const loadDigest = useCallback(async () => {
     try {
-      const res = await fetch("/api/intel/hn/digest", { cache: "no-store" });
+      const res = await fetch("/api/intel/reddit/digest", { cache: "no-store" });
       const data = (await res.json()) as { digest: Digest | null };
       setDigest(data.digest);
     } catch {
@@ -79,9 +74,10 @@ export default function HnFlywheelPage() {
 
   const loadPainkillers = useCallback(async () => {
     try {
-      const url = statusFilter === "all"
-        ? "/api/intel/hn/painkillers?limit=100"
-        : `/api/intel/hn/painkillers?limit=100&status=${statusFilter}`;
+      const url =
+        statusFilter === "all"
+          ? "/api/intel/reddit/painkillers?limit=100"
+          : `/api/intel/reddit/painkillers?limit=100&status=${statusFilter}`;
       const res = await fetch(url, { cache: "no-store" });
       const data = (await res.json()) as { painkillers: Painkiller[] };
       setPainkillers(data.painkillers || []);
@@ -98,10 +94,7 @@ export default function HnFlywheelPage() {
     setRunning(true);
     setRunResult(null);
     try {
-      // Note: in production this needs ?secret=... — for admin manual
-      // trigger, the route honours requests without secret when
-      // CRON_SECRET isn't set, and admin auth covers the rest.
-      const res = await fetch("/api/intel/hn/run", { cache: "no-store" });
+      const res = await fetch("/api/intel/reddit/run", { cache: "no-store" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setRunResult(
@@ -115,32 +108,16 @@ export default function HnFlywheelPage() {
     }
   };
 
-  const emailDigest = async () => {
-    setEmailing(true);
-    setEmailResult(null);
-    try {
-      const res = await fetch("/api/intel/hn/email", { cache: "no-store" });
-      const data = (await res.json()) as { ok: boolean; sent: boolean; reason?: string };
-      if (!res.ok || !data.ok) throw new Error(data.reason || `HTTP ${res.status}`);
-      setEmailResult(`✓ Digest emailed`);
-    } catch (err) {
-      setEmailResult(`✗ ${err instanceof Error ? err.message : "Email failed"}`);
-    } finally {
-      setEmailing(false);
-    }
-  };
-
   const updateStatus = async (id: string, status: Status) => {
-    // optimistic
     setPainkillers((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
     try {
-      await fetch("/api/intel/hn/painkillers", {
+      await fetch("/api/intel/reddit/painkillers", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status }),
       });
     } catch {
-      // rollback would be nice but the next reload will fix it
+      // next reload will fix
     }
   };
 
@@ -153,22 +130,6 @@ export default function HnFlywheelPage() {
     }
   };
 
-  const exportRoadmap = async () => {
-    setExporting(true);
-    setExportResult(null);
-    try {
-      const res = await fetch("/api/intel/hn/roadmap-md?as=json", { cache: "no-store" });
-      const data = (await res.json()) as { markdown: string; count: number };
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      await navigator.clipboard.writeText(data.markdown);
-      setExportResult(`✓ Copied ${data.count} roadmap item${data.count === 1 ? "" : "s"} to clipboard — paste into CLAUDE.md`);
-    } catch (err) {
-      setExportResult(`✗ ${err instanceof Error ? err.message : "Export failed"}`);
-    } finally {
-      setExporting(false);
-    }
-  };
-
   const roadmapCount = painkillers.filter(
     (p) => p.status === "triaged" || p.status === "building"
   ).length;
@@ -177,6 +138,17 @@ export default function HnFlywheelPage() {
     <div className="px-6 py-8 max-w-7xl mx-auto" style={{ color: "var(--ink)" }}>
       {/* Source toggle — HN | Reddit cross-link */}
       <div className="flex items-center gap-1 mb-6">
+        <Link
+          href="/admin/intel/hn"
+          className="px-3 py-1 rounded-full text-[11px] font-medium transition-colors"
+          style={{
+            background: "transparent",
+            color: "var(--ink-secondary)",
+            border: "1px solid var(--rule)",
+          }}
+        >
+          Hacker News
+        </Link>
         <span
           className="px-3 py-1 rounded-full text-[11px] font-medium"
           style={{
@@ -185,19 +157,8 @@ export default function HnFlywheelPage() {
             border: "1px solid var(--ink)",
           }}
         >
-          Hacker News
-        </span>
-        <Link
-          href="/admin/intel/reddit"
-          className="px-3 py-1 rounded-full text-[11px] font-medium transition-colors"
-          style={{
-            background: "transparent",
-            color: "var(--ink-secondary)",
-            border: "1px solid var(--rule)",
-          }}
-        >
           Reddit
-        </Link>
+        </span>
       </div>
 
       {/* Header */}
@@ -210,58 +171,30 @@ export default function HnFlywheelPage() {
             <TrendingUp className="w-3 h-3" />
             Intel Flywheel
           </div>
-          <h1 className="text-3xl font-semibold tracking-[-0.02em]">Hacker News</h1>
+          <h1 className="text-3xl font-semibold tracking-[-0.02em]">Reddit</h1>
           <p className="mt-2 text-[14px]" style={{ color: "var(--ink-secondary)" }}>
-            Painkillers extracted from HN comment threads on AI builders.{" "}
+            Painkillers extracted from r/SideProject, r/SaaS, r/webdev,
+            r/nocode, r/ChatGPTCoding and friends.{" "}
             <span style={{ color: "var(--ink)" }}>What developers complain about → what we build next.</span>
           </p>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={exportRoadmap}
-            disabled={exporting}
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all disabled:opacity-50"
-            style={{
-              background: "var(--paper-elevated)",
-              color: "var(--ink)",
-              border: "1px solid var(--rule-strong)",
-            }}
-            title="Copy triaged + building items as markdown for CLAUDE.md"
-          >
-            {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ClipboardCopy className="w-3.5 h-3.5" />}
-            {exporting ? "Copying…" : "Export roadmap"}
-          </button>
-          <button
-            onClick={emailDigest}
-            disabled={emailing || !digest}
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all disabled:opacity-50"
-            style={{
-              background: "var(--paper-elevated)",
-              color: "var(--ink)",
-              border: "1px solid var(--rule-strong)",
-            }}
-          >
-            {emailing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />}
-            {emailing ? "Sending…" : "Email digest"}
-          </button>
-          <button
-            onClick={runNow}
-            disabled={running}
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all disabled:opacity-50"
-            style={{
-              background: "var(--ink)",
-              color: "var(--paper)",
-            }}
-          >
-            {running ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-            {running ? "Running…" : "Run pipeline now"}
-          </button>
-        </div>
+        <button
+          onClick={runNow}
+          disabled={running}
+          className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all disabled:opacity-50"
+          style={{
+            background: "var(--ink)",
+            color: "var(--paper)",
+          }}
+        >
+          {running ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+          {running ? "Running…" : "Run pipeline now"}
+        </button>
       </div>
 
       {runResult && (
         <div
-          className="mb-3 px-4 py-3 rounded-xl text-[13px]"
+          className="mb-6 px-4 py-3 rounded-xl text-[13px]"
           style={{
             background: "var(--paper-elevated)",
             border: "1px solid var(--rule)",
@@ -272,33 +205,6 @@ export default function HnFlywheelPage() {
         </div>
       )}
 
-      {emailResult && (
-        <div
-          className="mb-3 px-4 py-3 rounded-xl text-[13px]"
-          style={{
-            background: "var(--paper-elevated)",
-            border: "1px solid var(--rule)",
-            color: "var(--ink-secondary)",
-          }}
-        >
-          {emailResult}
-        </div>
-      )}
-
-      {exportResult && (
-        <div
-          className="mb-6 px-4 py-3 rounded-xl text-[13px]"
-          style={{
-            background: "var(--paper-elevated)",
-            border: "1px solid var(--rule)",
-            color: "var(--ink-secondary)",
-          }}
-        >
-          {exportResult}
-        </div>
-      )}
-
-      {/* Roadmap strip — shows count of items already promoted */}
       {roadmapCount > 0 && (
         <div
           className="mb-6 flex items-center justify-between rounded-xl px-5 py-3"
@@ -390,7 +296,7 @@ export default function HnFlywheelPage() {
       )}
 
       {/* Status filter */}
-      <div className="flex items-center gap-2 mb-5">
+      <div className="flex items-center gap-2 mb-5 flex-wrap">
         <Filter className="w-4 h-4" style={{ color: "var(--ink-muted)" }} />
         <span className="text-[12px]" style={{ color: "var(--ink-muted)" }}>
           Filter:
@@ -465,6 +371,16 @@ export default function HnFlywheelPage() {
                         {p.competitor}
                       </span>
                     )}
+                    <span
+                      className="px-2 py-0.5 rounded-full text-[10px] font-mono"
+                      style={{
+                        background: "var(--paper)",
+                        color: "var(--ink-muted)",
+                        border: "1px solid var(--rule)",
+                      }}
+                    >
+                      r/{p.subreddit}
+                    </span>
                     <span className="text-[10px] font-mono" style={{ color: "var(--ink-muted)" }}>
                       score {score} · conf {p.confidence.toFixed(2)} · {p.mentions}× mentions
                     </span>
@@ -493,7 +409,6 @@ export default function HnFlywheelPage() {
                   </a>
                 </div>
 
-                {/* Right-side action column: one-click promote + status dropdown */}
                 <div className="flex flex-col items-end gap-2 flex-shrink-0">
                   {p.status === "new" ? (
                     <button
@@ -504,7 +419,7 @@ export default function HnFlywheelPage() {
                         background: "var(--ink)",
                         color: "var(--paper)",
                       }}
-                      title="Mark as triaged — adds to the export-able roadmap"
+                      title="Mark as triaged"
                     >
                       {promotingId === p.id ? (
                         <Loader2 className="w-3 h-3 animate-spin" />
