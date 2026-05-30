@@ -23,8 +23,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Homepage
     { path: '/', priority: 1.0, changeFrequency: 'daily' },
 
-    // The one product
+    // The one product + its highest-intent onboarding funnel
     { path: '/builder', priority: 0.9, changeFrequency: 'daily' },
+    { path: '/upgrade', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/pricing', priority: 0.9, changeFrequency: 'weekly' },
 
     // SEO marketing surfaces
