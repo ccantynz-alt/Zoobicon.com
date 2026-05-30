@@ -47,7 +47,7 @@ The Prestige Properties cream-on-cream bug is symptomatic; this sprint kills the
 ## SPRINT 4 — DEPTH
 
 - [x] **T4 (partial)** ✅ **MCP — GitHub + WordPress import paths shipped.** `/github-import` + `/api/github/preview` wraps existing `fetchGitHubContext` to pull README/package.json/repo info and compose a builder prompt for a landing page. `/wordpress-import` + `/api/wordpress/import` does the same for WordPress sites via wp-json (richer structured data than HTML scraping). Figma + Notion connectors still queued.
-- [ ] **T7** ⏳ **Real-time multi-user collaboration** — two people editing the same site simultaneously.
+- [x] **T7 (foundation)** ✅ **Real-time collab — server side wired** — the client-side `useCollaboration` hook + `CollaborationBar` were already shipped but the server routes (`/api/collab`, `/api/collab/presence`, `/api/collab/code`) didn't exist; every call 404'd. T7 builds the server: Neon-backed `collab_rooms` + `collab_participants` tables with auto-create, room create/join/leave, presence list + cursor update, code state get/push with optimistic concurrency. Lazy-GC drops idle participants after 5 minutes. Polling-based; WebSocket spec deferred (Vercel serverless can't host long-lived sockets natively).
 - [x] **T9 (partial)** ✅ **Share / Fork URL** — builder gains a Share button in the top toolbar that copies a builder URL with the current prompt encoded. A recipient opens the link and starts a session that begins at the same prompt. Full file-state sharing requires DB persistence (queued as `shared_builds` table follow-up).
 
 ---
@@ -101,6 +101,7 @@ These ship the moment Crontech endpoints are live. Code is ready.
 
 This is what's been ticked off in chronological order. Newest at top.
 
+- **2026-05-30** — ✅ T7 foundation — collab server routes wired (collab_rooms + collab_participants tables, presence + code sync; CollaborationBar finally works end-to-end)
 - **2026-05-30** — ✅ T9 partial — Share/fork URL button in builder toolbar; copies current prompt as a shareable link
 - **2026-05-30** — ✅ T4 partial — GitHub repo import (/github-import + /api/github/preview) and WordPress wp-json import (/wordpress-import + /api/wordpress/import). Figma + Notion connectors queued.
 - **2026-05-30** — ✅ T6 Multi-format generation — brand-assets.ts + /api/brand-assets + /brand-kit page; favicon + email signature + OG + Twitter + business card from one BrandSpec
