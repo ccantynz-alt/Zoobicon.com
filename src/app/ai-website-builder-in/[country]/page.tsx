@@ -219,7 +219,7 @@ export default async function Page({ params }: { params: Promise<{ country: stri
               ))}
             </div>
             <p className="text-[12px] mt-3" style={{ color: "var(--ink-muted)" }}>
-              All routed through Stripe via Crontech's billing layer — no separate gateway accounts needed.
+              All routed through Stripe via Crontech&apos;s billing layer — no separate gateway accounts needed.
             </p>
           </section>
 

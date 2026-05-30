@@ -68,7 +68,7 @@ export default function RegionIndexPage() {
               Local TLDs.
             </h1>
             <p className="text-[16px] leading-relaxed max-w-2xl" style={{ color: "var(--ink-secondary)" }}>
-              Pick your country. Zoobicon's builder ships with regional defaults — currency, payment rails,
+              Pick your country. Zoobicon&apos;s builder ships with regional defaults — currency, payment rails,
               hosting region, country TLD, and consent banner for your jurisdiction.
             </p>
           </header>
