@@ -39,7 +39,7 @@ The Prestige Properties cream-on-cream bug is symptomatic; this sprint kills the
 ## SPRINT 3 — COMPETITOR TERROR MOVES
 
 - [x] **T1** ✅ **AI Site Audit Agent** — `/audit` route shipped. `scoreAudit()` in url-extractor returns 4 category scores (perf/SEO/a11y/conversion) with ✓ passed and ✗ failed check lists. Report card UI + "Rebuild with these fixes" CTA → builder with prefilled prompt. Linked from nav. Targets high-volume "free website audit AI" search intent.
-- [ ] **T5** ⏳ **Voice-to-Site** — harden the existing VoiceToBuildButton end-to-end.
+- [x] **T5** ✅ **Voice-to-Site** — VoiceToBuildButton now mounted on every onboarding surface (builder, homepage HeroBuilder hero, /upgrade URL input, /audit URL input). Voice is no longer just-in-builder; users can dictate from the first impression.
 - [ ] **T6** ⏳ **Multi-format generation** — one prompt → site + email signature + social cards + business card + favicon + OG images. Total brand kit from one input.
 
 ---
@@ -101,6 +101,7 @@ These ship the moment Crontech endpoints are live. Code is ready.
 
 This is what's been ticked off in chronological order. Newest at top.
 
+- **2026-05-30** — ✅ T5 Voice-to-Site — VoiceToBuildButton mounted on HeroBuilder + /upgrade + /audit (was builder-only)
 - **2026-05-30** — ✅ T1 AI Site Audit — /audit route + /api/audit/run + scoreAudit() with 4 category scores; nav link added
 - **2026-05-30** — ✅ T2 (Plan Mode) — confirmed pre-shipped (KILLER-MOVES #B12) at `/api/generate/plan` + planReview gate in builder. Prompt Queue split out as a follow-up.
 - **2026-05-30** — ✅ Q2+T3 Post-generation critique loop runs on every build (was premium-only); BrandSpec fed to critic catches palette drift

@@ -18,6 +18,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 import {
   ArrowRight,
   Globe2,
@@ -146,6 +147,11 @@ export default function AuditPage() {
               disabled={loading}
               className="flex-1 bg-transparent outline-none text-[16px]"
               style={{ color: "var(--ink)" }}
+            />
+            {/* T5: voice input — speak the URL */}
+            <VoiceToBuildButton
+              size="sm"
+              onTranscript={(text) => setUrl(text.trim())}
             />
             <button
               type="submit"
