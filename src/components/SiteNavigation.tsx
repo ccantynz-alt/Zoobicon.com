@@ -58,10 +58,10 @@ const PRODUCT_SECTIONS = [
 
 const TOP_NAV_LINKS = [
   { name: "Builder", href: "/builder" },
-  { name: "Upgrade my site", href: "/upgrade" },
+  { name: "Import", href: "/import" },
+  { name: "Free audit", href: "/audit" },
   { name: "Marketplace", href: "/marketplace" },
   { name: "Pricing", href: "/pricing" },
-  { name: "Agencies", href: "/agencies" },
 ];
 
 export default function SiteNavigation() {

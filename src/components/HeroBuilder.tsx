@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Sparkles, Check } from "lucide-react";
+import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 
 /**
  * HeroBuilder — the homepage IS the product.
@@ -517,6 +518,19 @@ export default function HeroBuilder() {
             placeholder={building ? "" : placeholder}
             className="w-full resize-none bg-transparent px-6 py-5 pr-32 text-lg leading-relaxed text-white placeholder:text-white/25 focus:outline-none sm:text-xl"
           />
+          {/* T5: voice input — dictate the prompt instead of typing.
+              Positioned just left of the Build button so it's discoverable. */}
+          {!building && (
+            <div className="absolute right-[7.5rem] top-1/2 -translate-y-1/2">
+              <VoiceToBuildButton
+                size="sm"
+                onTranscript={(text) => {
+                  setPrompt((prev) => (prev ? `${prev} ${text}` : text));
+                  inputRef.current?.focus();
+                }}
+              />
+            </div>
+          )}
           <button
             type="submit"
             disabled={building}

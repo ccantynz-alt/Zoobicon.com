@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/vendor-sync.mjs || true",
     "build": "next build",
+    "vendor:sync": "node scripts/vendor-sync.mjs",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",

@@ -12,6 +12,7 @@ import type { Plan } from "@/lib/user-plan";
 import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 import PrewarmFrame from "@/components/PrewarmFrame";
 import AgentOrbsRow from "@/components/AgentOrbsRow";
+import PromptQueuePanel from "@/components/PromptQueuePanel";
 import dynamic from "next/dynamic";
 
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
@@ -167,6 +168,7 @@ import {
   Workflow,
   Undo2,
   Redo2,
+  Share2,
   Save,
   Sparkles,
   History,
@@ -666,6 +668,18 @@ function BuilderPage() {
   const [showDiffPanel, setShowDiffPanel] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [showBuildSuccess, setShowBuildSuccess] = useState(false);
+  // T6 follow-up: BrandSpec from the server's done event. Used to
+  // deep-link /brand-kit with the actual build's palette/typography.
+  const [buildBrandSpec, setBuildBrandSpec] = useState<{
+    brandName: string;
+    primaryColor: string;
+    bgColor: string;
+    textPrimary: string;
+    textSecondary: string;
+    accentColor: string;
+    headlineFont: string;
+    bodyFont: string;
+  } | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [crontechAvailable, setCrontechAvailable] = useState(false);
   const [crontechProjectId, setCrontechProjectId] = useState<string | null>(null);
@@ -1504,6 +1518,13 @@ function BuilderPage() {
                     setReactSource(event.files);
                     receivedFiles = true;
                   }
+                  // T6 follow-up: capture the planner-emitted BrandSpec
+                  // so the "Brand kit" affordance can deep-link to
+                  // /brand-kit?spec=<encoded> with the build's actual
+                  // palette + typography.
+                  if (event.brandSpec && typeof event.brandSpec === "object") {
+                    setBuildBrandSpec(event.brandSpec as typeof buildBrandSpec);
+                  }
                   setGeneratedCode("<!-- react-app-mode -->");
                   setStatus("complete");
                   setBuildProgress(null);
@@ -1732,11 +1753,13 @@ function BuilderPage() {
     [prompt, handleGenerate],
   );
 
-  // Edit existing React files via the same streaming endpoint
-  const handleEdit = useCallback(async () => {
-    if (!editPrompt.trim() || !reactFiles) return;
+  // Edit existing React files via the same streaming endpoint. Core
+  // body extracted to runEditWith(instruction) so the Prompt Queue
+  // panel (T2) can fire edits sequentially without going through
+  // editPrompt state.
+  const runEditWith = useCallback(async (instruction: string): Promise<void> => {
+    if (!instruction.trim() || !reactFiles) return;
 
-    const instruction = editPrompt.trim();
     setStatus("generating");
     setError("");
     setPipelineAgents([`Editing: ${instruction.slice(0, 60)}...`]);
@@ -1746,7 +1769,6 @@ function BuilderPage() {
     abortRef.current = controller;
 
     try {
-      // Use diff-based editing — only regenerate changed files (2-5s vs 30s)
       const res = await fetch("/api/generate/edit", {
         method: "POST",
         headers: authHeaders(),
@@ -1762,12 +1784,12 @@ function BuilderPage() {
         throw new Error(errData.error || `HTTP ${res.status}`);
       }
 
-      // Read SSE stream
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No response stream");
 
       const decoder = new TextDecoder();
       let lineBuffer = "";
+      let sawDone = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -1783,31 +1805,30 @@ function BuilderPage() {
             if (event.type === "status") {
               setPipelineAgents(prev => [...prev, event.message]);
             } else if (event.type === "partial" && event.files) {
-              // Merge changed files into existing files (diff-based)
               setReactFiles(prev => ({ ...prev, ...event.files }));
             } else if (event.type === "done" && event.files) {
-              // Merge ONLY the changed files — keep everything else
               setReactFiles(prev => {
                 const merged = { ...prev, ...event.files };
                 setReactSource(merged);
                 return merged;
               });
               setStatus("complete");
-              setEditPrompt("");
               setPipelineAgents(prev => [...prev, `Edit complete — ${event.changedCount || Object.keys(event.files).length} file(s) changed`]);
+              sawDone = true;
             } else if (event.type === "error") {
               throw new Error(event.message);
             }
           } catch (e) {
-            // Malformed JSON = partial SSE chunk or heartbeat line, skip.
-            // Anything else (including our own "throw new Error(event.message)"
-            // above and legitimate application errors) must propagate — otherwise
-            // the user stares at an unchanging Sandpack preview and never learns
-            // the edit failed (Law 8: no silent catches).
             if (e instanceof SyntaxError) continue;
             throw e;
           }
         }
+      }
+
+      // If the stream ended without a 'done' event, surface that
+      // instead of silently leaving the queue runner thinking success.
+      if (!sawDone) {
+        throw new Error("Edit stream ended without a done event");
       }
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
@@ -1815,8 +1836,25 @@ function BuilderPage() {
       console.error("[Edit] Failed:", errMsg);
       setError(cleanErrorMessage(errMsg));
       setStatus("error");
+      // Re-throw so the queue runner can mark this item as errored.
+      throw err;
     }
-  }, [editPrompt, reactFiles, tier, selectedModel]);
+  }, [reactFiles, authHeaders]);
+
+  // Manual single-shot edit (the Send button path). Calls
+  // runEditWith with the current editPrompt then clears it.
+  const handleEdit = useCallback(async () => {
+    if (!editPrompt.trim() || !reactFiles) return;
+    const instruction = editPrompt.trim();
+    try {
+      await runEditWith(instruction);
+      setEditPrompt("");
+    } catch {
+      // runEditWith already surfaced the error via setError; nothing
+      // more to do here.
+    }
+  }, [editPrompt, reactFiles, runEditWith]);
+
 
   const handleCodeUpdate = useCallback((newCode: string) => {
     setGeneratedCode(newCode);
@@ -2352,6 +2390,17 @@ function BuilderPage() {
             >
               {useEscapeHatch ? "🪂 Direct preview" : "📦 Sandpack"}
             </button>
+            {buildBrandSpec && (
+              <a
+                href={`/brand-kit?spec=${typeof window !== "undefined" ? btoa(JSON.stringify(buildBrandSpec)) : ""}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-2 py-1 text-[10px] rounded border bg-gradient-to-r from-amber-500/90 to-yellow-600/90 text-black border-amber-400 font-semibold hover:from-amber-400 hover:to-yellow-500 transition-all"
+                title="Open the brand kit for this build — favicon, OG card, business card, email signature, all derived from the planner's BrandSpec."
+              >
+                ✨ Brand kit
+              </a>
+            )}
           </div>
         )}
 
@@ -2771,6 +2820,51 @@ function BuilderPage() {
             >
               <History size={14} />
             </button>
+            {/* Sprint 4 T9 — Share / Fork. Persists the full file
+                state to /api/share/create and copies the resulting
+                /share/<code> URL. Recipient sees the exact same
+                generated site (not a fresh re-generation). Falls back
+                to the prompt-only URL if persistence fails (e.g. DB
+                offline). */}
+            <button
+              onClick={async () => {
+                const fallback = () => {
+                  const u = new URL(window.location.href);
+                  if (prompt) u.searchParams.set("prompt", prompt);
+                  u.searchParams.set("from", "share");
+                  return u.toString();
+                };
+                let shareUrl = fallback();
+                try {
+                  if (reactFiles && Object.keys(reactFiles).length > 0) {
+                    const res = await fetch("/api/share/create", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        prompt: prompt || "(no prompt)",
+                        files: reactFiles,
+                      }),
+                    });
+                    if (res.ok) {
+                      const data = (await res.json()) as { ok: boolean; url?: string };
+                      if (data.ok && data.url) shareUrl = data.url;
+                    }
+                  }
+                } catch {
+                  // Network / DB error — fall through to prompt-only URL
+                }
+                try {
+                  await navigator.clipboard.writeText(shareUrl);
+                  alert("Share link copied to clipboard");
+                } catch {
+                  window.prompt("Copy share link:", shareUrl);
+                }
+              }}
+              title="Share / fork — copy a link to this build"
+              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all"
+            >
+              <Share2 size={14} />
+            </button>
           </div>
         )}
 
@@ -2987,6 +3081,16 @@ function BuilderPage() {
                     onFullStackChange={setFullStack}
                     showAdvanced={advancedMode}
                   />
+                  {/* T2 Prompt Queue — Lovable-parity batch edits.
+                      Only surfaces when there's a build to edit. */}
+                  {hasCode && (
+                    <div className="mt-3">
+                      <PromptQueuePanel
+                        onRunPrompt={runEditWith}
+                        isBusy={status === "generating"}
+                      />
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ) : (

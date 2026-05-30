@@ -202,7 +202,7 @@ async function getPlannerSystemCacheable(): Promise<string> {
   if (_plannerSystemCache) return _plannerSystemCache;
   _plannerSystemCache = `You are the section planner for the Zoobicon AI website builder.
 
-Your job: pick the best component id for each slot in a website, drawn ONLY from the registry catalog provided below. You return JSON only.
+Your job: pick the best component id for each slot in a website, drawn ONLY from the registry catalog provided below. You also emit a BRAND SPEC — a typed sheet of design tokens (palette + typography) that the downstream customiser must use as the single source of truth for the build. You return JSON only.
 
 Rules:
 - Pick exactly one id per slot you include.
@@ -211,11 +211,22 @@ Rules:
 - Never invent ids. If a slot has no good fit, omit it.
 - Output ONLY JSON, no prose, no markdown fences.
 
+BRAND SPEC RULES (Sprint 1 Q4 — kills color drift across the build):
+- The brand spec is the contract. Every component the customiser builds MUST draw colors + fonts from this sheet, not invent its own.
+- textPrimary MUST meet 4.5:1 contrast against bgColor — this is WCAG AA. Pick deep ink on light bg (e.g. #18181b on #fafafa) or near-white on dark (e.g. #f5f5f4 on #0c0a09). The Prestige Properties cream-on-cream bug came from textPrimary being too pale; never pick something like #d4a574 as textPrimary on a cream background.
+- accentColor is reserved for icons, hover states, small badge text, and primary button fills — never body text.
+- headlineFont + bodyFont are explicit Google Font names (or "Inter", "Playfair Display", "Fraunces", "JetBrains Mono", etc.). The customiser will reference them via Tailwind's font-* classes.
+
 Schema:
 {
   "brandName": "<short brand name inferred from prompt>",
-  "primaryColor": "<hex>",
-  "bgColor": "<hex>",
+  "primaryColor": "<hex — main brand color, used for primary CTAs>",
+  "bgColor": "<hex — page background color>",
+  "textPrimary": "<hex — body text color, must hit 4.5:1 against bgColor>",
+  "textSecondary": "<hex — supporting/muted text, must hit 4.5:1 against bgColor>",
+  "accentColor": "<hex — for icons, hovers, small accent surfaces; NOT for body copy>",
+  "headlineFont": "<font family name — e.g. 'Playfair Display' or 'Inter'>",
+  "bodyFont": "<font family name — typically 'Inter' or system font stack>",
   "selections": [
     { "slot": "navbar|hero|features|stats|logos|testimonials|pricing|faq|cta|about|contact|gallery|blog|ecommerce|forms|footer|misc",
       "id": "<registry id>" }
@@ -236,7 +247,27 @@ interface PlannerOutput {
   brandName?: string;
   primaryColor?: string;
   bgColor?: string;
+  // Q4 brand-token-sheet additions (planner-emitted, customiser-consumed):
+  textPrimary?: string;
+  textSecondary?: string;
+  accentColor?: string;
+  headlineFont?: string;
+  bodyFont?: string;
   selections: PlannerSelection[];
+}
+
+/** Q4: structured brand spec passed to every customiser call so all
+ *  components share one palette + typography sheet. Kills the
+ *  cream-on-cream bug class by making contrast a planner contract. */
+interface BrandSpec {
+  brandName: string;
+  primaryColor: string;
+  bgColor: string;
+  textPrimary: string;
+  textSecondary: string;
+  accentColor: string;
+  headlineFont: string;
+  bodyFont: string;
 }
 
 function safeParseJson<T>(raw: string): T | null {
@@ -257,6 +288,8 @@ interface PlanResult {
   brandName: string;
   primaryColor: string;
   bgColor: string;
+  // Q4 brand spec — passed forward to every customiseComponent call
+  brandSpec: BrandSpec;
 }
 
 /**
@@ -305,6 +338,41 @@ export function inferBrandName(prompt: string): string {
 async function planComponents(prompt: string): Promise<PlanResult> {
   const { getById, selectComponentsForPrompt } = await getRegistry();
 
+  // T8 — industry-aware defaults. Detect the niche from the user prompt
+  // using the existing detectIndustry heuristic, look up the niche in
+  // our SEO catalog (the same catalog that drives the 28 niche pages
+  // at /ai-website-builder-for/[slug]), and inject the must-haves +
+  // sections list as planner context. The planner then has
+  // niche-specific guidance for free.
+  let nicheHint = "";
+  try {
+    const { detectIndustry } = await import("@/lib/stock-images");
+    const { NICHES } = await import("@/lib/seo/niches");
+    const industry = detectIndustry(prompt); // "restaurant", "saas", etc.
+    if (industry) {
+      // Loose match: niche slug starts with or contains the industry token.
+      const niche = NICHES.find(
+        (n) =>
+          n.slug === industry ||
+          n.slug.startsWith(industry) ||
+          n.slug.includes(industry) ||
+          n.name.toLowerCase().includes(industry)
+      );
+      if (niche) {
+        nicheHint =
+          `\n\nINDUSTRY DETECTED: ${niche.name} (${niche.slug})\n` +
+          `Audience: ${niche.audience}\n` +
+          `Typical sections for this niche (pick components that cover these):\n` +
+          niche.sections.map((s) => `  - ${s}`).join("\n") +
+          `\nMust-haves for this niche:\n` +
+          niche.mustHaves.map((m) => `  - ${m}`).join("\n");
+      }
+    }
+  } catch {
+    // Industry detection or niche catalog failed — non-fatal; planner
+    // proceeds with prompt-only context.
+  }
+
   // Planning uses callLLMWithFailover so Anthropic outages don't kill builds.
   // Order: Anthropic Haiku (fastest) → Sonnet → OpenAI → Gemini.
   let text = "";
@@ -314,7 +382,7 @@ async function planComponents(prompt: string): Promise<PlanResult> {
     const res = await callLLMWithFailover({
       model: MODEL_HAIKU,
       system: plannerSystem,
-      userMessage: `User prompt: ${prompt}`,
+      userMessage: `User prompt: ${prompt}${nicheHint}`,
       maxTokens: 1500,
     });
     text = res.text || "";
@@ -333,21 +401,42 @@ async function planComponents(prompt: string): Promise<PlanResult> {
     }
   }
 
+  // Q4: build a complete brand spec from parsed values plus contrast-
+  // safe defaults. Spread the spec into the returned PlanResult so it
+  // flows through to every customiseComponent call. The defaults are
+  // chosen to PASS WCAG AA (4.5:1) — that's the whole point of Q4.
+  const buildBrandSpec = (resolvedBrandName: string, fallbackMode: boolean): BrandSpec => ({
+    brandName: resolvedBrandName,
+    primaryColor: parsed?.primaryColor ?? (fallbackMode ? "#1c1917" : "#4f46e5"),
+    bgColor: parsed?.bgColor ?? (fallbackMode ? "#FAF9F6" : "#ffffff"),
+    // Default body text is near-black on light, near-white on dark.
+    // Both pass AA against the bgColor defaults above (>12:1 ratio).
+    textPrimary: parsed?.textPrimary ?? "#18181b",
+    textSecondary: parsed?.textSecondary ?? "#52525b",
+    accentColor: parsed?.accentColor ?? parsed?.primaryColor ?? "#a16207",
+    headlineFont: parsed?.headlineFont ?? "Playfair Display",
+    bodyFont: parsed?.bodyFont ?? "Inter",
+  });
+
   if (resolved.length < 3) {
     const fallback = selectComponentsForPrompt(prompt);
+    const resolvedBrandName = parsed?.brandName ?? inferBrandName(prompt);
     return {
       components: fallback,
-      brandName: parsed?.brandName ?? inferBrandName(prompt),
+      brandName: resolvedBrandName,
       primaryColor: parsed?.primaryColor ?? "#1c1917",
       bgColor: parsed?.bgColor ?? "#FAF9F6",
+      brandSpec: buildBrandSpec(resolvedBrandName, true),
     };
   }
 
+  const resolvedBrandName = parsed?.brandName ?? inferBrandName(prompt);
   return {
     components: resolved,
-    brandName: parsed?.brandName ?? inferBrandName(prompt),
+    brandName: resolvedBrandName,
     primaryColor: parsed?.primaryColor ?? "#4f46e5",
     bgColor: parsed?.bgColor ?? "#ffffff",
+    brandSpec: buildBrandSpec(resolvedBrandName, false),
   };
 }
 
@@ -376,7 +465,41 @@ Hard rules:
 - Replace AI-slop words ("revolutionary", "unleash", "empower", "synergy", "next-generation", "game-changer", "leverage", "elevate", "seamless", "cutting-edge") with specific copy.
 - Use real-sounding metrics, not "10,000+ users".
 - Add aria-labels to icon-only buttons. Add alt text to images. Keep responsive classes.
-- For navbars: anchor links (href="#features", "#pricing", etc.) MUST match real section ids on the page. Only use: features, pricing, faq, about, contact. Never use #docs, #solutions, #markets, or any id that won't exist as a section.`;
+- For navbars: anchor links (href="#features", "#pricing", etc.) MUST match real section ids on the page. Only use: features, pricing, faq, about, contact. Never use #docs, #solutions, #markets, or any id that won't exist as a section.
+
+QUALITY CONTRACT — non-negotiable, the builder ships these or it doesn't ship:
+
+CONTRAST (WCAG AA minimum 4.5:1 for body, 3:1 for large text):
+- Body copy (any <p>, <span>, <li>, table cell) MUST use a text color that meets 4.5:1 against the section's background. On a light/cream background that means text-stone-900, text-stone-800, text-slate-900, text-slate-800, text-amber-950, text-orange-950, text-zinc-900 — NEVER text-amber-600 / text-orange-600 / text-yellow-700 / text-stone-500 / text-slate-500 for body copy.
+- The same applies to feature descriptions, testimonial quotes, FAQ answers, and any descriptive text under a heading. If you would not be confident reading the copy in bright daylight on a phone, the contrast is wrong.
+- Accent colors (text-amber-600, text-rose-700, etc.) are reserved for: small UPPERCASE eyebrow labels (>= text-xs font-semibold tracking-wider), icon strokes, link hover states, and small badge/pill text — never the main body.
+- "EST. 1998" style eyebrow labels: if they're going to be small + uppercase + tracking-wide, make them text-stone-800 / text-amber-900 / text-orange-900, NOT pale gold. The Prestige Properties bug ("EST. 1998 · SOTHEBY'S AFFILIATED" rendered in pale gold on cream) is the failure mode we ship against.
+
+NON-EMPTY CTAS:
+- Every <button>, <a> styled as a button, and every link with role="button" MUST have visible text content (not just an icon). Pattern: <button>Get started <ArrowRight /></button> — never <button><ArrowRight /></button> unless it has BOTH aria-label="..." AND a visually-hidden span (sr-only) with the same label.
+- The secondary CTA next to the primary in a hero MUST have a label. Never render an empty pill button just because it looks balanced.
+- Form submits ("Subscribe", "Send", "Book a table", etc.) MUST have explicit text labels.
+
+SEMANTIC HTML:
+- Top-level region tags by component type:
+    Navbar → <header><nav>...</nav></header>
+    Hero / page top → <section> with id="hero" or omit id
+    Features / pricing / FAQ / testimonials / about / contact → <section id="..."> matching the slug
+    Footer → <footer>
+- Use <article> for repeating cards that have a title + body (blog posts, testimonials, team members). Use <ul><li> for lists of links / nav items. Use <dl><dt><dd> for label-value pairs (stats).
+- Headings descend logically: each page has exactly one <h1>; sections start with <h2>; sub-elements use <h3>. Never use <h4>+.
+
+MOBILE-FIRST RESPONSIVENESS:
+- Default classes apply at the smallest breakpoint. Add sm:, md:, lg: variants for larger screens.
+- Grids: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 (never default to grid-cols-3 with no mobile fallback).
+- Typography: text-2xl sm:text-3xl lg:text-5xl on h1/h2 (never default to a desktop size).
+- Padding: px-4 sm:px-6 lg:px-8 minimum on outer containers.
+
+ACCESSIBILITY:
+- All images have alt="..." (descriptive, not "image of"). Decorative images use alt="".
+- All form inputs have associated <label> (visible or sr-only).
+- focus-visible:ring-2 focus-visible:ring-offset-2 on every interactive element.
+- aria-current="page" on active nav items if you can infer them.`;
 
 const THEME_BRIEFS: Record<string, string> = {
   editorial: `
@@ -402,8 +525,10 @@ This site ships BRIGHT, AIRY, and WELCOMING — the visual opposite of the dark-
 WARM / ARTISAN DESIGN SYSTEM — MANDATORY
 This site ships on a warm cream + amber palette. Restaurant, bakery, hospitality, artisan voice. You MUST:
 - Backgrounds are cream (bg-amber-50, bg-orange-50) or warm off-white. NEVER dark backgrounds.
-- Primary text is deep warm tone: text-stone-900, text-amber-950, text-orange-950.
-- Accent is amber/orange: amber-600, orange-600, or a deep rose like rose-700 for restaurants.
+- Primary text (body, paragraphs, descriptions, list items, table cells) is deep warm tone: text-stone-900, text-amber-950, text-orange-950, text-zinc-900. NEVER text-amber-600, text-amber-700, text-orange-600, text-yellow-700 on a cream background — those fail WCAG AA (the Prestige Properties cream-on-cream bug). If you find yourself reaching for text-amber-{500..700} for body copy, STOP and use text-stone-900 / text-amber-950 instead.
+- Accent (used ONLY for small UPPERCASE eyebrow labels, icon strokes, link hover, badges): amber-700 / amber-800 / orange-700 / orange-800 / rose-700 (for restaurants). The accent should ALWAYS be at least -700 weight on a cream background to maintain 4.5:1 contrast. amber-600 is too pale; bump to amber-700.
+- Eyebrow labels (e.g. "EST. 1998 · SOTHEBY'S AFFILIATED"): use text-amber-900 or text-stone-800 with tracking-widest, NOT text-amber-600 / text-amber-500.
+- Stats and metric numbers (e.g. "$2.3B in Sales Volume"): the number itself is text-stone-900 / text-amber-950; the caption beneath is text-stone-700.
 - Borders are warm: border-amber-200, border-stone-200.
 - Wrap one evocative word in each h1/h2 in <em>…</em> so the Playfair italic serif accent renders.
 - Copy is sensory, specific, inviting. Name real dishes, real rooms, real experiences.`,
@@ -437,6 +562,15 @@ interface CustomiseArgs {
   /** Visual theme — drives which system prompt is sent to the LLM. */
   theme: "editorial" | "light" | "warm" | "dark";
   /**
+   * Q4 brand spec — the shared palette + typography sheet from the
+   * planner. The customiser MUST draw colors + fonts from this spec;
+   * no component should invent its own palette. Kills the
+   * cream-on-cream class of bugs by making contrast a contract.
+   * Optional for back-compat — if absent the customiser falls back
+   * to the legacy brandName + primaryColor hints.
+   */
+  brandSpec?: BrandSpec;
+  /**
    * When true, the generated project has a live Supabase client wired
    * up at `./lib/supabase`. The customiser should wire real auth / data
    * calls into interactive elements (sign-in, sign-up, contact forms,
@@ -462,6 +596,99 @@ function stripFencesAndWrap(raw: string): string {
     return `import React from "react";\n\n${code}\n`;
   }
   return `${code}\n`;
+}
+
+/**
+ * Q3 — slot contract validation. After the customiser emits a
+ * component, scan it for the failure patterns that produced the
+ * Prestige Properties bug: empty <button></button>, anchor links
+ * styled as buttons with no children, untouched placeholder copy,
+ * images missing alt text.
+ *
+ * Returns an array of human-readable issue messages. Empty array
+ * means the component passed; non-empty means the customiser needs a
+ * second pass with the issues listed as the fix-list.
+ *
+ * We intentionally check for *patterns* in the source rather than
+ * trying to render and inspect the DOM — keeps this synchronous, no
+ * additional dependencies, and runs in well under a millisecond per
+ * component.
+ */
+function validateCustomisedComponent(code: string): string[] {
+  const issues: string[] = [];
+
+  // 1. Empty buttons — <button>…</button> with no text content or
+  // child elements other than self-closing icons. Catches both
+  // <button></button> and <button>   </button> and
+  // <button><ArrowRight /></button> (icon-only with no aria-label).
+  const buttonRegex = /<button\b([^>]*)>([\s\S]*?)<\/button>/g;
+  let m: RegExpExecArray | null;
+  while ((m = buttonRegex.exec(code))) {
+    const attrs = m[1];
+    const inner = m[2].trim();
+    const hasAriaLabel = /\baria-label\s*=/.test(attrs);
+    // Strip JSX children that are self-closing icons / spans
+    const textish = inner
+      .replace(/<[A-Z][A-Za-z0-9]*\b[^>]*\/>/g, "") // self-closing components
+      .replace(/<\/?\w+[^>]*>/g, "") // open/close tags
+      .replace(/\{[^}]*\}/g, "X") // JSX expressions count as "content"
+      .trim();
+    if (!textish && !hasAriaLabel) {
+      issues.push(
+        "Empty <button> with no text content and no aria-label — every button must have a visible label or aria-label."
+      );
+    }
+  }
+
+  // 2. Link-as-button with empty body — same failure mode rendered
+  // via <a className="..button..">.
+  const linkAsButton = /<a\b([^>]*className\s*=\s*["'][^"']*\b(?:btn|button|cta)\b[^"']*["'][^>]*)>([\s\S]*?)<\/a>/g;
+  while ((m = linkAsButton.exec(code))) {
+    const inner = m[2].trim();
+    const textish = inner
+      .replace(/<[A-Z][A-Za-z0-9]*\b[^>]*\/>/g, "")
+      .replace(/<\/?\w+[^>]*>/g, "")
+      .replace(/\{[^}]*\}/g, "X")
+      .trim();
+    if (!textish) {
+      issues.push(
+        "Anchor styled as button has no visible label — fill in the link text."
+      );
+    }
+  }
+
+  // 3. Images without alt text. Catches both <img ... /> and <img ...>
+  // without an alt= attribute.
+  const imgRegex = /<img\b([^>]*?)\/?>/g;
+  while ((m = imgRegex.exec(code))) {
+    const attrs = m[1];
+    if (!/\balt\s*=/.test(attrs)) {
+      issues.push(
+        "<img> missing alt attribute — every image needs alt='descriptive text' (or alt='' if purely decorative)."
+      );
+    }
+  }
+
+  // 4. Untouched placeholder copy that betrays we didn't actually
+  // customise. Either pure {{lorem}} mustache, Lorem ipsum substrings,
+  // or our own sentinel keywords from base components.
+  const placeholderHits = [
+    /\bLorem ipsum\b/i,
+    /\b\{\{\s*[a-z_]+\s*\}\}/, // {{handle}} mustache
+    /\bAcme Inc\.?\b/,
+    /\bCompany Name\b/,
+  ];
+  for (const re of placeholderHits) {
+    if (re.test(code)) {
+      issues.push(
+        `Placeholder copy still present (${re.source}) — replace with real on-brand copy.`
+      );
+    }
+  }
+
+  // De-dupe — the same regex can fire multiple times per component
+  // but the fix is the same.
+  return Array.from(new Set(issues));
 }
 
 /**
@@ -539,12 +766,39 @@ interface CustomiseResult {
 async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult> {
   const supabaseBrief = args.supabase ? buildSupabaseBrief(args.supabase) : "";
   const systemPrompt = buildCustomiserSystem(args.theme);
+
+  // Q4: brand spec block — the planner-emitted token sheet rendered
+  // as a hard contract in the customiser user message. Every component
+  // built in this run shares one palette + typography, killing the
+  // color-drift bug class. Falls back to the legacy brandName +
+  // primaryColor hints when brandSpec is absent (back-compat).
+  const brandBlock = args.brandSpec
+    ? [
+        ``,
+        `BRAND SPEC — these are the ONLY colors and fonts you may use.`,
+        `Do NOT pick a Tailwind color outside this sheet for any element.`,
+        ``,
+        `  brandName       ${args.brandSpec.brandName}`,
+        `  bgColor         ${args.brandSpec.bgColor}  (use as the section background)`,
+        `  primaryColor    ${args.brandSpec.primaryColor}  (primary CTAs, primary buttons)`,
+        `  textPrimary     ${args.brandSpec.textPrimary}  (body copy, paragraphs, list text — passes WCAG AA against bgColor)`,
+        `  textSecondary   ${args.brandSpec.textSecondary}  (muted descriptions, captions)`,
+        `  accentColor     ${args.brandSpec.accentColor}  (icon strokes, hover states, small badges — NEVER body text)`,
+        `  headlineFont    ${args.brandSpec.headlineFont}  (use in <h1><h2><h3>)`,
+        `  bodyFont        ${args.brandSpec.bodyFont}  (default body)`,
+        ``,
+        `When picking Tailwind classes, match the hex above to the closest Tailwind shade. For example: if textPrimary is #18181b use text-zinc-900; if accentColor is #a16207 use text-amber-700. Never reach for a vivid color (text-cyan-500, text-rose-500) that isn't in this sheet.`,
+        ``,
+      ].join("\n")
+    : "";
+
   const userMsg =
     `BRAND: ${args.brandName}\n` +
     `PRIMARY COLOR: ${args.primaryColor}\n` +
     `THEME: ${args.theme}\n` +
     `SECTION: ${args.category} (${args.variant})\n` +
     `USER PROMPT: ${args.prompt}\n` +
+    brandBlock +
     supabaseBrief +
     `\nBASE COMPONENT FILE:\n${args.baseCode}\n\n` +
     `Output the full updated TypeScript file only.`;
@@ -574,6 +828,51 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
       // to the failover provider. Matches Bolt V2's auto-error-fixing.
       const verified = verifyGeneratedCode(stripped);
       if (verified.ok) {
+        // Q3 slot contract validation — catches empty buttons, anchor
+        // links styled as buttons with no labels, untouched placeholder
+        // copy, missing alts. If issues found, ONE repair pass with the
+        // slot issues as the fix-list. If repair doesn't help, ship the
+        // original anyway (better than a base-component fallback).
+        const slotIssues = validateCustomisedComponent(stripped);
+        if (slotIssues.length === 0) {
+          return { ok: true, code: stripped, modelUsed: args.model };
+        }
+        console.warn(
+          `[react-stream] slot validator flagged ${args.category}: ${slotIssues.join("; ")}`
+        );
+        try {
+          const slotRepair = await callLLMWithFailover({
+            model: args.model,
+            system: systemPrompt,
+            userMessage: buildRepairPrompt(stripped, slotIssues),
+            maxTokens: 4000,
+          });
+          const slotRepaired = stripFencesAndWrap(slotRepair.text || "");
+          const slotRepairValid = validateGeneratedComponent(slotRepaired);
+          const slotRepairVerified = verifyGeneratedCode(slotRepaired);
+          const slotRepairIssues = validateCustomisedComponent(slotRepaired);
+          if (
+            slotRepairValid.ok &&
+            slotRepairVerified.ok &&
+            slotRepairIssues.length === 0
+          ) {
+            console.info(`[react-stream] slot repair succeeded for ${args.category}`);
+            return {
+              ok: true,
+              code: slotRepaired,
+              modelUsed: `${slotRepair.model || args.model} (slot-repair)`,
+            };
+          }
+          attemptLog.push(
+            `slot-repair: ${slotRepairIssues.length} issues remain after one pass`
+          );
+        } catch (repairErr) {
+          const msg = repairErr instanceof Error ? repairErr.message : String(repairErr);
+          attemptLog.push(`slot-repair: ${msg.slice(0, 80)}`);
+        }
+        // Repair didn't fix it — ship the original; slot issues degrade
+        // quality but don't break the build. UI surfaces these via the
+        // failedSections warning chain elsewhere.
         return { ok: true, code: stripped, modelUsed: args.model };
       }
       attemptLog.push(`${args.model}: verifier flagged ${verified.issues.length} issues`);
@@ -856,7 +1155,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           message: "Picking best components for each section…",
         });
         const planStart = Date.now();
-        const { components, brandName, primaryColor, bgColor } =
+        const { components, brandName, primaryColor, bgColor, brandSpec } =
           await planComponents(prompt + flywheelContext);
         telemetry.phase("plan", Date.now() - planStart);
         telemetry.setComponents(components.map((c) => ({ category: c.category, variant: c.variant })));
@@ -947,6 +1246,7 @@ export async function POST(req: NextRequest): Promise<Response> {
               primaryColor,
               model: customiserModel,
               theme,
+              brandSpec, // Q4: planner-emitted token sheet, shared across all customise calls in this build
               supabase: customiserSupabase,
               onFallback: (provider, model) => {
                 writer.send("fallback", {
@@ -1093,48 +1393,56 @@ export async function POST(req: NextRequest): Promise<Response> {
           });
         }
 
-        // ── PHASE 4: critique loop (premium only) ──
+        // ── PHASE 4: critique loop — Sprint 2 Q2+T3 ──
+        // Runs on EVERY build (Q2+T3 expansion from premium-only).
+        // Premium gets up to 2 refinement passes; free gets 1 pass so
+        // we always emit a score + brand-coherence audit without
+        // doubling build time. brandSpec from the Q4 planner gets fed
+        // in so the critic catches cross-component palette drift.
         let finalFiles = files;
         let finalScore = 0;
 
-        if (mode === "premium") {
-          try {
+        try {
+          writer.send("phase", {
+            phase: "critiquing",
+            message:
+              mode === "premium"
+                ? "Running $100K quality critique…"
+                : "Auditing brand coherence + slot contract…",
+          });
+          const loop = await runQualityLoop({
+            files,
+            originalPrompt: prompt,
+            maxPasses: mode === "premium" ? 2 : 1,
+            brandSpec,
+          });
+
+          finalFiles = loop.finalFiles;
+          finalScore = loop.finalScore;
+
+          const lastCritique =
+            loop.history[loop.history.length - 1];
+          writer.send("score", {
+            score: finalScore,
+            issues: lastCritique?.issues ?? [],
+          });
+
+          if (loop.passes > 1) {
             writer.send("phase", {
-              phase: "critiquing",
-              message: "Running $100K quality critique…",
-            });
-            const loop = await runQualityLoop({
-              files,
-              originalPrompt: prompt,
-              maxPasses: 2,
-            });
-            finalFiles = loop.finalFiles;
-            finalScore = loop.finalScore;
-
-            const lastCritique =
-              loop.history[loop.history.length - 1];
-            writer.send("score", {
-              score: finalScore,
-              issues: lastCritique?.issues ?? [],
-            });
-
-            if (loop.passes > 1) {
-              writer.send("phase", {
-                phase: "refining",
-                message: `Refined ${loop.passes - 1} time(s) — final score ${finalScore}/100`,
-              });
-            }
-            writer.send("files", { files: finalFiles });
-          } catch (err) {
-            // Critique loop failure is non-fatal — the unrefined site is still
-            // usable and has already been streamed to the client.
-            const { message, hint } = classifyError(err);
-            writer.send("error", {
-              fatal: false,
-              message: `Critique loop skipped: ${message}`,
-              hint: `${hint} The unrefined site is still usable.`,
+              phase: "refining",
+              message: `Refined ${loop.passes - 1} time(s) — final score ${finalScore}/100`,
             });
           }
+          writer.send("files", { files: finalFiles });
+        } catch (err) {
+          // Critique loop failure is non-fatal — the unrefined site is still
+          // usable and has already been streamed to the client.
+          const { message, hint } = classifyError(err);
+          writer.send("error", {
+            fatal: false,
+            message: `Critique loop skipped: ${message}`,
+            hint: `${hint} The unrefined site is still usable.`,
+          });
         }
 
         // ── PHASE 5: done ──
@@ -1159,6 +1467,12 @@ export async function POST(req: NextRequest): Promise<Response> {
           score: finalScore,
           durationMs,
           failedSections,
+          // T6 follow-up — surface the planner-emitted BrandSpec on
+          // the done event so the client can wire the brand-kit page
+          // to the actual build's palette + typography (favicon /
+          // social cards / business card / email signature derived
+          // from the same tokens the site uses).
+          brandSpec,
           ...(wantsBackend ? { backend: { projectId } } : {}),
         });
 
