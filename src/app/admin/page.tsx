@@ -15,7 +15,6 @@ import {
   RefreshCw,
   Copy,
   Check,
-  BarChart3,
   Code2,
   Trash2,
   Edit3,
@@ -27,9 +26,6 @@ import {
   UserPlus,
   FolderOpen,
   Rocket,
-  Mail,
-  Inbox,
-  HeadphonesIcon,
   Activity,
   Database,
   Cpu,
@@ -308,15 +304,20 @@ export default function AdminPage() {
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {[
-                  { icon: Mail, label: "Email Inbox", href: "/admin", desc: "Read & manage email" },
-                  { icon: Inbox, label: "Mailboxes", href: "/admin", desc: "Manage mailboxes & routing" },
-                  { icon: Settings, label: "Email Settings", href: "/admin", desc: "Configure admin email" },
-                  { icon: HeadphonesIcon, label: "Support", href: "/admin", desc: "Support tickets & knowledge" },
+                  // AI Website Builder — the only product (Rule 32). Surfaces first.
+                  { icon: Code2, label: "AI Builder", href: "/builder", desc: "Open the builder" },
+                  // Intel Flywheel — daily painkillers from HN + Reddit
+                  { icon: TrendingUp, label: "HN Flywheel", href: "/admin/intel/hn", desc: "Hacker News painkillers" },
+                  { icon: TrendingUp, label: "Reddit Flywheel", href: "/admin/intel/reddit", desc: "Reddit painkillers" },
+                  { icon: Activity, label: "Competitive Intel", href: "/admin/intel", desc: "Competitor crawler" },
+                  // Revenue + product surfaces that actually exist on disk
+                  { icon: Globe, label: "Domains", href: "/admin/domains", desc: "Registered domains" },
+                  { icon: FolderOpen, label: "Builds", href: "/admin/builds", desc: "Build history" },
+                  { icon: Workflow, label: "Integrations", href: "/admin/integrations", desc: "Third-party hooks" },
                   { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness" },
-                  { icon: Code2, label: "Builder", href: "/builder", desc: "AI website builder" },
+                  // Account + public surfaces
+                  { icon: Settings, label: "Settings", href: "/admin/settings", desc: "Admin settings" },
                   { icon: Globe, label: "View Site", href: "/", desc: "Public homepage", external: true },
-                  { icon: Settings, label: "Settings", href: "/auth/settings", desc: "Account settings" },
-                  { icon: BarChart3, label: "Dashboard", href: "/dashboard", desc: "Project dashboard" },
                 ].map((a, i) => (
                   <motion.div
                     key={a.label}
