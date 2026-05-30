@@ -1655,6 +1655,48 @@ select {
    PULSING GLOW BUTTON — animated border glow
    ============================================ */
 
+/* ============================================
+   UTILITY BUTTON CLASSES — used in builder panels
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid var(--rule);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--ink-secondary);
+  border-color: var(--ink-secondary);
+}
+
+.btn-secondary {
+  background: var(--paper-elevated);
+  color: var(--ink);
+  border-color: var(--rule);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: #eeede4;
+  border-color: #d4cfc0;
+}
+
 .btn-glow-pulse {
   position: relative;
   overflow: visible;

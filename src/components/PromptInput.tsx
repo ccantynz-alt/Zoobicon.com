@@ -85,7 +85,7 @@ const EXAMPLE_PROMPTS = [
   "A SaaS pricing page with three tiers, toggle for monthly/annual, and FAQ section",
 ];
 
-const STANDARD_FEATURES = ["Opus-powered", "Responsive", "Fast single-pass"];
+const STANDARD_FEATURES = ["Sonnet-powered", "Responsive", "Fast single-pass"];
 const PREMIUM_FEATURES = ["10-agent pipeline", "Animations", "SEO + Forms", "React export"];
 
 const GENERATION_MODES: { id: GenerationMode; label: string; icon: typeof FileText; description: string }[] = [

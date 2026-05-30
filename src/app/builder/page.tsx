@@ -642,7 +642,7 @@ function BuilderPage() {
   } | null>(null);
   const [validating, setValidating] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
-  const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Opus, pipeline=7-agent
+  const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Sonnet, pipeline=7-agent
   const instantMode = buildMode === "instant"; // back-compat
   const [fullStack, setFullStack] = useState(false); // Full-stack mode: auto-provisions Supabase backend (auth, database, storage)
   // Launch video combo removed 2026-05-26 — AI Video Creator (and its
@@ -1302,7 +1302,7 @@ function BuilderPage() {
 
       // THREE PATHS:
       // 1. Quick Build (buildMode="instant", DEFAULT): Registry scaffold (<1s) + AI customization (~10s)
-      // 2. Deep Build (buildMode="deep"): Opus generates everything from scratch (~30s)
+      // 2. Deep Build (buildMode="deep"): Sonnet generates everything from scratch (~30s)
       // 3. Full Build (buildMode="pipeline"): 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)
       //
       // Slot-locked composition (B1) — opt in via ?slotLocked=1 in the URL
@@ -2100,7 +2100,7 @@ function BuilderPage() {
       case "crawl":
         return (
           <div className="flex flex-col gap-4 p-4">
-            <p className="text-xs text-white/50 leading-relaxed">
+            <p className="text-xs text-[var(--ink-secondary)] leading-relaxed">
               Crawl a competitor&apos;s website to detect their tech stack, features, and design patterns.
               Use insights to build something better.
             </p>
@@ -2456,7 +2456,7 @@ function BuilderPage() {
                         m.id === "instant"
                           ? "Quick: registry assembly + Sonnet customization (<3s preview, ~10s total)"
                           : m.id === "deep"
-                          ? "Deep: Opus generates everything from scratch (~30s)"
+                          ? "Deep: Sonnet generates everything from scratch (~30s)"
                           : "Full: 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)"
                       }
                     >
@@ -2764,12 +2764,12 @@ function BuilderPage() {
         </Link>
 
         {/* Divider */}
-        <div className="w-px h-5 bg-white/[0.08]" />
+        <div className="w-px h-5 bg-[var(--rule)]" />
 
         {/* Project name / status */}
         <div className="flex items-center gap-2 min-w-0">
           {hasCode && (
-            <span className="text-xs text-white/40 truncate max-w-[200px]">
+            <span className="text-xs text-[var(--ink-muted)] truncate max-w-[200px]">
               {prompt.trim().slice(0, 40) || "Untitled Project"}
             </span>
           )}
@@ -2800,7 +2800,7 @@ function BuilderPage() {
               onClick={handleUndo}
               disabled={!canUndo}
               title="Undo (Ctrl+Z)"
-              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <Undo2 size={14} />
             </button>
@@ -2808,7 +2808,7 @@ function BuilderPage() {
               onClick={handleRedo}
               disabled={!canRedo}
               title="Redo (Ctrl+Shift+Z)"
-              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <Redo2 size={14} />
             </button>
@@ -2816,7 +2816,7 @@ function BuilderPage() {
               onClick={() => setShowDiffPanel(true)}
               disabled={snapshots.length < 2}
               title="Version History"
-              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <History size={14} />
             </button>
@@ -2861,7 +2861,7 @@ function BuilderPage() {
                 }
               }}
               title="Share / fork — copy a link to this build"
-              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all"
             >
               <Share2 size={14} />
             </button>
@@ -2890,7 +2890,7 @@ function BuilderPage() {
                   window.open("/builder/ide", "_blank");
                 }}
                 title="Open full code editor"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border border-white/[0.06]"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-[var(--paper-elevated)] text-[var(--ink-secondary)] hover:text-[var(--ink)] hover:bg-stone-100 border border-[var(--rule)]"
               >
                 <Code2 size={13} />
                 <span className="hidden sm:inline">IDE</span>
@@ -2900,8 +2900,8 @@ function BuilderPage() {
                 title="Push to GitHub"
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
                   activeTool === "github-sync"
-                    ? "bg-white/[0.08] text-white/80 border-white/[0.12]"
-                    : "bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border-white/[0.06]"
+                    ? "bg-stone-100 text-[var(--ink)] border-stone-300"
+                    : "bg-[var(--paper-elevated)] text-[var(--ink-secondary)] hover:text-[var(--ink)] hover:bg-stone-100 border-[var(--rule)]"
                 }`}
               >
                 <GitBranchPlus size={13} />
@@ -2911,7 +2911,7 @@ function BuilderPage() {
                 onClick={handleSaveTemplate}
                 disabled={saveStatus === "saving"}
                 title="Save as reusable template"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border border-white/[0.06]"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-[var(--paper-elevated)] text-[var(--ink-secondary)] hover:text-[var(--ink)] hover:bg-stone-100 border border-[var(--rule)]"
               >
                 {saveStatus === "saved" ? <Check size={13} className="text-stone-400" /> : <Save size={13} />}
                 <span className="hidden sm:inline">{saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}</span>
@@ -2972,30 +2972,30 @@ function BuilderPage() {
                 className="flex flex-col h-full"
               >
                 {/* Panel header */}
-                <div className="px-4 py-3 border-b border-white/[0.06]">
+                <div className="px-4 py-3 border-b border-[var(--rule)]">
                   {generatorBanner ? (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-stone-600 to-stone-700 flex items-center justify-center">
+                        <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "var(--gold)", }}>
                           <Sparkles className="w-3 h-3 text-white" />
                         </div>
-                        <span className="text-xs font-semibold text-white/80">
+                        <span className="text-xs font-semibold text-[var(--ink)]">
                           {generatorBanner.name}
                         </span>
                       </div>
                       <button
                         onClick={() => setGeneratorBanner(null)}
-                        className="text-white/30 hover:text-white/50 text-xs transition-colors"
+                        className="text-[var(--ink-muted)] hover:text-[var(--ink)] text-xs transition-colors"
                       >
                         <X size={14} />
                       </button>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-stone-500/15 to-stone-600/15 border border-stone-500/10 flex items-center justify-center">
-                        <MessageSquare className="w-3 h-3 text-stone-400" />
+                      <div className="w-6 h-6 rounded-lg border border-[var(--rule)] flex items-center justify-center" style={{ background: "var(--paper-elevated)" }}>
+                        <MessageSquare className="w-3 h-3 text-[var(--ink-muted)]" />
                       </div>
-                      <span className="text-xs font-medium text-white/50">
+                      <span className="text-xs font-medium text-[var(--ink-secondary)]">
                         AI Website Builder
                       </span>
                     </div>
@@ -3004,14 +3004,14 @@ function BuilderPage() {
 
                 {/* Context import strip */}
                 {mcpContext && (
-                  <div className="px-4 py-1.5 border-b border-white/[0.04] flex items-center gap-2 bg-stone-500/[0.03]">
-                    <span className="text-[10px] text-stone-400/70">Context imported</span>
-                    <button onClick={() => setActiveTool("mcp")} className="text-[10px] text-stone-400/50 hover:text-stone-400 transition-colors">Manage</button>
+                  <div className="px-4 py-1.5 border-b border-[var(--rule)] flex items-center gap-2" style={{ background: "var(--paper-elevated)" }}>
+                    <span className="text-[10px] text-[var(--ink-muted)]">Context imported</span>
+                    <button onClick={() => setActiveTool("mcp")} className="text-[10px] text-[var(--gold-deep)] hover:text-[var(--ink)] transition-colors">Manage</button>
                   </div>
                 )}
                 {!mcpContext && !hasCode && (
-                  <div className="px-4 py-1.5 border-b border-white/[0.04]">
-                    <button onClick={() => setActiveTool("mcp")} className="flex items-center gap-1.5 text-[10px] text-white/25 hover:text-stone-400/70 transition-colors">
+                  <div className="px-4 py-1.5 border-b border-[var(--rule)]">
+                    <button onClick={() => setActiveTool("mcp")} className="flex items-center gap-1.5 text-[10px] text-[var(--ink-muted)] hover:text-[var(--gold-deep)] transition-colors">
                       <ExternalLink size={10} />
                       Import from GitHub, Figma, or URL
                     </button>
@@ -3103,12 +3103,12 @@ function BuilderPage() {
                 className="flex flex-col h-full"
               >
                 {/* Chat header */}
-                <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
+                <div className="px-4 py-2.5 border-b border-[var(--rule)] flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: "rgba(184,146,63,0.15)" }}>
                       <MessageSquare className="w-3 h-3" style={{ color: "var(--gold-deep)" }} />
                     </div>
-                    <span className="text-xs font-semibold text-white/70">Edit with AI</span>
+                    <span className="text-xs font-semibold text-[var(--ink)]">Edit with AI</span>
                     {saveStatus === "saving" && (
                       <span className="text-[9px] text-amber-400/60 flex items-center gap-1">
                         <Loader2 className="w-2.5 h-2.5 animate-spin" />Saving
@@ -3131,7 +3131,7 @@ function BuilderPage() {
                     </button>
                     <button
                       onClick={handleNewSite}
-                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all"
+                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all"
                     >
                       <Plus size={12} />
                       New
@@ -3154,7 +3154,7 @@ function BuilderPage() {
 
                 {/* Section editor (collapsible) */}
                 {showSections && (
-                  <div className="border-b border-white/[0.06] max-h-[45%] overflow-y-auto">
+                  <div className="border-b border-[var(--rule)] max-h-[45%] overflow-y-auto">
                     <SectionEditor
                       files={reactFiles}
                       onFilesUpdate={(updatedFiles) => {
@@ -3206,17 +3206,17 @@ function BuilderPage() {
         </div>
 
         {/* ── Center Panel — Preview / Code / SEO ── */}
-        <div className="flex-1 flex flex-col bg-white/[0.03] backdrop-blur-sm min-w-0 ring-1 ring-white/[0.06]">
+        <div className="flex-1 flex flex-col min-w-0" style={{ background: "var(--paper)", borderLeft: "1px solid var(--rule)" }}>
           {/* Tab bar — clean, minimal */}
-          <div className="flex items-center h-10 border-b border-white/[0.06] px-2 bg-white/[0.03] backdrop-blur-sm">
+          <div className="flex items-center h-10 border-b border-[var(--rule)] px-2" style={{ background: "var(--paper-elevated)" }}>
             <div className="flex items-center gap-0.5">
               {(["preview", "code", ...(hasCode ? ["seo"] : [])] as const).map(tab => (
                 <button
                   key={tab}
                   className={`relative px-3.5 py-2 text-[11px] font-medium transition-all ${
                     activeTab === tab
-                      ? "text-white"
-                      : "text-white/35 hover:text-white/55"
+                      ? "text-[var(--ink)]"
+                      : "text-[var(--ink-muted)] hover:text-[var(--ink-secondary)]"
                   }`}
                   onClick={() => setActiveTab(tab as typeof activeTab)}
                 >
@@ -3227,7 +3227,8 @@ function BuilderPage() {
                   {activeTab === tab && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute bottom-0 left-1 right-1 h-[2px] bg-gradient-to-r from-stone-500 to-stone-500 rounded-full"
+                      className="absolute bottom-0 left-1 right-1 h-[2px] rounded-full"
+                      style={{ background: "var(--gold)" }}
                       transition={{ type: "spring", stiffness: 500, damping: 35 }}
                     />
                   )}
@@ -3564,15 +3565,16 @@ function BuilderPage() {
               animate={{ width: 380, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="flex flex-col border-l border-white/[0.06] bg-white/[0.03] backdrop-blur-xl overflow-hidden"
+              className="flex flex-col border-l border-[var(--rule)] overflow-hidden"
+              style={{ background: "var(--paper-bright)" }}
             >
-              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06] min-w-[380px]">
-                <span className="text-[11px] font-medium text-white/40">
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--rule)] min-w-[380px]">
+                <span className="text-[11px] font-medium text-[var(--ink-secondary)]">
                   {activeToolLabel}
                 </span>
                 <button
                   onClick={() => setActiveTool(null)}
-                  className="p-1 rounded-md text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all"
+                  className="p-1 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all"
                 >
                   <X size={14} />
                 </button>
@@ -3584,7 +3586,7 @@ function BuilderPage() {
 
         {/* ── Right Toolbar — Tool Icons (advanced mode only) ── */}
         {advancedMode && (
-          <div className="w-11 flex flex-col items-center py-2 gap-0.5 border-l border-white/[0.06] bg-white/[0.03] backdrop-blur-sm overflow-y-auto">
+          <div className="w-11 flex flex-col items-center py-2 gap-0.5 border-l border-[var(--rule)] overflow-y-auto" style={{ background: "var(--paper-elevated)" }}>
             {TOOLS.map((tool) => (
               <button
                 key={tool.id}
@@ -3592,8 +3594,8 @@ function BuilderPage() {
                 title={tool.label}
                 className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150 ${
                   activeTool === tool.id
-                    ? "bg-stone-500/15 text-stone-400"
-                    : "text-white/25 hover:text-white/50 hover:bg-white/[0.04]"
+                    ? "bg-[var(--gold-soft)] text-[var(--gold-deep)]"
+                    : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100"
                 }`}
               >
                 {tool.icon}

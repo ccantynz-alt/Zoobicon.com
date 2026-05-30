@@ -1032,7 +1032,10 @@ export async function POST(req: NextRequest): Promise<Response> {
   }
 
   const prompt = (body.prompt ?? "").trim();
-  const mode: Mode = body.mode === "premium" ? "premium" : "fast";
+  // Craig 2026-05-31: Sonnet only for all generation — always premium mode.
+  // Previously this read body.mode which the builder never set, defaulting
+  // every build to Haiku ("fast"). Root cause of near-100% preview crashes.
+  const mode: Mode = "premium";
 
   if (!prompt) {
     return new Response(
