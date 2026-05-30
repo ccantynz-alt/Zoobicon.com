@@ -169,6 +169,59 @@ function buildSrcDoc(
         const pending = new Set(codeFiles);
         let stalls = 0;
 
+        // Sprint 1 S2: content-hash transpile cache.
+        // Babel.transform is the single most expensive step (~10-50ms
+        // per file × 13 files = 130-650ms even on warm runs). The vast
+        // majority of edits change ONE file; the other 12 are byte-
+        // identical to the previous build. We cache by SHA-256 of
+        // (sourceForBabel + path) in localStorage so cross-rebuild
+        // transpilation is skipped for unchanged files.
+        //
+        // Why localStorage and not in-memory: the iframe is torn down
+        // and rebuilt on every preview update, so an in-memory cache
+        // would die between builds. localStorage persists across the
+        // iframe lifecycle as long as the origin (srcdoc) is the same.
+        const CACHE_PREFIX = "zoobicon:transpile:v1:";
+        const CACHE_MAX = 200; // hard cap on cached entries — LRU sweep below
+        async function sha256Hex(s) {
+          const buf = new TextEncoder().encode(s);
+          const hash = await crypto.subtle.digest("SHA-256", buf);
+          return Array.from(new Uint8Array(hash))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+        }
+        function cacheGet(key) {
+          try { return localStorage.getItem(CACHE_PREFIX + key); } catch { return null; }
+        }
+        function cacheSet(key, value) {
+          try {
+            localStorage.setItem(CACHE_PREFIX + key, value);
+            // Simple LRU sweep: if we've exceeded CACHE_MAX entries,
+            // drop the oldest 25%. localStorage doesn't track recency
+            // natively so we use insertion order from key enumeration
+            // which is reasonable for this size.
+            let count = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if (k && k.startsWith(CACHE_PREFIX)) count++;
+            }
+            if (count > CACHE_MAX) {
+              const toDrop = Math.ceil(count * 0.25);
+              const dropped = [];
+              for (let i = 0; i < localStorage.length && dropped.length < toDrop; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith(CACHE_PREFIX)) dropped.push(k);
+              }
+              for (const k of dropped) localStorage.removeItem(k);
+            }
+          } catch {
+            // Storage quota / private mode — silently skip caching.
+          }
+        }
+
+        let cacheHits = 0;
+        let cacheMisses = 0;
+
         while (pending.size > 0) {
           let progress = false;
           for (const path of [...pending]) {
@@ -178,17 +231,29 @@ function buildSrcDoc(
               // them as-is and they'd leak into the Blob URL module.
               const sourceForBabel = stripAssetImports(FILES[path]);
               let transpiled;
-              try {
-                transpiled = Babel.transform(sourceForBabel, {
-                  presets: [
-                    ["typescript", { onlyRemoveTypeImports: true, isTSX: /\.tsx$/.test(path), allExtensions: true }],
-                    ["react", { runtime: "classic" }],
-                  ],
-                  filename: path,
-                }).code;
-              } catch (err) {
-                showError("Failed to transpile " + path, String(err && err.message || err));
-                return;
+              // Cache key includes filename because tsx/ts/jsx/js
+              // toggling changes the Babel presets and the path is
+              // part of the transform input.
+              const cacheKey = await sha256Hex(path + "\0" + sourceForBabel);
+              const cached = cacheGet(cacheKey);
+              if (cached !== null) {
+                transpiled = cached;
+                cacheHits++;
+              } else {
+                try {
+                  transpiled = Babel.transform(sourceForBabel, {
+                    presets: [
+                      ["typescript", { onlyRemoveTypeImports: true, isTSX: /\.tsx$/.test(path), allExtensions: true }],
+                      ["react", { runtime: "classic" }],
+                    ],
+                    filename: path,
+                  }).code;
+                } catch (err) {
+                  showError("Failed to transpile " + path, String(err && err.message || err));
+                  return;
+                }
+                cacheSet(cacheKey, transpiled);
+                cacheMisses++;
               }
 
               // Rewrite relative imports → blob URLs we already created.
@@ -222,6 +287,17 @@ function buildSrcDoc(
               return;
             }
           }
+        }
+
+        // Cache telemetry — visible in DevTools console. Useful when
+        // tuning whether the transpile cache is actually paying off
+        // for the user's edit patterns.
+        if (cacheHits + cacheMisses > 0) {
+          console.log(
+            "[zoobicon-preview] transpile cache: " + cacheHits + " hits / " +
+              (cacheHits + cacheMisses) + " files (" +
+              Math.round((cacheHits / (cacheHits + cacheMisses)) * 100) + "% hit rate)"
+          );
         }
 
         // Find entry
