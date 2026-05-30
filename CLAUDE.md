@@ -350,9 +350,9 @@ These are never allowed under any circumstance without Craig explicitly saying "
 ---
 
 # LIVE REPO STATUS — READ THIS FIRST
-## Last updated: 2026-05-31 | Build: GREEN | Scope: AI WEBSITE BUILDER ONLY (Rule 32) | Branch: claude/website-audit-cleanup-8WhB4 (PR #402)
+## Last updated: 2026-05-31 | Build: GREEN | Scope: AI WEBSITE BUILDER ONLY (Rule 32) | Branch: main (PR #402 merged)
 
-**NEXT ACTION:** Builder now runs Sonnet on every build (PR #402 — the root cause of all crashes). Black buttons fixed. Editorial-light colour polish done. Merge PR #402 to main. After merge: verify a real build end-to-end on production (prompt → site → no preview crash). Then: MCP integration (Emergent has it LIVE, we have a stub) + Tier 0F pricing/Stripe products (Craig task).
+**NEXT ACTION:** PR #402 merged — builder now runs Sonnet on every build, black buttons fixed, editorial-light colour polish complete. Verify a real build end-to-end on production (prompt → site → no "Preview failed" crash). Then: MCP integration (Emergent has it LIVE, we have a stub) + Tier 0F pricing/Stripe products (Craig task).
 
 ### CRONTECH PIVOT (RULE 31) — STATUS
 - §1 AUTH — DONE (1fbcb40). auth-guard.ts is a Crontech-SSO shim.
