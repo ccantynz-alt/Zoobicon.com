@@ -17,7 +17,7 @@
 
 The Prestige Properties cream-on-cream bug is symptomatic; this sprint kills the whole bug class.
 
-- [ ] **Q1** ⏳ **Agent contract hardening** — system prompts enforce WCAG AA contrast, non-empty CTAs, mobile breakpoints, semantic HTML, JSON-LD by default. One prompt rewrite kills 80% of quality bugs.
+- [x] **Q1** ✅ **Agent contract hardening** — system prompts enforce WCAG AA contrast, non-empty CTAs, mobile breakpoints, semantic HTML. The warm preset specifically calls out the Prestige Properties cream-on-cream bug as the failure mode to never ship.
 - [ ] **S1 + I1 + I3** ⏳ **Self-host preview deps under `/vendor/`** — React, ReactDOM, Babel, lucide-react, framer-motion, clsx, tailwind-merge served from zoobicon.com. Eliminates esm.sh + Babel CDN dependencies in one move.
 - [ ] **Q3** ⏳ **Component registry slot contract** — every component declares its required slots; generation can't ship a component with an empty required slot.
 - [ ] **Q4** ⏳ **Brand-coherence token sheet** — Brand Designer agent emits a palette + typography token sheet that the Developer agent must reference. Kills cream-on-cream and font drift globally.
@@ -100,4 +100,5 @@ These ship the moment Crontech endpoints are live. Code is ready.
 
 This is what's been ticked off in chronological order. Newest at top.
 
+- **2026-05-30** — ✅ Q1 Agent contract hardening — QUALITY CONTRACT block added to CUSTOMISER_SYSTEM_BASE in react-stream route, warm preset tightened with explicit guidance against the Prestige Properties cream-on-cream bug class
 - **2026-05-30** — `BUILDER-MASTER-PLAN.md` written and committed (this doc)

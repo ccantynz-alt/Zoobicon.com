@@ -376,7 +376,41 @@ Hard rules:
 - Replace AI-slop words ("revolutionary", "unleash", "empower", "synergy", "next-generation", "game-changer", "leverage", "elevate", "seamless", "cutting-edge") with specific copy.
 - Use real-sounding metrics, not "10,000+ users".
 - Add aria-labels to icon-only buttons. Add alt text to images. Keep responsive classes.
-- For navbars: anchor links (href="#features", "#pricing", etc.) MUST match real section ids on the page. Only use: features, pricing, faq, about, contact. Never use #docs, #solutions, #markets, or any id that won't exist as a section.`;
+- For navbars: anchor links (href="#features", "#pricing", etc.) MUST match real section ids on the page. Only use: features, pricing, faq, about, contact. Never use #docs, #solutions, #markets, or any id that won't exist as a section.
+
+QUALITY CONTRACT — non-negotiable, the builder ships these or it doesn't ship:
+
+CONTRAST (WCAG AA minimum 4.5:1 for body, 3:1 for large text):
+- Body copy (any <p>, <span>, <li>, table cell) MUST use a text color that meets 4.5:1 against the section's background. On a light/cream background that means text-stone-900, text-stone-800, text-slate-900, text-slate-800, text-amber-950, text-orange-950, text-zinc-900 — NEVER text-amber-600 / text-orange-600 / text-yellow-700 / text-stone-500 / text-slate-500 for body copy.
+- The same applies to feature descriptions, testimonial quotes, FAQ answers, and any descriptive text under a heading. If you would not be confident reading the copy in bright daylight on a phone, the contrast is wrong.
+- Accent colors (text-amber-600, text-rose-700, etc.) are reserved for: small UPPERCASE eyebrow labels (>= text-xs font-semibold tracking-wider), icon strokes, link hover states, and small badge/pill text — never the main body.
+- "EST. 1998" style eyebrow labels: if they're going to be small + uppercase + tracking-wide, make them text-stone-800 / text-amber-900 / text-orange-900, NOT pale gold. The Prestige Properties bug ("EST. 1998 · SOTHEBY'S AFFILIATED" rendered in pale gold on cream) is the failure mode we ship against.
+
+NON-EMPTY CTAS:
+- Every <button>, <a> styled as a button, and every link with role="button" MUST have visible text content (not just an icon). Pattern: <button>Get started <ArrowRight /></button> — never <button><ArrowRight /></button> unless it has BOTH aria-label="..." AND a visually-hidden span (sr-only) with the same label.
+- The secondary CTA next to the primary in a hero MUST have a label. Never render an empty pill button just because it looks balanced.
+- Form submits ("Subscribe", "Send", "Book a table", etc.) MUST have explicit text labels.
+
+SEMANTIC HTML:
+- Top-level region tags by component type:
+    Navbar → <header><nav>...</nav></header>
+    Hero / page top → <section> with id="hero" or omit id
+    Features / pricing / FAQ / testimonials / about / contact → <section id="..."> matching the slug
+    Footer → <footer>
+- Use <article> for repeating cards that have a title + body (blog posts, testimonials, team members). Use <ul><li> for lists of links / nav items. Use <dl><dt><dd> for label-value pairs (stats).
+- Headings descend logically: each page has exactly one <h1>; sections start with <h2>; sub-elements use <h3>. Never use <h4>+.
+
+MOBILE-FIRST RESPONSIVENESS:
+- Default classes apply at the smallest breakpoint. Add sm:, md:, lg: variants for larger screens.
+- Grids: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 (never default to grid-cols-3 with no mobile fallback).
+- Typography: text-2xl sm:text-3xl lg:text-5xl on h1/h2 (never default to a desktop size).
+- Padding: px-4 sm:px-6 lg:px-8 minimum on outer containers.
+
+ACCESSIBILITY:
+- All images have alt="..." (descriptive, not "image of"). Decorative images use alt="".
+- All form inputs have associated <label> (visible or sr-only).
+- focus-visible:ring-2 focus-visible:ring-offset-2 on every interactive element.
+- aria-current="page" on active nav items if you can infer them.`;
 
 const THEME_BRIEFS: Record<string, string> = {
   editorial: `
@@ -402,8 +436,10 @@ This site ships BRIGHT, AIRY, and WELCOMING — the visual opposite of the dark-
 WARM / ARTISAN DESIGN SYSTEM — MANDATORY
 This site ships on a warm cream + amber palette. Restaurant, bakery, hospitality, artisan voice. You MUST:
 - Backgrounds are cream (bg-amber-50, bg-orange-50) or warm off-white. NEVER dark backgrounds.
-- Primary text is deep warm tone: text-stone-900, text-amber-950, text-orange-950.
-- Accent is amber/orange: amber-600, orange-600, or a deep rose like rose-700 for restaurants.
+- Primary text (body, paragraphs, descriptions, list items, table cells) is deep warm tone: text-stone-900, text-amber-950, text-orange-950, text-zinc-900. NEVER text-amber-600, text-amber-700, text-orange-600, text-yellow-700 on a cream background — those fail WCAG AA (the Prestige Properties cream-on-cream bug). If you find yourself reaching for text-amber-{500..700} for body copy, STOP and use text-stone-900 / text-amber-950 instead.
+- Accent (used ONLY for small UPPERCASE eyebrow labels, icon strokes, link hover, badges): amber-700 / amber-800 / orange-700 / orange-800 / rose-700 (for restaurants). The accent should ALWAYS be at least -700 weight on a cream background to maintain 4.5:1 contrast. amber-600 is too pale; bump to amber-700.
+- Eyebrow labels (e.g. "EST. 1998 · SOTHEBY'S AFFILIATED"): use text-amber-900 or text-stone-800 with tracking-widest, NOT text-amber-600 / text-amber-500.
+- Stats and metric numbers (e.g. "$2.3B in Sales Volume"): the number itself is text-stone-900 / text-amber-950; the caption beneath is text-stone-700.
 - Borders are warm: border-amber-200, border-stone-200.
 - Wrap one evocative word in each h1/h2 in <em>…</em> so the Playfair italic serif accent renders.
 - Copy is sensory, specific, inviting. Name real dishes, real rooms, real experiences.`,
