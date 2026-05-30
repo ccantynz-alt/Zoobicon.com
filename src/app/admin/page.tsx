@@ -316,6 +316,7 @@ export default function AdminPage() {
                   // Crontech's API at deploy time.
                   { icon: FolderOpen, label: "Builds", href: "/admin/builds", desc: "Build history" },
                   { icon: Workflow, label: "Integrations", href: "/admin/integrations", desc: "Third-party hooks" },
+                  { icon: TrendingUp, label: "SEO control room", href: "/admin/seo", desc: "Sitemap + IndexNow" },
                   { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness" },
                   // Account + public surfaces
                   { icon: Settings, label: "Settings", href: "/admin/settings", desc: "Admin settings" },
