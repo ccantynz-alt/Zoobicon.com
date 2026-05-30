@@ -28,6 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/upgrade', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/audit', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/marketplace', priority: 0.85, changeFrequency: 'weekly' },
+    { path: '/brand-kit', priority: 0.85, changeFrequency: 'weekly' },
     { path: '/pricing', priority: 0.9, changeFrequency: 'weekly' },
 
     // SEO marketing surfaces
