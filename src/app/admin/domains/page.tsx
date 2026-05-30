@@ -90,10 +90,10 @@ export default function AdminDomainsPage() {
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Refresh
           </button>
           <Link
-            href="/domains"
+            href="/builder"
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-500 hover:bg-stone-600 text-white text-sm font-semibold transition-colors shadow-sm"
           >
-            <Plus className="w-4 h-4" /> Register New
+            <Plus className="w-4 h-4" /> Buy in builder
           </Link>
         </div>
       </div>
@@ -151,8 +151,8 @@ export default function AdminDomainsPage() {
             {domains.length === 0 ? "Domains purchased through the platform will appear here." : "Try a different search term."}
           </p>
           {domains.length === 0 && (
-            <Link href="/domains" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-stone-500 hover:bg-stone-600 text-white font-semibold text-sm transition-colors">
-              <Search className="w-4 h-4" /> Search Domains
+            <Link href="/builder" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-stone-500 hover:bg-stone-600 text-white font-semibold text-sm transition-colors">
+              <Search className="w-4 h-4" /> Open builder
             </Link>
           )}
         </div>
