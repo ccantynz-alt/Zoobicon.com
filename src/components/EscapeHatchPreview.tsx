@@ -20,17 +20,27 @@
  * silently) is a launch blocker.
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface EscapeHatchPreviewProps {
   files: Record<string, string>;
   onDownload?: () => void;
 }
 
-// External packages → esm.sh URLs. Matches the GENERATED_SITE_DEPS
-// pinning in react-stream/route.ts so versions are identical to what
-// Sandpack would load.
-const ESM_MAP: Record<string, string> = {
+// Sprint 1 S1+I1+I3: self-host preview deps. scripts/vendor-sync.mjs
+// runs at build time and populates public/vendor/ with the same esm.sh
+// bundles. At runtime we PREFER /vendor/ paths so the user's iframe
+// loads from zoobicon.com — no esm.sh in the runtime hot path.
+//
+// Fallback chain (per dep):
+//   1. /vendor/<pkg>.js  — self-hosted, populated by prebuild script
+//   2. https://esm.sh/<pkg>@<ver>  — fallback if vendor file is missing
+//
+// We probe the manifest at /vendor/manifest.json on mount and rewrite
+// ESM_MAP to local paths for whichever deps actually shipped. If the
+// manifest is unreachable or empty, we fall through to esm.sh and the
+// preview still works exactly as before.
+const ESM_FALLBACK: Record<string, string> = {
   react: "https://esm.sh/react@18.3.1",
   "react-dom": "https://esm.sh/react-dom@18.3.1",
   "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
@@ -40,7 +50,31 @@ const ESM_MAP: Record<string, string> = {
   "tailwind-merge": "https://esm.sh/tailwind-merge@2.5.5",
 };
 
-function buildSrcDoc(files: Record<string, string>): string {
+// Specifier → vendor filename (when populated). Lines up with
+// VENDOR_TARGETS in scripts/vendor-sync.mjs.
+const VENDOR_PATHS: Record<string, string> = {
+  react: "/vendor/react.js",
+  "react-dom": "/vendor/react-dom.js",
+  "react-dom/client": "/vendor/react-dom-client.js",
+  "lucide-react": "/vendor/lucide-react.js",
+  "framer-motion": "/vendor/framer-motion.js",
+  clsx: "/vendor/clsx.js",
+  "tailwind-merge": "/vendor/tailwind-merge.js",
+};
+
+const BABEL_FALLBACK_URL = "https://esm.sh/@babel/standalone@7.25.6";
+const BABEL_VENDOR_PATH = "/vendor/babel-standalone.js";
+
+interface VendorManifest {
+  syncedAt: string;
+  files: Array<{ name: string; status: "downloaded" | "cached" | "failed" }>;
+}
+
+function buildSrcDoc(
+  files: Record<string, string>,
+  esmMap: Record<string, string>,
+  babelUrl: string
+): string {
   // Normalise paths — Sandpack uses leading-slash convention; esm
   // import resolution doesn't.
   const normalized: Record<string, string> = {};
@@ -51,7 +85,7 @@ function buildSrcDoc(files: Record<string, string>): string {
   const stylesCss = normalized["styles.css"] || "";
 
   // The runtime script is the meat. It runs INSIDE the iframe and:
-  //  1. Loads Babel-standalone via esm.sh
+  //  1. Loads Babel-standalone (vendor or esm.sh fallback)
   //  2. Topologically sorts the project's TSX/TS files
   //  3. Transpiles each file, rewrites relative imports to Blob URLs,
   //     creates a Blob URL per file
@@ -61,6 +95,7 @@ function buildSrcDoc(files: Record<string, string>): string {
   // sees a real message instead of a blank iframe.
   const runtime = String.raw`
     const FILES = __FILES_JSON__;
+    const BABEL_URL = __BABEL_URL__;
 
     function showError(title, detail) {
       const root = document.getElementById("root");
@@ -79,7 +114,7 @@ function buildSrcDoc(files: Record<string, string>): string {
 
     (async () => {
       try {
-        const babelMod = await import("https://esm.sh/@babel/standalone@7.25.6");
+        const babelMod = await import(BABEL_URL);
         const Babel = babelMod.default || babelMod;
 
         function resolveRel(imp, from) {
@@ -228,23 +263,77 @@ function buildSrcDoc(files: Record<string, string>): string {
   <style>html,body,#root{margin:0;min-height:100vh;background:#ffffff}</style>
   <style>${stylesCss.replace(/<\/style>/g, "<\\/style>")}</style>
   <script type="importmap">
-${JSON.stringify({ imports: ESM_MAP }, null, 2)}
+${JSON.stringify({ imports: esmMap }, null, 2)}
   </script>
 </head>
 <body>
   <div id="root"></div>
   <script type="module">
-${runtime.replace("__FILES_JSON__", JSON.stringify(normalized))}
+${runtime
+  .replace("__FILES_JSON__", JSON.stringify(normalized))
+  .replace("__BABEL_URL__", JSON.stringify(babelUrl))}
   </script>
 </body>
 </html>`;
 }
 
+/**
+ * Resolve ESM_MAP + Babel URL — checks /vendor/manifest.json on mount
+ * and prefers local paths when the file is present and reported
+ * downloaded/cached. Falls back to esm.sh per-dep if vendor missing.
+ *
+ * This is the Sprint 1 S1+I1+I3 self-hosting move. Users never hit
+ * esm.sh at runtime once Vercel has populated /vendor/.
+ */
+function useResolvedEsm() {
+  const [esmMap, setEsmMap] = useState<Record<string, string>>(ESM_FALLBACK);
+  const [babelUrl, setBabelUrl] = useState<string>(BABEL_FALLBACK_URL);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/vendor/manifest.json", { cache: "force-cache" });
+        if (!res.ok) return; // manifest missing — keep esm.sh fallbacks
+        const manifest = (await res.json()) as VendorManifest;
+        const okFiles = new Set(
+          manifest.files
+            .filter((f) => f.status === "downloaded" || f.status === "cached")
+            .map((f) => f.name)
+        );
+        if (cancelled) return;
+
+        // Build a hybrid map: local path if vendor file present, else esm.sh
+        const hybrid: Record<string, string> = {};
+        for (const [spec, fallback] of Object.entries(ESM_FALLBACK)) {
+          const localPath = VENDOR_PATHS[spec];
+          const localFile = localPath?.replace("/vendor/", "");
+          hybrid[spec] = localFile && okFiles.has(localFile) ? localPath : fallback;
+        }
+        setEsmMap(hybrid);
+
+        if (okFiles.has("babel-standalone.js")) {
+          setBabelUrl(BABEL_VENDOR_PATH);
+        }
+      } catch {
+        // Network / parse failure — keep esm.sh fallbacks
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return { esmMap, babelUrl };
+}
+
 export default function EscapeHatchPreview({ files, onDownload }: EscapeHatchPreviewProps) {
   const [reloadKey, setReloadKey] = useState(0);
-  // Re-build srcDoc only when files change. The reloadKey trick lets
-  // the user manually retry a stuck preview without changing files.
-  const srcDoc = useMemo(() => buildSrcDoc(files), [files]);
+  const { esmMap, babelUrl } = useResolvedEsm();
+  // Re-build srcDoc when files OR the resolved ESM map change. The
+  // reloadKey trick lets the user manually retry a stuck preview
+  // without changing files.
+  const srcDoc = useMemo(() => buildSrcDoc(files, esmMap, babelUrl), [files, esmMap, babelUrl]);
   const hasFiles = Object.keys(files).length > 0;
 
   if (!hasFiles) {
@@ -277,8 +366,8 @@ export default function EscapeHatchPreview({ files, onDownload }: EscapeHatchPre
         }}
       >
         <span>
-          Direct preview — no Sandpack bundler. Uses esm.sh + Babel
-          in-browser.
+          Direct preview — Zoobicon&apos;s own sandbox. Self-hosted React +
+          Babel from /vendor/.
         </span>
         <div className="flex items-center gap-2">
           {onDownload && (
