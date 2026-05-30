@@ -2772,21 +2772,44 @@ function BuilderPage() {
             >
               <History size={14} />
             </button>
-            {/* Sprint 4 T9 — Share / Fork: copy the builder URL with the
-                current prompt encoded so a recipient can open a new
-                session that starts at the same prompt. Full file-state
-                sharing requires DB persistence (queued). */}
+            {/* Sprint 4 T9 — Share / Fork. Persists the full file
+                state to /api/share/create and copies the resulting
+                /share/<code> URL. Recipient sees the exact same
+                generated site (not a fresh re-generation). Falls back
+                to the prompt-only URL if persistence fails (e.g. DB
+                offline). */}
             <button
               onClick={async () => {
-                const shareUrl = new URL(window.location.href);
-                if (prompt) shareUrl.searchParams.set("prompt", prompt);
-                shareUrl.searchParams.set("from", "share");
+                const fallback = () => {
+                  const u = new URL(window.location.href);
+                  if (prompt) u.searchParams.set("prompt", prompt);
+                  u.searchParams.set("from", "share");
+                  return u.toString();
+                };
+                let shareUrl = fallback();
                 try {
-                  await navigator.clipboard.writeText(shareUrl.toString());
+                  if (reactFiles && Object.keys(reactFiles).length > 0) {
+                    const res = await fetch("/api/share/create", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        prompt: prompt || "(no prompt)",
+                        files: reactFiles,
+                      }),
+                    });
+                    if (res.ok) {
+                      const data = (await res.json()) as { ok: boolean; url?: string };
+                      if (data.ok && data.url) shareUrl = data.url;
+                    }
+                  }
+                } catch {
+                  // Network / DB error — fall through to prompt-only URL
+                }
+                try {
+                  await navigator.clipboard.writeText(shareUrl);
                   alert("Share link copied to clipboard");
                 } catch {
-                  // Fallback: open the URL in a new window so user can copy
-                  window.prompt("Copy share link:", shareUrl.toString());
+                  window.prompt("Copy share link:", shareUrl);
                 }
               }}
               title="Share / fork — copy a link to this build"
