@@ -298,8 +298,10 @@ export async function POST(req: NextRequest): Promise<Response> {
   // Quota + plan resolution — same gating as react-stream.
   const plan = getPlanFromRequest(req);
   const userEmail = req.headers.get("x-user-email") || null;
-  const quotaPlan: QuotaPlan =
-    plan === "pro" || plan === "agency" || plan === "free" || plan === "creator"
+  const isAdmin = !!(req.headers.get("x-admin") && req.headers.get("x-admin") !== "0" && req.headers.get("x-admin") !== "false");
+  const quotaPlan: QuotaPlan = isAdmin
+    ? "admin"
+    : plan === "pro" || plan === "agency" || plan === "free" || plan === "creator"
       ? (plan as QuotaPlan)
       : "free";
   const quota = await checkBuildQuota(userEmail, quotaPlan);

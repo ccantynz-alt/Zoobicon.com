@@ -46,7 +46,9 @@ export function getPlanFromRequest(req: NextRequest): Plan {
   if (explicit) return normalizePlan(explicit);
   // Admin header — set by the builder for admin users — short-circuits to
   // the most permissive tier so admins never see the free-tier UI.
-  if (req.headers.get("x-admin") === "true") return "agency";
+  // Accept both "true" and "1" (builder sends "1").
+  const adminHeader = req.headers.get("x-admin");
+  if (adminHeader && adminHeader !== "0" && adminHeader !== "false") return "agency";
   return "free";
 }
 
