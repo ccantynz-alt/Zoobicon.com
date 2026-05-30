@@ -168,7 +168,9 @@ export default function RootLayout({
             <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${process.env.NEXT_PUBLIC_GA_ID}',{page_path:window.location.pathname})` }} />
           </>
         )}
-        {/* Organization JSON-LD structured data — enhanced for GEO (Generative Engine Optimization) */}
+        {/* Organization JSON-LD — site-wide authority signal. Refreshed
+            for Rule 33 (six agents, $49-299 builder tiers, Crontech-
+            provisioned hosting + domain). */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
@@ -177,12 +179,11 @@ export default function RootLayout({
             "name": "Zoobicon",
             "url": "https://zoobicon.com",
             "logo": "https://zoobicon.com/og-image.png",
-            "description": "AI Website Builder — 7 AI agents build production-ready websites, SaaS apps, and e-commerce stores from a single prompt.",
-            "foundingDate": "2025",
+            "description": "AI Website Builder. Six agents build a production-ready React site from a single prompt; hosting + custom domain provisioned via Crontech at deploy.",
+            "foundingDate": "2024",
             "sameAs": [
               "https://zoobicon.ai",
-              "https://zoobicon.io",
-              "https://dominat8.io"
+              "https://zoobicon.io"
             ],
             "contactPoint": {
               "@type": "ContactPoint",
@@ -192,10 +193,10 @@ export default function RootLayout({
             },
             "offers": {
               "@type": "AggregateOffer",
-              "lowPrice": "0",
-              "highPrice": "99",
+              "lowPrice": "49",
+              "highPrice": "299",
               "priceCurrency": "USD",
-              "offerCount": "4"
+              "offerCount": "3"
             },
             "knowsAbout": [
               "AI website generation",
@@ -259,22 +260,43 @@ export default function RootLayout({
             ]
           }) }}
         />
-        {/* SoftwareApplication JSON-LD structured data */}
+        {/* SoftwareApplication JSON-LD — drives Google Software Knowledge Panel */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             "name": "Zoobicon AI Website Builder",
-            "applicationCategory": "DeveloperApplication",
+            "applicationCategory": "WebApplication",
             "operatingSystem": "Web",
             "url": "https://zoobicon.com/builder",
             "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD"
+              "@type": "AggregateOffer",
+              "lowPrice": "49",
+              "highPrice": "299",
+              "priceCurrency": "USD",
+              "offerCount": "3"
             },
-            "description": "Build production-ready websites with AI. 7 agents collaborate to generate full-stack apps, e-commerce stores, and multi-page sites from a single prompt."
+            "description": "Six AI agents collaborate to generate a production-ready React website from a single prompt. Hosting + custom domain provisioned via Crontech at deploy."
+          }) }}
+        />
+        {/* WebSite JSON-LD with SearchAction — enables Google Sitelinks
+            search box for branded queries. High-leverage SEO signal. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Zoobicon",
+            "url": "https://zoobicon.com",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://zoobicon.com/builder?prompt={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
           }) }}
         />
         {/* FAQ JSON-LD for rich snippets in Google search results */}
@@ -289,7 +311,7 @@ export default function RootLayout({
                 "name": "How does Zoobicon build websites with AI?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Zoobicon uses a 7-agent AI pipeline. You describe what you want in plain English, and 7 specialized AI agents (strategist, brand designer, copywriter, architect, developer, SEO optimizer, animation specialist) collaborate to build a production-ready website in about 95 seconds."
+                  "text": "Zoobicon uses a six-agent AI pipeline. You describe what you want in plain English; the Strategist, Brand Designer, Architect, Copywriter, Developer, and SEO agents collaborate live in your browser to ship a production-ready React site in roughly 60 seconds."
                 }
               },
               {
@@ -297,7 +319,7 @@ export default function RootLayout({
                 "name": "How much does Zoobicon cost?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Zoobicon offers a free starter plan with limited builds. Paid plans start at $19/month (Creator), $49/month (Pro), and $99/month (Agency). All paid plans include a 14-day free trial. Enterprise pricing is available on request."
+                  "text": "Three tiers: Starter $49/mo (1 site, 1 custom domain included), Pro $129/mo (3 sites, 3 domains, Opus 4.7), Agency $299/mo (10 sites, white-label, API access). All domains and hosting are provisioned via the Crontech API at deploy time."
                 }
               },
               {
@@ -305,7 +327,7 @@ export default function RootLayout({
                 "name": "What types of websites can Zoobicon generate?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Zoobicon can generate any type of website: business sites, e-commerce stores, SaaS dashboards, portfolios, blogs, restaurants, real estate, healthcare, and more. It includes 43 specialized generators and 100+ templates across 13 categories."
+                  "text": "Restaurants, photographers, SaaS startups, lawyers, coaches, ecommerce stores, portfolios, real estate, nonprofits, hotels — Zoobicon ships tuned niche templates for 28+ industries, plus open-ended generation from any prompt."
                 }
               },
               {
@@ -313,7 +335,7 @@ export default function RootLayout({
                 "name": "Can I edit the website after it's generated?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Yes. Zoobicon includes a full visual editor with click-to-select editing, a code editor, AI-powered chat editing, version history with rollback, and 16+ sidebar tools for SEO, accessibility, performance, animations, and more."
+                  "text": "Yes. Diff-based chat editing means a one-line change re-renders in roughly two seconds without regenerating the whole site. The output is a real React + Tailwind codebase you can export and host anywhere."
                 }
               },
               {
@@ -321,7 +343,7 @@ export default function RootLayout({
                 "name": "Where are Zoobicon sites hosted?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Generated sites deploy to the Crontech cloud with free SSL and global CDN. You can also connect a custom domain, export as HTML/ZIP/React, or export as a WordPress theme."
+                  "text": "Hosting + custom domains are provisioned via the Crontech API at deploy time — one platform, free SSL, global CDN. The generated codebase is portable, so you can also export and host anywhere else."
                 }
               }
             ]

@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next'
 import { COMPETITORS } from '@/lib/seo/competitors'
+import { NICHES } from '@/lib/seo/niches'
 
 // Rule 32 — scope lock: AI Website Builder only. Sitemap reflects the
 // single product + supporting marketing surfaces. /domains standalone,
@@ -82,7 +83,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly' as const,
   }))
 
-  return [...routes, ...comparisonRoutes].map((route) => ({
+  // Programmatic niche pages — /ai-website-builder-for/[niche] for
+  // every entry in the niche catalog. Plus the parent index. These
+  // target the long-tail "AI website builder for {industry}" query
+  // family — much higher search volume than the comparison set, even
+  // if per-query intent is slightly lower.
+  const nicheRoutes = [
+    { path: '/ai-website-builder-for', priority: 0.8, changeFrequency: 'weekly' as const },
+    ...NICHES.map((n) => ({
+      path: `/ai-website-builder-for/${n.slug}`,
+      priority: 0.75,
+      changeFrequency: 'weekly' as const,
+    })),
+  ]
+
+  return [...routes, ...comparisonRoutes, ...nicheRoutes].map((route) => ({
     url: `${baseUrl}${route.path}`,
     lastModified: new Date(),
     changeFrequency: route.changeFrequency,
