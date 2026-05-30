@@ -240,6 +240,7 @@ function buildSrcDoc(
                 transpiled = cached;
                 cacheHits++;
               } else {
+                let transpileFailed = false;
                 try {
                   transpiled = Babel.transform(sourceForBabel, {
                     presets: [
@@ -249,10 +250,32 @@ function buildSrcDoc(
                     filename: path,
                   }).code;
                 } catch (err) {
-                  showError("Failed to transpile " + path, String(err && err.message || err));
-                  return;
+                  // CRITICAL — per-module error isolation. Without this, one
+                  // bad component blanks all 8 of its siblings (root cause of
+                  // "the builder has never worked" — Craig 2026-05-31).
+                  // Replace the broken file with a stub that renders an
+                  // inline error card so the other components keep working.
+                  transpileFailed = true;
+                  const msg = String(err && err.message || err).replace(/[\`\$\\]/g, "?");
+                  const safePath = String(path).replace(/[\`\$\\]/g, "?");
+                  transpiled =
+                    'import React from "react";\\n' +
+                    'export default function BrokenModule(){\\n' +
+                    '  return React.createElement("div",{style:{padding:"24px",margin:"12px",' +
+                    'background:"#fef2f2",border:"2px solid #fca5a5",borderRadius:"12px",' +
+                    'fontFamily:"ui-monospace,monospace",fontSize:"12px",color:"#991b1b",' +
+                    'whiteSpace:"pre-wrap"}},' +
+                    '"' + safePath + ' failed to transpile",' +
+                    'React.createElement("br"),' +
+                    'React.createElement("br"),' +
+                    '"' + msg + '"' +
+                    ');\\n' +
+                    '}\\n';
+                  console.warn("[zoobicon-preview] " + path + " replaced with error stub: " + msg);
                 }
-                cacheSet(cacheKey, transpiled);
+                // Only cache the successful transpile — broken stubs should
+                // re-attempt next render in case the source was fixed.
+                if (!transpileFailed) cacheSet(cacheKey, transpiled);
                 cacheMisses++;
               }
 
@@ -312,17 +335,62 @@ function buildSrcDoc(
           return;
         }
 
-        const [{ default: React }, { createRoot }, AppMod] = await Promise.all([
+        const [{ default: React }, { createRoot }] = await Promise.all([
           import("react"),
           import("react-dom/client"),
-          import(moduleUrls[entry]),
         ]);
-        const App = AppMod.default || AppMod;
-        if (!App) {
-          showError("App.tsx has no default export", "Make sure App.tsx exports a default function.");
+
+        // Wrap the entry import in its own try/catch so a single broken leaf
+        // module surfaces as an error card INSIDE the preview rather than
+        // killing the entire iframe. (Part of the per-module isolation
+        // landed alongside the transpile-stub fallback.)
+        let App = null;
+        let entryError = null;
+        try {
+          const AppMod = await import(moduleUrls[entry]);
+          App = AppMod.default || AppMod;
+        } catch (err) {
+          entryError = String(err && err.stack || err.message || err);
+        }
+
+        // Class-based error boundary so a runtime throw inside ANY child
+        // component (bad hook usage, undefined props, etc.) renders an
+        // inline error card instead of blanking the iframe.
+        class ZoobiconBoundary extends React.Component {
+          constructor(props) { super(props); this.state = { err: null }; }
+          static getDerivedStateFromError(err) { return { err: err }; }
+          componentDidCatch(err) { console.error("[zoobicon-preview] runtime error:", err); }
+          render() {
+            if (this.state.err) {
+              const m = String(this.state.err && this.state.err.message || this.state.err);
+              return React.createElement("div", {
+                style: {
+                  padding: "24px", margin: "24px",
+                  background: "#fef2f2", border: "2px solid #fca5a5",
+                  borderRadius: "12px", fontFamily: "ui-monospace,monospace",
+                  fontSize: "13px", color: "#991b1b", whiteSpace: "pre-wrap",
+                  maxWidth: "720px",
+                },
+              },
+                React.createElement("div", { style: { fontWeight: 600, marginBottom: "8px" } }, "Runtime error in preview"),
+                m
+              );
+            }
+            return this.props.children;
+          }
+        }
+
+        const rootEl = document.getElementById("root");
+        if (entryError || !App) {
+          showError(
+            entryError ? "Entry module failed to load" : "App.tsx has no default export",
+            entryError || "Make sure App.tsx exports a default function."
+          );
           return;
         }
-        createRoot(document.getElementById("root")).render(React.createElement(App));
+        createRoot(rootEl).render(
+          React.createElement(ZoobiconBoundary, null, React.createElement(App))
+        );
       } catch (err) {
         showError("Preview failed", String(err && err.stack || err));
       }
@@ -369,7 +437,10 @@ function useResolvedEsm() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/vendor/manifest.json", { cache: "force-cache" });
+        // `no-cache` (not `force-cache`) — a previously-403'd manifest must
+        // not stick forever; vendor self-hosting should kick in the moment
+        // a fresh build lands. Browser still revalidates via ETag/Last-Modified.
+        const res = await fetch("/vendor/manifest.json", { cache: "no-cache" });
         if (!res.ok) return; // manifest missing — keep esm.sh fallbacks
         const manifest = (await res.json()) as VendorManifest;
         const okFiles = new Set(
