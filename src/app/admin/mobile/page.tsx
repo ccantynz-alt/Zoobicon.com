@@ -9,7 +9,6 @@ import {
   Server,
   TrendingUp,
   RefreshCw,
-  Mail,
   Shield,
   Activity,
   ChevronRight,
@@ -284,12 +283,13 @@ export default function MobileAdminDashboard() {
               <span className="text-xs font-semibold text-stone-700">Quick Actions</span>
             </div>
             <div className="divide-y divide-stone-100">
+              <QuickLink href="/builder" icon={Zap} label="AI Builder" />
+              <QuickLink href="/admin/intel/hn" icon={TrendingUp} label="HN Flywheel" />
+              <QuickLink href="/admin/intel/reddit" icon={TrendingUp} label="Reddit Flywheel" />
+              <QuickLink href="/admin/intel" icon={Shield} label="Competitive Intel" />
+              <QuickLink href="/admin/domains" icon={Globe} label="Domains" />
+              <QuickLink href="/admin/pre-launch" icon={Rocket} label="Pre-Launch" />
               <QuickLink href="/admin" icon={LayoutDashboard} label="Full Admin Panel" />
-              <QuickLink href="/admin" icon={Activity} label="System Health" />
-              <QuickLink href="/admin" icon={Mail} label="Support Inbox" />
-              <QuickLink href="/admin/intel" icon={Shield} label="Market Intel" />
-              <QuickLink href="/admin" icon={BarChart3} label="Usage & Billing" />
-              <QuickLink href="/admin" icon={Server} label="Operations" />
             </div>
           </div>
 
