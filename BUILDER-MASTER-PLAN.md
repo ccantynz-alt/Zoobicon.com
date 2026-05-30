@@ -29,9 +29,9 @@ The Prestige Properties cream-on-cream bug is symptomatic; this sprint kills the
 
 ## SPRINT 2 — COMPETITOR PARITY
 
-- [ ] **Q2 + T3** ⏳ **Post-generation critique + auto-fix loop** — QA agent reads the rendered DOM, detects issues, Developer agent runs a fix pass. Lovable's Browser Testing + Bolt V2's auto-error-fix in one move.
+- [x] **Q2 + T3** ✅ **Post-generation critique + auto-fix loop** — `runQualityLoop` is no longer premium-only. Runs on every build: 1 pass for free tier, 2 passes for premium. The BrandSpec from the Q4 planner is fed into the critic so it catches cross-component palette violations (e.g. one component using bg-cyan-500 when the spec is amber). Score + issues streamed to UI on completion.
 - [ ] **T2** ⏳ **Plan Mode + Prompt Queue** — batch 50 changes, preview diffs, apply selectively. Lovable parity.
-- [ ] **T8** ⏳ **Industry-aware defaults** — niche pages drive builder defaults when user picks an industry.
+- [x] **T8** ✅ **Industry-aware defaults** — `planComponents` runs `detectIndustry()` on the user prompt, looks up the matching niche in `src/lib/seo/niches.ts` (the same catalog driving the 28 SEO pages), and injects the niche's `sections[]` + `mustHaves[]` into the planner user message. Planner now has explicit niche-specific guidance for free; the SEO investment pays off in every build.
 
 ---
 
@@ -100,6 +100,8 @@ These ship the moment Crontech endpoints are live. Code is ready.
 
 This is what's been ticked off in chronological order. Newest at top.
 
+- **2026-05-30** — ✅ Q2+T3 Post-generation critique loop runs on every build (was premium-only); BrandSpec fed to critic catches palette drift
+- **2026-05-30** — ✅ T8 Industry-aware defaults — detectIndustry + niches catalog inject sections/must-haves into planner user message
 - **2026-05-30** — ✅ I2 Sandpack migration confirmed complete — EscapeHatch is the default; Sandpack is opt-in only
 - **2026-05-30** — ✅ Q3 Slot contract validation — validateCustomisedComponent + ONE auto-repair pass with detected issues as fix-list
 - **2026-05-30** — ✅ Q4 Brand-coherence token sheet — planner emits full BrandSpec (palette + typography), injected into every customiseComponent call as a hard "use only these tokens" contract

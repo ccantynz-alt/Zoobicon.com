@@ -338,6 +338,41 @@ export function inferBrandName(prompt: string): string {
 async function planComponents(prompt: string): Promise<PlanResult> {
   const { getById, selectComponentsForPrompt } = await getRegistry();
 
+  // T8 — industry-aware defaults. Detect the niche from the user prompt
+  // using the existing detectIndustry heuristic, look up the niche in
+  // our SEO catalog (the same catalog that drives the 28 niche pages
+  // at /ai-website-builder-for/[slug]), and inject the must-haves +
+  // sections list as planner context. The planner then has
+  // niche-specific guidance for free.
+  let nicheHint = "";
+  try {
+    const { detectIndustry } = await import("@/lib/stock-images");
+    const { NICHES } = await import("@/lib/seo/niches");
+    const industry = detectIndustry(prompt); // "restaurant", "saas", etc.
+    if (industry) {
+      // Loose match: niche slug starts with or contains the industry token.
+      const niche = NICHES.find(
+        (n) =>
+          n.slug === industry ||
+          n.slug.startsWith(industry) ||
+          n.slug.includes(industry) ||
+          n.name.toLowerCase().includes(industry)
+      );
+      if (niche) {
+        nicheHint =
+          `\n\nINDUSTRY DETECTED: ${niche.name} (${niche.slug})\n` +
+          `Audience: ${niche.audience}\n` +
+          `Typical sections for this niche (pick components that cover these):\n` +
+          niche.sections.map((s) => `  - ${s}`).join("\n") +
+          `\nMust-haves for this niche:\n` +
+          niche.mustHaves.map((m) => `  - ${m}`).join("\n");
+      }
+    }
+  } catch {
+    // Industry detection or niche catalog failed — non-fatal; planner
+    // proceeds with prompt-only context.
+  }
+
   // Planning uses callLLMWithFailover so Anthropic outages don't kill builds.
   // Order: Anthropic Haiku (fastest) → Sonnet → OpenAI → Gemini.
   let text = "";
@@ -347,7 +382,7 @@ async function planComponents(prompt: string): Promise<PlanResult> {
     const res = await callLLMWithFailover({
       model: MODEL_HAIKU,
       system: plannerSystem,
-      userMessage: `User prompt: ${prompt}`,
+      userMessage: `User prompt: ${prompt}${nicheHint}`,
       maxTokens: 1500,
     });
     text = res.text || "";
@@ -1358,48 +1393,56 @@ export async function POST(req: NextRequest): Promise<Response> {
           });
         }
 
-        // ── PHASE 4: critique loop (premium only) ──
+        // ── PHASE 4: critique loop — Sprint 2 Q2+T3 ──
+        // Runs on EVERY build (Q2+T3 expansion from premium-only).
+        // Premium gets up to 2 refinement passes; free gets 1 pass so
+        // we always emit a score + brand-coherence audit without
+        // doubling build time. brandSpec from the Q4 planner gets fed
+        // in so the critic catches cross-component palette drift.
         let finalFiles = files;
         let finalScore = 0;
 
-        if (mode === "premium") {
-          try {
+        try {
+          writer.send("phase", {
+            phase: "critiquing",
+            message:
+              mode === "premium"
+                ? "Running $100K quality critique…"
+                : "Auditing brand coherence + slot contract…",
+          });
+          const loop = await runQualityLoop({
+            files,
+            originalPrompt: prompt,
+            maxPasses: mode === "premium" ? 2 : 1,
+            brandSpec,
+          });
+
+          finalFiles = loop.finalFiles;
+          finalScore = loop.finalScore;
+
+          const lastCritique =
+            loop.history[loop.history.length - 1];
+          writer.send("score", {
+            score: finalScore,
+            issues: lastCritique?.issues ?? [],
+          });
+
+          if (loop.passes > 1) {
             writer.send("phase", {
-              phase: "critiquing",
-              message: "Running $100K quality critique…",
-            });
-            const loop = await runQualityLoop({
-              files,
-              originalPrompt: prompt,
-              maxPasses: 2,
-            });
-            finalFiles = loop.finalFiles;
-            finalScore = loop.finalScore;
-
-            const lastCritique =
-              loop.history[loop.history.length - 1];
-            writer.send("score", {
-              score: finalScore,
-              issues: lastCritique?.issues ?? [],
-            });
-
-            if (loop.passes > 1) {
-              writer.send("phase", {
-                phase: "refining",
-                message: `Refined ${loop.passes - 1} time(s) — final score ${finalScore}/100`,
-              });
-            }
-            writer.send("files", { files: finalFiles });
-          } catch (err) {
-            // Critique loop failure is non-fatal — the unrefined site is still
-            // usable and has already been streamed to the client.
-            const { message, hint } = classifyError(err);
-            writer.send("error", {
-              fatal: false,
-              message: `Critique loop skipped: ${message}`,
-              hint: `${hint} The unrefined site is still usable.`,
+              phase: "refining",
+              message: `Refined ${loop.passes - 1} time(s) — final score ${finalScore}/100`,
             });
           }
+          writer.send("files", { files: finalFiles });
+        } catch (err) {
+          // Critique loop failure is non-fatal — the unrefined site is still
+          // usable and has already been streamed to the client.
+          const { message, hint } = classifyError(err);
+          writer.send("error", {
+            fatal: false,
+            message: `Critique loop skipped: ${message}`,
+            hint: `${hint} The unrefined site is still usable.`,
+          });
         }
 
         // ── PHASE 5: done ──

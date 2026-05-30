@@ -306,23 +306,52 @@ export async function runQualityLoop(args: {
   files: Record<string, string>;
   originalPrompt: string;
   maxPasses?: number;
+  /** Q2+T3: brand spec from the planner. When provided, the critic
+   *  receives it as additional context so it can flag cross-component
+   *  palette violations (e.g. a hero using bg-amber-50 with a footer
+   *  using bg-slate-900 — incoherent brand). */
+  brandSpec?: {
+    brandName: string;
+    primaryColor: string;
+    bgColor: string;
+    textPrimary: string;
+    textSecondary: string;
+    accentColor: string;
+    headlineFont: string;
+    bodyFont: string;
+  };
 }): Promise<QualityLoopResult> {
-  const { originalPrompt } = args;
+  const { originalPrompt, brandSpec } = args;
   const maxPasses = args.maxPasses ?? 2;
   let files: Record<string, string> = { ...args.files };
   const history: CritiqueResult[] = [];
   let passes = 0;
   let lastScore = 0;
 
+  // Brand spec block — appended to the originalPrompt so it flows
+  // into both critique and refine calls as part of context.
+  const promptWithBrand = brandSpec
+    ? `${originalPrompt}\n\nBRAND SPEC (what the build is supposed to match):\n` +
+      `  brandName     ${brandSpec.brandName}\n` +
+      `  bgColor       ${brandSpec.bgColor}\n` +
+      `  primaryColor  ${brandSpec.primaryColor}\n` +
+      `  textPrimary   ${brandSpec.textPrimary}\n` +
+      `  textSecondary ${brandSpec.textSecondary}\n` +
+      `  accentColor   ${brandSpec.accentColor}\n` +
+      `  headlineFont  ${brandSpec.headlineFont}\n` +
+      `  bodyFont      ${brandSpec.bodyFont}\n\n` +
+      `Flag any component using colors outside this spec (e.g. text-cyan-500 when the spec is amber) as a brand-coherence violation. Body text must use textPrimary or textSecondary, never accentColor.`
+    : originalPrompt;
+
   while (passes < maxPasses) {
     passes += 1;
-    const critique = await critiqueGeneratedSite({ files, originalPrompt });
+    const critique = await critiqueGeneratedSite({ files, originalPrompt: promptWithBrand });
     history.push(critique);
     lastScore = critique.scoreOutOf100;
 
     if (lastScore >= 90) break;
 
-    const updates = await refineWithCritique({ files, critique, originalPrompt });
+    const updates = await refineWithCritique({ files, critique, originalPrompt: promptWithBrand });
     if (Object.keys(updates).length === 0) break;
 
     files = { ...files, ...updates };
