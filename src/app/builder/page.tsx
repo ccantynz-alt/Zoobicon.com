@@ -2382,23 +2382,62 @@ function BuilderPage() {
                 placeholder="Describe the website you want to build..."
                 className="flex-1 bg-transparent text-white text-base placeholder-white/50 outline-none"
               />
-              <button
-                onClick={() => setBuildMode(buildMode === "instant" ? "deep" : buildMode === "deep" ? "pipeline" : "instant")}
-                className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
-                  buildMode === "pipeline"
-                    ? "bg-stone-200 border-stone-300 text-stone-700"
-                    : buildMode === "deep"
-                    ? "bg-stone-100 border-stone-200 text-stone-500"
-                    : "bg-stone-100 border-stone-200 text-stone-500"
-                }`}
-                title={
-                  buildMode === "instant" ? "Quick Build: <3s preview from component library (free tier)" :
-                  buildMode === "deep" ? "Deep Build: full AI generation with Opus (~30s)" :
-                  "Full Build: 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)"
-                }
+              {/* Quality mode — segmented toggle. CLAUDE.md NEXT ACTION
+                  said "expose Quality mode toggle in builder UI (Sonnet
+                  vs deep pipeline)." The previous single-cycle button
+                  hid two of the three modes from view; this version
+                  makes all three speed/quality tradeoffs visible at a
+                  glance with the active segment lit in gold + a latency
+                  subtitle. */}
+              <div
+                className="flex items-center gap-0 rounded-xl p-0.5"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+                title="Quality mode — pick speed vs depth"
               >
-                {buildMode === "instant" ? "Quick" : buildMode === "deep" ? "Deep" : "Full Build"}
-              </button>
+                {([
+                  { id: "instant", label: "Quick", sub: "<3s" },
+                  { id: "deep", label: "Deep", sub: "~30s" },
+                  { id: "pipeline", label: "Full", sub: "~90s" },
+                ] as const).map((m) => {
+                  const active = buildMode === m.id;
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => setBuildMode(m.id)}
+                      className="flex flex-col items-center px-2.5 py-1 rounded-[10px] transition-all"
+                      style={{
+                        background: active
+                          ? "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)"
+                          : "transparent",
+                        color: active ? "#ffffff" : "rgba(255,255,255,0.5)",
+                        boxShadow: active
+                          ? "0 2px 8px -2px rgba(140,107,37,0.45), inset 0 1px 0 0 rgba(255,255,255,0.25)"
+                          : "none",
+                      }}
+                      title={
+                        m.id === "instant"
+                          ? "Quick: registry assembly + Sonnet customization (<3s preview, ~10s total)"
+                          : m.id === "deep"
+                          ? "Deep: Opus generates everything from scratch (~30s)"
+                          : "Full: 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)"
+                      }
+                    >
+                      <span className="text-[10px] font-semibold uppercase tracking-wider leading-none">
+                        {m.label}
+                      </span>
+                      <span
+                        className="text-[8px] font-mono leading-none mt-0.5"
+                        style={{ opacity: active ? 0.85 : 0.6 }}
+                      >
+                        {m.sub}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
               <button
                 onClick={() => setFullStack(!fullStack)}
                 className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
