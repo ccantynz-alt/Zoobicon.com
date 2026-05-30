@@ -202,7 +202,7 @@ async function getPlannerSystemCacheable(): Promise<string> {
   if (_plannerSystemCache) return _plannerSystemCache;
   _plannerSystemCache = `You are the section planner for the Zoobicon AI website builder.
 
-Your job: pick the best component id for each slot in a website, drawn ONLY from the registry catalog provided below. You return JSON only.
+Your job: pick the best component id for each slot in a website, drawn ONLY from the registry catalog provided below. You also emit a BRAND SPEC — a typed sheet of design tokens (palette + typography) that the downstream customiser must use as the single source of truth for the build. You return JSON only.
 
 Rules:
 - Pick exactly one id per slot you include.
@@ -211,11 +211,22 @@ Rules:
 - Never invent ids. If a slot has no good fit, omit it.
 - Output ONLY JSON, no prose, no markdown fences.
 
+BRAND SPEC RULES (Sprint 1 Q4 — kills color drift across the build):
+- The brand spec is the contract. Every component the customiser builds MUST draw colors + fonts from this sheet, not invent its own.
+- textPrimary MUST meet 4.5:1 contrast against bgColor — this is WCAG AA. Pick deep ink on light bg (e.g. #18181b on #fafafa) or near-white on dark (e.g. #f5f5f4 on #0c0a09). The Prestige Properties cream-on-cream bug came from textPrimary being too pale; never pick something like #d4a574 as textPrimary on a cream background.
+- accentColor is reserved for icons, hover states, small badge text, and primary button fills — never body text.
+- headlineFont + bodyFont are explicit Google Font names (or "Inter", "Playfair Display", "Fraunces", "JetBrains Mono", etc.). The customiser will reference them via Tailwind's font-* classes.
+
 Schema:
 {
   "brandName": "<short brand name inferred from prompt>",
-  "primaryColor": "<hex>",
-  "bgColor": "<hex>",
+  "primaryColor": "<hex — main brand color, used for primary CTAs>",
+  "bgColor": "<hex — page background color>",
+  "textPrimary": "<hex — body text color, must hit 4.5:1 against bgColor>",
+  "textSecondary": "<hex — supporting/muted text, must hit 4.5:1 against bgColor>",
+  "accentColor": "<hex — for icons, hovers, small accent surfaces; NOT for body copy>",
+  "headlineFont": "<font family name — e.g. 'Playfair Display' or 'Inter'>",
+  "bodyFont": "<font family name — typically 'Inter' or system font stack>",
   "selections": [
     { "slot": "navbar|hero|features|stats|logos|testimonials|pricing|faq|cta|about|contact|gallery|blog|ecommerce|forms|footer|misc",
       "id": "<registry id>" }
@@ -236,7 +247,27 @@ interface PlannerOutput {
   brandName?: string;
   primaryColor?: string;
   bgColor?: string;
+  // Q4 brand-token-sheet additions (planner-emitted, customiser-consumed):
+  textPrimary?: string;
+  textSecondary?: string;
+  accentColor?: string;
+  headlineFont?: string;
+  bodyFont?: string;
   selections: PlannerSelection[];
+}
+
+/** Q4: structured brand spec passed to every customiser call so all
+ *  components share one palette + typography sheet. Kills the
+ *  cream-on-cream bug class by making contrast a planner contract. */
+interface BrandSpec {
+  brandName: string;
+  primaryColor: string;
+  bgColor: string;
+  textPrimary: string;
+  textSecondary: string;
+  accentColor: string;
+  headlineFont: string;
+  bodyFont: string;
 }
 
 function safeParseJson<T>(raw: string): T | null {
@@ -257,6 +288,8 @@ interface PlanResult {
   brandName: string;
   primaryColor: string;
   bgColor: string;
+  // Q4 brand spec — passed forward to every customiseComponent call
+  brandSpec: BrandSpec;
 }
 
 /**
@@ -333,21 +366,42 @@ async function planComponents(prompt: string): Promise<PlanResult> {
     }
   }
 
+  // Q4: build a complete brand spec from parsed values plus contrast-
+  // safe defaults. Spread the spec into the returned PlanResult so it
+  // flows through to every customiseComponent call. The defaults are
+  // chosen to PASS WCAG AA (4.5:1) — that's the whole point of Q4.
+  const buildBrandSpec = (resolvedBrandName: string, fallbackMode: boolean): BrandSpec => ({
+    brandName: resolvedBrandName,
+    primaryColor: parsed?.primaryColor ?? (fallbackMode ? "#1c1917" : "#4f46e5"),
+    bgColor: parsed?.bgColor ?? (fallbackMode ? "#FAF9F6" : "#ffffff"),
+    // Default body text is near-black on light, near-white on dark.
+    // Both pass AA against the bgColor defaults above (>12:1 ratio).
+    textPrimary: parsed?.textPrimary ?? "#18181b",
+    textSecondary: parsed?.textSecondary ?? "#52525b",
+    accentColor: parsed?.accentColor ?? parsed?.primaryColor ?? "#a16207",
+    headlineFont: parsed?.headlineFont ?? "Playfair Display",
+    bodyFont: parsed?.bodyFont ?? "Inter",
+  });
+
   if (resolved.length < 3) {
     const fallback = selectComponentsForPrompt(prompt);
+    const resolvedBrandName = parsed?.brandName ?? inferBrandName(prompt);
     return {
       components: fallback,
-      brandName: parsed?.brandName ?? inferBrandName(prompt),
+      brandName: resolvedBrandName,
       primaryColor: parsed?.primaryColor ?? "#1c1917",
       bgColor: parsed?.bgColor ?? "#FAF9F6",
+      brandSpec: buildBrandSpec(resolvedBrandName, true),
     };
   }
 
+  const resolvedBrandName = parsed?.brandName ?? inferBrandName(prompt);
   return {
     components: resolved,
-    brandName: parsed?.brandName ?? inferBrandName(prompt),
+    brandName: resolvedBrandName,
     primaryColor: parsed?.primaryColor ?? "#4f46e5",
     bgColor: parsed?.bgColor ?? "#ffffff",
+    brandSpec: buildBrandSpec(resolvedBrandName, false),
   };
 }
 
@@ -473,6 +527,15 @@ interface CustomiseArgs {
   /** Visual theme — drives which system prompt is sent to the LLM. */
   theme: "editorial" | "light" | "warm" | "dark";
   /**
+   * Q4 brand spec — the shared palette + typography sheet from the
+   * planner. The customiser MUST draw colors + fonts from this spec;
+   * no component should invent its own palette. Kills the
+   * cream-on-cream class of bugs by making contrast a contract.
+   * Optional for back-compat — if absent the customiser falls back
+   * to the legacy brandName + primaryColor hints.
+   */
+  brandSpec?: BrandSpec;
+  /**
    * When true, the generated project has a live Supabase client wired
    * up at `./lib/supabase`. The customiser should wire real auth / data
    * calls into interactive elements (sign-in, sign-up, contact forms,
@@ -575,12 +638,39 @@ interface CustomiseResult {
 async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult> {
   const supabaseBrief = args.supabase ? buildSupabaseBrief(args.supabase) : "";
   const systemPrompt = buildCustomiserSystem(args.theme);
+
+  // Q4: brand spec block — the planner-emitted token sheet rendered
+  // as a hard contract in the customiser user message. Every component
+  // built in this run shares one palette + typography, killing the
+  // color-drift bug class. Falls back to the legacy brandName +
+  // primaryColor hints when brandSpec is absent (back-compat).
+  const brandBlock = args.brandSpec
+    ? [
+        ``,
+        `BRAND SPEC — these are the ONLY colors and fonts you may use.`,
+        `Do NOT pick a Tailwind color outside this sheet for any element.`,
+        ``,
+        `  brandName       ${args.brandSpec.brandName}`,
+        `  bgColor         ${args.brandSpec.bgColor}  (use as the section background)`,
+        `  primaryColor    ${args.brandSpec.primaryColor}  (primary CTAs, primary buttons)`,
+        `  textPrimary     ${args.brandSpec.textPrimary}  (body copy, paragraphs, list text — passes WCAG AA against bgColor)`,
+        `  textSecondary   ${args.brandSpec.textSecondary}  (muted descriptions, captions)`,
+        `  accentColor     ${args.brandSpec.accentColor}  (icon strokes, hover states, small badges — NEVER body text)`,
+        `  headlineFont    ${args.brandSpec.headlineFont}  (use in <h1><h2><h3>)`,
+        `  bodyFont        ${args.brandSpec.bodyFont}  (default body)`,
+        ``,
+        `When picking Tailwind classes, match the hex above to the closest Tailwind shade. For example: if textPrimary is #18181b use text-zinc-900; if accentColor is #a16207 use text-amber-700. Never reach for a vivid color (text-cyan-500, text-rose-500) that isn't in this sheet.`,
+        ``,
+      ].join("\n")
+    : "";
+
   const userMsg =
     `BRAND: ${args.brandName}\n` +
     `PRIMARY COLOR: ${args.primaryColor}\n` +
     `THEME: ${args.theme}\n` +
     `SECTION: ${args.category} (${args.variant})\n` +
     `USER PROMPT: ${args.prompt}\n` +
+    brandBlock +
     supabaseBrief +
     `\nBASE COMPONENT FILE:\n${args.baseCode}\n\n` +
     `Output the full updated TypeScript file only.`;
@@ -892,7 +982,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           message: "Picking best components for each section…",
         });
         const planStart = Date.now();
-        const { components, brandName, primaryColor, bgColor } =
+        const { components, brandName, primaryColor, bgColor, brandSpec } =
           await planComponents(prompt + flywheelContext);
         telemetry.phase("plan", Date.now() - planStart);
         telemetry.setComponents(components.map((c) => ({ category: c.category, variant: c.variant })));
@@ -983,6 +1073,7 @@ export async function POST(req: NextRequest): Promise<Response> {
               primaryColor,
               model: customiserModel,
               theme,
+              brandSpec, // Q4: planner-emitted token sheet, shared across all customise calls in this build
               supabase: customiserSupabase,
               onFallback: (provider, model) => {
                 writer.send("fallback", {
