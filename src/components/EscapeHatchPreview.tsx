@@ -100,13 +100,31 @@ function buildSrcDoc(files: Record<string, string>): string {
           return null;
         }
 
+        // Strip imports of non-JS static assets (CSS, images, fonts).
+        // CSS is already inlined as a <style> tag in the iframe head;
+        // images and fonts will 404 inside the iframe but at least the
+        // module graph can resolve. Without this, browser-native ESM
+        // throws "Invalid relative url or base scheme isn't hierarchical"
+        // because Blob URLs aren't hierarchical and can't resolve
+        // ./styles.css.
+        function stripAssetImports(code) {
+          return code
+            // Side-effect imports:   import "./styles.css";
+            .replace(/^\s*import\s+["'][^"']+\.(css|scss|sass|less|svg|png|jpe?g|gif|webp|woff2?|ttf|otf)["']\s*;?\s*$/gm, "")
+            // Default/namespace imports of assets: import styles from "./styles.css"
+            .replace(/^\s*import\s+[\w\s{},*]+\s+from\s+["'][^"']+\.(css|scss|sass|less|svg|png|jpe?g|gif|webp|woff2?|ttf|otf)["']\s*;?\s*$/gm, "");
+        }
+
         function depsOf(path, code) {
           const deps = [];
           const re = /from\s+["'](\.[^"']+)["']/g;
           let m;
           while ((m = re.exec(code))) {
             const r = resolveRel(m[1], path);
-            if (r) deps.push(r);
+            // Only count deps that are JS — CSS/img imports might be
+            // resolvable by file name but they're not processable
+            // through the Babel + Blob URL pipeline.
+            if (r && /\.(tsx?|jsx?)$/.test(r)) deps.push(r);
           }
           return deps;
         }
@@ -121,9 +139,12 @@ function buildSrcDoc(files: Record<string, string>): string {
           for (const path of [...pending]) {
             const deps = depsOf(path, FILES[path]);
             if (deps.every(d => moduleUrls[d])) {
+              // Strip CSS/image imports BEFORE Babel — Babel preserves
+              // them as-is and they'd leak into the Blob URL module.
+              const sourceForBabel = stripAssetImports(FILES[path]);
               let transpiled;
               try {
-                transpiled = Babel.transform(FILES[path], {
+                transpiled = Babel.transform(sourceForBabel, {
                   presets: [
                     ["typescript", { onlyRemoveTypeImports: true, isTSX: /\.tsx$/.test(path), allExtensions: true }],
                     ["react", { runtime: "classic" }],
