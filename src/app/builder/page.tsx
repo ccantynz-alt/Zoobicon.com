@@ -12,6 +12,7 @@ import type { Plan } from "@/lib/user-plan";
 import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 import PrewarmFrame from "@/components/PrewarmFrame";
 import AgentOrbsRow from "@/components/AgentOrbsRow";
+import PromptQueuePanel from "@/components/PromptQueuePanel";
 import dynamic from "next/dynamic";
 
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
@@ -1733,11 +1734,13 @@ function BuilderPage() {
     [prompt, handleGenerate],
   );
 
-  // Edit existing React files via the same streaming endpoint
-  const handleEdit = useCallback(async () => {
-    if (!editPrompt.trim() || !reactFiles) return;
+  // Edit existing React files via the same streaming endpoint. Core
+  // body extracted to runEditWith(instruction) so the Prompt Queue
+  // panel (T2) can fire edits sequentially without going through
+  // editPrompt state.
+  const runEditWith = useCallback(async (instruction: string): Promise<void> => {
+    if (!instruction.trim() || !reactFiles) return;
 
-    const instruction = editPrompt.trim();
     setStatus("generating");
     setError("");
     setPipelineAgents([`Editing: ${instruction.slice(0, 60)}...`]);
@@ -1747,7 +1750,6 @@ function BuilderPage() {
     abortRef.current = controller;
 
     try {
-      // Use diff-based editing — only regenerate changed files (2-5s vs 30s)
       const res = await fetch("/api/generate/edit", {
         method: "POST",
         headers: authHeaders(),
@@ -1763,12 +1765,12 @@ function BuilderPage() {
         throw new Error(errData.error || `HTTP ${res.status}`);
       }
 
-      // Read SSE stream
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No response stream");
 
       const decoder = new TextDecoder();
       let lineBuffer = "";
+      let sawDone = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -1784,31 +1786,30 @@ function BuilderPage() {
             if (event.type === "status") {
               setPipelineAgents(prev => [...prev, event.message]);
             } else if (event.type === "partial" && event.files) {
-              // Merge changed files into existing files (diff-based)
               setReactFiles(prev => ({ ...prev, ...event.files }));
             } else if (event.type === "done" && event.files) {
-              // Merge ONLY the changed files — keep everything else
               setReactFiles(prev => {
                 const merged = { ...prev, ...event.files };
                 setReactSource(merged);
                 return merged;
               });
               setStatus("complete");
-              setEditPrompt("");
               setPipelineAgents(prev => [...prev, `Edit complete — ${event.changedCount || Object.keys(event.files).length} file(s) changed`]);
+              sawDone = true;
             } else if (event.type === "error") {
               throw new Error(event.message);
             }
           } catch (e) {
-            // Malformed JSON = partial SSE chunk or heartbeat line, skip.
-            // Anything else (including our own "throw new Error(event.message)"
-            // above and legitimate application errors) must propagate — otherwise
-            // the user stares at an unchanging Sandpack preview and never learns
-            // the edit failed (Law 8: no silent catches).
             if (e instanceof SyntaxError) continue;
             throw e;
           }
         }
+      }
+
+      // If the stream ended without a 'done' event, surface that
+      // instead of silently leaving the queue runner thinking success.
+      if (!sawDone) {
+        throw new Error("Edit stream ended without a done event");
       }
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
@@ -1816,8 +1817,25 @@ function BuilderPage() {
       console.error("[Edit] Failed:", errMsg);
       setError(cleanErrorMessage(errMsg));
       setStatus("error");
+      // Re-throw so the queue runner can mark this item as errored.
+      throw err;
     }
-  }, [editPrompt, reactFiles, tier, selectedModel]);
+  }, [reactFiles, authHeaders]);
+
+  // Manual single-shot edit (the Send button path). Calls
+  // runEditWith with the current editPrompt then clears it.
+  const handleEdit = useCallback(async () => {
+    if (!editPrompt.trim() || !reactFiles) return;
+    const instruction = editPrompt.trim();
+    try {
+      await runEditWith(instruction);
+      setEditPrompt("");
+    } catch {
+      // runEditWith already surfaced the error via setError; nothing
+      // more to do here.
+    }
+  }, [editPrompt, reactFiles, runEditWith]);
+
 
   const handleCodeUpdate = useCallback((newCode: string) => {
     setGeneratedCode(newCode);
@@ -3033,6 +3051,16 @@ function BuilderPage() {
                     onFullStackChange={setFullStack}
                     showAdvanced={advancedMode}
                   />
+                  {/* T2 Prompt Queue — Lovable-parity batch edits.
+                      Only surfaces when there's a build to edit. */}
+                  {hasCode && (
+                    <div className="mt-3">
+                      <PromptQueuePanel
+                        onRunPrompt={runEditWith}
+                        isBusy={status === "generating"}
+                      />
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ) : (

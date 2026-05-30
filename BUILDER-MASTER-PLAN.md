@@ -31,7 +31,7 @@ The Prestige Properties cream-on-cream bug is symptomatic; this sprint kills the
 
 - [x] **Q2 + T3** ✅ **Post-generation critique + auto-fix loop** — `runQualityLoop` is no longer premium-only. Runs on every build: 1 pass for free tier, 2 passes for premium. The BrandSpec from the Q4 planner is fed into the critic so it catches cross-component palette violations (e.g. one component using bg-cyan-500 when the spec is amber). Score + issues streamed to UI on completion.
 - [x] **T2 (Plan Mode)** ✅ **Plan Mode shipped via pre-flight endpoint** — `/api/generate/plan` returns industry + brandName + component lineup + estimated cost in <1s; builder gates the expensive build behind a user confirm via `planReview` state in `/builder/page.tsx`. KILLER-MOVES-BUILDER #B12 was the historic context. **Prompt Queue** (batch 50 changes) is the remaining Lovable-parity piece — tracked separately as a follow-up in the Advanced Funnels queue below.
-- [ ] **T2 (Prompt Queue)** ⏳ **Prompt Queue** — batch multiple edit prompts and process them sequentially. Backend already supports the diff-edit endpoint; frontend needs a queue UI.
+- [x] **T2 (Prompt Queue)** ✅ **Prompt Queue** — `PromptQueuePanel` mounted in the builder when a build exists. Add prompts (one per line or one-by-one), click Run to fire them sequentially via the diff-edit endpoint. Per-item status (pending/running/done/error) with auto-stop on error. `handleEdit` refactored to expose `runEditWith(instruction)` so the queue can fire edits without going through editPrompt state.
 - [x] **T8** ✅ **Industry-aware defaults** — `planComponents` runs `detectIndustry()` on the user prompt, looks up the matching niche in `src/lib/seo/niches.ts` (the same catalog driving the 28 SEO pages), and injects the niche's `sections[]` + `mustHaves[]` into the planner user message. Planner now has explicit niche-specific guidance for free; the SEO investment pays off in every build.
 
 ---
@@ -101,6 +101,7 @@ These ship the moment Crontech endpoints are live. Code is ready.
 
 This is what's been ticked off in chronological order. Newest at top.
 
+- **2026-05-30** — ✅ T2 Prompt Queue — PromptQueuePanel + runEditWith refactor; batch edits with per-item status and auto-stop on error
 - **2026-05-30** — ✅ T9 full — shared_builds table + /api/share/create + /api/share/[code] + /share/[code] viewer; builder Share button now persists files
 - **2026-05-30** — ✅ T7 foundation — collab server routes wired (collab_rooms + collab_participants tables, presence + code sync; CollaborationBar finally works end-to-end)
 - **2026-05-30** — ✅ T9 partial — Share/fork URL button in builder toolbar; copies current prompt as a shareable link
