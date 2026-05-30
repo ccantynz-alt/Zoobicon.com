@@ -27,6 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/builder', priority: 0.9, changeFrequency: 'daily' },
     { path: '/upgrade', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/wordpress-import', priority: 0.9, changeFrequency: 'weekly' },
+    { path: '/github-import', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/audit', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/marketplace', priority: 0.85, changeFrequency: 'weekly' },
     { path: '/brand-kit', priority: 0.85, changeFrequency: 'weekly' },

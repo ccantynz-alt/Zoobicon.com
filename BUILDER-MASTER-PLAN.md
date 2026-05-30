@@ -46,7 +46,7 @@ The Prestige Properties cream-on-cream bug is symptomatic; this sprint kills the
 
 ## SPRINT 4 — DEPTH
 
-- [ ] **T4** ⏳ **Real MCP integration** — GitHub repo import, Figma frame import, Notion content import.
+- [x] **T4 (partial)** ✅ **MCP — GitHub + WordPress import paths shipped.** `/github-import` + `/api/github/preview` wraps existing `fetchGitHubContext` to pull README/package.json/repo info and compose a builder prompt for a landing page. `/wordpress-import` + `/api/wordpress/import` does the same for WordPress sites via wp-json (richer structured data than HTML scraping). Figma + Notion connectors still queued.
 - [ ] **T7** ⏳ **Real-time multi-user collaboration** — two people editing the same site simultaneously.
 - [ ] **T9** ⏳ **Fork / Session continuity** — every prompt is a branch point.
 
@@ -101,6 +101,7 @@ These ship the moment Crontech endpoints are live. Code is ready.
 
 This is what's been ticked off in chronological order. Newest at top.
 
+- **2026-05-30** — ✅ T4 partial — GitHub repo import (/github-import + /api/github/preview) and WordPress wp-json import (/wordpress-import + /api/wordpress/import). Figma + Notion connectors queued.
 - **2026-05-30** — ✅ T6 Multi-format generation — brand-assets.ts + /api/brand-assets + /brand-kit page; favicon + email signature + OG + Twitter + business card from one BrandSpec
 - **2026-05-30** — ✅ T5 Voice-to-Site — VoiceToBuildButton mounted on HeroBuilder + /upgrade + /audit (was builder-only)
 - **2026-05-30** — ✅ T1 AI Site Audit — /audit route + /api/audit/run + scoreAudit() with 4 category scores; nav link added
