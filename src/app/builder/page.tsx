@@ -12,6 +12,7 @@ import type { Plan } from "@/lib/user-plan";
 import DomainHookModal from "@/components/DomainHookModal";
 import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 import PrewarmFrame from "@/components/PrewarmFrame";
+import AgentOrbsRow from "@/components/AgentOrbsRow";
 import dynamic from "next/dynamic";
 
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
@@ -2129,7 +2130,15 @@ function BuilderPage() {
         {/* Pipeline status overlay — shows during generation with progress bar */}
         {status === "generating" && pipelineAgents.length > 0 && (
           <div className="absolute bottom-6 left-6 right-6 z-40">
-            <div className="max-w-xl mx-auto px-5 py-3 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/[0.08] shadow-2xl">
+            <div className="max-w-2xl mx-auto px-5 py-3 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/[0.08] shadow-2xl">
+              {/* Six-agent orb row — derives the active agent by
+                  keyword-matching the latest log line. No new
+                  server-side state required. */}
+              <AgentOrbsRow
+                latestMessage={pipelineAgents[pipelineAgents.length - 1] || null}
+                componentsDone={buildProgress?.current}
+                componentsTotal={buildProgress?.total}
+              />
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-stone-500 animate-pulse flex-shrink-0" />
                 <span className="text-sm text-white/80 font-medium truncate">
