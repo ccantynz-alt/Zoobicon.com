@@ -30,14 +30,15 @@ The Prestige Properties cream-on-cream bug is symptomatic; this sprint kills the
 ## SPRINT 2 — COMPETITOR PARITY
 
 - [x] **Q2 + T3** ✅ **Post-generation critique + auto-fix loop** — `runQualityLoop` is no longer premium-only. Runs on every build: 1 pass for free tier, 2 passes for premium. The BrandSpec from the Q4 planner is fed into the critic so it catches cross-component palette violations (e.g. one component using bg-cyan-500 when the spec is amber). Score + issues streamed to UI on completion.
-- [ ] **T2** ⏳ **Plan Mode + Prompt Queue** — batch 50 changes, preview diffs, apply selectively. Lovable parity.
+- [x] **T2 (Plan Mode)** ✅ **Plan Mode shipped via pre-flight endpoint** — `/api/generate/plan` returns industry + brandName + component lineup + estimated cost in <1s; builder gates the expensive build behind a user confirm via `planReview` state in `/builder/page.tsx`. KILLER-MOVES-BUILDER #B12 was the historic context. **Prompt Queue** (batch 50 changes) is the remaining Lovable-parity piece — tracked separately as a follow-up in the Advanced Funnels queue below.
+- [ ] **T2 (Prompt Queue)** ⏳ **Prompt Queue** — batch multiple edit prompts and process them sequentially. Backend already supports the diff-edit endpoint; frontend needs a queue UI.
 - [x] **T8** ✅ **Industry-aware defaults** — `planComponents` runs `detectIndustry()` on the user prompt, looks up the matching niche in `src/lib/seo/niches.ts` (the same catalog driving the 28 SEO pages), and injects the niche's `sections[]` + `mustHaves[]` into the planner user message. Planner now has explicit niche-specific guidance for free; the SEO investment pays off in every build.
 
 ---
 
 ## SPRINT 3 — COMPETITOR TERROR MOVES
 
-- [ ] **T1** ⏳ **AI Site Audit Agent** — `/audit` route. Paste URL → perf + SEO + accessibility + conversion audit → fix list → rebuild CTA. Extends `/upgrade`.
+- [x] **T1** ✅ **AI Site Audit Agent** — `/audit` route shipped. `scoreAudit()` in url-extractor returns 4 category scores (perf/SEO/a11y/conversion) with ✓ passed and ✗ failed check lists. Report card UI + "Rebuild with these fixes" CTA → builder with prefilled prompt. Linked from nav. Targets high-volume "free website audit AI" search intent.
 - [ ] **T5** ⏳ **Voice-to-Site** — harden the existing VoiceToBuildButton end-to-end.
 - [ ] **T6** ⏳ **Multi-format generation** — one prompt → site + email signature + social cards + business card + favicon + OG images. Total brand kit from one input.
 
@@ -100,6 +101,8 @@ These ship the moment Crontech endpoints are live. Code is ready.
 
 This is what's been ticked off in chronological order. Newest at top.
 
+- **2026-05-30** — ✅ T1 AI Site Audit — /audit route + /api/audit/run + scoreAudit() with 4 category scores; nav link added
+- **2026-05-30** — ✅ T2 (Plan Mode) — confirmed pre-shipped (KILLER-MOVES #B12) at `/api/generate/plan` + planReview gate in builder. Prompt Queue split out as a follow-up.
 - **2026-05-30** — ✅ Q2+T3 Post-generation critique loop runs on every build (was premium-only); BrandSpec fed to critic catches palette drift
 - **2026-05-30** — ✅ T8 Industry-aware defaults — detectIndustry + niches catalog inject sections/must-haves into planner user message
 - **2026-05-30** — ✅ I2 Sandpack migration confirmed complete — EscapeHatch is the default; Sandpack is opt-in only
