@@ -59,6 +59,7 @@ const PRODUCT_SECTIONS = [
 const TOP_NAV_LINKS = [
   { name: "Builder", href: "/builder" },
   { name: "Upgrade my site", href: "/upgrade" },
+  { name: "Marketplace", href: "/marketplace" },
   { name: "Pricing", href: "/pricing" },
   { name: "Agencies", href: "/agencies" },
 ];
