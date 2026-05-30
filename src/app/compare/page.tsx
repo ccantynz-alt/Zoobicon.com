@@ -180,6 +180,47 @@ export default function ComparePage() {
         </div>
       </section>
 
+      {/* Deep-dive per-competitor comparison pages.
+          Programmatic SEO: /compare/[competitor] for 13 builders.
+          See src/lib/seo/competitors.ts for the catalog. */}
+      <section className="py-16 px-4 bg-white/[0.02]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-[10px] uppercase tracking-[0.22em] font-semibold text-stone-400 mb-2">Honest deep-dives</p>
+            <h2 className="text-3xl font-bold mb-3">Compare Zoobicon vs every AI builder</h2>
+            <p className="text-sm text-stone-400 max-w-2xl mx-auto">
+              Each page below carries a full feature matrix, side-by-side pricing, FAQ, and an honest accounting of where the competitor leads us.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {[
+              { slug: "lovable", name: "Lovable" },
+              { slug: "bolt-new", name: "Bolt.new" },
+              { slug: "v0", name: "v0 (Vercel)" },
+              { slug: "emergent", name: "Emergent" },
+              { slug: "wix", name: "Wix" },
+              { slug: "squarespace", name: "Squarespace" },
+              { slug: "webflow", name: "Webflow" },
+              { slug: "framer", name: "Framer" },
+              { slug: "carrd", name: "Carrd" },
+              { slug: "bubble", name: "Bubble" },
+              { slug: "google-stitch", name: "Google Stitch" },
+              { slug: "replit", name: "Replit Agent" },
+              { slug: "flutterflow", name: "FlutterFlow" },
+            ].map((c) => (
+              <Link
+                key={c.slug}
+                href={`/compare/${c.slug}`}
+                className="group flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-white/10 hover:border-stone-400/40 bg-white/[0.02] hover:bg-white/[0.04] transition-all"
+              >
+                <span className="text-sm font-medium text-stone-200 group-hover:text-white">vs {c.name}</span>
+                <ArrowRight className="w-4 h-4 text-stone-400 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Why Choose Zoobicon */}
       <section className="py-20 px-4 bg-white/[0.02]">
         <div className="max-w-4xl mx-auto">

@@ -71,7 +71,7 @@ export default function SiteFooter() {
               </h2>
               <p className="mt-4 text-[15px] leading-relaxed max-w-md" style={{ color: "var(--ink-secondary)" }}>
                 One sentence. Sixty seconds. A complete, responsive site
-                with the matching domain bought in the same checkout.
+                with the matching custom domain + hosting provisioned via Crontech.
                 No templates. No code.
               </p>
             </div>

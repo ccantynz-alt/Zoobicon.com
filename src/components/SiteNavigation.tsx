@@ -58,6 +58,7 @@ const PRODUCT_SECTIONS = [
 
 const TOP_NAV_LINKS = [
   { name: "Builder", href: "/builder" },
+  { name: "Upgrade my site", href: "/upgrade" },
   { name: "Pricing", href: "/pricing" },
   { name: "Agencies", href: "/agencies" },
 ];
@@ -294,7 +295,7 @@ export default function SiteNavigation() {
                       <span className="text-[12px]" style={{ color: "var(--ink-secondary)" }}>
                         AI Website Builder.{" "}
                         <span style={{ color: "var(--ink)", fontWeight: 600 }}>
-                          Domain registration baked into the checkout.
+                          Hosting + custom domain via Crontech at deploy.
                         </span>
                       </span>
                       <div className="flex items-center gap-5">

@@ -9,7 +9,6 @@ import PromptInput from "@/components/PromptInput";
 import type { Tier, AIModel, GenerationMode } from "@/components/PromptInput";
 import { getClientPlan, isPaidPlan, planLabel } from "@/lib/user-plan";
 import type { Plan } from "@/lib/user-plan";
-import DomainHookModal from "@/components/DomainHookModal";
 import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 import PrewarmFrame from "@/components/PrewarmFrame";
 import AgentOrbsRow from "@/components/AgentOrbsRow";
@@ -651,8 +650,6 @@ function BuilderPage() {
   const [reactFiles, setReactFiles] = useState<Record<string, string> | null>(null);
   const [reactDeps, setReactDeps] = useState<Record<string, string>>({});
   const [generationMode, setGenerationMode] = useState<GenerationMode>("react");
-  const [domainHookOpen, setDomainHookOpen] = useState(false);
-  const [domainHookShownForThisBuild, setDomainHookShownForThisBuild] = useState(false);
   const [mcpContext, setMcpContext] = useState("");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   // Project persistence
@@ -1073,30 +1070,10 @@ function BuilderPage() {
     }
   }, [status, generatedCode]);
 
-  // Open the Domain Hook modal once per build when a site finishes generating.
-  // This is the #1 monetization hook: free site → paid domain + deploy + email.
-  useEffect(() => {
-    if (status === "complete" && reactFiles && Object.keys(reactFiles).length > 0 && !domainHookShownForThisBuild) {
-      const t = setTimeout(() => {
-        setDomainHookOpen(true);
-        setDomainHookShownForThisBuild(true);
-      }, 2500);
-      return () => clearTimeout(t);
-    }
-  }, [status, reactFiles, domainHookShownForThisBuild]);
-
-  // Reset the "shown once" flag whenever the user starts a new prompt
-  useEffect(() => {
-    if (status === "idle") setDomainHookShownForThisBuild(false);
-  }, [status]);
-
-  // Derive a site name from the current prompt for the Domain Hook
-  const siteNameForHook = useMemo(() => {
-    const raw = (prompt || "").trim().toLowerCase();
-    if (!raw) return "mysite";
-    const slug = raw.replace(/[^a-z0-9\s-]/g, "").split(/\s+/).slice(0, 3).join("").slice(0, 32);
-    return slug || "mysite";
-  }, [prompt]);
+  // Rule 33 (2026-05-30): the domain-in-checkout hook is retired.
+  // Zoobicon now sits on top of Crontech's API — custom domains for
+  // generated sites are provisioned through Crontech's project API at
+  // deploy time, not through a Zoobicon-owned Stripe + OpenSRS flow.
 
   const handleUndo = useCallback(() => {
     if (!canUndo) return;
@@ -3526,14 +3503,6 @@ function BuilderPage() {
       <StatusBar status={status} pipelineStep={pipelineAgents.length > 0 ? pipelineAgents[pipelineAgents.length - 1] : undefined} />
 
       <OnboardingTooltips active={showTour} />
-      <DomainHookModal
-        isOpen={domainHookOpen}
-        onClose={() => setDomainHookOpen(false)}
-        businessName={siteNameForHook}
-        siteFiles={reactFiles || {}}
-        contactEmail={userEmail || ""}
-        onComplete={() => setDomainHookOpen(false)}
-      />
       <BuildSuccessModal
         isOpen={showBuildSuccess}
         onClose={() => { setShowBuildSuccess(false); dismissBuildSuccess(); }}
