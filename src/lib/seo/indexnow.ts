@@ -113,9 +113,37 @@ export async function submitToIndexNow(urls: string[]): Promise<SubmitResult> {
 
   const anyOk = results.some((r) => r.ok);
 
+  // Honest failure reporting — if every endpoint rejected, surface the
+  // most common status so the admin UI can show something better than
+  // "Submission failed: undefined." Common causes:
+  //   403 — key file at /<key>.txt isn't returning the key (verify
+  //         INDEXNOW_KEY in Vercel + visit /<key>.txt manually)
+  //   422 — host mismatch (the URL list contains URLs not matching
+  //         INDEXNOW_HOST). The same-host filter above should prevent
+  //         this in practice.
+  //   0   — fetch threw (network / timeout). Endpoint may be down.
+  let reason: string | undefined;
+  if (!anyOk) {
+    const statuses = results.map((r) => r.status).filter(Boolean);
+    if (statuses.length === 0) {
+      reason =
+        "All three IndexNow endpoints failed to respond (network or timeout). Retry, or check the IndexNow status page.";
+    } else {
+      const dominant = statuses[0];
+      if (dominant === 403) {
+        reason = `IndexNow returned 403 — your key file at https://${INDEXNOW_HOST}/${key}.txt is not returning the key. Verify INDEXNOW_KEY in Vercel and visit that URL directly to confirm it returns "${key}" (200 OK).`;
+      } else if (dominant === 422) {
+        reason = `IndexNow returned 422 — URL host mismatch. URLs being submitted don't all match ${INDEXNOW_HOST}.`;
+      } else {
+        reason = `All three IndexNow endpoints rejected the submission (HTTP ${dominant}). Check per-endpoint detail below.`;
+      }
+    }
+  }
+
   return {
     ok: anyOk,
     submitted: sameHost.length,
     endpoints: results,
+    ...(reason ? { reason } : {}),
   };
 }
