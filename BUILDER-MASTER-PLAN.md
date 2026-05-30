@@ -22,7 +22,7 @@ The Prestige Properties cream-on-cream bug is symptomatic; this sprint kills the
 - [ ] **Q3** ⏳ **Component registry slot contract** — every component declares its required slots; generation can't ship a component with an empty required slot.
 - [ ] **Q4** ⏳ **Brand-coherence token sheet** — Brand Designer agent emits a palette + typography token sheet that the Developer agent must reference. Kills cream-on-cream and font drift globally.
 - [x] **S2** ✅ **Content-hash transpile cache** — Babel.transform output cached in `localStorage` keyed by SHA-256 of `(path + sourceForBabel)`. Edits that change one file in a 13-file project skip 12 Babel runs. LRU sweep at 200 entries. Cache hit-rate logged to DevTools console.
-- [ ] **S3** ⏳ **Pre-warm the iframe** — load Babel + React + registry into a hidden iframe on `/builder` mount, before user types. Sub-2s first preview.
+- [x] **S3** ✅ **Pre-warm the iframe** — PrewarmFrame mounted at `/builder` page load fires `import()` for Babel + React + ReactDOM + lucide-react + framer-motion + clsx + tailwind-merge before user types. Now manifest-driven: prefers `/vendor/` paths when populated, falls back to esm.sh per-dep — same logic as the real preview iframe so HTTP cache fills hit identical URLs.
 - [ ] **I2** ⏳ **Finish Sandpack migration** — EscapeHatchPreview is the default; make Sandpack removable.
 
 ---
@@ -100,6 +100,7 @@ These ship the moment Crontech endpoints are live. Code is ready.
 
 This is what's been ticked off in chronological order. Newest at top.
 
+- **2026-05-30** — ✅ S3 Pre-warm iframe — PrewarmFrame updated to manifest-driven hybrid URLs (matches EscapeHatchPreview); HTTP cache fills hit the same /vendor/ paths the real preview uses
 - **2026-05-30** — ✅ S2 Content-hash transpile cache — localStorage cache keyed by SHA-256 of (path + source), LRU sweep at 200, hit-rate logged
 - **2026-05-30** — ✅ S1+I1+I3 Self-host preview deps — vendor-sync prebuild script + manifest-driven hybrid ESM map in EscapeHatchPreview, esm.sh removed from runtime hot path
 - **2026-05-30** — ✅ Q1 Agent contract hardening — QUALITY CONTRACT block added to CUSTOMISER_SYSTEM_BASE in react-stream route, warm preset tightened with explicit guidance against the Prestige Properties cream-on-cream bug class
