@@ -40,13 +40,6 @@ const SIDEBAR_SECTIONS = [
     ],
   },
   {
-    label: "DOMAINS",
-    items: [
-      { name: "Domain Admin", href: "/admin/domains", icon: Globe },
-      { name: "Register Domain", href: "/domains", icon: Globe },
-    ],
-  },
-  {
     label: "BUILDS",
     items: [
       { name: "Builds", href: "/admin/builds", icon: Activity },

@@ -70,11 +70,8 @@ export default function TopBar() {
           <Link href="/admin" className="px-2.5 py-1 text-xs text-white/50 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
             Dashboard
           </Link>
-          <Link href="/builder" className="px-2.5 py-1 text-xs text-white/50 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
-            Hosting
-          </Link>
-          <Link href="/video-creator" className="px-2.5 py-1 text-xs text-white/50 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
-            Video
+          <Link href="/pricing" className="px-2.5 py-1 text-xs text-white/50 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
+            Pricing
           </Link>
           {isAgency && (
             <Link href="/agencies/dashboard" className="px-2.5 py-1 text-xs text-white/50 hover:text-white/70 transition-colors rounded-md hover:bg-white/[0.04]">
