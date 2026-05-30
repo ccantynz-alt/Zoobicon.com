@@ -28,6 +28,11 @@ interface SubmitResult {
   timestamp?: string;
   sitemapUrl?: string;
   totalUrlsInSitemap?: number;
+  // Diagnose response fields
+  diagnose?: boolean;
+  indexNowKeyConfigured?: boolean;
+  keyFileUrl?: string | null;
+  cronSecretConfigured?: boolean;
 }
 
 export default function SeoAdminPage() {
@@ -78,11 +83,35 @@ export default function SeoAdminPage() {
       const url = only ? `/api/seo/submit-sitemap?only=${encodeURIComponent(only)}` : "/api/seo/submit-sitemap";
       const res = await fetch(url, { cache: "no-store" });
       const data = (await res.json()) as SubmitResult;
+      // Defensive: if the server response came back without a reason
+      // string on a non-ok result, surface something better than
+      // "undefined." The library now always sets a reason when ok is
+      // false, but the admin should never render bare "undefined".
+      if (!data.ok && !data.reason) {
+        data.reason = `Submission failed without a reason — HTTP ${res.status}. Try the Diagnose button to check your INDEXNOW_KEY configuration.`;
+      }
       setLastSubmit(data);
     } catch (err) {
       setLastSubmit({
         ok: false,
         reason: err instanceof Error ? err.message : "Submit failed",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const diagnose = async () => {
+    setSubmitting(true);
+    setLastSubmit(null);
+    try {
+      const res = await fetch("/api/seo/submit-sitemap?diagnose=1", { cache: "no-store" });
+      const data = (await res.json()) as SubmitResult;
+      setLastSubmit(data);
+    } catch (err) {
+      setLastSubmit({
+        ok: false,
+        reason: err instanceof Error ? err.message : "Diagnose failed",
       });
     } finally {
       setSubmitting(false);
@@ -118,6 +147,20 @@ export default function SeoAdminPage() {
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Refresh sitemap
+          </button>
+          <button
+            onClick={() => void diagnose()}
+            disabled={submitting}
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all disabled:opacity-50"
+            style={{
+              background: "var(--paper-elevated)",
+              color: "var(--ink)",
+              border: "1px solid var(--rule-strong)",
+            }}
+            title="Check INDEXNOW_KEY + CRON_SECRET state without firing a submission"
+          >
+            <KeyRound className="w-3.5 h-3.5" />
+            Diagnose
           </button>
           <button
             onClick={() => void submit()}
@@ -164,7 +207,7 @@ export default function SeoAdminPage() {
         ))}
       </div>
 
-      {/* Last submission result */}
+      {/* Last submission / diagnose result */}
       {lastSubmit && (
         <div
           className="mb-8 rounded-xl p-5"
@@ -173,21 +216,61 @@ export default function SeoAdminPage() {
             border: `1px solid ${lastSubmit.ok ? "var(--gold)" : "rgba(239,68,68,0.2)"}`,
           }}
         >
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-start gap-2 mb-3">
             {lastSubmit.ok ? (
-              <CheckCircle2 className="w-4 h-4" style={{ color: "var(--gold-deep)" }} />
+              <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "var(--gold-deep)" }} />
             ) : (
-              <AlertCircle className="w-4 h-4" style={{ color: "rgb(220, 38, 38)" }} />
+              <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: "rgb(220, 38, 38)" }} />
             )}
-            <span className="text-[13px] font-semibold" style={{ color: "var(--ink)" }}>
-              {lastSubmit.ok
+            <div className="text-[13px] font-semibold leading-snug" style={{ color: "var(--ink)" }}>
+              {lastSubmit.diagnose
+                ? lastSubmit.indexNowKeyConfigured
+                  ? "INDEXNOW_KEY is configured"
+                  : "INDEXNOW_KEY is NOT configured"
+                : lastSubmit.ok
                 ? `Submitted ${lastSubmit.submitted} URLs at ${new Date(lastSubmit.timestamp || "").toLocaleString()}`
-                : `Submission failed: ${lastSubmit.reason}`}
-            </span>
+                : `Submission failed: ${lastSubmit.reason || "unknown error"}`}
+            </div>
           </div>
 
+          {/* Diagnose detail */}
+          {lastSubmit.diagnose && (
+            <div className="text-[12px] space-y-2 mt-3" style={{ color: "var(--ink-secondary)" }}>
+              <p>{lastSubmit.reason}</p>
+              {lastSubmit.keyFileUrl && (
+                <p>
+                  Verify the key file:{" "}
+                  <a
+                    href={lastSubmit.keyFileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline font-mono"
+                    style={{ color: "var(--gold-deep)" }}
+                  >
+                    {lastSubmit.keyFileUrl}
+                  </a>{" "}
+                  must return the bare key (200 OK).
+                </p>
+              )}
+              <p>
+                CRON_SECRET:{" "}
+                <span style={{ color: lastSubmit.cronSecretConfigured ? "var(--gold-deep)" : "rgb(220, 38, 38)" }}>
+                  {lastSubmit.cronSecretConfigured ? "✓ configured" : "✗ not set"}
+                </span>
+              </p>
+            </div>
+          )}
+
+          {/* Submission reason (rendered separately from header so long
+              error messages aren't truncated) */}
+          {!lastSubmit.diagnose && !lastSubmit.ok && lastSubmit.reason && (
+            <p className="text-[12px] mt-2" style={{ color: "var(--ink-secondary)" }}>
+              {lastSubmit.reason}
+            </p>
+          )}
+
           {lastSubmit.endpoints && lastSubmit.endpoints.length > 0 && (
-            <div className="space-y-1.5 mt-2">
+            <div className="space-y-1.5 mt-4">
               <div
                 className="text-[10px] uppercase tracking-[0.18em] font-semibold mb-2"
                 style={{ color: "var(--gold-deep)" }}

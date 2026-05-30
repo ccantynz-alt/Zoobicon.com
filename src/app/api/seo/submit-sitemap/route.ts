@@ -45,11 +45,29 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Diagnose mode — checks env state without firing a submission. Used
+  // by the admin SEO control room to surface configuration problems
+  // before the user clicks "Submit."
+  if (searchParams.get("diagnose") === "1") {
+    const key = getIndexNowKey();
+    return NextResponse.json({
+      ok: Boolean(key),
+      diagnose: true,
+      indexNowKeyConfigured: Boolean(key),
+      keyFileUrl: key ? `https://zoobicon.com/${key}.txt` : null,
+      cronSecretConfigured: Boolean(process.env.CRON_SECRET),
+      reason: key
+        ? "INDEXNOW_KEY is set. Visit the keyFileUrl above to confirm it returns the key (200 OK)."
+        : "INDEXNOW_KEY env not set. Set a UUID as INDEXNOW_KEY in Vercel, then visit /<key>.txt to verify.",
+    });
+  }
+
   if (!getIndexNowKey()) {
     return NextResponse.json(
       {
         ok: false,
-        reason: "INDEXNOW_KEY env not set. Generate a UUID, set it as INDEXNOW_KEY in Vercel, and visit /<that-key>.txt to confirm verification.",
+        reason:
+          "INDEXNOW_KEY env not set. Generate a UUID, set it as INDEXNOW_KEY in Vercel, and visit /<that-key>.txt to confirm verification.",
       },
       { status: 400 }
     );
