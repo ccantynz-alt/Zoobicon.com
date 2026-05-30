@@ -668,6 +668,18 @@ function BuilderPage() {
   const [showDiffPanel, setShowDiffPanel] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [showBuildSuccess, setShowBuildSuccess] = useState(false);
+  // T6 follow-up: BrandSpec from the server's done event. Used to
+  // deep-link /brand-kit with the actual build's palette/typography.
+  const [buildBrandSpec, setBuildBrandSpec] = useState<{
+    brandName: string;
+    primaryColor: string;
+    bgColor: string;
+    textPrimary: string;
+    textSecondary: string;
+    accentColor: string;
+    headlineFont: string;
+    bodyFont: string;
+  } | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [crontechAvailable, setCrontechAvailable] = useState(false);
   const [crontechProjectId, setCrontechProjectId] = useState<string | null>(null);
@@ -1505,6 +1517,13 @@ function BuilderPage() {
                     setReactDeps(event.dependencies || {});
                     setReactSource(event.files);
                     receivedFiles = true;
+                  }
+                  // T6 follow-up: capture the planner-emitted BrandSpec
+                  // so the "Brand kit" affordance can deep-link to
+                  // /brand-kit?spec=<encoded> with the build's actual
+                  // palette + typography.
+                  if (event.brandSpec && typeof event.brandSpec === "object") {
+                    setBuildBrandSpec(event.brandSpec as typeof buildBrandSpec);
                   }
                   setGeneratedCode("<!-- react-app-mode -->");
                   setStatus("complete");
@@ -2371,6 +2390,17 @@ function BuilderPage() {
             >
               {useEscapeHatch ? "🪂 Direct preview" : "📦 Sandpack"}
             </button>
+            {buildBrandSpec && (
+              <a
+                href={`/brand-kit?spec=${typeof window !== "undefined" ? btoa(JSON.stringify(buildBrandSpec)) : ""}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-2 py-1 text-[10px] rounded border bg-gradient-to-r from-amber-500/90 to-yellow-600/90 text-black border-amber-400 font-semibold hover:from-amber-400 hover:to-yellow-500 transition-all"
+                title="Open the brand kit for this build — favicon, OG card, business card, email signature, all derived from the planner's BrandSpec."
+              >
+                ✨ Brand kit
+              </a>
+            )}
           </div>
         )}
 

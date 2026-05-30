@@ -1467,6 +1467,12 @@ export async function POST(req: NextRequest): Promise<Response> {
           score: finalScore,
           durationMs,
           failedSections,
+          // T6 follow-up — surface the planner-emitted BrandSpec on
+          // the done event so the client can wire the brand-kit page
+          // to the actual build's palette + typography (favicon /
+          // social cards / business card / email signature derived
+          // from the same tokens the site uses).
+          brandSpec,
           ...(wantsBackend ? { backend: { projectId } } : {}),
         });
 

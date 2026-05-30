@@ -60,7 +60,21 @@ function downloadString(content: string, filename: string, mime: string) {
 }
 
 export default function BrandKitPage() {
-  const [spec, setSpec] = useState<BrandSpec>(DEFAULT_SPEC);
+  // T6 follow-up — accept ?spec=<base64-json> from the builder's
+  // "Brand kit" button so the page boots with the build's actual
+  // palette + typography (not the default Aurora spec). Falls back
+  // cleanly when the param is absent or malformed.
+  const [spec, setSpec] = useState<BrandSpec>(() => {
+    if (typeof window === "undefined") return DEFAULT_SPEC;
+    try {
+      const encoded = new URLSearchParams(window.location.search).get("spec");
+      if (!encoded) return DEFAULT_SPEC;
+      const decoded = JSON.parse(atob(encoded)) as Partial<BrandSpec>;
+      return { ...DEFAULT_SPEC, ...decoded };
+    } catch {
+      return DEFAULT_SPEC;
+    }
+  });
   const [assets, setAssets] = useState<BrandAssets | null>(null);
   const [loading, setLoading] = useState(false);
 

@@ -41,6 +41,7 @@ The Prestige Properties cream-on-cream bug is symptomatic; this sprint kills the
 - [x] **T1** ✅ **AI Site Audit Agent** — `/audit` route shipped. `scoreAudit()` in url-extractor returns 4 category scores (perf/SEO/a11y/conversion) with ✓ passed and ✗ failed check lists. Report card UI + "Rebuild with these fixes" CTA → builder with prefilled prompt. Linked from nav. Targets high-volume "free website audit AI" search intent.
 - [x] **T5** ✅ **Voice-to-Site** — VoiceToBuildButton now mounted on every onboarding surface (builder, homepage HeroBuilder hero, /upgrade URL input, /audit URL input). Voice is no longer just-in-builder; users can dictate from the first impression.
 - [x] **T6** ✅ **Multi-format generation** — `src/lib/brand-assets.ts` exports `generateBrandAssets(brandSpec, contactInfo)` returning favicon SVG + email signature HTML + OG card SVG + Twitter card SVG + business card SVG. `/api/brand-assets` POST endpoint wraps it. `/brand-kit` page renders the kit with download buttons + live brand-spec editor. Nobody else in the AI builder space generates the full kit from one input.
+- [x] **T6 follow-up** ✅ **Brand kit wired into builder** — react-stream now emits the planner's `brandSpec` on the `done` event; builder captures it into `buildBrandSpec` state; a gold "✨ Brand kit" button appears in the preview toolbar once a build completes, deep-linking to `/brand-kit?spec=<base64-json>`. `/brand-kit` decodes the param and boots with the build's actual palette + typography instead of the default Aurora spec.
 
 ---
 
@@ -104,6 +105,8 @@ This is what's been ticked off in chronological order. Newest at top.
 - **2026-05-30** — ✅ T4 fully shipped — /figma-import + /notion-import frontends added; both surface a clear setup message when their env tokens aren't set
 - **2026-05-30** — ✅ T4 backend — Figma + Notion connector libs + routes
 - **2026-05-30** — ✅ T2 Prompt Queue — PromptQueuePanel + runEditWith refactor; batch edits with per-item status and auto-stop on error
+- **2026-05-30** — ✅ T6 follow-up — react-stream emits brandSpec on done; builder "✨ Brand kit" button deep-links to /brand-kit?spec=<base64>; kit boots with build's real palette + typography
+- **2026-05-30** — ✅ /import discovery hub — single landing for all 6 onboarding paths (URL clone, WordPress, GitHub, Figma, Notion, Audit); added to nav + sitemap
 - **2026-05-30** — ✅ T9 full — shared_builds table + /api/share/create + /api/share/[code] + /share/[code] viewer; builder Share button now persists files
 - **2026-05-30** — ✅ T7 foundation — collab server routes wired (collab_rooms + collab_participants tables, presence + code sync; CollaborationBar finally works end-to-end)
 - **2026-05-30** — ✅ T9 partial — Share/fork URL button in builder toolbar; copies current prompt as a shareable link

@@ -25,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // The one product + its highest-intent onboarding funnel
     { path: '/builder', priority: 0.9, changeFrequency: 'daily' },
+    { path: '/import', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/upgrade', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/wordpress-import', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/github-import', priority: 0.9, changeFrequency: 'weekly' },
