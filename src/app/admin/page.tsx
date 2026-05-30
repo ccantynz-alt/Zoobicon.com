@@ -310,8 +310,10 @@ export default function AdminPage() {
                   { icon: TrendingUp, label: "HN Flywheel", href: "/admin/intel/hn", desc: "Hacker News painkillers" },
                   { icon: TrendingUp, label: "Reddit Flywheel", href: "/admin/intel/reddit", desc: "Reddit painkillers" },
                   { icon: Activity, label: "Competitive Intel", href: "/admin/intel", desc: "Competitor crawler" },
-                  // Revenue + product surfaces that actually exist on disk
-                  { icon: Globe, label: "Domains", href: "/admin/domains", desc: "Registered domains" },
+                  // Product surfaces that actually exist on disk.
+                  // Rule 33 (2026-05-30): Zoobicon owns no domain UI —
+                  // custom domains for built sites are provisioned via
+                  // Crontech's API at deploy time.
                   { icon: FolderOpen, label: "Builds", href: "/admin/builds", desc: "Build history" },
                   { icon: Workflow, label: "Integrations", href: "/admin/integrations", desc: "Third-party hooks" },
                   { icon: Rocket, label: "Pre-Launch", href: "/admin/pre-launch", desc: "Launch checklist & readiness" },

@@ -294,7 +294,7 @@ export default function SiteNavigation() {
                       <span className="text-[12px]" style={{ color: "var(--ink-secondary)" }}>
                         AI Website Builder.{" "}
                         <span style={{ color: "var(--ink)", fontWeight: 600 }}>
-                          Domain registration baked into the checkout.
+                          Hosting + custom domain via Crontech at deploy.
                         </span>
                       </span>
                       <div className="flex items-center gap-5">

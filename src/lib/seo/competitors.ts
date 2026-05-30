@@ -65,10 +65,10 @@ const ZOOBICON_PRICING: PricingTier[] = [
 ];
 
 const COMMON_OUR_EDGE = [
-  "Domain registration baked into the checkout — buy your `.com` in the same Stripe flow as the build (real OpenSRS integration, nobody else has this)",
+  "Hosting + custom domains provisioned via the Crontech API at deploy time — one platform, no glue scripts between builder, hosting, and registrar",
   "Slot-locked composition + 121-component registry — every section is hand-polished, agency-grade, never generated from scratch",
   "Six visible agents stream live during generation (Strategist, Brand, Architect, Copy, Developer, SEO) — Emergent shows four, most show none",
-  "Crontech-delegated infrastructure (auth, hosting, DB, email) — we pour 100% of engineering into builder quality, not reinventing auth",
+  "Crontech-delegated infrastructure (auth, hosting, DB, email, domains) — we pour 100% of engineering into builder quality, not reinventing infrastructure",
 ];
 
 // ─── Lovable ──────────────────────────────────────────────────────────
@@ -77,7 +77,7 @@ const lovable: Competitor = {
   name: "Lovable",
   tagline: "Build apps and websites by chatting with AI",
   metaPitch:
-    "Lovable alternative comparison. Zoobicon ships a 121-component registry, domain-in-checkout, and six visible agents — see how they stack up on speed, quality, and price.",
+    "Lovable alternative comparison. Zoobicon ships a 121-component registry, Crontech-managed hosting and domains, and six visible agents — see how they stack up on speed, quality, and price.",
   positioning:
     "$400M ARR full-stack AI app builder that runs Plan Mode, Prompt Queue, and Browser Testing on top of Supabase auto-provisioning.",
   founded: 2024,
@@ -96,7 +96,7 @@ const lovable: Competitor = {
   ],
   features: [
     { label: "Generates full-stack apps (DB + API + UI)", ours: true, theirs: true },
-    { label: "Domain registration in checkout", ours: true, theirs: false },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
     { label: "Hand-polished 121-component registry", ours: true, theirs: false },
     { label: "Visible 6-agent streaming UI", ours: true, theirs: false },
     { label: "Supabase auto-provisioning", ours: "Partial", theirs: true },
@@ -110,7 +110,7 @@ const lovable: Competitor = {
   faqs: [
     {
       q: "Is Zoobicon a Lovable alternative?",
-      a: "Yes — Zoobicon is built for the same job (describe an app, get a working site) but adds domain registration directly inside the build checkout via OpenSRS. Lovable doesn't sell domains; you have to bring your own and wire it separately.",
+      a: "Yes — Zoobicon is built for the same job (describe an app, get a working site) but provisions a custom domain alongside hosting via the Crontech API at deploy time. Lovable doesn't bundle the hosting + domain layer at all — you have to buy a domain separately and wire it up yourself.",
     },
     {
       q: "Why is Zoobicon more expensive than Lovable's Starter tier?",
@@ -129,7 +129,7 @@ const bolt: Competitor = {
   name: "Bolt.new",
   tagline: "Prompt-driven dev environment in your browser",
   metaPitch:
-    "Bolt.new alternative comparison. See how Zoobicon's domain-in-checkout flow, slot-locked composition, and visible 6-agent UI compare to Bolt's WebContainers and Plan Mode.",
+    "Bolt.new alternative comparison. See how Zoobicon's Crontech-managed hosting + domain provisioning, slot-locked composition, and visible 6-agent UI compare to Bolt's WebContainers and Plan Mode.",
   positioning:
     "$40M ARR StackBlitz spinoff running WebContainers (full Node.js in browser), Plan Mode, and auto-error-fix. 5M+ users.",
   founded: 2024,
@@ -148,7 +148,7 @@ const bolt: Competitor = {
   features: [
     { label: "First preview <5 seconds", ours: "Pre-warm pending", theirs: true },
     { label: "Full Node.js in browser (WebContainers)", ours: false, theirs: true },
-    { label: "Domain registration in checkout", ours: true, theirs: false },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
     { label: "Hand-polished 121-component registry", ours: true, theirs: false },
     { label: "Visible 6-agent streaming UI", ours: true, theirs: false },
     { label: "Plan Mode / auto-error-fix", ours: false, theirs: true },
@@ -169,7 +169,7 @@ const bolt: Competitor = {
     },
     {
       q: "Why use Zoobicon if Bolt is faster?",
-      a: "Domain-in-checkout: Bolt doesn't sell domains, you buy them separately. Zoobicon registers your `.com` in the same Stripe flow as the build via OpenSRS — one purchase, live site.",
+      a: "Crontech-managed hosting + custom domain at deploy: Bolt doesn't sell domains or run a hosting + registrar bundle, you buy each separately. Zoobicon provisions both via Crontech in one deploy step.",
     },
   ],
 };
@@ -201,7 +201,7 @@ const v0: Competitor = {
   ],
   features: [
     { label: "Generates React + Tailwind", ours: true, theirs: true },
-    { label: "Domain registration in checkout", ours: true, theirs: false },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
     { label: "Visible 6-agent streaming UI", ours: true, theirs: false },
     { label: "Hand-polished 121-component registry", ours: true, theirs: "shadcn/ui only" },
     { label: "Web search mid-build", ours: false, theirs: true },
@@ -234,7 +234,7 @@ const emergent: Competitor = {
   name: "Emergent",
   tagline: "Multi-agent AI app builder",
   metaPitch:
-    "Emergent alternative. Zoobicon ships 6 visible agents vs Emergent's 4, plus domain-in-checkout and a 121-component registry. Full comparison inside.",
+    "Emergent alternative. Zoobicon ships 6 visible agents vs Emergent's 4, plus Crontech-managed hosting + custom domain and a 121-component registry. Full comparison inside.",
   positioning:
     "$100M ARR. 6M signups, 150K paying. MCP integration LIVE (Notion, GitHub, Figma). Fork Feature for session continuity. Google Play app.",
   founded: 2024,
@@ -256,7 +256,7 @@ const emergent: Competitor = {
   ],
   features: [
     { label: "Multi-agent visualization", ours: "6 agents", theirs: "4 agents" },
-    { label: "Domain registration in checkout", ours: true, theirs: false },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
     { label: "Hand-polished 121-component registry", ours: true, theirs: false },
     { label: "MCP integration (Notion, GitHub, Figma)", ours: "Stub", theirs: true },
     { label: "Fork / session continuity", ours: false, theirs: true },
@@ -289,7 +289,7 @@ const wix: Competitor = {
   name: "Wix",
   tagline: "All-in-one website builder",
   metaPitch:
-    "Wix alternative for the AI-first era. Describe a site in one sentence, watch six agents build it, register your domain in the same checkout.",
+    "Wix alternative for the AI-first era. Describe a site in one sentence, watch six agents build it, deploy with a custom domain via Crontech.",
   positioning:
     "Public Israeli company. Established drag-and-drop builder with 200M+ users and an AI editor (Wix ADI) bolted on.",
   founded: 2006,
@@ -313,7 +313,7 @@ const wix: Competitor = {
   features: [
     { label: "AI-generated from one prompt", ours: true, theirs: "Wix ADI (legacy)" },
     { label: "Hand-polished React components", ours: true, theirs: false },
-    { label: "Domain registration in checkout", ours: true, theirs: true },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: true },
     { label: "Code export (own your site)", ours: true, theirs: false },
     { label: "Six visible agents during build", ours: true, theirs: false },
     { label: "App marketplace", ours: false, theirs: true },
@@ -356,7 +356,7 @@ const squarespace: Competitor = {
   ],
   ourEdge: [
     "Generated bespoke, not selected from a template grid",
-    "Same-checkout domain registration via OpenSRS — Squarespace owns the registrar layer but charges full retail",
+    "Crontech-managed hosting + custom domain at deploy — Squarespace owns its registrar layer but charges full retail and locks you to its CMS",
     ...COMMON_OUR_EDGE,
   ],
   pricing: [
@@ -368,7 +368,7 @@ const squarespace: Competitor = {
   features: [
     { label: "AI-generated from one prompt", ours: true, theirs: "AI design assistant" },
     { label: "Hand-polished React components", ours: true, theirs: false },
-    { label: "Domain registration in checkout", ours: true, theirs: true },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: true },
     { label: "Built-in eCommerce", ours: false, theirs: true },
     { label: "Built-in member sites", ours: false, theirs: true },
     { label: "Code export (own your site)", ours: true, theirs: false },
@@ -423,7 +423,7 @@ const webflow: Competitor = {
   features: [
     { label: "AI-generated from one prompt", ours: true, theirs: "AI bolt-on" },
     { label: "Hand-polished components", ours: true, theirs: false },
-    { label: "Domain registration in checkout", ours: true, theirs: false },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
     { label: "Visual editor (post-build)", ours: "Click-to-edit", theirs: true },
     { label: "CMS for dynamic content", ours: "Crontech", theirs: true },
     { label: "Code export", ours: true, theirs: "Paid add-on" },
@@ -478,7 +478,7 @@ const framer: Competitor = {
   features: [
     { label: "AI-generated from one prompt", ours: true, theirs: true },
     { label: "Output is real React code", ours: true, theirs: false },
-    { label: "Domain registration in checkout", ours: true, theirs: true },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: true },
     { label: "Hand-polished components", ours: true, theirs: true },
     { label: "Visible 6-agent UI", ours: true, theirs: false },
     { label: "Design-tool canvas editor", ours: false, theirs: true },
@@ -535,7 +535,7 @@ const carrd: Competitor = {
     { label: "AI-generated from one prompt", ours: true, theirs: false },
     { label: "Multi-section / multi-page sites", ours: true, theirs: false },
     { label: "Hand-polished components", ours: true, theirs: "Templates" },
-    { label: "Domain registration in checkout", ours: true, theirs: false },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
     { label: "Visible 6-agent UI", ours: true, theirs: false },
     { label: "Modern React/Tailwind stack", ours: true, theirs: false },
     { label: "Code export", ours: true, theirs: false },
@@ -591,7 +591,7 @@ const bubble: Competitor = {
     { label: "AI-generated from one prompt", ours: true, theirs: "AI assistant bolt-on" },
     { label: "Visual workflow editor", ours: false, theirs: true },
     { label: "Real React code output", ours: true, theirs: false },
-    { label: "Domain registration in checkout", ours: true, theirs: false },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
     { label: "Hand-polished components", ours: true, theirs: false },
     { label: "Visible 6-agent UI", ours: true, theirs: false },
     { label: "Marketplace of plugins", ours: false, theirs: true },
@@ -644,7 +644,7 @@ const stitch: Competitor = {
     { label: "AI-generated from one prompt", ours: true, theirs: true },
     { label: "Deployable production site", ours: true, theirs: false },
     { label: "Backend / API generation", ours: "Crontech", theirs: false },
-    { label: "Domain registration in checkout", ours: true, theirs: false },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
     { label: "Voice-driven design critiques", ours: false, theirs: true },
     { label: "Multi-screen generation", ours: true, theirs: true },
     { label: "Hand-polished component registry", ours: true, theirs: false },
@@ -698,7 +698,7 @@ const replit: Competitor = {
   features: [
     { label: "AI-generated from one prompt", ours: true, theirs: true },
     { label: "No-IDE UX (write sentence, get site)", ours: true, theirs: false },
-    { label: "Domain registration in checkout", ours: true, theirs: false },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
     { label: "Hand-polished components", ours: true, theirs: false },
     { label: "Visible 6-agent UI", ours: true, theirs: false },
     { label: "Full Linux dev environment", ours: false, theirs: true },
@@ -756,7 +756,7 @@ const flutterflow: Competitor = {
     { label: "Output target", ours: "Web (React)", theirs: "Mobile (Flutter)" },
     { label: "AI-generated from one prompt", ours: true, theirs: "AI Gen" },
     { label: "App Store / Play Store deploy", ours: false, theirs: true },
-    { label: "Domain registration in checkout", ours: true, theirs: false },
+    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
     { label: "Hand-polished components", ours: true, theirs: true },
     { label: "Visible 6-agent UI", ours: true, theirs: false },
     { label: "Code export", ours: true, theirs: true },

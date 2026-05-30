@@ -287,7 +287,6 @@ export default function MobileAdminDashboard() {
               <QuickLink href="/admin/intel/hn" icon={TrendingUp} label="HN Flywheel" />
               <QuickLink href="/admin/intel/reddit" icon={TrendingUp} label="Reddit Flywheel" />
               <QuickLink href="/admin/intel" icon={Shield} label="Competitive Intel" />
-              <QuickLink href="/admin/domains" icon={Globe} label="Domains" />
               <QuickLink href="/admin/pre-launch" icon={Rocket} label="Pre-Launch" />
               <QuickLink href="/admin" icon={LayoutDashboard} label="Full Admin Panel" />
             </div>

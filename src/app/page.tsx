@@ -30,7 +30,7 @@ const TRUST_ITEMS = [
   { label: "Stripe Verified", sub: "Live Connect" },
   { label: "Neon Serverless", sub: "Postgres 16" },
   { label: "Cloudflare", sub: "5 domains" },
-  { label: "OpenSRS", sub: "Domain registry" },
+  { label: "Crontech", sub: "Hosting + domains" },
   { label: "121 Components", sub: "Registry" },
 ];
 
@@ -46,8 +46,8 @@ const AI_FEATURES = [
   },
   {
     icon: Globe2,
-    title: "Domain included in checkout.",
-    desc: "Register the matching .com, .ai, or .io in the same flow as your build. Real OpenSRS registry checks — no leaving the page.",
+    title: "Hosting + domain via Crontech.",
+    desc: "Hosting + custom domain (.com, .ai, .io) provisioned through Crontech at deploy time. One platform, no glue scripts.",
     tag: "Domains",
     href: "/builder",
   },
@@ -243,8 +243,8 @@ export default function HomePage() {
                 },
                 {
                   step: "03",
-                  title: "Register & deploy.",
-                  desc: "Buy the matching domain and ship to the cloud in the same checkout. Real OpenSRS registry. Free SSL. One click.",
+                  title: "Deploy.",
+                  desc: "Hosting + custom domain provisioned through Crontech in one deploy step. Free SSL. No infra to manage. One click.",
                   href: "/builder",
                   cta: "Try it free",
                   icon: Globe2,
