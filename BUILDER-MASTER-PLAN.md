@@ -46,7 +46,7 @@ The Prestige Properties cream-on-cream bug is symptomatic; this sprint kills the
 
 ## SPRINT 4 — DEPTH
 
-- [x] **T4** ✅ **MCP — all four connectors shipped backend.** GitHub (`/api/github/preview` + `/github-import` page), WordPress (`/api/wordpress/import` + `/wordpress-import` page), Figma (`/api/figma/import` — backend ready, requires FIGMA_TOKEN env), Notion (`/api/notion/import` — backend ready, requires NOTION_TOKEN env + per-page integration share). Each composes a builder-ready prompt and a `?from=<source>` `builderHref`. Figma/Notion UI pages are queued to ship the moment the tokens land.
+- [x] **T4** ✅ **MCP — all four connectors fully shipped.** GitHub (`/github-import`), WordPress (`/wordpress-import`), Figma (`/figma-import` — requires FIGMA_TOKEN env), Notion (`/notion-import` — requires NOTION_TOKEN env + per-page integration share). Each route composes a builder-ready prompt and a `?from=<source>` `builderHref`. Figma + Notion UI surface clear setup messages when the tokens aren't configured yet.
 - [x] **T7 (foundation)** ✅ **Real-time collab — server side wired** — the client-side `useCollaboration` hook + `CollaborationBar` were already shipped but the server routes (`/api/collab`, `/api/collab/presence`, `/api/collab/code`) didn't exist; every call 404'd. T7 builds the server: Neon-backed `collab_rooms` + `collab_participants` tables with auto-create, room create/join/leave, presence list + cursor update, code state get/push with optimistic concurrency. Lazy-GC drops idle participants after 5 minutes. Polling-based; WebSocket spec deferred (Vercel serverless can't host long-lived sockets natively).
 - [x] **T9 (full)** ✅ **Share / Fork** — full file-state sharing via Neon-backed `shared_builds` table. Share button now POSTs current file tree to `/api/share/create`, copies the returned `/share/<code>` URL. `/share/[code]` renders the same EscapeHatchPreview the builder uses, so recipients see the exact React app (not a fresh re-gen). "Fork to builder" CTA jumps to /builder with the prompt prefilled. View count tracked. Lazy GC drops expired rows.
 
@@ -101,7 +101,8 @@ These ship the moment Crontech endpoints are live. Code is ready.
 
 This is what's been ticked off in chronological order. Newest at top.
 
-- **2026-05-30** — ✅ T4 full backend — Figma + Notion connector libs + routes; UI ships once FIGMA_TOKEN + NOTION_TOKEN env vars land
+- **2026-05-30** — ✅ T4 fully shipped — /figma-import + /notion-import frontends added; both surface a clear setup message when their env tokens aren't set
+- **2026-05-30** — ✅ T4 backend — Figma + Notion connector libs + routes
 - **2026-05-30** — ✅ T2 Prompt Queue — PromptQueuePanel + runEditWith refactor; batch edits with per-item status and auto-stop on error
 - **2026-05-30** — ✅ T9 full — shared_builds table + /api/share/create + /api/share/[code] + /share/[code] viewer; builder Share button now persists files
 - **2026-05-30** — ✅ T7 foundation — collab server routes wired (collab_rooms + collab_participants tables, presence + code sync; CollaborationBar finally works end-to-end)
