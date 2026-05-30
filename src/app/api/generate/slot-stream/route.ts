@@ -368,7 +368,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         const aiStart = Date.now();
         const fb = await callLLMWithFailover(
           {
-            model: "claude-haiku-4-5",
+            model: "claude-sonnet-4-6",
             system:
               fewShotPrefix +
               "You are filling in the slots of a hand-written React component template. " +
@@ -628,7 +628,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
         await telemetry.finalize({ ok: okCount > 0, qualityScore });
         await recordBuildQuotaUsage(userEmail, [
-          { model: "claude-haiku-4-5", inputTokens: 0, outputTokens: 0 },
+          { model: "claude-sonnet-4-6", inputTokens: 0, outputTokens: 0 },
         ]);
         controller.close();
       } catch (err) {
