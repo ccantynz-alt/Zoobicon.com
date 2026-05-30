@@ -167,6 +167,7 @@ import {
   Workflow,
   Undo2,
   Redo2,
+  Share2,
   Save,
   Sparkles,
   History,
@@ -2770,6 +2771,28 @@ function BuilderPage() {
               className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
             >
               <History size={14} />
+            </button>
+            {/* Sprint 4 T9 — Share / Fork: copy the builder URL with the
+                current prompt encoded so a recipient can open a new
+                session that starts at the same prompt. Full file-state
+                sharing requires DB persistence (queued). */}
+            <button
+              onClick={async () => {
+                const shareUrl = new URL(window.location.href);
+                if (prompt) shareUrl.searchParams.set("prompt", prompt);
+                shareUrl.searchParams.set("from", "share");
+                try {
+                  await navigator.clipboard.writeText(shareUrl.toString());
+                  alert("Share link copied to clipboard");
+                } catch {
+                  // Fallback: open the URL in a new window so user can copy
+                  window.prompt("Copy share link:", shareUrl.toString());
+                }
+              }}
+              title="Share / fork — copy a link to this build"
+              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all"
+            >
+              <Share2 size={14} />
             </button>
           </div>
         )}
