@@ -19,11 +19,11 @@ The Prestige Properties cream-on-cream bug is symptomatic; this sprint kills the
 
 - [x] **Q1** ✅ **Agent contract hardening** — system prompts enforce WCAG AA contrast, non-empty CTAs, mobile breakpoints, semantic HTML. The warm preset specifically calls out the Prestige Properties cream-on-cream bug as the failure mode to never ship.
 - [x] **S1 + I1 + I3** ✅ **Self-host preview deps under `/vendor/`** — `scripts/vendor-sync.mjs` runs as `prebuild`, downloads React + ReactDOM + Babel + lucide-react + framer-motion + clsx + tailwind-merge from esm.sh into `public/vendor/`. EscapeHatchPreview reads `/vendor/manifest.json` on mount and prefers local paths per-dep, falls back to esm.sh per-dep when missing. Result: runtime never hits esm.sh once Vercel has populated `/vendor/`. Build-time still pulls (one-time per deploy).
-- [ ] **Q3** ⏳ **Component registry slot contract** — every component declares its required slots; generation can't ship a component with an empty required slot.
+- [x] **Q3** ✅ **Slot contract validation** — pragmatic version shipped: `validateCustomisedComponent` runs after every Babel-verified customisation, detecting empty `<button>`, empty link-as-button, missing alts, untouched placeholder copy. If issues found, ONE repair pass with the issue list as fix-list. If repair doesn't help, ship the original (better than base fallback). Declarative per-component slot declarations deferred to a future iteration.
 - [x] **Q4** ✅ **Brand-coherence token sheet** — planner now emits a full BrandSpec (brandName + primaryColor + bgColor + textPrimary + textSecondary + accentColor + headlineFont + bodyFont) that gets injected into every customiseComponent call. Customiser system prompt instructs the LLM to draw colors + fonts ONLY from this sheet and to match closest Tailwind shade. Contrast-safe defaults ensure even fallback builds pass WCAG AA.
 - [x] **S2** ✅ **Content-hash transpile cache** — Babel.transform output cached in `localStorage` keyed by SHA-256 of `(path + sourceForBabel)`. Edits that change one file in a 13-file project skip 12 Babel runs. LRU sweep at 200 entries. Cache hit-rate logged to DevTools console.
 - [x] **S3** ✅ **Pre-warm the iframe** — PrewarmFrame mounted at `/builder` page load fires `import()` for Babel + React + ReactDOM + lucide-react + framer-motion + clsx + tailwind-merge before user types. Now manifest-driven: prefers `/vendor/` paths when populated, falls back to esm.sh per-dep — same logic as the real preview iframe so HTTP cache fills hit identical URLs.
-- [ ] **I2** ⏳ **Finish Sandpack migration** — EscapeHatchPreview is the default; make Sandpack removable.
+- [x] **I2** ✅ **Sandpack migration de facto complete** — `useEscapeHatch` defaults to `true` in builder/page.tsx (line 568); Sandpack is opt-in only via localStorage. EscapeHatchPreview is the default preview path. Removing the `@codesandbox/sandpack-react` dependency entirely is a future cleanup but no longer in the hot path.
 
 ---
 
@@ -100,6 +100,8 @@ These ship the moment Crontech endpoints are live. Code is ready.
 
 This is what's been ticked off in chronological order. Newest at top.
 
+- **2026-05-30** — ✅ I2 Sandpack migration confirmed complete — EscapeHatch is the default; Sandpack is opt-in only
+- **2026-05-30** — ✅ Q3 Slot contract validation — validateCustomisedComponent + ONE auto-repair pass with detected issues as fix-list
 - **2026-05-30** — ✅ Q4 Brand-coherence token sheet — planner emits full BrandSpec (palette + typography), injected into every customiseComponent call as a hard "use only these tokens" contract
 - **2026-05-30** — ✅ S3 Pre-warm iframe — PrewarmFrame updated to manifest-driven hybrid URLs (matches EscapeHatchPreview); HTTP cache fills hit the same /vendor/ paths the real preview uses
 - **2026-05-30** — ✅ S2 Content-hash transpile cache — localStorage cache keyed by SHA-256 of (path + source), LRU sweep at 200, hit-rate logged

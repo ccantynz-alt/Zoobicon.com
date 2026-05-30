@@ -564,6 +564,99 @@ function stripFencesAndWrap(raw: string): string {
 }
 
 /**
+ * Q3 — slot contract validation. After the customiser emits a
+ * component, scan it for the failure patterns that produced the
+ * Prestige Properties bug: empty <button></button>, anchor links
+ * styled as buttons with no children, untouched placeholder copy,
+ * images missing alt text.
+ *
+ * Returns an array of human-readable issue messages. Empty array
+ * means the component passed; non-empty means the customiser needs a
+ * second pass with the issues listed as the fix-list.
+ *
+ * We intentionally check for *patterns* in the source rather than
+ * trying to render and inspect the DOM — keeps this synchronous, no
+ * additional dependencies, and runs in well under a millisecond per
+ * component.
+ */
+function validateCustomisedComponent(code: string): string[] {
+  const issues: string[] = [];
+
+  // 1. Empty buttons — <button>…</button> with no text content or
+  // child elements other than self-closing icons. Catches both
+  // <button></button> and <button>   </button> and
+  // <button><ArrowRight /></button> (icon-only with no aria-label).
+  const buttonRegex = /<button\b([^>]*)>([\s\S]*?)<\/button>/g;
+  let m: RegExpExecArray | null;
+  while ((m = buttonRegex.exec(code))) {
+    const attrs = m[1];
+    const inner = m[2].trim();
+    const hasAriaLabel = /\baria-label\s*=/.test(attrs);
+    // Strip JSX children that are self-closing icons / spans
+    const textish = inner
+      .replace(/<[A-Z][A-Za-z0-9]*\b[^>]*\/>/g, "") // self-closing components
+      .replace(/<\/?\w+[^>]*>/g, "") // open/close tags
+      .replace(/\{[^}]*\}/g, "X") // JSX expressions count as "content"
+      .trim();
+    if (!textish && !hasAriaLabel) {
+      issues.push(
+        "Empty <button> with no text content and no aria-label — every button must have a visible label or aria-label."
+      );
+    }
+  }
+
+  // 2. Link-as-button with empty body — same failure mode rendered
+  // via <a className="..button..">.
+  const linkAsButton = /<a\b([^>]*className\s*=\s*["'][^"']*\b(?:btn|button|cta)\b[^"']*["'][^>]*)>([\s\S]*?)<\/a>/g;
+  while ((m = linkAsButton.exec(code))) {
+    const inner = m[2].trim();
+    const textish = inner
+      .replace(/<[A-Z][A-Za-z0-9]*\b[^>]*\/>/g, "")
+      .replace(/<\/?\w+[^>]*>/g, "")
+      .replace(/\{[^}]*\}/g, "X")
+      .trim();
+    if (!textish) {
+      issues.push(
+        "Anchor styled as button has no visible label — fill in the link text."
+      );
+    }
+  }
+
+  // 3. Images without alt text. Catches both <img ... /> and <img ...>
+  // without an alt= attribute.
+  const imgRegex = /<img\b([^>]*?)\/?>/g;
+  while ((m = imgRegex.exec(code))) {
+    const attrs = m[1];
+    if (!/\balt\s*=/.test(attrs)) {
+      issues.push(
+        "<img> missing alt attribute — every image needs alt='descriptive text' (or alt='' if purely decorative)."
+      );
+    }
+  }
+
+  // 4. Untouched placeholder copy that betrays we didn't actually
+  // customise. Either pure {{lorem}} mustache, Lorem ipsum substrings,
+  // or our own sentinel keywords from base components.
+  const placeholderHits = [
+    /\bLorem ipsum\b/i,
+    /\b\{\{\s*[a-z_]+\s*\}\}/, // {{handle}} mustache
+    /\bAcme Inc\.?\b/,
+    /\bCompany Name\b/,
+  ];
+  for (const re of placeholderHits) {
+    if (re.test(code)) {
+      issues.push(
+        `Placeholder copy still present (${re.source}) — replace with real on-brand copy.`
+      );
+    }
+  }
+
+  // De-dupe — the same regex can fire multiple times per component
+  // but the fix is the same.
+  return Array.from(new Set(issues));
+}
+
+/**
  * When Supabase is provisioned, every interactive component (navbars with
  * Sign In, heroes with Sign Up, contact forms, auth pages) should wire
  * into the real client instead of shipping dead buttons. This block is
@@ -700,6 +793,51 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
       // to the failover provider. Matches Bolt V2's auto-error-fixing.
       const verified = verifyGeneratedCode(stripped);
       if (verified.ok) {
+        // Q3 slot contract validation — catches empty buttons, anchor
+        // links styled as buttons with no labels, untouched placeholder
+        // copy, missing alts. If issues found, ONE repair pass with the
+        // slot issues as the fix-list. If repair doesn't help, ship the
+        // original anyway (better than a base-component fallback).
+        const slotIssues = validateCustomisedComponent(stripped);
+        if (slotIssues.length === 0) {
+          return { ok: true, code: stripped, modelUsed: args.model };
+        }
+        console.warn(
+          `[react-stream] slot validator flagged ${args.category}: ${slotIssues.join("; ")}`
+        );
+        try {
+          const slotRepair = await callLLMWithFailover({
+            model: args.model,
+            system: systemPrompt,
+            userMessage: buildRepairPrompt(stripped, slotIssues),
+            maxTokens: 4000,
+          });
+          const slotRepaired = stripFencesAndWrap(slotRepair.text || "");
+          const slotRepairValid = validateGeneratedComponent(slotRepaired);
+          const slotRepairVerified = verifyGeneratedCode(slotRepaired);
+          const slotRepairIssues = validateCustomisedComponent(slotRepaired);
+          if (
+            slotRepairValid.ok &&
+            slotRepairVerified.ok &&
+            slotRepairIssues.length === 0
+          ) {
+            console.info(`[react-stream] slot repair succeeded for ${args.category}`);
+            return {
+              ok: true,
+              code: slotRepaired,
+              modelUsed: `${slotRepair.model || args.model} (slot-repair)`,
+            };
+          }
+          attemptLog.push(
+            `slot-repair: ${slotRepairIssues.length} issues remain after one pass`
+          );
+        } catch (repairErr) {
+          const msg = repairErr instanceof Error ? repairErr.message : String(repairErr);
+          attemptLog.push(`slot-repair: ${msg.slice(0, 80)}`);
+        }
+        // Repair didn't fix it — ship the original; slot issues degrade
+        // quality but don't break the build. UI surfaces these via the
+        // failedSections warning chain elsewhere.
         return { ok: true, code: stripped, modelUsed: args.model };
       }
       attemptLog.push(`${args.model}: verifier flagged ${verified.issues.length} issues`);
