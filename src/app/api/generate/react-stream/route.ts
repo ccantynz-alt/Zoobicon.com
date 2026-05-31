@@ -1052,9 +1052,12 @@ export async function POST(req: NextRequest): Promise<Response> {
   // KILLER-MOVES-BUILDER.md #5 + #6: per-user telemetry and cost ceiling.
   // Anonymous builds still log (with userEmail=null) but skip quota.
   const userEmail = req.headers.get("x-user-email") || null;
-  const quotaPlan: QuotaPlan = (plan === "pro" || plan === "agency" || plan === "free" || plan === "creator")
-    ? (plan as QuotaPlan)
-    : "free";
+  const isAdmin = !!(req.headers.get("x-admin") && req.headers.get("x-admin") !== "0" && req.headers.get("x-admin") !== "false");
+  const quotaPlan: QuotaPlan = isAdmin
+    ? "admin"
+    : (plan === "pro" || plan === "agency" || plan === "free" || plan === "creator")
+      ? (plan as QuotaPlan)
+      : "free";
   const quota = await checkBuildQuota(userEmail, quotaPlan);
   if (!quota.ok) {
     return new Response(

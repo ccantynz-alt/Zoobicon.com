@@ -154,18 +154,18 @@ img, video {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #162044;
+  background: #c9c5b8;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2d4d8c;
+  background: #a8a392;
 }
 
 /* Scrollbar — Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #2a2a4a #111a2e;
+  scrollbar-color: #c9c5b8 var(--paper);
 }
 
 /* ============================================
@@ -174,42 +174,38 @@ img, video {
    ============================================ */
 
 .surface {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
   border-radius: 12px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .surface-elevated {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
   border-radius: 12px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-1);
 }
 
 .surface-interactive {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
   border-radius: 12px;
   transition: all 0.15s ease;
 }
 
 .surface-interactive:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: #f3f1e6;
+  border-color: var(--rule-strong);
+  box-shadow: var(--shadow-1);
 }
 
-/* Dividers — sharper than default border opacity */
+/* Dividers */
 .divider {
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--rule);
 }
 
 .divider-strong {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--rule-strong);
 }
 
 /* ============================================
@@ -294,7 +290,7 @@ pre code {
 }
 
 .cyber-input::placeholder {
-  color: rgba(255, 255, 255, 0.50);
+  color: var(--ink-muted);
 }
 
 /* Loading dots */
@@ -333,11 +329,11 @@ pre code {
   padding: 8px 16px;
   font-size: 12px;
   font-weight: 500;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   cursor: pointer;
   border-bottom: 2px solid transparent;
-  color: rgba(255, 255, 255, 0.5);
-  transition: all 0.2s;
+  color: var(--ink-muted);
+  transition: all 0.15s;
   background: none;
   border-top: none;
   border-left: none;
@@ -346,12 +342,12 @@ pre code {
 }
 
 .cyber-tab:hover {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--ink-secondary);
 }
 
 .cyber-tab.active {
-  color: var(--zoo-400);
-  border-bottom-color: var(--zoo-400);
+  color: var(--ink);
+  border-bottom-color: var(--gold);
 }
 
 /* ============================================
@@ -572,8 +568,8 @@ pre code {
 
 .grid-pattern {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(10, 10, 11, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 10, 11, 0.04) 1px, transparent 1px);
   background-size: 64px 64px;
 }
 
@@ -629,17 +625,17 @@ pre code {
    ============================================ */
 
 .glass {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(24px) saturate(1.2);
   -webkit-backdrop-filter: blur(24px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid var(--rule);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.90);
   backdrop-filter: blur(40px) saturate(1.3);
   -webkit-backdrop-filter: blur(40px) saturate(1.3);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--rule);
 }
 
 /* ============================================
@@ -696,16 +692,16 @@ pre code {
    ============================================ */
 
 .gradient-border {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-1);
 }
 
 .gradient-border:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-color: var(--rule-strong);
+  background: #f3f1e6;
+  box-shadow: var(--shadow-2);
 }
 
 /* ============================================
@@ -718,7 +714,7 @@ pre code {
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.10);
 }
 
 /* ============================================
@@ -727,7 +723,7 @@ pre code {
 
 .section-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.10);
+  background: var(--rule);
 }
 
 /* ============================================
@@ -769,7 +765,7 @@ pre code {
   }
 
   .cyber-tab:hover {
-    color: rgba(255, 255, 255, 0.50);
+    color: var(--ink-muted);
   }
 }
 
@@ -911,7 +907,7 @@ body::before {
 }
 .card-lift:hover {
   transform: translateY(-6px) scale(1.01);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(184, 146, 63, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.10), 0 0 40px rgba(184, 146, 63, 0.08);
 }
 
 /* Staggered reveal for list items — CSS-only */
@@ -1610,10 +1606,10 @@ select {
    ============================================ */
 
 .glass-panel {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.82);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--rule);
   border-radius: 1.5rem;
 }
 
@@ -1727,7 +1723,7 @@ select {
 .typing-cursor::after {
   content: '|';
   animation: blink-cursor 1s steps(2) infinite;
-  color: rgba(255,255,255,0.50);
+  color: var(--ink-muted);
   font-weight: 300;
   margin-left: 2px;
 }
@@ -1906,8 +1902,8 @@ select {
 /* ── Thin scrollbar for notification dropdown ── */
 .notif-scrollbar::-webkit-scrollbar { width: 4px; }
 .notif-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.notif-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-.notif-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+.notif-scrollbar::-webkit-scrollbar-thumb { background: #d0cdc0; border-radius: 2px; }
+.notif-scrollbar::-webkit-scrollbar-thumb:hover { background: #b8b3a5; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FILMORA-TIER DESIGN SYSTEM — SERIOUS BUSINESS STANDARD
@@ -1973,7 +1969,7 @@ select {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.2em;
-  color: rgba(255,255,255,0.45);
+  color: var(--ink-muted);
 }
 
 .fs-serif-italic {
@@ -2002,8 +1998,8 @@ select {
 /* ── Cards — the bento/feature-grid primitive ── */
 .fs-card {
   position: relative;
-  background: linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%);
-  border: 1px solid var(--fs-hair);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
   border-radius: var(--fs-radius-lg);
   box-shadow: var(--fs-shadow-card);
   overflow: hidden;
@@ -2073,17 +2069,16 @@ select {
   border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255,255,255,0.85);
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--fs-hair-strong);
-  backdrop-filter: blur(12px);
+  color: var(--ink-secondary);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
   transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .fs-btn-ghost:hover {
-  color: var(--fs-accent);
-  border-color: var(--fs-accent-ring);
-  background: rgba(232,212,176,0.04);
+  color: var(--gold-deep);
+  border-color: var(--gold);
+  background: var(--gold-soft);
   transform: translateY(-2px);
 }
 
