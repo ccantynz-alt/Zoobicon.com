@@ -395,9 +395,13 @@ async function planComponents(prompt: string): Promise<PlanResult> {
 
   const resolved: RegistryComponent[] = [];
   if (parsed && Array.isArray(parsed.selections)) {
+    const seenCategories = new Set<string>();
     for (const sel of parsed.selections) {
       const comp = getById(sel.id);
-      if (comp) resolved.push(comp);
+      if (comp && !seenCategories.has(comp.category)) {
+        seenCategories.add(comp.category);
+        resolved.push(comp);
+      }
     }
   }
 
