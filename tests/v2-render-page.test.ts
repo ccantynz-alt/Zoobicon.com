@@ -6,7 +6,16 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { renderSlotPage } from "../src/lib/v2/render-page";
+import { renderSlotPage, renderFromRegistry } from "../src/lib/v2/render-page";
+// Populate the 118-component registry (ensureRegistryLoaded uses CommonJS
+// require which doesn't run under vitest's ESM transform).
+import "../src/lib/component-registry/navbars";
+import "../src/lib/component-registry/heroes";
+import "../src/lib/component-registry/features";
+import "../src/lib/component-registry/testimonials";
+import "../src/lib/component-registry/footers";
+import "../src/lib/component-registry/extras";
+import "../src/lib/component-registry/sections";
 
 describe("v2 renderSlotPage", () => {
   it("renders a complete SaaS page to a real HTML document", async () => {
@@ -35,5 +44,25 @@ describe("v2 renderSlotPage", () => {
     const page = await renderSlotPage({ prompt: "something nice", useExampleFill: true });
     expect(page.componentIds.length).toBeGreaterThanOrEqual(5);
     expect(page.html.length).toBeGreaterThan(3000);
+  });
+});
+
+describe("v2 renderFromRegistry (rich engine)", () => {
+  it("selects prompt-relevant components from the full registry and renders them", async () => {
+    const page = await renderFromRegistry({
+      prompt: "A SaaS analytics platform for product teams",
+      useExampleFill: true, // no AI — exercise selection + server render
+    });
+    // SaaS prompt → navbar/hero/logos/features/stats/testimonials/pricing/faq/cta/footer
+    expect(page.componentIds.length).toBeGreaterThanOrEqual(8);
+    expect(page.componentIds).toContain("logos-marquee");
+    expect(page.html).toContain("<!DOCTYPE html>");
+    expect(page.html.length).toBeGreaterThan(5000);
+  });
+
+  it("picks a different section mix for an e-commerce prompt", async () => {
+    const page = await renderFromRegistry({ prompt: "An online boutique store for handmade jewelry", useExampleFill: true });
+    expect(page.componentIds.length).toBeGreaterThanOrEqual(6);
+    expect(page.html.length).toBeGreaterThan(5000);
   });
 });
