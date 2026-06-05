@@ -14,7 +14,7 @@
  */
 
 import { NextRequest } from "next/server";
-import { renderSlotPage } from "@/lib/v2/render-page";
+import { renderFromRegistry } from "@/lib/v2/render-page";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -42,11 +42,11 @@ export async function POST(req: NextRequest): Promise<Response> {
   }
 
   try {
-    const page = await renderSlotPage({
+    // Rich engine: full 118-component registry, prompt-aware selection +
+    // AI-tailored copy, rendered server-side.
+    const page = await renderFromRegistry({
       prompt,
       brandName: body.brandName,
-      industry: body.industry,
-      theme: body.theme,
       useExampleFill: body.useExampleFill,
     });
     return Response.json({ ok: true, ...page });

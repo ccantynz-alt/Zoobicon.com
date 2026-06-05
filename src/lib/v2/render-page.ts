@@ -37,6 +37,7 @@ import { SLOT_REGISTRY } from "@/lib/slot-locked/registry";
 import { assembleComponent } from "@/lib/slot-locked/assembler";
 import { planPageForIndustry } from "@/lib/slot-locked/industry-planner";
 import { schemaToPrompt } from "@/lib/slot-locked/assembler";
+import { selectComponentsForPrompt } from "@/lib/component-registry";
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { validateEditJson } from "@/lib/llm-output-validator";
 import type { SlotValueMap } from "@/lib/slot-locked/types";
@@ -185,6 +186,107 @@ export async function renderSlotPage(opts: {
     componentIds,
     industry,
     theme,
+    aiUsed,
+  };
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// REGISTRY-POWERED RENDER (the rich path) — V2's default engine.
+//
+// Uses the full 118-component $100K-agency registry with prompt-aware
+// selection (selectComponentsForPrompt scores every component against the
+// prompt), then AI-rewrites the COPY in each selected component to fit the
+// business, then server-renders. Quality of V1's library + reliability of
+// V2's server render. A customisation that fails to render falls back to
+// the (already polished) base component — so it can't break the page.
+// ───────────────────────────────────────────────────────────────────────
+
+// Ask the model to rewrite only the user-facing text of a component to fit
+// the business, keeping structure/classes/imports intact. Returns the full
+// component code, or null on any failure (caller falls back to the base).
+async function aiRewriteCopy(
+  baseCode: string,
+  prompt: string,
+  brandName: string,
+  category: string,
+): Promise<string | null> {
+  try {
+    const fb = await callLLMWithFailover({
+      model: "claude-sonnet-4-6",
+      system:
+        "You are tailoring a production React component for a specific business. " +
+        "You will receive a complete React component. Rewrite ONLY the user-facing TEXT " +
+        "(headlines, paragraphs, button labels, nav links, testimonial quotes, customer names, " +
+        "stat labels and numbers, FAQ questions/answers, footer text) so it fits the business described. " +
+        "KEEP the JSX structure, every className, every import (including `import React`), all props, all logic, " +
+        "and all inline SVG EXACTLY as-is. Do not add or remove elements. Do not change styling or layout. " +
+        "Make the copy specific, confident and on-brand — never generic placeholder text like 'Acme' or 'lorem ipsum'. " +
+        "Return ONLY the complete component code — no markdown fences, no commentary.",
+      userMessage: `Business: ${prompt}\nBrand name: ${brandName || "(choose one that fits)"}\nSection: ${category}\n\nComponent code:\n\n${baseCode}`,
+      maxTokens: 4000,
+    });
+    let out = (fb.text || "").trim();
+    // Strip markdown fences if the model added them despite instructions.
+    out = out.replace(/^```[a-zA-Z]*\n?/, "").replace(/\n?```$/, "").trim();
+    if (out.length < 80 || !/export\s+default/.test(out)) return null;
+    return out;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Build + render a complete page from the full 118-component registry,
+ * tailored to the prompt and rendered server-side. This is the rich,
+ * prompt-relevant engine the /api/v2/build route uses by default.
+ */
+export async function renderFromRegistry(opts: {
+  prompt: string;
+  brandName?: string;
+  useExampleFill?: boolean;
+}): Promise<RenderedPage> {
+  const prompt = opts.prompt.trim();
+  const brandName = (opts.brandName || "").trim();
+  const industry = detectIndustry(prompt);
+
+  // Prompt-aware selection across the whole registry ($100K components).
+  const components = selectComponentsForPrompt(prompt);
+
+  const hasKey = Boolean(
+    process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY || process.env.GOOGLE_AI_API_KEY,
+  );
+  const doAi = !opts.useExampleFill && hasKey;
+  let aiUsed = false;
+
+  const sections = await Promise.all(
+    components.map(async (c) => {
+      // Registry component code omits `import React`; the pipeline prepends
+      // it. Match that so the component renders in isolation.
+      const base = `import React from "react";\n\n${c.code}\n`;
+      let code = base;
+      if (doAi) {
+        const rewritten = await aiRewriteCopy(base, prompt, brandName, c.category);
+        if (rewritten) { code = rewritten; aiUsed = true; }
+      }
+      // Render the tailored version; if it fails, fall back to the polished
+      // base; if THAT fails, drop the section rather than blank the page.
+      try {
+        return await renderComponentToHtml(code);
+      } catch {
+        try {
+          return await renderComponentToHtml(base);
+        } catch {
+          return "";
+        }
+      }
+    }),
+  );
+
+  return {
+    html: pageShell(sections.filter(Boolean).join("\n"), brandName),
+    componentIds: components.map((c) => c.id),
+    industry,
+    theme: "editorial",
     aiUsed,
   };
 }
