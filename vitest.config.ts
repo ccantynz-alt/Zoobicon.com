@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, configDefaults } from "vitest/config";
 import path from "path";
 
 // lru-cache 10.x ships its main entry as TypeScript source via the `exports`
@@ -13,6 +13,10 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     include: ["tests/**/*.test.ts", "tests/**/*.test.tsx"],
+    // tests/auto-generated/* are scaffolding tests written for node's
+    // built-in `node:test` runner; vitest can't bundle `node:test` and
+    // they fail to load. Exclude them so the suite reflects real tests.
+    exclude: [...configDefaults.exclude, "tests/auto-generated/**"],
     setupFiles: [],
     server: {
       deps: {

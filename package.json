@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "audit": "node scripts/claude-md-audit.js",
-    "audit:deep": "node scripts/claude-md-audit.js --deep"
+    "audit:deep": "node scripts/claude-md-audit.js --deep",
+    "audit:code": "bash scripts/deep-audit.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
