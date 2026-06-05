@@ -29,7 +29,13 @@ jobs:
       - name: Run smoke tests against live site
         run: bash scripts/smoke-test.sh "$SMOKE_URL"
         env:
-          SMOKE_URL: ${{ github.event.deployment_status.target_url || inputs.url || 'https://zoobicon.com' }}
+          # Always smoke-test the PUBLIC production domain. The per-deploy
+          # `target_url` is a *.vercel.app URL with Vercel Deployment
+          # Protection enabled, so unauthenticated requests get HTTP 401 on
+          # every route and the whole suite fails for the wrong reason.
+          # zoobicon.com is the public alias Vercel promotes production to.
+          # workflow_dispatch can still override via inputs.url.
+          SMOKE_URL: ${{ inputs.url || 'https://zoobicon.com' }}
 
   gatetest-live:
     name: GateTest E2E (live deploy)

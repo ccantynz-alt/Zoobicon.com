@@ -89,20 +89,20 @@ echo "════════════════════════�
 echo ""
 
 # ── Critical Pages (must load) ──
-# Updated 2026-05-27 — matches post-Rule-19 + post-Rule-31 scope.
-# Removed: /video-creator, /products/video-creator, /products/dictation
-# (Rule 19 retired AI Video Creator), /my-domains (Crontech owns
-# customer domain mgmt). /auth/* are now editorial-light stub pages
-# that explain the Crontech-SSO migration (200 OK).
+# Updated 2026-06-05 — matches post-Rule-32 scope (AI Builder only).
+# Removed: /domains + /tools (Rule 32 deleted the standalone domain
+# search page and the 12 free-tool pages — they now 404). Removed
+# /admin (internal, URL-only; not a public smoke target and its
+# unauthenticated status is non-deterministic). Kept the genuinely
+# public product surface. /auth/* are editorial-light Crontech-SSO
+# stub pages (200 OK).
 echo "── Pages ──"
 check_page "/"
 check_page "/builder"
-check_page "/domains"
 check_page "/pricing"
-check_page "/tools"
+check_page "/upgrade"
 check_page "/auth/login"
 check_page "/auth/signup"
-check_page "/admin"
 echo ""
 
 # ── API Health Checks ──
