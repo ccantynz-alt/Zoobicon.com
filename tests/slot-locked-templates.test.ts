@@ -27,13 +27,29 @@ import {
 import {
   FOOTER_EDITORIAL_SCHEMA, FOOTER_EDITORIAL_TEMPLATE, FOOTER_EDITORIAL_EXAMPLE,
 } from "../src/lib/slot-locked/templates/footer-editorial";
+import {
+  STATS_STRIP_SCHEMA, STATS_STRIP_TEMPLATE, STATS_STRIP_EXAMPLE,
+} from "../src/lib/slot-locked/templates/stats-strip";
+import {
+  TESTIMONIALS_QUOTES_SCHEMA, TESTIMONIALS_QUOTES_TEMPLATE, TESTIMONIALS_QUOTES_EXAMPLE,
+} from "../src/lib/slot-locked/templates/testimonials-quotes";
+import {
+  CTA_BANNER_SCHEMA, CTA_BANNER_TEMPLATE, CTA_BANNER_EXAMPLE,
+} from "../src/lib/slot-locked/templates/cta-banner";
+import {
+  FAQ_ACCORDION_SCHEMA, FAQ_ACCORDION_TEMPLATE, FAQ_ACCORDION_EXAMPLE,
+} from "../src/lib/slot-locked/templates/faq-accordion";
 
 const REGISTRY = [
-  { name: "hero-spotlight",   schema: HERO_SPOTLIGHT_SCHEMA,   template: HERO_SPOTLIGHT_TEMPLATE,   example: HERO_SPOTLIGHT_EXAMPLE   },
-  { name: "navbar-minimal",   schema: NAVBAR_MINIMAL_SCHEMA,   template: NAVBAR_MINIMAL_TEMPLATE,   example: NAVBAR_MINIMAL_EXAMPLE   },
-  { name: "features-bento",   schema: FEATURES_BENTO_SCHEMA,   template: FEATURES_BENTO_TEMPLATE,   example: FEATURES_BENTO_EXAMPLE   },
-  { name: "pricing-tiers",    schema: PRICING_TIERS_SCHEMA,    template: PRICING_TIERS_TEMPLATE,    example: PRICING_TIERS_EXAMPLE    },
-  { name: "footer-editorial", schema: FOOTER_EDITORIAL_SCHEMA, template: FOOTER_EDITORIAL_TEMPLATE, example: FOOTER_EDITORIAL_EXAMPLE },
+  { name: "hero-spotlight",      schema: HERO_SPOTLIGHT_SCHEMA,      template: HERO_SPOTLIGHT_TEMPLATE,      example: HERO_SPOTLIGHT_EXAMPLE      },
+  { name: "navbar-minimal",      schema: NAVBAR_MINIMAL_SCHEMA,      template: NAVBAR_MINIMAL_TEMPLATE,      example: NAVBAR_MINIMAL_EXAMPLE      },
+  { name: "features-bento",      schema: FEATURES_BENTO_SCHEMA,      template: FEATURES_BENTO_TEMPLATE,      example: FEATURES_BENTO_EXAMPLE      },
+  { name: "pricing-tiers",       schema: PRICING_TIERS_SCHEMA,       template: PRICING_TIERS_TEMPLATE,       example: PRICING_TIERS_EXAMPLE       },
+  { name: "footer-editorial",    schema: FOOTER_EDITORIAL_SCHEMA,    template: FOOTER_EDITORIAL_TEMPLATE,    example: FOOTER_EDITORIAL_EXAMPLE    },
+  { name: "stats-strip",         schema: STATS_STRIP_SCHEMA,         template: STATS_STRIP_TEMPLATE,         example: STATS_STRIP_EXAMPLE         },
+  { name: "testimonials-quotes", schema: TESTIMONIALS_QUOTES_SCHEMA, template: TESTIMONIALS_QUOTES_TEMPLATE, example: TESTIMONIALS_QUOTES_EXAMPLE },
+  { name: "cta-banner",          schema: CTA_BANNER_SCHEMA,          template: CTA_BANNER_TEMPLATE,          example: CTA_BANNER_EXAMPLE          },
+  { name: "faq-accordion",       schema: FAQ_ACCORDION_SCHEMA,       template: FAQ_ACCORDION_TEMPLATE,       example: FAQ_ACCORDION_EXAMPLE       },
 ];
 
 describe("slot-locked registry — smoke tests", () => {

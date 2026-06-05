@@ -63,6 +63,26 @@ import {
   HERO_PORTFOLIO_EDITORIAL_TEMPLATE,
   HERO_PORTFOLIO_EDITORIAL_EXAMPLE,
 } from "@/lib/slot-locked/templates/by-industry/hero-portfolio-editorial";
+import {
+  STATS_STRIP_SCHEMA,
+  STATS_STRIP_TEMPLATE,
+  STATS_STRIP_EXAMPLE,
+} from "@/lib/slot-locked/templates/stats-strip";
+import {
+  TESTIMONIALS_QUOTES_SCHEMA,
+  TESTIMONIALS_QUOTES_TEMPLATE,
+  TESTIMONIALS_QUOTES_EXAMPLE,
+} from "@/lib/slot-locked/templates/testimonials-quotes";
+import {
+  CTA_BANNER_SCHEMA,
+  CTA_BANNER_TEMPLATE,
+  CTA_BANNER_EXAMPLE,
+} from "@/lib/slot-locked/templates/cta-banner";
+import {
+  FAQ_ACCORDION_SCHEMA,
+  FAQ_ACCORDION_TEMPLATE,
+  FAQ_ACCORDION_EXAMPLE,
+} from "@/lib/slot-locked/templates/faq-accordion";
 import { planPageForIndustry, planPageForIndustryAdaptive } from "@/lib/slot-locked/industry-planner";
 import { critiquePanel, axesNeedingRepair } from "@/lib/builder-critique/multi-judge";
 import { retrieveFewShotExamples, renderFewShotPrefix, recordSuccessfulBuild } from "@/lib/flywheel/successful-builds";
@@ -107,6 +127,10 @@ const SLOT_REGISTRY: Record<string, { schema: ComponentSchema; template: string;
   "features-bento-slot":           { schema: FEATURES_BENTO_SCHEMA,           template: FEATURES_BENTO_TEMPLATE,           example: FEATURES_BENTO_EXAMPLE },
   "pricing-tiers-slot":            { schema: PRICING_TIERS_SCHEMA,            template: PRICING_TIERS_TEMPLATE,            example: PRICING_TIERS_EXAMPLE },
   "footer-editorial-slot":         { schema: FOOTER_EDITORIAL_SCHEMA,         template: FOOTER_EDITORIAL_TEMPLATE,         example: FOOTER_EDITORIAL_EXAMPLE },
+  "stats-strip-slot":              { schema: STATS_STRIP_SCHEMA,              template: STATS_STRIP_TEMPLATE,              example: STATS_STRIP_EXAMPLE },
+  "testimonials-quotes-slot":      { schema: TESTIMONIALS_QUOTES_SCHEMA,      template: TESTIMONIALS_QUOTES_TEMPLATE,      example: TESTIMONIALS_QUOTES_EXAMPLE },
+  "cta-banner-slot":               { schema: CTA_BANNER_SCHEMA,               template: CTA_BANNER_TEMPLATE,               example: CTA_BANNER_EXAMPLE },
+  "faq-accordion-slot":            { schema: FAQ_ACCORDION_SCHEMA,            template: FAQ_ACCORDION_TEMPLATE,            example: FAQ_ACCORDION_EXAMPLE },
   // Industry variants — the planner picks these when industry + theme match.
   "hero-restaurant-warm-slot":     { schema: HERO_RESTAURANT_WARM_SCHEMA,     template: HERO_RESTAURANT_WARM_TEMPLATE,     example: HERO_RESTAURANT_WARM_EXAMPLE },
   "hero-portfolio-editorial-slot": { schema: HERO_PORTFOLIO_EDITORIAL_SCHEMA, template: HERO_PORTFOLIO_EDITORIAL_TEMPLATE, example: HERO_PORTFOLIO_EDITORIAL_EXAMPLE },
