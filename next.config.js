@@ -215,15 +215,14 @@ const nextConfig = {
             key: "Cache-Control",
             value: "private, no-cache, no-store, must-revalidate",
           },
-          // Required for WebContainers (SharedArrayBuffer / cross-origin isolation)
-          {
-            key: "Cross-Origin-Opener-Policy",
-            value: "same-origin",
-          },
-          {
-            key: "Cross-Origin-Embedder-Policy",
-            value: "require-corp",
-          },
+          // Cross-Origin-Embedder-Policy: require-corp was REMOVED here.
+          // It was added speculatively "for WebContainers" (SharedArrayBuffer),
+          // but WebContainers is NOT the active preview engine. The preview
+          // loads Babel/React from esm.sh, Tailwind from its CDN, and Google
+          // Fonts — all cross-origin and WITHOUT CORP headers. require-corp
+          // BLOCKS every one of those, which breaks the preview ("Preview
+          // failed"). Do not re-add it unless WebContainers is actually wired
+          // AND every preview resource is served with CORP/CORS headers.
         ],
       },
       {

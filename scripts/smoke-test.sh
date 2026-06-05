@@ -17,12 +17,15 @@ green() { echo -e "\033[32m✓ $1\033[0m"; }
 red() { echo -e "\033[31m✗ $1\033[0m"; }
 yellow() { echo -e "\033[33m⚠ $1\033[0m"; }
 
-# Check HTTP status of a page
+# Check HTTP status of a page.
+# -L follows redirects: the apex domain issues a benign 307 to the canonical
+# host (browsers follow it transparently), so without -L every path falsely
+# reported 307. We want the FINAL status after redirects.
 check_page() {
   local path="$1"
   local expected="${2:-200}"
   local status
-  status=$(curl -so /dev/null -w "%{http_code}" --max-time 15 "$BASE$path" 2>/dev/null || echo "000")
+  status=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 15 "$BASE$path" 2>/dev/null || echo "000")
   if [ "$status" = "$expected" ]; then
     green "$path → HTTP $status"
     PASS=$((PASS + 1))
@@ -39,7 +42,7 @@ check_api() {
   local field="$2"
   local label="${3:-$path}"
   local response
-  response=$(curl -sf --max-time 15 "$BASE$path" 2>/dev/null || echo "CURL_FAILED")
+  response=$(curl -sfL --max-time 15 "$BASE$path" 2>/dev/null || echo "CURL_FAILED")
   if [ "$response" = "CURL_FAILED" ]; then
     red "$label → Connection failed"
     FAIL=$((FAIL + 1))
@@ -63,7 +66,7 @@ check_api_value() {
   local expected="$3"
   local label="${4:-$path}"
   local response
-  response=$(curl -sf --max-time 15 "$BASE$path" 2>/dev/null || echo "")
+  response=$(curl -sfL --max-time 15 "$BASE$path" 2>/dev/null || echo "")
   if [ -z "$response" ]; then
     red "$label → No response"
     FAIL=$((FAIL + 1))
