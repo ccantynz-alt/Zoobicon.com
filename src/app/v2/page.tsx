@@ -10,7 +10,7 @@
  * else. This is the architecture that fixes the V1 failures for good.
  */
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const SERIF = "'Playfair Display','Fraunces',ui-serif,Georgia,serif";
 
@@ -22,7 +22,7 @@ const EXAMPLES = [
   "A boutique law firm with fixed-fee pricing",
 ];
 
-type Status = "idle" | "building" | "done" | "error";
+type Status = "idle" | "streaming" | "done" | "error";
 
 interface BuildResult {
   html: string;
@@ -38,50 +38,145 @@ export default function BuilderV2() {
   const [result, setResult] = useState<BuildResult | null>(null);
   const [error, setError] = useState("");
   const [elapsed, setElapsed] = useState(0);
+  const [shell, setShell] = useState<string | null>(null);
+  const [sectionsIn, setSectionsIn] = useState(0); // base sections rendered
+  const [tailoring, setTailoring] = useState(false); // AI copy still landing
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const readyRef = useRef(false);
+  const queueRef = useRef<Array<{ index: number; html: string }>>([]);
 
-  const build = useCallback(async (p: string) => {
-    const text = p.trim();
-    if (!text) return;
-    setStatus("building");
-    setError("");
-    setResult(null);
-    setElapsed(0);
-    const started = Date.now();
-    timerRef.current = setInterval(() => setElapsed((Date.now() - started) / 1000), 100);
-
-    // One automatic retry — server build is deterministic, so a transient
-    // network blip should never be a dead end for the user.
-    const attempt = async (): Promise<Response> =>
-      fetch("/api/v2/build", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: text }),
-      });
-
-    try {
-      let res: Response;
-      try {
-        res = await attempt();
-      } catch {
-        await new Promise((r) => setTimeout(r, 800));
-        res = await attempt();
+  // The iframe (srcDoc, opaque origin) tells us when its hot-swap listener is
+  // ready; we flush any sections that arrived before then.
+  useEffect(() => {
+    const onMsg = (e: MessageEvent) => {
+      if (e.data && e.data.type === "zb-ready") {
+        readyRef.current = true;
+        const win = iframeRef.current?.contentWindow;
+        if (win) {
+          for (const s of queueRef.current) win.postMessage({ type: "zb-section", index: s.index, html: s.html }, "*");
+        }
+        queueRef.current = [];
       }
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-        throw new Error(data.error || `HTTP ${res.status}`);
-      }
-      const data = (await res.json()) as { ok: boolean; error?: string } & BuildResult;
-      if (!data.ok) throw new Error(data.error || "Build failed");
-      setResult(data);
-      setStatus("done");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Build failed");
-      setStatus("error");
-    } finally {
-      if (timerRef.current) clearInterval(timerRef.current);
+    };
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, []);
+
+  const pushSection = useCallback((index: number, html: string) => {
+    if (readyRef.current && iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({ type: "zb-section", index, html }, "*");
+    } else {
+      queueRef.current.push({ index, html });
     }
   }, []);
+
+  // Non-streaming fallback (the original one-shot build) — used only if the
+  // SSE stream can't be established at all.
+  const buildFallback = useCallback(async (text: string) => {
+    const res = await fetch("/api/v2/build", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: text }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+      throw new Error(data.error || `HTTP ${res.status}`);
+    }
+    const data = (await res.json()) as { ok: boolean; error?: string } & BuildResult;
+    if (!data.ok) throw new Error(data.error || "Build failed");
+    setShell(data.html);
+    setResult(data);
+    setStatus("done");
+  }, []);
+
+  const build = useCallback(
+    async (p: string) => {
+      const text = p.trim();
+      if (!text) return;
+      setStatus("streaming");
+      setError("");
+      setResult(null);
+      setShell(null);
+      setSectionsIn(0);
+      setTailoring(false);
+      readyRef.current = false;
+      queueRef.current = [];
+      setElapsed(0);
+      const started = Date.now();
+      timerRef.current = setInterval(() => setElapsed((Date.now() - started) / 1000), 100);
+
+      try {
+        const res = await fetch("/api/v2/build/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text }),
+        });
+        if (!res.ok || !res.body) throw new Error(`stream unavailable (HTTP ${res.status})`);
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = "";
+        let gotAnything = false;
+        let sawError = "";
+
+        // eslint-disable-next-line no-constant-condition
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          const parts = buf.split("\n\n");
+          buf = parts.pop() || "";
+          for (const part of parts) {
+            const line = part.replace(/^data:\s?/, "").trim();
+            if (!line) continue;
+            let evt: Record<string, unknown>;
+            try {
+              evt = JSON.parse(line);
+            } catch {
+              continue;
+            }
+            gotAnything = true;
+            if (evt.type === "meta") {
+              setShell(evt.shell as string);
+              setTailoring(true);
+            } else if (evt.type === "section") {
+              pushSection(evt.index as number, evt.html as string);
+              if (evt.ai === false) setSectionsIn((n) => n + 1);
+            } else if (evt.type === "done") {
+              setResult({
+                html: evt.html as string,
+                componentIds: (evt.componentIds as string[]) || [],
+                industry: (evt.industry as string) || "",
+                theme: "editorial",
+                aiUsed: Boolean(evt.aiUsed),
+              });
+              setTailoring(false);
+              setStatus("done");
+            } else if (evt.type === "error") {
+              sawError = (evt.error as string) || "Build failed";
+            }
+          }
+        }
+
+        if (sawError && !gotAnything) throw new Error(sawError);
+        // If the stream ended without a `done` (rare), still settle the UI.
+        setTailoring(false);
+        setStatus((s) => (s === "streaming" ? "done" : s));
+      } catch (streamErr) {
+        // Stream couldn't be established — fall back to the one-shot build.
+        try {
+          await buildFallback(text);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : streamErr instanceof Error ? streamErr.message : "Build failed");
+          setStatus("error");
+        }
+      } finally {
+        if (timerRef.current) clearInterval(timerRef.current);
+      }
+    },
+    [buildFallback, pushSection],
+  );
 
   return (
     <div className="flex h-screen flex-col" style={{ background: "var(--paper)", color: "var(--ink)" }}>
@@ -148,12 +243,12 @@ export default function BuilderV2() {
             />
             <button
               onClick={() => build(prompt)}
-              disabled={status === "building" || !prompt.trim()}
+              disabled={status === "streaming" || !prompt.trim()}
               className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-[15px] font-semibold transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
               style={{ background: "var(--ink)", color: "var(--paper)", boxShadow: "0 8px 24px rgba(10,10,11,0.18)" }}
             >
-              {status === "building" ? `Building… ${elapsed.toFixed(1)}s` : "Build my website"}
-              {status !== "building" && <span style={{ fontFamily: SERIF }}>→</span>}
+              {status === "streaming" ? `Building… ${elapsed.toFixed(1)}s` : "Build my website"}
+              {status !== "streaming" && <span style={{ fontFamily: SERIF }}>→</span>}
             </button>
             <p className="mt-2 text-center text-[11px]" style={{ color: "var(--ink-muted)" }}>
               ⌘/Ctrl + Enter
@@ -169,7 +264,7 @@ export default function BuilderV2() {
                 <button
                   key={ex}
                   onClick={() => { setPrompt(ex); build(ex); }}
-                  disabled={status === "building"}
+                  disabled={status === "streaming"}
                   className="rounded-xl px-3.5 py-2.5 text-left text-[13px] transition-colors disabled:opacity-50"
                   style={{ background: "var(--paper-elevated)", border: "1px solid var(--rule)", color: "var(--ink-secondary)" }}
                 >
@@ -217,7 +312,10 @@ export default function BuilderV2() {
             </div>
           )}
 
-          {status === "building" && (
+          {/* Streaming: mount the iframe the instant the shell arrives so
+              sections hot-swap in live. A brief warm-up shows only until the
+              shell (first event) lands (~1s). */}
+          {status === "streaming" && !shell && (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
                 <div
@@ -225,10 +323,51 @@ export default function BuilderV2() {
                   style={{ border: "3px solid var(--rule)", borderTopColor: "var(--gold)" }}
                 />
                 <p className="text-[14px]" style={{ color: "var(--ink-secondary)" }}>
-                  Assembling + rendering your site on the server…
+                  Selecting your sections…
                 </p>
                 <p className="mt-1 text-[12px]" style={{ color: "var(--ink-muted)" }}>{elapsed.toFixed(1)}s</p>
               </div>
+            </div>
+          )}
+
+          {(status === "streaming" || status === "done") && shell && (
+            <div className="flex h-full flex-col">
+              <div
+                className="flex items-center gap-1.5 px-4 py-2.5"
+                style={{ borderBottom: "1px solid var(--rule)", background: "var(--paper)" }}
+              >
+                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--rule-strong)" }} />
+                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--rule-strong)" }} />
+                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--rule-strong)" }} />
+                <span className="ml-3 font-mono text-[11px]" style={{ color: "var(--ink-muted)" }}>
+                  preview · {sectionsIn} section{sectionsIn === 1 ? "" : "s"}
+                </span>
+                {tailoring && (
+                  <span
+                    className="ml-2 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                    style={{ background: "var(--gold-soft)", color: "var(--gold-deep)" }}
+                  >
+                    <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full" style={{ background: "var(--gold)" }} />
+                    Tailoring copy…
+                  </span>
+                )}
+                {status === "done" && (
+                  <button
+                    onClick={() => build(prompt)}
+                    className="ml-auto rounded-full px-3 py-1 text-[11px] font-medium"
+                    style={{ background: "var(--ink)", color: "var(--paper)" }}
+                  >
+                    Rebuild
+                  </button>
+                )}
+              </div>
+              <iframe
+                ref={iframeRef}
+                title="Your website preview"
+                srcDoc={shell}
+                className="w-full flex-1 border-0"
+                sandbox="allow-scripts allow-popups allow-forms"
+              />
             </div>
           )}
 
@@ -250,34 +389,6 @@ export default function BuilderV2() {
             </div>
           )}
 
-          {status === "done" && result && (
-            <div className="flex h-full flex-col">
-              <div
-                className="flex items-center gap-1.5 px-4 py-2.5"
-                style={{ borderBottom: "1px solid var(--rule)", background: "var(--paper)" }}
-              >
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--rule-strong)" }} />
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--rule-strong)" }} />
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: "var(--rule-strong)" }} />
-                <span className="ml-3 font-mono text-[11px]" style={{ color: "var(--ink-muted)" }}>
-                  preview · {result.componentIds.length} sections
-                </span>
-                <button
-                  onClick={() => build(prompt)}
-                  className="ml-auto rounded-full px-3 py-1 text-[11px] font-medium"
-                  style={{ background: "var(--ink)", color: "var(--paper)" }}
-                >
-                  Rebuild
-                </button>
-              </div>
-              <iframe
-                title="Your website preview"
-                srcDoc={result.html}
-                className="w-full flex-1 border-0"
-                sandbox="allow-scripts allow-popups allow-forms"
-              />
-            </div>
-          )}
         </main>
       </div>
     </div>
