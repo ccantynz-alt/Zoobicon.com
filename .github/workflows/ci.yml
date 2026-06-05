@@ -36,11 +36,21 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # `npx tsc --noEmit` removed deliberately. Rule 3 in CLAUDE.md sets
-      # next.config.js `ignoreBuildErrors: true` for rapid iteration, which
-      # makes a parallel hard-fail tsc step contradictory — the production
-      # build is the source of truth. Re-enable only after the pre-existing
-      # TS debt across src/, cli/, scripts/ and packages/ is paid down.
+      - name: Critical code guard (broken imports + iOS-Safari footgun)
+        # Blocks the bug CLASSES that actually crash production but that a
+        # green `next build` hides (next.config has ignoreBuildErrors:true):
+        #   - broken imports in src/ (TS2305/TS2307) → "X is not a function"
+        #   - crypto.subtle in client preview code → blank preview on iPad
+        # Intentionally narrow so it can hard-fail TODAY without first
+        # paying down the 75-item type-strictness backlog. Full report:
+        # `npm run audit:code`.
+        run: node scripts/critical-code-guard.js
+
+      # A full `npx tsc --noEmit` hard-fail is NOT used here: next.config.js
+      # sets `ignoreBuildErrors: true` (Rule 3) and there is a pre-existing
+      # ~75-item TS strictness backlog across src/, cli/, scripts/, packages/.
+      # The critical-code-guard above gates the runtime-breaking subset.
+      # Re-enable the full check once that backlog is paid down.
 
       - name: Unit Tests
         # continue-on-error mirrors the tsc-step decision above: 8
