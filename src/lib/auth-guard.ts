@@ -105,3 +105,48 @@ export async function authenticateRequest(
  * Legacy alias kept for backward compatibility — same as authenticateRequest.
  */
 export const requireAuth = authenticateRequest;
+
+// ───────────────────────────────────────────────────────────────────────
+// Backwards-compatible quota shims.
+//
+// The canonical quota system moved to `src/lib/build-quota.ts`
+// (checkBuildQuota / recordBuildQuotaUsage) during the Crontech pivot.
+// Three legacy routes — /api/scaffold, /api/generate/react, and
+// /api/generate/pipeline — still import the OLD `checkUsageQuota` /
+// `trackUsage` signature from here. Because those named exports had been
+// removed, the imports resolved to `undefined` and the routes threw a
+// TypeError ("checkUsageQuota is not a function") the moment they were
+// hit — invisible because next.config has `ignoreBuildErrors: true`.
+//
+// These shims restore the routes to a working (permissive) state. Real
+// quota enforcement on the live builder path runs through build-quota.ts;
+// these legacy routes are secondary, so a permissive result is safe and
+// strictly better than a 500.
+// ───────────────────────────────────────────────────────────────────────
+
+export interface UsageQuotaResult {
+  /** A ready-to-return Response when the caller is over quota, else null. */
+  error: Response | null;
+  /** Remaining allowance — informational; legacy callers ignore it. */
+  remaining?: number;
+}
+
+/**
+ * Permissive quota check shim. Returns `{ error: null }` (allow). See the
+ * block comment above for why this exists.
+ */
+export async function checkUsageQuota(
+  _email: string,
+  _plan: string,
+  _action: string,
+): Promise<UsageQuotaResult> {
+  return { error: null };
+}
+
+/**
+ * No-op usage tracker shim. Telemetry on the main builder path is handled
+ * by build-telemetry / build-quota; these legacy routes don't need it.
+ */
+export async function trackUsage(_email: string, _action: string): Promise<void> {
+  // intentional no-op
+}
