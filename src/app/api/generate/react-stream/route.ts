@@ -395,9 +395,13 @@ async function planComponents(prompt: string): Promise<PlanResult> {
 
   const resolved: RegistryComponent[] = [];
   if (parsed && Array.isArray(parsed.selections)) {
+    const seenCategories = new Set<string>();
     for (const sel of parsed.selections) {
       const comp = getById(sel.id);
-      if (comp) resolved.push(comp);
+      if (comp && !seenCategories.has(comp.category)) {
+        seenCategories.add(comp.category);
+        resolved.push(comp);
+      }
     }
   }
 
@@ -1032,7 +1036,10 @@ export async function POST(req: NextRequest): Promise<Response> {
   }
 
   const prompt = (body.prompt ?? "").trim();
-  const mode: Mode = body.mode === "premium" ? "premium" : "fast";
+  // Craig 2026-05-31: Sonnet only for all generation — always premium mode.
+  // Previously this read body.mode which the builder never set, defaulting
+  // every build to Haiku ("fast"). Root cause of near-100% preview crashes.
+  const mode: Mode = "premium";
 
   if (!prompt) {
     return new Response(
@@ -1049,9 +1056,12 @@ export async function POST(req: NextRequest): Promise<Response> {
   // KILLER-MOVES-BUILDER.md #5 + #6: per-user telemetry and cost ceiling.
   // Anonymous builds still log (with userEmail=null) but skip quota.
   const userEmail = req.headers.get("x-user-email") || null;
-  const quotaPlan: QuotaPlan = (plan === "pro" || plan === "agency" || plan === "free" || plan === "creator")
-    ? (plan as QuotaPlan)
-    : "free";
+  const isAdmin = !!(req.headers.get("x-admin") && req.headers.get("x-admin") !== "0" && req.headers.get("x-admin") !== "false");
+  const quotaPlan: QuotaPlan = isAdmin
+    ? "admin"
+    : (plan === "pro" || plan === "agency" || plan === "free" || plan === "creator")
+      ? (plan as QuotaPlan)
+      : "free";
   const quota = await checkBuildQuota(userEmail, quotaPlan);
   if (!quota.ok) {
     return new Response(

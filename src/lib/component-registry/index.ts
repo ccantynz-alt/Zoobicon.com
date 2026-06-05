@@ -26,6 +26,33 @@ export {
 
 import { REGISTRY, type RegistryComponent, type ComponentCategory } from "./store";
 
+/**
+ * Source for the per-section error boundary that gets baked into every
+ * generated App.tsx. A class component (React requires a class for
+ * componentDidCatch) that renders nothing if its child section throws
+ * during render — so one broken section degrades invisibly instead of
+ * blanking the entire page. Pairs with the module-evaluation isolation
+ * in EscapeHatchPreview.tsx for end-to-end fault tolerance.
+ *
+ * Kept as a string so it can be injected verbatim into the generated
+ * project. Intentionally zero-dependency and prop-light.
+ */
+const SECTION_BOUNDARY_SRC = `class SectionBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { failed: false }; }
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(error) {
+    if (typeof console !== "undefined") {
+      console.error("[zoobicon] section \\"" + (this.props.name || "?") + "\\" failed to render:", error);
+    }
+  }
+  render() {
+    // Degrade invisibly: a missing section looks far more professional on
+    // a live site than an error box. The console logs which one failed.
+    if (this.state.failed) return null;
+    return this.props.children;
+  }
+}`;
+
 // ── Query Functions ──
 
 /** Get all components in a given category */
@@ -250,13 +277,17 @@ export function assembleComponents(
   const renders = components
     .map(c => {
       const name = capitalize(c.category);
-      return `      <${name} />`;
+      // Wrap each section so a render error degrades invisibly instead of
+      // blanking the page (pairs with EscapeHatchPreview isolation).
+      return `      <SectionBoundary name="${name}"><${name} /></SectionBoundary>`;
     })
     .join("\n");
 
   files["App.tsx"] = `import React from "react";
 import "./styles.css";
 ${imports}
+
+${SECTION_BOUNDARY_SRC}
 
 export default function App() {
   return (
@@ -1052,7 +1083,9 @@ export function buildAppFile(
   const renders = components
     .map(c => {
       const name = capitalize(c.category);
-      return `      <${name} />`;
+      // Wrap each section so a render error degrades invisibly instead of
+      // blanking the page (pairs with EscapeHatchPreview isolation).
+      return `      <SectionBoundary name="${name}"><${name} /></SectionBoundary>`;
     })
     .join("\n");
 
@@ -1117,6 +1150,8 @@ function ZoobiconBadge() {
   return `import React from "react";
 import "./styles.css";
 ${imports}
+
+${SECTION_BOUNDARY_SRC}
 
 export default function App() {
   return (

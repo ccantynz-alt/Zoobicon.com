@@ -33,6 +33,10 @@ import { PRICING_TIERS_SCHEMA } from "./templates/pricing-tiers";
 import { FOOTER_EDITORIAL_SCHEMA } from "./templates/footer-editorial";
 import { HERO_RESTAURANT_WARM_SCHEMA } from "./templates/by-industry/hero-restaurant-warm";
 import { HERO_PORTFOLIO_EDITORIAL_SCHEMA } from "./templates/by-industry/hero-portfolio-editorial";
+import { STATS_STRIP_SCHEMA } from "./templates/stats-strip";
+import { TESTIMONIALS_QUOTES_SCHEMA } from "./templates/testimonials-quotes";
+import { CTA_BANNER_SCHEMA } from "./templates/cta-banner";
+import { FAQ_ACCORDION_SCHEMA } from "./templates/faq-accordion";
 import { getQuarantinedComponents } from "@/lib/flywheel/self-healing";
 import { getIndustryPreferences } from "@/lib/flywheel/consolidate";
 
@@ -49,7 +53,11 @@ const ALL_SCHEMAS: PlannerSchema[] = [
   HERO_PORTFOLIO_EDITORIAL_SCHEMA,
   NAVBAR_MINIMAL_SCHEMA,
   FEATURES_BENTO_SCHEMA,
+  STATS_STRIP_SCHEMA,
+  TESTIMONIALS_QUOTES_SCHEMA,
   PRICING_TIERS_SCHEMA,
+  FAQ_ACCORDION_SCHEMA,
+  CTA_BANNER_SCHEMA,
   FOOTER_EDITORIAL_SCHEMA,
 ];
 
@@ -133,12 +141,24 @@ export function planPageForIndustry(ctx: {
   const includePricing =
     ctx.includePricing ?? (ctx.industry ? PRICING_INDUSTRIES.has(ctx.industry) : true);
 
+  const pick = (category: string) =>
+    pickComponentForIndustry({ category, industry: ctx.industry, theme: ctx.theme });
+
+  // Full editorial page rhythm now that stats / testimonials / faq / cta
+  // have slot-locked templates: navbar → hero → features → stats →
+  // testimonials → [pricing] → faq → cta → footer. Any category without
+  // a registered template returns null and is filtered out, so the page
+  // gracefully shrinks rather than erroring.
   const order = [
-    pickComponentForIndustry({ category: "navbar", industry: ctx.industry, theme: ctx.theme }),
-    pickComponentForIndustry({ category: "hero", industry: ctx.industry, theme: ctx.theme }),
-    pickComponentForIndustry({ category: "features", industry: ctx.industry, theme: ctx.theme }),
-    includePricing ? pickComponentForIndustry({ category: "pricing", industry: ctx.industry, theme: ctx.theme }) : null,
-    pickComponentForIndustry({ category: "footer", industry: ctx.industry, theme: ctx.theme }),
+    pick("navbar"),
+    pick("hero"),
+    pick("features"),
+    pick("stats"),
+    pick("testimonials"),
+    includePricing ? pick("pricing") : null,
+    pick("faq"),
+    pick("cta"),
+    pick("footer"),
   ];
 
   return order.filter((id): id is string => id !== null);
@@ -215,14 +235,22 @@ export async function planPageForIndustryAdaptive(ctx: {
   const includePricing =
     ctx.includePricing ?? (ctx.industry ? PRICING_INDUSTRIES.has(ctx.industry) : true);
 
+  const pick = (category: string) =>
+    pickComponentForIndustryAdaptive({ category, industry: ctx.industry, theme: ctx.theme });
+
+  // Mirror planPageForIndustry's fuller rhythm: navbar → hero → features
+  // → stats → testimonials → [pricing] → faq → cta → footer. Categories
+  // without a registered template resolve to null and drop out.
   const picks = await Promise.all([
-    pickComponentForIndustryAdaptive({ category: "navbar", industry: ctx.industry, theme: ctx.theme }),
-    pickComponentForIndustryAdaptive({ category: "hero", industry: ctx.industry, theme: ctx.theme }),
-    pickComponentForIndustryAdaptive({ category: "features", industry: ctx.industry, theme: ctx.theme }),
-    includePricing
-      ? pickComponentForIndustryAdaptive({ category: "pricing", industry: ctx.industry, theme: ctx.theme })
-      : Promise.resolve(null),
-    pickComponentForIndustryAdaptive({ category: "footer", industry: ctx.industry, theme: ctx.theme }),
+    pick("navbar"),
+    pick("hero"),
+    pick("features"),
+    pick("stats"),
+    pick("testimonials"),
+    includePricing ? pick("pricing") : Promise.resolve(null),
+    pick("faq"),
+    pick("cta"),
+    pick("footer"),
   ]);
 
   return picks.filter((id): id is string => id !== null);

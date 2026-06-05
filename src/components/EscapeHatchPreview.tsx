@@ -44,6 +44,8 @@ const ESM_FALLBACK: Record<string, string> = {
   react: "https://esm.sh/react@18.3.1",
   "react-dom": "https://esm.sh/react-dom@18.3.1",
   "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+  "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime?external=react",
+  "react/jsx-dev-runtime": "https://esm.sh/react@18.3.1/jsx-dev-runtime?external=react",
   "lucide-react": "https://esm.sh/lucide-react@1.7.0?external=react",
   "framer-motion": "https://esm.sh/framer-motion@12.38.0?external=react,react-dom",
   clsx: "https://esm.sh/clsx@2.1.1",
@@ -56,6 +58,8 @@ const VENDOR_PATHS: Record<string, string> = {
   react: "/vendor/react.js",
   "react-dom": "/vendor/react-dom.js",
   "react-dom/client": "/vendor/react-dom-client.js",
+  "react/jsx-runtime": "/vendor/react-jsx-runtime.js",
+  "react/jsx-dev-runtime": "/vendor/react-jsx-dev-runtime.js",
   "lucide-react": "/vendor/lucide-react.js",
   "framer-motion": "/vendor/framer-motion.js",
   clsx: "/vendor/clsx.js",
@@ -96,6 +100,11 @@ function buildSrcDoc(
   const runtime = String.raw`
     const FILES = __FILES_JSON__;
     const BABEL_URL = __BABEL_URL__;
+    const KNOWN_SPECIFIERS = new Set(__ESM_SPECIFIERS__);
+    // Shim for CJS require() — AI-generated code sometimes uses it
+    if (typeof globalThis.require === "undefined") {
+      globalThis.require = (s) => { console.warn("[preview] require(" + s + ") not supported in browser sandbox"); return {}; };
+    }
 
     function showError(title, detail) {
       const root = document.getElementById("root");
@@ -110,6 +119,16 @@ function buildSrcDoc(
       p.textContent = detail;
       wrap.appendChild(h); wrap.appendChild(p);
       root.appendChild(wrap);
+    }
+
+    // Stub blob for a section that fails to evaluate — renders nothing
+    // so the rest of the page is unaffected. Created lazily once.
+    let nullComponentUrl = null;
+    function getNullComponentUrl() {
+      if (nullComponentUrl) return nullComponentUrl;
+      const b = new Blob(["export default function(){return null}"], { type: "application/javascript" });
+      nullComponentUrl = URL.createObjectURL(b);
+      return nullComponentUrl;
     }
 
     (async () => {
@@ -169,6 +188,24 @@ function buildSrcDoc(
         const pending = new Set(codeFiles);
         let stalls = 0;
 
+        // Stub cache for unknown bare specifiers (packages not in importmap).
+        // We stub instead of crashing so the preview shows something useful
+        // even when Sonnet generates an import we can't fulfil (e.g. sonner,
+        // react-hot-toast, @headlessui/react, shadcn sub-paths, etc.).
+        const stubBlobUrls = {};
+        function getStubUrl(specifier) {
+          if (stubBlobUrls[specifier]) return stubBlobUrls[specifier];
+          // Provide a cn() utility for @/lib/utils-style stubs. Everything
+          // else gets an empty-exports module so destructuring doesn't throw.
+          const isUtils = /utils|helpers|lib\/cn/.test(specifier);
+          const stubCode = isUtils
+            ? 'export function cn() { return Array.from(arguments).filter(Boolean).join(" "); } export const cva = () => () => ""; export default {};'
+            : "export default {}; export const _stub = true;";
+          const b = new Blob([stubCode], { type: "application/javascript" });
+          stubBlobUrls[specifier] = URL.createObjectURL(b);
+          return stubBlobUrls[specifier];
+        }
+
         // Sprint 1 S2: content-hash transpile cache.
         // Babel.transform is the single most expensive step (~10-50ms
         // per file × 13 files = 130-650ms even on warm runs). The vast
@@ -181,7 +218,7 @@ function buildSrcDoc(
         // and rebuilt on every preview update, so an in-memory cache
         // would die between builds. localStorage persists across the
         // iframe lifecycle as long as the origin (srcdoc) is the same.
-        const CACHE_PREFIX = "zoobicon:transpile:v1:";
+        const CACHE_PREFIX = "zoobicon:transpile:v2:";
         const CACHE_MAX = 200; // hard cap on cached entries — LRU sweep below
         async function sha256Hex(s) {
           const buf = new TextEncoder().encode(s);
@@ -221,6 +258,78 @@ function buildSrcDoc(
 
         let cacheHits = 0;
         let cacheMisses = 0;
+
+        // A "section component" is anything under components/. These are
+        // individually isolated: a single broken section is stubbed to
+        // render nothing rather than crashing the whole preview. The
+        // entry (App.tsx) and shared lib files are NOT isolatable — if
+        // they fail, the build genuinely can't render.
+        const isSection = (p) => /(^|\/)components\//.test(p);
+
+        // Transpile + rewrite-imports + blob a single module. Returns
+        // the blob URL. Throws only on a Babel transpile error so the
+        // caller can decide whether to abort (entry/lib) or stub (section).
+        async function compileModule(path) {
+          // Strip CSS/image imports BEFORE Babel — Babel preserves them
+          // as-is and they'd leak into the Blob URL module.
+          const sourceForBabel = stripAssetImports(FILES[path]);
+          let transpiled;
+          // Cache key includes filename because tsx/ts/jsx/js toggling
+          // changes the Babel presets and the path is part of the input.
+          const cacheKey = await sha256Hex(path + "\0" + sourceForBabel);
+          const cached = cacheGet(cacheKey);
+          if (cached !== null) {
+            transpiled = cached;
+            cacheHits++;
+          } else {
+            transpiled = Babel.transform(sourceForBabel, {
+              presets: [
+                ["typescript", { onlyRemoveTypeImports: true, isTSX: /\.tsx$/.test(path), allExtensions: true }],
+                ["react", { runtime: "automatic" }],
+              ],
+              filename: path,
+            }).code;
+            cacheSet(cacheKey, transpiled);
+            cacheMisses++;
+          }
+
+          // Rewrite imports:
+          //  - relative (./) → blob URL from moduleUrls
+          //  - @/ path alias → resolve from FILES tree, or stub
+          //  - known bare specifiers → left as-is (importmap handles them)
+          //  - unknown bare specifiers → stub blob (prevents crash)
+          const rewritten = transpiled.replace(
+            /from\s+["']([^"']+)["']/g,
+            (whole, imp) => {
+              if (imp.startsWith(".")) {
+                const r = resolveRel(imp, path);
+                if (r && moduleUrls[r]) return 'from "' + moduleUrls[r] + '"';
+                return whole;
+              }
+              if (imp.startsWith("@/")) {
+                // Next.js / shadcn path alias — resolve against file tree
+                const aliasPath = imp.slice(2);
+                const candidates = [
+                  aliasPath, aliasPath + ".tsx", aliasPath + ".ts",
+                  aliasPath + ".jsx", aliasPath + ".js",
+                  aliasPath + "/index.tsx", aliasPath + "/index.ts",
+                ];
+                for (const c of candidates) {
+                  if (FILES[c] && moduleUrls[c]) return 'from "' + moduleUrls[c] + '"';
+                }
+                // Not in file tree — provide a graceful stub
+                return 'from "' + getStubUrl(imp) + '"';
+              }
+              // Known bare specifier — importmap handles it
+              if (KNOWN_SPECIFIERS.has(imp)) return whole;
+              // Unknown bare specifier — stub it so the preview doesn't crash
+              return 'from "' + getStubUrl(imp) + '"';
+            }
+          );
+
+          const blob = new Blob([rewritten], { type: "application/javascript" });
+          return URL.createObjectURL(blob);
+        }
 
         while (pending.size > 0) {
           let progress = false;
@@ -278,24 +387,6 @@ function buildSrcDoc(
                 if (!transpileFailed) cacheSet(cacheKey, transpiled);
                 cacheMisses++;
               }
-
-              // Rewrite relative imports → blob URLs we already created.
-              // Leave bare-package imports alone — the <importmap> handles
-              // them (react, lucide-react, framer-motion, clsx, tw-merge).
-              const rewritten = transpiled.replace(
-                /from\s+["']([^"']+)["']/g,
-                (whole, imp) => {
-                  if (imp.startsWith(".")) {
-                    const r = resolveRel(imp, path);
-                    if (r && moduleUrls[r]) return 'from "' + moduleUrls[r] + '"';
-                    return whole;
-                  }
-                  return whole;
-                }
-              );
-
-              const blob = new Blob([rewritten], { type: "application/javascript" });
-              moduleUrls[path] = URL.createObjectURL(blob);
               pending.delete(path);
               progress = true;
             }
@@ -310,17 +401,6 @@ function buildSrcDoc(
               return;
             }
           }
-        }
-
-        // Cache telemetry — visible in DevTools console. Useful when
-        // tuning whether the transpile cache is actually paying off
-        // for the user's edit patterns.
-        if (cacheHits + cacheMisses > 0) {
-          console.log(
-            "[zoobicon-preview] transpile cache: " + cacheHits + " hits / " +
-              (cacheHits + cacheMisses) + " files (" +
-              Math.round((cacheHits / (cacheHits + cacheMisses)) * 100) + "% hit rate)"
-          );
         }
 
         // Find entry
@@ -415,7 +495,8 @@ ${JSON.stringify({ imports: esmMap }, null, 2)}
   <script type="module">
 ${runtime
   .replace("__FILES_JSON__", JSON.stringify(normalized))
-  .replace("__BABEL_URL__", JSON.stringify(babelUrl))}
+  .replace("__BABEL_URL__", JSON.stringify(babelUrl))
+  .replace("__ESM_SPECIFIERS__", JSON.stringify(Object.keys(esmMap)))}
   </script>
 </body>
 </html>`;

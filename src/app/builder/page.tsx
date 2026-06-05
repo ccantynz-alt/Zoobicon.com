@@ -286,222 +286,18 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "mcp", label: "Import From...", icon: <ExternalLink size={18} /> },
 ];
 
-/* ─── Interactive particle constellation background ─── */
+/* ─── Minimal paper-grain background ─── */
 function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: -1000, y: -1000 });
-  const isGeneratingRef = useRef(isGenerating);
-  isGeneratingRef.current = isGenerating;
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animId: number;
-    let w = 0, h = 0;
-
-    const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
-      w = canvas.clientWidth;
-      h = canvas.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    resize();
-    window.addEventListener("resize", resize);
-
-    // Particles
-    const PARTICLE_COUNT = 80;
-    const CONNECTION_DIST = 140;
-    const MOUSE_RADIUS = 200;
-
-    interface Particle {
-      x: number; y: number;
-      vx: number; vy: number;
-      baseVx: number; baseVy: number;
-      size: number;
-      hue: number;
-      pulse: number;
-      pulseSpeed: number;
-    }
-
-    const particles: Particle[] = [];
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const speed = 0.15 + Math.random() * 0.3;
-      const angle = Math.random() * Math.PI * 2;
-      const vx = Math.cos(angle) * speed;
-      const vy = Math.sin(angle) * speed;
-      particles.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx, vy,
-        baseVx: vx, baseVy: vy,
-        size: 1.2 + Math.random() * 2,
-        hue: 35 + Math.random() * 18, // warm gold/amber range
-        pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.01 + Math.random() * 0.02,
-      });
-    }
-
-    // Track mouse on document level so canvas can be pointer-events:none
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      // Only track if mouse is within canvas bounds
-      if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-        mouseRef.current = { x, y };
-      } else {
-        mouseRef.current = { x: -1000, y: -1000 };
-      }
-    };
-    document.addEventListener("mousemove", handleMouseMove);
-
-    let time = 0;
-
-    const draw = () => {
-      time += 1;
-      ctx.clearRect(0, 0, w, h);
-
-      const gen = isGeneratingRef.current;
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
-
-      // Update particles
-      for (const p of particles) {
-        p.pulse += p.pulseSpeed;
-
-        // During generation, particles orbit and speed up
-        if (gen) {
-          const cx = w / 2, cy = h / 2;
-          const dx = p.x - cx, dy = p.y - cy;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          const orbitStrength = 0.0004;
-          p.vx += (-dy / dist) * orbitStrength + (cx - p.x) * 0.00003;
-          p.vy += (dx / dist) * orbitStrength + (cy - p.y) * 0.00003;
-        } else {
-          // Slowly return to base velocity
-          p.vx += (p.baseVx - p.vx) * 0.005;
-          p.vy += (p.baseVy - p.vy) * 0.005;
-        }
-
-        // Mouse repulsion with elastic return
-        const dmx = p.x - mx;
-        const dmy = p.y - my;
-        const distMouse = Math.sqrt(dmx * dmx + dmy * dmy);
-        if (distMouse < MOUSE_RADIUS) {
-          const force = (1 - distMouse / MOUSE_RADIUS) * 0.8;
-          p.vx += (dmx / distMouse) * force;
-          p.vy += (dmy / distMouse) * force;
-        }
-
-        // Damping
-        p.vx *= 0.99;
-        p.vy *= 0.99;
-
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // Wrap edges
-        if (p.x < -10) p.x = w + 10;
-        if (p.x > w + 10) p.x = -10;
-        if (p.y < -10) p.y = h + 10;
-        if (p.y > h + 10) p.y = -10;
-      }
-
-      // Draw connections
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const a = particles[i], b = particles[j];
-          const dx = a.x - b.x, dy = a.y - b.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < CONNECTION_DIST) {
-            const alpha = (1 - dist / CONNECTION_DIST) * (gen ? 0.25 : 0.12);
-            const hue = gen ? 40 + Math.sin(time * 0.02) * 8 : 38;
-            ctx.strokeStyle = `hsla(${hue}, 55%, 48%, ${alpha})`;
-            ctx.lineWidth = (1 - dist / CONNECTION_DIST) * 1.5;
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Draw mouse attraction lines
-      if (mx > 0 && my > 0) {
-        for (const p of particles) {
-          const dx = p.x - mx, dy = p.y - my;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < MOUSE_RADIUS * 1.2) {
-            const alpha = (1 - dist / (MOUSE_RADIUS * 1.2)) * 0.15;
-            ctx.strokeStyle = `hsla(38, 55%, 48%, ${alpha})`;
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(mx, my);
-            ctx.lineTo(p.x, p.y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Draw particles
-      for (const p of particles) {
-        const pulseSize = p.size + Math.sin(p.pulse) * 0.6;
-        const brightness = gen ? 70 + Math.sin(p.pulse * 2) * 15 : 55;
-        const alpha = gen ? 0.7 + Math.sin(p.pulse) * 0.3 : 0.4 + Math.sin(p.pulse) * 0.15;
-
-        // Outer glow
-        const glowRadius = pulseSize * (gen ? 4 : 2.5);
-        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius);
-        glow.addColorStop(0, `hsla(${p.hue}, 80%, ${brightness}%, ${alpha * 0.4})`);
-        glow.addColorStop(1, `hsla(${p.hue}, 80%, ${brightness}%, 0)`);
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, glowRadius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Core
-        ctx.fillStyle = `hsla(${p.hue}, 85%, ${brightness + 15}%, ${alpha})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, pulseSize, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Generation energy ring
-      if (gen) {
-        const cx = w / 2, cy = h / 2;
-        const ringRadius = 100 + Math.sin(time * 0.03) * 30;
-        const ringGlow = ctx.createRadialGradient(cx, cy, ringRadius - 20, cx, cy, ringRadius + 40);
-        ringGlow.addColorStop(0, "hsla(38, 55%, 48%, 0)");
-        ringGlow.addColorStop(0.5, `hsla(38, 55%, 48%, ${0.04 + Math.sin(time * 0.05) * 0.02})`);
-        ringGlow.addColorStop(1, "hsla(38, 55%, 48%, 0)");
-        ctx.fillStyle = ringGlow;
-        ctx.beginPath();
-        ctx.arc(cx, cy, ringRadius + 40, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      animId = requestAnimationFrame(draw);
-    };
-
-    draw();
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("resize", resize);
-      document.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, []);
-
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ zIndex: 0 }}
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        zIndex: 0,
+        background: isGenerating
+          ? "radial-gradient(ellipse 60% 40% at 50% 50%, rgba(201,169,97,0.06) 0%, transparent 70%)"
+          : "none",
+        transition: "background 1s ease",
+      }}
     />
   );
 }
@@ -642,7 +438,7 @@ function BuilderPage() {
   } | null>(null);
   const [validating, setValidating] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
-  const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Opus, pipeline=7-agent
+  const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Sonnet, pipeline=7-agent
   const instantMode = buildMode === "instant"; // back-compat
   const [fullStack, setFullStack] = useState(false); // Full-stack mode: auto-provisions Supabase backend (auth, database, storage)
   // Launch video combo removed 2026-05-26 — AI Video Creator (and its
@@ -1302,7 +1098,7 @@ function BuilderPage() {
 
       // THREE PATHS:
       // 1. Quick Build (buildMode="instant", DEFAULT): Registry scaffold (<1s) + AI customization (~10s)
-      // 2. Deep Build (buildMode="deep"): Opus generates everything from scratch (~30s)
+      // 2. Deep Build (buildMode="deep"): Sonnet generates everything from scratch (~30s)
       // 3. Full Build (buildMode="pipeline"): 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)
       //
       // Slot-locked composition (B1) — opt in via ?slotLocked=1 in the URL
@@ -2100,7 +1896,7 @@ function BuilderPage() {
       case "crawl":
         return (
           <div className="flex flex-col gap-4 p-4">
-            <p className="text-xs text-white/50 leading-relaxed">
+            <p className="text-xs text-[var(--ink-secondary)] leading-relaxed">
               Crawl a competitor&apos;s website to detect their tech stack, features, and design patterns.
               Use insights to build something better.
             </p>
@@ -2145,7 +1941,7 @@ function BuilderPage() {
         {/* Pipeline status overlay — shows during generation with progress bar */}
         {status === "generating" && pipelineAgents.length > 0 && (
           <div className="absolute bottom-6 left-6 right-6 z-40">
-            <div className="max-w-2xl mx-auto px-5 py-3 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/[0.08] shadow-2xl">
+            <div className="max-w-2xl mx-auto px-5 py-3 rounded-2xl shadow-lg" style={{ background: "var(--paper-elevated)", border: "1px solid var(--rule)" }}>
               {/* Six-agent orb row — derives the active agent by
                   keyword-matching the latest log line. No new
                   server-side state required. */}
@@ -2155,26 +1951,26 @@ function BuilderPage() {
                 componentsTotal={buildProgress?.total}
               />
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-stone-500 animate-pulse flex-shrink-0" />
-                <span className="text-sm text-white/80 font-medium truncate">
+                <div className="w-2.5 h-2.5 rounded-full animate-pulse flex-shrink-0" style={{ background: "var(--gold)" }} />
+                <span className="text-sm font-medium truncate" style={{ color: "var(--ink)" }}>
                   {pipelineAgents[pipelineAgents.length - 1]}
                 </span>
                 {buildProgress && buildProgress.total > 0 && (
-                  <span className="text-xs text-white/40 ml-auto flex-shrink-0">
+                  <span className="text-xs ml-auto flex-shrink-0" style={{ color: "var(--ink-muted)" }}>
                     {buildProgress.current}/{buildProgress.total}
                   </span>
                 )}
               </div>
               {buildProgress && buildProgress.total > 0 && (
-                <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: "var(--rule)" }}>
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-stone-500 to-stone-500 transition-all duration-500 ease-out"
-                    style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%`, background: "var(--gold)" }}
                   />
                 </div>
               )}
               {streamWarning && (
-                <div className="flex items-center gap-2 text-[10px] text-stone-400 mt-2">
+                <div className="flex items-center gap-2 text-[10px] mt-2" style={{ color: "var(--ink-muted)" }}>
                   <AlertTriangle className="w-3 h-3" />
                   <span>{streamWarning}</span>
                 </div>
@@ -2186,12 +1982,12 @@ function BuilderPage() {
                     return (
                       <div key={s.section} className="flex items-center gap-2 text-[10px]">
                         {s.status === "done" ? (
-                          <Check className="w-3 h-3 text-stone-400 flex-shrink-0" />
+                          <Check className="w-3 h-3 flex-shrink-0" style={{ color: "var(--gold)" }} />
                         ) : (
-                          <span className="w-2 h-2 rounded-full bg-stone-500 animate-pulse flex-shrink-0" />
+                          <span className="w-2 h-2 rounded-full animate-pulse flex-shrink-0" style={{ background: "var(--gold)" }} />
                         )}
-                        <span className={s.status === "done" ? "text-white/60" : "text-white/90"}>{s.label}</span>
-                        {elapsed && <span className="text-white/30 ml-auto tabular-nums">{elapsed}s</span>}
+                        <span style={{ color: s.status === "done" ? "var(--ink-muted)" : "var(--ink)" }}>{s.label}</span>
+                        {elapsed && <span className="ml-auto tabular-nums" style={{ color: "var(--ink-muted)" }}>{elapsed}s</span>}
                       </div>
                     );
                   })}
@@ -2203,23 +1999,25 @@ function BuilderPage() {
 
         {buildError && (
           <div className="absolute top-16 left-6 right-6 z-50">
-            <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-stone-950/90 backdrop-blur-xl border border-stone-500/40 shadow-2xl">
+            <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl shadow-lg" style={{ background: "var(--paper-elevated)", border: "1px solid var(--rule)" }}>
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-stone-400 flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "var(--gold-deep)" }} />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-stone-200">{buildError.message}</div>
-                  <div className="text-xs text-stone-300/80 mt-0.5">{buildError.suggestion}</div>
+                  <div className="text-sm font-semibold" style={{ color: "var(--ink)" }}>{buildError.message}</div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--ink-muted)" }}>{buildError.suggestion}</div>
                 </div>
                 <button
                   onClick={() => { setBuildError(null); handleGenerate(); }}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-500/20 hover:bg-stone-500/30 text-xs text-stone-100 border border-stone-500/40 transition"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs transition"
+                  style={{ background: "var(--ink)", color: "var(--paper)", border: "none" }}
                 >
                   <RotateCcw className="w-3 h-3" /> Retry
                 </button>
                 <button
                   onClick={() => setBuildError(null)}
-                  className="p-1.5 rounded-lg hover:bg-stone-500/20 text-stone-300 transition"
+                  className="p-1.5 rounded-lg transition"
                   aria-label="Dismiss"
+                  style={{ color: "var(--ink-muted)" }}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -2456,7 +2254,7 @@ function BuilderPage() {
                         m.id === "instant"
                           ? "Quick: registry assembly + Sonnet customization (<3s preview, ~10s total)"
                           : m.id === "deep"
-                          ? "Deep: Opus generates everything from scratch (~30s)"
+                          ? "Deep: Sonnet generates everything from scratch (~30s)"
                           : "Full: 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)"
                       }
                     >
@@ -2764,12 +2562,12 @@ function BuilderPage() {
         </Link>
 
         {/* Divider */}
-        <div className="w-px h-5 bg-white/[0.08]" />
+        <div className="w-px h-5 bg-[var(--rule)]" />
 
         {/* Project name / status */}
         <div className="flex items-center gap-2 min-w-0">
           {hasCode && (
-            <span className="text-xs text-white/40 truncate max-w-[200px]">
+            <span className="text-xs text-[var(--ink-muted)] truncate max-w-[200px]">
               {prompt.trim().slice(0, 40) || "Untitled Project"}
             </span>
           )}
@@ -2800,7 +2598,7 @@ function BuilderPage() {
               onClick={handleUndo}
               disabled={!canUndo}
               title="Undo (Ctrl+Z)"
-              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <Undo2 size={14} />
             </button>
@@ -2808,7 +2606,7 @@ function BuilderPage() {
               onClick={handleRedo}
               disabled={!canRedo}
               title="Redo (Ctrl+Shift+Z)"
-              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <Redo2 size={14} />
             </button>
@@ -2816,7 +2614,7 @@ function BuilderPage() {
               onClick={() => setShowDiffPanel(true)}
               disabled={snapshots.length < 2}
               title="Version History"
-              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <History size={14} />
             </button>
@@ -2861,7 +2659,7 @@ function BuilderPage() {
                 }
               }}
               title="Share / fork — copy a link to this build"
-              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all"
             >
               <Share2 size={14} />
             </button>
@@ -2890,7 +2688,7 @@ function BuilderPage() {
                   window.open("/builder/ide", "_blank");
                 }}
                 title="Open full code editor"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border border-white/[0.06]"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-[var(--paper-elevated)] text-[var(--ink-secondary)] hover:text-[var(--ink)] hover:bg-stone-100 border border-[var(--rule)]"
               >
                 <Code2 size={13} />
                 <span className="hidden sm:inline">IDE</span>
@@ -2900,8 +2698,8 @@ function BuilderPage() {
                 title="Push to GitHub"
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
                   activeTool === "github-sync"
-                    ? "bg-white/[0.08] text-white/80 border-white/[0.12]"
-                    : "bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border-white/[0.06]"
+                    ? "bg-stone-100 text-[var(--ink)] border-stone-300"
+                    : "bg-[var(--paper-elevated)] text-[var(--ink-secondary)] hover:text-[var(--ink)] hover:bg-stone-100 border-[var(--rule)]"
                 }`}
               >
                 <GitBranchPlus size={13} />
@@ -2911,7 +2709,7 @@ function BuilderPage() {
                 onClick={handleSaveTemplate}
                 disabled={saveStatus === "saving"}
                 title="Save as reusable template"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border border-white/[0.06]"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-[var(--paper-elevated)] text-[var(--ink-secondary)] hover:text-[var(--ink)] hover:bg-stone-100 border border-[var(--rule)]"
               >
                 {saveStatus === "saved" ? <Check size={13} className="text-stone-400" /> : <Save size={13} />}
                 <span className="hidden sm:inline">{saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}</span>
@@ -2972,30 +2770,30 @@ function BuilderPage() {
                 className="flex flex-col h-full"
               >
                 {/* Panel header */}
-                <div className="px-4 py-3 border-b border-white/[0.06]">
+                <div className="px-4 py-3 border-b border-[var(--rule)]">
                   {generatorBanner ? (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-stone-600 to-stone-700 flex items-center justify-center">
+                        <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "var(--gold)", }}>
                           <Sparkles className="w-3 h-3 text-white" />
                         </div>
-                        <span className="text-xs font-semibold text-white/80">
+                        <span className="text-xs font-semibold text-[var(--ink)]">
                           {generatorBanner.name}
                         </span>
                       </div>
                       <button
                         onClick={() => setGeneratorBanner(null)}
-                        className="text-white/30 hover:text-white/50 text-xs transition-colors"
+                        className="text-[var(--ink-muted)] hover:text-[var(--ink)] text-xs transition-colors"
                       >
                         <X size={14} />
                       </button>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-stone-500/15 to-stone-600/15 border border-stone-500/10 flex items-center justify-center">
-                        <MessageSquare className="w-3 h-3 text-stone-400" />
+                      <div className="w-6 h-6 rounded-lg border border-[var(--rule)] flex items-center justify-center" style={{ background: "var(--paper-elevated)" }}>
+                        <MessageSquare className="w-3 h-3 text-[var(--ink-muted)]" />
                       </div>
-                      <span className="text-xs font-medium text-white/50">
+                      <span className="text-xs font-medium text-[var(--ink-secondary)]">
                         AI Website Builder
                       </span>
                     </div>
@@ -3004,14 +2802,14 @@ function BuilderPage() {
 
                 {/* Context import strip */}
                 {mcpContext && (
-                  <div className="px-4 py-1.5 border-b border-white/[0.04] flex items-center gap-2 bg-stone-500/[0.03]">
-                    <span className="text-[10px] text-stone-400/70">Context imported</span>
-                    <button onClick={() => setActiveTool("mcp")} className="text-[10px] text-stone-400/50 hover:text-stone-400 transition-colors">Manage</button>
+                  <div className="px-4 py-1.5 border-b border-[var(--rule)] flex items-center gap-2" style={{ background: "var(--paper-elevated)" }}>
+                    <span className="text-[10px] text-[var(--ink-muted)]">Context imported</span>
+                    <button onClick={() => setActiveTool("mcp")} className="text-[10px] text-[var(--gold-deep)] hover:text-[var(--ink)] transition-colors">Manage</button>
                   </div>
                 )}
                 {!mcpContext && !hasCode && (
-                  <div className="px-4 py-1.5 border-b border-white/[0.04]">
-                    <button onClick={() => setActiveTool("mcp")} className="flex items-center gap-1.5 text-[10px] text-white/25 hover:text-stone-400/70 transition-colors">
+                  <div className="px-4 py-1.5 border-b border-[var(--rule)]">
+                    <button onClick={() => setActiveTool("mcp")} className="flex items-center gap-1.5 text-[10px] text-[var(--ink-muted)] hover:text-[var(--gold-deep)] transition-colors">
                       <ExternalLink size={10} />
                       Import from GitHub, Figma, or URL
                     </button>
@@ -3103,12 +2901,12 @@ function BuilderPage() {
                 className="flex flex-col h-full"
               >
                 {/* Chat header */}
-                <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
+                <div className="px-4 py-2.5 border-b border-[var(--rule)] flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: "rgba(184,146,63,0.15)" }}>
                       <MessageSquare className="w-3 h-3" style={{ color: "var(--gold-deep)" }} />
                     </div>
-                    <span className="text-xs font-semibold text-white/70">Edit with AI</span>
+                    <span className="text-xs font-semibold text-[var(--ink)]">Edit with AI</span>
                     {saveStatus === "saving" && (
                       <span className="text-[9px] text-amber-400/60 flex items-center gap-1">
                         <Loader2 className="w-2.5 h-2.5 animate-spin" />Saving
@@ -3131,7 +2929,7 @@ function BuilderPage() {
                     </button>
                     <button
                       onClick={handleNewSite}
-                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all"
+                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all"
                     >
                       <Plus size={12} />
                       New
@@ -3154,7 +2952,7 @@ function BuilderPage() {
 
                 {/* Section editor (collapsible) */}
                 {showSections && (
-                  <div className="border-b border-white/[0.06] max-h-[45%] overflow-y-auto">
+                  <div className="border-b border-[var(--rule)] max-h-[45%] overflow-y-auto">
                     <SectionEditor
                       files={reactFiles}
                       onFilesUpdate={(updatedFiles) => {
@@ -3206,17 +3004,17 @@ function BuilderPage() {
         </div>
 
         {/* ── Center Panel — Preview / Code / SEO ── */}
-        <div className="flex-1 flex flex-col bg-white/[0.03] backdrop-blur-sm min-w-0 ring-1 ring-white/[0.06]">
+        <div className="flex-1 flex flex-col min-w-0" style={{ background: "var(--paper)", borderLeft: "1px solid var(--rule)" }}>
           {/* Tab bar — clean, minimal */}
-          <div className="flex items-center h-10 border-b border-white/[0.06] px-2 bg-white/[0.03] backdrop-blur-sm">
+          <div className="flex items-center h-10 border-b border-[var(--rule)] px-2" style={{ background: "var(--paper-elevated)" }}>
             <div className="flex items-center gap-0.5">
               {(["preview", "code", ...(hasCode ? ["seo"] : [])] as const).map(tab => (
                 <button
                   key={tab}
                   className={`relative px-3.5 py-2 text-[11px] font-medium transition-all ${
                     activeTab === tab
-                      ? "text-white"
-                      : "text-white/35 hover:text-white/55"
+                      ? "text-[var(--ink)]"
+                      : "text-[var(--ink-muted)] hover:text-[var(--ink-secondary)]"
                   }`}
                   onClick={() => setActiveTab(tab as typeof activeTab)}
                 >
@@ -3227,7 +3025,8 @@ function BuilderPage() {
                   {activeTab === tab && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute bottom-0 left-1 right-1 h-[2px] bg-gradient-to-r from-stone-500 to-stone-500 rounded-full"
+                      className="absolute bottom-0 left-1 right-1 h-[2px] rounded-full"
+                      style={{ background: "var(--gold)" }}
                       transition={{ type: "spring", stiffness: 500, damping: 35 }}
                     />
                   )}
@@ -3564,15 +3363,16 @@ function BuilderPage() {
               animate={{ width: 380, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="flex flex-col border-l border-white/[0.06] bg-white/[0.03] backdrop-blur-xl overflow-hidden"
+              className="flex flex-col border-l border-[var(--rule)] overflow-hidden"
+              style={{ background: "var(--paper-bright)" }}
             >
-              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06] min-w-[380px]">
-                <span className="text-[11px] font-medium text-white/40">
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--rule)] min-w-[380px]">
+                <span className="text-[11px] font-medium text-[var(--ink-secondary)]">
                   {activeToolLabel}
                 </span>
                 <button
                   onClick={() => setActiveTool(null)}
-                  className="p-1 rounded-md text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all"
+                  className="p-1 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all"
                 >
                   <X size={14} />
                 </button>
@@ -3584,7 +3384,7 @@ function BuilderPage() {
 
         {/* ── Right Toolbar — Tool Icons (advanced mode only) ── */}
         {advancedMode && (
-          <div className="w-11 flex flex-col items-center py-2 gap-0.5 border-l border-white/[0.06] bg-white/[0.03] backdrop-blur-sm overflow-y-auto">
+          <div className="w-11 flex flex-col items-center py-2 gap-0.5 border-l border-[var(--rule)] overflow-y-auto" style={{ background: "var(--paper-elevated)" }}>
             {TOOLS.map((tool) => (
               <button
                 key={tool.id}
@@ -3592,8 +3392,8 @@ function BuilderPage() {
                 title={tool.label}
                 className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150 ${
                   activeTool === tool.id
-                    ? "bg-stone-500/15 text-stone-400"
-                    : "text-white/25 hover:text-white/50 hover:bg-white/[0.04]"
+                    ? "bg-[var(--gold-soft)] text-[var(--gold-deep)]"
+                    : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100"
                 }`}
               >
                 {tool.icon}

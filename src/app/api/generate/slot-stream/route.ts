@@ -63,6 +63,26 @@ import {
   HERO_PORTFOLIO_EDITORIAL_TEMPLATE,
   HERO_PORTFOLIO_EDITORIAL_EXAMPLE,
 } from "@/lib/slot-locked/templates/by-industry/hero-portfolio-editorial";
+import {
+  STATS_STRIP_SCHEMA,
+  STATS_STRIP_TEMPLATE,
+  STATS_STRIP_EXAMPLE,
+} from "@/lib/slot-locked/templates/stats-strip";
+import {
+  TESTIMONIALS_QUOTES_SCHEMA,
+  TESTIMONIALS_QUOTES_TEMPLATE,
+  TESTIMONIALS_QUOTES_EXAMPLE,
+} from "@/lib/slot-locked/templates/testimonials-quotes";
+import {
+  CTA_BANNER_SCHEMA,
+  CTA_BANNER_TEMPLATE,
+  CTA_BANNER_EXAMPLE,
+} from "@/lib/slot-locked/templates/cta-banner";
+import {
+  FAQ_ACCORDION_SCHEMA,
+  FAQ_ACCORDION_TEMPLATE,
+  FAQ_ACCORDION_EXAMPLE,
+} from "@/lib/slot-locked/templates/faq-accordion";
 import { planPageForIndustry, planPageForIndustryAdaptive } from "@/lib/slot-locked/industry-planner";
 import { critiquePanel, axesNeedingRepair } from "@/lib/builder-critique/multi-judge";
 import { retrieveFewShotExamples, renderFewShotPrefix, recordSuccessfulBuild } from "@/lib/flywheel/successful-builds";
@@ -107,6 +127,10 @@ const SLOT_REGISTRY: Record<string, { schema: ComponentSchema; template: string;
   "features-bento-slot":           { schema: FEATURES_BENTO_SCHEMA,           template: FEATURES_BENTO_TEMPLATE,           example: FEATURES_BENTO_EXAMPLE },
   "pricing-tiers-slot":            { schema: PRICING_TIERS_SCHEMA,            template: PRICING_TIERS_TEMPLATE,            example: PRICING_TIERS_EXAMPLE },
   "footer-editorial-slot":         { schema: FOOTER_EDITORIAL_SCHEMA,         template: FOOTER_EDITORIAL_TEMPLATE,         example: FOOTER_EDITORIAL_EXAMPLE },
+  "stats-strip-slot":              { schema: STATS_STRIP_SCHEMA,              template: STATS_STRIP_TEMPLATE,              example: STATS_STRIP_EXAMPLE },
+  "testimonials-quotes-slot":      { schema: TESTIMONIALS_QUOTES_SCHEMA,      template: TESTIMONIALS_QUOTES_TEMPLATE,      example: TESTIMONIALS_QUOTES_EXAMPLE },
+  "cta-banner-slot":               { schema: CTA_BANNER_SCHEMA,               template: CTA_BANNER_TEMPLATE,               example: CTA_BANNER_EXAMPLE },
+  "faq-accordion-slot":            { schema: FAQ_ACCORDION_SCHEMA,            template: FAQ_ACCORDION_TEMPLATE,            example: FAQ_ACCORDION_EXAMPLE },
   // Industry variants — the planner picks these when industry + theme match.
   "hero-restaurant-warm-slot":     { schema: HERO_RESTAURANT_WARM_SCHEMA,     template: HERO_RESTAURANT_WARM_TEMPLATE,     example: HERO_RESTAURANT_WARM_EXAMPLE },
   "hero-portfolio-editorial-slot": { schema: HERO_PORTFOLIO_EDITORIAL_SCHEMA, template: HERO_PORTFOLIO_EDITORIAL_TEMPLATE, example: HERO_PORTFOLIO_EDITORIAL_EXAMPLE },
@@ -220,7 +244,9 @@ function buildSlotAppFile(orderedIds: string[]): string {
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join("");
     importLines.push(`import ${comp} from "./components/${id}";`);
-    renderLines.push(`      <${comp} />`);
+    // Wrap each section so a render error degrades invisibly instead of
+    // blanking the page (pairs with EscapeHatchPreview isolation).
+    renderLines.push(`      <SectionBoundary name="${comp}"><${comp} /></SectionBoundary>`);
   }
   return `import React from "react";
 ${importLines.join("\n")}
@@ -231,6 +257,20 @@ ${importLines.join("\n")}
  * AI-filled JSON slot fill. Structure is guaranteed correct; content
  * is brand-tuned for this build.
  */
+class SectionBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { failed: false }; }
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(error) {
+    if (typeof console !== "undefined") {
+      console.error("[zoobicon] section failed to render:", error);
+    }
+  }
+  render() {
+    if (this.state.failed) return null;
+    return this.props.children;
+  }
+}
+
 export default function App() {
   return (
     <main className="min-h-screen" style={{ background: "var(--paper)", color: "var(--ink)" }}>
@@ -298,8 +338,10 @@ export async function POST(req: NextRequest): Promise<Response> {
   // Quota + plan resolution — same gating as react-stream.
   const plan = getPlanFromRequest(req);
   const userEmail = req.headers.get("x-user-email") || null;
-  const quotaPlan: QuotaPlan =
-    plan === "pro" || plan === "agency" || plan === "free" || plan === "creator"
+  const isAdmin = !!(req.headers.get("x-admin") && req.headers.get("x-admin") !== "0" && req.headers.get("x-admin") !== "false");
+  const quotaPlan: QuotaPlan = isAdmin
+    ? "admin"
+    : plan === "pro" || plan === "agency" || plan === "free" || plan === "creator"
       ? (plan as QuotaPlan)
       : "free";
   const quota = await checkBuildQuota(userEmail, quotaPlan);
@@ -368,7 +410,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         const aiStart = Date.now();
         const fb = await callLLMWithFailover(
           {
-            model: "claude-haiku-4-5",
+            model: "claude-sonnet-4-6",
             system:
               fewShotPrefix +
               "You are filling in the slots of a hand-written React component template. " +
@@ -628,7 +670,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
         await telemetry.finalize({ ok: okCount > 0, qualityScore });
         await recordBuildQuotaUsage(userEmail, [
-          { model: "claude-haiku-4-5", inputTokens: 0, outputTokens: 0 },
+          { model: "claude-sonnet-4-6", inputTokens: 0, outputTokens: 0 },
         ]);
         controller.close();
       } catch (err) {

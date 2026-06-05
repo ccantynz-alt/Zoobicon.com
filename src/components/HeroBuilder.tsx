@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Sparkles, Check } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Sparkles, Check, Globe2 } from "lucide-react";
 import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 
 /**
@@ -574,6 +575,34 @@ export default function HeroBuilder() {
           </div>
         )}
       </form>
+
+      {/* ── "Already have a site?" — the URL clone-and-upgrade door ──
+          A huge slice of visitors aren't starting from scratch — they
+          have a WordPress/Wix/Squarespace site they're unhappy with and
+          don't know what to type into a blank prompt. This gives them a
+          one-tap path: paste the URL, we fetch it, rebuild a modern React
+          version, they continue with us. High-intent funnel, not buried
+          in a nav menu. */}
+      {!building && (
+        <div className="mt-7 text-center animate-[fadeIn_0.6s_ease-out]">
+          <Link
+            href="/upgrade"
+            className="group inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] transition-all duration-300 hover:-translate-y-0.5"
+            style={{
+              borderColor: "var(--gold-soft)",
+              background: "var(--paper-elevated)",
+              color: "var(--ink-secondary)",
+            }}
+          >
+            <Globe2 className="h-3.5 w-3.5" style={{ color: "var(--gold-deep)" }} />
+            Already have a website?
+            <span className="font-semibold" style={{ color: "var(--gold-deep)" }}>
+              Paste the URL — we&rsquo;ll rebuild it better
+            </span>
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" style={{ color: "var(--gold-deep)" }} />
+          </Link>
+        </div>
+      )}
 
       {/* ── Morphing preview canvas (only visible while building) ── */}
       {building && (
