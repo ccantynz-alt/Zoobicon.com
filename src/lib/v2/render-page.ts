@@ -72,7 +72,6 @@ async function renderComponentToHtml(tsx: string): Promise<string> {
     if (id === "framer-motion") return framer;
     return {};
   };
-  // eslint-disable-next-line @typescript-eslint/no-implied-eval
   new Function("require", "module", "exports", js)(requireShim, moduleObj, moduleObj.exports);
   const Comp = moduleObj.exports.default as React.ComponentType | undefined;
   if (typeof Comp !== "function") throw new Error("component has no default export");
