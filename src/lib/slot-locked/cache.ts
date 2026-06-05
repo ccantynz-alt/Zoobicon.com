@@ -38,6 +38,7 @@ import type { SlotValueMap } from "./types";
 const STOP_WORDS = new Set([
   "a", "an", "the", "for", "of", "in", "on", "to", "with", "and", "or",
   "is", "are", "be", "been", "being", "i", "we", "want", "need", "make",
+  "me", "my", "mine", "us", "our", "ours", "your", "yours",
   "build", "create", "site", "website", "landing", "page", "pages",
   "modern", "simple", "clean", "professional", "beautiful", "stunning",
   "amazing", "great", "good", "nice", "please", "thanks", "thank", "you",

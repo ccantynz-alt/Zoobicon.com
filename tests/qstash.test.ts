@@ -42,9 +42,10 @@ describe("QStash", () => {
     const mod = await import("@/lib/qstash");
     const paths = mod.CRON_SCHEDULES.map((s) => s.destination);
 
-    // Check that critical cron paths are covered
+    // Check that critical cron paths are covered.
+    // (daily-comeback removed per Rule 31 — email + analytics delegated to
+    // Crontech — so it's intentionally no longer in CRON_SCHEDULES.)
     expect(paths).toContain("/api/cron/warmup");
-    expect(paths).toContain("/api/cron/daily-comeback");
     expect(paths).toContain("/api/cron/warm-replicate");
     expect(paths).toContain("/api/cron/warm-sandpack");
     expect(paths).toContain("/api/cron/warmup-video");

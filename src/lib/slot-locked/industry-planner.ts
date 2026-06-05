@@ -84,22 +84,29 @@ export function pickComponentForIndustry(ctx: PickContext): string | null {
     // Theme match is worth a lot — wrong theme produces a visually
     // wrong site even if industry overlaps. e.g. picking the WARM
     // restaurant hero on an EDITORIAL theme would be jarring.
-    if (s.themes && ctx.theme) {
+    let themeMismatch = false;
+    if (s.themes && s.themes.length > 0 && ctx.theme) {
       if (s.themes.includes(ctx.theme as "editorial" | "light" | "warm" | "dark")) {
         score += 10;
       } else {
         // Penalty for theme mismatch — better to fall back to a generic
         // variant with neutral theme than a wrong-theme specialist.
         score -= 5;
+        themeMismatch = true;
       }
     } else if (!s.themes || s.themes.length === 0) {
       // No theme constraint = universal. Small bonus.
       score += 1;
     }
 
-    // Industry match is also valuable but slightly less than theme.
-    if (s.industries && ctx.industry) {
-      if (s.industries.includes(ctx.industry)) {
+    // Industry match is also valuable but slightly less than theme — and
+    // it is only awarded when the theme is NOT wrong. A specialist whose
+    // theme clashes with the request must not out-rank the neutral generic
+    // on the strength of its industry alone (e.g. the WARM restaurant hero
+    // should lose to the editorial generic on a DARK build even though both
+    // are "restaurant").
+    if (s.industries && s.industries.length > 0 && ctx.industry) {
+      if (s.industries.includes(ctx.industry) && !themeMismatch) {
         score += 8;
       }
     } else if (!s.industries || s.industries.length === 0) {
