@@ -245,6 +245,65 @@ export async function* streamClaude(
   }
 }
 
+export interface CachedMessageSystemBlock {
+  type: "text";
+  text: string;
+  cache_control?: { type: "ephemeral" };
+}
+
+export interface CachedMessageArgs {
+  system: CachedMessageSystemBlock[] | string;
+  messages: Array<{ role: "user" | "assistant"; content: string }>;
+  model: string;
+  maxTokens: number;
+  temperature?: number;
+}
+
+export interface CachedMessageResult {
+  text: string;
+  usage?: ClaudeUsage;
+}
+
+/**
+ * Send a message to the Anthropic API with structured system blocks that may
+ * carry `cache_control: { type: "ephemeral" }` for prompt caching. Used by
+ * builder-critique.ts to cache the large static system prompt across calls.
+ *
+ * Returns `{ text, usage }` where `text` is the concatenated text content.
+ */
+export async function createCachedMessage(
+  args: CachedMessageArgs,
+): Promise<CachedMessageResult> {
+  const body = {
+    model: args.model,
+    max_tokens: args.maxTokens,
+    temperature: args.temperature ?? 0.7,
+    system: args.system,
+    messages: args.messages,
+  };
+
+  const res = await fetch(ANTHROPIC_URL, {
+    method: "POST",
+    headers: await headers(),
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(120_000),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    const err = new Error(
+      `Anthropic API error ${res.status}: ${text}`,
+    ) as Error & { status: number };
+    err.status = res.status;
+    throw err;
+  }
+
+  const response = (await res.json()) as ClaudeResponse;
+  const text =
+    response.content.find((b) => b.type === "text")?.text ?? "";
+  return { text, usage: response.usage };
+}
+
 export interface CostInput {
   model: string;
   inputTokens: number;

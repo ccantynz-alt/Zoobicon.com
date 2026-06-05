@@ -182,8 +182,7 @@ export const FOOTER_EDITORIAL_EXAMPLE = {
       title: "Product",
       links: [
         { label: "AI Builder", href: "/builder" },
-        { label: "Domains", href: "/domains" },
-        { label: "Video creator", href: "/video-creator" },
+        { label: "Marketplace", href: "/marketplace" },
         { label: "Pricing", href: "/pricing" },
       ],
     },

@@ -169,6 +169,15 @@ export function validateGeneratedComponent(code: string): ComponentValidation {
     return { ok: false, reason: "output appears truncated (mid-statement)", warnings };
   }
 
+  // 8. Runtime-trap heuristic — Rules of Hooks violation. The LLM frequently
+  //    drops a `useState`/`useEffect`/`useRef`/`useMemo`/`useCallback` inside
+  //    a `.map()` callback when adding per-item state. Syntactically valid,
+  //    crashes at mount. Audit 2026-05-31 — root cause of recurring builder
+  //    preview failures (e.g. about:srcdoc runtime errors).
+  if (/\.map\s*\(\s*(?:\([^)]*\)|[a-zA-Z_$][\w$]*)\s*=>\s*\{[^}]*\b(?:useState|useEffect|useRef|useMemo|useCallback|useLayoutEffect|useTransition|useDeferredValue|useSyncExternalStore)\s*\(/.test(trimmed)) {
+    return { ok: false, reason: "hook called inside .map() callback (Rules of Hooks violation)", warnings };
+  }
+
   return { ok: true, warnings };
 }
 
