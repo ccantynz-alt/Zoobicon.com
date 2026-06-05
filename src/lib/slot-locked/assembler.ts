@@ -233,9 +233,16 @@ function expandEachBlocks(template: string, ctx: RenderContext): string {
     return before + expandEachBlocks(after, ctx);
   }
 
+  // Fully render each iteration (each → if → scalar) WITH the item
+  // context bound. The previous code only re-expanded nested #each here
+  // and left {{item.x}} scalars for the top-level Pass 3 — by which point
+  // the item context was gone, so every list row resolved to empty. That
+  // silently blanked every list-based slot component (features, pricing,
+  // testimonials, etc). Recursing through renderTemplate resolves item
+  // scalars (and #if conditions) in the same scope the item is bound.
   const expanded = list
     .map((item) =>
-      expandEachBlocks(inner, { ...ctx, item: item as SlotValueMap }),
+      renderTemplate(inner, { ...ctx, item: item as SlotValueMap }),
     )
     .join("");
   return before + expanded + expandEachBlocks(after, ctx);

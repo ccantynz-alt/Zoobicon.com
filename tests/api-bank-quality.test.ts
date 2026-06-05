@@ -84,8 +84,8 @@ describe("quality class semantics", () => {
   it("classifies the navbar-minimal slot fill correctly", () => {
     // From src/lib/slot-locked/templates/navbar-minimal.ts
     const fixtures: Array<[string, string, "premium" | "acceptable" | "mechanical"]> = [
-      ["brandName", "text", "acceptable"],
-      ["brandMonogram", "text", "mechanical"],
+      ["brandName", "text", "premium"], // /^brand/ → premium (brand copy is high-value)
+      ["brandMonogram", "text", "mechanical"], // ALWAYS_MECHANICAL_NAMES
       ["ctaLabel", "text", "premium"], // starts with "cta"
       ["ctaHref", "url", "mechanical"],
       ["showCta", "boolean", "mechanical"],

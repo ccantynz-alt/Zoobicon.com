@@ -60,7 +60,10 @@ describe("llm-provider", () => {
     const { checkProviderHealth } = await import("@/lib/llm-provider");
     const health = checkProviderHealth({ log: false });
 
-    expect(health).toHaveLength(3);
+    // claude / openai / gemini / selfhosted substrate (added as failover
+    // providers). Assert >= 4 so adding another provider later doesn't
+    // break this test.
+    expect(health.length).toBeGreaterThanOrEqual(4);
     const claude = health.find((h) => h.provider === "claude");
     const openai = health.find((h) => h.provider === "openai");
     const gemini = health.find((h) => h.provider === "gemini");
@@ -122,7 +125,7 @@ describe("llm-provider", () => {
       expect(model.label).toBeTruthy();
       expect(model.maxTokens).toBeGreaterThan(0);
       expect(["fast", "balanced", "premium"]).toContain(model.tier);
-      expect(["claude", "openai", "gemini"]).toContain(model.provider);
+      expect(["claude", "openai", "gemini", "groq", "selfhosted"]).toContain(model.provider);
     }
   });
 });

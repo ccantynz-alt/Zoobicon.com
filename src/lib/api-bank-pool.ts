@@ -207,10 +207,15 @@ export function pickKey(provider: LLMProvider): PickedKey | null {
     .filter((x) => x.hr > 0);
 
   const healthy = ranked.filter((x) => !x.sidelined);
-  const pool = healthy.length > 0 ? healthy : ranked;
+  // When no healthy keys remain we fall back to the sidelined ones — the
+  // system keeps working but is DEGRADED, and callers/telemetry must know.
+  // (Previously `degraded` was only set in the zero-headroom branch, so a
+  // build that ran entirely on sidelined keys silently reported healthy.)
+  const usingSidelinedFallback = healthy.length === 0;
+  const pool = usingSidelinedFallback ? ranked : healthy;
 
   if (pool.length === 0) {
-    // All sidelined or zero headroom — pick the least-exhausted as last resort.
+    // No headroom anywhere — pick the least-exhausted as last resort.
     const fallback = keys
       .map((k) => ({ key: k, hr: headroomFor(k) }))
       .sort((a, b) => b.hr - a.hr)[0];
@@ -230,7 +235,7 @@ export function pickKey(provider: LLMProvider): PickedKey | null {
     name: winner.key.name,
     apiKey: winner.key.apiKey,
     headroom: winner.hr,
-    degraded: false,
+    degraded: usingSidelinedFallback,
   };
 }
 

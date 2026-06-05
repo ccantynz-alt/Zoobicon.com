@@ -109,15 +109,18 @@ export function validateGeneratedComponent(code: string): ComponentValidation {
   const warnings: string[] = [];
   const trimmed = (code || "").trim();
 
-  // 1. Non-empty + minimum size (a real component is at least ~150 chars
+  // 1. Refusal check FIRST — a refusal is a refusal regardless of length.
+  //    A short refusal ("I'm sorry, I can't help with that.") must be
+  //    categorised as a refusal, not mislabelled "too short": the failover
+  //    layer treats the two differently.
+  const refusal = detectRefusal(trimmed);
+  if (refusal.refused) return { ok: false, reason: refusal.reason, warnings };
+
+  // 2. Non-empty + minimum size (a real component is at least ~150 chars
   //    including imports and a default export).
   if (trimmed.length < 120) {
     return { ok: false, reason: `too short (${trimmed.length} chars)`, warnings };
   }
-
-  // 2. Refusal check — model returned English instead of code.
-  const refusal = detectRefusal(trimmed);
-  if (refusal.refused) return { ok: false, reason: refusal.reason, warnings };
 
   // 3. Markdown fence leakage — should have been stripped upstream.
   if (/^\s*```/.test(trimmed) || /```\s*$/.test(trimmed)) {
