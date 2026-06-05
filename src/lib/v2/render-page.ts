@@ -79,6 +79,25 @@ export async function renderComponentToHtml(tsx: string): Promise<string> {
   return renderToStaticMarkup(React.createElement(Comp));
 }
 
+// Compile a TSX component to a browser-ready ES MODULE (imports kept as bare
+// specifiers, resolved by the iframe's importmap). This is the other half of
+// "live but reliable": the server does the TypeScript+JSX compile (no Babel
+// in the browser — the single most fragile piece of the old V1 runtime), and
+// the iframe just imports the finished module and mounts it over the static
+// HTML. If the import/mount fails for any reason, the static render stays —
+// so hydration can only ever ENHANCE the page, never blank it.
+export function compileComponentToModule(tsx: string): string {
+  return ts.transpileModule(tsx, {
+    compilerOptions: {
+      jsx: ts.JsxEmit.React, // classic runtime — React is imported in the module
+      module: ts.ModuleKind.ESNext,
+      target: ts.ScriptTarget.ES2020,
+      esModuleInterop: true,
+    },
+    reportDiagnostics: false,
+  }).outputText;
+}
+
 // Lightweight industry/theme heuristics so we don't need an LLM round-trip
 // just to plan the page. (The AI still customises the copy below.)
 export function detectIndustry(prompt: string): string {
@@ -310,6 +329,22 @@ export function sectionWrap(index: number, html: string): string {
   return `<section data-zb-i="${index}">${html}</section>`;
 }
 
+// Browser runtime deps for the live-preview hydration layer. React does the
+// TS/JSX compile server-side, so the browser only needs these libs (no Babel,
+// no module graph). esm.sh is the source; if any fails to load, the affected
+// section simply stays as its server-rendered static HTML.
+const HYDRATE_IMPORTMAP = JSON.stringify({
+  imports: {
+    react: "https://esm.sh/react@18.3.1",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "lucide-react": "https://esm.sh/lucide-react@1.7.0?external=react",
+    "framer-motion": "https://esm.sh/framer-motion@12.38.0?external=react,react-dom",
+    clsx: "https://esm.sh/clsx@2.1.1",
+    "tailwind-merge": "https://esm.sh/tailwind-merge@2.5.5",
+  },
+});
+
 // The iframe document. Editorial-light design tokens inline; Tailwind via
 // CDN (a single reliable stylesheet generator — the ONLY script in the
 // iframe, and not our generated code). Playfair + Inter for the editorial,
@@ -325,12 +360,21 @@ export function pageShell(
   const headingRule = serif
     ? `h1,h2{font-family:"Playfair Display",Georgia,serif;letter-spacing:-0.02em;}`
     : "";
-  // Listener that hot-swaps sections as the AI-tailored copy streams in. Only
-  // emitted for the streaming shell; the static page never needs it.
+  // Importmap (head, before any module) for the hydration layer.
+  const importmap = opts.streaming
+    ? `<script type="importmap">${HYDRATE_IMPORTMAP}</script>`
+    : "";
+  // Listener that (1) hot-swaps each section's static HTML as it streams in,
+  // then (2) mounts the LIVE React component over it so the page is fully
+  // interactive — accordions open, menus drop, toggles toggle, animations
+  // play. Every step is wrapped so a failure leaves the static HTML intact:
+  // hydration strictly enhances, never regresses. Only emitted for streaming.
   const streamScript = opts.streaming
     ? `<script>
 (function(){
+  var ZB = (window.__ZB__ = window.__ZB__ || { roots:{}, React:null, createRoot:null, reactPromise:null });
   function place(root, idx, html){
+    if (!root) return;
     var existing = root.querySelector('[data-zb-i="'+idx+'"]');
     if (existing){ existing.outerHTML = html; return; }
     var tmp = document.createElement('div');
@@ -344,9 +388,59 @@ export function pageShell(
     }
     root.insertBefore(node, after);
   }
+  function ensureReact(){
+    if (ZB.React) return Promise.resolve();
+    if (!ZB.reactPromise){
+      ZB.reactPromise = Promise.all([import('react'), import('react-dom/client')]).then(function(m){
+        ZB.React = m[0].default || m[0];
+        ZB.createRoot = m[1].createRoot;
+      });
+    }
+    return ZB.reactPromise;
+  }
+  function hydrate(idx, js){
+    ensureReact().then(function(){
+      var React = ZB.React;
+      var node = document.querySelector('[data-zb-i="'+idx+'"]');
+      if (!node || !React) return;
+      var url;
+      try { url = URL.createObjectURL(new Blob([js], { type: 'application/javascript' })); }
+      catch(_){ return; }
+      import(url).then(function(mod){
+        try { URL.revokeObjectURL(url); } catch(_){}
+        var Comp = (mod && (mod.default || mod));
+        if (typeof Comp !== 'function') return;
+        if (ZB.roots[idx]){ try { ZB.roots[idx].unmount(); } catch(_){} }
+        // Capture the server-rendered static markup so we can put it back if
+        // the live component throws — even asynchronously, in an effect. The
+        // section degrades to static; it can never end up blank.
+        var staticHtml = node.innerHTML;
+        var restored = false;
+        function restore(){
+          if (restored) return; restored = true;
+          try { if (ZB.roots[idx]) ZB.roots[idx].unmount(); } catch(_){}
+          try { node.innerHTML = staticHtml; } catch(_){}
+        }
+        var Boundary = class extends React.Component {
+          constructor(p){ super(p); this.state = { e: null }; }
+          static getDerivedStateFromError(e){ return { e: e }; }
+          componentDidCatch(){ setTimeout(restore, 0); }
+          render(){ return this.state.e ? null : this.props.children; }
+        };
+        try {
+          var root = ZB.createRoot(node);
+          ZB.roots[idx] = root;
+          root.render(React.createElement(Boundary, null, React.createElement(Comp)));
+        } catch(_){ restore(); /* static HTML stays — never regress */ }
+      }).catch(function(){ /* esm.sh / import failure — static stays */ });
+    }).catch(function(){ /* React failed to load — page stays static */ });
+  }
   window.addEventListener('message', function(e){
     var d = e.data || {};
-    if (d.type === 'zb-section'){ place(document.getElementById('zb-root'), d.index, d.html); }
+    if (d.type === 'zb-section'){
+      place(document.getElementById('zb-root'), d.index, d.html);
+      if (d.js) hydrate(d.index, d.js);
+    }
   });
   function ready(){ try { parent.postMessage({type:'zb-ready'}, '*'); } catch(_){} }
   if (document.readyState !== 'loading') ready();
@@ -362,6 +456,7 @@ export function pageShell(
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title}</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  ${importmap}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@300..900&display=swap" rel="stylesheet" />
