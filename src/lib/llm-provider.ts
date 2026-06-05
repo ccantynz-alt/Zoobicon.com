@@ -142,18 +142,16 @@ async function callClaude(req: LLMRequest): Promise<LLMResponse> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("AI service is temporarily unavailable.");
 
-  // SDK has its own maxRetries, but it doesn't retry EPROTO/SSL — wrap it.
-  const client = new Anthropic({ apiKey, timeout: 60000, maxRetries: 0 });
-  const res = await retryTransient(
-    () =>
-      client.messages.create({
-        model: req.model,
-        max_tokens: req.maxTokens || 64000,
-        system: req.system,
-        messages: [{ role: "user", content: req.userMessage }],
-      }),
-    { label: `claude:${req.model}` }
-  );
+  // 90s ceiling per attempt — without this, the SDK's default "no timeout"
+  // means a single hung Anthropic request blocks callLLMWithFailover
+  // forever instead of falling through to OpenAI / Gemini.
+  const client = new Anthropic({ apiKey, timeout: 90_000, maxRetries: 0 });
+  const res = await client.messages.create({
+    model: req.model,
+    max_tokens: req.maxTokens || 64000,
+    system: req.system,
+    messages: [{ role: "user", content: req.userMessage }],
+  });
 
   const text = res.content.find((b) => b.type === "text")?.text || "";
   return {
