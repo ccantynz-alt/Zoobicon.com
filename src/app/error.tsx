@@ -42,8 +42,8 @@ export default function GlobalError({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#0a1628",
-          color: "#e0e0e0",
+          background: "#fafaf7",
+          color: "#0a0a0b",
           fontFamily: '"Inter", system-ui, sans-serif',
         }}
       >
@@ -52,14 +52,14 @@ export default function GlobalError({
             style={{
               width: "40px",
               height: "40px",
-              border: "3px solid rgba(37, 99, 235, 0.2)",
-              borderTopColor: "#2563eb",
+              border: "3px solid rgba(184,146,63, 0.2)",
+              borderTopColor: "#57534e",
               borderRadius: "50%",
               animation: "spin 0.8s linear infinite",
               margin: "0 auto 16px",
             }}
           />
-          <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)" }}>
+          <p style={{ fontSize: "14px", color: "rgba(10,10,11,0.55)" }}>
             Recovering... (attempt {retryCount + 1}/{maxAutoRetries})
           </p>
           <style dangerouslySetInnerHTML={{ __html: `@keyframes spin{to{transform:rotate(360deg)}}` }} />
@@ -76,8 +76,8 @@ export default function GlobalError({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0a1628",
-        color: "#e0e0e0",
+        background: "#fafaf7",
+        color: "#0a0a0b",
         fontFamily: '"Inter", system-ui, sans-serif',
         padding: "24px",
       }}
@@ -88,7 +88,7 @@ export default function GlobalError({
             width: "64px",
             height: "64px",
             borderRadius: "16px",
-            background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+            background: "linear-gradient(135deg, #57534e, #44403c)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -110,7 +110,7 @@ export default function GlobalError({
         <p
           style={{
             fontSize: "14px",
-            color: "rgba(255,255,255,0.4)",
+            color: "rgba(10,10,11,0.55)",
             lineHeight: 1.6,
             marginBottom: "24px",
           }}
@@ -127,7 +127,7 @@ export default function GlobalError({
             style={{
               padding: "12px 32px",
               borderRadius: "12px",
-              background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
+              background: "linear-gradient(135deg, #57534e, #44403c)",
               color: "white",
               border: "none",
               fontWeight: 600,

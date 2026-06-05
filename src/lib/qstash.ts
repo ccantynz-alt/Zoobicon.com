@@ -69,12 +69,17 @@ export async function ensureSchedule(config: ScheduleConfig): Promise<{ schedule
 
 /**
  * Publish a one-off job to QStash.
+ *
+ * `delay` follows the QStash duration string format: a positive integer
+ * followed by `s` / `m` / `h` / `d` (or a number for seconds). Other shapes
+ * are accepted at runtime by QStash but TypeScript narrows the SDK input
+ * so we type the parameter the same way.
  */
 export async function publishJob(opts: {
   url: string;
   body?: Record<string, unknown>;
   retries?: number;
-  delay?: string;
+  delay?: number | `${bigint}s` | `${bigint}m` | `${bigint}h` | `${bigint}d`;
 }): Promise<{ messageId: string } | null> {
   const client = getQStashClient();
   if (!client) return null;
@@ -86,7 +91,12 @@ export async function publishJob(opts: {
       retries: opts.retries ?? 3,
       delay: opts.delay,
     });
-    return { messageId: result.messageId };
+    // The SDK return type is a union: PublishToApiResponse | PublishToUrlResponse
+    // | PublishToUrlGroupsResponse. Only the URL-groups variant doesn't carry
+    // `messageId` — and we never publish to a URL group from this helper, so
+    // narrowing with `in` is enough to satisfy TypeScript without a cast.
+    const messageId = "messageId" in result ? result.messageId : "";
+    return { messageId };
   } catch (err) {
     console.error("[qstash] Failed to publish job:", err instanceof Error ? err.message : err);
     return null;
@@ -110,12 +120,7 @@ export const CRON_SCHEDULES: ScheduleConfig[] = [
     retries: 3,
     scheduleId: "health-check",
   },
-  {
-    destination: "/api/cron/daily-comeback",
-    cron: "0 3 * * *",
-    retries: 3,
-    scheduleId: "daily-comeback",
-  },
+  // daily-comeback removed (Rule 31) — email + analytics delegated to Crontech.
   {
     destination: "/api/cron/warm-replicate",
     cron: "*/5 * * * *",

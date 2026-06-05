@@ -8,57 +8,71 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Navy replaces pure black across the platform.
-        // Deep ocean navy — clearly blue, premium, Stripe-inspired.
-        // `black` is remapped below so every existing bg-black/text-black
-        // usage picks up the new tone without 144 file edits.
+        // Editorial-light palette — warm bone, near-black ink, champagne
+        // gold accent. The legacy `navy`, `brand`, `accent.*`, `zoo`, `dark`
+        // palette names are kept so existing class references resolve, but
+        // every shade now points at the editorial scale (warm/stone tones,
+        // gold accent) instead of cold blue/violet. No file edits needed —
+        // bg-navy-900, text-brand-500, bg-zoo-400, etc. all render warm.
         navy: {
-          50: "#eef2fb",
-          100: "#d8e0f3",
-          200: "#b4c3e5",
-          300: "#8299c9",
-          400: "#4f6eaa",
-          500: "#2d4d8c",
-          600: "#1e3a7a",
-          700: "#152e60",
-          800: "#0f2148",
-          900: "#0a1628",
-          950: "#060e1f",
+          50: "#fafaf9",
+          100: "#f5f5f4",
+          200: "#e7e5e4",
+          300: "#d6d3d1",
+          400: "#a8a29e",
+          500: "#78716c",
+          600: "#57534e",
+          700: "#44403c",
+          800: "#292524",
+          900: "#1c1917",
+          950: "#0c0a09",
         },
-        black: "#060e1f",
+        // Pure black stays black so text-black / fill-black still work.
+        // Background usages should already be opt-in via class.
+        black: "#0a0a0b",
+        // Rule 29 — `dark.100/200/300` was used as the card background
+        // ramp. The old values (#f4f3ed → #e7e5dd) were noticeably darker
+        // than the v4 paper-elevated (#fbf9f1), which is why some cards
+        // read as "a bit too dark" against the pure white page. Pulled
+        // every shade closer to paper-elevated so card surfaces sit
+        // cleanly on the white canvas.
         dark: {
-          100: "#162044",
-          200: "#0f1d3a",
-          300: "#0a1628",
+          100: "#fbf9f1",
+          200: "#f7f4e8",
+          300: "#f0ecdc",
         },
+        // Brand accent — champagne gold ladder (was Stripe blue).
         brand: {
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#2563eb",
-          600: "#1d4ed8",
-          700: "#1e40af",
+          200: "#f4ead0",
+          300: "#e7d6a3",
+          400: "#d4b86d",
+          500: "#b8923f",
+          600: "#9c7a2c",
+          700: "#7a5e1f",
         },
+        // Accent neutrals — were cyan/purple/pink, now warm tonal variants
+        // so legacy `text-accent-cyan` / `bg-accent-purple` resolve to
+        // editorial neutrals instead of bright sky/violet.
         accent: {
-          cyan: "#22d3ee",
-          purple: "#67e8f9",
-          pink: "#38bdf8",
+          cyan: "#a8a29e",
+          purple: "#78716c",
+          pink: "#b8923f",
+          stone: "#78716c",
         },
-        // Signature color — electric violet/indigo that's uniquely Zoobicon
-        // Not another blue gradient — this is ownable
+        // Signature — was electric violet, now warm gold series.
         zoo: {
-          50: "#f0eeff",
-          100: "#ddd8ff",
-          200: "#bfb4ff",
-          300: "#9b85ff",
-          400: "#7c5aff", // Primary signature
-          500: "#6d3bff", // Saturated core
-          600: "#5a1eff",
-          700: "#4a0ed4",
-          800: "#3d0eab",
-          900: "#2d0a7a",
+          50: "#fdf9ec",
+          100: "#fbf2d4",
+          200: "#f4ead0",
+          300: "#e7d6a3",
+          400: "#d4b86d",
+          500: "#b8923f",
+          600: "#9c7a2c",
+          700: "#7a5e1f",
+          800: "#5a4716",
+          900: "#3a2e0e",
         },
-        // Warm grays — Linear-inspired, not cold blue-gray
+        // Warm grays — kept (already neutral, used as the editorial spine)
         warm: {
           50: "#fafaf9",
           100: "#f5f5f4",
@@ -132,14 +146,23 @@ const config: Config = {
         "counter": "counter 2s cubic-bezier(0.16, 1, 0.3, 1)",
       },
       boxShadow: {
-        glow: "0 4px 24px rgba(37, 99, 235, 0.15), 0 0 48px rgba(37, 99, 235, 0.06)",
-        "glow-lg": "0 8px 40px rgba(37, 99, 235, 0.2), 0 0 80px rgba(37, 99, 235, 0.08)",
-        "glow-cyan": "0 4px 24px rgba(125, 211, 252, 0.15), 0 0 48px rgba(125, 211, 252, 0.06)",
-        "glow-blue": "0 4px 24px rgba(96, 165, 250, 0.15), 0 0 48px rgba(96, 165, 250, 0.06)",
-        "glow-zoo": "0 4px 24px rgba(124, 90, 255, 0.2), 0 0 60px rgba(124, 90, 255, 0.1)",
-        "glow-zoo-lg": "0 8px 40px rgba(124, 90, 255, 0.3), 0 0 80px rgba(124, 90, 255, 0.15)",
-        "premium": "0 1px 2px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.04)",
-        "card": "0 1px 3px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
+        // Rule 29 — every glow now uses the champagne palette. The old blue
+        // (rgb 37/99/235), cyan (125/211/252), and electric purple (124/90/
+        // 255) values bled through every `shadow-glow*` usage in the
+        // codebase and were the source of Craig's "purple sneaking in"
+        // report. Same intensity ratios, gold channel.
+        glow: "0 4px 24px rgba(184, 146, 63, 0.18), 0 0 48px rgba(184, 146, 63, 0.08)",
+        "glow-lg": "0 8px 40px rgba(184, 146, 63, 0.24), 0 0 80px rgba(184, 146, 63, 0.10)",
+        "glow-cyan": "0 4px 24px rgba(184, 146, 63, 0.15), 0 0 48px rgba(184, 146, 63, 0.06)",
+        "glow-blue": "0 4px 24px rgba(184, 146, 63, 0.15), 0 0 48px rgba(184, 146, 63, 0.06)",
+        "glow-zoo": "0 4px 24px rgba(184, 146, 63, 0.22), 0 0 60px rgba(184, 146, 63, 0.10)",
+        "glow-zoo-lg": "0 8px 40px rgba(184, 146, 63, 0.30), 0 0 80px rgba(184, 146, 63, 0.14)",
+        // Premium/card shadows softened for the bright editorial-light
+        // canvas. Removed the inset white highlight (rendered as a grimy
+        // ring on cream) and tuned darks down so cards stop reading "too
+        // dark" against the paper.
+        "premium": "0 1px 2px rgba(10, 10, 11, 0.05), 0 4px 16px rgba(10, 10, 11, 0.06), 0 0 0 1px var(--rule)",
+        "card": "0 1px 3px rgba(10, 10, 11, 0.04), 0 8px 24px rgba(10, 10, 11, 0.06)",
       },
       keyframes: {
         "glow-pulse": {
@@ -172,8 +195,17 @@ const config: Config = {
         },
       },
       backgroundImage: {
-        "gradient-zoo": "linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee)",
-        "gradient-zoo-subtle": "linear-gradient(135deg, rgba(124,90,255,0.15), rgba(59,130,246,0.1))",
+        // Rule 29 — was `linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee)`
+        // (purple → blue → cyan). That was the single biggest source of
+        // blue/purple bleeding through. Now: warm champagne ladder so every
+        // `bg-gradient-zoo` reference paints sand/gold instead.
+        "gradient-zoo": "linear-gradient(135deg, #d4b86d, #b8923f, #8c6b25)",
+        "gradient-zoo-subtle": "linear-gradient(135deg, rgba(184, 146, 63, 0.14), rgba(140, 107, 37, 0.08))",
+        // Cleaner semantic names for new components.
+        "gradient-gold": "linear-gradient(135deg, #d4b86d 0%, #b8923f 50%, #8c6b25 100%)",
+        "gradient-gold-soft": "linear-gradient(135deg, rgba(212, 184, 109, 0.18), rgba(184, 146, 63, 0.10))",
+        // Subtle paper-to-cream lift for hero sections.
+        "gradient-paper-lift": "linear-gradient(180deg, #ffffff 0%, #fbf9f1 100%)",
       },
     },
   },

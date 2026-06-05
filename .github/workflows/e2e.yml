@@ -1,4 +1,9 @@
-name: E2E Tests
+name: GateTest E2E
+
+# Replaces the previous Playwright e2e workflow. Per Craig's directive:
+# "Playwright is our competition — we own GateTest, we use our own product."
+# GateTest exercises the same user flows via the GATE_TEST_API_URL service
+# (results posted back as PR check status).
 
 on:
   push:
@@ -7,12 +12,12 @@ on:
     branches: [main, master]
 
 jobs:
-  e2e:
-    name: End-to-End Tests
+  gatetest-pr:
+    name: GateTest — PR / Push Scan
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # E2E tests report but don't block merging — they need a running
-    # server with database to fully pass. Use results for diagnostics.
+    # GateTest reports but doesn't block merging while the API is being
+    # hardened. Once stable, flip continue-on-error to false.
     continue-on-error: true
 
     steps:
@@ -28,9 +33,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright browsers
-        run: npx playwright install chromium --with-deps
-
       - name: Build app
         run: npm run build
         env:
@@ -40,28 +42,59 @@ jobs:
           DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
           STRIPE_SECRET_KEY: sk_test_ci_placeholder
 
-      - name: Run E2E tests
-        run: npx playwright test --project="Desktop Chrome"
+      - name: Run GateTest E2E
+        if: ${{ env.GATE_TEST_API_URL != '' }}
+        run: |
+          node -e "
+          const https = require('https');
+          const url = new URL(process.env.GATE_TEST_API_URL);
+          const body = JSON.stringify({
+            repo_url: 'https://github.com/${{ github.repository }}',
+            tier: 'e2e',
+            ref: '${{ github.sha }}',
+            target: 'localhost',
+          });
+          const req = https.request({
+            hostname: url.hostname,
+            port: url.port || 443,
+            path: url.pathname,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': process.env.GATE_TEST_API_KEY || '',
+              'Content-Length': Buffer.byteLength(body),
+            },
+            timeout: 600000,
+          }, (res) => {
+            let data = '';
+            res.on('data', (chunk) => data += chunk);
+            res.on('end', () => {
+              const result = JSON.parse(data);
+              console.log('GateTest E2E Results:');
+              console.log('  Modules:', result.totalModules, '| Issues:', result.totalIssues, '| Duration:', result.duration + 'ms');
+              for (const mod of result.modules || []) {
+                const icon = mod.status === 'passed' ? '✅' : '❌';
+                console.log('  ' + icon + ' ' + mod.name + ': ' + mod.checks + ' checks, ' + mod.issues + ' issues');
+                if (mod.details) mod.details.forEach(d => console.log('    → ' + d));
+              }
+              if (result.totalIssues > 0) {
+                console.error('GateTest found ' + result.totalIssues + ' issue(s)');
+                process.exit(1);
+              }
+            });
+          });
+          req.on('error', (e) => { console.error('GateTest API error:', e.message); process.exit(1); });
+          req.write(body);
+          req.end();
+          "
         env:
-          PLAYWRIGHT_BASE_URL: http://localhost:3000
-          ANTHROPIC_API_KEY: sk-ant-ci-placeholder
-          ADMIN_EMAIL: admin@zoobicon.com
-          ADMIN_PASSWORD: ci-placeholder
-          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
-          STRIPE_SECRET_KEY: sk_test_ci_placeholder
+          GATE_TEST_API_URL: ${{ secrets.GATE_TEST_API_URL }}
+          GATE_TEST_API_KEY: ${{ secrets.GATE_TEST_API_KEY }}
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 7
-
-      - name: Upload screenshots on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: failure-screenshots
-          path: test-results/
-          retention-days: 7
+      - name: Skip notice (no GateTest secrets)
+        if: ${{ env.GATE_TEST_API_URL == '' }}
+        run: |
+          echo "::notice::GATE_TEST_API_URL not configured — skipping GateTest E2E."
+          echo "Set repo secrets GATE_TEST_API_URL and GATE_TEST_API_KEY to enable."
+        env:
+          GATE_TEST_API_URL: ${{ secrets.GATE_TEST_API_URL }}

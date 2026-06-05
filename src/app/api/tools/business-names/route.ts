@@ -521,38 +521,39 @@ CORE RULES:
 - NEVER suggest generic names ("TechSolutions", "BestService", "ProBuilder", "AIvoice", "SmartApp").
 - NEVER reuse a forbidden name or its near-phonetic siblings.
 
-.COM AVAILABILITY IS THE GOAL — .com is saturated. 30 years of squatting.
-Every common word, every one-syllable Latin root, every mythological name is
-already registered. To give the user REAL .com hits, you MUST lean hard into
-patterns that are statistically likely to be free:
+.COM AVAILABILITY IS THE GOAL — .com is saturated after 30 years. To find
+AVAILABLE .com names, use these proven patterns that real successful startups use:
 
 DISTRIBUTE your ${nameCount} names across ALL of these patterns (roughly
-even split — do NOT dump 20 single-word Latin names and call it done):
+even split — variety is critical):
 
-  1. INVENTED COINAGES (~25%) — fabricated words built from Latin/Greek
-     morphemes. 6-10 letters. Examples: Vexion, Lumeris, Calidus, Octavus,
-     Sophora, Veridia, Noctura, Saelum, Orbix, Celestar, Veridax, Sonare.
-     These are UNREGISTERED 90% of the time.
-  2. TWO-ROOT COMPOUNDS (~25%) — stitch two uncommon Latin/Greek/Norse roots.
-     Examples: AurumVox, FerroMind, NoxCaesar, VelumOra, CelerMens, NovaRune,
-     SolVerba, DuxSonus, ImperoVox. Compounds almost never taken on .com.
-  3. RARE MYTHOLOGICAL DEEP CUTS (~20%) — not Apollo/Atlas/Phoenix (all taken).
-     Dig for obscure figures: Vesta, Vulcanus, Mercurius, Quirinus, Fornax,
-     Volturnus, Portunus, Robigus, Vertumnus, Edusa, Potina, Aius Locutius,
-     Saturnalia, Caerimonia. The less famous, the more likely free.
-  4. LATIN/GREEK ABSTRACT NOUNS (~15%) — uncommon abstract virtues or concepts:
-     Libertas, Magnanimitas, Concordia, Prudentia, Sapientia, Virtus, Pietas,
-     Dignitas, Gravitas, Auctoritas, Clementia, Fides. Full Latin abstract
-     nouns fare much better than single short words.
-  5. LETTER-MUTATED CLASSICS (~15%) — take a classic and mutate one letter
-     to dodge the squatter: Julius → Julix, Caesar → Caesor, Apex → Apox,
-     Nova → Novix, Lumen → Lumex, Atlas → Atlax. Looks classical, very
-     likely free.
+  1. MODERN BLENDS (~30%) — smash two short English words together or blend
+     fragments. 5-9 letters. Think: Shopify (shop+ify), Spotify (spot+ify),
+     Calendly (calendar+ly), Grammarly (grammar+ly), Loomly (loom+ly),
+     Dashly, Rentwise, Bookflip, Paystead, Calmhive, Driftway, Peakly.
+     These sound professional and are usually available.
+  2. INVENTED SHORT WORDS (~25%) — make up a punchy 4-8 letter word that
+     SOUNDS English but doesn't exist. Like: Klarna, Zapier, Trello, Asana,
+     Figma, Canva, Miro, Ravio, Breely, Tasklo, Qubly, Verato, Crafto,
+     Pulsn, Hively, Workli, Boldo, Vendix. Must be easy to spell and say.
+  3. DESCRIPTIVE COMPOUNDS (~25%) — two real English words joined.
+     Like: Basecamp, Mailchimp, Freshbooks, Salesforce, Hubspot, Dropbox,
+     Clockwork, Greenlight, Brightpath, Cleardesk, Swiftpay, Truemark,
+     Goldleaf, Ironclad, Sunforge, Wildgrain. Instantly communicates value.
+  4. LETTER-PLAY & TWEAKS (~20%) — take a common word and swap/drop/add a
+     letter to make it unique: Lyft (lift), Tumblr (tumbler), Flickr (flicker),
+     Fiverr (fiver), Grubhub, Raize (raise), Grynd (grind), Buildr,
+     Brandd, Reelz, Cliqk, Staqe, Solvd, Shippr. Memorable and available.
 
-BANNED on .com (DO NOT suggest these — 99% taken): Solar, Apex, Phoenix,
-Atlas, Nova, Lumen, Vertex, Pulse, Forge, Spark, Edge, Flux, Sage, Echo,
-Lyra, Lux, Vox, Apex, Helios, Kairos, Orion, Nexus, Zenith, Apollo, Vega,
-Titan, Iris, Aura, Sol, Luna.
+ABSOLUTELY BANNED — DO NOT suggest any of these (all taken on .com):
+Solar, Apex, Phoenix, Atlas, Nova, Lumen, Vertex, Pulse, Forge, Spark,
+Edge, Flux, Sage, Echo, Lyra, Lux, Vox, Helios, Kairos, Orion, Nexus,
+Zenith, Apollo, Vega, Titan, Iris, Aura, Sol, Luna, Quest, Bolt, Wave,
+Core, Rise, Shift, Flow, Bloom, Craft, Swift, Bright, Clear, True, Prime,
+Hub, Lab, Labs, Pro, Cloud, Pixel, Stack, Launch, Rocket.
+
+DO NOT use obscure Latin/Greek/mythological words. Real business owners
+want names they can say over the phone and their customers can spell.
 
 CRITICAL OUTPUT FORMAT:
 Output ONLY a valid JSON array. No markdown code fences. No preamble. No explanation text. No trailing commentary.
@@ -579,7 +580,7 @@ async function callAnthropic(apiKey: string, model: string, prompt: string): Pro
       body: JSON.stringify({
         model,
         max_tokens: 4000,
-        temperature: 1.0,
+        temperature: 0.7,
         messages: [{ role: "user", content: prompt }],
       }),
       signal: controller.signal,

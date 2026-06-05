@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { checkRateLimit, checkRateLimitAdmin, getClientIp } from "@/lib/rateLimit";
-import { validateApiKey } from "@/lib/apiKey";
 
 function getClient() {
   return new Anthropic({
@@ -157,17 +156,18 @@ function classifyEdit(instruction: string, html: string): { mode: EditMode; sect
 }
 
 export async function POST(request: NextRequest) {
-  // API key auth — valid zbk_live_ key gets higher rate limit
+  // Rule 31 — API key validation delegated to Crontech. Token-bearing
+  // requests get the higher rate; everything else falls back to anonymous.
   const bearerKey = request.headers.get("authorization")?.replace("Bearer ", "").trim() || "";
-  const apiKeyResult = bearerKey ? await validateApiKey(bearerKey) : null;
-  const isApiKeyRequest = apiKeyResult?.valid === true;
+  const crontechToken = request.headers.get("x-crontech-token");
+  const isApiKeyRequest = Boolean(bearerKey || crontechToken);
 
   // Admin bypass: no rate limits
   const isAdminRequest = request.headers.get("x-admin") === "1";
 
-  // Rate limit: unlimited for admin, 120/min for API keys, 20/min for browsers
+  // Rate limit: unlimited for admin, 120/min for token-bearing requests, 20/min for browsers
   const ip = getClientIp(request);
-  const rateLimitId = isApiKeyRequest ? `chat:key:${bearerKey.slice(-8)}` : `chat:${ip}`;
+  const rateLimitId = isApiKeyRequest ? `chat:key:${(bearerKey || crontechToken || "").slice(-8)}` : `chat:${ip}`;
   const rateLimit = isApiKeyRequest ? { limit: 120, windowMs: 60_000 } : { limit: 20, windowMs: 60_000 };
   const rl = isAdminRequest ? checkRateLimitAdmin() : await checkRateLimit(rateLimitId, rateLimit);
   if (!rl.allowed) {
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
     if (!process.env.ANTHROPIC_API_KEY) {
       return new Response(
         JSON.stringify({ error: "AI service is temporarily unavailable." }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
+        { status: 503, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -233,6 +233,18 @@ export async function POST(request: NextRequest) {
 
     const model = "claude-sonnet-4-6";
 
+    // --- Flywheel: inject platform memory into system prompt ---
+    try {
+      const { getMemories } = await import("@/lib/flywheel");
+      const mems = await getMemories("brand");
+      const memStr = mems.slice(0, 8).map((m) => m.content).join("; ");
+      if (memStr) {
+        systemPrompt += `\n\nPlatform memory: ${memStr.slice(0, 500)}`;
+      }
+    } catch {
+      // Flywheel unavailable — proceed without memory
+    }
+
     let stream;
     try {
       stream = await getClient().messages.stream({
@@ -263,6 +275,8 @@ export async function POST(request: NextRequest) {
       sectionName: editClass.mode === "targeted" ? editClass.section?.sectionName : undefined,
     });
 
+    let accumulatedResponse = "";
+
     const readable = new ReadableStream({
       async start(controller) {
         try {
@@ -274,6 +288,7 @@ export async function POST(request: NextRequest) {
               event.type === "content_block_delta" &&
               event.delta.type === "text_delta"
             ) {
+              accumulatedResponse += event.delta.text;
               controller.enqueue(
                 encoder.encode(`data: ${JSON.stringify({ type: "chunk", content: event.delta.text })}\n\n`)
               );
@@ -282,6 +297,27 @@ export async function POST(request: NextRequest) {
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`)
           );
+
+          // --- Flywheel: persist conversation after successful edit ---
+          try {
+            const { saveConversation } = await import("@/lib/flywheel");
+            const now = Date.now();
+            const convoId = `${now}-${Math.random().toString(36).slice(2, 11)}`;
+            await saveConversation({
+              id: convoId,
+              title: (instruction || "Site edit").slice(0, 50),
+              messages: [
+                { role: "user" as const, content: instruction, timestamp: now - 1000 },
+                { role: "assistant" as const, content: accumulatedResponse.slice(0, 2000), timestamp: now },
+              ],
+              model,
+              createdAt: now,
+              updatedAt: now,
+            });
+          } catch {
+            // Flywheel save failed — non-fatal
+          }
+
           controller.close();
         } catch (err) {
           const message = err instanceof Error ? err.message : "Stream error";

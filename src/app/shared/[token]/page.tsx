@@ -50,7 +50,7 @@ export default function SharedProjectPage({ params }: { params: { token: string 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 text-stone-400 animate-spin mx-auto mb-4" />
           <p className="text-white/50 text-sm">Loading shared project...</p>
@@ -61,7 +61,7 @@ export default function SharedProjectPage({ params }: { params: { token: string 
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-6">
           <div className="w-16 h-16 rounded-2xl bg-stone-500/10 border border-stone-500/20 flex items-center justify-center mx-auto mb-6">
             <ExternalLink className="w-7 h-7 text-stone-400" />
@@ -82,7 +82,7 @@ export default function SharedProjectPage({ params }: { params: { token: string 
   const currentConfig = viewportConfig[viewport];
 
   return (
-    <div className="h-screen flex flex-col bg-[#0a1628]">
+    <div className="h-screen flex flex-col bg-transparent">
       {/* Top bar */}
       <header className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06] bg-[#12121a]/90 backdrop-blur-sm shrink-0">
         {/* Left: branding + project name */}
@@ -135,7 +135,7 @@ export default function SharedProjectPage({ params }: { params: { token: string 
       </header>
 
       {/* Preview area */}
-      <div className="flex-1 flex items-start justify-center overflow-auto bg-[#0a1628] p-0">
+      <div className="flex-1 flex items-start justify-center overflow-auto bg-transparent p-0">
         <div
           className="h-full transition-all duration-300 ease-in-out bg-white"
           style={{

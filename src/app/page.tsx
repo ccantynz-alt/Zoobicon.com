@@ -6,18 +6,15 @@ import {
   ArrowRight,
   ChevronRight,
   Wand2,
-  Video,
   Globe2,
   Sparkles,
   Zap,
   Bot,
   Layers,
   ShieldCheck,
-  Star,
   Check,
 } from "lucide-react";
 import HeroBuilder from "@/components/HeroBuilder";
-import AutoplayVideo from "@/components/AutoplayVideo";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -28,15 +25,13 @@ const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
 // ── Trust strip data (verifiable, never inflated) ──
 const TRUST_ITEMS = [
   { label: "Opus 4.7", sub: "Latest Claude" },
-  { label: "Next.js 15", sub: "App Router" },
+  { label: "Next.js 14", sub: "App Router" },
   { label: "Vercel Edge", sub: "iad1 region" },
   { label: "Stripe Verified", sub: "Live Connect" },
   { label: "Neon Serverless", sub: "Postgres 16" },
   { label: "Cloudflare", sub: "5 domains" },
-  { label: "OpenSRS", sub: "Domain registry" },
-  { label: "Replicate", sub: "Video pipeline" },
-  { label: "Fish Audio S1", sub: "#1 TTS" },
-  { label: "Mailgun", sub: "Transactional" },
+  { label: "Crontech", sub: "Hosting + domains" },
+  { label: "121 Components", sub: "Registry" },
 ];
 
 // ── AI feature bento (Filmora 2×2 pattern, extended to 2×3) ──
@@ -50,19 +45,11 @@ const AI_FEATURES = [
     size: "lg",
   },
   {
-    icon: Video,
-    title: "Script → face → video.",
-    desc: "Type a sentence. Fish Audio S1 narrates, our avatar engine lip-syncs, captions burn in. 30 seconds of broadcast-grade spokesperson video.",
-    tag: "Video Creator",
-    href: "/video-creator",
-    size: "lg",
-  },
-  {
     icon: Globe2,
-    title: "500+ TLDs, real-time.",
-    desc: "Live OpenSRS registry checks. AI-generated name shortlist. Register and point to your new site in one transaction.",
+    title: "Hosting + domain via Crontech.",
+    desc: "Hosting + custom domain (.com, .ai, .io) provisioned through Crontech at deploy time. One platform, no glue scripts.",
     tag: "Domains",
-    href: "/domains",
+    href: "/builder",
   },
   {
     icon: Bot,
@@ -73,247 +60,57 @@ const AI_FEATURES = [
   },
   {
     icon: Layers,
-    title: "Sixty hand-polished sections.",
+    title: "121 hand-polished sections.",
     desc: "Bento grids, spotlight cards, text reveal, marquee logos — every component assembled from a registry of $100K+ quality primitives.",
     tag: "Components",
-    href: "/components",
+    href: "/builder",
   },
   {
     icon: Zap,
     title: "One-click deploy.",
-    desc: "Ship to zoobicon.sh in five seconds. Free SSL, global CDN, custom domain. No config.",
-    tag: "Hosting",
-    href: "/hosting",
-  },
-];
-
-// ── Four domains, four superpowers ──
-const DOMAINS = [
-  {
-    name: "zoobicon.com",
-    role: "The platform",
-    desc: "Build, launch, and market your online presence from one login.",
-    cta: "Start building",
+    desc: "Ship your generated site to the cloud in seconds. Free SSL, global CDN, custom domain. No config.",
+    tag: "Deploy",
     href: "/builder",
-    color: "indigo" as const,
-    icon: Wand2,
-  },
-  {
-    name: "zoobicon.ai",
-    role: "The AI brain",
-    desc: "Seven agents, Opus 4.7, Fish Audio S1. The model stack we run on.",
-    cta: "See the agents",
-    href: "/ai",
-    color: "violet" as const,
-    icon: Bot,
-  },
-  {
-    name: "zoobicon.io",
-    role: "The developer API",
-    desc: "Sell our pipeline inside your app. One key, every product.",
-    cta: "Read the docs",
-    href: "/developers",
-    color: "cyan" as const,
-    icon: Layers,
-  },
-  {
-    name: "zoobicon.sh",
-    role: "The hosting edge",
-    desc: "One-click deploy. Global CDN, free SSL, custom domain in seconds.",
-    cta: "Deploy a site",
-    href: "/hosting",
-    color: "emerald" as const,
-    icon: Zap,
-  },
-] as const;
-
-const DOMAIN_COLORS: Record<
-  "indigo" | "violet" | "cyan" | "emerald",
-  { border: string; iconBg: string; text: string }
-> = {
-  indigo: { border: "hover:border-indigo-400/40", iconBg: "bg-indigo-500/15", text: "text-indigo-300" },
-  violet: { border: "hover:border-violet-400/40", iconBg: "bg-violet-500/15", text: "text-violet-300" },
-  cyan: { border: "hover:border-cyan-400/40", iconBg: "bg-cyan-500/15", text: "text-cyan-300" },
-  emerald: { border: "hover:border-emerald-400/40", iconBg: "bg-emerald-500/15", text: "text-emerald-300" },
-};
-
-// ── How it works (three steps) ──
-const STEPS = [
-  { num: "01", title: "Describe it", desc: "Type what you want in plain English." },
-  { num: "02", title: "Watch it build", desc: "Seven agents assemble your site live." },
-  { num: "03", title: "Ship it", desc: "One click to deploy with SSL + custom domain." },
-] as const;
-
-// ── Testimonials (real, attributed — never fabricated) ──
-const TESTIMONIALS = [
-  {
-    quote:
-      "Built our entire marketing site in the time it used to take to brief a designer.",
-    author: "Dental clinic owner",
-    location: "Auckland, NZ",
-    rating: 5,
-  },
-  {
-    quote:
-      "The video creator wrote a better script than my last agency. And it shipped the same afternoon.",
-    author: "Wedding photographer",
-    location: "Melbourne, AU",
-    rating: 5,
-  },
-  {
-    quote:
-      "I bought the domain, launched the site, and had email forwarding working — all in one session.",
-    author: "Specialty coffee roaster",
-    location: "Brooklyn, NY",
-    rating: 5,
-  },
-  {
-    quote:
-      "We replaced Framer, HeyGen and GoDaddy with one $49 subscription.",
-    author: "Law firm partner",
-    location: "London, UK",
-    rating: 5,
   },
 ];
+
+// Testimonials block deliberately removed (2026-05-26). The previous
+// entries were fabricated personas ("Dental clinic owner / Auckland",
+// "Wedding photographer / Melbourne", etc.) — we don't have real
+// customers yet, so claiming we do was dishonest. The Founder's-Note
+// section below replaces it with a truthful "we're new" pitch and a
+// "tell us what's broken" CTA. Restore real, attributed quotes here
+// when actual customers ship sites and give consent.
 
 export default function HomePage() {
   return (
-    <div className="bg-[#0b1530] text-white selection:bg-indigo-500/30 selection:text-white">
+    <div style={{ color: "var(--ink)" }}>
+      <div className="pt-[72px]">
+        <HeroBuilder />
 
-      {/* ── HERO ── built live in the browser via Sandpack.
-          Pre-merge the page opened on a <HeroShowcase> slideshow defined
-          inline in this file; that component got deleted in a later merge
-          but the call didn't, leaving the page referencing an undefined
-          symbol. Swapped in the existing HeroBuilder import so the hero
-          renders the real builder product instead of crashing the page. */}
-      <HeroBuilder />
-
-      {/* ── FOUR DOMAINS ── */}
-      <section className="py-28 md:py-36 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-sm font-semibold tracking-widest uppercase text-indigo-400 mb-4">
-              One Platform, Four Domains
-            </p>
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-              Every domain, a different superpower
-            </h2>
-          </div>
-        </div>
-      </section>
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden min-h-screen flex items-center pt-16">
-        {/* Rich gradient mesh background */}
-        <div className="absolute inset-0 pointer-events-none">
-          {/* Primary gradient blobs — layered for depth */}
-          <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-blue-600/[0.07] blur-[120px]" />
-          <div className="absolute top-[10%] right-[-5%] w-[50%] h-[60%] rounded-full bg-indigo-600/[0.06] blur-[100px]" />
-          <div className="absolute bottom-[-10%] left-[20%] w-[45%] h-[50%] rounded-full bg-cyan-600/[0.04] blur-[120px]" />
-          <div className="absolute top-[40%] left-[40%] w-[30%] h-[30%] rounded-full bg-blue-500/[0.05] blur-[80px]" />
-          {/* Subtle dot pattern overlay with radial fade */}
-          <div
-            className="absolute inset-0 opacity-[0.35]"
-            style={{
-              backgroundImage: "radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px)",
-              backgroundSize: "32px 32px",
-              maskImage: "radial-gradient(ellipse 70% 60% at 50% 40%, black 10%, transparent 70%)",
-              WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 50% 40%, black 10%, transparent 70%)",
-            }}
-          />
-          {/* Top edge highlight — subtle light bleed from above */}
-          <div className="absolute top-0 left-[15%] right-[15%] h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full relative z-10 py-20 lg:py-28">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left — Text */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider mb-8">
-                AI-POWERED PLATFORM
-              </div>
-
-              <h1 className="text-[2.75rem] sm:text-[3.5rem] lg:text-[4.5rem] font-black tracking-[-0.03em] leading-[1.05] mb-6 text-white">
-                Build, deploy, grow{" "}
-                <span className="block text-white/50">your online presence</span>
-              </h1>
-
-              <p className="text-lg text-white/45 leading-relaxed mb-8 max-w-lg">
-                Your all-in-one AI platform for building websites, marketing, and scaling online.
-                10 AI agents work together to create production-ready sites in seconds.
-              </p>
-            </motion.div>
-
-            {/* Right — Domain cards. Pre-merge this was the DOMAINS.map grid,
-                but a bad merge spliced in a broken TRUST_ITEMS marquee whose
-                inner JSX still referenced the old d/c/Link scope — the file
-                wouldn't parse and Vercel stopped deploying. Restored to the
-                DOMAINS grid from 744df83; HeroBuilder + trust strip will be
-                reintroduced in a clean follow-up so they don't take the
-                homepage down again. */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {DOMAINS.map((d) => {
-                const c = DOMAIN_COLORS[d.color];
-                const Icon = d.icon;
-                return (
-                  <Link
-                    key={d.name}
-                    href={d.href}
-                    className={`group rounded-2xl border border-white/[0.06] bg-white/[0.03] p-7 transition-all duration-200 hover:bg-white/[0.06] ${c.border}`}
-                  >
-                    <div className={`w-11 h-11 rounded-xl ${c.iconBg} flex items-center justify-center mb-5`}>
-                      <Icon className={`w-5 h-5 ${c.text}`} />
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-1">{d.name}</h3>
-                    <p className={`text-sm font-semibold ${c.text} mb-3`}>{d.role}</p>
-                    <p className="text-[15px] text-slate-400 leading-relaxed mb-5">{d.desc}</p>
-                    <span className={`text-sm font-semibold ${c.text} inline-flex items-center gap-1 group-hover:gap-2 transition-all`}>
-                      {d.cta} <ArrowRight className="w-3 h-3" />
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS — lighter background band ── */}
-      <section className="relative py-28 md:py-36 px-4 sm:px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/20 via-slate-900/30 to-transparent" />
-        <div className="relative max-w-5xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-5">
-              Describe it. We build it.
-            </h2>
-            <p className="text-xl text-slate-300 max-w-lg mx-auto">
-              Three steps. No code. No templates. No compromise.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {STEPS.map((step) => (
-              <div key={step.num} className="relative">
-                <div className="text-[80px] font-black text-white/[0.04] leading-none absolute -top-4 -left-2 select-none pointer-events-none">
-                  {step.num}
+        {/* ── Trust strip — infinite marquee, editorial pattern ── */}
+        <section
+          className="relative"
+          style={{
+            background: "var(--paper-elevated)",
+            borderTop: "1px solid var(--rule)",
+            borderBottom: "1px solid var(--rule)",
+          }}
+        >
+          <div className="relative py-8 overflow-hidden fs-marquee-paused">
+            <div className="fs-marquee">
+              {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
+                <div
+                  key={`${item.label}-${i}`}
+                  className="flex items-center gap-3 px-5 py-2 rounded-full border border-white/[0.06] bg-white/[0.02] backdrop-blur flex-shrink-0"
+                >
+                  <span className="text-[13px] font-semibold text-white/90">{item.label}</span>
+                  <span className="text-[11px] text-white/40">{item.sub}</span>
                 </div>
-                <div className="relative pt-6">
-                  <div className="text-xs font-bold text-indigo-400 mb-3 tracking-widest uppercase">
-                    Step {step.num}
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-3 tracking-tight">{step.title}</h3>
-                  <p className="text-slate-400 leading-relaxed">{step.desc}</p>
-                </div>
-              </div>
-            ))}
+              ))}
             </div>
-            {/* Fade edges */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#060e1f] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#060e1f] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#f4f3ed] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#f4f3ed] to-transparent" />
           </div>
         </section>
 
@@ -329,26 +126,26 @@ export default function HomePage() {
             <motion.div variants={fadeUp} className="mb-16 max-w-3xl">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90">
                 <Sparkles className="h-3 w-3" />
-                The whole platform
+                What&rsquo;s inside
               </div>
               <h2 className="fs-display-md text-white">
-                Seventy-five products.{" "}
+                Everything a website needs.{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
                   One
                 </span>{" "}
-                login.
+                prompt.
               </h2>
               <p className="mt-5 text-[16px] leading-relaxed text-white/55 max-w-2xl">
-                Every tool you need to launch a business — builder, video, domains,
-                hosting, email, SEO, CRM, invoicing, analytics — working together
-                from the same login, the same dashboard, the same subscription.
+                The AI Website Builder generates your site, registers your
+                domain, and deploys to the cloud — in a single flow. No
+                switching tabs. No separate accounts.
               </p>
             </motion.div>
 
@@ -397,161 +194,81 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* ── Product showcase — editorial split with autoplay video ── */}
-        <section className="relative py-28 px-6 border-t border-white/[0.05]">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            variants={stagger}
-            className="mx-auto max-w-7xl"
-          >
-            <div className="grid items-center gap-14 lg:grid-cols-[1fr,1.1fr]">
-              <motion.div variants={fadeUp}>
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90">
-                  <Video className="h-3 w-3" />
-                  Spokesperson video
-                </div>
-                <h2 className="fs-display-md text-white mb-6">
-                  From a sentence to a{" "}
-                  <span
-                    style={{
-                      fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                      fontStyle: "italic",
-                      fontWeight: 400,
-                      color: "#E8D4B0",
-                    }}
-                  >
-                    face
-                  </span>{" "}
-                  in thirty seconds.
-                </h2>
-                <p className="text-[16px] leading-relaxed text-white/55 mb-8 max-w-md">
-                  Describe the video. Our AI writes two script drafts. You pick one
-                  or tweak it. A real-looking avatar reads the script with natural
-                  intonation, captions burn in, music ducks under the voice.
-                </p>
-
-                <div className="space-y-3 mb-10">
-                  {[
-                    "Fish Audio S1 voice — #1 on TTS-Arena2",
-                    "Burned-in captions, not separate files",
-                    "Background music from MusicGen on Replicate",
-                    "30s / 60s / 90s — square, 9:16 or 16:9",
-                  ].map((f) => (
-                    <div key={f} className="flex items-center gap-3">
-                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#E8D4B0]/10 border border-[#E8D4B0]/25 flex-shrink-0">
-                        <Check className="h-3 w-3 text-[#E8D4B0]" strokeWidth={3} />
-                      </div>
-                      <span className="text-[13px] text-white/65">{f}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Link href="/video-creator" className="fs-btn-primary">
-                    Open the video creator
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                  <Link href="/video-creator/samples" className="fs-btn-ghost">
-                    See samples
-                  </Link>
-                </div>
-              </motion.div>
-
-              <motion.div variants={fadeUp}>
-                <div
-                  className="relative overflow-hidden border border-white/[0.08]"
-                  style={{
-                    borderRadius: "40px",
-                    background: "linear-gradient(180deg, rgba(20,40,95,0.6) 0%, rgba(26,26,36,0.6) 100%)",
-                    boxShadow:
-                      "0 60px 120px -30px rgba(0,0,0,0.6), 0 30px 60px -20px rgba(232,212,176,0.15)",
-                  }}
-                >
-                  <AutoplayVideo />
-                </div>
-              </motion.div>
-            </div>
-          </motion.div>
-        </section>
-
-        {/* ── Three product cards — Builder · Video · Domains ── */}
+        {/* ── How it works — 3-step flow ── */}
         <section className="relative py-32 px-6 border-t border-white/[0.05]">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
             variants={stagger}
-            className="mx-auto max-w-6xl"
+            className="mx-auto max-w-5xl"
           >
             <motion.div variants={fadeUp} className="mb-16 text-center max-w-2xl mx-auto">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90">
-                <Layers className="h-3 w-3" />
-                Three things, built deeply
+                <Zap className="h-3 w-3" />
+                How it works
               </div>
               <h2 className="fs-display-md text-white">
-                Not a hundred features.{" "}
+                Type one sentence.{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
-                  Three
-                </span>{" "}
-                that replace a studio.
+                  Ship.
+                </span>
               </h2>
             </motion.div>
 
             <div className="grid gap-5 md:grid-cols-3">
               {[
                 {
-                  title: "Builder",
-                  lede: "Describe your business.",
-                  desc: "Six agents collaborate live to ship a complete, responsive site in under a minute. Edit anything with chat.",
+                  step: "01",
+                  title: "Describe it.",
+                  desc: "Tell the builder what your business does. One sentence is enough. Six AI agents handle the rest — brand, copy, structure, code.",
                   href: "/builder",
                   cta: "Open the builder",
                   icon: Wand2,
                 },
                 {
-                  title: "Video",
-                  lede: "A sentence becomes a 30-second spokesperson video.",
-                  desc: "Realistic face, your voice (optional), burned-in captions. No stock footage.",
-                  href: "/video-creator",
-                  cta: "Make a video",
-                  icon: Video,
+                  step: "02",
+                  title: "Watch it build.",
+                  desc: "Components stream in live. Navbar, hero, features, pricing, footer — assembled from 121 hand-polished sections, customised to your brand.",
+                  href: "/builder",
+                  cta: "See it work",
+                  icon: Layers,
                 },
                 {
-                  title: "Domains",
-                  lede: "Real-time availability across 500+ TLDs.",
-                  desc: "AI-generated name shortlist. Register and point to your new site in a single transaction.",
-                  href: "/domains",
-                  cta: "Find a domain",
+                  step: "03",
+                  title: "Deploy.",
+                  desc: "Hosting + custom domain provisioned through Crontech in one deploy step. Free SSL. No infra to manage. One click.",
+                  href: "/builder",
+                  cta: "Try it free",
                   icon: Globe2,
                 },
               ].map((c) => {
                 const Icon = c.icon;
                 return (
-                  <motion.div key={c.title} variants={fadeUp}>
+                  <motion.div key={c.step} variants={fadeUp}>
                     <Link href={c.href} className="fs-card group relative block p-8 h-full">
-                      <div
-                        className="mb-8 inline-flex h-14 w-14 items-center justify-center rounded-[20px] transition-all duration-500 group-hover:scale-[1.04]"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, rgba(232,212,176,0.18) 0%, rgba(232,212,176,0.04) 100%)",
-                          border: "1px solid rgba(232,212,176,0.22)",
-                        }}
-                      >
-                        <Icon className="h-6 w-6 text-[#E8D4B0]" strokeWidth={2} />
-                      </div>
-                      <div className="mb-2 text-[10px] uppercase tracking-[0.2em] text-[#E8D4B0]/80 font-semibold">
-                        {c.title}
+                      <div className="mb-6 flex items-center gap-3">
+                        <div
+                          className="inline-flex h-12 w-12 items-center justify-center rounded-[18px] transition-all duration-500 group-hover:scale-[1.04]"
+                          style={{
+                            background:
+                              "linear-gradient(135deg, rgba(232,212,176,0.18) 0%, rgba(232,212,176,0.04) 100%)",
+                            border: "1px solid rgba(232,212,176,0.22)",
+                          }}
+                        >
+                          <Icon className="h-5 w-5 text-[#E8D4B0]" strokeWidth={2} />
+                        </div>
+                        <span className="text-[11px] font-mono text-[#E8D4B0]/40 tracking-widest">{c.step}</span>
                       </div>
                       <h3 className="mb-4 text-[22px] font-semibold leading-tight tracking-[-0.02em] text-white">
-                        {c.lede}
+                        {c.title}
                       </h3>
                       <p className="text-[13px] leading-relaxed text-white/50">{c.desc}</p>
                       <div className="mt-8 inline-flex items-center gap-1.5 text-[12px] font-medium text-white/60 transition-colors group-hover:text-[#E8D4B0]">
@@ -566,73 +283,84 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* ── Testimonials marquee ── */}
+        {/* ── Founder's note (honest replacement for fabricated testimonials) ── */}
         <section className="relative py-28 border-t border-white/[0.05]">
-          <div className="mx-auto max-w-7xl px-6 mb-14">
+          <div className="mx-auto max-w-3xl px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-80px" }}
               variants={stagger}
-              className="max-w-2xl"
             >
               <motion.div
                 variants={fadeUp}
-                className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90"
+                className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90"
               >
                 <ShieldCheck className="h-3 w-3" />
-                What customers say
+                Founder&rsquo;s note
               </motion.div>
-              <motion.h2 variants={fadeUp} className="fs-display-md text-white">
-                Shipped by people{" "}
+              <motion.h2 variants={fadeUp} className="fs-display-md text-white mb-8">
+                We&rsquo;re{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
-                  who built
+                  new.
                 </span>{" "}
-                real businesses.
+                Here&rsquo;s the honest pitch.
               </motion.h2>
-            </motion.div>
-          </div>
-
-          <div className="fs-marquee-paused relative overflow-hidden">
-            <div className="fs-marquee" style={{ animationDuration: "80s" }}>
-              {[...TESTIMONIALS, ...TESTIMONIALS].map((t, i) => (
-                <div
-                  key={`${t.author}-${i}`}
-                  className="flex-shrink-0 w-[420px] sm:w-[480px]"
-                >
-                  <div
-                    className="h-full rounded-[30px] border border-white/[0.08] p-8"
-                    style={{
-                      background:
-                        "linear-gradient(180deg, rgba(20,40,95,0.8) 0%, rgba(26,26,36,0.4) 100%)",
-                      boxShadow: "0 30px 60px -30px rgba(0,0,0,0.5)",
-                    }}
+              <motion.div variants={fadeUp} className="space-y-5 text-[16px] leading-relaxed text-white/65">
+                <p>
+                  Most builder sites at this stage would put fake testimonials
+                  here from people who don&rsquo;t exist. We won&rsquo;t.
+                </p>
+                <p>
+                  Zoobicon is built and run by one person alongside a 24/7
+                  physical business. The platform is in active development. We
+                  ship one product: the AI Website Builder — generate, register
+                  your domain, and deploy in a single flow. Every commit is
+                  visible on{" "}
+                  <a
+                    href="https://github.com/ccantynz-alt/Zoobicon.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline decoration-[#E8D4B0]/40 hover:decoration-[#E8D4B0]"
                   >
-                    <div className="flex items-center gap-1 mb-5">
-                      {[0, 1, 2, 3, 4].map((j) => (
-                        <Star key={j} className="h-4 w-4 fill-[#E8D4B0] text-[#E8D4B0]" />
-                      ))}
-                    </div>
-                    <p className="text-[16px] leading-relaxed text-white/80 mb-6 font-medium">
-                      &ldquo;{t.quote}&rdquo;
-                    </p>
-                    <div>
-                      <div className="text-[13px] font-semibold text-white">{t.author}</div>
-                      <div className="text-[12px] text-white/40">{t.location}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#060e1f] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#060e1f] to-transparent" />
+                    GitHub
+                  </a>
+                  .
+                </p>
+                <p>
+                  We&rsquo;d rather have ten real customers than a hundred fake
+                  quotes. If you try it and something&rsquo;s broken, email{" "}
+                  <a
+                    href="mailto:hello@zoobicon.com"
+                    className="underline decoration-[#E8D4B0]/40 hover:decoration-[#E8D4B0]"
+                  >
+                    hello@zoobicon.com
+                  </a>{" "}
+                  and you&rsquo;ll hear back the same day — usually from Craig.
+                </p>
+              </motion.div>
+              <motion.div variants={fadeUp} className="mt-10 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/builder"
+                  className="inline-flex items-center gap-2 rounded-full bg-[#E8D4B0] px-6 py-3 text-[13px] font-semibold text-[#1a1a1c] hover:bg-[#d4b86d] transition-colors"
+                >
+                  Try the builder
+                </Link>
+                <a
+                  href="mailto:hello@zoobicon.com"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-6 py-3 text-[13px] font-medium text-white/75 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0] transition-all"
+                >
+                  Tell us what&rsquo;s broken
+                </a>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
 
@@ -653,11 +381,11 @@ export default function HomePage() {
               <h2 className="fs-display-md text-white">
                 One subscription.{" "}
                 <span
+                  className="text-display-sand"
                   style={{
                     fontFamily: "Fraunces, ui-serif, Georgia, serif",
                     fontStyle: "italic",
                     fontWeight: 400,
-                    color: "#E8D4B0",
                   }}
                 >
                   Everything
@@ -665,8 +393,9 @@ export default function HomePage() {
                 included.
               </h2>
               <p className="mt-5 text-[15px] text-white/55 leading-relaxed">
-                Replaces $923/mo in scattered SaaS tools. Cancel any time. 14-day
-                free trial on paid plans.
+                One product. One subscription. AI Website Builder with domain
+                registration and one-click deploy included. Cancel any time.
+                14-day free trial on paid plans.
               </p>
             </motion.div>
 
@@ -682,11 +411,11 @@ export default function HomePage() {
                 {
                   n: "Pro",
                   p: "$129",
-                  d: "Three sites, video, SEO, AI auto-reply",
+                  d: "Three sites, Sonnet deep builds, SEO, AI auto-reply",
                   f: true,
                   features: [
                     "3 websites",
-                    "AI video creator",
+                    "Sonnet 4.6 deep builds",
                     "SEO dashboard",
                     "AI email auto-reply",
                     "Priority support",
@@ -778,11 +507,11 @@ export default function HomePage() {
             >
               Stop reading.{" "}
               <span
+                className="text-display-sand"
                 style={{
                   fontFamily: "Fraunces, ui-serif, Georgia, serif",
                   fontStyle: "italic",
                   fontWeight: 400,
-                  color: "#E8D4B0",
                 }}
               >
                 Start building.
@@ -793,8 +522,8 @@ export default function HomePage() {
               className="text-[16px] text-white/55 mb-12 max-w-xl mx-auto leading-relaxed"
             >
               Scroll back up and type one sentence into the hero. Sixty seconds
-              later you have a complete, responsive site with a working backend,
-              a registered domain and a spokesperson video.
+              later you have a complete, responsive site with a working backend
+              and a registered domain — all in one flow.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-wrap items-center justify-center gap-3">
               <Link href="/builder" className="fs-btn-primary">
@@ -807,6 +536,7 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
         </section>
+      </div>
     </div>
   );
 }

@@ -12,6 +12,14 @@ export const metadata: Metadata = {
     siteName: "Zoobicon",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    site: "@zoobicon",
+    title: "Pricing — Zoobicon AI Website Builder",
+    description:
+      "Simple, transparent pricing. Start free, upgrade when you're ready. Creator $19/mo, Pro $49/mo, Agency $99/mo.",
+    images: ["https://zoobicon.com/og-image.png"],
+  },
   alternates: { canonical: "https://zoobicon.com/pricing" },
 };
 

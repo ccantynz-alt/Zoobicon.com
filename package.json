@@ -4,13 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/vendor-sync.mjs || true",
     "build": "next build",
+    "vendor:sync": "node scripts/vendor-sync.mjs",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
     "audit": "node scripts/claude-md-audit.js",
-    "audit:deep": "node scripts/claude-md-audit.js --deep"
+    "audit:deep": "node scripts/claude-md-audit.js --deep",
+    "audit:code": "bash scripts/deep-audit.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
@@ -33,12 +36,13 @@
     "stripe": "^21.0.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.59.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "20.19.37",
     "@types/react": "18.3.28",
     "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.2",
+    "@typescript-eslint/parser": "^8.59.2",
     "autoprefixer": "^10.4.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.35",

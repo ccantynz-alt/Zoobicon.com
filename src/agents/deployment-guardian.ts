@@ -127,11 +127,11 @@ class DeploymentGuardianAgent extends BaseAgent<DeployCheckInput, DeployCheckOut
         severity: failures.length >= 5 ? "critical" : "warning",
         category: "deployment:failures",
         title: `${failures.length} Failed Deployment(s) in Last 30 Minutes`,
-        description: `${failures.length} deployment(s) failed recently. Sites: ${failures.map((f) => f.slug).join(", ")}. Users may be experiencing deploy errors.`,
+        description: `${failures.length} deployment(s) failed recently. Sites: ${failures.map((f: any) => f.slug).join(", ")}. Users may be experiencing deploy errors.`,
         autoFixed: false,
         metadata: {
           failedCount: failures.length,
-          sites: failures.map((f) => ({ slug: f.slug, email: f.email })),
+          sites: failures.map((f: any) => ({ slug: f.slug, email: f.email })),
         },
       });
 
@@ -139,7 +139,7 @@ class DeploymentGuardianAgent extends BaseAgent<DeployCheckInput, DeployCheckOut
       if (failures.length >= 5) {
         try {
           const { notifyAdmin } = await import("@/lib/admin-notify");
-          const siteList = failures.slice(0, 10).map((f) => `${f.slug} (${f.email})`).join("<br>");
+          const siteList = failures.slice(0, 10).map((f: any) => `${f.slug} (${f.email})`).join("<br>");
           await notifyAdmin({
             subject: `[DEPLOY] ${failures.length} failed deployments in 30 minutes`,
             html: `<h2 style="color: #dc2626;">Deployment Failures Spike</h2>

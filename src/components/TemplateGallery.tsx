@@ -34,7 +34,7 @@ export default function TemplateGallery({ onSelectTemplate, onClose }: TemplateG
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="relative w-full max-w-3xl max-h-[85vh] mx-4 bg-[#0c0c14] border border-white/[0.08] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-3xl max-h-[85vh] mx-4 bg-[var(--paper-elevated)] border border-white/[0.08] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
           <div className="flex items-center gap-2.5">

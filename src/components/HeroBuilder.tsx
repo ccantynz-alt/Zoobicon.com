@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Sparkles, Check } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, Sparkles, Check, Globe2 } from "lucide-react";
+import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 
 /**
  * HeroBuilder — the homepage IS the product.
@@ -414,7 +416,7 @@ export default function HeroBuilder() {
                   isActive
                     ? "border-[#E8D4B0]/60 bg-[#E8D4B0]/[0.08] text-white scale-[1.04]"
                     : isDone
-                    ? "border-emerald-400/30 bg-emerald-400/[0.04] text-emerald-200/80"
+                    ? "border-amber-400/30 bg-amber-400/[0.04] text-amber-200/80"
                     : "border-white/[0.08] bg-white/[0.02] text-white/40"
                 }`}
               >
@@ -426,7 +428,7 @@ export default function HeroBuilder() {
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#E8D4B0]" />
                   </span>
                 )}
-                {isDone && <Check className="h-3 w-3 text-emerald-300" strokeWidth={3} />}
+                {isDone && <Check className="h-3 w-3 text-amber-300" strokeWidth={3} />}
               </div>
             );
           })}
@@ -475,7 +477,7 @@ export default function HeroBuilder() {
           </p>
           <h1 className="text-5xl sm:text-6xl lg:text-[6.5rem] leading-[1.02] font-semibold tracking-[-0.035em] text-white">
             Describe it.{" "}
-            <span className="font-serif italic font-normal text-[#E8D4B0]">
+            <span className="font-serif italic font-normal text-display-sand">
               Watch
             </span>{" "}
             it build.
@@ -517,14 +519,27 @@ export default function HeroBuilder() {
             placeholder={building ? "" : placeholder}
             className="w-full resize-none bg-transparent px-6 py-5 pr-32 text-lg leading-relaxed text-white placeholder:text-white/25 focus:outline-none sm:text-xl"
           />
+          {/* T5: voice input — dictate the prompt instead of typing.
+              Positioned just left of the Build button so it's discoverable. */}
+          {!building && (
+            <div className="absolute right-[7.5rem] top-1/2 -translate-y-1/2">
+              <VoiceToBuildButton
+                size="sm"
+                onTranscript={(text) => {
+                  setPrompt((prev) => (prev ? `${prev} ${text}` : text));
+                  inputRef.current?.focus();
+                }}
+              />
+            </div>
+          )}
           <button
             type="submit"
             disabled={building}
-            className="absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-all hover:-translate-y-[calc(50%+2px)] hover:shadow-lg hover:shadow-white/10 disabled:opacity-50 disabled:hover:translate-y-[-50%]"
+            className="absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-stone-950 transition-all hover:-translate-y-[calc(50%+2px)] hover:shadow-lg hover:shadow-white/10 disabled:opacity-50 disabled:hover:translate-y-[-50%]"
           >
             {building ? (
               <>
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                 Building
               </>
             ) : (
@@ -561,6 +576,34 @@ export default function HeroBuilder() {
         )}
       </form>
 
+      {/* ── "Already have a site?" — the URL clone-and-upgrade door ──
+          A huge slice of visitors aren't starting from scratch — they
+          have a WordPress/Wix/Squarespace site they're unhappy with and
+          don't know what to type into a blank prompt. This gives them a
+          one-tap path: paste the URL, we fetch it, rebuild a modern React
+          version, they continue with us. High-intent funnel, not buried
+          in a nav menu. */}
+      {!building && (
+        <div className="mt-7 text-center animate-[fadeIn_0.6s_ease-out]">
+          <Link
+            href="/upgrade"
+            className="group inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] transition-all duration-300 hover:-translate-y-0.5"
+            style={{
+              borderColor: "var(--gold-soft)",
+              background: "var(--paper-elevated)",
+              color: "var(--ink-secondary)",
+            }}
+          >
+            <Globe2 className="h-3.5 w-3.5" style={{ color: "var(--gold-deep)" }} />
+            Already have a website?
+            <span className="font-semibold" style={{ color: "var(--gold-deep)" }}>
+              Paste the URL — we&rsquo;ll rebuild it better
+            </span>
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" style={{ color: "var(--gold-deep)" }} />
+          </Link>
+        </div>
+      )}
+
       {/* ── Morphing preview canvas (only visible while building) ── */}
       {building && (
         <div className="mt-12 w-full max-w-5xl">
@@ -575,17 +618,17 @@ export default function HeroBuilder() {
               </div>
               <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-white/[0.04] px-2 py-0.5">
                 <span className="relative flex h-1 w-1">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/60" />
-                  <span className="relative inline-flex h-1 w-1 rounded-full bg-emerald-400" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400/60" />
+                  <span className="relative inline-flex h-1 w-1 rounded-full bg-amber-400" />
                 </span>
-                <span className="text-[9px] font-medium text-emerald-300/80">
+                <span className="text-[9px] font-medium text-amber-300/80">
                   live
                 </span>
               </span>
             </div>
 
             {/* rendered fake site — editorial, not cyberpunk */}
-            <div className="relative h-[460px] overflow-hidden bg-[#0a0a0c]">
+            <div className="relative h-[460px] overflow-hidden bg-[var(--paper-elevated)]">
               <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[#E8D4B0]/[0.08] blur-[90px]" />
 
               <div className="relative flex h-full flex-col">
@@ -706,12 +749,12 @@ export default function HeroBuilder() {
                 {/* done badge */}
                 {phaseShown("done") && (
                   <div className="absolute top-4 right-4 pointer-events-none">
-                    <div className="flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-1 backdrop-blur animate-[fadeIn_0.4s_ease-out]">
+                    <div className="flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 backdrop-blur animate-[fadeIn_0.4s_ease-out]">
                       <Check
-                        className="h-2.5 w-2.5 text-emerald-300"
+                        className="h-2.5 w-2.5 text-amber-300"
                         strokeWidth={3}
                       />
-                      <span className="text-[9px] font-semibold text-emerald-200">
+                      <span className="text-[9px] font-semibold text-amber-200">
                         ready
                       </span>
                     </div>
@@ -735,7 +778,7 @@ export default function HeroBuilder() {
               </div>
               <button
                 onClick={goToBuilder}
-                className="inline-flex items-center gap-2 rounded-full bg-[#E8D4B0] px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#E8D4B0]/20"
+                className="inline-flex items-center gap-2 rounded-full bg-[#E8D4B0] px-5 py-2.5 text-sm font-semibold text-stone-950 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#E8D4B0]/20"
               >
                 Open in builder
                 <ArrowRight className="h-4 w-4" />

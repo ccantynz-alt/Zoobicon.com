@@ -72,8 +72,8 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
         className="absolute inset-0 rounded-2xl blur-2xl transition-all duration-700"
         style={{
           background: isSpeaking
-            ? "radial-gradient(ellipse at 50% 60%, rgba(16,185,129,0.18) 0%, rgba(99,102,241,0.10) 60%, transparent 100%)"
-            : "radial-gradient(ellipse at 50% 60%, rgba(99,102,241,0.08) 0%, transparent 70%)",
+            ? "radial-gradient(ellipse at 50% 60%, rgba(16,185,129,0.18) 0%, rgba(184,146,63,0.10) 60%, transparent 100%)"
+            : "radial-gradient(ellipse at 50% 60%, rgba(184,146,63,0.08) 0%, transparent 70%)",
         }}
       />
 
@@ -181,7 +181,7 @@ export default function SupportAvatar({ isSpeaking, size = "lg" }: SupportAvatar
         {/* Bottom nameplate */}
         <div className="flex items-center justify-between px-4 py-2.5 border-t border-white/[0.06] bg-dark-400/40">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500/30 to-accent-purple/30 border border-brand-500/20 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500/30 to-accent-stone/30 border border-brand-500/20 flex items-center justify-center">
               <Headphones className="w-3 h-3 text-brand-400" />
             </div>
             <div>

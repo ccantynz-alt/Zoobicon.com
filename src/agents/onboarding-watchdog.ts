@@ -214,14 +214,14 @@ class OnboardingWatchdogAgent extends BaseAgent<OnboardingCheckInput, Onboarding
           title: `${stuckUsers.length} User(s) Stuck on First Build`,
           description: `${stuckUsers.length} user(s) have tried to build but keep failing. They have never had a successful generation. These users are at high risk of churning.`,
           autoFixed: false,
-          metadata: { users: stuckUsers.map((u) => ({ email: u.user_email, failures: Number(u.failed_count) })) },
+          metadata: { users: stuckUsers.map((u: any) => ({ email: u.user_email, failures: Number(u.failed_count) })) },
         });
 
         // Alert admin about stuck users
         try {
           const { notifyAdmin } = await import("@/lib/admin-notify");
           const userList = stuckUsers
-            .map((u) => `${u.user_email} (${u.failed_count} failures)`)
+            .map((u: any) => `${u.user_email} (${u.failed_count} failures)`)
             .join("<br>");
 
           await notifyAdmin({

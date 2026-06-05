@@ -13,7 +13,7 @@ const RESERVED_ROUTES = new Set([
   'for', 'gallery', 'generators', 'hosting', 'invoicing', 'io', 'marketplace',
   'pricing', 'privacy', 'products', 'profile', 'publisher', 'referral', 'seo',
   'sh', 'shared', 'showcase', 'starter-kits', 'store', 'support', 'terms',
-  'video-creator', 'wordpress',
+  'wordpress',
 ]);
 
 function isValidCountry(code: string): boolean {
@@ -117,7 +117,7 @@ function PricingCard({
         ))}
       </ul>
       <Link
-        href="/auth/signup"
+        href="/builder"
         className={`block w-full text-center py-3 rounded-xl font-semibold transition-all ${
           featured
             ? 'bg-stone-600 hover:bg-stone-500 text-white'
@@ -211,9 +211,9 @@ export default async function CountryPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-[#0a1628] text-white">
+      <div className="min-h-screen bg-[var(--paper)] text-white">
         {/* Navigation */}
-        <nav className="border-b border-white/10 bg-[#0a1628]/80 backdrop-blur-xl sticky top-0 z-50">
+        <nav className="border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               Zoobicon

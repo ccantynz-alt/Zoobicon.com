@@ -202,7 +202,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
                       initial={false}
                       animate={{
                         scale: isRunning ? 1.01 : 1,
-                        borderColor: isRunning ? "rgba(124,90,255,0.35)" : isDone ? "rgba(52,211,153,0.2)" : "rgba(255,255,255,0.04)",
+                        borderColor: isRunning ? "rgba(184,146,63,0.35)" : isDone ? "rgba(184,146,63,0.2)" : "rgba(10,10,11,0.06)",
                       }}
                       className={`flex items-center gap-2.5 p-2 rounded-lg border transition-all duration-300 ${
                         isRunning
@@ -302,7 +302,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
       <button
         onClick={handleRun}
         disabled={!prompt.trim() || status === "running"}
-        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-500 via-accent-purple to-accent-cyan text-white text-sm font-medium py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40"
+        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-500 via-accent-stone to-accent-stone text-white text-sm font-medium py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40"
       >
         {status === "running" ? (
           <>

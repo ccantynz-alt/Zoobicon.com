@@ -1,189 +1,146 @@
-import { NextRequest, NextResponse } from "next/server";
-import { randomUUID } from "crypto";
+/**
+ * /api/integrations — per-user third-party integration registry.
+ *
+ * Backs the /admin/integrations page. Saves opaque connection configs
+ * (API keys, OAuth tokens, webhook URLs) keyed by (email, service)
+ * so the admin dashboard can render "Connected" state and surface
+ * the connected account.
+ *
+ * NOTE on security: configs are stored as JSONB and may contain
+ * secrets. Connection happens through this admin-only surface — the
+ * UI is gated by admin auth at the page layer. Don't expose this
+ * endpoint to non-admin contexts.
+ *
+ * Schema (auto-creates on first hit, same pattern as hn-flywheel):
+ *   user_integrations (
+ *     email TEXT, service TEXT, config JSONB, connected_at TIMESTAMPTZ,
+ *     PRIMARY KEY (email, service)
+ *   )
+ *
+ * GET    ?email=<user>          → { integrations: [{ service, config, connectedAt }] }
+ * POST   { service, email, config }  → { ok: true }
+ * DELETE { service, email }          → { ok: true }
+ */
 
-// ---------------------------------------------------------------------------
-// In-memory storage with DB fallback (same pattern as dns/ssl routes)
-// ---------------------------------------------------------------------------
-interface Integration {
-  id: string;
-  service: string;
-  status: "connected" | "disconnected";
-  config: Record<string, string>;
-  connectedAt: string;
-  userEmail: string;
+import { NextResponse } from "next/server";
+import { neon } from "@neondatabase/serverless";
+
+export const dynamic = "force-dynamic";
+
+function getDb() {
+  if (!process.env.DATABASE_URL) return null;
+  return neon(process.env.DATABASE_URL);
 }
 
-const memoryStore = new Map<string, Integration>();
-
-// ---------------------------------------------------------------------------
-// Database helpers (graceful — returns null if DB unavailable)
-// ---------------------------------------------------------------------------
-async function getDb() {
-  try {
-    const { sql } = await import("@/lib/db");
-    return sql;
-  } catch {
-    return null;
-  }
+async function ensureTable(): Promise<void> {
+  const sql = getDb();
+  if (!sql) return;
+  await sql`
+    CREATE TABLE IF NOT EXISTS user_integrations (
+      email         TEXT NOT NULL,
+      service       TEXT NOT NULL,
+      config        JSONB NOT NULL DEFAULT '{}',
+      connected_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (email, service)
+    )
+  `;
 }
 
-async function ensureTable() {
-  const sql = await getDb();
-  if (!sql) return false;
-  try {
-    await sql`
-      CREATE TABLE IF NOT EXISTS integrations (
-        id TEXT PRIMARY KEY,
-        service TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'connected',
-        config JSONB DEFAULT '{}',
-        connected_at TIMESTAMPTZ DEFAULT NOW(),
-        user_email TEXT NOT NULL
-      )
-    `;
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-async function dbList(email: string): Promise<Integration[] | null> {
-  const sql = await getDb();
-  if (!sql) return null;
+export async function GET(request: Request) {
   try {
     await ensureTable();
-    const rows = await sql`
-      SELECT id, service, status, config, connected_at, user_email
-      FROM integrations
-      WHERE user_email = ${email}
-      ORDER BY connected_at DESC
-    `;
-    return rows.map((r: Record<string, unknown>) => ({
-      id: r.id as string,
-      service: r.service as string,
-      status: r.status as Integration["status"],
-      config: (r.config as Record<string, string>) || {},
-      connectedAt: (r.connected_at as string) || new Date().toISOString(),
-      userEmail: r.user_email as string,
-    }));
-  } catch {
-    return null;
-  }
-}
+    const sql = getDb();
+    if (!sql) return NextResponse.json({ integrations: [] });
 
-async function dbUpsert(integration: Integration): Promise<boolean> {
-  const sql = await getDb();
-  if (!sql) return false;
-  try {
-    await ensureTable();
-    await sql`
-      INSERT INTO integrations (id, service, status, config, connected_at, user_email)
-      VALUES (${integration.id}, ${integration.service}, ${integration.status},
-              ${JSON.stringify(integration.config)}::jsonb, ${integration.connectedAt}, ${integration.userEmail})
-      ON CONFLICT (id) DO UPDATE SET
-        status = EXCLUDED.status,
-        config = EXCLUDED.config,
-        connected_at = EXCLUDED.connected_at
-    `;
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-async function dbDelete(service: string, email: string): Promise<boolean> {
-  const sql = await getDb();
-  if (!sql) return false;
-  try {
-    await ensureTable();
-    await sql`
-      DELETE FROM integrations WHERE service = ${service} AND user_email = ${email}
-    `;
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// GET /api/integrations?email=...
-// ---------------------------------------------------------------------------
-export async function GET(request: NextRequest) {
-  const email = request.nextUrl.searchParams.get("email");
-  if (!email) {
-    return NextResponse.json({ error: "email query parameter required" }, { status: 400 });
-  }
-
-  // Try DB first
-  const dbResults = await dbList(email);
-  if (dbResults !== null) {
-    return NextResponse.json({ integrations: dbResults });
-  }
-
-  // Fallback to memory
-  const results: Integration[] = [];
-  memoryStore.forEach((v) => {
-    if (v.userEmail === email && v.status === "connected") results.push(v);
-  });
-
-  return NextResponse.json({ integrations: results });
-}
-
-// ---------------------------------------------------------------------------
-// POST /api/integrations  { service, config, email }
-// ---------------------------------------------------------------------------
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { service, config, email } = body;
-
-    if (!service || !email) {
-      return NextResponse.json({ error: "service and email are required" }, { status: 400 });
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get("email");
+    if (!email) {
+      return NextResponse.json({ error: "email query param required" }, { status: 400 });
     }
 
-    const integration: Integration = {
-      id: randomUUID(),
-      service,
-      status: "connected",
-      config: config || {},
-      connectedAt: new Date().toISOString(),
-      userEmail: email,
+    const rows = (await sql`
+      SELECT service, config, connected_at
+      FROM user_integrations
+      WHERE email = ${email}
+      ORDER BY connected_at DESC
+    `) as Array<{ service: string; config: Record<string, string>; connected_at: string }>;
+
+    return NextResponse.json({
+      integrations: rows.map((r) => ({
+        service: r.service,
+        config: r.config,
+        connectedAt: r.connected_at,
+      })),
+    });
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    await ensureTable();
+    const sql = getDb();
+    if (!sql) {
+      return NextResponse.json({ error: "DATABASE_URL not set" }, { status: 503 });
+    }
+
+    const body = (await request.json()) as {
+      service?: string;
+      email?: string;
+      config?: Record<string, string>;
     };
 
-    // Try DB first
-    const saved = await dbUpsert(integration);
-    if (!saved) {
-      // Fallback to memory
-      memoryStore.set(`${email}:${service}`, integration);
+    if (!body.service || !body.email) {
+      return NextResponse.json({ error: "service and email required" }, { status: 400 });
     }
 
-    return NextResponse.json({ integration }, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    const config = body.config || {};
+
+    await sql`
+      INSERT INTO user_integrations (email, service, config, connected_at)
+      VALUES (${body.email}, ${body.service}, ${JSON.stringify(config)}::jsonb, NOW())
+      ON CONFLICT (email, service) DO UPDATE
+        SET config = EXCLUDED.config,
+            connected_at = NOW()
+    `;
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Unknown error" },
+      { status: 500 }
+    );
   }
 }
 
-// ---------------------------------------------------------------------------
-// DELETE /api/integrations  { service, email }
-// ---------------------------------------------------------------------------
-export async function DELETE(request: NextRequest) {
+export async function DELETE(request: Request) {
   try {
-    const body = await request.json();
-    const { service, email } = body;
-
-    if (!service || !email) {
-      return NextResponse.json({ error: "service and email are required" }, { status: 400 });
+    await ensureTable();
+    const sql = getDb();
+    if (!sql) {
+      return NextResponse.json({ error: "DATABASE_URL not set" }, { status: 503 });
     }
 
-    // Try DB first
-    const deleted = await dbDelete(service, email);
-    if (!deleted) {
-      // Fallback to memory
-      memoryStore.delete(`${email}:${service}`);
+    const body = (await request.json()) as { service?: string; email?: string };
+
+    if (!body.service || !body.email) {
+      return NextResponse.json({ error: "service and email required" }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, service });
-  } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    await sql`
+      DELETE FROM user_integrations
+      WHERE email = ${body.email} AND service = ${body.service}
+    `;
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Unknown error" },
+      { status: 500 }
+    );
   }
 }

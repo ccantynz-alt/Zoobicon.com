@@ -293,7 +293,7 @@ class RevenueMonitorAgent extends BaseAgent<RevenueCheckInput, RevenueCheckOutpu
       failedCount = failed.length;
 
       if (failedCount > 0) {
-        const totalLost = failed.reduce((sum, r) => sum + Number(r.amount || 0), 0);
+        const totalLost = failed.reduce((sum: any, r: any) => sum + Number(r.amount || 0), 0);
 
         findings.push({
           severity: failedCount > 10 ? "critical" : "warning",
@@ -301,7 +301,7 @@ class RevenueMonitorAgent extends BaseAgent<RevenueCheckInput, RevenueCheckOutpu
           title: `${failedCount} failed payments in last 24h`,
           description: `Total potential revenue lost: $${(totalLost / 100).toFixed(2)}. Most common error: ${(failed[0]?.error_message as string) || "Unknown"}.`,
           autoFixed: false,
-          metadata: { failedCount, totalLost, recentEmails: failed.slice(0, 5).map(r => r.user_email) },
+          metadata: { failedCount, totalLost, recentEmails: failed.slice(0, 5).map((r: any) => r.user_email) },
         });
 
         if (failedCount > 10) {
@@ -367,7 +367,7 @@ class RevenueMonitorAgent extends BaseAgent<RevenueCheckInput, RevenueCheckOutpu
 
       if (opportunities > 0) {
         const topUsers = activeFreeTier.slice(0, 10).map(
-          (r) => `${r.user_email} (${r.gen_count} builds)`
+          (r: any) => `${r.user_email} (${r.gen_count} builds)`
         );
 
         findings.push({
@@ -376,7 +376,7 @@ class RevenueMonitorAgent extends BaseAgent<RevenueCheckInput, RevenueCheckOutpu
           title: `${opportunities} free users likely to upgrade`,
           description: `Active free-tier users with 5+ builds this week: ${topUsers.join(", ")}`,
           autoFixed: false,
-          metadata: { count: opportunities, topUsers: activeFreeTier.slice(0, 10).map(r => ({ email: r.user_email, builds: r.gen_count })) },
+          metadata: { count: opportunities, topUsers: activeFreeTier.slice(0, 10).map((r: any) => ({ email: r.user_email, builds: r.gen_count })) },
         });
 
         // Send weekly digest if there are significant opportunities
@@ -386,7 +386,7 @@ class RevenueMonitorAgent extends BaseAgent<RevenueCheckInput, RevenueCheckOutpu
             `<h2>Upgrade Opportunity Report</h2>
             <p><strong>${opportunities}</strong> free-tier users with 5+ builds this week.</p>
             <p><strong>Top candidates:</strong></p>
-            <ul>${topUsers.map(u => `<li>${u}</li>`).join("")}</ul>
+            <ul>${topUsers.map((u: any) => `<li>${u}</li>`).join("")}</ul>
             <p>Consider sending targeted upgrade emails or offering trial upgrades to these users.</p>`
           );
         }

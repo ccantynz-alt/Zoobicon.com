@@ -121,7 +121,7 @@ class AutoHealerAgent extends BaseAgent<HealerInput, HealerOutput> {
       }
 
       // Mark stuck deployments as failed
-      const ids = stuck.map((r) => r.id);
+      const ids = stuck.map((r: any) => r.id);
       await sql`
         UPDATE deployments
         SET status = 'failed'
@@ -179,7 +179,7 @@ class AutoHealerAgent extends BaseAgent<HealerInput, HealerOutput> {
         };
       }
 
-      const ids = stuck.map((r) => r.id);
+      const ids = stuck.map((r: any) => r.id);
       await sql`
         UPDATE agency_generations
         SET status = 'failed'

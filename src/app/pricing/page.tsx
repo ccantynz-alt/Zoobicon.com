@@ -46,7 +46,7 @@ const PLANS = [
     description: "For creators and businesses ready to scale with the full AI toolkit.",
     features: [
       "3 AI-generated websites",
-      "AI builder + video creator",
+      "AI builder (Claude Opus 4.7)",
       "3 custom domains included",
       "10 email mailboxes",
       "SEO monitor & optimizer",
@@ -168,7 +168,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0b1530] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
+    <div className="relative min-h-screen bg-[var(--paper)] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
       {/* ── structured data ── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -209,11 +209,10 @@ export default function PricingPage() {
             >
               Build smarter.{" "}
               <span
-                className="font-normal"
+                className="font-normal text-display-sand"
                 style={{
                   fontFamily: "Fraunces, ui-serif, Georgia, serif",
                   fontStyle: "italic",
-                  color: "#E8D4B0",
                 }}
               >
                 Pay&nbsp;less.
@@ -225,7 +224,7 @@ export default function PricingPage() {
               variants={fadeUp}
               className="mt-8 text-[17px] sm:text-lg text-white/55 max-w-2xl mx-auto leading-relaxed"
             >
-              One platform for AI websites, domains, hosting, email, and video.
+              One platform for AI websites and domains. Hosting via partner cloud.
               Start with a 14-day free trial. No credit card required.
             </motion.p>
 
@@ -242,7 +241,7 @@ export default function PricingPage() {
                 <motion.div
                   className="absolute left-0.5 top-0.5 h-6 w-6 rounded-full shadow-lg"
                   style={{
-                    background: "linear-gradient(135deg, #E8D4B0 0%, #F7C8A0 60%, #E08BB0 100%)",
+                    background: "var(--ink)",
                     boxShadow: "0 6px 14px -4px rgba(232,212,176,0.55)",
                   }}
                   animate={{ x: annual ? 28 : 0 }}
@@ -300,8 +299,8 @@ export default function PricingPage() {
                       style={{
                         borderColor: plan.featured ? "rgba(232,212,176,0.35)" : "rgba(255,255,255,0.08)",
                         background: plan.featured
-                          ? "linear-gradient(180deg, rgba(232,212,176,0.07) 0%, rgba(20,40,95,0.85) 60%)"
-                          : "linear-gradient(180deg, rgba(20,40,95,0.6) 0%, rgba(10,10,15,0.4) 100%)",
+                          ? "var(--paper-elevated)"
+                          : "var(--paper-elevated)",
                         boxShadow: plan.featured
                           ? "0 1px 0 rgba(232,212,176,0.15) inset, 0 32px 80px -32px rgba(232,212,176,0.45)"
                           : "0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 50px -30px rgba(0,0,0,0.6)",
@@ -398,7 +397,7 @@ export default function PricingPage() {
                         </a>
                       ) : (
                         <Link
-                          href="/auth/signup"
+                          href="/builder"
                           className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
                           style={plan.featured ? {
                             background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
@@ -470,8 +469,8 @@ export default function PricingPage() {
                 >
                   Frequently{" "}
                   <span
-                    className="font-normal"
-                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                    className="font-normal text-display-sand"
+                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic" }}
                   >
                     asked.
                   </span>
@@ -497,8 +496,8 @@ export default function PricingPage() {
                       style={{
                         borderColor: isOpen ? "rgba(232,212,176,0.25)" : "rgba(255,255,255,0.08)",
                         background: isOpen
-                          ? "linear-gradient(135deg, rgba(232,212,176,0.05) 0%, rgba(20,40,95,0.6) 100%)"
-                          : "linear-gradient(135deg, rgba(20,40,95,0.6) 0%, rgba(10,10,15,0.4) 100%)",
+                          ? "var(--paper-elevated)"
+                          : "var(--paper-elevated)",
                         boxShadow: isOpen
                           ? "0 1px 0 rgba(232,212,176,0.12) inset, 0 20px 50px -28px rgba(232,212,176,0.3)"
                           : "0 1px 0 rgba(255,255,255,0.03) inset",
@@ -555,7 +554,7 @@ export default function PricingPage() {
             <div
               className="relative overflow-hidden rounded-[40px] border border-white/[0.08] p-12 sm:p-16 text-center"
               style={{
-                background: "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(26,26,36,0.65) 100%)",
+                background: "var(--paper-elevated)",
                 boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset, 0 40px 100px -40px rgba(0,0,0,0.8)",
               }}
             >
@@ -567,8 +566,8 @@ export default function PricingPage() {
                 <h2 className="fs-display-md text-white">
                   Build something{" "}
                   <span
-                    className="font-normal"
-                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic", color: "#E8D4B0" }}
+                    className="font-normal text-display-sand"
+                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic" }}
                   >
                     extraordinary.
                   </span>
@@ -591,7 +590,7 @@ export default function PricingPage() {
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                   <Link
-                    href="/auth/signup"
+                    href="/builder"
                     className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-4 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
                   >
                     Create free account

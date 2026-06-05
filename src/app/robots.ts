@@ -2,11 +2,11 @@ import { MetadataRoute } from 'next'
 import { headers } from 'next/headers'
 
 // Domain-to-sitemap mapping for multi-domain support
+// Rule 31 — zoobicon.sh retired (hosting delegated to Crontech).
 const DOMAIN_MAP: Record<string, string> = {
   'zoobicon.com': 'https://zoobicon.com',
   'zoobicon.ai': 'https://zoobicon.ai',
   'zoobicon.io': 'https://zoobicon.io',
-  'zoobicon.sh': 'https://zoobicon.sh',
   'dominat8.io': 'https://dominat8.io',
   'dominat8.com': 'https://dominat8.com',
 }
@@ -29,17 +29,17 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       {
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/admin', '/api', '/dashboard', '/edit', '/auth/callback', '/auth/reset-password', '/auth/forgot-password', '/auth/settings', '/email-support'],
+        disallow: ['/admin', '/api', '/edit'],
       },
       {
         userAgent: 'Bingbot',
         allow: '/',
-        disallow: ['/admin', '/api', '/dashboard', '/edit', '/auth/callback', '/auth/reset-password', '/auth/forgot-password', '/auth/settings', '/email-support'],
+        disallow: ['/admin', '/api', '/edit'],
       },
       {
         userAgent: 'DuckDuckBot',
         allow: '/',
-        disallow: ['/admin', '/api', '/dashboard', '/edit'],
+        disallow: ['/admin', '/api', '/edit'],
       },
       // Block competitor crawlers and AI scrapers that steal our content
       {
@@ -97,7 +97,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       // Block all other bots by default — only explicitly allowed ones get through
       {
         userAgent: '*',
-        disallow: ['/admin', '/api', '/dashboard', '/edit', '/auth/callback', '/auth/reset-password', '/auth/forgot-password', '/auth/settings', '/email-support', '/builder'],
+        disallow: ['/admin', '/api', '/edit', '/builder'],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

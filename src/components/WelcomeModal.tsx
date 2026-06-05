@@ -162,13 +162,15 @@ export default function WelcomeModal({ onClose, onBrowseTemplates }: WelcomeModa
           <div className="flex items-center gap-3">
             <button
               onClick={handleBrowseTemplates}
-              className="flex-1 px-4 py-2.5 rounded-lg border border-white/10 text-sm font-medium text-white/60 hover:text-white hover:border-white/20 hover:bg-white/5 transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
+              style={{ background: "var(--paper-elevated)", border: "1px solid var(--rule)", color: "var(--ink-secondary)" }}
             >
               Browse Templates
             </button>
             <button
               onClick={handleStartBuilding}
-              className="flex-1 px-4 py-2.5 rounded-lg bg-stone-600 hover:bg-stone-500 text-sm font-medium text-white transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold text-white transition-all"
+              style={{ background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)", boxShadow: "0 2px 8px rgba(184,146,63,0.3)", textShadow: "0 1px 1px rgba(80,55,15,0.35)" }}
             >
               Start Building
             </button>

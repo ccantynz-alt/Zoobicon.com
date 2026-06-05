@@ -51,17 +51,23 @@ import {
 } from "lucide-react";
 import { endpointToGeneratorId } from "@/lib/generator-prompts";
 
-const CARD_BG = "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const CARD_BG = "var(--paper-elevated)";
 const PRIMARY_CTA = {
   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
   color: "#0a1628",
   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
 } as const;
+// SERIF accent — Fraunces italic in the brand sand→champagne→bronze
+// gradient. Single source of truth for every hero accent on this page.
 const SERIF: React.CSSProperties = {
   fontFamily: "Fraunces, ui-serif, Georgia, serif",
   fontStyle: "italic",
   fontWeight: 400,
-  color: "#E8D4B0",
+  background: "linear-gradient(180deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  backgroundClip: "text",
+  color: "transparent",
 };
 
 const GENERATOR_CATEGORIES = [
@@ -208,7 +214,7 @@ export default function GeneratorsPage() {
   const isFiltering = Boolean(selectedCategory || searchQuery);
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[var(--paper)] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(generatorsJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
@@ -293,7 +299,7 @@ export default function GeneratorsPage() {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
-              href="/developers"
+              href="/builder"
               className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
             >
               <Code2 className="w-4 h-4" />
@@ -350,7 +356,7 @@ export default function GeneratorsPage() {
                 }`}
                 style={{
                   background: tier.tag
-                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(20,40,95,0.85) 100%)"
+                    ? "var(--paper-elevated)"
                     : CARD_BG,
                 }}
               >
@@ -469,7 +475,7 @@ export default function GeneratorsPage() {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
             <Link
-              href="/developers"
+              href="/builder"
               className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-8 py-4 text-[15px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
             >
               <Code2 className="w-4 h-4" />

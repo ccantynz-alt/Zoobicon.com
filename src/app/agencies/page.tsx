@@ -39,7 +39,7 @@ const AGENCY_TOOLS = [
   },
   {
     title: "Client Dashboard",
-    desc: "Each client gets their own branded portal to view their sites, SEO reports, and video content.",
+    desc: "Each client gets their own branded portal to view their sites and SEO reports.",
     stat: "∞ clients",
     icon: FolderOpen,
   },
@@ -90,7 +90,6 @@ const TIERS = [
       "Full white-label platform",
       "Unlimited site generation",
       "Unlimited SEO campaigns",
-      "AI Video Creator",
       "Bulk generation (CSV upload)",
       "Team roles & permissions",
       "Priority chat support",
@@ -126,17 +125,23 @@ const HERO_STATS = [
   { value: "24/7", label: "AI agents working" },
 ];
 
-const CARD_BG = "linear-gradient(135deg, rgba(20,40,95,0.85) 0%, rgba(10,10,15,0.7) 100%)";
+const CARD_BG = "var(--paper-elevated)";
 const PRIMARY_CTA = {
   background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
   color: "#0a1628",
   boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
 } as const;
+// SERIF accent — Fraunces italic in the brand sand→champagne→bronze
+// gradient. Single source of truth for every hero accent on this page.
 const SERIF: React.CSSProperties = {
   fontFamily: "Fraunces, ui-serif, Georgia, serif",
   fontStyle: "italic",
   fontWeight: 400,
-  color: "#E8D4B0",
+  background: "linear-gradient(180deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  backgroundClip: "text",
+  color: "transparent",
 };
 
 export default function AgenciesPage() {
@@ -167,7 +172,7 @@ export default function AgenciesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white fs-grain pt-[72px]">
+    <div className="min-h-screen bg-[var(--paper)] text-white fs-grain pt-[72px]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
@@ -210,7 +215,7 @@ export default function AgenciesPage() {
 
           <div className="flex flex-wrap items-center justify-center gap-3 mb-16">
             <Link
-              href="/auth/signup"
+              href="/builder"
               className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
               style={PRIMARY_CTA}
             >
@@ -395,7 +400,7 @@ export default function AgenciesPage() {
                 }`}
                 style={{
                   background: tier.featured
-                    ? "linear-gradient(135deg, rgba(232,212,176,0.08) 0%, rgba(20,40,95,0.85) 100%)"
+                    ? "var(--paper-elevated)"
                     : CARD_BG,
                 }}
               >
@@ -430,7 +435,7 @@ export default function AgenciesPage() {
                   </a>
                 ) : (
                   <Link
-                    href="/auth/signup"
+                    href="/builder"
                     className={`block text-center rounded-full py-3 text-[13px] font-semibold transition-all ${
                       tier.featured ? "" : "border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
                     }`}
@@ -460,7 +465,7 @@ export default function AgenciesPage() {
             Join hundreds of agencies using Zoobicon to 10x their output.
           </p>
           <Link
-            href="/auth/signup"
+            href="/builder"
             className="group inline-flex items-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
             style={PRIMARY_CTA}
           >

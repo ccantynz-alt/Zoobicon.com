@@ -1,70 +1,78 @@
-import { NextRequest, NextResponse } from "next/server";
+/**
+ * /api/collab/presence — get + update presence for a collab room.
+ *
+ * GET  ?roomId=X&exclude=Y → { participants: [...] }
+ * POST { participantId, cursorX?, cursorY?, cursorElement? } → { ok: true }
+ *
+ * Polled at PRESENCE_POLL_MS by useCollaboration. The lazy-GC drops
+ * idle participants on every read so a leaver disappears within ~5
+ * minutes even if their leaveRoom call never made it through.
+ */
+
+import { NextResponse } from "next/server";
 import {
-  getRoom,
-  joinRoom,
-  leaveRoom,
+  ensureCollabTables,
+  listPresence,
   updatePresence,
-  pruneStale,
-  serializeParticipants,
-} from "@/lib/collab/yjs-room";
+} from "@/lib/collab-server";
 
-export const maxDuration = 10;
+export const dynamic = "force-dynamic";
 
-interface PresenceBody {
-  roomId?: string;
-  participantId?: string;
-  name?: string;
-  color?: string;
-  cursor?: { x: number; y: number };
-}
-
-export async function POST(req: NextRequest) {
+export async function GET(request: Request) {
   try {
-    const body = (await req.json()) as PresenceBody;
-    const { roomId, participantId, name, color, cursor } = body;
-    if (!roomId || !participantId || !name || !color) {
+    await ensureCollabTables();
+    const { searchParams } = new URL(request.url);
+    const roomId = searchParams.get("roomId");
+    const exclude = searchParams.get("exclude") || undefined;
+    if (!roomId) {
       return NextResponse.json(
-        { ok: false, error: "roomId, participantId, name, color required" },
-        { status: 400 },
+        { error: "roomId required" },
+        { status: 400 }
       );
     }
-    pruneStale(30000);
-    const room = getRoom(roomId);
-    if (!room) {
-      return NextResponse.json({ ok: false, error: "Room not found" }, { status: 404 });
-    }
-    if (!room.participants.has(participantId)) {
-      joinRoom(roomId, { id: participantId, name, color, cursor });
-    } else {
-      updatePresence(roomId, participantId, cursor);
-    }
-    return NextResponse.json({
-      ok: true,
-      participants: serializeParticipants(room),
-    });
-  } catch (e) {
+    const participants = await listPresence(roomId, exclude);
+    return NextResponse.json({ participants });
+  } catch (err) {
     return NextResponse.json(
-      { ok: false, error: e instanceof Error ? e.message : "Invalid request" },
-      { status: 400 },
+      { error: err instanceof Error ? err.message : "Server error" },
+      { status: 500 }
     );
   }
 }
 
-export async function DELETE(req: NextRequest) {
+interface PostBody {
+  participantId?: string;
+  cursorX?: number | null;
+  cursorY?: number | null;
+  cursorElement?: string | null;
+}
+
+export async function POST(request: Request) {
+  let body: PostBody;
   try {
-    const body = (await req.json()) as { roomId?: string; participantId?: string };
-    if (!body.roomId || !body.participantId) {
-      return NextResponse.json(
-        { ok: false, error: "roomId and participantId required" },
-        { status: 400 },
-      );
-    }
-    leaveRoom(body.roomId, body.participantId);
-    return NextResponse.json({ ok: true });
-  } catch (e) {
+    body = (await request.json()) as PostBody;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  if (!body.participantId) {
     return NextResponse.json(
-      { ok: false, error: e instanceof Error ? e.message : "Invalid request" },
-      { status: 400 },
+      { error: "participantId required" },
+      { status: 400 }
+    );
+  }
+  try {
+    await ensureCollabTables();
+    await updatePresence({
+      participantId: body.participantId,
+      cursorX: body.cursorX,
+      cursorY: body.cursorY,
+      cursorElement: body.cursorElement,
+    });
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Server error" },
+      { status: 500 }
     );
   }
 }

@@ -10,7 +10,6 @@ import {
   Send,
   Globe,
   Search,
-  Video,
   Server,
   CreditCard,
   Code2,
@@ -59,19 +58,17 @@ interface UsageData {
 const QUICK_TOPICS = [
   { icon: Globe, label: "How do I build a website?", category: "Builder" },
   { icon: Search, label: "How does the SEO Agent work?", category: "SEO" },
-  { icon: Video, label: "How do I create AI videos?", category: "Video" },
   { icon: Server, label: "Help with DNS configuration", category: "DNS" },
   { icon: CreditCard, label: "What are the pricing plans?", category: "Billing" },
   { icon: Code2, label: "How do I use the API?", category: "Developer" },
 ];
 
 const HELP_CATEGORIES = [
-  { icon: Globe, title: "Website Builder", desc: "Build, edit, and publish AI-generated websites", href: "/products/website-builder" },
-  { icon: Search, title: "SEO Agent", desc: "Set up and manage autonomous SEO campaigns", href: "/products/seo-agent" },
-  { icon: Video, title: "Video Creator", desc: "Generate videos for social media platforms", href: "/products/video-creator" },
-  { icon: Server, title: "Domains & DNS", desc: "Domain registration, DNS records, transfers", href: "/domains" },
-  { icon: Code2, title: "API & Developer Tools", desc: "REST API, SDKs, CLI, and integrations", href: "/developers" },
-  { icon: BookOpen, title: "Marketplace", desc: "Browse and install add-ons and templates", href: "/marketplace" },
+  { icon: Globe, title: "Website Builder", desc: "Build, edit, and publish AI-generated websites", href: "/builder" },
+  { icon: Search, title: "SEO Agent", desc: "Set up and manage autonomous SEO campaigns", href: "/seo" },
+  { icon: BookOpen, title: "Marketplace", desc: "Browse and install add-ons via Crontech", href: "/marketplace" },
+  { icon: Code2, title: "Import a site", desc: "URL, WordPress, GitHub, Figma, Notion, or Audit", href: "/import" },
+  { icon: Server, title: "Compare", desc: "Zoobicon vs every other AI builder", href: "/compare" },
 ];
 
 export default function SupportPage() {
@@ -347,11 +344,11 @@ export default function SupportPage() {
       <BackgroundEffects preset="technical" />
 
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[var(--paper)]/80 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center">
                 <Zap className="w-4 h-4 text-white" />
               </div>
               <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -709,7 +706,7 @@ export default function SupportPage() {
             </div>
 
             {/* Chat input */}
-            <div className="border-t border-white/[0.08] bg-[#0a0a12]/80 backdrop-blur-xl">
+            <div className="border-t border-white/[0.08] bg-[var(--paper)]/80 backdrop-blur-xl">
               <div className="max-w-3xl mx-auto px-6 py-4">
                 <div className={`flex items-end rounded-2xl overflow-hidden transition-colors ${
                   isLiveAgent

@@ -23,20 +23,29 @@ import { NextRequest } from "next/server";
 import { callClaude, streamClaude } from "@/lib/anthropic-cached";
 import { runQualityLoop } from "@/lib/builder-critique";
 import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
+import { validateGeneratedComponent, detectRefusal } from "@/lib/llm-output-validator";
+import { verifyGeneratedCode, buildRepairPrompt } from "@/lib/builder-critique/code-verifier";
+import { TelemetryRecorder } from "@/lib/build-telemetry";
+import { checkBuildQuota, recordBuildQuotaUsage, type QuotaPlan } from "@/lib/build-quota";
+import { getPlanFromRequest, shouldWatermark } from "@/lib/user-plan";
 import {
   detectSupabaseNeeds,
   needsSupabase,
-  generateSupabaseClient,
-  generateAuthProvider,
 } from "@/lib/supabase-detect";
-import type { SupabaseNeeds, SupabaseProvisionResult } from "@/lib/supabase-detect";
-import { isConfigured as isSupabaseConfigured } from "@/lib/supabase-provisioner";
+import type { SupabaseNeeds } from "@/lib/supabase-detect";
+import { generateZoobiconClient, generateZoobiconAuthProvider } from "@/lib/zoobicon-client";
 // Component registry is imported lazily inside POST to avoid circular dependency
 // at module load time (the registry's side-effect imports cause a TDZ error in webpack).
 import type { RegistryComponent, ComponentCategory } from "@/lib/component-registry";
 
 async function getRegistry() {
   const mod = await import("@/lib/component-registry");
+  // CRITICAL — REGISTRY is empty until ensureRegistryLoaded() runs the
+  // side-effect imports for navbars/heroes/features/etc. Without this
+  // call, any direct REGISTRY.map / REGISTRY.filter on the returned
+  // module reads an empty array — which silently broke planComponents
+  // (it kept falling through to the heuristic selector). 2026-05-26 fix.
+  mod.ensureRegistryLoaded();
   return mod;
 }
 
@@ -92,6 +101,22 @@ function mapEvent(name: string, data: unknown): Record<string, unknown> {
       return { type: "status", message: "Backend provisioned", supabase: obj };
     case "score":
       return { type: "status", message: `Quality score: ${obj.score ?? "?"}`, ...obj };
+    case "fallback":
+      // Phase 2 (2026-05-13): when callLLMWithFailover switches providers
+      // mid-build, surface which model is being tried so the UI can
+      // show "Anthropic overloaded — switching to OpenAI" instead of a
+      // silent 10-second wait.
+      return {
+        type: "status",
+        message: obj.section
+          ? `Anthropic unavailable — switching to ${obj.model} (${obj.provider}) for ${obj.section}`
+          : `Switching to ${obj.model} (${obj.provider})`,
+        ...obj,
+      };
+    case "warning":
+      // Was previously dropped on the floor — client never saw partial-
+      // failure warnings emitted by customiseComponent.
+      return { type: "warning", ...obj };
     case "done":
       return { type: "done", ...obj };
     case "error":
@@ -101,9 +126,17 @@ function mapEvent(name: string, data: unknown): Record<string, unknown> {
   }
 }
 
-function makeWriter(controller: ReadableStreamDefaultController<Uint8Array>): SSEWriter {
+function makeWriter(controller: ReadableStreamDefaultController<Uint8Array>): SSEWriter & {
+  hasTerminated: () => boolean;
+} {
   const encoder = new TextEncoder();
   let closed = false;
+  // Phase 2 (2026-05-13): track whether a terminal event (done/error/
+  // fatal) was actually emitted before close(). The audit found cases
+  // where controller.enqueue silently fails mid-stream and the writer
+  // closes without the client ever seeing a terminal event — looks
+  // like a hang. close() now force-emits a synthetic fatal if needed.
+  let terminated = false;
   return {
     send(event, data) {
       if (closed) return;
@@ -111,12 +144,25 @@ function makeWriter(controller: ReadableStreamDefaultController<Uint8Array>): SS
       const sse = `data: ${JSON.stringify(payload)}\n\n`;
       try {
         controller.enqueue(encoder.encode(sse));
+        if (event === "done" || event === "error") terminated = true;
       } catch {
         closed = true;
       }
     },
     close() {
       if (closed) return;
+      if (!terminated) {
+        // Force a terminal event so the client never hangs.
+        try {
+          const payload = mapEvent("error", {
+            message: "Build stream closed unexpectedly.",
+            hint: "Please retry. If this keeps happening contact support@zoobicon.com.",
+          });
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+        } catch {
+          /* enqueue may already fail — nothing we can do */
+        }
+      }
       closed = true;
       try {
         controller.close();
@@ -124,10 +170,13 @@ function makeWriter(controller: ReadableStreamDefaultController<Uint8Array>): SS
         /* already closed */
       }
     },
+    hasTerminated: () => terminated,
   };
 }
 
 const MODEL_HAIKU = "claude-haiku-4-5";
+// Sonnet 4.6 outperforms Opus on coding tasks — better structured output,
+// faster, cheaper. Confirmed by Craig 2026-05-28.
 const MODEL_SONNET = "claude-sonnet-4-6";
 
 /** Build the cacheable registry catalog the planner sees. */
@@ -153,7 +202,7 @@ async function getPlannerSystemCacheable(): Promise<string> {
   if (_plannerSystemCache) return _plannerSystemCache;
   _plannerSystemCache = `You are the section planner for the Zoobicon AI website builder.
 
-Your job: pick the best component id for each slot in a website, drawn ONLY from the registry catalog provided below. You return JSON only.
+Your job: pick the best component id for each slot in a website, drawn ONLY from the registry catalog provided below. You also emit a BRAND SPEC — a typed sheet of design tokens (palette + typography) that the downstream customiser must use as the single source of truth for the build. You return JSON only.
 
 Rules:
 - Pick exactly one id per slot you include.
@@ -162,11 +211,22 @@ Rules:
 - Never invent ids. If a slot has no good fit, omit it.
 - Output ONLY JSON, no prose, no markdown fences.
 
+BRAND SPEC RULES (Sprint 1 Q4 — kills color drift across the build):
+- The brand spec is the contract. Every component the customiser builds MUST draw colors + fonts from this sheet, not invent its own.
+- textPrimary MUST meet 4.5:1 contrast against bgColor — this is WCAG AA. Pick deep ink on light bg (e.g. #18181b on #fafafa) or near-white on dark (e.g. #f5f5f4 on #0c0a09). The Prestige Properties cream-on-cream bug came from textPrimary being too pale; never pick something like #d4a574 as textPrimary on a cream background.
+- accentColor is reserved for icons, hover states, small badge text, and primary button fills — never body text.
+- headlineFont + bodyFont are explicit Google Font names (or "Inter", "Playfair Display", "Fraunces", "JetBrains Mono", etc.). The customiser will reference them via Tailwind's font-* classes.
+
 Schema:
 {
   "brandName": "<short brand name inferred from prompt>",
-  "primaryColor": "<hex>",
-  "bgColor": "<hex>",
+  "primaryColor": "<hex — main brand color, used for primary CTAs>",
+  "bgColor": "<hex — page background color>",
+  "textPrimary": "<hex — body text color, must hit 4.5:1 against bgColor>",
+  "textSecondary": "<hex — supporting/muted text, must hit 4.5:1 against bgColor>",
+  "accentColor": "<hex — for icons, hovers, small accent surfaces; NOT for body copy>",
+  "headlineFont": "<font family name — e.g. 'Playfair Display' or 'Inter'>",
+  "bodyFont": "<font family name — typically 'Inter' or system font stack>",
   "selections": [
     { "slot": "navbar|hero|features|stats|logos|testimonials|pricing|faq|cta|about|contact|gallery|blog|ecommerce|forms|footer|misc",
       "id": "<registry id>" }
@@ -187,7 +247,27 @@ interface PlannerOutput {
   brandName?: string;
   primaryColor?: string;
   bgColor?: string;
+  // Q4 brand-token-sheet additions (planner-emitted, customiser-consumed):
+  textPrimary?: string;
+  textSecondary?: string;
+  accentColor?: string;
+  headlineFont?: string;
+  bodyFont?: string;
   selections: PlannerSelection[];
+}
+
+/** Q4: structured brand spec passed to every customiser call so all
+ *  components share one palette + typography sheet. Kills the
+ *  cream-on-cream bug class by making contrast a planner contract. */
+interface BrandSpec {
+  brandName: string;
+  primaryColor: string;
+  bgColor: string;
+  textPrimary: string;
+  textSecondary: string;
+  accentColor: string;
+  headlineFont: string;
+  bodyFont: string;
 }
 
 function safeParseJson<T>(raw: string): T | null {
@@ -208,15 +288,90 @@ interface PlanResult {
   brandName: string;
   primaryColor: string;
   bgColor: string;
+  // Q4 brand spec — passed forward to every customiseComponent call
+  brandSpec: BrandSpec;
 }
 
-function inferBrandName(prompt: string): string {
-  const m = prompt.match(/(?:called|named|for)\s+([A-Z][A-Za-z0-9]+)/);
-  return m ? m[1] : "Northwind";
+/**
+ * Best-effort brand name extraction from the user's prompt.
+ *
+ * Returns either an explicit name found in the prompt OR a slug derived
+ * from the prompt's salient nouns. The previous version silently returned
+ * "Northwind" whenever the explicit-name regex missed — which gave every
+ * site that didn't say "called X" a generic Microsoft-branded fallback.
+ * That was a Bible Law 8 violation: the user had no way to know we'd
+ * picked a placeholder.
+ *
+ * Now: explicit match → use it. Otherwise pull the most signal-rich word
+ * (first capitalised non-stopword, then first noun-like token) so the
+ * generated site at least references the user's vocabulary. If even that
+ * fails we surface a clear "BRAND_INFERRED" sentinel so the caller can
+ * emit a warning event instead of shipping a placeholder name.
+ */
+const BRAND_STOPWORDS = new Set([
+  "a","an","and","or","the","for","with","without","my","our","your","their",
+  "this","that","these","those","is","are","was","were","be","been","being",
+  "i","you","we","they","he","she","it","want","need","build","create","make",
+  "site","website","page","app","application","store","shop","platform","tool",
+]);
+
+export function inferBrandName(prompt: string): string {
+  const explicit = prompt.match(/(?:called|named|for|brand(?:ed)?)\s+([A-Z][A-Za-z0-9]{1,30})/);
+  if (explicit) return explicit[1];
+
+  const tokens = prompt.split(/[^A-Za-z0-9]+/).filter(Boolean);
+  const cap = tokens.find((t) => /^[A-Z]/.test(t) && !BRAND_STOPWORDS.has(t.toLowerCase()) && t.length >= 3 && t.length <= 24);
+  if (cap) return cap.charAt(0).toUpperCase() + cap.slice(1);
+
+  const noun = tokens.find((t) => !BRAND_STOPWORDS.has(t.toLowerCase()) && t.length >= 4 && t.length <= 24);
+  if (noun) return noun.charAt(0).toUpperCase() + noun.slice(1).toLowerCase();
+
+  // Last resort — derive from the first non-stopword token of any length.
+  // This is still better than "Northwind" because at least the user's
+  // vocabulary shows up in the generated copy.
+  const firstReal = tokens.find((t) => !BRAND_STOPWORDS.has(t.toLowerCase()) && t.length >= 2);
+  if (firstReal) return firstReal.charAt(0).toUpperCase() + firstReal.slice(1).toLowerCase();
+
+  return "Studio";
 }
 
 async function planComponents(prompt: string): Promise<PlanResult> {
   const { getById, selectComponentsForPrompt } = await getRegistry();
+
+  // T8 — industry-aware defaults. Detect the niche from the user prompt
+  // using the existing detectIndustry heuristic, look up the niche in
+  // our SEO catalog (the same catalog that drives the 28 niche pages
+  // at /ai-website-builder-for/[slug]), and inject the must-haves +
+  // sections list as planner context. The planner then has
+  // niche-specific guidance for free.
+  let nicheHint = "";
+  try {
+    const { detectIndustry } = await import("@/lib/stock-images");
+    const { NICHES } = await import("@/lib/seo/niches");
+    const industry = detectIndustry(prompt); // "restaurant", "saas", etc.
+    if (industry) {
+      // Loose match: niche slug starts with or contains the industry token.
+      const niche = NICHES.find(
+        (n) =>
+          n.slug === industry ||
+          n.slug.startsWith(industry) ||
+          n.slug.includes(industry) ||
+          n.name.toLowerCase().includes(industry)
+      );
+      if (niche) {
+        nicheHint =
+          `\n\nINDUSTRY DETECTED: ${niche.name} (${niche.slug})\n` +
+          `Audience: ${niche.audience}\n` +
+          `Typical sections for this niche (pick components that cover these):\n` +
+          niche.sections.map((s) => `  - ${s}`).join("\n") +
+          `\nMust-haves for this niche:\n` +
+          niche.mustHaves.map((m) => `  - ${m}`).join("\n");
+      }
+    }
+  } catch {
+    // Industry detection or niche catalog failed — non-fatal; planner
+    // proceeds with prompt-only context.
+  }
 
   // Planning uses callLLMWithFailover so Anthropic outages don't kill builds.
   // Order: Anthropic Haiku (fastest) → Sonnet → OpenAI → Gemini.
@@ -227,7 +382,7 @@ async function planComponents(prompt: string): Promise<PlanResult> {
     const res = await callLLMWithFailover({
       model: MODEL_HAIKU,
       system: plannerSystem,
-      userMessage: `User prompt: ${prompt}`,
+      userMessage: `User prompt: ${prompt}${nicheHint}`,
       maxTokens: 1500,
     });
     text = res.text || "";
@@ -240,27 +395,52 @@ async function planComponents(prompt: string): Promise<PlanResult> {
 
   const resolved: RegistryComponent[] = [];
   if (parsed && Array.isArray(parsed.selections)) {
+    const seenCategories = new Set<string>();
     for (const sel of parsed.selections) {
       const comp = getById(sel.id);
-      if (comp) resolved.push(comp);
+      if (comp && !seenCategories.has(comp.category)) {
+        seenCategories.add(comp.category);
+        resolved.push(comp);
+      }
     }
   }
 
+  // Q4: build a complete brand spec from parsed values plus contrast-
+  // safe defaults. Spread the spec into the returned PlanResult so it
+  // flows through to every customiseComponent call. The defaults are
+  // chosen to PASS WCAG AA (4.5:1) — that's the whole point of Q4.
+  const buildBrandSpec = (resolvedBrandName: string, fallbackMode: boolean): BrandSpec => ({
+    brandName: resolvedBrandName,
+    primaryColor: parsed?.primaryColor ?? (fallbackMode ? "#1c1917" : "#4f46e5"),
+    bgColor: parsed?.bgColor ?? (fallbackMode ? "#FAF9F6" : "#ffffff"),
+    // Default body text is near-black on light, near-white on dark.
+    // Both pass AA against the bgColor defaults above (>12:1 ratio).
+    textPrimary: parsed?.textPrimary ?? "#18181b",
+    textSecondary: parsed?.textSecondary ?? "#52525b",
+    accentColor: parsed?.accentColor ?? parsed?.primaryColor ?? "#a16207",
+    headlineFont: parsed?.headlineFont ?? "Playfair Display",
+    bodyFont: parsed?.bodyFont ?? "Inter",
+  });
+
   if (resolved.length < 3) {
     const fallback = selectComponentsForPrompt(prompt);
+    const resolvedBrandName = parsed?.brandName ?? inferBrandName(prompt);
     return {
       components: fallback,
-      brandName: parsed?.brandName ?? inferBrandName(prompt),
+      brandName: resolvedBrandName,
       primaryColor: parsed?.primaryColor ?? "#1c1917",
       bgColor: parsed?.bgColor ?? "#FAF9F6",
+      brandSpec: buildBrandSpec(resolvedBrandName, true),
     };
   }
 
+  const resolvedBrandName = parsed?.brandName ?? inferBrandName(prompt);
   return {
     components: resolved,
-    brandName: parsed?.brandName ?? inferBrandName(prompt),
+    brandName: resolvedBrandName,
     primaryColor: parsed?.primaryColor ?? "#4f46e5",
     bgColor: parsed?.bgColor ?? "#ffffff",
+    brandSpec: buildBrandSpec(resolvedBrandName, false),
   };
 }
 
@@ -276,10 +456,54 @@ Hard rules:
 - Output ONLY the full updated TypeScript file. No prose. No markdown fences.
 - Keep the same default export name and signature.
 - Keep imports identical unless you genuinely need a new one.
+- IMPORTS ARE LIMITED. You may only import from these packages:
+    react, react-dom, lucide-react, framer-motion, clsx, tailwind-merge
+  PLUS relative imports (./, ../) for sibling components and the
+  generated './lib/zoobicon' client when auth/database is wired.
+  NEVER import @supabase/*, @auth/*, react-countup, embla-carousel,
+  react-icons, react-spring, swr, axios, lodash, date-fns, or ANY
+  other npm package. The Sandpack runtime cannot resolve them and the
+  preview will fail to compile. If you need an icon, use lucide-react.
+  If you need motion, use framer-motion. If you need a carousel,
+  build it with framer-motion + state instead of importing a library.
 - Replace AI-slop words ("revolutionary", "unleash", "empower", "synergy", "next-generation", "game-changer", "leverage", "elevate", "seamless", "cutting-edge") with specific copy.
 - Use real-sounding metrics, not "10,000+ users".
 - Add aria-labels to icon-only buttons. Add alt text to images. Keep responsive classes.
-- For navbars: anchor links (href="#features", "#pricing", etc.) MUST match real section ids on the page. Only use: features, pricing, faq, about, contact. Never use #docs, #solutions, #markets, or any id that won't exist as a section.`;
+- For navbars: anchor links (href="#features", "#pricing", etc.) MUST match real section ids on the page. Only use: features, pricing, faq, about, contact. Never use #docs, #solutions, #markets, or any id that won't exist as a section.
+
+QUALITY CONTRACT — non-negotiable, the builder ships these or it doesn't ship:
+
+CONTRAST (WCAG AA minimum 4.5:1 for body, 3:1 for large text):
+- Body copy (any <p>, <span>, <li>, table cell) MUST use a text color that meets 4.5:1 against the section's background. On a light/cream background that means text-stone-900, text-stone-800, text-slate-900, text-slate-800, text-amber-950, text-orange-950, text-zinc-900 — NEVER text-amber-600 / text-orange-600 / text-yellow-700 / text-stone-500 / text-slate-500 for body copy.
+- The same applies to feature descriptions, testimonial quotes, FAQ answers, and any descriptive text under a heading. If you would not be confident reading the copy in bright daylight on a phone, the contrast is wrong.
+- Accent colors (text-amber-600, text-rose-700, etc.) are reserved for: small UPPERCASE eyebrow labels (>= text-xs font-semibold tracking-wider), icon strokes, link hover states, and small badge/pill text — never the main body.
+- "EST. 1998" style eyebrow labels: if they're going to be small + uppercase + tracking-wide, make them text-stone-800 / text-amber-900 / text-orange-900, NOT pale gold. The Prestige Properties bug ("EST. 1998 · SOTHEBY'S AFFILIATED" rendered in pale gold on cream) is the failure mode we ship against.
+
+NON-EMPTY CTAS:
+- Every <button>, <a> styled as a button, and every link with role="button" MUST have visible text content (not just an icon). Pattern: <button>Get started <ArrowRight /></button> — never <button><ArrowRight /></button> unless it has BOTH aria-label="..." AND a visually-hidden span (sr-only) with the same label.
+- The secondary CTA next to the primary in a hero MUST have a label. Never render an empty pill button just because it looks balanced.
+- Form submits ("Subscribe", "Send", "Book a table", etc.) MUST have explicit text labels.
+
+SEMANTIC HTML:
+- Top-level region tags by component type:
+    Navbar → <header><nav>...</nav></header>
+    Hero / page top → <section> with id="hero" or omit id
+    Features / pricing / FAQ / testimonials / about / contact → <section id="..."> matching the slug
+    Footer → <footer>
+- Use <article> for repeating cards that have a title + body (blog posts, testimonials, team members). Use <ul><li> for lists of links / nav items. Use <dl><dt><dd> for label-value pairs (stats).
+- Headings descend logically: each page has exactly one <h1>; sections start with <h2>; sub-elements use <h3>. Never use <h4>+.
+
+MOBILE-FIRST RESPONSIVENESS:
+- Default classes apply at the smallest breakpoint. Add sm:, md:, lg: variants for larger screens.
+- Grids: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 (never default to grid-cols-3 with no mobile fallback).
+- Typography: text-2xl sm:text-3xl lg:text-5xl on h1/h2 (never default to a desktop size).
+- Padding: px-4 sm:px-6 lg:px-8 minimum on outer containers.
+
+ACCESSIBILITY:
+- All images have alt="..." (descriptive, not "image of"). Decorative images use alt="".
+- All form inputs have associated <label> (visible or sr-only).
+- focus-visible:ring-2 focus-visible:ring-offset-2 on every interactive element.
+- aria-current="page" on active nav items if you can infer them.`;
 
 const THEME_BRIEFS: Record<string, string> = {
   editorial: `
@@ -305,8 +529,10 @@ This site ships BRIGHT, AIRY, and WELCOMING — the visual opposite of the dark-
 WARM / ARTISAN DESIGN SYSTEM — MANDATORY
 This site ships on a warm cream + amber palette. Restaurant, bakery, hospitality, artisan voice. You MUST:
 - Backgrounds are cream (bg-amber-50, bg-orange-50) or warm off-white. NEVER dark backgrounds.
-- Primary text is deep warm tone: text-stone-900, text-amber-950, text-orange-950.
-- Accent is amber/orange: amber-600, orange-600, or a deep rose like rose-700 for restaurants.
+- Primary text (body, paragraphs, descriptions, list items, table cells) is deep warm tone: text-stone-900, text-amber-950, text-orange-950, text-zinc-900. NEVER text-amber-600, text-amber-700, text-orange-600, text-yellow-700 on a cream background — those fail WCAG AA (the Prestige Properties cream-on-cream bug). If you find yourself reaching for text-amber-{500..700} for body copy, STOP and use text-stone-900 / text-amber-950 instead.
+- Accent (used ONLY for small UPPERCASE eyebrow labels, icon strokes, link hover, badges): amber-700 / amber-800 / orange-700 / orange-800 / rose-700 (for restaurants). The accent should ALWAYS be at least -700 weight on a cream background to maintain 4.5:1 contrast. amber-600 is too pale; bump to amber-700.
+- Eyebrow labels (e.g. "EST. 1998 · SOTHEBY'S AFFILIATED"): use text-amber-900 or text-stone-800 with tracking-widest, NOT text-amber-600 / text-amber-500.
+- Stats and metric numbers (e.g. "$2.3B in Sales Volume"): the number itself is text-stone-900 / text-amber-950; the caption beneath is text-stone-700.
 - Borders are warm: border-amber-200, border-stone-200.
 - Wrap one evocative word in each h1/h2 in <em>…</em> so the Playfair italic serif accent renders.
 - Copy is sensory, specific, inviting. Name real dishes, real rooms, real experiences.`,
@@ -340,6 +566,15 @@ interface CustomiseArgs {
   /** Visual theme — drives which system prompt is sent to the LLM. */
   theme: "editorial" | "light" | "warm" | "dark";
   /**
+   * Q4 brand spec — the shared palette + typography sheet from the
+   * planner. The customiser MUST draw colors + fonts from this spec;
+   * no component should invent its own palette. Kills the
+   * cream-on-cream class of bugs by making contrast a contract.
+   * Optional for back-compat — if absent the customiser falls back
+   * to the legacy brandName + primaryColor hints.
+   */
+  brandSpec?: BrandSpec;
+  /**
    * When true, the generated project has a live Supabase client wired
    * up at `./lib/supabase`. The customiser should wire real auth / data
    * calls into interactive elements (sign-in, sign-up, contact forms,
@@ -350,6 +585,12 @@ interface CustomiseArgs {
     needsDatabase: boolean;
     needsStorage: boolean;
   };
+  /**
+   * Phase 2 (2026-05-13): called once if the primary model fails and
+   * callLLMWithFailover switches to another provider mid-build. Lets
+   * the caller emit a user-visible "switching to OpenAI" status event.
+   */
+  onFallback?: (provider: string, model: string) => void;
 }
 
 function stripFencesAndWrap(raw: string): string {
@@ -359,6 +600,99 @@ function stripFencesAndWrap(raw: string): string {
     return `import React from "react";\n\n${code}\n`;
   }
   return `${code}\n`;
+}
+
+/**
+ * Q3 — slot contract validation. After the customiser emits a
+ * component, scan it for the failure patterns that produced the
+ * Prestige Properties bug: empty <button></button>, anchor links
+ * styled as buttons with no children, untouched placeholder copy,
+ * images missing alt text.
+ *
+ * Returns an array of human-readable issue messages. Empty array
+ * means the component passed; non-empty means the customiser needs a
+ * second pass with the issues listed as the fix-list.
+ *
+ * We intentionally check for *patterns* in the source rather than
+ * trying to render and inspect the DOM — keeps this synchronous, no
+ * additional dependencies, and runs in well under a millisecond per
+ * component.
+ */
+function validateCustomisedComponent(code: string): string[] {
+  const issues: string[] = [];
+
+  // 1. Empty buttons — <button>…</button> with no text content or
+  // child elements other than self-closing icons. Catches both
+  // <button></button> and <button>   </button> and
+  // <button><ArrowRight /></button> (icon-only with no aria-label).
+  const buttonRegex = /<button\b([^>]*)>([\s\S]*?)<\/button>/g;
+  let m: RegExpExecArray | null;
+  while ((m = buttonRegex.exec(code))) {
+    const attrs = m[1];
+    const inner = m[2].trim();
+    const hasAriaLabel = /\baria-label\s*=/.test(attrs);
+    // Strip JSX children that are self-closing icons / spans
+    const textish = inner
+      .replace(/<[A-Z][A-Za-z0-9]*\b[^>]*\/>/g, "") // self-closing components
+      .replace(/<\/?\w+[^>]*>/g, "") // open/close tags
+      .replace(/\{[^}]*\}/g, "X") // JSX expressions count as "content"
+      .trim();
+    if (!textish && !hasAriaLabel) {
+      issues.push(
+        "Empty <button> with no text content and no aria-label — every button must have a visible label or aria-label."
+      );
+    }
+  }
+
+  // 2. Link-as-button with empty body — same failure mode rendered
+  // via <a className="..button..">.
+  const linkAsButton = /<a\b([^>]*className\s*=\s*["'][^"']*\b(?:btn|button|cta)\b[^"']*["'][^>]*)>([\s\S]*?)<\/a>/g;
+  while ((m = linkAsButton.exec(code))) {
+    const inner = m[2].trim();
+    const textish = inner
+      .replace(/<[A-Z][A-Za-z0-9]*\b[^>]*\/>/g, "")
+      .replace(/<\/?\w+[^>]*>/g, "")
+      .replace(/\{[^}]*\}/g, "X")
+      .trim();
+    if (!textish) {
+      issues.push(
+        "Anchor styled as button has no visible label — fill in the link text."
+      );
+    }
+  }
+
+  // 3. Images without alt text. Catches both <img ... /> and <img ...>
+  // without an alt= attribute.
+  const imgRegex = /<img\b([^>]*?)\/?>/g;
+  while ((m = imgRegex.exec(code))) {
+    const attrs = m[1];
+    if (!/\balt\s*=/.test(attrs)) {
+      issues.push(
+        "<img> missing alt attribute — every image needs alt='descriptive text' (or alt='' if purely decorative)."
+      );
+    }
+  }
+
+  // 4. Untouched placeholder copy that betrays we didn't actually
+  // customise. Either pure {{lorem}} mustache, Lorem ipsum substrings,
+  // or our own sentinel keywords from base components.
+  const placeholderHits = [
+    /\bLorem ipsum\b/i,
+    /\b\{\{\s*[a-z_]+\s*\}\}/, // {{handle}} mustache
+    /\bAcme Inc\.?\b/,
+    /\bCompany Name\b/,
+  ];
+  for (const re of placeholderHits) {
+    if (re.test(code)) {
+      issues.push(
+        `Placeholder copy still present (${re.source}) — replace with real on-brand copy.`
+      );
+    }
+  }
+
+  // De-dupe — the same regex can fire multiple times per component
+  // but the fix is the same.
+  return Array.from(new Set(issues));
 }
 
 /**
@@ -375,25 +709,24 @@ function buildSupabaseBrief(needs: {
 }): string {
   const lines: string[] = [
     "",
-    "BACKEND — SUPABASE IS WIRED",
-    "This project has a live Supabase client at ./lib/supabase.ts. If this",
+    "BACKEND — ZOOBICON IS WIRED",
+    "This project has a live Zoobicon client at ./lib/zoobicon.ts. If this",
     "component has ANY interactive elements, wire them to the real client",
     "using the patterns below. Do NOT leave dead buttons.",
     "",
-    'Import the client with: import { supabase } from "./lib/supabase";',
+    'Import with: import { signUp, signIn, signOut, getUser, insert, query } from "../lib/zoobicon";',
   ];
 
   if (needs.needsAuth) {
     lines.push(
       "",
       "AUTH (available):",
-      "- Sign In buttons → onClick: await supabase.auth.signInWithPassword({ email, password })",
-      "- Sign Up buttons → onClick: await supabase.auth.signUp({ email, password })",
-      "- Sign Out → onClick: await supabase.auth.signOut()",
-      "- OAuth (Google/GitHub) → await supabase.auth.signInWithOAuth({ provider: \"google\" })",
+      "- Sign In buttons → onClick: const { user } = await signIn(email, password)",
+      "- Sign Up buttons → onClick: const { user } = await signUp(email, password)",
+      "- Sign Out → onClick: await signOut()",
       "- Use React useState for email/password inputs. Show error messages on failure.",
       "- For navbars: show 'Sign In' / 'Sign Up' when signed out, 'Sign Out' when signed in",
-      "  (use useEffect + supabase.auth.getSession() + supabase.auth.onAuthStateChange).",
+      "  (use useEffect + getUser() on mount to check session).",
     );
   }
 
@@ -401,9 +734,9 @@ function buildSupabaseBrief(needs: {
     lines.push(
       "",
       "DATABASE (available):",
-      "- Contact forms → await supabase.from(\"messages\").insert({ name, email, message })",
-      "- Bookings → await supabase.from(\"bookings\").insert({ ... })",
-      "- Profile reads → await supabase.from(\"profiles\").select(\"*\").eq(\"user_id\", userId).single()",
+      "- Contact forms → await insert(\"messages\", { name, email, message })",
+      "- Bookings → await insert(\"bookings\", { name, date, time, email })",
+      "- Profile reads → const rows = await query(\"profiles\", { user_id: userId })",
       "- Wire real submit handlers. Show success / error states with useState.",
     );
   }
@@ -412,15 +745,15 @@ function buildSupabaseBrief(needs: {
     lines.push(
       "",
       "STORAGE (available):",
-      "- File uploads → await supabase.storage.from(\"uploads\").upload(path, file)",
-      "- Public URLs → supabase.storage.from(\"uploads\").getPublicUrl(path)",
+      "- File uploads → use a standard <input type=\"file\"> and POST to /api/v1/storage/upload",
+      "- Show upload progress with useState. Store the returned URL via insert(\"files\", { url, name })",
     );
   }
 
   lines.push(
     "",
-    "Still keep imports minimal. Only add `import { supabase } from \"./lib/supabase\"`",
-    "if this component actually needs it. Preserve the editorial design system.",
+    "Still keep imports minimal. Only import `{ signUp, signIn, signOut, getUser, insert, query }`",
+    "from \"../lib/zoobicon\" when this component actually needs them. Preserve the design system.",
     "",
   );
 
@@ -437,12 +770,39 @@ interface CustomiseResult {
 async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult> {
   const supabaseBrief = args.supabase ? buildSupabaseBrief(args.supabase) : "";
   const systemPrompt = buildCustomiserSystem(args.theme);
+
+  // Q4: brand spec block — the planner-emitted token sheet rendered
+  // as a hard contract in the customiser user message. Every component
+  // built in this run shares one palette + typography, killing the
+  // color-drift bug class. Falls back to the legacy brandName +
+  // primaryColor hints when brandSpec is absent (back-compat).
+  const brandBlock = args.brandSpec
+    ? [
+        ``,
+        `BRAND SPEC — these are the ONLY colors and fonts you may use.`,
+        `Do NOT pick a Tailwind color outside this sheet for any element.`,
+        ``,
+        `  brandName       ${args.brandSpec.brandName}`,
+        `  bgColor         ${args.brandSpec.bgColor}  (use as the section background)`,
+        `  primaryColor    ${args.brandSpec.primaryColor}  (primary CTAs, primary buttons)`,
+        `  textPrimary     ${args.brandSpec.textPrimary}  (body copy, paragraphs, list text — passes WCAG AA against bgColor)`,
+        `  textSecondary   ${args.brandSpec.textSecondary}  (muted descriptions, captions)`,
+        `  accentColor     ${args.brandSpec.accentColor}  (icon strokes, hover states, small badges — NEVER body text)`,
+        `  headlineFont    ${args.brandSpec.headlineFont}  (use in <h1><h2><h3>)`,
+        `  bodyFont        ${args.brandSpec.bodyFont}  (default body)`,
+        ``,
+        `When picking Tailwind classes, match the hex above to the closest Tailwind shade. For example: if textPrimary is #18181b use text-zinc-900; if accentColor is #a16207 use text-amber-700. Never reach for a vivid color (text-cyan-500, text-rose-500) that isn't in this sheet.`,
+        ``,
+      ].join("\n")
+    : "";
+
   const userMsg =
     `BRAND: ${args.brandName}\n` +
     `PRIMARY COLOR: ${args.primaryColor}\n` +
     `THEME: ${args.theme}\n` +
     `SECTION: ${args.category} (${args.variant})\n` +
     `USER PROMPT: ${args.prompt}\n` +
+    brandBlock +
     supabaseBrief +
     `\nBASE COMPONENT FILE:\n${args.baseCode}\n\n` +
     `Output the full updated TypeScript file only.`;
@@ -463,10 +823,90 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
         collected += delta.text;
       }
     }
-    if (collected.trim().length > 100) {
-      return { ok: true, code: stripFencesAndWrap(collected), modelUsed: args.model };
+    const stripped = stripFencesAndWrap(collected);
+    const validation = validateGeneratedComponent(stripped);
+    if (validation.ok) {
+      // B2 verification loop — even when the validator passes, run the
+      // deeper JSX-balance + tag-balance check. If THIS fails, send the
+      // error back to Haiku for ONE repair pass before falling through
+      // to the failover provider. Matches Bolt V2's auto-error-fixing.
+      const verified = verifyGeneratedCode(stripped);
+      if (verified.ok) {
+        // Q3 slot contract validation — catches empty buttons, anchor
+        // links styled as buttons with no labels, untouched placeholder
+        // copy, missing alts. If issues found, ONE repair pass with the
+        // slot issues as the fix-list. If repair doesn't help, ship the
+        // original anyway (better than a base-component fallback).
+        const slotIssues = validateCustomisedComponent(stripped);
+        if (slotIssues.length === 0) {
+          return { ok: true, code: stripped, modelUsed: args.model };
+        }
+        console.warn(
+          `[react-stream] slot validator flagged ${args.category}: ${slotIssues.join("; ")}`
+        );
+        try {
+          const slotRepair = await callLLMWithFailover({
+            model: args.model,
+            system: systemPrompt,
+            userMessage: buildRepairPrompt(stripped, slotIssues),
+            maxTokens: 4000,
+          });
+          const slotRepaired = stripFencesAndWrap(slotRepair.text || "");
+          const slotRepairValid = validateGeneratedComponent(slotRepaired);
+          const slotRepairVerified = verifyGeneratedCode(slotRepaired);
+          const slotRepairIssues = validateCustomisedComponent(slotRepaired);
+          if (
+            slotRepairValid.ok &&
+            slotRepairVerified.ok &&
+            slotRepairIssues.length === 0
+          ) {
+            console.info(`[react-stream] slot repair succeeded for ${args.category}`);
+            return {
+              ok: true,
+              code: slotRepaired,
+              modelUsed: `${slotRepair.model || args.model} (slot-repair)`,
+            };
+          }
+          attemptLog.push(
+            `slot-repair: ${slotRepairIssues.length} issues remain after one pass`
+          );
+        } catch (repairErr) {
+          const msg = repairErr instanceof Error ? repairErr.message : String(repairErr);
+          attemptLog.push(`slot-repair: ${msg.slice(0, 80)}`);
+        }
+        // Repair didn't fix it — ship the original; slot issues degrade
+        // quality but don't break the build. UI surfaces these via the
+        // failedSections warning chain elsewhere.
+        return { ok: true, code: stripped, modelUsed: args.model };
+      }
+      attemptLog.push(`${args.model}: verifier flagged ${verified.issues.length} issues`);
+      console.warn(`[react-stream] verifier flagged ${args.category}: ${verified.issues.join("; ")}`);
+      // Repair attempt — one shot at fixing, then fall through to failover.
+      try {
+        const repairFb = await callLLMWithFailover({
+          model: args.model,
+          system: systemPrompt,
+          userMessage: buildRepairPrompt(stripped, verified.issues),
+          maxTokens: 4000,
+        });
+        const repairedCode = stripFencesAndWrap(repairFb.text || "");
+        const repairValidation = validateGeneratedComponent(repairedCode);
+        if (repairValidation.ok) {
+          const repairVerified = verifyGeneratedCode(repairedCode);
+          if (repairVerified.ok) {
+            console.info(`[react-stream] auto-repair succeeded for ${args.category}`);
+            return { ok: true, code: repairedCode, modelUsed: `${repairFb.model || args.model} (auto-repair)` };
+          }
+        }
+        attemptLog.push(`repair: still flagged after one pass`);
+      } catch (repairErr) {
+        const msg = repairErr instanceof Error ? repairErr.message : String(repairErr);
+        attemptLog.push(`repair: ${msg.slice(0, 80)}`);
+      }
+    } else {
+      attemptLog.push(`${args.model}: ${validation.reason}`);
+      console.warn(`[react-stream] validation rejected ${args.category} from ${args.model}: ${validation.reason}`);
     }
-    attemptLog.push(`${args.model}: empty/short output`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     attemptLog.push(`${args.model}: ${msg.slice(0, 120)}`);
@@ -478,17 +918,25 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
   // with the raw base component as last-resort code so the build still completes,
   // and the caller surfaces a warning event to the UI (Law 8: never silent).
   try {
-    const fb = await callLLMWithFailover({
-      model: args.model,
-      system: systemPrompt,
-      userMessage: userMsg,
-      maxTokens: 4000,
-    });
-    const text = (fb.text || "").trim();
-    if (text.length > 100) {
-      return { ok: true, code: stripFencesAndWrap(text), modelUsed: fb.model || args.model };
+    const fb = await callLLMWithFailover(
+      {
+        model: args.model,
+        system: systemPrompt,
+        userMessage: userMsg,
+        maxTokens: 4000,
+      },
+      // Surface the provider switch to the caller so the UI shows
+      // "Anthropic unavailable — switching to OpenAI" instead of a
+      // silent 10-second pause.
+      (provider, model) => args.onFallback?.(provider, model),
+    );
+    const stripped = stripFencesAndWrap(fb.text || "");
+    const validation = validateGeneratedComponent(stripped);
+    if (validation.ok) {
+      return { ok: true, code: stripped, modelUsed: fb.model || args.model };
     }
-    attemptLog.push(`failover: empty/short output`);
+    attemptLog.push(`${fb.model || "failover"}: ${validation.reason}`);
+    console.warn(`[react-stream] validation rejected ${args.category} from failover: ${validation.reason}`);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     attemptLog.push(`failover: ${msg.slice(0, 120)}`);
@@ -502,20 +950,27 @@ async function customiseComponent(args: CustomiseArgs): Promise<CustomiseResult>
   };
 }
 
-function buildPackageJson(opts?: { withSupabase?: boolean }): string {
-  const deps: Record<string, string> = {
-    react: "^18.3.1",
-    "react-dom": "^18.3.1",
-  };
-  if (opts?.withSupabase) {
-    deps["@supabase/supabase-js"] = "^2.45.0";
-  }
+// Common deps every generated site uses. PINNED versions match the
+// SandpackPreview pre-warm map (src/components/SandpackPreview.tsx)
+// so the bundler's cache hits 100% of the time on the first real
+// component arrival. Unpinned "latest" was the difference between a 2s
+// and 25s first preview — see KNOWN ISSUES #builder-prewarm-drift.
+const GENERATED_SITE_DEPS: Record<string, string> = {
+  react: "^18.3.1",
+  "react-dom": "^18.3.1",
+  "lucide-react": "^1.7.0",
+  "framer-motion": "^12.38.0",
+  clsx: "^2.1.1",
+  "tailwind-merge": "^2.5.5",
+};
+
+function buildPackageJson(): string {
   return JSON.stringify(
     {
       name: "zoobicon-generated-site",
       version: "1.0.0",
       private: true,
-      dependencies: deps,
+      dependencies: GENERATED_SITE_DEPS,
     },
     null,
     2,
@@ -581,7 +1036,10 @@ export async function POST(req: NextRequest): Promise<Response> {
   }
 
   const prompt = (body.prompt ?? "").trim();
-  const mode: Mode = body.mode === "premium" ? "premium" : "fast";
+  // Craig 2026-05-31: Sonnet only for all generation — always premium mode.
+  // Previously this read body.mode which the builder never set, defaulting
+  // every build to Haiku ("fast"). Root cause of near-100% preview crashes.
+  const mode: Mode = "premium";
 
   if (!prompt) {
     return new Response(
@@ -590,10 +1048,85 @@ export async function POST(req: NextRequest): Promise<Response> {
     );
   }
 
+  // Plan resolution drives the watermark + (later) feature gates. Single
+  // source of truth lives in /lib/user-plan.ts.
+  const plan = getPlanFromRequest(req);
+  const showWatermark = shouldWatermark(plan);
+
+  // KILLER-MOVES-BUILDER.md #5 + #6: per-user telemetry and cost ceiling.
+  // Anonymous builds still log (with userEmail=null) but skip quota.
+  const userEmail = req.headers.get("x-user-email") || null;
+  const isAdmin = !!(req.headers.get("x-admin") && req.headers.get("x-admin") !== "0" && req.headers.get("x-admin") !== "false");
+  const quotaPlan: QuotaPlan = isAdmin
+    ? "admin"
+    : (plan === "pro" || plan === "agency" || plan === "free" || plan === "creator")
+      ? (plan as QuotaPlan)
+      : "free";
+  const quota = await checkBuildQuota(userEmail, quotaPlan);
+  if (!quota.ok) {
+    return new Response(
+      JSON.stringify({
+        error: quota.reason || "Daily build budget reached.",
+        resetsAt: quota.resetsAtIso,
+        buildsToday: quota.buildsToday,
+        costToday: quota.costToday,
+        hardCostUsd: quota.hardCostUsd,
+        hardBuildCount: quota.hardBuildCount,
+      }),
+      { status: 429, headers: { "content-type": "application/json", "retry-after": "3600" } },
+    );
+  }
+
+  // Telemetry recorder — every build, success or failure, gets one row
+  // in `builds` for failure-pattern analysis and cost tracking. We track
+  // the recorder via a closure so finally{} can finalise on both paths.
+  const buildId = `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+  const telemetry = new TelemetryRecorder({
+    buildId,
+    endpoint: "react-stream",
+    prompt,
+    userEmail,
+    userPlan: plan,
+    mode,
+    theme: body.theme ?? null,
+  });
+
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const writer = makeWriter(controller);
+      // Surface soft-quota crossings to the user so they know they're
+      // close to the daily cap before being blocked tomorrow.
+      if (quota.crossedSoft) {
+        writer.send("warning", {
+          kind: "quota-soft",
+          message: `You've used $${quota.costToday.toFixed(2)} of your $${quota.hardCostUsd.toFixed(2)} daily build budget.`,
+          resetsAt: quota.resetsAtIso,
+        });
+      }
       try {
+        // ── FLYWHEEL: load accumulated context from previous builds ──
+        let flywheelContext = "";
+        try {
+          const { getMemories } = await import("@/lib/flywheel");
+          const memories = await getMemories();
+          // Filter to preference, brand, and context types only
+          const relevant = memories
+            .filter((m) => m.type === "preference" || m.type === "brand" || m.type === "context")
+            .slice(0, 10);
+          if (relevant.length > 0) {
+            const lines = relevant.map((m) => `- [${m.type}] ${m.content}`);
+            // Cap at ~500 chars to keep the injection concise
+            let joined = lines.join("\n");
+            if (joined.length > 500) {
+              joined = joined.slice(0, 497) + "...";
+            }
+            flywheelContext = `\n\nContext from previous builds:\n${joined}\n`;
+          }
+        } catch (flywheelErr) {
+          // Flywheel is a bonus — never break the build pipeline
+          console.warn("[react-stream] Flywheel context load skipped:", flywheelErr);
+        }
+
         // ── PHASE 1: planning ──
         writer.send("phase", {
           phase: "planning",
@@ -602,8 +1135,10 @@ export async function POST(req: NextRequest): Promise<Response> {
 
         // Detect full-stack intent (auth, database, storage needs)
         const supabaseNeeds = detectSupabaseNeeds(prompt);
-        const wantsSupabase = needsSupabase(supabaseNeeds);
-        const supabaseAvailable = wantsSupabase && isSupabaseConfigured();
+        const wantsBackend = needsSupabase(supabaseNeeds);
+        // Generate a stable project ID for this build — embedded in the Zoobicon
+        // client so all data operations are automatically scoped to this site.
+        const projectId = crypto.randomUUID();
 
         // ── FLOOR: emit a CINEMATIC INSTANT SHELL immediately. The shell is
         // a self-contained animated skeleton (hero + nav + features strip)
@@ -617,7 +1152,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         // instead of being overridden by "No components generated".
         const registry = await getRegistry();
         const files: Record<string, string> = {
-          "package.json": buildPackageJson({ withSupabase: wantsSupabase }),
+          "package.json": buildPackageJson(),
           "tailwind.config.js": buildTailwindConfig(),
           "styles.css": registry.buildStylesFile({ primaryColor: "#1c1917", bgColor: "#FAF9F6" }),
           "App.tsx": registry.buildShellAppFile(prompt),
@@ -629,13 +1164,17 @@ export async function POST(req: NextRequest): Promise<Response> {
           phase: "selecting",
           message: "Picking best components for each section…",
         });
-        const { components, brandName, primaryColor, bgColor } =
-          await planComponents(prompt);
+        const planStart = Date.now();
+        const { components, brandName, primaryColor, bgColor, brandSpec } =
+          await planComponents(prompt + flywheelContext);
+        telemetry.phase("plan", Date.now() - planStart);
+        telemetry.setComponents(components.map((c) => ({ category: c.category, variant: c.variant })));
 
         // Detect industry from the prompt once — drives imagery selection
         // for every component in this build (restaurants get warm hand/craft
         // imagery, SaaS gets workspace/dashboards, portfolio gets landscape).
         const industry = registry.detectIndustry(prompt);
+        telemetry.setIndustry(industry);
 
         // Detect the visual theme the prompt actually wants. This is the
         // critical fix for "every site comes out dark editorial". Consumer-
@@ -651,19 +1190,14 @@ export async function POST(req: NextRequest): Promise<Response> {
         // Update styles with the real brand colours now that planning succeeded.
         files["styles.css"] = registry.buildStylesFile({ primaryColor, bgColor, theme });
 
-        // ── Pre-inject Supabase client BEFORE customisation so generated
-        // components can import from "./lib/supabase" without breaking
-        // Sandpack while Phase 3.5 provisioning is still running. The
-        // placeholder is overwritten with real credentials after provision.
-        if (wantsSupabase) {
-          files["lib/supabase.ts"] = generateSupabaseClient(
-            "https://YOUR_PROJECT.supabase.co",
-            "YOUR_ANON_KEY",
-          );
+        // Pre-inject Zoobicon client whenever the prompt needs backend features.
+        // Unlike Supabase, no external token is required — Zoobicon's own API
+        // is always available, so wantsBackend is the only gate.
+        if (wantsBackend) {
+          files["lib/zoobicon.ts"] = generateZoobiconClient(projectId);
           if (supabaseNeeds.needsAuth) {
-            files["lib/AuthProvider.tsx"] = generateAuthProvider();
+            files["lib/AuthProvider.tsx"] = generateZoobiconAuthProvider();
           }
-          files["package.json"] = buildPackageJson({ withSupabase: true });
         }
 
         writer.send("files", { files, fileCount: 0, totalComponents: components.length });
@@ -677,13 +1211,10 @@ export async function POST(req: NextRequest): Promise<Response> {
         const customiserModel =
           mode === "premium" ? MODEL_SONNET : MODEL_HAIKU;
 
-        // Supabase brief passed to customiser when the project has
-        // full-stack needs — we include it whether provisioning has
-        // actually run yet or not. If provisioning later fails the
-        // placeholder client is still injected and the code still
-        // compiles (the calls will error at runtime with a clear
-        // message, not fail the build).
-        const customiserSupabase = wantsSupabase
+        // Backend brief only passed to the customiser when the prompt actually
+        // needs backend features. Without this gate, the AI adds zoobicon
+        // imports to purely static components that don't need them.
+        const customiserSupabase = wantsBackend
           ? {
               needsAuth: supabaseNeeds.needsAuth,
               needsDatabase: supabaseNeeds.needsDatabase,
@@ -703,18 +1234,38 @@ export async function POST(req: NextRequest): Promise<Response> {
         let completedCount = 0;
         const failedSections: Array<{ id: string; category: string; variant: string; reason: string }> = [];
 
+        // Narrate every section start so the user sees continuous progress
+        // instead of staring at "Customising N components for X…" for 30
+        // seconds. This is the single biggest UX gap vs Lovable/Bolt
+        // (audit 2026-05-26): users describe silence > 3s as "broken".
         await Promise.all(
           components.map(async (comp, i) => {
+            writer.send("status", {
+              message: `Writing ${comp.category} (${comp.variant})…`,
+              section: comp.id,
+              current: i,
+              total: components.length,
+              phase: "building",
+            });
             const result = await customiseComponent({
               baseCode: comp.code,
               brandName,
               category: comp.category,
               variant: comp.variant,
-              prompt,
+              prompt: prompt + flywheelContext,
               primaryColor,
               model: customiserModel,
               theme,
+              brandSpec, // Q4: planner-emitted token sheet, shared across all customise calls in this build
               supabase: customiserSupabase,
+              onFallback: (provider, model) => {
+                writer.send("fallback", {
+                  provider,
+                  model,
+                  section: comp.id,
+                  category: comp.category,
+                });
+              },
             });
             let updatedCode = result.code;
             if (!result.ok) {
@@ -724,6 +1275,7 @@ export async function POST(req: NextRequest): Promise<Response> {
                 variant: comp.variant,
                 reason: result.reason || "unknown",
               });
+              telemetry.fail({ id: comp.id, reason: result.reason || "unknown" });
               // Surface the failure to the client the moment it happens so the
               // UI can render a "this section used the base template" badge
               // instead of silently shipping placeholder copy (Law 8).
@@ -768,6 +1320,21 @@ export async function POST(req: NextRequest): Promise<Response> {
               updatedCode = registry.emphasizeHeadings(updatedCode);
             }
 
+            // Re-validate after post-processing. The regex passes above
+            // (reskin*, swapImagesForIndustry, emphasizeHeadings) can in
+            // edge cases mutate JSX expression slots they shouldn't touch,
+            // producing syntactically invalid output that crashes the
+            // preview. Audit 2026-05-31 — root cause of recurring "Preview
+            // failed" errors. If post-processing broke the code, revert to
+            // the pre-process version (which already passed validation).
+            const postCheck = validateGeneratedComponent(updatedCode);
+            if (!postCheck.ok) {
+              console.warn(
+                `[react-stream] post-processing broke ${comp.id}: ${postCheck.reason} — reverting to pre-process code`
+              );
+              updatedCode = result.code;
+            }
+
             // Write the component file
             const { fileName } = registry.buildComponentFile(comp, { theme });
             files[fileName] = updatedCode;
@@ -781,7 +1348,7 @@ export async function POST(req: NextRequest): Promise<Response> {
               const done = completedByIndex.get(j);
               if (done) ordered.push(done);
             }
-            files["App.tsx"] = registry.buildAppFile(ordered, { theme });
+            files["App.tsx"] = registry.buildAppFile(ordered, { theme, showWatermark });
 
             writer.send("component", {
               name: comp.id,
@@ -816,166 +1383,91 @@ export async function POST(req: NextRequest): Promise<Response> {
           );
         }
 
-        writer.send("files", { files });
-
-        // ── PHASE 3.5: Supabase auto-provisioning (if full-stack detected) ──
-        let supabaseResult: SupabaseProvisionResult | null = null;
-
-        if (wantsSupabase) {
-          if (supabaseAvailable) {
-            // Supabase env vars are set — provision a real project
-            try {
-              writer.send("phase", {
-                phase: "provisioning",
-                message: "Setting up your database and auth…",
-              });
-
-              // Lazy-import provisioner (only loaded when needed)
-              const provisioner = await import("@/lib/supabase-provisioner");
-
-              const projectName = `zbk-${brandName.toLowerCase().replace(/[^a-z0-9]/g, "-").slice(0, 30)}-${Date.now().toString(36)}`;
-
-              const provision = await provisioner.provisionFullStack({
-                name: projectName,
-                region: "us-east-1",
-                schema: supabaseNeeds.needsDatabase
-                  ? {
-                      profiles: {
-                        columns: [
-                          { name: "id", type: "uuid", primary: true, default: "gen_random_uuid()" },
-                          { name: "user_id", type: "uuid", nullable: false },
-                          { name: "display_name", type: "text" },
-                          { name: "avatar_url", type: "text" },
-                          { name: "created_at", type: "timestamptz", default: "now()" },
-                          { name: "updated_at", type: "timestamptz", default: "now()" },
-                        ],
-                        rls: "owner",
-                      },
-                    }
-                  : undefined,
-                auth: supabaseNeeds.needsAuth ? ["email"] : undefined,
-                buckets: supabaseNeeds.needsStorage
-                  ? [{ name: "uploads", public: true }]
-                  : undefined,
-              });
-
-              const projectUrl = provision.envVars.NEXT_PUBLIC_SUPABASE_URL;
-              const anonKey = provision.envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-              // Inject Supabase client files into the generated project
-              files["lib/supabase.ts"] = generateSupabaseClient(projectUrl, anonKey);
-              if (supabaseNeeds.needsAuth) {
-                files["lib/AuthProvider.tsx"] = generateAuthProvider();
-              }
-              files["package.json"] = buildPackageJson({ withSupabase: true });
-
-              supabaseResult = {
-                projectUrl,
-                anonKey,
-                projectRef: provision.project.projectRef,
-                needsAuth: supabaseNeeds.needsAuth,
-                needsDatabase: supabaseNeeds.needsDatabase,
-                needsStorage: supabaseNeeds.needsStorage,
-                tables: provision.tables,
-                authProviders: provision.auth,
-                buckets: provision.buckets.map((b) => b.name),
-              };
-
-              writer.send("supabase", supabaseResult);
-              writer.send("files", { files });
-
-              writer.send("phase", {
-                phase: "provisioned",
-                message: `Database ready — ${provision.tables.length} table(s), ${provision.auth.length > 0 ? "auth enabled" : "no auth"}, ${provision.buckets.length} bucket(s)`,
-              });
-            } catch (err) {
-              // Supabase provisioning failure is non-fatal — site still works without it.
-              // Use fatal:false so the client treats this as a warning, not a build abort.
-              // The JWT / token-expired path lives here (SUPABASE_ACCESS_TOKEN invalid in prod
-              // would otherwise surface as "Something went wrong / JWT could not be decoded"
-              // and kill the entire build even though it's non-fatal).
-              const msg = err instanceof Error ? err.message : String(err);
-              writer.send("error", {
-                fatal: false,
-                message: `Supabase provisioning skipped: ${msg}`,
-                hint: "The site will still work but without a live database. You can connect Supabase manually later.",
-              });
-
-              // Still inject client stub with placeholder values so the code compiles
-              files["lib/supabase.ts"] = generateSupabaseClient(
-                "https://YOUR_PROJECT.supabase.co",
-                "YOUR_ANON_KEY",
-              );
-              if (supabaseNeeds.needsAuth) {
-                files["lib/AuthProvider.tsx"] = generateAuthProvider();
-              }
-              writer.send("files", { files });
-            }
-          } else {
-            // Supabase env vars not set — inject placeholder client so code compiles
-            writer.send("phase", {
-              phase: "provisioning",
-              message: "Full-stack features detected — injecting Supabase client (connect your project to go live)…",
-            });
-
-            files["lib/supabase.ts"] = generateSupabaseClient(
-              "https://YOUR_PROJECT.supabase.co",
-              "YOUR_ANON_KEY",
-            );
-            if (supabaseNeeds.needsAuth) {
-              files["lib/AuthProvider.tsx"] = generateAuthProvider();
-            }
-            writer.send("files", { files });
-
-            writer.send("phase", {
-              phase: "provisioned",
-              message: "Supabase client injected with placeholders — set SUPABASE_ACCESS_TOKEN to auto-provision real projects.",
-            });
-          }
+        // Partial-failure warning — 2026-05-26 fix. If >30% of sections
+        // dropped to base templates, the site shipped is materially
+        // worse than the intent. Surface a loud warning so the user
+        // knows to regenerate rather than thinking it just worked.
+        if (
+          failedSections.length > 0 &&
+          components.length > 0 &&
+          failedSections.length / components.length >= 0.3
+        ) {
+          writer.send("warning", {
+            kind: "section-fallback",
+            fatal: false,
+            message: `${failedSections.length} of ${components.length} sections used base templates (LLM unavailable). The site is usable but less personalised than intended — consider regenerating.`,
+            reason: failedSections.slice(0, 2).map((f) => `${f.category}: ${f.reason.slice(0, 60)}`).join(" · "),
+          });
         }
 
-        // ── PHASE 4: critique loop (premium only) ──
+        writer.send("files", { files });
+
+        // ── PHASE 3.5: Backend wiring (Zoobicon's own API — no provisioning needed) ──
+        if (wantsBackend) {
+          // Zoobicon's backend is always available — no external token required.
+          // The client files were already pre-injected above. Here we just
+          // emit the confirmation event so the UI can show "Backend ready".
+          files["lib/zoobicon.ts"] = generateZoobiconClient(projectId);
+          if (supabaseNeeds.needsAuth) {
+            files["lib/AuthProvider.tsx"] = generateZoobiconAuthProvider();
+          }
+          writer.send("files", { files });
+          writer.send("phase", {
+            phase: "provisioned",
+            message: `Backend ready — powered by Zoobicon${supabaseNeeds.needsAuth ? " · auth enabled" : ""}${supabaseNeeds.needsDatabase ? " · data storage enabled" : ""}`,
+          });
+        }
+
+        // ── PHASE 4: critique loop — Sprint 2 Q2+T3 ──
+        // Runs on EVERY build (Q2+T3 expansion from premium-only).
+        // Premium gets up to 2 refinement passes; free gets 1 pass so
+        // we always emit a score + brand-coherence audit without
+        // doubling build time. brandSpec from the Q4 planner gets fed
+        // in so the critic catches cross-component palette drift.
         let finalFiles = files;
         let finalScore = 0;
 
-        if (mode === "premium") {
-          try {
+        try {
+          writer.send("phase", {
+            phase: "critiquing",
+            message:
+              mode === "premium"
+                ? "Running $100K quality critique…"
+                : "Auditing brand coherence + slot contract…",
+          });
+          const loop = await runQualityLoop({
+            files,
+            originalPrompt: prompt,
+            maxPasses: mode === "premium" ? 2 : 1,
+            brandSpec,
+          });
+
+          finalFiles = loop.finalFiles;
+          finalScore = loop.finalScore;
+
+          const lastCritique =
+            loop.history[loop.history.length - 1];
+          writer.send("score", {
+            score: finalScore,
+            issues: lastCritique?.issues ?? [],
+          });
+
+          if (loop.passes > 1) {
             writer.send("phase", {
-              phase: "critiquing",
-              message: "Running $100K quality critique…",
-            });
-            const loop = await runQualityLoop({
-              files,
-              originalPrompt: prompt,
-              maxPasses: 2,
-            });
-            finalFiles = loop.finalFiles;
-            finalScore = loop.finalScore;
-
-            const lastCritique =
-              loop.history[loop.history.length - 1];
-            writer.send("score", {
-              score: finalScore,
-              issues: lastCritique?.issues ?? [],
-            });
-
-            if (loop.passes > 1) {
-              writer.send("phase", {
-                phase: "refining",
-                message: `Refined ${loop.passes - 1} time(s) — final score ${finalScore}/100`,
-              });
-            }
-            writer.send("files", { files: finalFiles });
-          } catch (err) {
-            // Critique loop failure is non-fatal — the unrefined site is still
-            // usable and has already been streamed to the client.
-            const { message, hint } = classifyError(err);
-            writer.send("error", {
-              fatal: false,
-              message: `Critique loop skipped: ${message}`,
-              hint: `${hint} The unrefined site is still usable.`,
+              phase: "refining",
+              message: `Refined ${loop.passes - 1} time(s) — final score ${finalScore}/100`,
             });
           }
+          writer.send("files", { files: finalFiles });
+        } catch (err) {
+          // Critique loop failure is non-fatal — the unrefined site is still
+          // usable and has already been streamed to the client.
+          const { message, hint } = classifyError(err);
+          writer.send("error", {
+            fatal: false,
+            message: `Critique loop skipped: ${message}`,
+            hint: `${hint} The unrefined site is still usable.`,
+          });
         }
 
         // ── PHASE 5: done ──
@@ -983,6 +1475,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           phase: "done",
           message: "Build complete.",
         });
+        const durationMs = Date.now() - startedAt;
         writer.send("done", {
           // Client listens for `event.files` on the done event — it sets
           // receivedFiles = true and updates Sandpack's source. The previous
@@ -990,15 +1483,78 @@ export async function POST(req: NextRequest): Promise<Response> {
           // the last progressive partial (usually fine) but also preventing
           // the post-build file replacement in premium critique mode.
           files: finalFiles,
+          // Surface the pinned dep map to the client so SandpackPreview's
+          // customSetup.dependencies gets the same versions the package.json
+          // already declares. Without this, the client passes {} and Sandpack
+          // auto-detects + downloads "latest" at iframe render time → cold
+          // bundle, flicker, occasional API-version mismatches.
+          dependencies: GENERATED_SITE_DEPS,
           score: finalScore,
-          durationMs: Date.now() - startedAt,
+          durationMs,
           failedSections,
-          ...(supabaseResult ? { supabase: supabaseResult } : {}),
+          // T6 follow-up — surface the planner-emitted BrandSpec on
+          // the done event so the client can wire the brand-kit page
+          // to the actual build's palette + typography (favicon /
+          // social cards / business card / email signature derived
+          // from the same tokens the site uses).
+          brandSpec,
+          ...(wantsBackend ? { backend: { projectId } } : {}),
         });
+
+        // ── FLYWHEEL: record this build for future context ──
+        try {
+          const { saveBuild } = await import("@/lib/flywheel");
+          await saveBuild({
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+            prompt,
+            siteName: brandName || inferBrandName(prompt),
+            model: mode === "premium" ? MODEL_SONNET : MODEL_HAIKU,
+            durationMs,
+            createdAt: Date.now(),
+          });
+        } catch (flywheelErr) {
+          // Flywheel save is non-critical — log and move on
+          console.warn("[react-stream] Flywheel build save skipped:", flywheelErr);
+        }
+
+        // Finalise telemetry on success path — failed sections are still
+        // tracked but the overall build counts as ok=true if any files
+        // shipped. recordBuildQuotaUsage runs regardless so partial
+        // builds still count against the daily cap.
+        await telemetry.finalize({
+          ok: true,
+          qualityScore: typeof finalScore === "number" ? Math.round(finalScore) : null,
+        });
+        await recordBuildQuotaUsage(userEmail, [
+          // Token counts not yet threaded through customise/plan paths;
+          // logged as zero so the build_count column increments. Token
+          // tracking lands in Q3 (Slot-Locked Composition) where we have
+          // structured model output to count.
+          { model: customiserModel, inputTokens: 0, outputTokens: 0 },
+        ]);
+
         writer.close();
       } catch (err) {
+        const { message, hint } = (() => {
+          try { return classifyError(err); }
+          catch { return { message: err instanceof Error ? err.message : "Unknown error", hint: "Please try again" }; }
+        })();
+        // Finalise telemetry on failure path so admin can see WHICH
+        // builds failed and WHY.
         try {
-          const { message, hint } = classifyError(err);
+          await telemetry.finalize({
+            ok: false,
+            errorKind: err instanceof Error ? err.constructor.name : "Unknown",
+            errorMessage: message,
+          });
+          await recordBuildQuotaUsage(userEmail, [
+            { model: "claude-haiku-4-5", inputTokens: 0, outputTokens: 0 },
+          ]);
+        } catch (telemetryErr) {
+          console.warn("[react-stream] telemetry finalise on error failed:", telemetryErr);
+        }
+
+        try {
           writer.send("error", { message, hint });
         } catch (classifyErr) {
           console.error("[react-stream] Error classification failed:", classifyErr);

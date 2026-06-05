@@ -9,7 +9,6 @@ import {
   Server,
   TrendingUp,
   RefreshCw,
-  Mail,
   Shield,
   Activity,
   ChevronRight,
@@ -52,11 +51,9 @@ export default function MobileAdminDashboard() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [analyticsRes, healthRes] = await Promise.all([
-        fetch("/api/admin/analytics").then(r => r.json()).catch(() => null),
-        fetch("/api/health").then(r => r.json()).catch(() => null),
-      ]);
-      if (analyticsRes) setAnalytics(analyticsRes);
+      // Rule 31 — platform analytics live in Crontech; mobile dashboard
+      // only pulls /api/health which Zoobicon still owns.
+      const healthRes = await fetch("/api/health").then(r => r.json()).catch(() => null);
       if (healthRes) setHealth(healthRes);
       setLastRefresh(new Date());
     } catch {
@@ -93,7 +90,7 @@ export default function MobileAdminDashboard() {
   const overallHealth = health?.status === "healthy" ? "healthy" : health ? "degraded" : "unknown";
 
   return (
-    <div className="min-h-screen bg-[#0a0a12] text-white pb-24 safe-area-inset">
+    <div className="pb-24 safe-area-inset">
       {/* Viewport meta for PWA-like experience */}
       <style>{`
         .safe-area-inset { padding-bottom: env(safe-area-inset-bottom, 24px); }
@@ -103,32 +100,32 @@ export default function MobileAdminDashboard() {
       `}</style>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#0a0a12]/95 backdrop-blur-xl border-b border-white/[0.06] safe-top">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-stone-200 safe-top">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-stone-500 to-stone-500 flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="text-sm font-bold">Zoobicon</h1>
-              <p className="text-[10px] text-white/40">Command Centre</p>
+              <h1 className="text-sm font-bold text-stone-800">Zoobicon</h1>
+              <p className="text-xs text-stone-600">Command Centre</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="p-2 rounded-lg bg-white/[0.05] active:bg-white/[0.1] transition-colors"
+              className="p-2 rounded-lg bg-stone-50 active:bg-stone-100 transition-colors"
             >
-              <RefreshCw className={`w-4 h-4 text-white/60 ${refreshing ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-4 h-4 text-stone-700 ${refreshing ? "animate-spin" : ""}`} />
             </button>
-            <Link href="/admin" className="p-2 rounded-lg bg-white/[0.05] active:bg-white/[0.1] transition-colors">
-              <LayoutDashboard className="w-4 h-4 text-white/60" />
+            <Link href="/admin" className="p-2 rounded-lg bg-stone-50 active:bg-stone-100 transition-colors">
+              <LayoutDashboard className="w-4 h-4 text-stone-700" />
             </Link>
           </div>
         </div>
         {lastRefresh && (
-          <div className="px-4 pb-2 text-[10px] text-white/30">
+          <div className="px-4 pb-2 text-xs text-stone-600">
             Updated {lastRefresh.toLocaleTimeString()}
           </div>
         )}
@@ -144,33 +141,37 @@ export default function MobileAdminDashboard() {
           {/* Health Status Banner */}
           <div className={`rounded-2xl p-4 border ${
             overallHealth === "healthy"
-              ? "bg-stone-500/5 border-stone-500/20"
+              ? "bg-amber-50 border-amber-200"
               : overallHealth === "degraded"
-              ? "bg-stone-500/5 border-stone-500/20"
-              : "bg-white/[0.03] border-white/[0.08]"
+              ? "bg-amber-50 border-amber-200"
+              : "bg-stone-50 border-stone-200"
           }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {overallHealth === "healthy" ? (
-                  <CheckCircle2 className="w-5 h-5 text-stone-400" />
+                  <CheckCircle2 className="w-5 h-5 text-amber-500" />
                 ) : overallHealth === "degraded" ? (
-                  <AlertCircle className="w-5 h-5 text-stone-400" />
+                  <AlertCircle className="w-5 h-5 text-amber-500" />
                 ) : (
-                  <Activity className="w-5 h-5 text-white/40" />
+                  <Activity className="w-5 h-5 text-stone-600" />
                 )}
                 <div>
-                  <p className="text-sm font-semibold">
+                  <p className={`text-sm font-semibold ${
+                    overallHealth === "healthy" ? "text-amber-700" :
+                    overallHealth === "degraded" ? "text-amber-700" :
+                    "text-stone-700"
+                  }`}>
                     {overallHealth === "healthy" ? "All Systems Operational" :
                      overallHealth === "degraded" ? "Some Systems Degraded" :
                      "Status Unknown"}
                   </p>
-                  <p className="text-[10px] text-white/40 mt-0.5">
+                  <p className="text-xs text-stone-600 mt-0.5">
                     {health?.checks ? `${Object.keys(health.checks).length} services monitored` : "Checking..."}
                   </p>
                 </div>
               </div>
-              <Link href="/admin/health" className="p-1.5 rounded-lg active:bg-white/[0.05]">
-                <ChevronRight className="w-4 h-4 text-white/30" />
+              <Link href="/admin" className="p-1.5 rounded-lg active:bg-stone-100">
+                <ChevronRight className="w-4 h-4 text-stone-600" />
               </Link>
             </div>
 
@@ -180,10 +181,10 @@ export default function MobileAdminDashboard() {
                 {Object.entries(health.checks).map(([name, check]) => (
                   <span
                     key={name}
-                    className={`text-[10px] px-2 py-0.5 rounded-full ${
+                    className={`text-xs px-2 py-0.5 rounded-full ${
                       check.status === "healthy"
-                        ? "bg-stone-500/10 text-stone-400"
-                        : "bg-stone-500/10 text-stone-400"
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-red-100 text-red-700"
                     }`}
                   >
                     {name}
@@ -203,16 +204,16 @@ export default function MobileAdminDashboard() {
 
           {/* MRR Estimate */}
           {analytics?.planDistribution && analytics.planDistribution.length > 0 && (
-            <div className="rounded-2xl bg-gradient-to-r from-brand-500/10 to-accent-purple/10 border border-brand-500/20 p-4">
+            <div className="rounded-2xl bg-gradient-to-r from-stone-50 to-stone-50 border border-stone-200 p-4">
               <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-4 h-4 text-brand-400" />
-                <span className="text-xs font-semibold text-white/70">Plan Distribution</span>
+                <TrendingUp className="w-4 h-4 text-stone-500" />
+                <span className="text-xs font-semibold text-stone-600">Plan Distribution</span>
               </div>
               <div className="space-y-2">
                 {analytics.planDistribution.map((p) => (
                   <div key={p.plan} className="flex items-center justify-between">
-                    <span className="text-sm capitalize">{p.plan || "free"}</span>
-                    <span className="text-sm font-mono text-brand-400">{p.count}</span>
+                    <span className="text-sm text-stone-700 capitalize">{p.plan || "free"}</span>
+                    <span className="text-sm font-mono text-stone-600">{p.count}</span>
                   </div>
                 ))}
               </div>
@@ -221,31 +222,31 @@ export default function MobileAdminDashboard() {
 
           {/* Recent Signups */}
           {analytics?.recentUsers && analytics.recentUsers.length > 0 && (
-            <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+            <div className="rounded-2xl bg-white border border-stone-200 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100">
                 <div className="flex items-center gap-2">
-                  <UserPlus className="w-4 h-4 text-stone-400" />
-                  <span className="text-xs font-semibold">Recent Signups</span>
+                  <UserPlus className="w-4 h-4 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">Recent Signups</span>
                 </div>
-                <Link href="/admin" className="text-[10px] text-brand-400 active:opacity-70">
+                <Link href="/admin" className="text-xs text-stone-500 active:opacity-70">
                   View all <ArrowUpRight className="w-3 h-3 inline" />
                 </Link>
               </div>
-              <div className="divide-y divide-white/[0.04]">
+              <div className="divide-y divide-stone-100">
                 {analytics.recentUsers.slice(0, 5).map((user, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{user.name || "—"}</p>
-                      <p className="text-[11px] text-white/40 truncate">{user.email}</p>
+                      <p className="text-sm font-medium text-stone-800 truncate">{user.name || "—"}</p>
+                      <p className="text-xs text-stone-600 truncate">{user.email}</p>
                     </div>
                     <div className="text-right ml-3 shrink-0">
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                        user.plan === "pro" ? "bg-brand-500/15 text-brand-400" :
-                        user.plan === "agency" ? "bg-stone-500/15 text-stone-400" :
-                        user.plan === "creator" ? "bg-stone-500/15 text-stone-400" :
-                        "bg-white/[0.05] text-white/40"
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        user.plan === "pro" ? "bg-stone-50 text-stone-600" :
+                        user.plan === "agency" ? "bg-stone-50 text-stone-600" :
+                        user.plan === "creator" ? "bg-amber-50 text-amber-600" :
+                        "bg-stone-100 text-stone-700"
                       }`}>{user.plan || "free"}</span>
-                      <p className="text-[10px] text-white/30 mt-0.5">{timeAgo(user.created_at)}</p>
+                      <p className="text-xs text-stone-600 mt-0.5">{timeAgo(user.created_at)}</p>
                     </div>
                   </div>
                 ))}
@@ -255,21 +256,21 @@ export default function MobileAdminDashboard() {
 
           {/* Recent Projects */}
           {analytics?.recentProjects && analytics.recentProjects.length > 0 && (
-            <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+            <div className="rounded-2xl bg-white border border-stone-200 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-stone-100">
                 <div className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-brand-400" />
-                  <span className="text-xs font-semibold">Recent Projects</span>
+                  <BarChart3 className="w-4 h-4 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">Recent Projects</span>
                 </div>
               </div>
-              <div className="divide-y divide-white/[0.04]">
+              <div className="divide-y divide-stone-100">
                 {analytics.recentProjects.slice(0, 5).map((proj, i) => (
                   <div key={i} className="flex items-center justify-between px-4 py-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{proj.name}</p>
-                      <p className="text-[11px] text-white/40 truncate">{proj.user_email}</p>
+                      <p className="text-sm font-medium text-stone-800 truncate">{proj.name}</p>
+                      <p className="text-xs text-stone-600 truncate">{proj.user_email}</p>
                     </div>
-                    <span className="text-[10px] text-white/30 ml-3 shrink-0">{timeAgo(proj.created_at)}</span>
+                    <span className="text-xs text-stone-600 ml-3 shrink-0">{timeAgo(proj.created_at)}</span>
                   </div>
                 ))}
               </div>
@@ -277,29 +278,30 @@ export default function MobileAdminDashboard() {
           )}
 
           {/* Quick Links */}
-          <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] overflow-hidden">
-            <div className="px-4 py-3 border-b border-white/[0.06]">
-              <span className="text-xs font-semibold text-white/50">Quick Actions</span>
+          <div className="rounded-2xl bg-white border border-stone-200 overflow-hidden">
+            <div className="px-4 py-3 border-b border-stone-100">
+              <span className="text-xs font-semibold text-stone-700">Quick Actions</span>
             </div>
-            <div className="divide-y divide-white/[0.04]">
+            <div className="divide-y divide-stone-100">
+              <QuickLink href="/builder" icon={Zap} label="AI Builder" />
+              <QuickLink href="/admin/intel/hn" icon={TrendingUp} label="HN Flywheel" />
+              <QuickLink href="/admin/intel/reddit" icon={TrendingUp} label="Reddit Flywheel" />
+              <QuickLink href="/admin/intel" icon={Shield} label="Competitive Intel" />
+              <QuickLink href="/admin/seo" icon={TrendingUp} label="SEO control room" />
+              <QuickLink href="/admin/pre-launch" icon={Rocket} label="Pre-Launch" />
               <QuickLink href="/admin" icon={LayoutDashboard} label="Full Admin Panel" />
-              <QuickLink href="/admin/health" icon={Activity} label="System Health" />
-              <QuickLink href="/admin/support" icon={Mail} label="Support Inbox" />
-              <QuickLink href="/admin/intel" icon={Shield} label="Market Intel" />
-              <QuickLink href="/admin/usage" icon={BarChart3} label="Usage & Billing" />
-              <QuickLink href="/admin/operations" icon={Server} label="Operations" />
             </div>
           </div>
 
           {/* Footer */}
           <div className="text-center py-6">
-            <p className="text-[10px] text-white/20">zoobicon.com · zoobicon.ai · zoobicon.io · zoobicon.sh</p>
+            <p className="text-xs text-stone-600">zoobicon.com · zoobicon.ai · zoobicon.io</p>
             <button
               onClick={() => {
                 try { localStorage.removeItem("zoobicon_user"); } catch {}
                 window.location.href = "/auth/login";
               }}
-              className="mt-3 text-xs text-stone-400/60 active:text-stone-400 flex items-center gap-1 mx-auto"
+              className="mt-3 text-xs text-stone-600 active:text-stone-600 flex items-center gap-1 mx-auto"
             >
               <LogOut className="w-3 h-3" /> Sign out
             </button>
@@ -314,35 +316,35 @@ function StatCard({ icon: Icon, label, value, color }: {
   icon: React.ElementType; label: string; value: number; color: string;
 }) {
   const colorMap: Record<string, string> = {
-    brand: "from-brand-500/10 to-brand-500/5 border-brand-500/15",
-    purple: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
-    emerald: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
-    cyan: "from-stone-500/10 to-stone-500/5 border-stone-500/15",
+    brand: "from-stone-50 to-stone-50/50 border-stone-200",
+    purple: "from-stone-50 to-stone-50/50 border-stone-200",
+    emerald: "from-amber-50 to-amber-50/50 border-amber-200",
+    cyan: "from-stone-50 to-stone-50/50 border-stone-200",
   };
   const iconMap: Record<string, string> = {
-    brand: "text-brand-400",
-    purple: "text-stone-400",
-    emerald: "text-stone-400",
-    cyan: "text-stone-400",
+    brand: "text-stone-500",
+    purple: "text-stone-500",
+    emerald: "text-amber-500",
+    cyan: "text-stone-500",
   };
 
   return (
     <div className={`rounded-2xl bg-gradient-to-br ${colorMap[color]} border p-4`}>
       <Icon className={`w-5 h-5 ${iconMap[color]} mb-2`} />
-      <p className="text-2xl font-bold">{value.toLocaleString()}</p>
-      <p className="text-[11px] text-white/40 mt-0.5">{label}</p>
+      <p className="text-2xl font-bold text-stone-800">{value.toLocaleString()}</p>
+      <p className="text-xs text-stone-700 mt-0.5">{label}</p>
     </div>
   );
 }
 
 function QuickLink({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
   return (
-    <Link href={href} className="flex items-center justify-between px-4 py-3.5 active:bg-white/[0.03] transition-colors">
+    <Link href={href} className="flex items-center justify-between px-4 py-3.5 active:bg-stone-50 transition-colors">
       <div className="flex items-center gap-3">
-        <Icon className="w-4 h-4 text-white/40" />
-        <span className="text-sm">{label}</span>
+        <Icon className="w-4 h-4 text-stone-600" />
+        <span className="text-sm text-stone-700">{label}</span>
       </div>
-      <ChevronRight className="w-4 h-4 text-white/20" />
+      <ChevronRight className="w-4 h-4 text-stone-300" />
     </Link>
   );
 }

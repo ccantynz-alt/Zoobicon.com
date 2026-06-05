@@ -6,7 +6,7 @@
  * in the pipeline for maximum flexibility.
  */
 
-export type LLMProvider = "claude" | "openai" | "gemini";
+export type LLMProvider = "claude" | "openai" | "gemini" | "groq" | "selfhosted";
 
 export interface LLMModel {
   provider: LLMProvider;
@@ -28,6 +28,15 @@ export const AVAILABLE_MODELS: LLMModel[] = [
   // Gemini (Google)
   { provider: "gemini", id: "gemini-2.5-pro", label: "Gemini 2.5 Pro", maxTokens: 65536, tier: "premium" },
   { provider: "gemini", id: "gemini-2.5-flash", label: "Gemini 2.5 Flash", maxTokens: 65536, tier: "fast" },
+  // Selfhosted (Zoobicon Substrate — Hetzner GPU bank, OpenAI-compatible API).
+  // Model IDs use the `zoo-` prefix; callSelfhosted() strips it before
+  // forwarding to vLLM/Ollama (so `zoo-llama-3.3-70b` → `llama-3.3-70b`
+  // on the wire). Without these entries the failover loop in
+  // callLLMWithFailover() finds no models for `selfhosted` and skips
+  // it even when the env var is set — that's why the safety net was
+  // dead. Registering them here turns it on.
+  { provider: "selfhosted", id: "zoo-llama-3.3-70b", label: "Zoo Llama 3.3 70B (substrate)", maxTokens: 32000, tier: "balanced" },
+  { provider: "selfhosted", id: "zoo-llama-3.1-8b", label: "Zoo Llama 3.1 8B (substrate, fast)", maxTokens: 8192, tier: "fast" },
 ];
 
 export interface LLMRequest {
@@ -51,7 +60,81 @@ function getProviderForModel(modelId: string): LLMProvider {
   if (modelId.startsWith("claude")) return "claude";
   if (modelId.startsWith("gpt") || modelId.startsWith("o3") || modelId.startsWith("o1")) return "openai";
   if (modelId.startsWith("gemini")) return "gemini";
+  // Groq hosts Llama 3.3 + others under their public model names.
+  if (modelId.startsWith("llama") || modelId.includes("groq")) return "groq";
+  // Self-hosted convention: model names start with "zoo-" so we route
+  // them to our own inference cluster (B25).
+  if (modelId.startsWith("zoo-")) return "selfhosted";
   return "claude"; // default
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Transient error classification + retry
+//
+// Root cause of the "Failed to fix X: write EPROTO ... SSL alert number 80"
+// storm: a flaky TLS connection between us and the upstream LLM. A single
+// ssl3_read_bytes internal_error (alert 80) kills one provider attempt, the
+// failover layer previously did not class EPROTO/SSL as retryable, so every
+// file in a Gate Test batch inherited the same upstream hiccup and the user
+// saw the raw openssl stack. The fix: tight per-call retry with jitter +
+// clean classification of what's retryable vs fatal.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Classify an error as transient (worth retrying) vs fatal (e.g. bad key).
+ * Covers Anthropic SDK failures, node-fetch/undici network errors, DNS,
+ * socket hangups, and raw OpenSSL alert 80 (internal_error) EPROTO faults.
+ */
+export function isTransientLLMError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return /rate.?limit|overloaded|529|too.many|5\d\d|timeout|timed?\s*out|abort|ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|EPIPE|EPROTO|socket\s*hang.?up|fetch failed|network.*error|ssl.*alert|tlsv1|handshake|internal.error/i.test(msg);
+}
+
+/**
+ * Convert any upstream error into a short, human-safe sentence.
+ * Never leaks openssl file paths, alert numbers, or TLS internals to users.
+ */
+export function describeLLMError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (/EPROTO|ssl.*alert|tlsv1|handshake/i.test(msg)) return "upstream TLS connection dropped";
+  if (/rate.?limit|too.many|429/i.test(msg)) return "rate limited";
+  if (/overloaded|529/i.test(msg)) return "provider overloaded";
+  if (/timeout|timed?\s*out|abort/i.test(msg)) return "request timed out";
+  if (/ECONNRESET|socket\s*hang.?up|EPIPE/i.test(msg)) return "connection reset";
+  if (/ECONNREFUSED/i.test(msg)) return "connection refused";
+  if (/ENOTFOUND|EAI_AGAIN/i.test(msg)) return "DNS lookup failed";
+  if (/5\d\d/i.test(msg)) return "provider 5xx error";
+  if (/401|unauthorized|invalid.api.key/i.test(msg)) return "invalid API key";
+  if (/400|invalid.request/i.test(msg)) return "bad request";
+  // Last resort: first sentence only, capped at 120 chars. Never the stack.
+  const first = msg.split(/[\n.]/)[0].trim();
+  return first.length > 120 ? first.slice(0, 117) + "..." : first;
+}
+
+/**
+ * Retry a zero-arg async operation with exponential backoff + jitter.
+ * Only retries transient errors (see isTransientLLMError). Fatal errors
+ * (auth, 400, malformed payload) throw immediately so we don't waste time.
+ */
+async function retryTransient<T>(
+  fn: () => Promise<T>,
+  opts: { attempts?: number; baseMs?: number; label: string } = { label: "llm" }
+): Promise<T> {
+  const attempts = opts.attempts ?? 3;
+  const baseMs = opts.baseMs ?? 400;
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (!isTransientLLMError(err) || i === attempts - 1) throw err;
+      const delay = baseMs * Math.pow(2, i) + Math.floor(Math.random() * 250);
+      console.warn(`[llm-retry:${opts.label}] attempt ${i + 1}/${attempts} failed (${describeLLMError(err)}), retrying in ${delay}ms`);
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  throw lastErr;
 }
 
 async function callClaude(req: LLMRequest): Promise<LLMResponse> {
@@ -84,29 +167,37 @@ async function callOpenAI(req: LLMRequest): Promise<LLMResponse> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("AI service is temporarily unavailable.");
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+  const data = await retryTransient(
+    async () => {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: req.model,
+          max_completion_tokens: req.maxTokens || 16384,
+          messages: [
+            { role: "system", content: req.system },
+            { role: "user", content: req.userMessage },
+          ],
+        }),
+        signal: AbortSignal.timeout(60000),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`OpenAI ${res.status}: ${err?.error?.message || res.statusText}`);
+      }
+      return (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+        usage?: { prompt_tokens?: number; completion_tokens?: number };
+      };
     },
-    body: JSON.stringify({
-      model: req.model,
-      max_completion_tokens: req.maxTokens || 16384,
-      messages: [
-        { role: "system", content: req.system },
-        { role: "user", content: req.userMessage },
-      ],
-    }),
-    signal: AbortSignal.timeout(60000),
-  });
+    { label: `openai:${req.model}` }
+  );
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`OpenAI API error: ${err?.error?.message || res.statusText}`);
-  }
-
-  const data = await res.json();
   const text = data.choices?.[0]?.message?.content || "";
   return {
     text,
@@ -123,25 +214,33 @@ async function callGemini(req: LLMRequest): Promise<LLMResponse> {
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${req.model}:generateContent?key=${apiKey}`;
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      system_instruction: { parts: [{ text: req.system }] },
-      contents: [{ parts: [{ text: req.userMessage }] }],
-      generationConfig: {
-        maxOutputTokens: req.maxTokens || 65536,
-      },
-    }),
-    signal: AbortSignal.timeout(60000),
-  });
+  const data = await retryTransient(
+    async () => {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: req.system }] },
+          contents: [{ parts: [{ text: req.userMessage }] }],
+          generationConfig: {
+            maxOutputTokens: req.maxTokens || 65536,
+          },
+        }),
+        signal: AbortSignal.timeout(60000),
+      });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Gemini API error: ${err?.error?.message || res.statusText}`);
-  }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`Gemini ${res.status}: ${err?.error?.message || res.statusText}`);
+      }
+      return (await res.json()) as {
+        candidates?: { content?: { parts?: { text?: string }[] } }[];
+        usageMetadata?: { promptTokenCount?: number; candidatesTokenCount?: number };
+      };
+    },
+    { label: `gemini:${req.model}` }
+  );
 
-  const data = await res.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
   return {
     text,
@@ -149,6 +248,143 @@ async function callGemini(req: LLMRequest): Promise<LLMResponse> {
     provider: "gemini",
     inputTokens: data.usageMetadata?.promptTokenCount,
     outputTokens: data.usageMetadata?.candidatesTokenCount,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Groq — KILLER-MOVES-BUILDER.md #B24
+//
+// Hosts Llama 3.3 70B + other open-source models. ~$0.20/M input tokens,
+// $0.40/M output (cheaper than Anthropic Haiku) and serves 750+ tokens/sec
+// (faster than any Anthropic tier). Compatible with the OpenAI Chat
+// Completions API shape.
+//
+// For slot-fills the structured-JSON job is well within Llama 3.3 70B's
+// capability. We use Groq as a 4th-line fallback when Anthropic +
+// OpenAI + Gemini all sideline — capacity that doesn't share rate
+// limits with the big three.
+// ─────────────────────────────────────────────────────────────────────────────
+async function callGroq(req: LLMRequest): Promise<LLMResponse> {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) throw new Error("Groq is not configured (set GROQ_API_KEY).");
+
+  // Map our friendly model names to Groq's actual ids.
+  const groqModelMap: Record<string, string> = {
+    "llama-3.3-70b": "llama-3.3-70b-versatile",
+    "llama-3.1-70b": "llama-3.1-70b-versatile",
+    "llama-3.1-8b": "llama-3.1-8b-instant",
+    "mixtral-8x7b": "mixtral-8x7b-32768",
+  };
+  const groqModel = groqModelMap[req.model] || "llama-3.3-70b-versatile";
+
+  const data = await retryTransient(
+    async () => {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: groqModel,
+          max_tokens: req.maxTokens || 4000,
+          messages: [
+            { role: "system", content: req.system },
+            { role: "user", content: req.userMessage },
+          ],
+          // Groq Llama tends to hallucinate JSON unless we explicitly
+          // request strict mode. Best-effort — Groq's strict-mode
+          // implementation varies by model.
+          response_format: req.maxTokens && req.userMessage.includes("JSON") ? { type: "json_object" } : undefined,
+        }),
+        signal: AbortSignal.timeout(60000),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`Groq ${res.status}: ${err?.error?.message || res.statusText}`);
+      }
+      return (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+        usage?: { prompt_tokens?: number; completion_tokens?: number };
+      };
+    },
+    { label: `groq:${groqModel}` },
+  );
+
+  const text = data.choices?.[0]?.message?.content || "";
+  return {
+    text,
+    model: req.model,
+    provider: "groq",
+    inputTokens: data.usage?.prompt_tokens,
+    outputTokens: data.usage?.completion_tokens,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Self-hosted — KILLER-MOVES-BUILDER.md #B25
+//
+// Our own Hetzner GPU bank running vLLM-served Llama 3.3 70B (or
+// equivalent open-source model). Same OpenAI-compatible API shape.
+// Endpoint configured via SELFHOSTED_LLM_URL env var.
+//
+// When deployed, this gives us $0 marginal API cost beyond the fixed
+// monthly infrastructure spend (~$3k/mo for 2× H100 nodes capable of
+// ~80 RPS sustained). The decision-point criterion: switch this on
+// when monthly Anthropic + OpenAI + Gemini bill crosses ~$5k/mo.
+//
+// Model names use the `zoo-` prefix convention (zoo-llama-70b,
+// zoo-llama-8b, etc) so router knows to send them here.
+// ─────────────────────────────────────────────────────────────────────────────
+async function callSelfhosted(req: LLMRequest): Promise<LLMResponse> {
+  const baseUrl = process.env.SELFHOSTED_LLM_URL;
+  if (!baseUrl) {
+    throw new Error("Self-hosted LLM not configured (set SELFHOSTED_LLM_URL).");
+  }
+  const apiKey = process.env.SELFHOSTED_LLM_KEY || "";
+
+  // Strip the "zoo-" prefix to get the actual vLLM model name.
+  const modelName = req.model.startsWith("zoo-") ? req.model.slice(4) : req.model;
+
+  const data = await retryTransient(
+    async () => {
+      const res = await fetch(`${baseUrl.replace(/\/$/, "")}/v1/chat/completions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+        },
+        body: JSON.stringify({
+          model: modelName,
+          max_tokens: req.maxTokens || 4000,
+          messages: [
+            { role: "system", content: req.system },
+            { role: "user", content: req.userMessage },
+          ],
+        }),
+        signal: AbortSignal.timeout(90000),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(`Self-hosted ${res.status}: ${err?.error?.message || res.statusText}`);
+      }
+      return (await res.json()) as {
+        choices?: { message?: { content?: string } }[];
+        usage?: { prompt_tokens?: number; completion_tokens?: number };
+      };
+    },
+    { label: `selfhosted:${modelName}` },
+  );
+
+  const text = data.choices?.[0]?.message?.content || "";
+  return {
+    text,
+    model: req.model,
+    provider: "selfhosted",
+    inputTokens: data.usage?.prompt_tokens,
+    outputTokens: data.usage?.completion_tokens,
   };
 }
 
@@ -165,6 +401,10 @@ export async function callLLM(req: LLMRequest): Promise<LLMResponse> {
       return callOpenAI(req);
     case "gemini":
       return callGemini(req);
+    case "groq":
+      return callGroq(req);
+    case "selfhosted":
+      return callSelfhosted(req);
     default:
       return callClaude(req);
   }
@@ -189,16 +429,14 @@ export async function callLLMWithFailover(
     );
   }
 
-  // Try primary model first
+  // Try primary model first. callLLM now has its own intra-provider retry
+  // for transient TLS/network flakes, so if it still throws, we either
+  // exhausted retries (genuine outage) or hit a fatal error (auth, 400).
   try {
     return await callLLM(req);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    const isRetryable =
-      /rate.limit|overloaded|529|too many|503|500|timeout|timed?\s*out|ECONNRESET|ENOTFOUND|fetch failed|AbortError/i.test(msg);
-    if (!isRetryable) throw err; // Non-retryable errors (auth, bad request) — don't failover
-
-    console.warn(`[LLM Failover] ${req.model} failed: ${msg}`);
+    if (!isTransientLLMError(err)) throw err; // Auth / bad request — don't failover
+    console.warn(`[LLM Failover] ${req.model} unavailable: ${describeLLMError(err)}`);
   }
 
   // Build fallback order: try other providers with their best available model
@@ -232,7 +470,7 @@ export async function callLLMWithFailover(
         maxTokens: Math.min(req.maxTokens || fb.maxTokens, fb.maxTokens),
       });
     } catch (fbErr) {
-      console.warn(`[LLM Failover] ${fb.model} also failed: ${fbErr instanceof Error ? fbErr.message : fbErr}`);
+      console.warn(`[LLM Failover] ${fb.model} also failed: ${describeLLMError(fbErr)}`);
     }
   }
 
@@ -247,6 +485,8 @@ export function getAvailableProviders(): LLMProvider[] {
   if (process.env.ANTHROPIC_API_KEY) providers.push("claude");
   if (process.env.OPENAI_API_KEY) providers.push("openai");
   if (process.env.GOOGLE_AI_API_KEY) providers.push("gemini");
+  if (process.env.GROQ_API_KEY) providers.push("groq");
+  if (process.env.SELFHOSTED_LLM_URL) providers.push("selfhosted");
   return providers;
 }
 
@@ -279,6 +519,9 @@ export function checkProviderHealth(options?: { log?: boolean; throwIfNone?: boo
     { provider: "claude", available: Boolean(process.env.ANTHROPIC_API_KEY), envVar: "ANTHROPIC_API_KEY" },
     { provider: "openai", available: Boolean(process.env.OPENAI_API_KEY), envVar: "OPENAI_API_KEY" },
     { provider: "gemini", available: Boolean(process.env.GOOGLE_AI_API_KEY), envVar: "GOOGLE_AI_API_KEY" },
+    // Substrate is intentionally last so it remains a safety net rather
+    // than competing with commercial providers for routing priority.
+    { provider: "selfhosted", available: Boolean(process.env.SELFHOSTED_LLM_URL), envVar: "SELFHOSTED_LLM_URL" },
   ];
 
   const shouldLog = options?.log ?? true;

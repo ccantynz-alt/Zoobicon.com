@@ -3,52 +3,9 @@
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
-
-  "regions": ["iad1"],
-
-  "crons": [
-    {
-      "path": "/api/cron/warmup",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/intel/health",
-      "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/health?deep=true",
-      "schedule": "0 */2 * * *"
-    },
-    {
-      "path": "/api/seo/agent/cron",
-      "schedule": "0 */6 * * *"
-    },
-    {
-      "path": "/api/intel/competitors",
-      "schedule": "0 */12 * * *"
-    },
-    {
-      "path": "/api/intel/technology",
-      "schedule": "0 0 */2 * *"
-    },
-    {
-      "path": "/api/intel/cron",
-      "schedule": "0 0 * * *"
-    },
-    {
-      "path": "/api/auto-pilot/cron",
-      "schedule": "0 3 * * 1"
-    },
-    {
-      "path": "/api/agents/cron",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/cron/daily-comeback",
-      "schedule": "0 3 * * *"
-    }
+  "regions": [
+    "iad1"
   ],
-
   "functions": {
     "src/app/api/health/route.ts": {
       "maxDuration": 120,
@@ -70,15 +27,7 @@
       "maxDuration": 300,
       "memory": 1024
     },
-    "src/app/api/generate/edit-diff/route.ts": {
-      "maxDuration": 120,
-      "memory": 1024
-    },
     "src/app/api/generate/quick/route.ts": {
-      "maxDuration": 300,
-      "memory": 1024
-    },
-    "src/app/api/generate/instant/route.ts": {
       "maxDuration": 300,
       "memory": 1024
     },
@@ -90,20 +39,12 @@
       "maxDuration": 300,
       "memory": 1024
     },
-    "src/app/api/slack/events/route.ts": {
-      "maxDuration": 30,
-      "memory": 512
-    },
     "src/app/api/chat/route.ts": {
       "maxDuration": 300,
       "memory": 1024
     },
     "src/app/api/support/route.ts": {
       "maxDuration": 60,
-      "memory": 512
-    },
-    "src/app/api/auth/**": {
-      "maxDuration": 30,
       "memory": 512
     },
     "src/app/api/seo/agent/cron/route.ts": {
@@ -113,42 +54,92 @@
     "src/app/api/video-creator/render/route.ts": {
       "maxDuration": 120,
       "memory": 1024
+    },
+    "src/app/api/generate/launch-video/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/video-creator/dub/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/cron/flywheel-consolidate/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/cron/prebuild-factory/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "src/app/api/cron/self-heal/route.ts": {
+      "maxDuration": 120,
+      "memory": 512
+    },
+    "src/app/api/generate/slot-stream/route.ts": {
+      "maxDuration": 300,
+      "memory": 1024
     }
   },
-
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-DNS-Prefetch-Control", "value": "on" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        {
+          "key": "X-DNS-Prefetch-Control",
+          "value": "on"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
       ]
     },
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store" }
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
       ]
     },
     {
       "source": "/_next/static/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
       "source": "/fonts/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
       "source": "/images/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400, stale-while-revalidate=604800"
+        }
       ]
     }
   ]

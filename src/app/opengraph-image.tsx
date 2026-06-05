@@ -42,7 +42,7 @@ export default async function OGImage() {
             width: "400px",
             height: "400px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(59, 130, 246, 0.2), transparent 70%)",
+            background: "radial-gradient(circle, rgba(212,184,109, 0.2), transparent 70%)",
             filter: "blur(60px)",
           }}
         />
@@ -61,12 +61,12 @@ export default async function OGImage() {
               width: "48px",
               height: "48px",
               borderRadius: "12px",
-              background: "linear-gradient(135deg, #6d3bff, #7c5aff)",
+              background: "linear-gradient(135deg, #d4b86d, #b8923f)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontSize: "24px",
-              color: "white",
+              color: "#0a0a0b",
               fontWeight: 900,
             }}
           >
@@ -99,7 +99,7 @@ export default async function OGImage() {
               fontWeight: 800,
               letterSpacing: "-0.04em",
               lineHeight: 1,
-              background: "linear-gradient(135deg, #7c5aff, #3b82f6, #22d3ee)",
+              background: "linear-gradient(135deg, #b8923f, #8c6b25, #0a0a0b)",
               backgroundClip: "text",
               color: "transparent",
             }}
@@ -150,7 +150,7 @@ export default async function OGImage() {
           </span>
           <span style={{ fontSize: "16px", color: "rgba(255, 255, 255, 0.15)" }}>•</span>
           <span style={{ fontSize: "16px", color: "rgba(255, 255, 255, 0.35)" }}>
-            zoobicon.sh
+            zoobicon.io
           </span>
         </div>
       </div>

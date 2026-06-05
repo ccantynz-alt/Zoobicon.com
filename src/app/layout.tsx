@@ -108,8 +108,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#0b1530" },
-    { media: "(prefers-color-scheme: light)", color: "#0b1530" },
+    { media: "(prefers-color-scheme: dark)", color: "#f7f5ee" },
+    { media: "(prefers-color-scheme: light)", color: "#f7f5ee" },
   ],
 };
 
@@ -126,18 +126,19 @@ export default function RootLayout({
         <link rel="alternate" hrefLang="x-default" href="https://zoobicon.com" />
         <link rel="alternate" href="https://zoobicon.ai" title="Zoobicon AI" />
         <link rel="alternate" href="https://zoobicon.io" title="Zoobicon for Developers" />
-        <link rel="alternate" href="https://zoobicon.sh" title="Zoobicon Hosting & CLI" />
-        {/* Critical inline styles — guarantees dark bg even before CSS bundle loads */}
-        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#0b1530;color:#e4e4e7;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em;overscroll-behavior:none;-webkit-overflow-scrolling:touch}html{overflow-x:hidden}` }} />
+        {/* Critical inline styles — paints the warm bone palette before the CSS bundle loads */}
+        <style dangerouslySetInnerHTML={{ __html: `html,body{background:#ffffff;color:#0a0a0b;margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:-0.011em;-webkit-overflow-scrolling:touch}body{overflow-x:hidden;overscroll-behavior:none}` }} />
         {/* Preconnect to Google Fonts CDN */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Async font loading — never blocks rendering. Subset to Latin to reduce download. */}
-        <script dangerouslySetInnerHTML={{ __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap&subset=latin';document.head.appendChild(l)})()` }} />
+        {/* Async font loading — never blocks rendering. Subset to Latin to reduce download.
+            Playfair Display (italic + roman) is the editorial display face used in
+            holdenmercer.com; we keep Fraunces too as a fallback for any legacy uses. */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,700&family=Fraunces:ital,opsz,wght@1,9..144,400&family=Inter:opsz,wght@14..32,400..900&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap&subset=latin';document.head.appendChild(l)})()` }} />
         {/* Fallback for users with JS disabled */}
         <noscript>
           <link
-            href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap&subset=latin"
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,700&family=Fraunces:ital,opsz,wght@1,9..144,400&family=Inter:opsz,wght@14..32,400..900&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap&subset=latin"
             rel="stylesheet"
           />
         </noscript>
@@ -146,7 +147,13 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://js.stripe.com" />
         <link rel="dns-prefetch" href="https://accounts.google.com" />
         <link rel="dns-prefetch" href="https://github.com" />
-        <meta name="msapplication-TileColor" content="#0b1530" />
+        {/* Preconnect for builder preview: warms TCP/TLS before the user's
+            first build so esm.sh package fetches start instantly. */}
+        <link rel="preconnect" href="https://esm.sh" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://esm.sh" />
+        <link rel="dns-prefetch" href="https://cdn.tailwindcss.com" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff" />
         <meta name="msapplication-config" content="none" />
         {/* AI Discovery — llms.txt is the "robots.txt for AI" */}
         <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt — AI-readable site description" />
@@ -161,7 +168,9 @@ export default function RootLayout({
             <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${process.env.NEXT_PUBLIC_GA_ID}',{page_path:window.location.pathname})` }} />
           </>
         )}
-        {/* Organization JSON-LD structured data — enhanced for GEO (Generative Engine Optimization) */}
+        {/* Organization JSON-LD — site-wide authority signal. Refreshed
+            for Rule 33 (six agents, $49-299 builder tiers, Crontech-
+            provisioned hosting + domain). */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
@@ -170,13 +179,11 @@ export default function RootLayout({
             "name": "Zoobicon",
             "url": "https://zoobicon.com",
             "logo": "https://zoobicon.com/og-image.png",
-            "description": "AI Website Builder — 7 AI agents build production-ready websites, SaaS apps, and e-commerce stores from a single prompt.",
-            "foundingDate": "2025",
+            "description": "AI Website Builder. Six agents build a production-ready React site from a single prompt; hosting + custom domain provisioned via Crontech at deploy.",
+            "foundingDate": "2024",
             "sameAs": [
               "https://zoobicon.ai",
-              "https://zoobicon.io",
-              "https://zoobicon.sh",
-              "https://dominat8.io"
+              "https://zoobicon.io"
             ],
             "contactPoint": {
               "@type": "ContactPoint",
@@ -186,17 +193,15 @@ export default function RootLayout({
             },
             "offers": {
               "@type": "AggregateOffer",
-              "lowPrice": "0",
-              "highPrice": "99",
+              "lowPrice": "49",
+              "highPrice": "299",
               "priceCurrency": "USD",
-              "offerCount": "4"
+              "offerCount": "3"
             },
             "knowsAbout": [
               "AI website generation",
               "Multi-agent AI pipelines",
-              "Website hosting and deployment",
-              "E-commerce storefront generation",
-              "Full-stack application generation",
+              "Domain registration",
               "SEO optimization",
               "AI-powered web design",
               "White-label website builder platforms",
@@ -205,7 +210,6 @@ export default function RootLayout({
               "AI code generation",
               "Responsive web design",
               "Website templates",
-              "SaaS application development",
               "Agency website management"
             ],
             "hasOfferCatalog": {
@@ -223,24 +227,6 @@ export default function RootLayout({
                   "name": "AI SEO Agent",
                   "description": "Automated SEO analysis and optimization for websites",
                   "url": "https://zoobicon.com/products/seo-agent"
-                },
-                {
-                  "@type": "OfferCatalog",
-                  "name": "AI Video Creator",
-                  "description": "AI-powered video script, storyboard, and scene generation pipeline",
-                  "url": "https://zoobicon.com/products/video-creator"
-                },
-                {
-                  "@type": "OfferCatalog",
-                  "name": "Email Support System",
-                  "description": "AI-powered email ticketing and support system with Mailgun integration",
-                  "url": "https://zoobicon.com/products/email-support"
-                },
-                {
-                  "@type": "OfferCatalog",
-                  "name": "Website Hosting",
-                  "description": "One-click deploy to zoobicon.sh with SSL, CDN, and custom domains",
-                  "url": "https://zoobicon.com/products/hosting"
                 },
                 {
                   "@type": "OfferCatalog",
@@ -274,22 +260,43 @@ export default function RootLayout({
             ]
           }) }}
         />
-        {/* SoftwareApplication JSON-LD structured data */}
+        {/* SoftwareApplication JSON-LD — drives Google Software Knowledge Panel */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             "name": "Zoobicon AI Website Builder",
-            "applicationCategory": "DeveloperApplication",
+            "applicationCategory": "WebApplication",
             "operatingSystem": "Web",
             "url": "https://zoobicon.com/builder",
             "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD"
+              "@type": "AggregateOffer",
+              "lowPrice": "49",
+              "highPrice": "299",
+              "priceCurrency": "USD",
+              "offerCount": "3"
             },
-            "description": "Build production-ready websites with AI. 7 agents collaborate to generate full-stack apps, e-commerce stores, and multi-page sites from a single prompt."
+            "description": "Six AI agents collaborate to generate a production-ready React website from a single prompt. Hosting + custom domain provisioned via Crontech at deploy."
+          }) }}
+        />
+        {/* WebSite JSON-LD with SearchAction — enables Google Sitelinks
+            search box for branded queries. High-leverage SEO signal. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Zoobicon",
+            "url": "https://zoobicon.com",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://zoobicon.com/builder?prompt={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
           }) }}
         />
         {/* FAQ JSON-LD for rich snippets in Google search results */}
@@ -304,7 +311,7 @@ export default function RootLayout({
                 "name": "How does Zoobicon build websites with AI?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Zoobicon uses a 7-agent AI pipeline. You describe what you want in plain English, and 7 specialized AI agents (strategist, brand designer, copywriter, architect, developer, SEO optimizer, animation specialist) collaborate to build a production-ready website in about 95 seconds."
+                  "text": "Zoobicon uses a six-agent AI pipeline. You describe what you want in plain English; the Strategist, Brand Designer, Architect, Copywriter, Developer, and SEO agents collaborate live in your browser to ship a production-ready React site in roughly 60 seconds."
                 }
               },
               {
@@ -312,7 +319,7 @@ export default function RootLayout({
                 "name": "How much does Zoobicon cost?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Zoobicon offers a free starter plan with limited builds. Paid plans start at $19/month (Creator), $49/month (Pro), and $99/month (Agency). All paid plans include a 14-day free trial. Enterprise pricing is available on request."
+                  "text": "Three tiers: Starter $49/mo (1 site, 1 custom domain included), Pro $129/mo (3 sites, 3 domains, Opus 4.7), Agency $299/mo (10 sites, white-label, API access). All domains and hosting are provisioned via the Crontech API at deploy time."
                 }
               },
               {
@@ -320,7 +327,7 @@ export default function RootLayout({
                 "name": "What types of websites can Zoobicon generate?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Zoobicon can generate any type of website: business sites, e-commerce stores, SaaS dashboards, portfolios, blogs, restaurants, real estate, healthcare, and more. It includes 43 specialized generators and 100+ templates across 13 categories."
+                  "text": "Restaurants, photographers, SaaS startups, lawyers, coaches, ecommerce stores, portfolios, real estate, nonprofits, hotels — Zoobicon ships tuned niche templates for 28+ industries, plus open-ended generation from any prompt."
                 }
               },
               {
@@ -328,7 +335,7 @@ export default function RootLayout({
                 "name": "Can I edit the website after it's generated?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Yes. Zoobicon includes a full visual editor with click-to-select editing, a code editor, AI-powered chat editing, version history with rollback, and 16+ sidebar tools for SEO, accessibility, performance, animations, and more."
+                  "text": "Yes. Diff-based chat editing means a one-line change re-renders in roughly two seconds without regenerating the whole site. The output is a real React + Tailwind codebase you can export and host anywhere."
                 }
               },
               {
@@ -336,17 +343,14 @@ export default function RootLayout({
                 "name": "Where are Zoobicon sites hosted?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Generated sites are deployed to zoobicon.sh with free hosting. You can also connect a custom domain, export as HTML/ZIP/React, or export as a WordPress theme."
+                  "text": "Hosting + custom domains are provisioned via the Crontech API at deploy time — one platform, free SSL, global CDN. The generated codebase is portable, so you can also export and host anywhere else."
                 }
               }
             ]
           }) }}
         />
       </head>
-      <body className="grain fs-grain">
-        {/* Site-wide navy backdrop + dot-grid pattern. Fixed behind all
-            content (z-index: -1) so every page inherits the same chrome
-            without individual pages needing to render <BackgroundEffects />. */}
+      <body className="fs-grain">
         <div className="site-backdrop" aria-hidden="true" />
         <ComingSoonBanner />
         <MaintenanceBanner />

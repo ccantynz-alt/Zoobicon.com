@@ -1,95 +1,85 @@
-import { NextRequest } from "next/server";
-import { sql } from "@/lib/db";
-
 /**
- * GET /api/collab/code?roomId=xxx&version=N
- * Returns latest code if version > client's version, otherwise 304-equivalent
+ * /api/collab/code — get + push the shared code state.
+ *
+ * GET  ?roomId=X&version=N → { html, version, updatedAt }
+ *        Returns the current code if it's newer than the client's
+ *        version. The client polls this so late-joiners and
+ *        out-of-sync clients converge.
+ * POST { roomId, html, expectedVersion } → { ok, version }
+ *        Optimistic concurrency: only writes if expectedVersion
+ *        matches what the server holds; otherwise returns
+ *        { ok: false, serverVersion } and the client re-fetches.
  */
-export async function GET(req: NextRequest) {
+
+import { NextResponse } from "next/server";
+import { ensureCollabTables, getCode, pushCode } from "@/lib/collab-server";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(request: Request) {
   try {
-    const roomId = req.nextUrl.searchParams.get("roomId");
-    const clientVersion = parseInt(req.nextUrl.searchParams.get("version") || "0");
-
+    await ensureCollabTables();
+    const { searchParams } = new URL(request.url);
+    const roomId = searchParams.get("roomId");
+    const clientVersion = parseInt(searchParams.get("version") || "0", 10);
     if (!roomId) {
-      return Response.json({ error: "Room ID required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "roomId required" },
+        { status: 400 }
+      );
     }
-
-    const [sync] = await sql`
-      SELECT html, version, updated_by, updated_at
-      FROM collab_code_sync
-      WHERE room_id = ${roomId}
-      LIMIT 1
-    `;
-
+    const sync = await getCode(roomId);
     if (!sync) {
-      return Response.json({ html: "", version: 0, updated_by: "", hasUpdate: false });
+      return NextResponse.json({ html: null, version: 0 });
     }
-
-    // Only send code if version is newer
     if (sync.version <= clientVersion) {
-      return Response.json({ hasUpdate: false, version: sync.version });
+      // Client already has the latest — return 304-equivalent payload
+      return NextResponse.json({ html: null, version: sync.version, noChange: true });
     }
-
-    return Response.json({
+    return NextResponse.json({
       html: sync.html,
       version: sync.version,
-      updated_by: sync.updated_by,
-      updated_at: sync.updated_at,
-      hasUpdate: true,
+      updatedAt: sync.updatedAt,
     });
   } catch (err) {
-    console.error("Code sync GET error:", err);
-    return Response.json({ error: "Failed to fetch code" }, { status: 500 });
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Server error" },
+      { status: 500 }
+    );
   }
 }
 
-/**
- * POST /api/collab/code — Push code update
- *
- * Body: { roomId, html, email, expectedVersion? }
- * Uses optimistic concurrency: if expectedVersion doesn't match, returns conflict
- */
-export async function POST(req: NextRequest) {
+interface PostBody {
+  roomId?: string;
+  html?: string;
+  expectedVersion?: number;
+}
+
+export async function POST(request: Request) {
+  let body: PostBody;
   try {
-    const { roomId, html, email, expectedVersion } = await req.json();
-
-    if (!roomId || typeof html !== "string") {
-      return Response.json({ error: "Room ID and HTML required" }, { status: 400 });
-    }
-
-    // Check if code sync record exists
-    const [existing] = await sql`
-      SELECT version FROM collab_code_sync WHERE room_id = ${roomId} LIMIT 1
-    `;
-
-    if (!existing) {
-      // Create initial record
-      await sql`
-        INSERT INTO collab_code_sync (room_id, html, version, updated_by)
-        VALUES (${roomId}, ${html}, 1, ${email || ""})
-      `;
-      return Response.json({ version: 1, conflict: false });
-    }
-
-    // Optimistic concurrency check
-    if (expectedVersion !== undefined && expectedVersion !== existing.version) {
-      return Response.json({
-        conflict: true,
-        serverVersion: existing.version,
-        message: "Code was updated by another collaborator",
-      }, { status: 409 });
-    }
-
-    const newVersion = existing.version + 1;
-    await sql`
-      UPDATE collab_code_sync
-      SET html = ${html}, version = ${newVersion}, updated_by = ${email || ""}, updated_at = NOW()
-      WHERE room_id = ${roomId}
-    `;
-
-    return Response.json({ version: newVersion, conflict: false });
+    body = (await request.json()) as PostBody;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  if (!body.roomId || typeof body.html !== "string" || typeof body.expectedVersion !== "number") {
+    return NextResponse.json(
+      { error: "roomId, html, expectedVersion required" },
+      { status: 400 }
+    );
+  }
+  try {
+    await ensureCollabTables();
+    const result = await pushCode({
+      roomId: body.roomId,
+      html: body.html,
+      expectedVersion: body.expectedVersion,
+    });
+    return NextResponse.json(result);
   } catch (err) {
-    console.error("Code sync POST error:", err);
-    return Response.json({ error: "Failed to sync code" }, { status: 500 });
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Server error" },
+      { status: 500 }
+    );
   }
 }

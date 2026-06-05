@@ -103,12 +103,12 @@ export default function ClientPortal() {
   );
 
   const brandName = agencyBrand?.agencyName || "Client Portal";
-  const primaryColor = agencyBrand?.primaryColor || "#3b82f6";
+  const primaryColor = agencyBrand?.primaryColor || "#78716c";
 
   // Preview mode — full-screen iframe
   if (previewSite) {
     return (
-      <div className="min-h-screen bg-[#0a0a12] flex flex-col">
+      <div className="min-h-screen bg-transparent flex flex-col">
         <header className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06] bg-[#12121a]/80 backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <nav className="flex items-center gap-1.5 text-sm" aria-label="Breadcrumb">
@@ -127,7 +127,7 @@ export default function ClientPortal() {
             </nav>
           </div>
           <a
-            href={`https://${previewSite.slug}.zoobicon.sh`}
+            href={`https://${previewSite.slug}.crontech.app`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-colors text-white/60 hover:text-white hover:bg-white/[0.06]"
@@ -150,7 +150,7 @@ export default function ClientPortal() {
   // Login screen
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-[#0a0a12] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             {agencyBrand?.logoUrl ? (
@@ -210,7 +210,7 @@ export default function ClientPortal() {
 
   // Sites list
   return (
-    <div className="min-h-screen bg-[#0a0a12]">
+    <div className="min-h-screen bg-transparent">
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06] bg-[#12121a]/80 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           {agencyBrand?.logoUrl ? (
@@ -305,7 +305,7 @@ export default function ClientPortal() {
 
                 <div className="p-4">
                   <h3 className="text-white font-medium text-sm truncate">{site.name}</h3>
-                  <p className="text-white/50 text-xs mt-1 truncate">{site.slug}.zoobicon.sh</p>
+                  <p className="text-white/50 text-xs mt-1 truncate">{site.slug}.crontech.app</p>
                   <div className="flex items-center justify-between mt-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       site.status === "published" ? "bg-stone-500/20 text-stone-400" :
@@ -323,7 +323,7 @@ export default function ClientPortal() {
                         <Eye size={14} />
                       </button>
                       <a
-                        href={`https://${site.slug}.zoobicon.sh`}
+                        href={`https://${site.slug}.crontech.app`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-white/50 hover:text-white transition-colors"

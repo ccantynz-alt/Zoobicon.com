@@ -4,14 +4,124 @@ import {
   SandpackProvider,
   SandpackPreview as SandboxPreview,
   SandpackCodeEditor,
+  useSandpack,
 } from "@codesandbox/sandpack-react";
 import { useMemo } from "react";
 import { extractSandpackFiles } from "@/lib/sandpack-utils";
+
+/**
+ * Compile-error overlay (Phase 2, 2026-05-13).
+ *
+ * Sandpack silently shows a blank preview when a generated component
+ * has a syntax error, broken import, or runtime crash. The audit found
+ * users assume the whole build failed because there's no visible
+ * indicator anything went wrong. This overlay reads Sandpack's bundler
+ * error state via the useSandpack hook and renders an editorial-light
+ * panel naming the offending file with a Refresh action.
+ */
+function CompileErrorOverlay({ onDownload }: { onDownload?: () => void }) {
+  const { sandpack } = useSandpack();
+  const error = sandpack.error;
+
+  if (!error) return null;
+
+  // Differentiate Sandpack bundler-infrastructure errors (TIME_OUT,
+  // network) from real generated-code compile errors. The bundler
+  // service is hosted by codesandbox.io and can be flaky — when it
+  // fails the user should know "your build is fine, the preview just
+  // can't reach the bundler service" and have a download fallback.
+  // 2026-05-26 fix: was previously just "Preview compile error" for
+  // EVERYTHING, which made bundler timeouts look like build failures.
+  const message = error.message || "Unknown compile error";
+  const isInfraError =
+    /TIME_OUT|TIMEOUT|connect to (server|runtime)|sandpack-bundler|create-react-app/i.test(message);
+
+  return (
+    <div
+      className="pointer-events-auto absolute inset-x-3 bottom-3 z-20 rounded-2xl border p-4 shadow-lg"
+      style={{
+        background: "var(--paper-elevated)",
+        borderColor: "var(--rule)",
+        color: "var(--ink)",
+      }}
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+          style={{ background: "var(--gold-soft)", color: "var(--gold-deep)" }}
+        >
+          !
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+            {isInfraError
+              ? "Preview bundler timed out"
+              : "Preview compile error"}
+          </div>
+          {isInfraError ? (
+            <div className="mt-0.5 text-xs" style={{ color: "var(--ink-muted)" }}>
+              Your site built fine — the in-browser preview service just couldn&apos;t reach its bundler. This is on the upstream sandbox provider (codesandbox.io), not your build.
+            </div>
+          ) : (
+            error.path && (
+              <div className="mt-0.5 truncate text-xs" style={{ color: "var(--ink-muted)" }}>
+                in {error.path}
+              </div>
+            )
+          )}
+          <div
+            className="mt-2 max-h-32 overflow-auto rounded-md p-2 font-mono text-[11px] leading-relaxed"
+            style={{
+              background: "var(--paper)",
+              border: "1px solid var(--rule)",
+              color: "var(--ink-secondary)",
+            }}
+          >
+            {message}
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => sandpack.runSandpack()}
+              className="rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              style={{ background: "var(--ink)", color: "var(--paper)" }}
+            >
+              {isInfraError ? "Retry connection" : "Retry compile"}
+            </button>
+            {isInfraError && onDownload && (
+              <button
+                type="button"
+                onClick={onDownload}
+                className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+                style={{
+                  background: "var(--paper)",
+                  borderColor: "var(--rule)",
+                  color: "var(--ink)",
+                }}
+              >
+                Download project as ZIP
+              </button>
+            )}
+            <span className="text-[11px]" style={{ color: "var(--ink-muted)" }}>
+              {isInfraError
+                ? "Or wait 30s and retry — the bundler usually recovers."
+                : "The generation didn't fail — only this preview render. Edit the file or ask the chat to fix it."}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface SandpackPreviewPropsHTML {
   mode?: "html";
   html: string;
   showEditor?: boolean;
+  /** Called when the user clicks "Download project" in the error
+   *  overlay. Builder passes a handler that exports the current files
+   *  as a ZIP so failed previews don't strand the user. */
+  onDownload?: () => void;
 }
 
 interface SandpackPreviewPropsReact {
@@ -19,36 +129,41 @@ interface SandpackPreviewPropsReact {
   files: Record<string, string>;
   dependencies?: Record<string, string>;
   showEditor?: boolean;
+  onDownload?: () => void;
 }
 
 type SandpackPreviewProps = SandpackPreviewPropsHTML | SandpackPreviewPropsReact;
 
 /**
- * Zoobicon-branded dark theme for Sandpack.
+ * Zoobicon-branded LIGHT theme for Sandpack — editorial palette.
+ * Was previously the Filmora dark theme (#0f2148 navy with cyan
+ * syntax highlighting). Flipped to bone surfaces + ink syntax so
+ * the builder's preview pane reads as part of the editorial-light
+ * design system, not as a foreign code editor.
  */
 const zoobiconTheme = {
   colors: {
-    surface1: "#0f2148",
-    surface2: "#1a1d2e",
-    surface3: "#252840",
-    clickable: "#999999",
-    base: "#e0e0e0",
-    disabled: "#4a4a4a",
-    hover: "#c5c5c5",
-    accent: "#6d5dfc",
-    error: "#ff453a",
-    errorSurface: "#3d1e1e",
+    surface1: "#ffffff",      // primary: pure white iframe bg
+    surface2: "#f4f1e6",      // secondary: warm cream (var --paper-elevated)
+    surface3: "#eeebde",      // tertiary: deeper cream for selection
+    clickable: "#76767e",     // interactive idle
+    base: "#0a0a0b",          // body text — near-black
+    disabled: "#a8a392",      // disabled / placeholder
+    hover: "#0a0a0b",         // hover text
+    accent: "#b8923f",        // champagne accent
+    error: "#b91c1c",
+    errorSurface: "#fef2f2",
   },
   syntax: {
-    plain: "#d4d4d4",
-    comment: { color: "#6a737d", fontStyle: "italic" as const },
-    keyword: "#c792ea",
-    tag: "#80cbc4",
-    punctuation: "#89ddff",
-    definition: "#82aaff",
-    property: "#c792ea",
-    static: "#f78c6c",
-    string: "#c3e88d",
+    plain: "#0a0a0b",
+    comment: { color: "#76767e", fontStyle: "italic" as const },
+    keyword: "#8c6b25",
+    tag: "#0a0a0b",
+    punctuation: "#2a2a30",
+    definition: "#0a0a0b",
+    property: "#8c6b25",
+    static: "#b8923f",
+    string: "#1a3d2e",
   },
   font: {
     body: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -174,20 +289,25 @@ const SANDPACK_FULL_HEIGHT_CSS = `
  * fills the entire available space regardless of Sandpack's internal layout.
  */
 export default function SandpackPreview(props: SandpackPreviewProps) {
-  const { showEditor = false } = props;
+  const { showEditor = false, onDownload } = props;
   const mode = props.mode || "html";
+
+  // Extract the mode-specific input into a stable value so the useMemo
+  // dependency arrays below can be statically checked. The previous inline
+  // ternaries triggered react-hooks/exhaustive-deps because eslint can't
+  // statically prove the discriminated-union narrowing.
+  const htmlInput = mode === "html" ? (props as SandpackPreviewPropsHTML).html : "";
+  const reactFilesInput = mode === "react" ? (props as SandpackPreviewPropsReact).files : null;
 
   const htmlFiles = useMemo(() => {
     if (mode !== "html") return {};
-    const html = (props as SandpackPreviewPropsHTML).html || "";
-    return extractSandpackFiles(html);
-  }, [mode, mode === "html" ? (props as SandpackPreviewPropsHTML).html : ""]);
+    return extractSandpackFiles(htmlInput || "");
+  }, [mode, htmlInput]);
 
   const reactFiles = useMemo(() => {
     if (mode !== "react") return {};
-    const files = (props as SandpackPreviewPropsReact).files || {};
-    return buildReactSandpackFiles(files);
-  }, [mode, mode === "react" ? (props as SandpackPreviewPropsReact).files : null]);
+    return buildReactSandpackFiles(reactFilesInput || {});
+  }, [mode, reactFilesInput]);
 
   const dependencies = mode === "react" ? (props as SandpackPreviewPropsReact).dependencies : undefined;
 
@@ -209,56 +329,82 @@ export default function SandpackPreview(props: SandpackPreviewProps) {
   // BEFORE the first real component arrives. Keep this list tight — every
   // extra dep adds to the pre-warm cost. Only include things >80% of generated
   // sites use.
+  //
+  // PINNED versions (not "latest"): "latest" forces Sandpack to re-resolve
+  // from npm on every cold cache, which is the difference between a 2s and
+  // a 25s first preview. Pinned versions are reproducible AND cached
+  // aggressively by Sandpack's CDN. If a generated component imports a
+  // newer API, react-stream's package.json overrides this map.
   const PREWARM_DEPS: Record<string, string> = {
-    "lucide-react": "latest",
-    "framer-motion": "latest",
-    "clsx": "latest",
-    "tailwind-merge": "latest",
+    "lucide-react": "^1.7.0",
+    "framer-motion": "^12.38.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.5",
   };
 
-  // Pre-warm App that actually imports and references the common libraries.
-  // The `const _warm = ...` lines prevent tree-shaking — the bundler has to
-  // include the real library code. Wrapped in `if (false)` so they never
-  // execute but still get bundled.
+  // Pre-warm App that ACTUALLY uses the common libraries in live JSX,
+  // not just module-level dead references. The previous version had
+  // `const _warm = {motion, Sparkles, ...}` + `{false && <div>...</div>}`
+  // which the bundler tree-shook because the warm const was only used
+  // in unreachable code. Audit 2026-05-13 confirmed deps weren't bundled
+  // → first real prompt still cold-bundled for 15-20s.
+  //
+  // Fix: every pre-warm dep is referenced in active JSX that the
+  // bundler cannot prove dead. clsx + twMerge build className strings;
+  // Sparkles + Zap render real icons; framer-motion wraps the spinner
+  // wrapper in a motion.div. By the time the real component arrives,
+  // every dep is bundled and module-cached.
   const PREWARM_APP = `import { motion } from "framer-motion";
-import { Sparkles, Zap, ArrowRight } from "lucide-react";
+import { Sparkles, Zap } from "lucide-react";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
-// Force bundler to include these libraries so the first real component
-// renders instantly. Never executes.
-const _warm = { motion, Sparkles, Zap, ArrowRight, clsx, twMerge };
-
 export default function App() {
+  // Active uses of clsx + twMerge so the bundler must include them.
+  const spinnerClass = twMerge(clsx("sp-spinner", "sp-rotate"));
+  const dotClass = twMerge(clsx("sp-dot"));
+
   return (
-    <div style={{
-      minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "#0f2148",
-      color: "rgba(255,255,255,0.4)",
-      fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-      fontSize: "14px",
-    }}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#ffffff",
+        color: "rgba(10, 10, 11, 0.55)",
+        fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+        fontSize: "14px",
+      }}
+    >
       <div style={{ textAlign: "center" }}>
-        <div style={{
+        <div className={spinnerClass} style={{
           width: "40px",
           height: "40px",
           margin: "0 auto 16px",
-          border: "3px solid rgba(109,93,252,0.2)",
-          borderTopColor: "#6d5dfc",
+          border: "3px solid rgba(184, 146, 63, 0.20)",
+          borderTopColor: "#b8923f",
           borderRadius: "50%",
           animation: "sp-spin 0.8s linear infinite",
-        }} />
-        <div>Preview ready — describe your site to begin</div>
-        <div style={{ fontSize: "11px", marginTop: "8px", opacity: 0.6 }}>
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          <Sparkles size={14} color="#b8923f" />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+          <Zap size={12} color="#8c6b25" />
+          <span>Preview ready — describe your site to begin</span>
+        </div>
+        <div className={dotClass} style={{ fontSize: "11px", marginTop: "8px", opacity: 0.6 }}>
           Pre-warming bundler & dependencies…
         </div>
         <style>{"@keyframes sp-spin { to { transform: rotate(360deg); } }"}</style>
       </div>
-      {false && <div>{JSON.stringify(_warm)}</div>}
-    </div>
+    </motion.div>
   );
 }`;
 
@@ -267,8 +413,8 @@ export default function App() {
 <head>
   <meta charset="utf-8" />
   <style>
-    body { margin: 0; background: #0f2148; color: rgba(255,255,255,0.4); font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 14px; text-align: center; }
-    .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid rgba(109,93,252,0.2); border-top-color: #6d5dfc; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    body { margin: 0; background: #ffffff; color: #2a2a30; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 14px; text-align: center; }
+    .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid rgba(184, 146, 63, 0.20); border-top-color: #b8923f; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -315,11 +461,14 @@ export default function App() {
               </div>
             )}
             <div className={showEditor ? "flex-[2] min-w-0" : "flex-1 min-w-0"} style={{ height: "100%" }}>
-              <SandboxPreview
-                showOpenInCodeSandbox={false}
-                showRefreshButton
-                style={{ height: "100%" }}
-              />
+              <div className="relative h-full w-full">
+                <SandboxPreview
+                  showOpenInCodeSandbox={false}
+                  showRefreshButton
+                  style={{ height: "100%" }}
+                />
+                {!isPrewarm && <CompileErrorOverlay onDownload={onDownload} />}
+              </div>
             </div>
           </div>
         </SandpackProvider>

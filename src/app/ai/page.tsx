@@ -9,7 +9,6 @@ import {
   Globe,
   Palette,
   Bot,
-  Video,
   Mail,
   Search,
   Bug,
@@ -90,14 +89,7 @@ const AI_TOOLS = [
     tag: "Agent",
     href: "/chatbot-widget",
   },
-  {
-    icon: Video,
-    name: "AI Video Creator",
-    description: "Transform text scripts into professional marketing videos in minutes.",
-    color: "from-accent-purple to-stone-700",
-    glowColor: "shadow-stone-500/25",
-    tag: "Video",
-  },
+  // AI Video Creator entry removed 2026-05-26 — Rule 19 retired.
   {
     icon: Mail,
     name: "AI Email Writer",
@@ -110,7 +102,7 @@ const AI_TOOLS = [
     icon: Search,
     name: "AI SEO Agent",
     description: "Autonomous SEO that ranks your content automatically.",
-    color: "from-accent-cyan to-stone-600",
+    color: "from-accent-stone to-stone-600",
     glowColor: "shadow-stone-500/25",
     tag: "Agent",
   },
@@ -155,16 +147,16 @@ const HOW_IT_WORKS = [
     title: "Generate",
     subtitle: "AI builds it in seconds with auto-debugging",
     description: "Our AI writes production-grade code, designs responsive layouts, and auto-debugs every error — all in under 60 seconds.",
-    color: "from-accent-purple to-stone-700",
+    color: "from-accent-stone to-stone-700",
     glowColor: "shadow-stone-500/30",
   },
   {
     step: "03",
     icon: Rocket,
     title: "Deploy",
-    subtitle: "One-click publish to your.zoobicon.sh or custom domain",
-    description: "Hit deploy and your site goes live instantly. Free hosting on zoobicon.sh, or connect your own domain in one click.",
-    color: "from-accent-cyan to-stone-600",
+    subtitle: "One-click publish to a Crontech subdomain or your custom domain",
+    description: "Hit deploy and your site goes live instantly. Free hosting on or connect your own domain in one click.",
+    color: "from-accent-stone to-stone-600",
     glowColor: "shadow-stone-500/30",
   },
 ];
@@ -197,17 +189,17 @@ export default function AiPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white overflow-x-hidden relative">
+    <div className="min-h-screen bg-[var(--paper)] text-white overflow-x-hidden relative">
       <BackgroundEffects preset="technical" />
       {/* ───────── Navigation ───────── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[#0b1530]/80 backdrop-blur-xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[var(--paper)]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-zoo-500 to-zoo-400 flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <span className="text-lg font-bold">
-              zoobicon<span className="text-accent-purple">.ai</span>
+              zoobicon<span className="text-accent-stone">.ai</span>
             </span>
           </Link>
 
@@ -215,11 +207,11 @@ export default function AiPage() {
             <Link href="/" className="hover:text-white transition-colors">
               zoobicon.com
             </Link>
-            <Link href="/developers" className="hover:text-white transition-colors">
+            <Link href="/builder" className="hover:text-white transition-colors">
               zoobicon.io
             </Link>
             <Link href="/cli" className="hover:text-white transition-colors">
-              zoobicon.sh
+              CLI
             </Link>
             <Link
               href="/builder"
@@ -239,7 +231,7 @@ export default function AiPage() {
 
         <div className="relative max-w-5xl mx-auto text-center">
           <motion.div variants={staggerContainer} initial="hidden" animate="visible">
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent-purple/30 bg-accent-purple/5 text-accent-purple text-sm font-medium mb-8">
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent-stone/30 bg-accent-stone/5 text-accent-stone text-sm font-medium mb-8">
               <Sparkles className="w-4 h-4" />
               The AI-First Creation Platform
             </motion.div>
@@ -249,14 +241,14 @@ export default function AiPage() {
                 Zoobicon.ai
               </span>
               <br />
-              <span className="bg-gradient-to-r from-zoo-400 via-accent-purple to-accent-cyan bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-zoo-400 via-accent-stone to-accent-stone bg-clip-text text-transparent">
                 Where AI Creates
               </span>
             </motion.h1>
 
             <motion.p variants={fadeInUp} className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 leading-relaxed">
-              The most powerful AI creation suite on the internet. Generate websites, brands, videos,
-              emails, and entire businesses — all from a single prompt.
+              The most powerful AI website builder on the internet. Generate sites,
+              brands, and entire businesses — all from a single prompt.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -295,7 +287,7 @@ export default function AiPage() {
                 variants={fadeInUp}
                 className="p-4 rounded-xl border border-white/10 bg-white/[0.05]"
               >
-                <div className="text-2xl font-bold bg-gradient-to-r from-zoo-400 to-accent-purple bg-clip-text text-transparent">
+                <div className="text-2xl font-bold bg-gradient-to-r from-zoo-400 to-accent-stone bg-clip-text text-transparent">
                   {stat.value}
                 </div>
                 <div className="text-sm text-gray-300 mt-1">{stat.label}</div>
@@ -307,7 +299,7 @@ export default function AiPage() {
 
       {/* ───────── AI Tools Grid ───────── */}
       <section className="relative py-24 px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent-purple/3 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent-stone/3 to-transparent pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto">
           <motion.div
@@ -326,7 +318,7 @@ export default function AiPage() {
                 Every Tool You Need,
               </span>
               <br />
-              <span className="bg-gradient-to-r from-zoo-400 to-accent-purple bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-zoo-400 to-accent-stone bg-clip-text text-transparent">
                 Powered by AI
               </span>
             </motion.h2>
@@ -395,7 +387,7 @@ export default function AiPage() {
             viewport={{ once: true, amount: 0.3 }}
             className="text-center mb-12"
           >
-            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent-cyan/30 bg-accent-cyan/5 text-accent-cyan text-sm font-medium mb-4">
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent-stone/30 bg-accent-stone/5 text-accent-stone text-sm font-medium mb-4">
               <MousePointerClick className="w-4 h-4" />
               Interactive
             </motion.div>
@@ -544,7 +536,7 @@ export default function AiPage() {
 
                 <div className={`relative p-8 rounded-2xl border border-white/10 bg-white/[0.05] hover:border-white/15 transition-all shadow-lg ${step.glowColor}`}>
                   {/* Step number */}
-                  <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-[#0b1530] border border-white/15 flex items-center justify-center text-sm font-bold text-gray-300">
+                  <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-[var(--paper)] border border-white/15 flex items-center justify-center text-sm font-bold text-gray-300">
                     {step.step}
                   </div>
 
@@ -566,8 +558,8 @@ export default function AiPage() {
       {/* ───────── Powered by Claude ───────── */}
       <section className="relative py-24 px-6">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-accent-purple/8 rounded-full blur-[120px]" />
-          <div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] bg-accent-cyan/7 rounded-full blur-[100px]" />
+          <div className="absolute top-1/2 left-1/4 w-[500px] h-[500px] bg-accent-stone/8 rounded-full blur-[120px]" />
+          <div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] bg-accent-stone/7 rounded-full blur-[100px]" />
         </div>
 
         <div className="relative max-w-5xl mx-auto">
@@ -581,7 +573,7 @@ export default function AiPage() {
             <div className="grid md:grid-cols-2 gap-0">
               {/* Left: Info */}
               <motion.div variants={slideInLeft} className="p-10 md:p-12 flex flex-col justify-center">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent-purple/30 bg-accent-purple/5 text-accent-purple text-sm font-medium mb-6 w-fit">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-accent-stone/30 bg-accent-stone/5 text-accent-stone text-sm font-medium mb-6 w-fit">
                   <Brain className="w-4 h-4" />
                   AI Foundation
                 </div>
@@ -601,8 +593,8 @@ export default function AiPage() {
                     "Safety-first design with responsible AI practices",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm text-gray-300">
-                      <div className="w-5 h-5 rounded-full bg-accent-purple/10 border border-accent-purple/30 flex items-center justify-center mt-0.5 shrink-0">
-                        <Sparkles className="w-3 h-3 text-accent-purple" />
+                      <div className="w-5 h-5 rounded-full bg-accent-stone/10 border border-accent-stone/30 flex items-center justify-center mt-0.5 shrink-0">
+                        <Sparkles className="w-3 h-3 text-accent-stone" />
                       </div>
                       {item}
                     </li>
@@ -611,14 +603,14 @@ export default function AiPage() {
               </motion.div>
 
               {/* Right: Visual */}
-              <motion.div variants={slideInRight} className="relative bg-gradient-to-br from-accent-purple/5 to-zoo-500/5 p-10 md:p-12 flex items-center justify-center border-l border-white/10">
+              <motion.div variants={slideInRight} className="relative bg-gradient-to-br from-accent-stone/5 to-zoo-500/5 p-10 md:p-12 flex items-center justify-center border-l border-white/10">
                 <div className="relative">
                   {/* Glow ring */}
-                  <div className="absolute inset-0 w-48 h-48 mx-auto rounded-full bg-gradient-to-br from-accent-purple/30 to-zoo-500/30 blur-2xl" />
-                  <div className="relative w-48 h-48 mx-auto rounded-full border border-white/15 bg-[#0b1530]/80 flex items-center justify-center">
-                    <div className="w-36 h-36 rounded-full border border-accent-purple/20 bg-gradient-to-br from-accent-purple/10 to-zoo-500/10 flex items-center justify-center">
+                  <div className="absolute inset-0 w-48 h-48 mx-auto rounded-full bg-gradient-to-br from-accent-stone/30 to-zoo-500/30 blur-2xl" />
+                  <div className="relative w-48 h-48 mx-auto rounded-full border border-white/15 bg-[var(--paper)]/80 flex items-center justify-center">
+                    <div className="w-36 h-36 rounded-full border border-accent-stone/20 bg-gradient-to-br from-accent-stone/10 to-zoo-500/10 flex items-center justify-center">
                       <div className="text-center">
-                        <Brain className="w-12 h-12 text-accent-purple mx-auto mb-2" />
+                        <Brain className="w-12 h-12 text-accent-stone mx-auto mb-2" />
                         <p className="text-sm font-semibold text-white">Claude</p>
                         <p className="text-[10px] text-gray-300">by Anthropic</p>
                       </div>
@@ -628,7 +620,7 @@ export default function AiPage() {
                   {/* Orbiting dots */}
                   {["top-0 left-1/2 -translate-x-1/2 -translate-y-2", "bottom-0 left-1/2 -translate-x-1/2 translate-y-2", "left-0 top-1/2 -translate-y-1/2 -translate-x-2", "right-0 top-1/2 -translate-y-1/2 translate-x-2"].map((pos, i) => (
                     <div key={i} className={`absolute ${pos}`}>
-                      <div className={`w-3 h-3 rounded-full ${["bg-zoo-500", "bg-accent-purple", "bg-accent-cyan", "bg-stone-500"][i]} shadow-lg`} />
+                      <div className={`w-3 h-3 rounded-full ${["bg-zoo-500", "bg-accent-stone", "bg-accent-stone", "bg-stone-500"][i]} shadow-lg`} />
                     </div>
                   ))}
                 </div>
@@ -641,7 +633,7 @@ export default function AiPage() {
       {/* ───────── CTA ───────── */}
       <section className="relative py-32 px-6">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-zoo-500/15 via-accent-purple/15 to-accent-cyan/15 rounded-full blur-[150px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-zoo-500/15 via-accent-stone/15 to-accent-stone/15 rounded-full blur-[150px]" />
         </div>
 
         <div className="relative max-w-3xl mx-auto text-center">
@@ -656,7 +648,7 @@ export default function AiPage() {
                 Ready to Build
               </span>
               <br />
-              <span className="bg-gradient-to-r from-zoo-400 via-accent-purple to-accent-cyan bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-zoo-400 via-accent-stone to-accent-stone bg-clip-text text-transparent">
                 with AI?
               </span>
             </motion.h2>
@@ -690,14 +682,14 @@ export default function AiPage() {
               <Sparkles className="w-3 h-3 text-white" />
             </div>
             <span className="text-sm font-semibold text-gray-300">
-              zoobicon<span className="text-accent-purple">.ai</span>
+              zoobicon<span className="text-accent-stone">.ai</span>
             </span>
           </div>
 
           <div className="flex items-center gap-6 text-sm text-gray-300">
             <Link href="/" className="hover:text-white transition-colors">zoobicon.com</Link>
-            <Link href="/developers" className="hover:text-white transition-colors">zoobicon.io</Link>
-            <Link href="/cli" className="hover:text-white transition-colors">zoobicon.sh</Link>
+            <Link href="/builder" className="hover:text-white transition-colors">zoobicon.io</Link>
+            <Link href="/cli" className="hover:text-white transition-colors">CLI</Link>
             <Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>

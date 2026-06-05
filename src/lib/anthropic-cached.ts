@@ -64,16 +64,21 @@ function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
 }
 
-function requireApiKey(): string {
+async function requireApiKey(): Promise<string> {
   const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) {
-    const err = new Error(
-      "ANTHROPIC_API_KEY environment variable is not set",
-    ) as Error & { status: number };
-    err.status = 503;
-    throw err;
-  }
-  return key;
+  if (key) return key;
+
+  try {
+    const { getSetting } = await import("@/lib/flywheel");
+    const stored = await getSetting("ANTHROPIC_API_KEY");
+    if (stored) return stored;
+  } catch {}
+
+  const err = new Error(
+    "ANTHROPIC_API_KEY is not set. Add it in Vercel env vars or at /admin/settings.",
+  ) as Error & { status: number };
+  err.status = 503;
+  throw err;
 }
 
 function buildSystem(
@@ -118,10 +123,10 @@ function buildBody(opts: CallClaudeOptions): RequestBody {
   };
 }
 
-function headers(): Record<string, string> {
+async function headers(): Promise<Record<string, string>> {
   return {
     "content-type": "application/json",
-    "x-api-key": requireApiKey(),
+    "x-api-key": await requireApiKey(),
     "anthropic-version": ANTHROPIC_VERSION,
     "anthropic-beta": ANTHROPIC_BETA,
   };
@@ -134,7 +139,7 @@ export async function callClaude(
 
   const res = await fetch(ANTHROPIC_URL, {
     method: "POST",
-    headers: headers(),
+    headers: await headers(),
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(90_000),
   });
@@ -190,7 +195,7 @@ export async function* streamClaude(
 
   const res = await fetch(ANTHROPIC_URL, {
     method: "POST",
-    headers: headers(),
+    headers: await headers(),
     body: JSON.stringify(body),
     signal: ac.signal,
   });
@@ -250,6 +255,65 @@ export async function* streamClaude(
   }
 }
 
+export interface CachedMessageSystemBlock {
+  type: "text";
+  text: string;
+  cache_control?: { type: "ephemeral" };
+}
+
+export interface CachedMessageArgs {
+  system: CachedMessageSystemBlock[] | string;
+  messages: Array<{ role: "user" | "assistant"; content: string }>;
+  model: string;
+  maxTokens: number;
+  temperature?: number;
+}
+
+export interface CachedMessageResult {
+  text: string;
+  usage?: ClaudeUsage;
+}
+
+/**
+ * Send a message to the Anthropic API with structured system blocks that may
+ * carry `cache_control: { type: "ephemeral" }` for prompt caching. Used by
+ * builder-critique.ts to cache the large static system prompt across calls.
+ *
+ * Returns `{ text, usage }` where `text` is the concatenated text content.
+ */
+export async function createCachedMessage(
+  args: CachedMessageArgs,
+): Promise<CachedMessageResult> {
+  const body = {
+    model: args.model,
+    max_tokens: args.maxTokens,
+    temperature: args.temperature ?? 0.7,
+    system: args.system,
+    messages: args.messages,
+  };
+
+  const res = await fetch(ANTHROPIC_URL, {
+    method: "POST",
+    headers: await headers(),
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(120_000),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    const err = new Error(
+      `Anthropic API error ${res.status}: ${text}`,
+    ) as Error & { status: number };
+    err.status = res.status;
+    throw err;
+  }
+
+  const response = (await res.json()) as ClaudeResponse;
+  const text =
+    response.content.find((b) => b.type === "text")?.text ?? "";
+  return { text, usage: response.usage };
+}
+
 export interface CostInput {
   model: string;
   inputTokens: number;
@@ -275,13 +339,11 @@ interface ModelPricing {
 }
 
 const PRICING: Record<string, ModelPricing> = {
-  // Claude Opus 4.7
   "claude-opus-4-7": { input: 15, output: 75, cached: 1.5 },
   "claude-opus-4-7-20250101": { input: 15, output: 75, cached: 1.5 },
-  // Claude Sonnet 4.6
+  "claude-opus-4-6": { input: 15, output: 75, cached: 1.5 },
   "claude-sonnet-4-6": { input: 3, output: 15, cached: 0.3 },
   "claude-sonnet-4-6-20250101": { input: 3, output: 15, cached: 0.3 },
-  // Claude Haiku 4.5
   "claude-haiku-4-5": { input: 0.8, output: 4, cached: 0.08 },
   "claude-haiku-4-5-20250101": { input: 0.8, output: 4, cached: 0.08 },
 };

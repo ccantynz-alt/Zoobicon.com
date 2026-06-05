@@ -49,9 +49,9 @@ const VARIANTS = {
     accent: "165, 243, 252",    // cyan-200
   },
   green: {
-    primary: "34, 197, 94",     // green-500
+    primary: "184, 146, 63",     // green-500
     secondary: "59, 130, 246",  // blue-500
-    accent: "134, 239, 172",    // green-300
+    accent: "212, 184, 109",    // green-300
   },
 };
 

@@ -130,7 +130,7 @@ function DomainSearch() {
                     ${r.price?.toFixed(2)}/yr
                   </span>
                   <Link
-                    href="/auth/signup"
+                    href="/builder"
                     className="px-3 py-1.5 bg-zoo-500/10 text-zoo-400 rounded-lg text-xs font-semibold hover:bg-zoo-500/20 transition-colors"
                   >
                     Register
@@ -348,6 +348,8 @@ const PRICING = [
     price: "$0",
     period: "/mo",
     description: "For personal projects",
+    generations: "1,000 emails/month",
+    rateLimit: "10 req/min",
     features: [
       "1,000 emails/month",
       "1 domain",
@@ -363,6 +365,8 @@ const PRICING = [
     price: "$25",
     period: "/mo",
     description: "For growing businesses",
+    generations: "50,000 emails/month",
+    rateLimit: "100 req/min",
     features: [
       "50,000 emails/month",
       "10 domains",
@@ -380,6 +384,8 @@ const PRICING = [
     price: "$99",
     period: "/mo",
     description: "For high-volume senders",
+    generations: "500,000 emails/month",
+    rateLimit: "Unlimited",
     features: [
       "500,000 emails/month",
       "Unlimited domains",
@@ -478,7 +484,7 @@ export default function ZoobiconIOPage() {
   const [activeLang, setActiveLang] = useState<"curl" | "javascript" | "python">("curl");
 
   return (
-    <div className="min-h-screen bg-[#0b1530] text-white overflow-hidden relative">
+    <div className="min-h-screen bg-[var(--paper)] text-white overflow-hidden relative">
       <BackgroundEffects preset="technical" />
       <CursorGlowTracker />
 
@@ -525,14 +531,14 @@ export default function ZoobiconIOPage() {
             className="flex flex-wrap justify-center gap-4 mb-16"
           >
             <Link
-              href="/auth/signup"
+              href="/builder"
               className="btn-zoo inline-flex items-center gap-2 px-8 py-4 text-white font-bold rounded-xl text-lg"
             >
               Start Free
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              href="/developers"
+              href="/builder"
               className="btn-zoo-outline inline-flex items-center gap-2 px-6 py-3 rounded-lg font-mono text-sm"
             >
               View API Docs
@@ -609,7 +615,7 @@ export default function ZoobiconIOPage() {
 
       {/* ─── How It Works ─── */}
       <section className="relative py-24 px-4">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(184,146,63,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(184,146,63,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
         <div className="relative max-w-4xl mx-auto">
           <motion.div
@@ -920,7 +926,7 @@ export default function ZoobiconIOPage() {
 
       {/* ─── Comparison Table ─── */}
       <section className="relative py-24 px-4">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(184,146,63,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(184,146,63,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
         <div className="relative max-w-4xl mx-auto">
           <motion.div
@@ -1003,7 +1009,7 @@ export default function ZoobiconIOPage() {
                 variants={scaleIn}
                 className={`relative p-8 rounded-xl border transition-all ${
                   tier.highlight
-                    ? "border-zoo-500/40 bg-zoo-500/[0.03] shadow-[0_0_60px_-15px_rgba(37,99,235,0.15)]"
+                    ? "border-zoo-500/40 bg-zoo-500/[0.03] shadow-[0_0_60px_-15px_rgba(184,146,63,0.15)]"
                     : "border-white/15 bg-white/[0.05] hover:border-white/15"
                 }`}
               >
@@ -1081,7 +1087,7 @@ export default function ZoobiconIOPage() {
                   <h3 className="font-semibold text-white mb-2">Generate an API key</h3>
                   <p className="text-sm text-gray-300 mb-3">
                     Navigate to{" "}
-                    <Link href="/auth/settings" className="text-zoo-400 hover:underline">
+                    <Link href="/builder" className="text-zoo-400 hover:underline">
                       Settings
                     </Link>{" "}
                     and create a new API key. Keys use the format:
@@ -1179,10 +1185,10 @@ export default function ZoobiconIOPage() {
                 icon: Bot,
               },
               {
-                domain: "zoobicon.sh",
+                domain: "crontech.app",
                 tagline: "Host it",
-                desc: "Deploy to zoobicon.sh with CDN, SSL, and custom domains. One-click from the builder.",
-                href: "/sh",
+                desc: "Deploy through our partner cloud — CDN, SSL, and custom domains, one-click from the builder.",
+                href: "/cli",
                 icon: Server,
               },
               {
@@ -1257,14 +1263,14 @@ export default function ZoobiconIOPage() {
             className="flex flex-wrap justify-center gap-4"
           >
             <Link
-              href="/auth/signup"
+              href="/builder"
               className="btn-zoo inline-flex items-center gap-2 px-8 py-4 text-white font-bold rounded-xl text-lg"
             >
               Get Started Free
               <Mail className="w-5 h-5" />
             </Link>
             <Link
-              href="/developers"
+              href="/builder"
               className="btn-zoo-outline inline-flex items-center gap-2 px-8 py-4 rounded-lg font-semibold"
             >
               API Documentation
@@ -1366,12 +1372,12 @@ export default function ZoobiconIOPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/sh" className="hover:text-gray-300">
-                    zoobicon.sh
+                  <Link href="/cli" className="hover:text-gray-300">
+                    CLI
                   </Link>
                 </li>
                 <li>
-                  <Link href="/developers" className="hover:text-gray-300">
+                  <Link href="/builder" className="hover:text-gray-300">
                     Developer Docs
                   </Link>
                 </li>

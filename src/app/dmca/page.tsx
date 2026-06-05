@@ -22,13 +22,13 @@ export const metadata: Metadata = {
 
 export default function DMCAPage() {
   return (
-    <div className="relative min-h-screen bg-[#0a0a12] text-[#e8e8ec]">
+    <div className="relative min-h-screen text-[#e8e8ec]">
       <BackgroundEffects preset="minimal" />
       {/* Nav */}
-      <nav className="border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
+      <nav className="border-b border-white/[0.06] bg-[var(--paper)]/80 backdrop-blur-2xl">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -49,7 +49,7 @@ export default function DMCAPage() {
               Zoobicon respects the intellectual property rights of others and expects its users to do
               the same. In accordance with the Digital Millennium Copyright Act of 1998 (&ldquo;DMCA&rdquo;),
               17 U.S.C. &sect; 512, we will respond expeditiously to claims of copyright infringement
-              committed using the Zoobicon platform (zoobicon.com, zoobicon.ai, zoobicon.io, zoobicon.sh).
+              committed using the Zoobicon platform (zoobicon.com, zoobicon.ai, zoobicon.io).
             </p>
             <p className="mt-3">
               Because Zoobicon uses AI to generate content, it is possible that generated output may

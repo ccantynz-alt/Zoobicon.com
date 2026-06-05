@@ -532,7 +532,7 @@ export async function getAuditHistory(siteId: string, limit = 30): Promise<SeoAg
     LIMIT ${limit}
   `;
 
-  return rows.map((r) => ({
+  return rows.map((r: any) => ({
     id: r.id,
     configId: r.config_id,
     siteId: r.site_id,
@@ -557,7 +557,7 @@ export async function getRunIssues(runId: string): Promise<SeoAgentIssue[]> {
     ORDER BY severity ASC, category ASC
   `;
 
-  return rows.map((r) => ({
+  return rows.map((r: any) => ({
     id: r.id,
     runId: r.run_id,
     category: r.category,
@@ -581,7 +581,7 @@ export async function getPendingFixes(siteId: string): Promise<SeoFix[]> {
     ORDER BY created_at DESC
   `;
 
-  return rows.map((r) => ({
+  return rows.map((r: any) => ({
     id: r.id,
     issueId: r.issue_id,
     runId: r.run_id,

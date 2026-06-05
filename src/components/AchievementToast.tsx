@@ -42,7 +42,8 @@ function ConfettiBurst() {
     const angle = (i / 24) * 360;
     const distance = 40 + Math.random() * 60;
     const size = 4 + Math.random() * 4;
-    const colors = ["#6d3bff", "#22d3ee", "#f59e0b", "#ef4444", "#10b981", "#ec4899", "#3b82f6"];
+    // Rule 29 — confetti palette is gold + ink + warm neutrals only (no purple/cyan/magenta).
+    const colors = ["#b8923f", "#d4b86d", "#8c6b25", "#f4f1e6", "#a8a392", "#0a0a0b", "#78716c"];
     const color = colors[i % colors.length];
     const dx = Math.cos((angle * Math.PI) / 180) * distance;
     const dy = Math.sin((angle * Math.PI) / 180) * distance;

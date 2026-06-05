@@ -1,0 +1,57 @@
+{
+  "name": "zoobicon",
+  "version": "0.1.0",
+  "description": "Zoobicon CLI — generate, deploy, and manage AI-built websites from your terminal.",
+  "keywords": [
+    "ai",
+    "website-builder",
+    "cli",
+    "deploy",
+    "domains",
+    "zoobicon",
+    "lovable-alternative",
+    "bolt-alternative"
+  ],
+  "homepage": "https://zoobicon.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ccantynz-alt/Zoobicon.com.git",
+    "directory": "cli"
+  },
+  "bugs": {
+    "url": "https://github.com/ccantynz-alt/Zoobicon.com/issues"
+  },
+  "license": "MIT",
+  "author": "Zoobicon",
+  "type": "module",
+  "bin": {
+    "zoobicon": "./dist/index.js",
+    "zbk": "./dist/index.js"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=esm --packages=external --outfile=dist/index.js --banner:js=\"#!/usr/bin/env node\" && chmod +x dist/index.js",
+    "dev": "tsx src/index.ts",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "kleur": "^4.1.5",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.0",
+    "@types/prompts": "^2.4.9",
+    "esbuild": "^0.23.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  }
+}

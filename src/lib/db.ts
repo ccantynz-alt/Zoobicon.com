@@ -138,6 +138,51 @@ export async function initSchema() {
     CREATE INDEX IF NOT EXISTS projects_user_email_idx ON projects (user_email)
   `;
 
+  // Idempotent: add columns for persistent project editing
+  await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS files JSONB DEFAULT '{}'`;
+  await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS deps JSONB DEFAULT '{}'`;
+  await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS current_version INTEGER DEFAULT 0`;
+  await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS sections JSONB DEFAULT '[]'`;
+
+  // Admin-private builds (added 2026-05-17). Default 'public' so existing
+  // rows are untouched; admin builds get tagged 'admin_private' at save
+  // time and filtered out of every public listing (gallery, showcase,
+  // intel exports, agency client views). Sites equivalent runs after
+  // the CREATE TABLE sites block below.
+  await sql`ALTER TABLE projects ADD COLUMN IF NOT EXISTS visibility TEXT NOT NULL DEFAULT 'public'`;
+  await sql`CREATE INDEX IF NOT EXISTS projects_visibility_idx ON projects (visibility)`;
+
+  // ---- Project versions: every edit creates a snapshot ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS project_versions (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      project_id  UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      version     INTEGER NOT NULL DEFAULT 1,
+      files       JSONB NOT NULL DEFAULT '{}',
+      deps        JSONB NOT NULL DEFAULT '{}',
+      label       TEXT NOT NULL DEFAULT '',
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS project_versions_project_id_idx ON project_versions (project_id)`;
+
+  // ---- Project chat messages: persistent conversation history ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS project_messages (
+      id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      project_id    UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      role          TEXT NOT NULL,
+      content       TEXT NOT NULL DEFAULT '',
+      status        TEXT NOT NULL DEFAULT 'complete',
+      changed_files TEXT[] DEFAULT '{}',
+      duration_ms   INTEGER,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS project_messages_project_id_idx ON project_messages (project_id)`;
+
   // ---- Hosting tables ----
 
   await sql`
@@ -156,6 +201,8 @@ export async function initSchema() {
 
   await sql`CREATE INDEX IF NOT EXISTS sites_email_idx ON sites (email)`;
   await sql`CREATE INDEX IF NOT EXISTS sites_slug_idx  ON sites (slug)`;
+  await sql`ALTER TABLE sites ADD COLUMN IF NOT EXISTS visibility TEXT NOT NULL DEFAULT 'public'`;
+  await sql`CREATE INDEX IF NOT EXISTS sites_visibility_idx ON sites (visibility)`;
 
   await sql`
     CREATE TABLE IF NOT EXISTS deployments (
@@ -621,4 +668,191 @@ export async function initSchema() {
   `;
 
   await sql`CREATE INDEX IF NOT EXISTS usage_tracking_email_idx ON usage_tracking (email)`;
+
+  // ---- Generated-site users (end-users of AI-built sites, not Zoobicon users) ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_users (
+      id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      project_id    TEXT NOT NULL,
+      email         TEXT NOT NULL,
+      password_hash TEXT NOT NULL,
+      metadata      JSONB,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_seen     TIMESTAMPTZ,
+      UNIQUE (project_id, email)
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS site_users_project_idx ON site_users (project_id)`;
+
+  // ---- Generated-site data (contact forms, bookings, records, etc.) ----
+
+  await sql`
+    CREATE TABLE IF NOT EXISTS site_data (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      project_id  TEXT NOT NULL,
+      collection  TEXT NOT NULL,
+      data        JSONB NOT NULL,
+      user_id     UUID REFERENCES site_users(id) ON DELETE SET NULL,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+
+  await sql`CREATE INDEX IF NOT EXISTS site_data_project_collection_idx ON site_data (project_id, collection)`;
+
+  // ---- Build telemetry (KILLER-MOVES.md #3) ----
+  // Every AI builder request lands a row in `builds` so we can answer
+  // "which components fail most?", "what's p99 build duration?", "how
+  // often does failover trigger?". See src/lib/build-telemetry.ts for
+  // the writer + summary helpers.
+  await sql`
+    CREATE TABLE IF NOT EXISTS builds (
+      id                  BIGSERIAL PRIMARY KEY,
+      build_id            TEXT UNIQUE NOT NULL,
+      user_email          TEXT,
+      user_plan           TEXT,
+      endpoint            TEXT NOT NULL,
+      mode                TEXT,
+      theme               TEXT,
+      prompt_head         TEXT NOT NULL,
+      industry            TEXT,
+      component_count     INTEGER,
+      components_selected JSONB DEFAULT '[]'::jsonb,
+      failed_sections     JSONB DEFAULT '[]'::jsonb,
+      total_duration_ms   INTEGER NOT NULL,
+      phase_timings       JSONB DEFAULT '[]'::jsonb,
+      model_usage         JSONB DEFAULT '[]'::jsonb,
+      ok                  BOOLEAN NOT NULL,
+      error_kind          TEXT,
+      error_message       TEXT,
+      quality_score       INTEGER,
+      created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS builds_user_email_idx ON builds (user_email)`;
+  await sql`CREATE INDEX IF NOT EXISTS builds_created_at_idx ON builds (created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS builds_ok_idx ON builds (ok, created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS builds_endpoint_idx ON builds (endpoint, created_at DESC)`;
+
+  // ---- Per-user build quotas (KILLER-MOVES.md #5) ----
+  // Daily token budget per user to prevent cost runaway + abuse. Soft
+  // cap (warn) and hard cap (block) configured per plan tier in
+  // src/lib/build-quota.ts. Resets per UTC day.
+  await sql`
+    CREATE TABLE IF NOT EXISTS build_quotas (
+      user_email          TEXT NOT NULL,
+      day                 DATE NOT NULL,
+      build_count         INTEGER NOT NULL DEFAULT 0,
+      total_input_tokens  INTEGER NOT NULL DEFAULT 0,
+      total_output_tokens INTEGER NOT NULL DEFAULT 0,
+      estimated_cost_usd  NUMERIC(10, 4) NOT NULL DEFAULT 0,
+      blocked_at          TIMESTAMPTZ,
+      updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (user_email, day)
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS build_quotas_day_idx ON build_quotas (day DESC)`;
+
+  // ---- Slot-fill cache (KILLER-MOVES-BUILDER.md #B19) ----
+  // Semantically similar prompts produce the same normalised cache key.
+  // At scale ~30% of customer prompts hash to a previously seen key →
+  // cached JSON slot-fill returns in <50ms with zero AI cost. See
+  // src/lib/slot-locked/cache.ts for the lookup/persist helpers.
+  // TTL is enforced in the query (rows older than 7 days are ignored,
+  // not deleted — a nightly cron can prune in a separate job).
+  await sql`
+    CREATE TABLE IF NOT EXISTS slot_cache (
+      cache_key    TEXT NOT NULL,
+      component_id TEXT NOT NULL,
+      slot_fill    JSONB NOT NULL,
+      hit_count    INTEGER NOT NULL DEFAULT 0,
+      created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      last_hit_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (cache_key, component_id)
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS slot_cache_component_idx ON slot_cache (component_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS slot_cache_last_hit_idx ON slot_cache (last_hit_at DESC)`;
+
+  // ---- Flywheel: successful slot fills for few-shot retrieval (B26) ----
+  // Every successful build's slot fill lands here. New builds retrieve
+  // top-N most similar past fills and inject them as few-shot examples
+  // in the customiser system prompt. Result: builds get smarter +
+  // cheaper as the table grows.
+  await sql`
+    CREATE TABLE IF NOT EXISTS flywheel_successful_builds (
+      id                  BIGSERIAL PRIMARY KEY,
+      component_id        TEXT NOT NULL,
+      industry            TEXT NOT NULL DEFAULT 'other',
+      theme               TEXT NOT NULL DEFAULT 'editorial',
+      prompt_head         TEXT NOT NULL,
+      normalised_prompt   TEXT NOT NULL,
+      brand_name          TEXT NOT NULL DEFAULT '',
+      slot_fill           JSONB NOT NULL,
+      quality_score       INTEGER NOT NULL DEFAULT 0,
+      shareable_anonymous BOOLEAN NOT NULL DEFAULT true,
+      created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_sb_component_idx ON flywheel_successful_builds (component_id, created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_sb_industry_idx ON flywheel_successful_builds (industry, theme, created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_sb_quality_idx ON flywheel_successful_builds (quality_score DESC, created_at DESC)`;
+
+  // ---- Flywheel: keystroke-level event log (B26b) ----
+  // Every meaningful user interaction during a build journey lands
+  // here. Used to measure time-to-first-deploy, regeneration rate,
+  // and to feed pattern-mining for the flywheel's intelligence layer.
+  await sql`
+    CREATE TABLE IF NOT EXISTS flywheel_events (
+      id           BIGSERIAL PRIMARY KEY,
+      build_id     TEXT NOT NULL,
+      session_id   TEXT,
+      user_email   TEXT,
+      type         TEXT NOT NULL,
+      payload      JSONB NOT NULL DEFAULT '{}'::jsonb,
+      created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_events_build_idx ON flywheel_events (build_id)`;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_events_session_idx ON flywheel_events (session_id, created_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_events_type_idx ON flywheel_events (type, created_at DESC)`;
+
+  // ---- Flywheel: consolidated memories (B27) ----
+  // Nightly cron rolls raw events + successful builds into higher-
+  // level memories the planner/customiser/admin dashboard read.
+  // Wiped + rebuilt fresh on every consolidation run for snapshot
+  // kinds; future "accumulating" kinds will keep history.
+  await sql`
+    CREATE TABLE IF NOT EXISTS flywheel_memories (
+      id              BIGSERIAL PRIMARY KEY,
+      kind            TEXT NOT NULL,
+      subject         TEXT NOT NULL,
+      content         JSONB NOT NULL,
+      sample_size     INTEGER NOT NULL DEFAULT 0,
+      consolidated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_memories_kind_idx ON flywheel_memories (kind, subject)`;
+  await sql`CREATE INDEX IF NOT EXISTS flywheel_memories_consolidated_idx ON flywheel_memories (consolidated_at DESC)`;
+
+  // ---- Self-healing actions (B29) ----
+  // Hourly cron detects failure patterns and writes corrective
+  // actions here. The planner + api-bank read this table on every
+  // build to skip quarantined components + deprioritise unhealthy
+  // providers. Actions expire automatically via active_until.
+  await sql`
+    CREATE TABLE IF NOT EXISTS self_healing_actions (
+      id            BIGSERIAL PRIMARY KEY,
+      kind          TEXT NOT NULL,
+      subject       TEXT NOT NULL,
+      reason        TEXT NOT NULL,
+      sample_size   INTEGER NOT NULL DEFAULT 0,
+      active_until  TIMESTAMPTZ NOT NULL,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE(kind, subject)
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS self_healing_kind_active_idx ON self_healing_actions (kind, active_until DESC)`;
 }

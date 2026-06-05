@@ -49,19 +49,19 @@ const NOTIFICATION_ICONS: Partial<Record<NotificationType, typeof Eye>> = {
 };
 
 const NOTIFICATION_COLORS: Partial<Record<NotificationType, string>> = {
-  site_views: "#06b6d4",
+  site_views: "#78716c",
   deploy_success: "#22c55e",
   achievement: "#eab308",
-  gallery_comment: "#8b5cf6",
-  gallery_upvote: "#3b82f6",
+  gallery_comment: "#78716c",
+  gallery_upvote: "#78716c",
   quota_warning: "#f97316",
-  weekly_report: "#06b6d4",
+  weekly_report: "#78716c",
   referral: "#22c55e",
   challenge: "#ec4899",
   system: "#94a3b8",
   admin_email: "#f59e0b",
   support_ticket: "#ef4444",
-  support_reply: "#8b5cf6",
+  support_reply: "#78716c",
 };
 
 // ── Time-ago helper ──
@@ -179,7 +179,7 @@ export default function NotificationInbox() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.97 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute right-0 top-full mt-2 w-[360px] max-h-[480px] rounded-xl bg-[#0a0a12] border border-white/10 shadow-2xl shadow-black/40 overflow-hidden z-50"
+            className="absolute right-0 top-full mt-2 w-[360px] max-h-[480px] rounded-xl bg-[var(--paper-elevated)] border border-white/10 shadow-2xl shadow-black/40 overflow-hidden z-50"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">

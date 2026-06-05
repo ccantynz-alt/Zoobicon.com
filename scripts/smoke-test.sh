@@ -89,25 +89,25 @@ echo "════════════════════════�
 echo ""
 
 # ── Critical Pages (must load) ──
+# Updated 2026-06-05 — matches post-Rule-32 scope (AI Builder only).
+# Removed: /domains + /tools (Rule 32 deleted the standalone domain
+# search page and the 12 free-tool pages — they now 404). Removed
+# /admin (internal, URL-only; not a public smoke target and its
+# unauthenticated status is non-deterministic). Kept the genuinely
+# public product surface. /auth/* are editorial-light Crontech-SSO
+# stub pages (200 OK).
 echo "── Pages ──"
 check_page "/"
 check_page "/builder"
-check_page "/domains"
 check_page "/pricing"
-check_page "/video-creator"
-check_page "/tools"
-check_page "/products/dictation"
-check_page "/products/video-creator"
+check_page "/upgrade"
 check_page "/auth/login"
 check_page "/auth/signup"
-check_page "/admin"
-check_page "/my-domains"
 echo ""
 
 # ── API Health Checks ──
 echo "── API Health ──"
 check_api_value "/api/health" "['status']" "healthy" "Health endpoint"
-check_api_value "/api/video-creator/health?admin=true" "['status']" "ok" "Video pipeline health"
 echo ""
 
 # ── Domain Search (core product) ──
@@ -117,19 +117,17 @@ echo ""
 
 # ── Builder Generation (core product) ──
 echo "── Builder API ──"
-# Test that the endpoint exists and returns proper error for missing auth
+# GET returns 405 because the endpoint is POST-only — proves the
+# route exists + auth middleware lets it through.
 check_page "/api/generate/react-stream" "405"
+# Post-build static validator — same Method-Not-Allowed check.
+check_page "/api/builds/validate" "405"
 echo ""
 
-# ── Video Creator API ──
-echo "── Video Creator API ──"
-check_api_value "/api/video-creator/health?admin=true" "['envVarsSet']['REPLICATE_API_TOKEN']" "True" "Replicate token configured"
-echo ""
-
-# ── Auth Endpoints ──
-echo "── Auth ──"
-check_page "/api/auth/login" "405"
-check_page "/api/auth/signup" "405"
+# ── Crontech-delegated surfaces ──
+# These previously checked /api/auth/* (deleted in Rule 31, Crontech
+# owns SSO) and /api/video-creator/* (deleted in Rule 19). No
+# replacements needed at this layer — Crontech tests its own surface.
 echo ""
 
 # ── Summary ──

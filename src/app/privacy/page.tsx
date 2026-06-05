@@ -23,13 +23,13 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="relative min-h-screen bg-[#0a0a12] text-[#e8e8ec]">
+    <div className="relative min-h-screen text-[#e8e8ec]">
       <BackgroundEffects preset="minimal" />
       {/* Nav */}
-      <nav className="border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-2xl">
+      <nav className="border-b border-white/[0.06] bg-[var(--paper)]/80 backdrop-blur-2xl">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-purple flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-accent-stone flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <span className="text-lg font-bold tracking-tight">Zoobicon</span>
@@ -47,8 +47,8 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-white mb-3">1. Introduction</h2>
             <p>
-              Zoobicon (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) operates zoobicon.com, zoobicon.ai, zoobicon.io, and
-              zoobicon.sh (collectively, the &ldquo;Platform&rdquo;). This Privacy Policy explains how we collect,
+              Zoobicon (&ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) operates zoobicon.com, zoobicon.ai, and
+              zoobicon.io (collectively, the &ldquo;Platform&rdquo;). This Privacy Policy explains how we collect,
               use, disclose, and safeguard your information when you use our Platform and services.
             </p>
             <p className="mt-3">

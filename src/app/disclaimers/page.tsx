@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function DisclaimersPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a12] text-white">
-      <nav className="border-b border-white/[0.06] bg-[#0a0a12]/90 backdrop-blur-xl">
+    <div className="min-h-screen text-white">
+      <nav className="border-b border-white/[0.06] bg-[var(--paper)]/90 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto px-6 flex items-center justify-between h-14">
           <Link href="/" className="text-sm font-bold">Zoobicon</Link>
           <div className="flex gap-4 text-xs text-white/40">
@@ -30,7 +30,7 @@ export default function DisclaimersPage() {
           <section>
             <h2 className="text-lg font-semibold text-white mb-3">1. General Disclaimer</h2>
             <p className="mb-3">
-              The information provided on zoobicon.com, zoobicon.ai, zoobicon.io, zoobicon.sh, and zoobicon.app
+              The information provided on zoobicon.com, zoobicon.ai, zoobicon.io, and zoobicon.app
               (collectively, the &quot;Platform&quot;) is for general informational purposes only. While we strive to keep
               information accurate and up to date, we make no representations or warranties of any kind, express or
               implied, about the completeness, accuracy, reliability, suitability, or availability of the Platform or
@@ -206,7 +206,7 @@ export default function DisclaimersPage() {
 
         {/* Footer */}
         <div className="mt-16 pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs text-white/20">zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io &middot; zoobicon.sh</div>
+          <div className="text-xs text-white/20">zoobicon.com &middot; zoobicon.ai &middot; zoobicon.io</div>
           <div className="flex gap-4">
             <Link href="/privacy" className="text-xs text-white/30 hover:text-white/50">Privacy Policy</Link>
             <Link href="/terms" className="text-xs text-white/30 hover:text-white/50">Terms of Service</Link>

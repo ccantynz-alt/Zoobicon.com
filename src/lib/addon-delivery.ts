@@ -82,7 +82,7 @@ export async function getUserAddons(email: string): Promise<AddonPurchase[]> {
     WHERE email = ${email} AND status = 'active'
     ORDER BY purchased_at DESC
   `;
-  return rows.map((r) => ({
+  return rows.map((r: any) => ({
     id: r.id,
     email: r.email,
     addonId: r.addon_id,
@@ -466,7 +466,7 @@ export function getAddonDelivery(
       description: "Email support widget",
       code: `<!-- AI Email Support -->
 <div id="zb-support-widget" style="position:fixed;bottom:24px;right:96px;z-index:9998;">
-  <a href="/email-support" style="display:flex;align-items:center;gap:8px;background:#0f2148;border:1px solid rgba(255,255,255,0.1);color:white;padding:10px 16px;border-radius:12px;text-decoration:none;font-size:13px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+  <a href="/support" style="display:flex;align-items:center;gap:8px;background:#0f2148;border:1px solid rgba(255,255,255,0.1);color:white;padding:10px 16px;border-radius:12px;text-decoration:none;font-size:13px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
     <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span>
     Support
   </a>

@@ -1,7 +1,13 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { authenticateRequest } from "@/lib/auth-guard";
-import { callLLMWithFailover, getAvailableProviders } from "@/lib/llm-provider";
+import {
+  callLLMWithFailover,
+  describeLLMError,
+  getAvailableProviders,
+  isTransientLLMError,
+} from "@/lib/llm-provider";
+import { validateEditJson } from "@/lib/llm-output-validator";
 
 export const maxDuration = 120;
 
@@ -20,6 +26,7 @@ export const maxDuration = 120;
  * Returns SSE: { files: Record<string,string> } — only the CHANGED files
  */
 export async function POST(req: NextRequest) {
+  const editStartedAt = Date.now();
   const auth = await authenticateRequest(req, { requireAuth: true, requireVerified: true });
   if (auth.error) return auth.error;
 
@@ -35,22 +42,63 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: { instruction?: string; files?: Record<string, string>; targetFile?: string };
+  let body: { instruction?: string; files?: Record<string, string>; targetFile?: string; conversationContext?: string; pageScope?: string };
   try {
     body = await req.json();
   } catch {
     return Response.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const { instruction, files, targetFile } = body;
+  const { instruction, files, targetFile, conversationContext, pageScope } = body;
 
   if (!instruction || !files || Object.keys(files).length === 0) {
     return Response.json({ error: "Instruction and files required" }, { status: 400 });
   }
 
+  // ── FLYWHEEL: load accumulated context from previous builds ──
+  let flywheelContext = "";
+  try {
+    const { getMemories } = await import("@/lib/flywheel");
+    const memories = await getMemories();
+    const relevant = memories
+      .filter((m) => m.type === "preference" || m.type === "brand" || m.type === "context")
+      .slice(0, 10);
+    if (relevant.length > 0) {
+      const lines = relevant.map((m) => `- [${m.type}] ${m.content}`);
+      let joined = lines.join("\n");
+      if (joined.length > 500) {
+        joined = joined.slice(0, 497) + "...";
+      }
+      flywheelContext = `\n\nContext from previous builds:\n${joined}\n`;
+    }
+  } catch (flywheelErr) {
+    console.warn("[edit] Flywheel context load skipped:", flywheelErr);
+  }
+
   // The Anthropic SDK is the primary path. The failover layer
   // (callLLMWithFailover) handles OpenAI/Gemini if Anthropic is down.
-  const client = new Anthropic({ apiKey: apiKey || "missing", timeout: 60000 });
+  // maxRetries:0 because we do our own classified retry below so we can
+  // distinguish transient TLS flakes from fatal errors and surface them
+  // cleanly (no raw openssl stack traces to Gate Test consumers).
+  const client = new Anthropic({ apiKey: apiKey || "missing", timeout: 60000, maxRetries: 0 });
+
+  // Retry a single SDK call 3x with jitter for transient network/TLS faults.
+  // Non-transient (auth, 400) bubbles up on the first try.
+  const callWithRetry = async <T>(fn: () => Promise<T>, label: string): Promise<T> => {
+    let lastErr: unknown;
+    for (let i = 0; i < 3; i++) {
+      try {
+        return await fn();
+      } catch (err) {
+        lastErr = err;
+        if (!isTransientLLMError(err) || i === 2) throw err;
+        const delay = 400 * Math.pow(2, i) + Math.floor(Math.random() * 250);
+        console.warn(`[edit:${label}] attempt ${i + 1}/3 failed (${describeLLMError(err)}), retrying in ${delay}ms`);
+        await new Promise((r) => setTimeout(r, delay));
+      }
+    }
+    throw lastErr;
+  };
 
   // Build context: show the AI which files exist and their content
   const fileList = Object.keys(files);
@@ -78,6 +126,16 @@ export async function POST(req: NextRequest) {
     }).join("\n\n");
   }
 
+  // Page-scope hint for Full-Site Mode multi-page projects. Only added
+  // when the client sent pageScope (a directory name under pages/). The
+  // client also pre-filters `files` so the LLM only sees in-scope files
+  // + shared chrome, but the explicit instruction below is what stops
+  // the model from "helpfully" touching a shared component when the
+  // user only asked about one page.
+  const scopeHint = pageScope
+    ? `\n\nSCOPE: The user is editing the "${pageScope}" page only. Only modify files under pages/${pageScope}/. Do NOT touch shared files in components/Shared* or lib/* unless the instruction EXPLICITLY asks to change something shared (e.g. "in the shared navbar"). If the instruction is ambiguous, prefer the in-scope change.`
+    : "";
+
   const systemPrompt = `You are a code editor. You receive existing React/TypeScript files and an instruction to modify them.
 
 RULES:
@@ -89,13 +147,30 @@ RULES:
 - Output the COMPLETE file content for each changed file (not a diff/patch)
 - Do NOT wrap the JSON in markdown code fences
 - Do NOT include any text before or after the JSON object
-- Start your response with { and end with }`;
+- Start your response with { and end with }${scopeHint}${flywheelContext}${conversationContext ? `\n\nPrevious edits in this session (use this to understand context and maintain consistency):\n${conversationContext}` : ""}`;
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
       const send = (data: Record<string, unknown>) => {
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+      };
+
+      // Helper: record a successful edit in the flywheel (non-blocking, non-fatal)
+      const recordEditInFlywheel = async (modelUsed: string) => {
+        try {
+          const { saveBuild } = await import("@/lib/flywheel");
+          await saveBuild({
+            id: `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+            prompt: `[edit] ${instruction}`,
+            siteName: targetFile || "Untitled",
+            model: modelUsed,
+            durationMs: Date.now() - editStartedAt,
+            createdAt: Date.now(),
+          });
+        } catch (flywheelErr) {
+          console.warn("[edit] Flywheel build save skipped:", flywheelErr);
+        }
       };
 
       try {
@@ -110,26 +185,15 @@ RULES:
         ):
           | { ok: true; files: Record<string, string> }
           | { ok: false; reason: string } => {
-          if (!text || !text.trim()) {
-            return { ok: false, reason: "AI returned empty response" };
-          }
-          const parsed = extractJSON(text);
-          if (!parsed) {
-            return { ok: false, reason: "AI response was not valid JSON" };
-          }
-          if (!parsed.files) {
-            return { ok: false, reason: "AI response missing 'files' key" };
-          }
-          const validFiles: Record<string, string> = {};
-          for (const [path, code] of Object.entries(parsed.files)) {
-            if (typeof code === "string" && code.trim().length > 10) {
-              validFiles[path] = code;
-            }
-          }
-          if (Object.keys(validFiles).length === 0) {
-            return { ok: false, reason: "AI returned empty or invalid file contents" };
-          }
-          return { ok: true, files: validFiles };
+          // Centralised validator catches:
+          //   - empty / whitespace-only responses
+          //   - AI refusals ("I can't help with that")
+          //   - markdown-fenced JSON
+          //   - prose surrounding the JSON object
+          //   - missing files key, non-string file values, suspiciously short files
+          const v = validateEditJson(text);
+          if (!v.ok || !v.data) return { ok: false, reason: v.reason || "validation failed" };
+          return { ok: true, files: v.data.files };
         };
 
         const errors: string[] = [];
@@ -137,12 +201,16 @@ RULES:
         // Pass 1 — Anthropic Haiku via direct SDK (fastest, cheapest)
         if (apiKey) {
           try {
-            const response = await client.messages.create({
-              model: "claude-haiku-4-5-20251001",
-              max_tokens: 16384,
-              system: systemPrompt,
-              messages: [{ role: "user", content: userMessage }],
-            });
+            const response = await callWithRetry(
+              () =>
+                client.messages.create({
+                  model: "claude-haiku-4-5-20251001",
+                  max_tokens: 16384,
+                  system: systemPrompt,
+                  messages: [{ role: "user", content: userMessage }],
+                }),
+              "haiku"
+            );
             const text = response.content.find((b: Anthropic.ContentBlock) => b.type === "text")?.text || "";
             const result = validate(text);
             if (result.ok) {
@@ -152,15 +220,16 @@ RULES:
                 changedCount: Object.keys(result.files).length,
                 modelUsed: "claude-haiku-4-5",
               });
+              await recordEditInFlywheel("claude-haiku-4-5");
               controller.close();
               return;
             }
             errors.push(`Haiku: ${result.reason}`);
             send({ type: "status", message: "Retrying with stronger model..." });
           } catch (err) {
-            const msg = err instanceof Error ? err.message : "Unknown error";
-            errors.push(`Haiku: ${msg}`);
-            console.warn(`[edit] Haiku call failed: ${msg}`);
+            const clean = describeLLMError(err);
+            errors.push(`Haiku: ${clean}`);
+            console.warn(`[edit] Haiku call failed: ${clean}`);
             send({ type: "status", message: "Retrying with fallback provider..." });
           }
         }
@@ -168,12 +237,16 @@ RULES:
         // Pass 2 — Anthropic Sonnet (smarter model, retry path)
         if (apiKey) {
           try {
-            const response = await client.messages.create({
-              model: "claude-sonnet-4-6",
-              max_tokens: 16384,
-              system: systemPrompt,
-              messages: [{ role: "user", content: userMessage }],
-            });
+            const response = await callWithRetry(
+              () =>
+                client.messages.create({
+                  model: "claude-sonnet-4-6",
+                  max_tokens: 16384,
+                  system: systemPrompt,
+                  messages: [{ role: "user", content: userMessage }],
+                }),
+              "sonnet"
+            );
             const text = response.content.find((b: Anthropic.ContentBlock) => b.type === "text")?.text || "";
             const result = validate(text);
             if (result.ok) {
@@ -183,18 +256,20 @@ RULES:
                 changedCount: Object.keys(result.files).length,
                 modelUsed: "claude-sonnet-4-6",
               });
+              await recordEditInFlywheel("claude-sonnet-4-6");
               controller.close();
               return;
             }
             errors.push(`Sonnet: ${result.reason}`);
           } catch (err) {
-            const msg = err instanceof Error ? err.message : "Unknown error";
-            errors.push(`Sonnet: ${msg}`);
-            console.warn(`[edit] Sonnet call failed: ${msg}`);
+            const clean = describeLLMError(err);
+            errors.push(`Sonnet: ${clean}`);
+            console.warn(`[edit] Sonnet call failed: ${clean}`);
           }
         }
 
-        // Pass 3 — cross-provider failover (OpenAI, Gemini)
+        // Pass 3 — cross-provider failover (OpenAI, Gemini). The failover
+        // layer now wraps each provider call in its own transient-retry.
         try {
           send({ type: "status", message: "Trying alternate AI provider..." });
           const fb = await callLLMWithFailover({
@@ -211,28 +286,43 @@ RULES:
               changedCount: Object.keys(result.files).length,
               modelUsed: fb.model,
             });
+            await recordEditInFlywheel(fb.model || "unknown");
             controller.close();
             return;
           }
           errors.push(`${fb.model}: ${result.reason}`);
         } catch (err) {
-          const msg = err instanceof Error ? err.message : "Unknown error";
-          errors.push(`Failover: ${msg}`);
-          console.error(`[edit] Cross-provider failover failed: ${msg}`);
+          const clean = describeLLMError(err);
+          errors.push(`Failover: ${clean}`);
+          console.error(`[edit] Cross-provider failover failed: ${clean}`);
         }
 
-        // Every attempt failed — surface the truth, with the actual reasons
+        // Every attempt failed — surface a clean, actionable message.
+        // Consumers like Craig's Gate Test tool echo this verbatim, so it
+        // must NEVER contain raw openssl stack traces or provider internals.
         const summary = errors.length > 0 ? errors.join(" | ") : "No changes detected";
+        const allTransient = errors.length > 0 && errors.every((e) =>
+          /TLS|timed out|reset|overloaded|rate limited|5xx|DNS/i.test(e)
+        );
+        const guidance = allTransient
+          ? "Upstream AI provider is temporarily unavailable. Wait 30-60s and retry — this is a network hiccup, not a problem with the request."
+          : "Try rephrasing your instruction or being more specific about which file to change.";
         send({
           type: "error",
           fatal: true,
-          message: `Edit failed across all providers. ${summary}. Try rephrasing your instruction or being more specific about which file to change.`,
+          retryable: allTransient,
+          message: `Edit failed across all providers. ${summary}. ${guidance}`,
         });
       } catch (err) {
-        const msg = err instanceof Error ? err.message : "Unknown error";
-        console.error(`[edit] Stream handler crashed: ${msg}`);
+        const clean = describeLLMError(err);
+        console.error(`[edit] Stream handler crashed: ${clean}`);
         try {
-          send({ type: "error", fatal: true, message: `Edit failed: ${msg}. Please try again.` });
+          send({
+            type: "error",
+            fatal: true,
+            retryable: isTransientLLMError(err),
+            message: `Edit failed: ${clean}. Please try again.`,
+          });
         } catch { /* controller may already be closed */ }
       } finally {
         try { controller.close(); } catch { /* already closed */ }

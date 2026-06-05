@@ -35,7 +35,7 @@ export default function CreatorBadge({
   const border = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
   const textPrimary = isDark ? "#ffffff" : "#0a0a12";
   const textSecondary = isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.55)";
-  const accentGradient = "linear-gradient(135deg, #06b6d4, #8b5cf6)";
+  const accentGradient = "linear-gradient(135deg, #78716c, #78716c)";
 
   return (
     <motion.div
@@ -210,7 +210,7 @@ export function getCreatorBadgeHTML(
     ">
       <div style="
         width:20px;height:20px;border-radius:6px;
-        background:linear-gradient(135deg,#06b6d4,#8b5cf6);
+        background:linear-gradient(135deg,#78716c,#78716c);
         display:flex;align-items:center;justify-content:center;flex-shrink:0;
       ">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -1,26 +1,16 @@
 import { MetadataRoute } from 'next'
+import { COMPETITORS } from '@/lib/seo/competitors'
+import { NICHES } from '@/lib/seo/niches'
+import { COUNTRIES } from '@/lib/seo/countries'
 
-// Try to fetch deployed sites for dynamic sitemap entries
-async function getDeployedSites(): Promise<{ slug: string; updatedAt: string }[]> {
-  try {
-    const { sql } = await import('@/lib/db')
-    const rows = await sql`
-      SELECT DISTINCT s.slug, COALESCE(s.updated_at, s.created_at, NOW()) as updated_at
-      FROM sites s
-      JOIN deployments d ON d.site_id = s.id
-      WHERE s.status != 'deleted' AND d.status = 'live' AND d.environment = 'production'
-      ORDER BY s.updated_at DESC NULLS LAST
-      LIMIT 1000
-    `
-    return rows.map((r) => ({
-      slug: r.slug as string,
-      updatedAt: (r.updated_at as Date)?.toISOString?.() || new Date().toISOString(),
-    }))
-  } catch {
-    // DB not available — return empty (static routes still work)
-    return []
-  }
-}
+// Rule 32 — scope lock: AI Website Builder only. Sitemap reflects the
+// single product + supporting marketing surfaces. /domains standalone,
+// /tools/*, /products/* removed. Domain registration lives inside the
+// builder checkout flow, not as a standalone page.
+//
+// Programmatic SEO surfaces enumerated here so every page lands in
+// the sitemap.xml and gets submitted to Bing/Yandex via IndexNow
+// (see /api/seo/submit-sitemap + src/lib/seo/indexnow.ts).
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://zoobicon.com'
@@ -33,139 +23,91 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Homepage
     { path: '/', priority: 1.0, changeFrequency: 'daily' },
 
-    // Core product pages — high priority
+    // The one product + its highest-intent onboarding funnel
     { path: '/builder', priority: 0.9, changeFrequency: 'daily' },
+    { path: '/import', priority: 0.9, changeFrequency: 'weekly' },
+    { path: '/upgrade', priority: 0.9, changeFrequency: 'weekly' },
+    { path: '/wordpress-import', priority: 0.9, changeFrequency: 'weekly' },
+    { path: '/github-import', priority: 0.9, changeFrequency: 'weekly' },
+    { path: '/figma-import', priority: 0.9, changeFrequency: 'weekly' },
+    { path: '/notion-import', priority: 0.9, changeFrequency: 'weekly' },
+    { path: '/audit', priority: 0.9, changeFrequency: 'weekly' },
+    { path: '/marketplace', priority: 0.85, changeFrequency: 'weekly' },
+    { path: '/brand-kit', priority: 0.85, changeFrequency: 'weekly' },
     { path: '/pricing', priority: 0.9, changeFrequency: 'weekly' },
-    { path: '/generators', priority: 0.9, changeFrequency: 'weekly' },
 
-    // Product pages
-    { path: '/products/website-builder', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/products/seo-agent', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/products/video-creator', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/products/email-support', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/products/hosting', priority: 0.8, changeFrequency: 'weekly' },
-
-    // Feature / marketing pages
-    { path: '/domains', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/domain-search', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/marketplace', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/hosting', priority: 0.8, changeFrequency: 'weekly' },
+    // SEO marketing surfaces
+    { path: '/seo', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/showcase', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/agencies', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/wordpress', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/developers', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/cli', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/showcase', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/video-creator', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/seo', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/analytics', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/gallery', priority: 0.8, changeFrequency: 'daily' },
-    { path: '/starter-kits', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/referral', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/blog-engine', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/booking', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/invoicing', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/email-marketing', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/store', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/content-calendar', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/content-writer', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/publisher', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/dictation', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/brand-kit', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/creator-marketplace', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/challenges', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/compare', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/changelog', priority: 0.7, changeFrequency: 'weekly' },
     { path: '/crawl', priority: 0.7, changeFrequency: 'weekly' },
+    { path: '/agents', priority: 0.7, changeFrequency: 'weekly' },
 
-    // Domain SEO pages — high-value funnel pages
-    { path: '/domain-finder', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/domains/ai', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/domains/io', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/domains/com', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/domains/sh', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/domains/dev', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/domains/app', priority: 0.8, changeFrequency: 'weekly' },
-
-    // Products
-    { path: '/products/esim', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/products/vpn', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/products/cloud-storage', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/products/dictation', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/products/booking', priority: 0.8, changeFrequency: 'weekly' },
-
-    // Free tools — SEO magnets
-    { path: '/tools/business-name-generator', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/tools/password-generator', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/tools/qr-code-generator', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/tools/meta-tag-generator', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/tools/color-palette-generator', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/tools/invoice-generator', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/tools/json-formatter', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/tools/privacy-policy-generator', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/tools/robots-txt-generator', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/tools/word-counter', priority: 0.8, changeFrequency: 'monthly' },
-
-    // Brand / domain-specific pages
+    // Brand / domain-specific landings
     { path: '/ai', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/io', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/sh', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/dominat8', priority: 0.8, changeFrequency: 'weekly' },
-
-    // Agency sub-pages
-    { path: '/agencies/dashboard', priority: 0.7, changeFrequency: 'weekly' },
-    { path: '/agencies/portal', priority: 0.7, changeFrequency: 'weekly' },
-
-    // Hosting sub-pages
-    { path: '/hosting/dashboard', priority: 0.7, changeFrequency: 'weekly' },
 
     // Support and legal
     { path: '/support', priority: 0.7, changeFrequency: 'weekly' },
     { path: '/privacy', priority: 0.7, changeFrequency: 'monthly' },
     { path: '/terms', priority: 0.7, changeFrequency: 'monthly' },
+    { path: '/disclaimers', priority: 0.6, changeFrequency: 'monthly' },
+    { path: '/dmca', priority: 0.6, changeFrequency: 'monthly' },
+    { path: '/refund-policy', priority: 0.6, changeFrequency: 'monthly' },
+    { path: '/acceptable-use', priority: 0.6, changeFrequency: 'monthly' },
 
-    // Dashboard (public-facing entry)
-    { path: '/dashboard', priority: 0.7, changeFrequency: 'weekly' },
-
-    // Auth pages
-    { path: '/auth/login', priority: 0.5, changeFrequency: 'weekly' },
-    { path: '/auth/signup', priority: 0.5, changeFrequency: 'weekly' },
-
-    // Country-specific pages (geo-targeted landing pages)
-    { path: '/us', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/uk', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/ca', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/au', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/de', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/fr', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/es', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/it', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/nl', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/se', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/br', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/mx', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/in', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/jp', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/kr', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/sg', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/ae', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/za', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/nz', priority: 0.8, changeFrequency: 'monthly' },
-    { path: '/ie', priority: 0.8, changeFrequency: 'monthly' },
+    // Country-targeted landing pages were previously root URLs (/us,
+    // /uk, etc.) but those page files never existed — the sitemap
+    // pointed at 404s. Phase 3 (Rule 33 era) moves them under
+    // /ai-website-builder-in/[country], rendered from a real dynamic
+    // route. Enumerated below in countryRoutes.
   ]
 
-  const staticEntries: MetadataRoute.Sitemap = routes.map((route) => ({
+  // Programmatic comparison pages — /compare/[competitor] for each
+  // entry in the SEO competitor catalog. Same priority as /compare
+  // index so search engines treat them as primary comparison surfaces,
+  // not orphan tail pages.
+  const comparisonRoutes = COMPETITORS.map((c) => ({
+    path: `/compare/${c.slug}`,
+    priority: 0.8,
+    changeFrequency: 'weekly' as const,
+  }))
+
+  // Programmatic niche pages — /ai-website-builder-for/[niche] for
+  // every entry in the niche catalog. Plus the parent index. These
+  // target the long-tail "AI website builder for {industry}" query
+  // family — much higher search volume than the comparison set, even
+  // if per-query intent is slightly lower.
+  const nicheRoutes = [
+    { path: '/ai-website-builder-for', priority: 0.8, changeFrequency: 'weekly' as const },
+    ...NICHES.map((n) => ({
+      path: `/ai-website-builder-for/${n.slug}`,
+      priority: 0.75,
+      changeFrequency: 'weekly' as const,
+    })),
+  ]
+
+  // Programmatic country pages — /ai-website-builder-in/[country] for
+  // every entry in the country catalog. Plus the parent regions index.
+  // Targets the international SEO surface (regional currency, payment
+  // methods, TLD, hosting region).
+  const countryRoutes = [
+    { path: '/ai-website-builder-in', priority: 0.8, changeFrequency: 'monthly' as const },
+    ...COUNTRIES.map((c) => ({
+      path: `/ai-website-builder-in/${c.slug}`,
+      priority: 0.75,
+      changeFrequency: 'monthly' as const,
+    })),
+  ]
+
+  return [...routes, ...comparisonRoutes, ...nicheRoutes, ...countryRoutes].map((route) => ({
     url: `${baseUrl}${route.path}`,
     lastModified: new Date(),
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }))
-
-  // Add deployed zoobicon.sh sites to sitemap
-  const deployedSites = await getDeployedSites()
-  const deployedEntries: MetadataRoute.Sitemap = deployedSites.map((site) => ({
-    url: `https://${site.slug}.zoobicon.sh`,
-    lastModified: new Date(site.updatedAt),
-    changeFrequency: 'weekly' as const,
-    priority: 0.6,
-  }))
-
-  return [...staticEntries, ...deployedEntries]
 }

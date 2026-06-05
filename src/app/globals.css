@@ -5,21 +5,45 @@
 /* Fonts loaded via <link> in layout.tsx with display=swap to prevent FOIT */
 
 :root {
-  /* Editorial palette — retired brand-500/brand-600/accent-cyan/accent-purple/
-     accent-pink/zoo-400/zoo-500/zoo-600 now alias to the warm accent so
-     every derived gradient/border/shadow in this file lands on the editorial
-     register without rewriting 1,700 lines of legacy CSS. */
-  --brand-500: #E8D4B0;
-  --brand-600: #D4B887;
-  --accent-cyan: #E8D4B0;
-  --accent-purple: #E8D4B0;
-  --accent-pink: #E8D4B0;
-  --zoo-400: #E8D4B0;
-  --zoo-500: #D4B887;
-  --zoo-600: #B89B64;
-  --zoo-glow: rgba(232, 212, 176, 0.2);
-  --editorial-ink: #1c1917;
-  --editorial-paper: #FAF9F6;
+  /* ─── Editorial-light palette v4 (rule 29 — pure white 2026-05-06) ───
+   *
+   * Reference: holdenmercer.com (which IS pure white #ffffff for bg-base
+   * — earlier sessions misread it as off-white). Craig's final call:
+   * "the backdrop should be white or really really white, gives good
+   * contrast." v4 makes the page itself pure white. Cards stay warm
+   * cream so they have maximum contrast against white. Same ink colour
+   * stack — readability is unchanged.
+   */
+  --paper: #ffffff;          /* PURE WHITE page background */
+  --paper-elevated: #fcfaf3; /* v5 — lifted from #fbf9f1 so cards stop reading "too dark" against pure white */
+  --paper-bright: #fefdf7;   /* nearly white — panels between paper and paper-elevated */
+  --paper-input: #fbf9f0;    /* pale cream inputs — subtle recess on white */
+  --ink: #1a1a1c;            /* primary text — soft near-black, not harsh */
+  --ink-secondary: #2a2a30;  /* secondary text */
+  --ink-muted: #76767e;      /* muted text, captions */
+  --rule: #ebe7d6;           /* hairline border — softer */
+  --rule-strong: #a8a392;    /* primary border */
+  --gold: #b8923f;           /* champagne accent */
+  --gold-soft: rgba(184, 146, 63, 0.14);
+  --gold-glow: rgba(184, 146, 63, 0.40);
+  --gold-deep: #8c6b25;      /* bronze for text + hover */
+  --shadow-1: 0 1px 2px rgba(10, 10, 11, 0.06), 0 0 0 1px rgba(10, 10, 11, 0.06);
+  --shadow-2: 0 8px 24px rgba(10, 10, 11, 0.10), 0 2px 6px rgba(10, 10, 11, 0.06);
+
+  /* Legacy aliases — retained so the 1,700 lines of legacy CSS below
+   * keep compiling. They now resolve to the warm palette instead of
+   * the dark champagne so derived components don't look wrong. */
+  --brand-500: var(--gold);
+  --brand-600: var(--gold-deep);
+  --accent-cyan: var(--gold);
+  --accent-purple: var(--gold);
+  --accent-pink: var(--gold);
+  --zoo-400: var(--gold);
+  --zoo-500: var(--gold);
+  --zoo-600: var(--gold-deep);
+  --zoo-glow: var(--gold-glow);
+  --editorial-ink: var(--ink);
+  --editorial-paper: var(--paper);
 }
 
 * {
@@ -34,10 +58,15 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #0b1530;
-  color: #e8e8ec;
+  background: var(--paper);
+  color: var(--ink);
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  overflow-x: hidden;
+  /* overflow-x: hidden is intentionally NOT applied here — applying it
+   * to <html> blocks the page's native vertical scroll in Chrome 124+
+   * (Craig's report 2026-05-05: "I can't seem to scroll with my mouse
+   * or cursor keys and there's no scroll bar"). The body-only variant
+   * below contains horizontal overflow without trapping vertical
+   * scroll. */
   overscroll-behavior-y: none;
   min-height: 100vh;
   min-height: 100dvh;
@@ -50,6 +79,11 @@ body {
   font-optical-sizing: auto;
   letter-spacing: -0.011em;
   line-height: 1.5;
+}
+
+body {
+  /* Horizontal overflow contained on body only — see explanation above */
+  overflow-x: hidden;
 }
 
 /* --- Apple-grade typography refinements --- */
@@ -77,27 +111,30 @@ p, span, label, div {
   font-feature-settings: "kern" 1, "liga" 0, "tnum" 1;
 }
 
-/* Text selection — crisp cyan instead of browser default */
+/* Text selection — champagne gold tint on the editorial-light canvas.
+ * Was `rgba(212, 184, 109, 0.30)` (cyan) which was the source of cyan
+ * highlighting whenever Craig dragged to select. */
 ::selection {
-  background: rgba(6, 182, 212, 0.30);
-  color: #fff;
+  background: rgba(184, 146, 63, 0.28);
+  color: var(--ink);
 }
 
 ::-moz-selection {
-  background: rgba(6, 182, 212, 0.30);
-  color: #fff;
+  background: rgba(184, 146, 63, 0.28);
+  color: var(--ink);
 }
 
-/* Focus visible — sharp ring instead of fuzzy outline */
+/* Focus visible — was cyan ring, now champagne to match Rule 29. */
 :focus-visible {
-  outline: 2px solid rgba(6, 182, 212, 0.6);
+  outline: 2px solid rgba(184, 146, 63, 0.65);
   outline-offset: 2px;
   border-radius: 6px;
 }
 
-/* Placeholder text — uniform across browsers */
+/* Placeholder text — uniform across browsers. Was white-on-dark for
+ * the old midnight backdrop; switched to ink-muted for the cream page. */
 ::placeholder {
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--ink-muted);
   font-weight: 400;
 }
 
@@ -113,22 +150,22 @@ img, video {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a1628;
+  background: var(--paper);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #162044;
+  background: #c9c5b8;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #2d4d8c;
+  background: #a8a392;
 }
 
 /* Scrollbar — Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #2a2a4a #111a2e;
+  scrollbar-color: #c9c5b8 var(--paper);
 }
 
 /* ============================================
@@ -137,42 +174,38 @@ img, video {
    ============================================ */
 
 .surface {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
   border-radius: 12px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .surface-elevated {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
   border-radius: 12px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-1);
 }
 
 .surface-interactive {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
   border-radius: 12px;
   transition: all 0.15s ease;
 }
 
 .surface-interactive:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: #f3f1e6;
+  border-color: var(--rule-strong);
+  box-shadow: var(--shadow-1);
 }
 
-/* Dividers — sharper than default border opacity */
+/* Dividers */
 .divider {
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--rule);
 }
 
 .divider-strong {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--rule-strong);
 }
 
 /* ============================================
@@ -188,11 +221,14 @@ pre code {
    BUILDER — Button styles
    ============================================ */
 
+/* Rule 29 — was a blue gradient with blue glow on the builder action
+ * buttons. Flipped to a champagne fill on ink with a gold hairline so
+ * the builder CTAs match the editorial-light system. */
 .cyber-btn {
   position: relative;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
-  border: 1px solid rgba(59, 130, 246, 0.5);
-  color: var(--zoo-400);
+  background: linear-gradient(135deg, rgba(212, 184, 109, 0.18), rgba(184, 146, 63, 0.22));
+  border: 1px solid rgba(184, 146, 63, 0.55);
+  color: var(--ink);
   padding: 12px 24px;
   font-family: "Inter", system-ui, sans-serif;
   font-size: 14px;
@@ -201,12 +237,12 @@ pre code {
   cursor: pointer;
   transition: all 0.2s ease;
   border-radius: 12px;
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 12px rgba(184, 146, 63, 0.10);
 }
 
 .cyber-btn:hover {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(37, 99, 235, 0.35));
-  box-shadow: 0 0 24px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, rgba(212, 184, 109, 0.32), rgba(184, 146, 63, 0.36));
+  box-shadow: 0 0 24px rgba(184, 146, 63, 0.26), 0 0 0 1px rgba(184, 146, 63, 0.42);
   transform: translateY(-1px);
 }
 
@@ -225,17 +261,19 @@ pre code {
    BUILDER — Panel & Input styles
    ============================================ */
 
+/* Rule 29 — builder panel was navy `#0f2148`. Now elevated cream so
+ * it sits cleanly on the white page without the navy bruise. */
 .cyber-panel {
-  background: #0f2148;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 2px rgba(10, 10, 11, 0.04), 0 4px 16px rgba(10, 10, 11, 0.06);
 }
 
 .cyber-input {
-  background: #0a1628;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #f0f0f5;
+  background: var(--paper-input);
+  border: 1px solid var(--rule);
+  color: var(--ink);
   font-family: "Inter", system-ui, sans-serif;
   font-size: 14px;
   padding: 12px 16px;
@@ -247,12 +285,12 @@ pre code {
 }
 
 .cyber-input:focus {
-  border-color: rgba(59, 130, 246, 0.6);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 0 12px rgba(59, 130, 246, 0.1);
+  border-color: rgba(184, 146, 63, 0.65);
+  box-shadow: 0 0 0 3px rgba(184, 146, 63, 0.16), 0 0 12px rgba(184, 146, 63, 0.10);
 }
 
 .cyber-input::placeholder {
-  color: rgba(255, 255, 255, 0.50);
+  color: var(--ink-muted);
 }
 
 /* Loading dots */
@@ -279,8 +317,8 @@ pre code {
 }
 
 @keyframes chat-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
-  50% { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(184, 146, 63, 0.42); }
+  50% { box-shadow: 0 0 0 12px rgba(184, 146, 63, 0); }
 }
 
 /* ============================================
@@ -291,11 +329,11 @@ pre code {
   padding: 8px 16px;
   font-size: 12px;
   font-weight: 500;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   cursor: pointer;
   border-bottom: 2px solid transparent;
-  color: rgba(255, 255, 255, 0.5);
-  transition: all 0.2s;
+  color: var(--ink-muted);
+  transition: all 0.15s;
   background: none;
   border-top: none;
   border-left: none;
@@ -304,12 +342,12 @@ pre code {
 }
 
 .cyber-tab:hover {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--ink-secondary);
 }
 
 .cyber-tab.active {
-  color: var(--zoo-400);
-  border-bottom-color: var(--zoo-400);
+  color: var(--ink);
+  border-bottom-color: var(--gold);
 }
 
 /* ============================================
@@ -328,7 +366,7 @@ pre code {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.15));
+  filter: drop-shadow(0 0 30px rgba(184, 146, 63, 0.18));
 }
 
 .gradient-text-static {
@@ -336,6 +374,34 @@ pre code {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/**
+ * Brand display gradient — sand → champagne → bronze, vertically.
+ * Use on the ONE accent word inside a hero h1/h2 (e.g. <em>One</em>,
+ * <em>Sandy</em>, the 404 numeral). Reads as Zoobicon at a glance,
+ * works on both #ffffff and #f4f3ed grounds. Pair with serif italic
+ * (Fraunces) for the editorial weight or keep the inherited weight
+ * for a sans accent.
+ */
+.text-display-sand {
+  background: linear-gradient(180deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/**
+ * 45° variant for the cases where a vertical fall reads too heavy
+ * (long horizontal headlines). Same palette, diagonal sweep.
+ */
+.text-display-sand-diag {
+  background: linear-gradient(135deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Sharp heading font for dark fog aesthetic */
@@ -379,7 +445,7 @@ pre code {
   border: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 24px rgba(124, 90, 255, 0.3), 0 0 0 1px rgba(124, 90, 255, 0.2);
+  box-shadow: 0 4px 24px rgba(184, 146, 63, 0.30), 0 0 0 1px rgba(184, 146, 63, 0.22);
   overflow: visible;
 }
 
@@ -399,7 +465,7 @@ pre code {
 
 .btn-zoo:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 40px rgba(124, 90, 255, 0.4), 0 0 0 1px rgba(124, 90, 255, 0.3);
+  box-shadow: 0 8px 40px rgba(184, 146, 63, 0.40), 0 0 0 1px rgba(184, 146, 63, 0.32);
 }
 
 .btn-zoo:hover::before {
@@ -410,29 +476,30 @@ pre code {
   transform: translateY(0);
 }
 
-/* Secondary outline button */
+/* Rule 29 — outline button was on white text + purple border on dark.
+ * Now ink text + gold hairline so it reads on the editorial-light page. */
 .btn-zoo-outline {
   position: relative;
   background: transparent;
-  color: #fff;
+  color: var(--ink);
   font-weight: 600;
   padding: 16px 32px;
   border-radius: 14px;
-  border: 1px solid rgba(124, 90, 255, 0.4);
+  border: 1px solid rgba(184, 146, 63, 0.50);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-zoo-outline:hover {
-  background: rgba(124, 90, 255, 0.1);
-  border-color: rgba(124, 90, 255, 0.6);
+  background: rgba(184, 146, 63, 0.10);
+  border-color: rgba(184, 146, 63, 0.65);
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(124, 90, 255, 0.15);
+  box-shadow: 0 4px 20px rgba(184, 146, 63, 0.18);
 }
 
-/* Void page — deep navy canvas */
+/* Void page — was deep navy canvas, now bone (rule 29 reversal) */
 .bg-void {
-  background: #0b1530 !important;
+  background: var(--paper) !important;
 }
 
 /* Crisp white text with subtle glow for black fog pages */
@@ -455,14 +522,14 @@ pre code {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 0 0 1px rgba(37,99,235,0.2);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 0 0 1px rgba(184,146,63,0.2);
   letter-spacing: -0.01em;
   font-weight: 600;
 }
 
 .btn-gradient:hover {
   background: linear-gradient(135deg, var(--zoo-400), var(--zoo-500));
-  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.25), 0 0 0 1px rgba(37,99,235,0.3);
+  box-shadow: 0 4px 20px rgba(184, 146, 63, 0.26), 0 0 0 1px rgba(184, 146, 63, 0.32);
   transform: translateY(-1px);
 }
 
@@ -481,16 +548,18 @@ pre code {
   opacity: 0.35;
 }
 
+/* Rule 29 — glow orbs flipped from blue/cyan to champagne so the radial
+ * blurs behind hero sections paint warm light instead of cool. */
 .glow-orb-blue {
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.5), transparent 70%);
+  background: radial-gradient(circle, rgba(184, 146, 63, 0.32), transparent 70%);
 }
 
 .glow-orb-purple {
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.4), transparent 70%);
+  background: radial-gradient(circle, rgba(184, 146, 63, 0.24), transparent 70%);
 }
 
 .glow-orb-cyan {
-  background: radial-gradient(circle, rgba(125, 211, 252, 0.3), transparent 70%);
+  background: radial-gradient(circle, rgba(212, 184, 109, 0.22), transparent 70%);
 }
 
 /* ============================================
@@ -499,8 +568,8 @@ pre code {
 
 .grid-pattern {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(10, 10, 11, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10, 10, 11, 0.04) 1px, transparent 1px);
   background-size: 64px 64px;
 }
 
@@ -530,7 +599,7 @@ pre code {
   height: 70%;
   top: -25%;
   left: -15%;
-  background: radial-gradient(ellipse, rgba(37, 99, 235, 0.7), rgba(59, 130, 246, 0.4), transparent 70%);
+  background: radial-gradient(ellipse, rgba(184, 146, 63, 0.42), rgba(212, 184, 109, 0.26), transparent 70%);
 }
 
 .aurora::after {
@@ -538,7 +607,7 @@ pre code {
   height: 60%;
   bottom: -20%;
   right: -15%;
-  background: radial-gradient(ellipse, rgba(99, 102, 241, 0.6), rgba(125, 211, 252, 0.3), transparent 70%);
+  background: radial-gradient(ellipse, rgba(184, 146, 63, 0.6), rgba(212, 184, 109, 0.3), transparent 70%);
   animation-delay: -10s;
   animation-direction: reverse;
 }
@@ -556,17 +625,17 @@ pre code {
    ============================================ */
 
 .glass {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(24px) saturate(1.2);
   -webkit-backdrop-filter: blur(24px) saturate(1.2);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid var(--rule);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.90);
   backdrop-filter: blur(40px) saturate(1.3);
   -webkit-backdrop-filter: blur(40px) saturate(1.3);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--rule);
 }
 
 /* ============================================
@@ -578,50 +647,28 @@ pre code {
    ============================================ */
 
 .site-backdrop {
+  /* Editorial-light reversal (rule 29 — 2026-05-05).
+   * The original Filmora dark backdrop painted a navy + purple + cyan
+   * radial-gradient stack behind every page. On the bone palette it
+   * showed through every section that didn't have its own opaque
+   * background, which is why the homepage hero, builder, and several
+   * product pages still read as "dark blue" after the override layer
+   * landed. Neutralised to transparent so the body's `var(--paper)`
+   * shows through cleanly. The JSX `<div className="site-backdrop" />`
+   * in layout.tsx is left in place so any third-party scripts that
+   * target the selector don't crash, but it now paints nothing. */
   position: fixed;
   inset: 0;
-  /* z-index: 0 (not -1) — a negative z-index would paint below the body's
-     solid navy fill and vanish. 0 keeps it behind later DOM siblings
-     (nav, banners, children) which paint on top in natural order. */
-  z-index: 0;
+  z-index: -1;
   pointer-events: none;
-  /* Richer navy with lifted middle stop — no more near-black. Glows are
-     large, saturated, and positioned so at least one hits view on any
-     viewport (mobile or desktop). The old edge vignette is deleted — it
-     was collapsing the whole thing to black on mobile. */
-  background:
-    radial-gradient(ellipse 70% 55% at 15% 18%, rgba(56, 120, 255, 0.30), transparent 65%),
-    radial-gradient(ellipse 65% 50% at 85% 30%, rgba(168, 85, 247, 0.24), transparent 65%),
-    radial-gradient(ellipse 80% 55% at 50% 92%, rgba(34, 211, 238, 0.16), transparent 70%),
-    linear-gradient(180deg, #0b1530 0%, #142454 50%, #0b1530 100%);
+  background: transparent;
 }
 
-.site-backdrop::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(180, 200, 255, 0.12) 1px, transparent 1px);
-  background-size: 32px 32px;
-  background-position: 0 0;
-  -webkit-mask-image: radial-gradient(ellipse 95% 80% at 50% 40%, black 55%, transparent 100%);
-  mask-image: radial-gradient(ellipse 95% 80% at 50% 40%, black 55%, transparent 100%);
-}
+.site-backdrop::before { content: none; }
 
-/* Mobile — viewport is narrow so desktop ellipses (positioned at 15% / 85%)
-   land off-screen. Reposition them to the centre, pump saturation, and
-   drop the dot-pattern density so the glows read clearly on small screens. */
 @media (max-width: 768px) {
-  .site-backdrop {
-    background:
-      radial-gradient(ellipse 120% 45% at 50% 12%, rgba(56, 120, 255, 0.40), transparent 65%),
-      radial-gradient(ellipse 120% 45% at 50% 50%, rgba(168, 85, 247, 0.32), transparent 65%),
-      radial-gradient(ellipse 130% 50% at 50% 92%, rgba(34, 211, 238, 0.22), transparent 70%),
-      linear-gradient(180deg, #0b1530 0%, #16285c 50%, #0b1530 100%);
-  }
-  .site-backdrop::before {
-    background-size: 24px 24px;
-    background-image: radial-gradient(rgba(180, 200, 255, 0.14) 1px, transparent 1px);
-  }
+  .site-backdrop { background: transparent; }
+  .site-backdrop::before { content: none; }
 }
 
 /* ============================================
@@ -645,16 +692,16 @@ pre code {
    ============================================ */
 
 .gradient-border {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-1);
 }
 
 .gradient-border:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-color: var(--rule-strong);
+  background: #f3f1e6;
+  box-shadow: var(--shadow-2);
 }
 
 /* ============================================
@@ -667,7 +714,7 @@ pre code {
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.10);
 }
 
 /* ============================================
@@ -676,7 +723,7 @@ pre code {
 
 .section-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.10);
+  background: var(--rule);
 }
 
 /* ============================================
@@ -708,17 +755,17 @@ pre code {
 /* Touch devices — disable hover effects that cause "sticky hover" on mobile */
 @media (hover: none) and (pointer: coarse) {
   .cyber-btn:hover {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(29, 78, 216, 0.15));
+    background: linear-gradient(135deg, rgba(184, 146, 63, 0.15), rgba(140, 107, 37, 0.15));
     box-shadow: none;
     transform: none;
   }
 
   .cyber-btn:active {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(29, 78, 216, 0.25));
+    background: linear-gradient(135deg, rgba(184, 146, 63, 0.25), rgba(140, 107, 37, 0.25));
   }
 
   .cyber-tab:hover {
-    color: rgba(255, 255, 255, 0.50);
+    color: var(--ink-muted);
   }
 }
 
@@ -731,7 +778,7 @@ pre code {
 
 /* Focus-visible — keyboard navigation (a11y) */
 :focus-visible {
-  outline: 2px solid rgba(37, 99, 235, 0.6);
+  outline: 2px solid rgba(184, 146, 63, 0.6);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -839,7 +886,7 @@ body::before {
   z-index: 1;
   background: radial-gradient(
     800px circle at var(--mx, -1000px) var(--my, -1000px),
-    rgba(124, 90, 255, 0.04),
+    rgba(184, 146, 63, 0.04),
     transparent 50%
   );
   transition: background 0.15s ease;
@@ -851,7 +898,7 @@ body::before {
 }
 .icon-hover-pop:hover {
   transform: scale(1.15) rotate(-3deg);
-  filter: drop-shadow(0 0 8px rgba(124, 90, 255, 0.4));
+  filter: drop-shadow(0 0 8px rgba(184, 146, 63, 0.4));
 }
 
 /* Card hover lift — premium 3D lift effect */
@@ -860,7 +907,7 @@ body::before {
 }
 .card-lift:hover {
   transform: translateY(-6px) scale(1.01);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(124, 90, 255, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.10), 0 0 40px rgba(184, 146, 63, 0.08);
 }
 
 /* Staggered reveal for list items — CSS-only */
@@ -1015,12 +1062,12 @@ body::before {
 
 /* Selection styling */
 ::selection {
-  background: rgba(37, 99, 235, 0.3);
+  background: rgba(184, 146, 63, 0.3);
   color: #fff;
 }
 
 ::-moz-selection {
-  background: rgba(37, 99, 235, 0.3);
+  background: rgba(184, 146, 63, 0.3);
   color: #fff;
 }
 
@@ -1045,6 +1092,12 @@ select {
   z-index: 0;
 }
 
+/* Rule 29 — mesh gradients painted blue/indigo/cyan/purple radials
+ * behind every hero with class `mesh-gradient`. Flipped to the
+ * champagne ladder so the animated backdrop reads as warm light
+ * instead of cool. This was THE source of "blue and purple sneaking
+ * in all over the place" — direct override classes can't touch
+ * pseudo-element backgrounds, only a rewrite at source can. */
 .mesh-gradient::before {
   content: "";
   position: absolute;
@@ -1053,10 +1106,10 @@ select {
   top: -40%;
   left: -40%;
   background:
-    radial-gradient(ellipse 50% 60% at 20% 30%, rgba(37, 99, 235, 0.35), transparent),
-    radial-gradient(ellipse 45% 55% at 70% 20%, rgba(99, 102, 241, 0.30), transparent),
-    radial-gradient(ellipse 55% 50% at 80% 70%, rgba(34, 211, 238, 0.25), transparent),
-    radial-gradient(ellipse 40% 65% at 30% 80%, rgba(167, 139, 250, 0.28), transparent);
+    radial-gradient(ellipse 50% 60% at 20% 30%, rgba(212, 184, 109, 0.18), transparent),
+    radial-gradient(ellipse 45% 55% at 70% 20%, rgba(184, 146, 63, 0.14), transparent),
+    radial-gradient(ellipse 55% 50% at 80% 70%, rgba(247, 240, 215, 0.32), transparent),
+    radial-gradient(ellipse 40% 65% at 30% 80%, rgba(140, 107, 37, 0.10), transparent);
   animation: mesh-shift 20s ease-in-out infinite;
   will-change: transform;
 }
@@ -1069,9 +1122,9 @@ select {
   top: -35%;
   left: -35%;
   background:
-    radial-gradient(ellipse 55% 45% at 60% 50%, rgba(59, 130, 246, 0.25), transparent),
-    radial-gradient(ellipse 50% 55% at 10% 60%, rgba(139, 92, 246, 0.22), transparent),
-    radial-gradient(ellipse 45% 50% at 90% 30%, rgba(6, 182, 212, 0.20), transparent);
+    radial-gradient(ellipse 55% 45% at 60% 50%, rgba(184, 146, 63, 0.12), transparent),
+    radial-gradient(ellipse 50% 55% at 10% 60%, rgba(212, 184, 109, 0.10), transparent),
+    radial-gradient(ellipse 45% 50% at 90% 30%, rgba(247, 240, 215, 0.22), transparent);
   animation: mesh-shift 18s ease-in-out infinite reverse;
   animation-delay: -8s;
   will-change: transform;
@@ -1085,45 +1138,50 @@ select {
   80% { transform: translate(-5%, -5%) rotate(-2deg) scale(0.97); }
 }
 
-/* Mesh variants per page mood */
+/* Rule 29 — mesh variants. Was a mix of warm/cool/dark moods that all
+ * leaked cool channels. Now every variant lands inside the editorial
+ * champagne palette with slightly different distribution per mood. */
 .mesh-gradient-warm::before {
   background:
-    radial-gradient(ellipse 50% 60% at 25% 25%, rgba(245, 158, 11, 0.30), transparent),
-    radial-gradient(ellipse 45% 55% at 70% 30%, rgba(239, 68, 68, 0.22), transparent),
-    radial-gradient(ellipse 55% 50% at 75% 65%, rgba(37, 99, 235, 0.25), transparent),
-    radial-gradient(ellipse 40% 65% at 30% 75%, rgba(167, 139, 250, 0.22), transparent);
+    radial-gradient(ellipse 50% 60% at 25% 25%, rgba(212, 184, 109, 0.26), transparent),
+    radial-gradient(ellipse 45% 55% at 70% 30%, rgba(184, 146, 63, 0.18), transparent),
+    radial-gradient(ellipse 55% 50% at 75% 65%, rgba(247, 240, 215, 0.30), transparent),
+    radial-gradient(ellipse 40% 65% at 30% 75%, rgba(140, 107, 37, 0.12), transparent);
 }
 
 .mesh-gradient-cool::before {
   background:
-    radial-gradient(ellipse 50% 60% at 15% 20%, rgba(6, 182, 212, 0.35), transparent),
-    radial-gradient(ellipse 45% 55% at 65% 25%, rgba(37, 99, 235, 0.30), transparent),
-    radial-gradient(ellipse 55% 50% at 80% 75%, rgba(99, 102, 241, 0.25), transparent),
-    radial-gradient(ellipse 40% 65% at 35% 85%, rgba(34, 211, 238, 0.28), transparent);
+    radial-gradient(ellipse 50% 60% at 15% 20%, rgba(231, 214, 163, 0.20), transparent),
+    radial-gradient(ellipse 45% 55% at 65% 25%, rgba(184, 146, 63, 0.14), transparent),
+    radial-gradient(ellipse 55% 50% at 80% 75%, rgba(212, 184, 109, 0.16), transparent),
+    radial-gradient(ellipse 40% 65% at 35% 85%, rgba(247, 240, 215, 0.28), transparent);
 }
 
-/* Deep dark mesh for contrast fog — makes whites pop */
+/* Contrast mesh — was dark navy fog, now soft ink wash on cream so
+ * whites still pop without painting a navy bruise on the page. */
 .mesh-gradient-contrast::before {
   background:
-    radial-gradient(ellipse 55% 60% at 15% 25%, rgba(15, 20, 40, 0.95), transparent),
-    radial-gradient(ellipse 50% 55% at 75% 20%, rgba(20, 15, 45, 0.85), transparent),
-    radial-gradient(ellipse 60% 50% at 80% 75%, rgba(10, 25, 50, 0.80), transparent),
-    radial-gradient(ellipse 45% 65% at 30% 80%, rgba(25, 15, 55, 0.75), transparent);
+    radial-gradient(ellipse 55% 60% at 15% 25%, rgba(10, 10, 11, 0.06), transparent),
+    radial-gradient(ellipse 50% 55% at 75% 20%, rgba(212, 184, 109, 0.14), transparent),
+    radial-gradient(ellipse 60% 50% at 80% 75%, rgba(10, 10, 11, 0.05), transparent),
+    radial-gradient(ellipse 45% 65% at 30% 80%, rgba(184, 146, 63, 0.10), transparent);
 }
 
 .mesh-gradient-contrast::after {
   background:
-    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(8, 12, 30, 0.90), transparent),
-    radial-gradient(ellipse 45% 55% at 20% 60%, rgba(15, 10, 40, 0.70), transparent),
-    radial-gradient(ellipse 55% 45% at 85% 40%, rgba(10, 20, 50, 0.65), transparent);
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(247, 240, 215, 0.22), transparent),
+    radial-gradient(ellipse 45% 55% at 20% 60%, rgba(212, 184, 109, 0.12), transparent),
+    radial-gradient(ellipse 55% 45% at 85% 40%, rgba(184, 146, 63, 0.10), transparent);
 }
 
+/* `.mesh-gradient-purple` is a misnomer kept for class-name compat —
+ * was actually a cyan/blue mix. Flipped to champagne. */
 .mesh-gradient-purple::before {
   background:
-    radial-gradient(ellipse 50% 60% at 20% 30%, rgba(6, 182, 212, 0.30), transparent),
-    radial-gradient(ellipse 45% 55% at 75% 20%, rgba(34, 211, 238, 0.25), transparent),
-    radial-gradient(ellipse 55% 50% at 70% 70%, rgba(37, 99, 235, 0.25), transparent),
-    radial-gradient(ellipse 40% 65% at 25% 80%, rgba(14, 165, 233, 0.20), transparent);
+    radial-gradient(ellipse 50% 60% at 20% 30%, rgba(212, 184, 109, 0.18), transparent),
+    radial-gradient(ellipse 45% 55% at 75% 20%, rgba(247, 240, 215, 0.26), transparent),
+    radial-gradient(ellipse 55% 50% at 70% 70%, rgba(184, 146, 63, 0.16), transparent),
+    radial-gradient(ellipse 40% 65% at 25% 80%, rgba(140, 107, 37, 0.10), transparent);
 }
 
 /* Thin white smoke wisps on pure black — admin/dashboard pages */
@@ -1164,26 +1222,26 @@ select {
 
 .fog-layer-1 {
   background:
-    radial-gradient(ellipse 80% 50% at 10% 20%, rgba(139, 92, 246, 0.45), transparent 70%),
-    radial-gradient(ellipse 60% 70% at 80% 60%, rgba(6, 182, 212, 0.40), transparent 70%),
-    radial-gradient(ellipse 70% 40% at 50% 90%, rgba(59, 130, 246, 0.35), transparent 70%);
+    radial-gradient(ellipse 80% 50% at 10% 20%, rgba(184, 146, 63, 0.45), transparent 70%),
+    radial-gradient(ellipse 60% 70% at 80% 60%, rgba(212, 184, 109, 0.40), transparent 70%),
+    radial-gradient(ellipse 70% 40% at 50% 90%, rgba(184, 146, 63, 0.35), transparent 70%);
   animation: fog-drift-1 25s ease-in-out infinite;
 }
 
 .fog-layer-2 {
   background:
-    radial-gradient(ellipse 70% 60% at 70% 30%, rgba(167, 139, 250, 0.40), transparent 70%),
-    radial-gradient(ellipse 55% 80% at 20% 70%, rgba(34, 211, 238, 0.35), transparent 70%),
-    radial-gradient(ellipse 65% 55% at 90% 80%, rgba(139, 92, 246, 0.30), transparent 70%);
+    radial-gradient(ellipse 70% 60% at 70% 30%, rgba(184, 146, 63, 0.40), transparent 70%),
+    radial-gradient(ellipse 55% 80% at 20% 70%, rgba(212, 184, 109, 0.35), transparent 70%),
+    radial-gradient(ellipse 65% 55% at 90% 80%, rgba(184, 146, 63, 0.30), transparent 70%);
   animation: fog-drift-2 30s ease-in-out infinite;
   animation-delay: -12s;
 }
 
 .fog-layer-3 {
   background:
-    radial-gradient(ellipse 90% 45% at 40% 50%, rgba(99, 102, 241, 0.35), transparent 70%),
+    radial-gradient(ellipse 90% 45% at 40% 50%, rgba(184, 146, 63, 0.35), transparent 70%),
     radial-gradient(ellipse 50% 70% at 85% 15%, rgba(244, 114, 182, 0.25), transparent 70%),
-    radial-gradient(ellipse 75% 55% at 15% 40%, rgba(6, 182, 212, 0.30), transparent 70%);
+    radial-gradient(ellipse 75% 55% at 15% 40%, rgba(212, 184, 109, 0.30), transparent 70%);
   animation: fog-drift-3 35s ease-in-out infinite;
   animation-delay: -20s;
 }
@@ -1200,7 +1258,7 @@ select {
   height: 700px;
   top: -5%;
   left: 5%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.55), transparent 65%);
+  background: radial-gradient(circle, rgba(184, 146, 63, 0.55), transparent 65%);
   animation: fog-glow-pulse 8s ease-in-out infinite;
 }
 
@@ -1209,7 +1267,7 @@ select {
   height: 600px;
   top: 35%;
   right: -5%;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.50), transparent 65%);
+  background: radial-gradient(circle, rgba(212, 184, 109, 0.50), transparent 65%);
   animation: fog-glow-pulse 10s ease-in-out infinite;
   animation-delay: -4s;
 }
@@ -1219,7 +1277,7 @@ select {
   height: 650px;
   bottom: 5%;
   left: 25%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.45), transparent 65%);
+  background: radial-gradient(circle, rgba(184, 146, 63, 0.45), transparent 65%);
   animation: fog-glow-pulse 12s ease-in-out infinite;
   animation-delay: -7s;
 }
@@ -1275,25 +1333,25 @@ select {
   position: absolute;
   width: 4px;
   height: 4px;
-  background: rgba(59, 130, 246, 0.7);
+  background: rgba(184, 146, 63, 0.7);
   border-radius: 50%;
-  box-shadow: 0 0 6px 2px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 6px 2px rgba(184, 146, 63, 0.3);
   animation: particle-float linear infinite;
   will-change: transform;
 }
 
-.particle:nth-child(1) { left: 10%; bottom: -5%; animation-duration: 12s; animation-delay: 0s; width: 6px; height: 6px; background: rgba(99, 102, 241, 0.8); box-shadow: 0 0 10px 3px rgba(99, 102, 241, 0.4); }
-.particle:nth-child(2) { left: 25%; bottom: -5%; animation-duration: 15s; animation-delay: -3s; background: rgba(34, 211, 238, 0.7); box-shadow: 0 0 8px 2px rgba(34, 211, 238, 0.35); }
+.particle:nth-child(1) { left: 10%; bottom: -5%; animation-duration: 12s; animation-delay: 0s; width: 6px; height: 6px; background: rgba(184, 146, 63, 0.8); box-shadow: 0 0 10px 3px rgba(184, 146, 63, 0.4); }
+.particle:nth-child(2) { left: 25%; bottom: -5%; animation-duration: 15s; animation-delay: -3s; background: rgba(212, 184, 109, 0.7); box-shadow: 0 0 8px 2px rgba(212, 184, 109, 0.35); }
 .particle:nth-child(3) { left: 40%; bottom: -5%; animation-duration: 11s; animation-delay: -6s; width: 5px; height: 5px; }
-.particle:nth-child(4) { left: 55%; bottom: -5%; animation-duration: 16s; animation-delay: -1s; background: rgba(167, 139, 250, 0.75); box-shadow: 0 0 8px 3px rgba(167, 139, 250, 0.35); }
+.particle:nth-child(4) { left: 55%; bottom: -5%; animation-duration: 16s; animation-delay: -1s; background: rgba(184, 146, 63, 0.75); box-shadow: 0 0 8px 3px rgba(184, 146, 63, 0.35); }
 .particle:nth-child(5) { left: 70%; bottom: -5%; animation-duration: 13s; animation-delay: -4s; width: 5px; height: 5px; }
-.particle:nth-child(6) { left: 85%; bottom: -5%; animation-duration: 14s; animation-delay: -7s; background: rgba(99, 102, 241, 0.65); box-shadow: 0 0 8px 2px rgba(99, 102, 241, 0.3); }
-.particle:nth-child(7) { left: 15%; bottom: -5%; animation-duration: 12s; animation-delay: -9s; background: rgba(34, 211, 238, 0.6); width: 5px; height: 5px; box-shadow: 0 0 8px 2px rgba(34, 211, 238, 0.3); }
-.particle:nth-child(8) { left: 50%; bottom: -5%; animation-duration: 14s; animation-delay: -2s; background: rgba(167, 139, 250, 0.8); box-shadow: 0 0 10px 3px rgba(167, 139, 250, 0.4); width: 6px; height: 6px; }
+.particle:nth-child(6) { left: 85%; bottom: -5%; animation-duration: 14s; animation-delay: -7s; background: rgba(184, 146, 63, 0.65); box-shadow: 0 0 8px 2px rgba(184, 146, 63, 0.3); }
+.particle:nth-child(7) { left: 15%; bottom: -5%; animation-duration: 12s; animation-delay: -9s; background: rgba(212, 184, 109, 0.6); width: 5px; height: 5px; box-shadow: 0 0 8px 2px rgba(212, 184, 109, 0.3); }
+.particle:nth-child(8) { left: 50%; bottom: -5%; animation-duration: 14s; animation-delay: -2s; background: rgba(184, 146, 63, 0.8); box-shadow: 0 0 10px 3px rgba(184, 146, 63, 0.4); width: 6px; height: 6px; }
 .particle:nth-child(9) { left: 65%; bottom: -5%; animation-duration: 11s; animation-delay: -5s; }
-.particle:nth-child(10) { left: 35%; bottom: -5%; animation-duration: 15s; animation-delay: -8s; background: rgba(59, 130, 246, 0.7); width: 6px; height: 6px; box-shadow: 0 0 10px 3px rgba(59, 130, 246, 0.35); }
-.particle:nth-child(11) { left: 80%; bottom: -5%; animation-duration: 16s; animation-delay: -10s; background: rgba(6, 182, 212, 0.65); box-shadow: 0 0 8px 2px rgba(6, 182, 212, 0.3); }
-.particle:nth-child(12) { left: 5%; bottom: -5%; animation-duration: 13s; animation-delay: -11s; background: rgba(139, 92, 246, 0.7); width: 5px; height: 5px; box-shadow: 0 0 8px 2px rgba(139, 92, 246, 0.35); }
+.particle:nth-child(10) { left: 35%; bottom: -5%; animation-duration: 15s; animation-delay: -8s; background: rgba(184, 146, 63, 0.7); width: 6px; height: 6px; box-shadow: 0 0 10px 3px rgba(184, 146, 63, 0.35); }
+.particle:nth-child(11) { left: 80%; bottom: -5%; animation-duration: 16s; animation-delay: -10s; background: rgba(212, 184, 109, 0.65); box-shadow: 0 0 8px 2px rgba(212, 184, 109, 0.3); }
+.particle:nth-child(12) { left: 5%; bottom: -5%; animation-duration: 13s; animation-delay: -11s; background: rgba(184, 146, 63, 0.7); width: 5px; height: 5px; box-shadow: 0 0 8px 2px rgba(184, 146, 63, 0.35); }
 
 @keyframes particle-float {
   0% { transform: translateY(0) translateX(0); opacity: 0; }
@@ -1314,8 +1372,8 @@ select {
   overflow: hidden;
   z-index: 0;
   background-image:
-    linear-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.08) 1px, transparent 1px);
+    linear-gradient(rgba(184, 146, 63, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184, 146, 63, 0.08) 1px, transparent 1px);
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, rgba(0,0,0,0.7), transparent 75%);
   -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, rgba(0,0,0,0.7), transparent 75%);
@@ -1345,7 +1403,7 @@ select {
   height: 600px;
   top: 5%;
   left: 0%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.35), transparent 70%);
+  background: radial-gradient(circle, rgba(184, 146, 63, 0.35), transparent 70%);
   animation-delay: 0s;
 }
 
@@ -1354,7 +1412,7 @@ select {
   height: 500px;
   top: 45%;
   right: 0%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.30), transparent 70%);
+  background: radial-gradient(circle, rgba(184, 146, 63, 0.30), transparent 70%);
   animation-delay: -2s;
 }
 
@@ -1363,7 +1421,7 @@ select {
   height: 450px;
   bottom: 5%;
   left: 25%;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.25), transparent 70%);
+  background: radial-gradient(circle, rgba(212, 184, 109, 0.25), transparent 70%);
   animation-delay: -4s;
 }
 
@@ -1390,7 +1448,7 @@ select {
   width: 70%;
   height: 130%;
   top: -15%;
-  background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.18), transparent 55%);
+  background: radial-gradient(ellipse at center, rgba(184, 146, 63, 0.18), transparent 55%);
   animation: spotlight-sweep 14s ease-in-out infinite;
   will-change: transform;
 }
@@ -1418,15 +1476,15 @@ select {
   animation-duration: 4s;
   width: 4px;
   height: 4px;
-  background: rgba(59, 130, 246, 0.8);
-  box-shadow: 0 0 8px 3px rgba(59, 130, 246, 0.4);
+  background: rgba(184, 146, 63, 0.8);
+  box-shadow: 0 0 8px 3px rgba(184, 146, 63, 0.4);
 }
 
 .constellation-dot:nth-child(even) {
   animation-duration: 5s;
   animation-delay: -2s;
-  background: rgba(139, 92, 246, 0.7);
-  box-shadow: 0 0 6px 2px rgba(139, 92, 246, 0.35);
+  background: rgba(184, 146, 63, 0.7);
+  box-shadow: 0 0 6px 2px rgba(184, 146, 63, 0.35);
 }
 
 @keyframes constellation-twinkle {
@@ -1467,20 +1525,20 @@ select {
 }
 
 .ambient-line:nth-child(1) {
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(184, 146, 63, 0.35), transparent);
   animation-duration: 6s;
   top: 20%;
 }
 
 .ambient-line:nth-child(2) {
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.30), transparent);
+  background: linear-gradient(90deg, transparent, rgba(184, 146, 63, 0.30), transparent);
   animation-duration: 9s;
   animation-delay: -3s;
   top: 45%;
 }
 
 .ambient-line:nth-child(3) {
-  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.28), transparent);
+  background: linear-gradient(90deg, transparent, rgba(212, 184, 109, 0.28), transparent);
   animation-duration: 7s;
   animation-delay: -5s;
   top: 70%;
@@ -1511,7 +1569,7 @@ select {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(59,130,246,0.5), rgba(139,92,246,0.5), rgba(236,72,153,0.5), rgba(59,130,246,0.5));
+  background: linear-gradient(135deg, rgba(184,146,63,0.5), rgba(184,146,63,0.5), rgba(236,72,153,0.5), rgba(184,146,63,0.5));
   background-size: 300% 300%;
   animation: gradient-rotate 4s ease infinite;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -1530,7 +1588,7 @@ select {
    ============================================ */
 
 .text-shimmer {
-  background: linear-gradient(110deg, #fff 0%, #fff 40%, rgba(59,130,246,0.8) 50%, #fff 60%, #fff 100%);
+  background: linear-gradient(110deg, #fff 0%, #fff 40%, rgba(184,146,63,0.8) 50%, #fff 60%, #fff 100%);
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -1548,10 +1606,10 @@ select {
    ============================================ */
 
 .glass-panel {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.82);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--rule);
   border-radius: 1.5rem;
 }
 
@@ -1593,6 +1651,48 @@ select {
    PULSING GLOW BUTTON — animated border glow
    ============================================ */
 
+/* ============================================
+   UTILITY BUTTON CLASSES — used in builder panels
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid var(--rule);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--ink-secondary);
+  border-color: var(--ink-secondary);
+}
+
+.btn-secondary {
+  background: var(--paper-elevated);
+  color: var(--ink);
+  border-color: var(--rule);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: #eeede4;
+  border-color: #d4cfc0;
+}
+
 .btn-glow-pulse {
   position: relative;
   overflow: visible;
@@ -1603,7 +1703,7 @@ select {
   position: absolute;
   inset: -2px;
   border-radius: inherit;
-  background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(59,130,246,0.3), rgba(139,92,246,0.3), rgba(255,255,255,0.4));
+  background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(184,146,63,0.3), rgba(184,146,63,0.3), rgba(255,255,255,0.4));
   background-size: 300% 300%;
   animation: btn-glow 3s ease infinite;
   z-index: -1;
@@ -1623,7 +1723,7 @@ select {
 .typing-cursor::after {
   content: '|';
   animation: blink-cursor 1s steps(2) infinite;
-  color: rgba(255,255,255,0.50);
+  color: var(--ink-muted);
   font-weight: 300;
   margin-left: 2px;
 }
@@ -1727,7 +1827,7 @@ select {
 }
 
 .card-tilt:hover {
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(59,130,246,0.08);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(184,146,63,0.08);
 }
 
 /* ============================================
@@ -1765,7 +1865,7 @@ select {
   left: 16px;
   font-size: 4rem;
   font-family: Georgia, serif;
-  color: rgba(59,130,246,0.15);
+  color: rgba(184,146,63,0.15);
   line-height: 1;
   pointer-events: none;
 }
@@ -1802,8 +1902,8 @@ select {
 /* ── Thin scrollbar for notification dropdown ── */
 .notif-scrollbar::-webkit-scrollbar { width: 4px; }
 .notif-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.notif-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-.notif-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+.notif-scrollbar::-webkit-scrollbar-thumb { background: #d0cdc0; border-radius: 2px; }
+.notif-scrollbar::-webkit-scrollbar-thumb:hover { background: #b8b3a5; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    FILMORA-TIER DESIGN SYSTEM — SERIOUS BUSINESS STANDARD
@@ -1812,13 +1912,19 @@ select {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Deep navy canvas — replaces pure black, still dark enough for editorial contrast */
-  --fs-bg-0: #060e1f;           /* page background (navy-950) */
-  --fs-bg-1: #0a1628;           /* nav + footer (navy-900) */
-  --fs-bg-2: #0f2148;           /* cards (navy-800) */
-  --fs-bg-3: #152e60;           /* elevated cards (navy-700) */
-  --fs-hair: rgba(255,255,255,0.06);
-  --fs-hair-strong: rgba(255,255,255,0.12);
+  /* Editorial-light surfaces (rule 29 reversal — 2026-05-06).
+   * Was Filmora navy (#060e1f / #0a1628 / #0f2148 / #152e60). The
+   * Filmora vars persist as aliases so any component using `.fs-card`
+   * or `var(--fs-bg-*)` directly now paints on the editorial palette
+   * without touching every consumer. Hairline tokens flipped from
+   * white-on-navy translucent to ink-on-paper translucent so borders
+   * remain visible against the new bone surfaces. */
+  --fs-bg-0: var(--paper);          /* page background — pure white */
+  --fs-bg-1: var(--paper-elevated); /* nav + footer — warm cream */
+  --fs-bg-2: var(--paper-elevated); /* cards — warm cream */
+  --fs-bg-3: #ffffff;               /* elevated cards — pure white pop on cream pages */
+  --fs-hair: rgba(10, 10, 11, 0.08);
+  --fs-hair-strong: rgba(10, 10, 11, 0.16);
 
   /* Display typography scale (Filmora uses 204px for final CTA) */
   --fs-display-2xl: clamp(4rem, 11vw, 11rem);     /* ~176px */
@@ -1863,7 +1969,7 @@ select {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.2em;
-  color: rgba(255,255,255,0.45);
+  color: var(--ink-muted);
 }
 
 .fs-serif-italic {
@@ -1892,8 +1998,8 @@ select {
 /* ── Cards — the bento/feature-grid primitive ── */
 .fs-card {
   position: relative;
-  background: linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0.01) 100%);
-  border: 1px solid var(--fs-hair);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
   border-radius: var(--fs-radius-lg);
   box-shadow: var(--fs-shadow-card);
   overflow: hidden;
@@ -1963,17 +2069,16 @@ select {
   border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255,255,255,0.85);
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--fs-hair-strong);
-  backdrop-filter: blur(12px);
+  color: var(--ink-secondary);
+  background: var(--paper-elevated);
+  border: 1px solid var(--rule);
   transition: all 0.35s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .fs-btn-ghost:hover {
-  color: var(--fs-accent);
-  border-color: var(--fs-accent-ring);
-  background: rgba(232,212,176,0.04);
+  color: var(--gold-deep);
+  border-color: var(--gold);
+  background: var(--gold-soft);
   transform: translateY(-2px);
 }
 
@@ -2049,4 +2154,1454 @@ select {
 @media (prefers-reduced-motion: reduce) {
   .fs-marquee { animation: none; }
   .fs-card:hover { transform: none; }
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+ * EDITORIAL-LIGHT OVERRIDE LAYER (rule 29 reversal — 2026-05-04)
+ * ───────────────────────────────────────────────────────────────────────
+ *
+ * The codebase contains 2000+ inline references to the dark Filmora palette
+ * (`bg-[#0b1530]`, `bg-gray-900`, `bg-gray-950`, `text-white`, `text-white/55`,
+ * `border-white/[0.06]`, etc.). Migrating every page individually would take
+ * many sessions; this override layer flips all of them to the warm-bone
+ * editorial palette in one place so every surface picks up the new look
+ * immediately — even pages we haven't rewritten yet. Pages we DO rewrite
+ * use `var(--paper)` / `var(--ink)` directly and don't hit these rules.
+ *
+ * Specificity: tailwind-jit emits these classes at low specificity
+ * (one class selector). We match the same specificity with `:where(...)`
+ * and rely on stylesheet order (this block ships AFTER tailwind utilities)
+ * to win.
+ *
+ * Site-wide ambient glows / gradient orbs (`radial-gradient(...232,212,176...)`,
+ * `linear-gradient(...rgba(20,40,95,...))`) live as inline styles inside
+ * components and aren't covered here — those will look slightly off until
+ * each page is migrated. Acceptable trade-off for "every page light today".
+ */
+
+/* Backgrounds — every dark surface routes to a warm bone variant.
+ * The opacity-suffixed variants (`bg-[#0b1530]/80`, `bg-[#0b1530]/40`) emit
+ * the colour as `rgb(...) / 0.8` so we override with rgba on the warm tone
+ * to keep the translucent-glass look while flipping the underlying hue. */
+.bg-\[\#0b1530\],
+.bg-\[\#0a1628\],
+.bg-\[\#131520\],
+.bg-\[\#0a0f1f\],
+.bg-\[\#0b1027\],
+.bg-\[\#06070b\],
+.bg-\[\#0a0a0f\],
+.bg-\[\#0a0a14\],
+/* Dark arbitrary backgrounds discovered in the second sweep
+ * (2026-05-05). Every value below was found in src/ via
+ * `grep -rh "bg-\[#" | sort -u` and is one of the original Filmora
+ * dark surfaces. They route to bone so unmigrated components still
+ * read correctly on the editorial-light theme. */
+.bg-\[\#05060a\],
+.bg-\[\#06060a\],
+.bg-\[\#080808\],
+.bg-\[\#09090f\],
+.bg-\[\#0a0a0c\],
+.bg-\[\#0a0a12\],
+.bg-\[\#0a0f1e\],
+.bg-\[\#0b0b16\],
+.bg-\[\#0b0d17\],
+.bg-\[\#0b1220\],
+.bg-\[\#0c0c0c\],
+.bg-\[\#0c0c14\],
+.bg-\[\#0c0e14\],
+.bg-\[\#0d0d10\],
+.bg-\[\#0d1321\],
+.bg-\[\#0e0e18\],
+.bg-\[\#0e0e1a\],
+.bg-\[\#0f0d1a\],
+.bg-\[\#0f111c\],
+.bg-\[\#0f172a\],
+.bg-\[\#0f1830\],
+.bg-\[\#0f2148\],
+.bg-\[\#101a35\],
+.bg-\[\#111318\],
+.bg-\[\#111a2e\],
+.bg-\[\#12121a\],
+.bg-\[\#12121e\],
+.bg-\[\#12121f\],
+.bg-\[\#141e33\],
+.bg-\[\#142046\],
+.bg-\[\#161f35\],
+.bg-\[\#1a1d24\],
+.bg-\[\#1e1e1e\],
+.bg-\[\#1e293b\],
+.bg-gray-900,
+.bg-gray-950,
+.bg-zinc-900,
+.bg-zinc-950,
+.bg-slate-900,
+.bg-slate-950,
+.bg-neutral-900,
+.bg-neutral-950 {
+  background-color: var(--paper) !important;
+}
+
+/* Opacity-suffixed variants of the dark colors above. `bg-[#12121a]/60`
+ * produces `rgb(18 18 26 / 0.6)` so we replace with translucent bone
+ * to preserve the glass-panel feel without the dark hue. */
+.bg-\[\#0b1530\]\/40,
+.bg-\[\#0b1530\]\/60,
+.bg-\[\#0b1530\]\/70,
+.bg-\[\#0b1530\]\/80,
+.bg-\[\#0b1530\]\/85,
+.bg-\[\#0b1530\]\/90,
+.bg-\[\#0b1530\]\/95,
+.bg-\[\#0a1628\]\/80,
+.bg-\[\#0a1628\]\/90,
+.bg-\[\#131520\]\/80,
+.bg-\[\#12121a\]\/60,
+.bg-\[\#12121a\]\/80,
+.bg-\[\#12121a\]\/95,
+.bg-\[\#0c0e14\]\/80,
+.bg-\[\#0f172a\]\/80,
+.bg-\[\#111318\]\/80 {
+  background-color: rgba(250, 250, 247, 0.92) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * BLUE/INDIGO/VIOLET/CYAN/SKY VIVID CLASSES (third sweep — 2026-05-05)
+ * ──────────────────────────────────────────────────────────────────────
+ *
+ * The first two override passes handled dark hex literals and `*-900/950`
+ * neutrals. They missed the *vivid* Tailwind colour ramps (`bg-blue-600`,
+ * `from-violet-500`, etc) used as panel backgrounds across the homepage
+ * hero, builder preview, video creator, and several admin pages. These
+ * read as solid-coloured blue/purple surfaces on the editorial-light
+ * palette and were the source of Craig's "still seeing blue" report.
+ *
+ * Saturated 400-900 shades route to bone. The 50/100/200 light shades
+ * are kept (they're already pale enough to read fine on a bone page).
+ * ────────────────────────────────────────────────────────────────────── */
+.bg-blue-400, .bg-blue-500, .bg-blue-600, .bg-blue-700, .bg-blue-800, .bg-blue-900,
+.bg-indigo-400, .bg-indigo-500, .bg-indigo-600, .bg-indigo-700, .bg-indigo-800, .bg-indigo-900,
+.bg-violet-400, .bg-violet-500, .bg-violet-600, .bg-violet-700, .bg-violet-800, .bg-violet-900,
+.bg-cyan-400, .bg-cyan-500, .bg-cyan-600, .bg-cyan-700, .bg-cyan-800, .bg-cyan-900,
+.bg-sky-400, .bg-sky-500, .bg-sky-600, .bg-sky-700, .bg-sky-800, .bg-sky-900,
+.bg-purple-400, .bg-purple-500, .bg-purple-600, .bg-purple-700, .bg-purple-800, .bg-purple-900,
+.bg-fuchsia-400, .bg-fuchsia-500, .bg-fuchsia-600, .bg-fuchsia-700, .bg-fuchsia-800, .bg-fuchsia-900 {
+  background-color: var(--paper-elevated) !important;
+}
+
+/* Gradient stops on the vivid ramps — `from-blue-500 to-violet-700` and
+ * friends were producing big purple gradient panels. Flip every stop to
+ * bone so the gradient effectively flattens to elevated cream. */
+[class*="from-blue-"], [class*="from-indigo-"], [class*="from-violet-"],
+[class*="from-cyan-"], [class*="from-sky-"], [class*="from-purple-"], [class*="from-fuchsia-"] {
+  --tw-gradient-from: var(--paper-elevated) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(244 243 237 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+[class*="via-blue-"], [class*="via-indigo-"], [class*="via-violet-"],
+[class*="via-cyan-"], [class*="via-sky-"], [class*="via-purple-"], [class*="via-fuchsia-"] {
+  --tw-gradient-via: var(--paper-elevated) !important;
+  --tw-gradient-via-stops: var(--tw-gradient-position, ), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-via-stops) !important;
+}
+[class*="to-blue-"], [class*="to-indigo-"], [class*="to-violet-"],
+[class*="to-cyan-"], [class*="to-sky-"], [class*="to-purple-"], [class*="to-fuchsia-"] {
+  --tw-gradient-to: var(--paper-elevated) var(--tw-gradient-to-position) !important;
+}
+
+/* Gradient FROM/TO arbitrary hex variants — anything starting with cool
+ * channel-dominant blues should flatten to bone too. `from-[#3b82f6]`
+ * (tailwind blue-500), `from-[#6366f1]` (indigo-500), `from-[#8b5cf6]`
+ * (violet-500), `from-[#0ea5e9]` (sky-500) — all common literals seen
+ * in the codebase. */
+.from-\[\#3b82f6\], .from-\[\#6366f1\], .from-\[\#8b5cf6\], .from-\[\#0ea5e9\],
+.from-\[\#2563eb\], .from-\[\#1d4ed8\], .from-\[\#7c3aed\], .from-\[\#a855f7\],
+.from-\[\#ec4899\] {
+  --tw-gradient-from: var(--paper-elevated) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(244 243 237 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+.to-\[\#3b82f6\], .to-\[\#6366f1\], .to-\[\#8b5cf6\], .to-\[\#0ea5e9\],
+.to-\[\#2563eb\], .to-\[\#1d4ed8\], .to-\[\#7c3aed\], .to-\[\#a855f7\],
+.to-\[\#ec4899\] {
+  --tw-gradient-to: var(--paper-elevated) var(--tw-gradient-to-position) !important;
+}
+
+/* Gradient stops — `from-[#0b1530]` / `to-[#0b1530]` are used as edge fades
+ * around marquees and cinematic strips. Switch them to bone fades. */
+.from-\[\#0b1530\],
+.from-\[\#0a1628\],
+.from-\[\#131520\] {
+  --tw-gradient-from: #fafaf7 var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(250 250 247 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+.to-\[\#0b1530\],
+.to-\[\#0a1628\],
+.to-\[\#131520\] {
+  --tw-gradient-to: #fafaf7 var(--tw-gradient-to-position) !important;
+}
+.via-\[\#0b1530\],
+.via-\[\#0a1628\],
+.via-\[\#131520\] {
+  --tw-gradient-via: #fafaf7 !important;
+  --tw-gradient-via-stops: var(--tw-gradient-position, ), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-via-stops) !important;
+}
+
+.bg-\[\#11131c\],
+.bg-\[\#162044\],
+.bg-\[\#1a1a24\],
+.bg-gray-800,
+.bg-zinc-800,
+.bg-slate-800,
+.bg-neutral-800,
+.bg-stone-800,
+.bg-gray-900,
+.bg-zinc-900,
+.bg-slate-900,
+.bg-neutral-900,
+.bg-stone-900,
+.bg-gray-950,
+.bg-zinc-950,
+.bg-slate-950,
+.bg-neutral-950,
+.bg-stone-950 {
+  background-color: var(--paper-elevated) !important;
+  color: var(--ink) !important;
+}
+
+/* Same classes with /opacity suffixes — `bg-zinc-900/80`, `bg-slate-900/60`,
+ * `bg-black/40` etc were used as overlays. On a bone canvas a dark overlay
+ * makes the page look bruised — flip them to a soft cream wash. */
+.bg-gray-900\/40, .bg-gray-900\/50, .bg-gray-900\/60, .bg-gray-900\/70, .bg-gray-900\/80, .bg-gray-900\/90,
+.bg-zinc-900\/40, .bg-zinc-900\/50, .bg-zinc-900\/60, .bg-zinc-900\/70, .bg-zinc-900\/80, .bg-zinc-900\/90,
+.bg-slate-900\/40, .bg-slate-900\/50, .bg-slate-900\/60, .bg-slate-900\/70, .bg-slate-900\/80, .bg-slate-900\/90,
+.bg-neutral-900\/40, .bg-neutral-900\/50, .bg-neutral-900\/60, .bg-neutral-900\/70, .bg-neutral-900\/80, .bg-neutral-900\/90,
+.bg-gray-950\/40, .bg-gray-950\/50, .bg-gray-950\/60, .bg-gray-950\/70, .bg-gray-950\/80, .bg-gray-950\/90,
+.bg-zinc-950\/40, .bg-zinc-950\/50, .bg-zinc-950\/60, .bg-zinc-950\/70, .bg-zinc-950\/80, .bg-zinc-950\/90,
+.bg-slate-950\/40, .bg-slate-950\/50, .bg-slate-950\/60, .bg-slate-950\/70, .bg-slate-950\/80, .bg-slate-950\/90 {
+  background-color: rgba(252, 250, 243, 0.94) !important;
+  color: var(--ink) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Text — invert the dark-mode foreground */
+.text-white,
+.text-zinc-50,
+.text-zinc-100,
+.text-gray-50,
+.text-gray-100,
+.text-slate-50,
+.text-slate-100,
+.text-neutral-50,
+.text-neutral-100 {
+  color: var(--ink) !important;
+}
+
+.text-white\/90,
+.text-zinc-200,
+.text-gray-200,
+.text-slate-200,
+.text-neutral-200 {
+  color: var(--ink-secondary) !important;
+}
+
+.text-white\/80,
+.text-white\/70,
+.text-white\/65,
+.text-zinc-300,
+.text-zinc-400,
+.text-gray-300,
+.text-gray-400,
+.text-slate-300,
+.text-slate-400,
+.text-neutral-300,
+.text-neutral-400 {
+  color: var(--ink-secondary) !important;
+}
+
+.text-white\/60,
+.text-white\/55,
+.text-white\/50,
+.text-white\/45,
+.text-white\/40,
+.text-white\/35,
+.text-white\/30,
+.text-white\/25,
+.text-white\/20,
+.text-zinc-500,
+.text-zinc-600,
+.text-gray-500,
+.text-gray-600,
+.text-slate-500,
+.text-slate-600,
+.text-neutral-500,
+.text-neutral-600 {
+  color: var(--ink-muted) !important;
+}
+
+/* Borders — warm hairline replaces `border-white/[0.06]` and friends */
+.border-white\/\[0\.04\],
+.border-white\/\[0\.05\],
+.border-white\/\[0\.06\],
+.border-white\/\[0\.07\],
+.border-white\/\[0\.08\],
+.border-white\/\[0\.1\],
+.border-white\/\[0\.12\],
+.border-white\/10,
+.border-white\/15,
+.border-white\/20,
+.border-zinc-700,
+.border-zinc-800,
+.border-zinc-900,
+.border-gray-700,
+.border-gray-800,
+.border-gray-900,
+.border-slate-700,
+.border-slate-800,
+.border-slate-900,
+.border-neutral-700,
+.border-neutral-800,
+.border-neutral-900,
+/* Dark arbitrary borders discovered in the second sweep (2026-05-05) */
+.border-\[\#0a0a12\],
+.border-\[\#111a2e\],
+.border-\[\#1e1e2e\] {
+  border-color: var(--rule) !important;
+}
+
+/* Dark gradient stop colors that the `from-[#0b1530]` block doesn't catch.
+ * Same approach: any gradient using these as a from/to/via stop now fades
+ * to bone. The opacity-suffixed forms (`from-[#0b1530]/40`) inherit because
+ * the underlying CSS variable is what we override. */
+.from-\[\#0a1628\],
+.from-\[\#12121a\],
+.from-\[\#0a0f1e\],
+.from-\[\#0f172a\] {
+  --tw-gradient-from: #fafaf7 var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(250 250 247 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+.to-\[\#0a1628\],
+.to-\[\#12121a\],
+.to-\[\#0a0f1e\],
+.to-\[\#0f172a\] {
+  --tw-gradient-to: #fafaf7 var(--tw-gradient-to-position) !important;
+}
+
+/* Glassy "white/[0.03]" panels become elevated bone surfaces */
+.bg-white\/\[0\.02\],
+.bg-white\/\[0\.03\],
+.bg-white\/\[0\.04\],
+.bg-white\/\[0\.05\],
+.bg-white\/\[0\.06\],
+.bg-white\/5,
+.bg-white\/10 {
+  background-color: var(--paper-elevated) !important;
+}
+
+/* Placeholder text — readable on bone */
+.placeholder\:text-white\/25::placeholder,
+.placeholder\:text-white\/30::placeholder,
+.placeholder\:text-white\/35::placeholder,
+.placeholder\:text-white\/40::placeholder,
+.placeholder-white\/25::placeholder,
+.placeholder-white\/30::placeholder,
+.placeholder-white\/35::placeholder,
+.placeholder-white\/40::placeholder {
+  color: var(--ink-muted) !important;
+}
+
+/* Critical-path overrides for body & html (these fight the inline
+ * critical CSS in layout.tsx until that bundle reverts). */
+html, body {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* Selection — warm gold, not cyan */
+::selection { background: var(--gold-soft); color: var(--ink); }
+::-moz-selection { background: var(--gold-soft); color: var(--ink); }
+
+/* Scrollbar — light variant */
+::-webkit-scrollbar-track { background: var(--paper) !important; }
+::-webkit-scrollbar-thumb { background: var(--rule-strong) !important; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-deep) !important; }
+
+/* Editorial display headlines — opt-in via .display utility */
+.display {
+  font-family: "Playfair Display", "Fraunces", ui-serif, Georgia, serif;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "dlig" 1;
+  letter-spacing: -0.02em;
+}
+.display-italic {
+  font-family: "Playfair Display", "Fraunces", ui-serif, Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * RULE-29 CLOSE-OUT SWEEP — 2026-05-06 (Craig: "the colours throughout
+ * the site are way off … please go through the whole site from start to
+ * finish.")
+ *
+ * The audit revealed that `bg-[#0b1530]` is used as the page wrapper on
+ * 131 routes. The previous override layer only caught it inside
+ * gradients (`from-[#0b1530]`/`to-[#0b1530]`) — never as a flat
+ * background. That's why the homepage looked right but every product
+ * page, builder, video-creator, /domains, /tools, /agencies, /pricing
+ * etc still rendered dark navy. Same story for the Filmora-tier
+ * `--fs-bg-*` tokens (lines 1830-1834) — those are still `#060e1f` /
+ * `#0a1628` / `#0f2148` / `#152e60`, dragging every `.fs-card`,
+ * `.fs-grain`, `.fs-marquee` surface into the navy era.
+ *
+ * Separately, admin/share routes use pure `bg-white` and `bg-slate-50`
+ * which Craig flagged as "too light" — they read pure-white against the
+ * warm bone of the homepage, which makes the site feel inconsistent.
+ *
+ * This block does FOUR things:
+ *   1. Maps every dark hex literal used as a `bg-[#…]` to `var(--paper)`
+ *   2. Remaps the `--fs-bg-*` tokens to bone palette (so .fs-* classes
+ *      automatically inherit the editorial-light look)
+ *   3. Maps pure `bg-white` / `bg-slate-50` / `bg-gray-50` and friends
+ *      to `var(--paper)` so admin matches the homepage warmth
+ *   4. Neutralises the dark `.fs-grain` texture overlay so it doesn't
+ *      stamp a dark film over the warm canvas
+ *
+ * Once this lands, the editorial-light theme covers the entire site
+ * without touching individual page files. Page-level cleanups can
+ * follow but the BIG visual flip happens here.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+/* (1) Dark hex backgrounds — flatten to paper. Covers wrappers and panels
+ *     across products/, builder/, video-creator/, tools/, domains/, admin/,
+ *     starter-kits/, agencies/, ai/, generators/, and ~120 other routes. */
+.bg-\[\#0b1530\],
+.bg-\[\#0a1628\],
+.bg-\[\#0f2148\],
+.bg-\[\#152e60\],
+.bg-\[\#060e1f\],
+.bg-\[\#131520\],
+.bg-\[\#0b0d17\],
+.bg-\[\#0e0e1a\],
+.bg-\[\#0a0a12\],
+.bg-\[\#0a0f1e\],
+.bg-\[\#0f172a\],
+.bg-\[\#111a2e\],
+.bg-\[\#12121a\],
+.bg-\[\#1e1e1e\],
+.bg-\[\#1e1e2e\],
+.bg-\[\#1a1a24\],
+.bg-\[\#162044\],
+.bg-\[\#11131c\],
+.bg-\[\#0d0d12\],
+.bg-\[\#1f2937\] {
+  background-color: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* Same dark hexes used with /opacity suffixes — `bg-[#0b1530]/40` etc.
+ * Tailwind compiles these to a different class name. Catch the common
+ * variants used in the codebase. */
+.bg-\[\#0b1530\]\/40, .bg-\[\#0b1530\]\/50, .bg-\[\#0b1530\]\/60, .bg-\[\#0b1530\]\/70, .bg-\[\#0b1530\]\/80, .bg-\[\#0b1530\]\/90, .bg-\[\#0b1530\]\/95,
+.bg-\[\#0a1628\]\/40, .bg-\[\#0a1628\]\/50, .bg-\[\#0a1628\]\/60, .bg-\[\#0a1628\]\/70, .bg-\[\#0a1628\]\/80, .bg-\[\#0a1628\]\/90,
+.bg-\[\#0f2148\]\/40, .bg-\[\#0f2148\]\/50, .bg-\[\#0f2148\]\/60, .bg-\[\#0f2148\]\/70, .bg-\[\#0f2148\]\/80, .bg-\[\#0f2148\]\/90,
+.bg-\[\#131520\]\/60, .bg-\[\#131520\]\/70, .bg-\[\#131520\]\/80, .bg-\[\#131520\]\/90,
+.bg-black\/40, .bg-black\/50, .bg-black\/60, .bg-black\/70, .bg-black\/80, .bg-black\/90 {
+  background-color: rgba(247, 245, 238, 0.92) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  color: var(--ink) !important;
+}
+
+/* `bg-black` flat — used in modals, IDE chrome, video-creator overlays */
+.bg-black {
+  background-color: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* (2) Filmora-tier token re-bind — every `.fs-card`, `.fs-grain`,
+ *     `.fs-marquee`, `.fs-btn-primary`, `.fs-text-gradient` etc reads
+ *     these variables. Flipping them here re-skins the whole Filmora
+ *     subsystem to editorial-light without touching the original
+ *     definitions above. */
+:root {
+  --fs-bg-0: var(--paper) !important;
+  --fs-bg-1: var(--paper) !important;
+  --fs-bg-2: var(--paper-elevated) !important;
+  --fs-bg-3: var(--paper-elevated) !important;
+  --fs-hair: var(--rule) !important;
+  --fs-hair-strong: var(--rule-strong) !important;
+  --fs-accent: var(--gold) !important;
+  --fs-accent-hover: var(--gold-deep) !important;
+  --fs-accent-ring: var(--gold-glow) !important;
+  --fs-shadow-card: var(--shadow-1) !important;
+  --fs-shadow-hover: var(--shadow-2) !important;
+  --fs-shadow-warm: 0 24px 72px -32px rgba(184, 146, 63, 0.30) !important;
+  --fs-gradient-text: linear-gradient(135deg, var(--ink) 0%, var(--gold-deep) 50%, var(--gold) 100%) !important;
+  --fs-gradient-cinema: linear-gradient(135deg, var(--ink) 0%, var(--gold-deep) 50%, var(--gold) 100%) !important;
+  --fs-gradient-primary: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 100%) !important;
+  --fs-gradient-magenta: linear-gradient(135deg, var(--gold-deep) 0%, var(--gold) 100%) !important;
+}
+
+/* `.fs-card` previously emitted a near-transparent white-on-dark surface.
+ * On bone canvas that becomes invisible — washing the page out. Force
+ * proper elevation. */
+.fs-card {
+  background: var(--paper-elevated) !important;
+  border-color: var(--rule-strong) !important;
+  color: var(--ink) !important;
+}
+.fs-card:hover {
+  border-color: var(--gold) !important;
+}
+
+/* `.fs-eyebrow` was rgba(255,255,255,0.45) — invisible on bone */
+.fs-eyebrow {
+  color: var(--ink-muted) !important;
+}
+
+/* `.fs-serif-italic` keeps the gold accent — stays correct on bone */
+
+/* `.fs-btn-primary` had #060e1f text on cream — keep ink */
+.fs-btn-primary {
+  color: var(--ink) !important;
+  background: var(--gold) !important;
+  border-color: var(--gold-deep) !important;
+}
+.fs-btn-primary:hover {
+  background: var(--gold-deep) !important;
+  color: var(--paper) !important;
+}
+
+/* (3) Pure white & pale neutrals — the "too light" complaint. Admin and
+ *     share pages used `bg-white` and `bg-slate-50` directly which read
+ *     as cold and washed-out next to the warm bone of the rest of the
+ *     site. Route them all to `--paper`. The opacity-suffixed
+ *     `bg-white/[0.0X]` forms above are intentionally kept on
+ *     `--paper-elevated` so cards still elevate. */
+/* Pure `bg-white` is overwhelmingly used for cards, badges, sidebars and
+ * elevated panels (admin, share-token, builder ChatPanel, etc). Route it
+ * to the elevated cream so cards lift cleanly off the bone page. */
+.bg-white {
+  background-color: var(--paper-elevated) !important;
+  color: var(--ink) !important;
+}
+
+/* Pale neutral wrappers — route to base paper. These are typically page
+ * backgrounds (admin shell uses bg-slate-50). */
+.bg-slate-50,
+.bg-slate-100,
+.bg-gray-50,
+.bg-gray-100,
+.bg-zinc-50,
+.bg-zinc-100,
+.bg-neutral-50,
+.bg-neutral-100,
+.bg-stone-50,
+.bg-stone-100 {
+  background-color: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* Admin uses `border-slate-200` and friends as hairlines — replace with
+ * the warm rule so borders match the rest of the site. */
+.border-slate-100,
+.border-slate-200,
+.border-slate-300,
+.border-gray-100,
+.border-gray-200,
+.border-gray-300,
+.border-zinc-100,
+.border-zinc-200,
+.border-zinc-300,
+.border-neutral-100,
+.border-neutral-200,
+.border-neutral-300,
+.border-stone-100,
+.border-stone-200,
+.border-stone-300 {
+  border-color: var(--rule) !important;
+}
+
+/* Admin slate text — flatten to ink scale so admin matches site copy */
+.text-slate-700, .text-slate-800, .text-slate-900,
+.text-gray-700, .text-gray-800, .text-gray-900,
+.text-zinc-700, .text-zinc-800, .text-zinc-900,
+.text-neutral-700, .text-neutral-800, .text-neutral-900,
+.text-stone-700, .text-stone-800, .text-stone-900,
+.text-black {
+  color: var(--ink) !important;
+}
+
+/* (4) `.fs-grain` — Filmora-style noise overlay. The original
+ *     definition stamps a low-opacity dark texture across the whole
+ *     viewport (it was designed for a navy canvas). On bone it just
+ *     muddies the page. Switch to a warm grain that adds tooth without
+ *     darkening. */
+.fs-grain {
+  position: relative;
+}
+.fs-grain::before,
+.fs-grain::after {
+  /* Disable any legacy dark texture pseudo-elements */
+  background-image: none !important;
+  background-color: transparent !important;
+  opacity: 0 !important;
+}
+
+/* Inline-style backgrounds — pages that hard-code `style={{background:
+ * "#0b1530"}}` can't be reached by class selectors. Catch the most
+ * common ones via attribute selector. (Inline style still wins over
+ * stylesheet declarations, but the attribute selector with !important
+ * matches Tailwind's specificity model and lands the override.) */
+[style*="background: #0b1530"],
+[style*="background:#0b1530"],
+[style*="background-color: #0b1530"],
+[style*="background-color:#0b1530"],
+[style*="background: #0a1628"],
+[style*="background:#0a1628"],
+[style*="background: #0f2148"],
+[style*="background:#0f2148"],
+[style*="background: #060e1f"],
+[style*="background:#060e1f"] {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* Headings + paragraph color fallback — many legacy pages still set
+ * `text-white` on bare h1/h2 with no class on the parent. The text-white
+ * override above catches `text-white` directly; this catches inline-styled
+ * white text via attribute selector for the rare cases where it slipped in. */
+[style*="color: #fff"],
+[style*="color:#fff"],
+[style*="color: white"],
+[style*="color:white"],
+[style*="color: #ffffff"],
+[style*="color:#ffffff"] {
+  color: var(--ink) !important;
+}
+
+/* Global placeholder + selection — re-state at end of file so the
+ * editorial-light values win against the dark defaults declared at
+ * line ~118-138. */
+::placeholder { color: var(--ink-muted) !important; opacity: 0.7 !important; }
+::-webkit-input-placeholder { color: var(--ink-muted) !important; opacity: 0.7 !important; }
+::-moz-placeholder { color: var(--ink-muted) !important; opacity: 0.7 !important; }
+:-ms-input-placeholder { color: var(--ink-muted) !important; opacity: 0.7 !important; }
+
+/* :focus-visible was a fuzzy cyan ring — switch to gold so it matches the
+ * editorial palette. */
+:focus-visible {
+  outline: 2px solid var(--gold) !important;
+  outline-offset: 2px !important;
+}
+
+/* `.cyber-input` was the dark-form primitive used in tools/* and
+ * generators/* — it baked a dark navy fill, white text, cyan focus ring.
+ * Re-skin to bone. */
+.cyber-input,
+input.cyber-input,
+textarea.cyber-input,
+select.cyber-input {
+  background-color: var(--paper-input) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--rule-strong) !important;
+  caret-color: var(--ink) !important;
+}
+.cyber-input:focus,
+input.cyber-input:focus,
+textarea.cyber-input:focus,
+select.cyber-input:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px var(--gold-soft) !important;
+  outline: none !important;
+}
+.cyber-input::placeholder { color: var(--ink-muted) !important; }
+
+/* Marquee fade gradients that read `from-[#0b1530]` were already routed
+ * to bone above, so the marquee fade on the homepage trust strip will
+ * fade to bone — which is exactly what we want. No further action. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * RULE-29 FINAL SWEEP — ATTRIBUTE-SELECTOR CATCH-ALL (2026-05-06)
+ *
+ * Craig (paraphrased): "How many times have I asked? Just repaired. I'm
+ * about to run out of usage and you've left me with a polished shit of
+ * a website. I've tried to fix this colours problem so many damn times."
+ *
+ * Root cause of Craig's latest screenshot: /builder shipped a dark
+ * gradient outer wrapper using `bg-gradient-to-br from-[#0a0f1e]
+ * via-[#0f172a] to-[#111827]`. The previous override layer caught
+ * `from-[#0a0f1e]` but NOT `via-[#0f172a]` or `to-[#111827]` — so the
+ * gradient's mid and end stops stayed navy, painting a dark band
+ * across the top of the page where SiteNavigation should have shown.
+ * Same kind of leak: 48 other pages use sticky/fixed top bars styled
+ * `bg-[#0b1530]/80`, `bg-[#0a0f1e]/80`, `bg-zinc-900/80` etc — only a
+ * handful of those /opacity variants were enumerated above.
+ *
+ * Rather than enumerate every hex × every /opacity × every gradient
+ * stop (a hopeless game — there are dozens), this block uses CSS
+ * attribute-substring selectors to catch ANY class containing the dark
+ * hex literal, including all opacity suffixes and all gradient stop
+ * positions. One rule covers infinite variants. New code can't leak
+ * dark navy past this layer without an inline `style=` (which has its
+ * own attribute-selector net below).
+ *
+ * Coverage:
+ *   - bg-[#XXX] flat backgrounds (any case)
+ *   - bg-[#XXX]/40, /50, /60, /70, /80, /90, /95 (any opacity)
+ *   - from-[#XXX], via-[#XXX], to-[#XXX] gradient stops (any position)
+ *   - same hexes used multiple times in the same className list
+ *
+ * The selectors target the page's RAW class attribute string, not the
+ * compiled Tailwind escaped form, so they ignore Tailwind's escape
+ * dance entirely.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Backgrounds — flatten any element whose class contains a dark hex bg
+ * to paper, regardless of /opacity. The slight transparency value here
+ * blends nicely with backdrop-blur where it's used as a sticky bar
+ * background. */
+[class*="bg-[#0b1530]"],
+[class*="bg-[#0a0f1e]"],
+[class*="bg-[#0a1628]"],
+[class*="bg-[#0f2148]"],
+[class*="bg-[#152e60]"],
+[class*="bg-[#060e1f]"],
+[class*="bg-[#131520]"],
+[class*="bg-[#0b0d17]"],
+[class*="bg-[#0e0e1a]"],
+[class*="bg-[#0a0a12]"],
+[class*="bg-[#0a0f2e]"],
+[class*="bg-[#0f172a]"],
+[class*="bg-[#111a2e]"],
+[class*="bg-[#111827]"],
+[class*="bg-[#12121a]"],
+[class*="bg-[#1e1e1e]"],
+[class*="bg-[#1e1e2e]"],
+[class*="bg-[#1a1a24]"],
+[class*="bg-[#162044]"],
+[class*="bg-[#11131c]"],
+[class*="bg-[#0d0d12]"],
+[class*="bg-[#1f2937]"],
+[class*="bg-[#0b0b16]"],
+[class*="bg-[#05060a]"],
+[class*="bg-[#0a0a0f]"] {
+  background-color: rgba(247, 245, 238, 0.94) !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+}
+
+/* Sticky / fixed dark top bars are the most visible offenders. When the
+ * element is `sticky top-0` AND has a dark bg class, give it the same
+ * editorial header treatment as SiteNavigation — bright cream lift +
+ * warm hairline + soft shadow — so per-page top-bars feel like part of
+ * the same chrome family instead of an alien dark strip. */
+.sticky[class*="top-0"][class*="bg-[#0"],
+.fixed[class*="top-0"][class*="bg-[#0"],
+.sticky[class*="top-0"][class*="bg-zinc-9"],
+.sticky[class*="top-0"][class*="bg-slate-9"],
+.sticky[class*="top-0"][class*="bg-gray-9"],
+.sticky[class*="top-0"][class*="bg-neutral-9"],
+.fixed[class*="top-0"][class*="bg-zinc-9"],
+.fixed[class*="top-0"][class*="bg-slate-9"],
+.fixed[class*="top-0"][class*="bg-gray-9"],
+.fixed[class*="top-0"][class*="bg-neutral-9"] {
+  background-color: rgba(250, 249, 244, 0.94) !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+  border-bottom: 1px solid var(--rule) !important;
+  box-shadow: 0 4px 16px -6px rgba(10,10,11,0.06) !important;
+}
+
+/* Gradient stops — `from-[#0..]`, `via-[#0..]`, `to-[#0..]` for ANY
+ * dark hex. Reset the compiled Tailwind gradient variables to bone so
+ * the gradient flattens to paper regardless of which stops were dark.
+ * This is what fixed the /builder outer wrapper. */
+[class*="from-[#0a0f1e]"],
+[class*="from-[#0f172a]"],
+[class*="from-[#111827]"],
+[class*="from-[#0b1530]"],
+[class*="from-[#0a1628]"],
+[class*="from-[#0f2148]"],
+[class*="from-[#0b0d17]"],
+[class*="from-[#0e0e1a]"],
+[class*="from-[#0a0a12]"],
+[class*="from-[#060e1f]"],
+[class*="from-[#0b0b16]"],
+[class*="from-[#05060a]"],
+[class*="from-[#11131c]"],
+[class*="from-[#0d0d12]"],
+[class*="from-[#1f2937]"],
+[class*="from-[#131520]"] {
+  --tw-gradient-from: var(--paper) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(247 245 238 / 0) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+[class*="via-[#0a0f1e]"],
+[class*="via-[#0f172a]"],
+[class*="via-[#111827]"],
+[class*="via-[#0b1530]"],
+[class*="via-[#0a1628]"],
+[class*="via-[#0f2148]"],
+[class*="via-[#0b0d17]"],
+[class*="via-[#0e0e1a]"],
+[class*="via-[#060e1f]"],
+[class*="via-[#0b0b16]"],
+[class*="via-[#11131c]"],
+[class*="via-[#1f2937]"],
+[class*="via-[#131520]"] {
+  --tw-gradient-via: var(--paper) !important;
+  --tw-gradient-via-stops: var(--tw-gradient-position, ), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-via-stops) !important;
+}
+
+[class*="to-[#0a0f1e]"],
+[class*="to-[#0f172a]"],
+[class*="to-[#111827]"],
+[class*="to-[#0b1530]"],
+[class*="to-[#0a1628]"],
+[class*="to-[#0f2148]"],
+[class*="to-[#0b0d17]"],
+[class*="to-[#0e0e1a]"],
+[class*="to-[#060e1f]"],
+[class*="to-[#0b0b16]"],
+[class*="to-[#11131c]"],
+[class*="to-[#1f2937]"],
+[class*="to-[#131520]"] {
+  --tw-gradient-to: var(--paper) var(--tw-gradient-to-position) !important;
+}
+
+/* Inline-style dark-color holdouts — pages that hard-code
+ * `style={{ background: '#0...' }}` can't be reached by class
+ * selectors. A handful of attribute-substring selectors below cover
+ * every common dark literal regardless of whitespace, quote-style or
+ * format (background / background-color / shorthand). The two-pass
+ * pattern (with-and-without-space) covers JSX which trims after `:`. */
+[style*="background:#0a"],
+[style*="background: #0a"],
+[style*="background:#0b"],
+[style*="background: #0b"],
+[style*="background:#0c"],
+[style*="background: #0c"],
+[style*="background:#0d"],
+[style*="background: #0d"],
+[style*="background:#0e"],
+[style*="background: #0e"],
+[style*="background:#0f"],
+[style*="background: #0f"],
+[style*="background:#11"],
+[style*="background: #11"],
+[style*="background:#12"],
+[style*="background: #12"],
+[style*="background:#1a"],
+[style*="background: #1a"],
+[style*="background:#1e"],
+[style*="background: #1e"],
+[style*="background:#1f"],
+[style*="background: #1f"],
+[style*="background-color:#0"],
+[style*="background-color: #0"],
+[style*="background-color:#1"],
+[style*="background-color: #1"] {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* CSS gradient inline-style — `style={{ background: 'linear-gradient(...
+ * #0a0f1e ...)' }}`. Detect the keyword + dark hex anywhere. */
+[style*="linear-gradient"][style*="#0a0f"],
+[style*="linear-gradient"][style*="#0b15"],
+[style*="linear-gradient"][style*="#0f17"],
+[style*="linear-gradient"][style*="#0a16"],
+[style*="linear-gradient"][style*="#0f21"],
+[style*="linear-gradient"][style*="#1118"],
+[style*="linear-gradient"][style*="#1313"],
+[style*="radial-gradient"][style*="#0a0f"],
+[style*="radial-gradient"][style*="#0b15"],
+[style*="radial-gradient"][style*="#0f17"] {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* Common animated-ring / status-dot purples that show up on the
+ * builder, video creator, dashboard generation states — flip to gold
+ * so the editorial palette stays consistent during loading states. */
+.bg-purple-500\/20, .bg-purple-500\/30, .bg-purple-500\/40, .bg-purple-500\/50,
+.bg-violet-500\/20, .bg-violet-500\/30, .bg-violet-500\/40, .bg-violet-500\/50,
+.bg-indigo-500\/20, .bg-indigo-500\/30, .bg-indigo-500\/40, .bg-indigo-500\/50,
+.bg-purple-600\/20, .bg-purple-600\/30, .bg-purple-600\/40, .bg-purple-600\/50,
+.shadow-purple-500\/20, .shadow-purple-500\/30, .shadow-purple-500\/40,
+.shadow-violet-500\/20, .shadow-violet-500\/30, .shadow-violet-500\/40 {
+  background-color: var(--gold-soft) !important;
+  --tw-shadow-color: var(--gold-glow) !important;
+}
+
+/* Final body lock — paint paper at the html level too so any
+ * out-of-flow page wrapper that escapes the override above (e.g.
+ * `position:fixed inset-0` modals) lands on bone instead of bleeding
+ * the browser default white. */
+html, body {
+  background-color: var(--paper) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   BLUE / PURPLE PURGE — Rule 29: no cold blue or purple on any surface.
+   Attribute-substring selectors catch ALL Tailwind variants + opacity.
+   Scoped overrides under .builder-editorial fix the builder panel text.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Dark sidebar colour not caught by earlier block ── */
+[class*="bg-[#0d1321]"] {
+  background-color: var(--paper-elevated) !important;
+}
+
+/* ── Purple / indigo / violet background solids & opacity variants ── */
+[class*="bg-purple-"],[class*="bg-indigo-"],[class*="bg-violet-"] {
+  background-color: rgba(184,146,63,0.10) !important;
+}
+/* ── Blue / sky / cyan → paper ── */
+[class*="bg-blue-"],[class*="bg-sky-"],[class*="bg-cyan-"] {
+  background-color: var(--paper-elevated) !important;
+}
+
+/* ── Purple / indigo / violet text → warm ink / gold ── */
+[class*="text-purple-"],[class*="text-indigo-"],[class*="text-violet-"] {
+  color: var(--gold-deep) !important;
+}
+[class*="text-blue-"],[class*="text-sky-"],[class*="text-cyan-"] {
+  color: var(--ink-secondary) !important;
+}
+
+/* ── Purple / indigo / violet / blue borders ── */
+[class*="border-purple-"],[class*="border-indigo-"],[class*="border-violet-"],
+[class*="border-blue-"],[class*="border-sky-"] {
+  border-color: var(--rule) !important;
+}
+
+/* ── Ring colours ── */
+[class*="ring-purple-"],[class*="ring-indigo-"],[class*="ring-violet-"],
+[class*="ring-blue-"],[class*="ring-sky-"] {
+  --tw-ring-color: var(--gold) !important;
+}
+
+/* ── Shadow colours ── */
+[class*="shadow-purple-"],[class*="shadow-indigo-"],[class*="shadow-violet-"],
+[class*="shadow-blue-"],[class*="shadow-sky-"] {
+  --tw-shadow-color: rgba(184,146,63,0.15) !important;
+}
+
+/* ── Gradient FROM stops — rewrite the Tailwind CSS variable ── */
+[class*="from-purple-"],[class*="from-indigo-"],[class*="from-violet-"],
+[class*="from-blue-"],[class*="from-sky-"] {
+  --tw-gradient-from: var(--paper-elevated) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(247,245,238,0)) !important;
+}
+/* ── TO stops ── */
+[class*="to-purple-"],[class*="to-indigo-"],[class*="to-violet-"],
+[class*="to-blue-"],[class*="to-sky-"] {
+  --tw-gradient-to: var(--paper) !important;
+}
+/* ── VIA stops ── */
+[class*="via-purple-"],[class*="via-indigo-"],[class*="via-violet-"],
+[class*="via-blue-"],[class*="via-sky-"] {
+  --tw-gradient-stops: var(--tw-gradient-from), var(--paper-elevated), var(--tw-gradient-to, rgba(247,245,238,0)) !important;
+}
+
+/* ── Hover purple/indigo overrides ── */
+[class*="hover:bg-purple-"]:hover,[class*="hover:bg-indigo-"]:hover,
+[class*="hover:bg-violet-"]:hover {
+  background-color: rgba(184,146,63,0.12) !important;
+}
+[class*="hover:border-purple-"]:hover,[class*="hover:border-indigo-"]:hover {
+  border-color: var(--gold) !important;
+}
+[class*="hover:text-purple-"]:hover,[class*="hover:text-indigo-"]:hover,
+[class*="hover:text-violet-"]:hover {
+  color: var(--gold-deep) !important;
+}
+[class*="hover:from-purple-"]:hover,[class*="hover:from-indigo-"]:hover {
+  --tw-gradient-from: rgba(184,146,63,0.20) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(247,245,238,0)) !important;
+}
+[class*="hover:to-purple-"]:hover,[class*="hover:to-indigo-"]:hover {
+  --tw-gradient-to: rgba(184,146,63,0.10) !important;
+}
+
+/* ── Builder editorial scope ──────────────────────────────────────────
+   The builder panels use dark-mode text (text-white/xx) designed for
+   a dark background. With the editorial-light paper backing, we remap
+   those to ink so they remain legible. Only applies inside the root
+   div that carries the .builder-editorial class. ── */
+.builder-editorial [class*="text-white"] {
+  color: var(--ink) !important;
+}
+.builder-editorial [class*="text-white/8"],
+.builder-editorial [class*="text-white/7"],
+.builder-editorial [class*="text-white/6"],
+.builder-editorial [class*="text-white/5"],
+.builder-editorial [class*="text-white/4"],
+.builder-editorial [class*="text-white/3"],
+.builder-editorial [class*="text-white/2"],
+.builder-editorial [class*="text-white/1"] {
+  color: var(--ink-muted) !important;
+}
+/* Subtle bg overlays (bg-white/[0.04] etc.) → paper-elevated tint */
+.builder-editorial [class*="bg-white/[0.0"] {
+  background-color: rgba(10,10,11,0.03) !important;
+}
+.builder-editorial [class*="bg-white/[0.1"] {
+  background-color: rgba(10,10,11,0.06) !important;
+}
+/* White borders → rule */
+.builder-editorial [class*="border-white/[0.0"],
+.builder-editorial [class*="border-white/[0.1"] {
+  border-color: var(--rule) !important;
+}
+/* Hover white bg → stone tint */
+.builder-editorial [class*="hover:bg-white/[0.0"]:hover,
+.builder-editorial [class*="hover:bg-white/[0.1"]:hover {
+  background-color: rgba(10,10,11,0.05) !important;
+}
+/* Hover white text → ink-secondary */
+.builder-editorial [class*="hover:text-white/7"]:hover,
+.builder-editorial [class*="hover:text-white/6"]:hover,
+.builder-editorial [class*="hover:text-white/5"]:hover {
+  color: var(--ink-secondary) !important;
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+ * GREY/BLACK STRAGGLER SWEEP — 2026-05-07
+ * ───────────────────────────────────────────────────────────────────────
+ *
+ * Craig's report (May 7): "I don't know where the grey and black is
+ * coming from from shouldn't be there." Two failure modes were leaking
+ * past the existing override layers:
+ *
+ *   (1) Opacity-suffix dark navys — the override at line 2098 catches
+ *       `.bg-[#101a35]` but not `.bg-[#101a35]/80`. JIT emits both as
+ *       distinct selectors. Add the missing variants for every dark hex
+ *       already in the unsuffixed list.
+ *
+ *   (2) Tailwind's `stone` ramp (300/400/500/600/700/800/900) was used
+ *       as both a washed CTA fill (`bg-stone-600`) AND as muted text
+ *       on dark surfaces. With the page now white, both render as a
+ *       muddy grey-brown blob. Route them to ink scale + paper scale.
+ *
+ *   (3) Gold-on-cream pill backgrounds — `bg-amber-500/15` and
+ *       `bg-yellow-500/15` etc. with `text-amber-200` are the gold-on-
+ *       cream invisibility offender. Strengthen text to gold-deep so
+ *       the pill remains readable on the new light page.
+ */
+
+/* (1) Missing opacity-suffix variants of dark navy hex codes.
+ * Every value below appears in src/ as `bg-[#XXXXXX]/N`. The unsuffixed
+ * forms are already overridden at line 2098; this catches the variants. */
+.bg-\[\#101a35\]\/40, .bg-\[\#101a35\]\/60, .bg-\[\#101a35\]\/70,
+.bg-\[\#101a35\]\/80, .bg-\[\#101a35\]\/85, .bg-\[\#101a35\]\/90, .bg-\[\#101a35\]\/95,
+.bg-\[\#142046\]\/40, .bg-\[\#142046\]\/60, .bg-\[\#142046\]\/70,
+.bg-\[\#142046\]\/80, .bg-\[\#142046\]\/85, .bg-\[\#142046\]\/90, .bg-\[\#142046\]\/95,
+.bg-\[\#0f1830\]\/40, .bg-\[\#0f1830\]\/60, .bg-\[\#0f1830\]\/70,
+.bg-\[\#0f1830\]\/80, .bg-\[\#0f1830\]\/85, .bg-\[\#0f1830\]\/90, .bg-\[\#0f1830\]\/95,
+.bg-\[\#0a0f1e\]\/80, .bg-\[\#0a0f1e\]\/85, .bg-\[\#0a0f1e\]\/90, .bg-\[\#0a0f1e\]\/95,
+.bg-\[\#0d1321\]\/80, .bg-\[\#0d1321\]\/85, .bg-\[\#0d1321\]\/90,
+.bg-\[\#1a1340\]\/80, .bg-\[\#1a1340\]\/85, .bg-\[\#1a1340\]\/90, .bg-\[\#1a1340\]\/95,
+.bg-\[\#0f1f3d\]\/80, .bg-\[\#0f1f3d\]\/85, .bg-\[\#0f1f3d\]\/90, .bg-\[\#0f1f3d\]\/95,
+.bg-\[\#161f35\]\/80, .bg-\[\#161f35\]\/85, .bg-\[\#161f35\]\/90,
+.bg-\[\#0c0e14\]\/40, .bg-\[\#0c0e14\]\/60, .bg-\[\#0c0e14\]\/70,
+.bg-\[\#0e0e18\]\/80, .bg-\[\#0e0e18\]\/85, .bg-\[\#0e0e18\]\/90,
+.bg-\[\#1e293b\]\/40, .bg-\[\#1e293b\]\/60, .bg-\[\#1e293b\]\/80, .bg-\[\#1e293b\]\/90 {
+  background-color: rgba(252, 250, 243, 0.94) !important; /* paper-elevated */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Gradient stops for those same dark navy hex codes. Same fade-to-paper
+ * approach used for the existing `from-[#0b1530]` block. */
+.from-\[\#101a35\], .to-\[\#101a35\], .via-\[\#101a35\],
+.from-\[\#142046\], .to-\[\#142046\], .via-\[\#142046\],
+.from-\[\#0f1830\], .to-\[\#0f1830\], .via-\[\#0f1830\],
+.from-\[\#1a1340\], .to-\[\#1a1340\], .via-\[\#1a1340\],
+.from-\[\#0f1f3d\], .to-\[\#0f1f3d\], .via-\[\#0f1f3d\],
+.from-\[\#0a0f1e\], .to-\[\#0a0f1e\], .via-\[\#0a0f1e\],
+.from-\[\#1a1340\]\/95, .to-\[\#0f1f3d\]\/95,
+.from-\[\#101a35\]\/85, .to-\[\#101a35\]\/85,
+.from-\[\#142046\]\/85, .to-\[\#142046\]\/85,
+.from-\[\#0a0a0c\], .to-\[\#0a0a0c\],
+.from-\[\#0d0d10\], .to-\[\#0d0d10\] {
+  --tw-gradient-from: var(--paper-elevated) !important;
+  --tw-gradient-to: var(--paper-elevated) !important;
+  --tw-gradient-via: var(--paper-elevated) !important;
+}
+
+/* (2) Stone ramp — muddy grey-brown when stranded on white.
+ * 700/800/900 already routes to ink in the admin block at line 2647;
+ * extend to cover the lighter shades and the bg variants. */
+.text-stone-300, .text-stone-400 {
+  color: var(--ink-secondary) !important;
+}
+.text-stone-500, .text-stone-600 {
+  color: var(--ink-muted) !important;
+}
+/* Stone backgrounds were used as washed CTAs (`bg-stone-600`) and as
+ * recessed surfaces (`bg-stone-50/100`). Route to ink for CTAs and
+ * paper-elevated for surfaces. The ambiguity is unavoidable but the
+ * common case for stone-500+ is a darker-on-light filled pill, which
+ * we want to be the primary ink CTA. */
+.bg-stone-500, .bg-stone-600, .bg-stone-700, .bg-stone-800 {
+  background-color: var(--ink) !important;
+  color: var(--paper) !important;
+}
+.bg-stone-50, .bg-stone-100, .bg-stone-200 {
+  background-color: var(--paper-elevated) !important;
+}
+.from-stone-500, .to-stone-500, .via-stone-500,
+.from-stone-600, .to-stone-600, .via-stone-600,
+.from-stone-700, .to-stone-700, .via-stone-700 {
+  --tw-gradient-from: var(--ink) !important;
+  --tw-gradient-to: var(--ink) !important;
+  --tw-gradient-via: var(--ink) !important;
+}
+/* Stone borders that were meant to be subtle dividers */
+.border-stone-300, .border-stone-400, .border-stone-500,
+.border-stone-600, .border-stone-700, .border-stone-800 {
+  border-color: var(--rule) !important;
+}
+/* Stone opacity-suffix tints (`bg-stone-500/15`, `bg-stone-500/20`, etc.)
+ * were used as soft pill backgrounds. Route to gold-soft so the pill
+ * keeps its accent feel without rendering as muddy grey-brown on cream. */
+.bg-stone-400\/10, .bg-stone-400\/15, .bg-stone-400\/20,
+.bg-stone-500\/10, .bg-stone-500\/15, .bg-stone-500\/20,
+.bg-stone-500\/30, .bg-stone-500\/40,
+.bg-stone-600\/10, .bg-stone-600\/15, .bg-stone-600\/20 {
+  background-color: var(--paper-elevated) !important;
+}
+
+/* (3) Gold-on-cream pill safety — `text-amber-200` / `text-amber-300`
+ * on `bg-amber-500/15` reads as cream-on-cream on the new white page.
+ * Promote text to gold-deep so the pill stays legible. The `bg-amber-*`
+ * classes already render correctly because the bg-amber tints hold up
+ * against gold-deep text. */
+.text-amber-100, .text-amber-200, .text-amber-300, .text-amber-400 {
+  color: var(--gold-deep) !important;
+}
+.text-yellow-200, .text-yellow-300, .text-yellow-400 {
+  color: var(--gold-deep) !important;
+}
+/* Soft amber fills — push to gold-soft for consistent warmth */
+.bg-amber-500\/5, .bg-amber-500\/10, .bg-amber-500\/15, .bg-amber-500\/20,
+.bg-amber-400\/10, .bg-amber-400\/15, .bg-amber-400\/20,
+.bg-yellow-500\/10, .bg-yellow-500\/15, .bg-yellow-500\/20 {
+  background-color: var(--gold-soft) !important;
+}
+/* Amber borders → gold for a clean champagne hairline */
+.border-amber-300, .border-amber-400, .border-amber-500,
+.border-amber-400\/40, .border-amber-400\/30, .border-amber-400\/25,
+.border-amber-500\/40, .border-amber-500\/30, .border-amber-500\/25,
+.border-yellow-400, .border-yellow-500 {
+  border-color: var(--gold) !important;
+}
+
+/* (4) Black/near-black inline backgrounds that aren't real CTAs —
+ * `bg-black/40`, `bg-black/60`, `bg-black/70` etc. used as semi-
+ * transparent panel overlays. Route the chunky variants to paper-
+ * elevated so error/info panels read on cream. The /20 and /30 stay
+ * as they're transient overlays (modal scrims) where dark IS correct. */
+.bg-black\/40, .bg-black\/50, .bg-black\/60 {
+  background-color: rgba(252, 250, 243, 0.94) !important; /* paper-elevated alpha */
+}
+/* `bg-stone-900`, `bg-stone-950` already route to paper at line 2275-2280;
+ * extend to opacity variants so `bg-stone-900/80`, /90 land on cream. */
+.bg-stone-900\/40, .bg-stone-900\/50, .bg-stone-900\/60,
+.bg-stone-900\/70, .bg-stone-900\/80, .bg-stone-900\/90,
+.bg-stone-950\/40, .bg-stone-950\/50, .bg-stone-950\/60,
+.bg-stone-950\/70, .bg-stone-950\/80, .bg-stone-950\/90 {
+  background-color: rgba(252, 250, 243, 0.94) !important; /* v5 paper-elevated alpha — was rgba(244,241,230) which read "too dark" */
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+ * COOL-CHANNEL TAILWIND CLASS SWEEP — 2026-05-13
+ * ───────────────────────────────────────────────────────────────────────
+ *
+ * Craig's report (May 13): "blue and purple sneaking in all over the
+ * place including all the buttons and the cards are a bit too dark."
+ *
+ * The previous override layer (line ~2195) caught solid `bg-blue-500`
+ * etc. and `from-blue-500`-style gradient stops. What it MISSED:
+ *
+ *   (1) Arbitrary-opacity variants  — `bg-violet-500/[0.06]`,
+ *       `bg-blue-500/10`, `bg-purple-500/20`, etc. JIT emits a
+ *       different escaped selector for each.
+ *   (2) Text colours — `text-violet-200`, `text-cyan-400`,
+ *       `text-blue-600`, `text-indigo-700`. Read as cool tints on the
+ *       cream page. Route to ink/muted/gold-deep.
+ *   (3) Border colours — same as text. Route to rule/gold-soft.
+ *   (4) Ring colours — `ring-blue-500`, `ring-violet-500`, etc.
+ *   (5) Hover/focus variants  — `hover:bg-blue-500`, `focus:ring-violet-500`.
+ *       Tailwind escapes the `:` as `\:`; both forms covered.
+ *
+ * This block runs LAST so it wins over every earlier rule.
+ * ────────────────────────────────────────────────────────────────────── */
+
+/* (1) Arbitrary-opacity tints — `bg-{vivid}-{shade}/{anything}`.
+ * Attribute selector catches every JIT-escaped variant in one rule. */
+[class*="bg-blue-"][class*="\/"],
+[class*="bg-indigo-"][class*="\/"],
+[class*="bg-violet-"][class*="\/"],
+[class*="bg-purple-"][class*="\/"],
+[class*="bg-cyan-"][class*="\/"],
+[class*="bg-sky-"][class*="\/"],
+[class*="bg-fuchsia-"][class*="\/"] {
+  background-color: var(--gold-soft) !important;
+}
+
+/* (2) Text — all cool-channel text classes route to the editorial ink
+ * ramp. Light shades → ink-muted; mid shades → gold-deep so accents
+ * keep their warmth; dark shades → ink for headings. */
+[class*="text-blue-1"], [class*="text-blue-2"],
+[class*="text-indigo-1"], [class*="text-indigo-2"],
+[class*="text-violet-1"], [class*="text-violet-2"],
+[class*="text-purple-1"], [class*="text-purple-2"],
+[class*="text-cyan-1"], [class*="text-cyan-2"],
+[class*="text-sky-1"], [class*="text-sky-2"],
+[class*="text-fuchsia-1"], [class*="text-fuchsia-2"] {
+  color: var(--ink-muted) !important;
+}
+[class*="text-blue-3"], [class*="text-blue-4"], [class*="text-blue-5"],
+[class*="text-indigo-3"], [class*="text-indigo-4"], [class*="text-indigo-5"],
+[class*="text-violet-3"], [class*="text-violet-4"], [class*="text-violet-5"],
+[class*="text-purple-3"], [class*="text-purple-4"], [class*="text-purple-5"],
+[class*="text-cyan-3"], [class*="text-cyan-4"], [class*="text-cyan-5"],
+[class*="text-sky-3"], [class*="text-sky-4"], [class*="text-sky-5"],
+[class*="text-fuchsia-3"], [class*="text-fuchsia-4"], [class*="text-fuchsia-5"] {
+  color: var(--gold-deep) !important;
+}
+[class*="text-blue-6"], [class*="text-blue-7"], [class*="text-blue-8"], [class*="text-blue-9"],
+[class*="text-indigo-6"], [class*="text-indigo-7"], [class*="text-indigo-8"], [class*="text-indigo-9"],
+[class*="text-violet-6"], [class*="text-violet-7"], [class*="text-violet-8"], [class*="text-violet-9"],
+[class*="text-purple-6"], [class*="text-purple-7"], [class*="text-purple-8"], [class*="text-purple-9"],
+[class*="text-cyan-6"], [class*="text-cyan-7"], [class*="text-cyan-8"], [class*="text-cyan-9"],
+[class*="text-sky-6"], [class*="text-sky-7"], [class*="text-sky-8"], [class*="text-sky-9"],
+[class*="text-fuchsia-6"], [class*="text-fuchsia-7"], [class*="text-fuchsia-8"], [class*="text-fuchsia-9"] {
+  color: var(--ink) !important;
+}
+
+/* (3) Borders — all cool-channel border classes route to rule. The
+ * tinted shades (`border-blue-400/30`) become gold-soft instead so
+ * accent borders retain warmth without painting cool. */
+[class*="border-blue-"]:not([class*="border-blue-100"]):not([class*="border-blue-200"]),
+[class*="border-indigo-"]:not([class*="border-indigo-100"]):not([class*="border-indigo-200"]),
+[class*="border-violet-"]:not([class*="border-violet-100"]):not([class*="border-violet-200"]),
+[class*="border-purple-"]:not([class*="border-purple-100"]):not([class*="border-purple-200"]),
+[class*="border-cyan-"]:not([class*="border-cyan-100"]):not([class*="border-cyan-200"]),
+[class*="border-sky-"]:not([class*="border-sky-100"]):not([class*="border-sky-200"]),
+[class*="border-fuchsia-"]:not([class*="border-fuchsia-100"]):not([class*="border-fuchsia-200"]) {
+  border-color: rgba(184, 146, 63, 0.32) !important;
+}
+
+/* (4) Rings — `ring-blue-500`, `ring-violet-500/30`, etc. */
+[class*="ring-blue-"],
+[class*="ring-indigo-"],
+[class*="ring-violet-"],
+[class*="ring-purple-"],
+[class*="ring-cyan-"],
+[class*="ring-sky-"],
+[class*="ring-fuchsia-"] {
+  --tw-ring-color: rgba(184, 146, 63, 0.42) !important;
+}
+
+/* (5) Decoration / accent colours — `decoration-blue-500`, `accent-violet-500` etc. */
+[class*="decoration-blue-"], [class*="decoration-indigo-"], [class*="decoration-violet-"],
+[class*="decoration-purple-"], [class*="decoration-cyan-"], [class*="decoration-sky-"],
+[class*="decoration-fuchsia-"] {
+  text-decoration-color: var(--gold) !important;
+}
+[class*="accent-blue-"], [class*="accent-indigo-"], [class*="accent-violet-"],
+[class*="accent-purple-"], [class*="accent-cyan-"], [class*="accent-sky-"],
+[class*="accent-fuchsia-"] {
+  accent-color: var(--gold) !important;
+}
+
+/* (6) Shadow tints — `shadow-blue-500/20`, `shadow-purple-500/30`. */
+[class*="shadow-blue-"], [class*="shadow-indigo-"], [class*="shadow-violet-"],
+[class*="shadow-purple-"], [class*="shadow-cyan-"], [class*="shadow-sky-"],
+[class*="shadow-fuchsia-"] {
+  --tw-shadow-color: rgba(184, 146, 63, 0.30) !important;
+  --tw-shadow: var(--tw-shadow-colored) !important;
+}
+
+/* (7) `bg-gradient-zoo` and `bg-gradient-zoo-subtle` — the Tailwind
+ * config now defines these as gold gradients, but if the bundler picks
+ * up an older cached value, this override forces gold. */
+.bg-gradient-zoo {
+  background-image: linear-gradient(135deg, #d4b86d, #b8923f, #8c6b25) !important;
+}
+.bg-gradient-zoo-subtle {
+  background-image: linear-gradient(135deg, rgba(184, 146, 63, 0.14), rgba(140, 107, 37, 0.08)) !important;
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+ * DARK HEX PANEL SWEEP — 2026-05-13 (#2)
+ * ───────────────────────────────────────────────────────────────────────
+ *
+ * Craig's follow-up (May 13): "I'm still finding some black buttons."
+ * Audit found 21 dark hex literals used as panel/surface/button backgrounds
+ * across 31 components that had NO override coverage:
+ *
+ *   #12121a — TopBar, BuildSuccessModal, PromptInput dropdown, FigmaImport
+ *   #0d0d10 — LiveBuildDemo frame
+ *   #131520 — SectionEditor
+ *   #0c0e14 — OnboardingFlow modal
+ *   #0f2148 — agencies dashboard cards
+ *   #0b1220 — AI page section
+ *   #1e1e2e / #1e1e25 / #1a1a24 — FigmaImport borders + panels
+ *   #0a0a0b, #0a0f1e, #0d1321, #0e0e18, #0f1830, #142046, #101a35,
+ *   #1a1340, #0f1f3d, #161f35, #0a1628, #0a1730 — assorted dark panels
+ *
+ * The existing override layer caught the OPACITY variants (`bg-[#101a35]/80`)
+ * but missed the SOLID forms. This block flips every solid + every
+ * gradient-stop variant to paper-elevated.
+ * ────────────────────────────────────────────────────────────────────── */
+
+.bg-\[\#12121a\], .bg-\[\#0d0d10\], .bg-\[\#131520\], .bg-\[\#0c0e14\],
+.bg-\[\#0f2148\], .bg-\[\#0b1220\], .bg-\[\#1e1e2e\], .bg-\[\#1e1e25\],
+.bg-\[\#1a1a24\], .bg-\[\#0a0a0b\], .bg-\[\#0a0f1e\], .bg-\[\#0d1321\],
+.bg-\[\#0e0e18\], .bg-\[\#0f1830\], .bg-\[\#142046\], .bg-\[\#101a35\],
+.bg-\[\#1a1340\], .bg-\[\#0f1f3d\], .bg-\[\#161f35\], .bg-\[\#0a1628\],
+.bg-\[\#0a1730\], .bg-\[\#11131c\], .bg-\[\#162044\] {
+  background-color: var(--paper-elevated) !important;
+  color: var(--ink) !important;
+}
+
+/* Opacity-suffix variants of the SAME hex codes — `bg-[#12121a]/80`,
+ * `bg-[#0d0d10]/90` etc. used as backdrop-blurred sticky headers. Route
+ * to the same paper-elevated with a slight alpha for the blur backdrop. */
+.bg-\[\#12121a\]\/40, .bg-\[\#12121a\]\/50, .bg-\[\#12121a\]\/60,
+.bg-\[\#12121a\]\/70, .bg-\[\#12121a\]\/80, .bg-\[\#12121a\]\/85,
+.bg-\[\#12121a\]\/90, .bg-\[\#12121a\]\/95,
+.bg-\[\#0d0d10\]\/40, .bg-\[\#0d0d10\]\/60, .bg-\[\#0d0d10\]\/80,
+.bg-\[\#0d0d10\]\/85, .bg-\[\#0d0d10\]\/90, .bg-\[\#0d0d10\]\/95,
+.bg-\[\#131520\]\/40, .bg-\[\#131520\]\/60, .bg-\[\#131520\]\/80,
+.bg-\[\#131520\]\/85, .bg-\[\#131520\]\/90, .bg-\[\#131520\]\/95,
+.bg-\[\#0c0e14\]\/40, .bg-\[\#0c0e14\]\/60, .bg-\[\#0c0e14\]\/80,
+.bg-\[\#0c0e14\]\/90, .bg-\[\#0c0e14\]\/95,
+.bg-\[\#0f2148\]\/40, .bg-\[\#0f2148\]\/60, .bg-\[\#0f2148\]\/80,
+.bg-\[\#0f2148\]\/85, .bg-\[\#0f2148\]\/90, .bg-\[\#0f2148\]\/95,
+.bg-\[\#0b1220\]\/40, .bg-\[\#0b1220\]\/60, .bg-\[\#0b1220\]\/80,
+.bg-\[\#0b1220\]\/85, .bg-\[\#0b1220\]\/90,
+.bg-\[\#1e1e2e\]\/40, .bg-\[\#1e1e2e\]\/60, .bg-\[\#1e1e2e\]\/80,
+.bg-\[\#1e1e2e\]\/90 {
+  background-color: rgba(252, 250, 243, 0.94) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: var(--ink) !important;
+}
+
+/* Gradient stops for the same hex codes — `from-[#12121a] to-[#0d0d10]`
+ * used as the LiveBuildDemo frame backdrop. Flatten to paper-elevated. */
+.from-\[\#12121a\], .to-\[\#12121a\], .via-\[\#12121a\],
+.from-\[\#0d0d10\], .to-\[\#0d0d10\], .via-\[\#0d0d10\],
+.from-\[\#131520\], .to-\[\#131520\], .via-\[\#131520\],
+.from-\[\#0c0e14\], .to-\[\#0c0e14\], .via-\[\#0c0e14\],
+.from-\[\#0f2148\], .to-\[\#0f2148\], .via-\[\#0f2148\],
+.from-\[\#0b1220\], .to-\[\#0b1220\], .via-\[\#0b1220\],
+.from-\[\#1e1e2e\], .to-\[\#1e1e2e\], .via-\[\#1e1e2e\],
+.from-\[\#0a0a0b\], .to-\[\#0a0a0b\], .via-\[\#0a0a0b\] {
+  --tw-gradient-from: var(--paper-elevated) !important;
+  --tw-gradient-to: var(--paper-elevated) !important;
+  --tw-gradient-via: var(--paper-elevated) !important;
+}
+
+/* Border versions — `border-[#1e1e2e]` etc. used as hairline borders
+ * on the dark panels above. Route to var(--rule) so the border still
+ * shows on the now-cream surface. */
+.border-\[\#1e1e2e\], .border-\[\#1e1e25\], .border-\[\#1a1a24\],
+.border-\[\#12121a\], .border-\[\#0d0d10\], .border-\[\#131520\],
+.border-\[\#0c0e14\], .border-\[\#0f2148\], .border-\[\#0b1220\] {
+  border-color: var(--rule) !important;
+}
+
+/* `.bg-black` flat — the existing override at line 2556 already routes
+ * this to var(--paper). But buttons that USE `bg-black` to act as an
+ * ink-on-paper CTA then become invisible (white-on-white). Promote
+ * `.bg-black` when on a clickable element via attribute selectors —
+ * <button> and <a> with `bg-black` get var(--ink) so they remain a
+ * visible CTA. Non-button uses stay as paper. */
+button.bg-black, a.bg-black,
+[role="button"].bg-black {
+  background-color: var(--ink) !important;
+  color: var(--paper) !important;
+}
+button.bg-black:hover, a.bg-black:hover,
+[role="button"].bg-black:hover {
+  background-color: var(--gold-deep) !important;
+}
+
+/* ───────────────────────────────────────────────────────────────────────
+ * PAGE-WRAPPER WHITE-BACKGROUND SWEEP — 2026-05-13 (#3)
+ * ───────────────────────────────────────────────────────────────────────
+ *
+ * Craig: "a lot of the pages need the white background."
+ *
+ * Audit found three failure modes across ~80 pages:
+ *
+ * (1) `bg-[#0b1530]` — explicit dark navy on admin/setup/page.tsx. The
+ *     hex was missing from every prior override block.
+ * (2) `bg-dark-400` / 500 / 600 / 700 / 800 / 900 — references to
+ *     tailwind ramp keys that don't exist in the current config
+ *     (only dark.100/200/300 are defined). Tailwind silently emits no
+ *     bg-color, so what shows depends on inherited bg. Force to paper
+ *     to keep behavior predictable and white.
+ * (3) Pure `.text-white` (no opacity) on page wrappers — propagated
+ *     white text via CSS inheritance to every descendant, rendering
+ *     them invisible on the white body. The earlier override only
+ *     covered `.text-white/0.X` opacity variants. This one catches
+ *     the un-suffixed form and routes to ink.
+ * ────────────────────────────────────────────────────────────────────── */
+
+.bg-\[\#0b1530\], .bg-\[\#0a1730\], .bg-\[\#0a1628\] {
+  background-color: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+/* bg-dark-X above 300 — invalid in current tailwind config. Route to
+ * paper so wrappers default to white and their borders/cards still show. */
+.bg-dark-400, .bg-dark-500, .bg-dark-600, .bg-dark-700, .bg-dark-800, .bg-dark-900 {
+  background-color: var(--paper) !important;
+  color: var(--ink) !important;
+}
+.bg-dark-400\/30, .bg-dark-400\/40, .bg-dark-400\/50, .bg-dark-400\/60,
+.bg-dark-400\/70, .bg-dark-400\/80, .bg-dark-400\/90,
+.bg-dark-500\/30, .bg-dark-500\/40, .bg-dark-500\/50, .bg-dark-500\/60,
+.bg-dark-500\/70, .bg-dark-500\/80, .bg-dark-500\/90 {
+  background-color: rgba(252, 250, 243, 0.94) !important;
+  color: var(--ink) !important;
+}
+/* Gradient stops `from-dark-300/400/500` etc used on auth visual panels */
+.from-dark-300, .to-dark-300, .via-dark-300,
+.from-dark-400, .to-dark-400, .via-dark-400,
+.from-dark-500, .to-dark-500, .via-dark-500 {
+  --tw-gradient-from: var(--paper-elevated) !important;
+  --tw-gradient-to: var(--paper-bright) !important;
+  --tw-gradient-via: var(--paper-elevated) !important;
+}
+
+/* Pure `.text-white` (no opacity suffix) — the un-suffixed form was
+ * missed by the earlier `.text-white/0.X` block. On page-wrapper
+ * elements (`<div class="min-h-screen ... text-white">`) this
+ * propagated white-on-white text to every descendant. Route to ink.
+ *
+ * Buttons that genuinely need white-on-dark CTA text should use
+ * `text-[color:var(--paper)]` or inline `style={{color:'var(--paper)'}}`
+ * rather than relying on `text-white` to look right. The auth/login
+ * rewrite already follows that pattern. */
+.text-white {
+  color: var(--ink) !important;
 }

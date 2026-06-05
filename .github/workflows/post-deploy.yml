@@ -29,12 +29,19 @@ jobs:
       - name: Run smoke tests against live site
         run: bash scripts/smoke-test.sh "$SMOKE_URL"
         env:
-          SMOKE_URL: ${{ github.event.deployment_status.target_url || inputs.url || 'https://zoobicon.com' }}
+          # Always smoke-test the PUBLIC production domain. The per-deploy
+          # `target_url` is a *.vercel.app URL with Vercel Deployment
+          # Protection enabled, so unauthenticated requests get HTTP 401 on
+          # every route and the whole suite fails for the wrong reason.
+          # zoobicon.com is the public alias Vercel promotes production to.
+          # workflow_dispatch can still override via inputs.url.
+          SMOKE_URL: ${{ inputs.url || 'https://zoobicon.com' }}
 
-  playwright-e2e:
-    name: E2E Tests (Playwright)
+  gatetest-live:
+    name: GateTest E2E (live deploy)
+    # Replaces the previous Playwright job — we use our own product.
     # Only run on production deployments (preview URLs are auth-protected)
-    # or on manual triggers
+    # or on manual triggers.
     if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -43,30 +50,63 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
       - name: Wait for deployment to stabilize
         run: sleep 30
 
-      - name: Run Playwright E2E tests against live site
-        run: npx playwright test --project="Desktop Chrome"
+      - name: Run GateTest against live site
+        if: ${{ env.GATE_TEST_API_URL != '' }}
+        run: |
+          node -e "
+          const https = require('https');
+          const url = new URL(process.env.GATE_TEST_API_URL);
+          const body = JSON.stringify({
+            repo_url: 'https://github.com/${{ github.repository }}',
+            tier: 'e2e',
+            ref: '${{ github.sha }}',
+            target: process.env.LIVE_URL,
+          });
+          const req = https.request({
+            hostname: url.hostname,
+            port: url.port || 443,
+            path: url.pathname,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': process.env.GATE_TEST_API_KEY || '',
+              'Content-Length': Buffer.byteLength(body),
+            },
+            timeout: 600000,
+          }, (res) => {
+            let data = '';
+            res.on('data', (chunk) => data += chunk);
+            res.on('end', () => {
+              const result = JSON.parse(data);
+              console.log('GateTest live-deploy results against ' + process.env.LIVE_URL + ':');
+              console.log('  Modules:', result.totalModules, '| Issues:', result.totalIssues, '| Duration:', result.duration + 'ms');
+              for (const mod of result.modules || []) {
+                const icon = mod.status === 'passed' ? '✅' : '❌';
+                console.log('  ' + icon + ' ' + mod.name + ': ' + mod.checks + ' checks, ' + mod.issues + ' issues');
+                if (mod.details) mod.details.forEach(d => console.log('    → ' + d));
+              }
+              if (result.totalIssues > 0) {
+                console.error('GateTest found ' + result.totalIssues + ' issue(s) on live site');
+                process.exit(1);
+              }
+            });
+          });
+          req.on('error', (e) => { console.error('GateTest API error:', e.message); process.exit(1); });
+          req.write(body);
+          req.end();
+          "
         env:
-          PLAYWRIGHT_BASE_URL: ${{ github.event.deployment_status.target_url || inputs.url || 'https://zoobicon.com' }}
+          LIVE_URL: ${{ github.event.deployment_status.target_url || inputs.url || 'https://zoobicon.com' }}
+          GATE_TEST_API_URL: ${{ secrets.GATE_TEST_API_URL }}
+          GATE_TEST_API_KEY: ${{ secrets.GATE_TEST_API_KEY }}
 
-      - name: Upload test report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 7
+      - name: Skip notice (no GateTest secrets)
+        if: ${{ env.GATE_TEST_API_URL == '' }}
+        run: |
+          echo "::notice::GATE_TEST_API_URL not configured — skipping post-deploy GateTest."
+          echo "Set repo secrets GATE_TEST_API_URL and GATE_TEST_API_KEY to enable."
+        env:
+          GATE_TEST_API_URL: ${{ secrets.GATE_TEST_API_URL }}

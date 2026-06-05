@@ -449,7 +449,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Build professional real estate websites with property listings, search filters, virtual tour integration, and agent profiles.",
     icon: "Building2",
     category: "Website",
-    color: "from-slate-600 to-zinc-700",
+    color: "from-stone-600 to-stone-700",
     fields: [
       {
         id: "agencyName",
@@ -1134,7 +1134,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate websites with full dark mode support including theme toggles, smooth color transitions, and accessible contrast ratios.",
     icon: "Moon",
     category: "Enhancement",
-    color: "from-gray-800 to-slate-900",
+    color: "from-gray-800 to-stone-900",
     fields: [
       {
         id: "websiteType",
@@ -1272,7 +1272,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       {
         id: "featuredIntegrations",
         label: "Featured Integrations",
-        placeholder: "List top integrations (e.g. Salesforce, Hash, Stripe, HubSpot — one per line)",
+        placeholder: "List top integrations (e.g. Salesforce, Slack, Stripe, HubSpot — one per line)",
         type: "textarea",
       },
       {
@@ -1864,7 +1864,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       {
         id: "existingColors",
         label: "Existing Brand Colors",
-        placeholder: "List existing colors with hex codes if available (e.g. Primary Blue: #2563EB)",
+        placeholder: "List existing colors with hex codes if available (e.g. Primary Blue: #57534e)",
         type: "textarea",
       },
       {
@@ -1903,7 +1903,7 @@ const GENERATOR_META: Record<string, GeneratorInfo> = {
       "Generate professional report pages with data visualizations, executive summaries, charts, comparison tables, and downloadable sections.",
     icon: "FileBarChart",
     category: "Tool",
-    color: "from-slate-600 to-gray-700",
+    color: "from-stone-600 to-gray-700",
     fields: [
       {
         id: "reportTitle",
@@ -2192,14 +2192,14 @@ export default function GeneratorTypePage() {
             </Link>
             {isLoggedIn ? (
               <Link
-                href="/dashboard"
+                href="/admin"
                 className="text-sm bg-white text-gray-950 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition"
               >
                 Dashboard
               </Link>
             ) : (
               <Link
-                href="/auth/signup"
+                href="/builder"
                 className="text-sm bg-white text-gray-950 px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition"
               >
                 Get Started

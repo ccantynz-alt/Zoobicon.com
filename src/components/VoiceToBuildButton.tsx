@@ -108,11 +108,10 @@ export default function VoiceToBuildButton({
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         aria-label={listening ? "Stop recording" : "Start voice input"}
-        className={`relative ${dim} rounded-full flex items-center justify-center text-white shadow-lg transition-all ${
-          listening
-            ? "bg-gradient-to-br from-stone-500 to-stone-600 shadow-stone-500/50"
-            : "bg-gradient-to-br from-stone-500 via-stone-500 to-stone-500 hover:shadow-stone-500/50"
-        } ${className}`}
+        className={`relative ${dim} rounded-full flex items-center justify-center text-white transition-all ${className}`}
+        style={listening
+          ? { background: "linear-gradient(135deg, #d4af5e 0%, #9c7a2c 100%)", boxShadow: "0 4px 16px rgba(184,146,63,0.5)" }
+          : { background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)", boxShadow: "0 2px 8px rgba(184,146,63,0.3)" }}
       >
         {listening && (
           <>
@@ -174,7 +173,7 @@ export default function VoiceToBuildButton({
                     </div>
                     <div className="text-white text-lg leading-snug font-medium truncate">
                       {interim || (
-                        <span className="text-slate-400">{placeholder}</span>
+                        <span className="text-stone-400">{placeholder}</span>
                       )}
                     </div>
                   </div>

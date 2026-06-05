@@ -46,15 +46,37 @@ export type GateTestSeverity = "critical" | "warning" | "info";
 
 export interface GateTestIssue {
   severity: GateTestSeverity;
-  category: "console" | "a11y" | "layout" | "interaction" | "link" | "runtime";
+  category: "console" | "a11y" | "layout" | "interaction" | "link" | "runtime" | "syntax" | "security" | "performance" | "seo";
   message: string;
   selector?: string;
+  file?: string;
+  line?: number;
   autoFixPrompt?: string;
+}
+
+export interface GateTestModule {
+  name: string;
+  status: "passed" | "failed" | "warning";
+  checks: number;
+  issues: number;
+  details?: string[];
+}
+
+export interface GateTestApiResponse {
+  status: "complete" | "error";
+  repo_url?: string;
+  tier?: string;
+  totalModules: number;
+  totalIssues: number;
+  duration: number;
+  modules: GateTestModule[];
 }
 
 export interface GateTestResult {
   passed: boolean;
   issues: GateTestIssue[];
+  totalModules: number;
+  totalChecks: number;
   runMs: number;
   source: "builtin" | "gate-test-api";
 }
@@ -87,30 +109,41 @@ export async function runProbes(ctx: GateTestContext): Promise<GateTestResult> {
   if (isGateTestApiEnabled()) {
     try {
       const snapshot = await snapshotIframe(ctx.iframe);
-      const res = await fetch(process.env.NEXT_PUBLIC_GATE_TEST_API_URL!, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_GATE_TEST_API_KEY!,
-        },
-        body: JSON.stringify({
-          round: ctx.round,
-          snapshot,
-          files: Object.keys(ctx.files),
-        }),
-        signal: AbortSignal.timeout(15_000),
-      });
+      const res = await fetchWithRetry(
+        process.env.NEXT_PUBLIC_GATE_TEST_API_URL!,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": process.env.NEXT_PUBLIC_GATE_TEST_API_KEY!,
+          },
+          body: JSON.stringify({
+            repo_url: typeof window !== "undefined" ? window.location.origin : "",
+            tier: "full",
+            round: ctx.round,
+            snapshot,
+            files: ctx.files,
+          }),
+          timeoutMs: 30_000,
+          attempts: 3,
+        }
+      );
       if (res.ok) {
-        const data = (await res.json()) as { issues: GateTestIssue[] };
+        const data = (await res.json()) as GateTestApiResponse;
+        const issues = parseModuleIssues(data.modules);
+        const totalChecks = data.modules.reduce((sum, m) => sum + m.checks, 0);
         return {
-          passed: data.issues.length === 0,
-          issues: data.issues,
+          passed: data.totalIssues === 0,
+          issues,
+          totalModules: data.totalModules,
+          totalChecks,
           runMs: performance.now() - start,
           source: "gate-test-api",
         };
       }
+      console.warn(`[gate-test] external API returned ${res.status}, falling back to builtin`);
     } catch (err) {
-      console.warn("[gate-test] external API failed, falling back to builtin:", err);
+      console.warn(`[gate-test] external API unreachable (${describeNetworkError(err)}), falling back to builtin`);
     }
   }
 
@@ -195,9 +228,60 @@ export async function runProbes(ctx: GateTestContext): Promise<GateTestResult> {
   return {
     passed: issues.filter((i) => i.severity === "critical").length === 0,
     issues,
+    totalModules: 5,
+    totalChecks: issues.length > 0 ? 5 : 5,
     runMs: performance.now() - start,
     source: "builtin",
   };
+}
+
+/**
+ * Convert Gate Test module-based response into actionable GateTestIssues.
+ * Each module detail string (e.g. "src/auth.ts:14: eval() usage") becomes
+ * a typed issue with file, line, severity, and an auto-fix prompt.
+ */
+function parseModuleIssues(modules: GateTestModule[]): GateTestIssue[] {
+  const issues: GateTestIssue[] = [];
+
+  const severityMap: Record<string, GateTestSeverity> = {
+    security: "critical",
+    syntax: "critical",
+    a11y: "warning",
+    accessibility: "warning",
+    performance: "warning",
+    seo: "info",
+    style: "info",
+  };
+
+  const autoFixMap: Record<string, string> = {
+    security: "Fix the security vulnerability described above. Never use eval(), sanitize all inputs, escape outputs.",
+    syntax: "Fix the syntax error so the code compiles and runs correctly.",
+    a11y: "Fix the accessibility issue — add missing alt text, labels, ARIA attributes, or correct heading hierarchy.",
+    accessibility: "Fix the accessibility issue — add missing alt text, labels, ARIA attributes, or correct heading hierarchy.",
+    performance: "Optimize the performance issue — reduce bundle size, lazy load, or fix the render bottleneck.",
+    seo: "Fix the SEO issue — add missing meta tags, structured data, or semantic HTML.",
+  };
+
+  for (const mod of modules) {
+    if (mod.status === "passed" || !mod.details || mod.details.length === 0) continue;
+
+    const category = mod.name.toLowerCase() as GateTestIssue["category"];
+    const severity = severityMap[mod.name.toLowerCase()] ?? "warning";
+
+    for (const detail of mod.details) {
+      const fileMatch = detail.match(/^([^:]+):(\d+):\s*(.+)$/);
+      issues.push({
+        severity,
+        category,
+        message: fileMatch ? fileMatch[3] : detail,
+        file: fileMatch ? fileMatch[1] : undefined,
+        line: fileMatch ? parseInt(fileMatch[2], 10) : undefined,
+        autoFixPrompt: autoFixMap[mod.name.toLowerCase()] ?? `Fix this ${mod.name} issue: ${detail}`,
+      });
+    }
+  }
+
+  return issues;
 }
 
 /**
@@ -231,4 +315,62 @@ export function issuesToEditPrompt(issues: GateTestIssue[]): string | null {
     "Automated QA found the following issues — fix them without changing anything else:",
     ...actionable.map((i, idx) => `${idx + 1}. [${i.severity}] ${i.message}\n   Fix: ${i.autoFixPrompt}`),
   ].join("\n\n");
+}
+
+/**
+ * Short, user-safe description of a network-layer failure. Never leaks the
+ * raw openssl stack (e.g. "ssl/record/rec_layer_s3.c:912:SSL alert number 80")
+ * that confused Craig when Gate Test surfaced it verbatim.
+ */
+export function describeNetworkError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (/EPROTO|ssl.*alert|tlsv1|handshake/i.test(msg)) return "upstream TLS connection dropped";
+  if (/timeout|timed?\s*out|abort/i.test(msg)) return "request timed out";
+  if (/ECONNRESET|socket\s*hang.?up|EPIPE/i.test(msg)) return "connection reset";
+  if (/ECONNREFUSED/i.test(msg)) return "connection refused";
+  if (/ENOTFOUND|EAI_AGAIN/i.test(msg)) return "DNS lookup failed";
+  if (/fetch failed|network/i.test(msg)) return "network unreachable";
+  const first = msg.split(/[\n.]/)[0].trim();
+  return first.length > 100 ? first.slice(0, 97) + "..." : first;
+}
+
+/**
+ * Transient-error fetch with exponential backoff + jitter. Retries on
+ * network-layer flakes (EPROTO/SSL/DNS/reset/timeout) and 5xx responses.
+ * Does NOT retry on 4xx — those are caller mistakes, not transient faults.
+ */
+async function fetchWithRetry(
+  url: string,
+  opts: RequestInit & { timeoutMs?: number; attempts?: number }
+): Promise<Response> {
+  const attempts = opts.attempts ?? 3;
+  const timeoutMs = opts.timeoutMs ?? 15_000;
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const { timeoutMs: _t, attempts: _a, ...init } = opts;
+      void _t; void _a;
+      const res = await fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+      if (res.status >= 500 && i < attempts - 1) {
+        console.warn(`[gate-test] ${url} returned ${res.status}, retrying`);
+        await sleep(400 * Math.pow(2, i) + Math.floor(Math.random() * 250));
+        continue;
+      }
+      return res;
+    } catch (err) {
+      lastErr = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      const transient =
+        /EPROTO|ssl.*alert|tlsv1|handshake|timeout|timed?\s*out|abort|ECONNRESET|ECONNREFUSED|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|EPIPE|socket\s*hang.?up|fetch failed|network/i.test(msg);
+      if (!transient || i === attempts - 1) throw err;
+      const delay = 400 * Math.pow(2, i) + Math.floor(Math.random() * 250);
+      console.warn(`[gate-test] attempt ${i + 1}/${attempts} failed (${describeNetworkError(err)}), retrying in ${delay}ms`);
+      await sleep(delay);
+    }
+  }
+  throw lastErr;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
 }

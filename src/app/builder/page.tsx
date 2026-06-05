@@ -7,12 +7,17 @@ import { getGeneratorDef } from "@/lib/generator-prompts";
 // TopBar replaced with inline custom top bar for builder chrome
 import PromptInput from "@/components/PromptInput";
 import type { Tier, AIModel, GenerationMode } from "@/components/PromptInput";
-import DomainHookModal from "@/components/DomainHookModal";
+import { getClientPlan, isPaidPlan, planLabel } from "@/lib/user-plan";
+import type { Plan } from "@/lib/user-plan";
 import VoiceToBuildButton from "@/components/VoiceToBuildButton";
+import PrewarmFrame from "@/components/PrewarmFrame";
+import AgentOrbsRow from "@/components/AgentOrbsRow";
+import PromptQueuePanel from "@/components/PromptQueuePanel";
 import dynamic from "next/dynamic";
 
 const SandpackPreview = dynamic(() => import("@/components/SandpackPreview"), { ssr: false });
 const WebContainerPreview = dynamic(() => import("@/components/WebContainerPreview"), { ssr: false });
+const EscapeHatchPreview = dynamic(() => import("@/components/EscapeHatchPreview"), { ssr: false });
 
 // Pre-warm WebContainers the moment this module loads (before React mounts).
 // The dynamic import of WebContainerPreview above is async, so we also fire
@@ -49,13 +54,28 @@ class WebContainerErrorBoundary extends Component<WCErrorBoundaryProps, WCErrorB
 
 interface PreviewSwitcherProps {
   useWebContainers: boolean;
+  useEscapeHatch: boolean;
   onWebContainersFail: () => void;
   files: Record<string, string>;
   reactDeps: Record<string, string>;
+  onDownload?: () => void;
 }
-function PreviewSwitcher({ useWebContainers, onWebContainersFail, files, reactDeps }: PreviewSwitcherProps): JSX.Element {
+function PreviewSwitcher({ useWebContainers, useEscapeHatch, onWebContainersFail, files, reactDeps, onDownload }: PreviewSwitcherProps): JSX.Element {
+  // EscapeHatch wins if explicitly set — it bypasses Sandpack's
+  // hosted bundler entirely (codesandbox.io infra) and renders via
+  // Babel-standalone + esm.sh inside a plain iframe. Used when
+  // Sandpack times out, which is a known reliability issue.
+  if (useEscapeHatch) {
+    return <EscapeHatchPreview files={files} onDownload={onDownload} />;
+  }
   const sandpack = (
-    <SandpackPreview mode="react" files={files} dependencies={reactDeps} showEditor={false} />
+    <SandpackPreview
+      mode="react"
+      files={files}
+      dependencies={reactDeps}
+      showEditor={false}
+      onDownload={onDownload}
+    />
   );
   if (!useWebContainers) return sandpack;
   return (
@@ -64,8 +84,18 @@ function PreviewSwitcher({ useWebContainers, onWebContainersFail, files, reactDe
     </WebContainerErrorBoundary>
   );
 }
+
+// ───────────────────────────────────────────────────────────────────────────
+// Launch video polaroid — a floating preview pinned over the site preview.
+// Shows progress while the launch video pipeline runs, the looping video
+// once it lands, and a clear retry path when it fails (Bible Law 8).
+//
+// Editorial-light palette: warm bone surfaces, near-black text, deep
+// champagne accent. NO dark gradients, NO champagne-on-black.
+// ───────────────────────────────────────────────────────────────────────────
 import CodePanel from "@/components/CodePanel";
 import ChatPanel from "@/components/ChatPanel";
+import SectionEditor from "@/components/SectionEditor";
 import StatusBar from "@/components/StatusBar";
 import SeoPreview from "@/components/SeoPreview";
 
@@ -91,6 +121,10 @@ import PipelinePanel from "@/components/PipelinePanel";
 import DiffPanel from "@/components/DiffPanel";
 import ProjectTree from "@/components/ProjectTree";
 import WelcomeModal, { shouldShowWelcomeModal, dismissWelcomeModal } from "@/components/WelcomeModal";
+import { PlanReviewPanel } from "@/components/PlanReviewPanel";
+import SitePlanPanel from "@/components/SitePlanPanel";
+import type { SitePlan } from "@/lib/site-planner";
+import { captureFlywheelEvent } from "@/lib/flywheel-client";
 import { downloadZip } from "@/lib/zip-export";
 import CollaborationBar from "@/components/CollaborationBar";
 import CursorOverlay from "@/components/CursorOverlay";
@@ -134,6 +168,7 @@ import {
   Workflow,
   Undo2,
   Redo2,
+  Share2,
   Save,
   Sparkles,
   History,
@@ -148,9 +183,19 @@ import {
   ChevronRight,
   Zap,
   Loader2,
+  Layout,
+  Copy,
 } from "lucide-react";
 
-/** Sanitize raw API error messages for user display */
+/** Sanitize raw API error messages for user display.
+ *
+ * Phase 2 (2026-05-13): rate-limit errors used to flatten to a generic
+ * "AI service is busy" with no actionable next step. The validator +
+ * failover layer downstream now classify failures precisely; this
+ * function preserves the underlying cause and adds a recovery hint
+ * matching what the server will try next (cross-provider failover,
+ * lower tier, etc).
+ */
 function cleanErrorMessage(raw: string): string {
   // Try to extract message from JSON error strings like {"type":"error","error":{"type":"rate_limit_error","message":"..."}}
   try {
@@ -167,9 +212,22 @@ function cleanErrorMessage(raw: string): string {
         .trim();
     }
   } catch { /* not JSON */ }
-  // If it looks like a raw JSON blob, return a generic message
+  // Detect rate-limit / overload via raw signal — give the user a
+  // useful hint instead of the generic "service busy" stub.
+  if (raw.includes('"rate_limit_error"') || /\b429\b/.test(raw)) {
+    return "Anthropic is rate-limiting right now. Trying the next provider (OpenAI / Gemini) automatically — if those are also configured this build will recover. Set OPENAI_API_KEY + GOOGLE_AI_API_KEY in Vercel env to enable failover.";
+  }
+  if (raw.includes('"overloaded_error"') || /\b529\b/.test(raw)) {
+    return "Anthropic is overloaded (HTTP 529). Trying the next provider (OpenAI / Gemini) automatically. If those aren't configured: wait 30 seconds and retry, or switch to STANDARD tier (less compute-intensive).";
+  }
+  if (raw.includes('"authentication_error"') || /\b401\b/.test(raw)) {
+    return "Anthropic API key missing or invalid. Check ANTHROPIC_API_KEY in Vercel env vars.";
+  }
+  if (/\bECONN|ETIMEDOUT|EPROTO|fetch failed\b/i.test(raw)) {
+    return "Network error reaching the AI provider. Trying again with a different provider. If this keeps happening contact support@zoobicon.com.";
+  }
   if (raw.includes('"type":"error"') || raw.includes('"rate_limit_error"')) {
-    return "AI service is busy. Please wait a moment and try again.";
+    return "AI provider returned an error. Trying alternate providers — if the failover is configured this build will recover.";
   }
   return raw;
 }
@@ -228,222 +286,18 @@ const TOOLS: { id: Exclude<ToolId, null>; label: string; icon: React.ReactNode }
   { id: "mcp", label: "Import From...", icon: <ExternalLink size={18} /> },
 ];
 
-/* ─── Interactive particle constellation background ─── */
+/* ─── Minimal paper-grain background ─── */
 function BuilderBackground({ isGenerating }: { isGenerating: boolean }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: -1000, y: -1000 });
-  const isGeneratingRef = useRef(isGenerating);
-  isGeneratingRef.current = isGenerating;
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animId: number;
-    let w = 0, h = 0;
-
-    const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
-      w = canvas.clientWidth;
-      h = canvas.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    resize();
-    window.addEventListener("resize", resize);
-
-    // Particles
-    const PARTICLE_COUNT = 80;
-    const CONNECTION_DIST = 140;
-    const MOUSE_RADIUS = 200;
-
-    interface Particle {
-      x: number; y: number;
-      vx: number; vy: number;
-      baseVx: number; baseVy: number;
-      size: number;
-      hue: number;
-      pulse: number;
-      pulseSpeed: number;
-    }
-
-    const particles: Particle[] = [];
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const speed = 0.15 + Math.random() * 0.3;
-      const angle = Math.random() * Math.PI * 2;
-      const vx = Math.cos(angle) * speed;
-      const vy = Math.sin(angle) * speed;
-      particles.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx, vy,
-        baseVx: vx, baseVy: vy,
-        size: 1.2 + Math.random() * 2,
-        hue: 260 + Math.random() * 30, // zoo purple/violet range
-        pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.01 + Math.random() * 0.02,
-      });
-    }
-
-    // Track mouse on document level so canvas can be pointer-events:none
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      // Only track if mouse is within canvas bounds
-      if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-        mouseRef.current = { x, y };
-      } else {
-        mouseRef.current = { x: -1000, y: -1000 };
-      }
-    };
-    document.addEventListener("mousemove", handleMouseMove);
-
-    let time = 0;
-
-    const draw = () => {
-      time += 1;
-      ctx.clearRect(0, 0, w, h);
-
-      const gen = isGeneratingRef.current;
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
-
-      // Update particles
-      for (const p of particles) {
-        p.pulse += p.pulseSpeed;
-
-        // During generation, particles orbit and speed up
-        if (gen) {
-          const cx = w / 2, cy = h / 2;
-          const dx = p.x - cx, dy = p.y - cy;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          const orbitStrength = 0.0004;
-          p.vx += (-dy / dist) * orbitStrength + (cx - p.x) * 0.00003;
-          p.vy += (dx / dist) * orbitStrength + (cy - p.y) * 0.00003;
-        } else {
-          // Slowly return to base velocity
-          p.vx += (p.baseVx - p.vx) * 0.005;
-          p.vy += (p.baseVy - p.vy) * 0.005;
-        }
-
-        // Mouse repulsion with elastic return
-        const dmx = p.x - mx;
-        const dmy = p.y - my;
-        const distMouse = Math.sqrt(dmx * dmx + dmy * dmy);
-        if (distMouse < MOUSE_RADIUS) {
-          const force = (1 - distMouse / MOUSE_RADIUS) * 0.8;
-          p.vx += (dmx / distMouse) * force;
-          p.vy += (dmy / distMouse) * force;
-        }
-
-        // Damping
-        p.vx *= 0.99;
-        p.vy *= 0.99;
-
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // Wrap edges
-        if (p.x < -10) p.x = w + 10;
-        if (p.x > w + 10) p.x = -10;
-        if (p.y < -10) p.y = h + 10;
-        if (p.y > h + 10) p.y = -10;
-      }
-
-      // Draw connections
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const a = particles[i], b = particles[j];
-          const dx = a.x - b.x, dy = a.y - b.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < CONNECTION_DIST) {
-            const alpha = (1 - dist / CONNECTION_DIST) * (gen ? 0.25 : 0.12);
-            const hue = gen ? 265 + Math.sin(time * 0.02) * 20 : 270;
-            ctx.strokeStyle = `hsla(${hue}, 80%, 60%, ${alpha})`;
-            ctx.lineWidth = (1 - dist / CONNECTION_DIST) * 1.5;
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Draw mouse attraction lines
-      if (mx > 0 && my > 0) {
-        for (const p of particles) {
-          const dx = p.x - mx, dy = p.y - my;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < MOUSE_RADIUS * 1.2) {
-            const alpha = (1 - dist / (MOUSE_RADIUS * 1.2)) * 0.15;
-            ctx.strokeStyle = `hsla(270, 90%, 70%, ${alpha})`;
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(mx, my);
-            ctx.lineTo(p.x, p.y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Draw particles
-      for (const p of particles) {
-        const pulseSize = p.size + Math.sin(p.pulse) * 0.6;
-        const brightness = gen ? 70 + Math.sin(p.pulse * 2) * 15 : 55;
-        const alpha = gen ? 0.7 + Math.sin(p.pulse) * 0.3 : 0.4 + Math.sin(p.pulse) * 0.15;
-
-        // Outer glow
-        const glowRadius = pulseSize * (gen ? 4 : 2.5);
-        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius);
-        glow.addColorStop(0, `hsla(${p.hue}, 80%, ${brightness}%, ${alpha * 0.4})`);
-        glow.addColorStop(1, `hsla(${p.hue}, 80%, ${brightness}%, 0)`);
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, glowRadius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Core
-        ctx.fillStyle = `hsla(${p.hue}, 85%, ${brightness + 15}%, ${alpha})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, pulseSize, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Generation energy ring
-      if (gen) {
-        const cx = w / 2, cy = h / 2;
-        const ringRadius = 100 + Math.sin(time * 0.03) * 30;
-        const ringGlow = ctx.createRadialGradient(cx, cy, ringRadius - 20, cx, cy, ringRadius + 40);
-        ringGlow.addColorStop(0, "hsla(270, 90%, 60%, 0)");
-        ringGlow.addColorStop(0.5, `hsla(270, 90%, 60%, ${0.04 + Math.sin(time * 0.05) * 0.02})`);
-        ringGlow.addColorStop(1, "hsla(270, 90%, 60%, 0)");
-        ctx.fillStyle = ringGlow;
-        ctx.beginPath();
-        ctx.arc(cx, cy, ringRadius + 40, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      animId = requestAnimationFrame(draw);
-    };
-
-    draw();
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("resize", resize);
-      document.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, []);
-
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ zIndex: 0 }}
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        zIndex: 0,
+        background: isGenerating
+          ? "radial-gradient(ellipse 60% 40% at 50% 50%, rgba(201,169,97,0.06) 0%, transparent 70%)"
+          : "none",
+        transition: "background 1s ease",
+      }}
     />
   );
 }
@@ -453,12 +307,12 @@ export default function BuilderPageWrapper() {
 
   if (crashed) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-8">
+      <div className="min-h-screen bg-[var(--paper)] flex items-center justify-center p-8">
         <div className="max-w-lg text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Builder Error</h1>
-          <p className="text-white/60 mb-4">The builder hit an error. Details below:</p>
-          <pre className="bg-zinc-900 border border-white/10 rounded-lg p-4 text-left text-sm text-stone-400 overflow-auto max-h-60 mb-6">{crashed}</pre>
-          <button onClick={() => { setCrashed(null); window.location.reload(); }} className="px-6 py-2 bg-stone-600 text-white rounded-lg hover:bg-stone-500 transition-colors">
+          <h1 className="text-2xl font-bold text-[var(--ink)] mb-4">Builder Error</h1>
+          <p className="text-[var(--ink-secondary)] mb-4">The builder hit an error. Details below:</p>
+          <pre className="bg-[var(--paper-elevated)] border border-[var(--rule)] rounded-lg p-4 text-left text-sm text-[var(--ink-secondary)] overflow-auto max-h-60 mb-6">{crashed}</pre>
+          <button onClick={() => { setCrashed(null); window.location.reload(); }} className="px-6 py-2 bg-[var(--ink)] text-[var(--paper)] rounded-lg hover:bg-[var(--ink-secondary)] transition-colors">
             Reload
           </button>
         </div>
@@ -467,7 +321,7 @@ export default function BuilderPageWrapper() {
   }
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-zinc-950 flex items-center justify-center"><div className="text-white/40">Loading builder...</div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--paper)] flex items-center justify-center"><div className="text-[var(--ink-muted)]">Loading builder...</div></div>}>
       <ErrorCatcher onError={(e) => setCrashed(e)}>
         <BuilderPage />
       </ErrorCatcher>
@@ -494,7 +348,39 @@ function BuilderPage() {
   const [activeTool, setActiveTool] = useState<ToolId>(null);
   const [tier, setTier] = useState<Tier>("premium");
   const [isAdmin, setIsAdmin] = useState(false);
+  // Admin-private builds (Rule 31, 2026-05-17). Toggle only visible when
+  // isAdmin is true. When checked, the save call stamps visibility =
+  // 'admin_private' so the project never surfaces in gallery, showcase,
+  // intel exports, or the future Crontech project map.
+  const [adminPrivate, setAdminPrivate] = useState<boolean>(true);
   const [useWebContainers, setUseWebContainers] = useState<boolean>(true);
+  // Escape-hatch preview: when Sandpack's hosted bundler is flaky
+  // (known TIME_OUT issue), this swaps the preview to a self-contained
+  // iframe that renders the project via Babel-standalone + esm.sh —
+  // no codesandbox.io dependency. Persisted in localStorage so the
+  // user's choice survives reloads.
+  // 2026-05-26: DEFAULT ON. Craig: "we need to be the most reliable
+  // possible so we can't have a flaky sandbox." Sandpack flakes too
+  // often to be the default. Users who explicitly want hot-reload
+  // can flip the toggle.
+  const [useEscapeHatch, setUseEscapeHatch] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const stored = localStorage.getItem("zoobicon_use_escape_hatch");
+    if (stored === "0") return false;  // explicit opt-out
+    return true;  // default + "1" both → escape hatch
+  });
+  const [userPlan, setUserPlan] = useState<Plan>("free");
+
+  // Resolve the user's plan from localStorage so the UI knows whether to
+  // surface the watermark / upgrade banner. Re-runs on storage events so
+  // a sign-in or upgrade in another tab updates instantly.
+  useEffect(() => {
+    setUserPlan(getClientPlan());
+    const refresh = () => setUserPlan(getClientPlan());
+    window.addEventListener("storage", refresh);
+    return () => window.removeEventListener("storage", refresh);
+  }, []);
+  const isFreePlan = !isPaidPlan(userPlan);
 
   // Detect unsupported browsers and pre-warm WebContainers on supported ones
   useEffect(() => {
@@ -524,21 +410,51 @@ function BuilderPage() {
   const [buildProgress, setBuildProgress] = useState<{ current: number; total: number; section: string } | null>(null);
   const [sectionTimeline, setSectionTimeline] = useState<Array<{ section: string; label: string; status: "pending" | "scaffolding" | "customizing" | "done"; startedAt: number; finishedAt?: number }>>([]);
   const [buildError, setBuildError] = useState<{ message: string; suggestion: string } | null>(null);
+  // Plan Mode (B12) — mistake-protection layer. When slotLocked is
+  // enabled, the build click first fetches a structured plan; the
+  // user reviews + confirms before the expensive build fires.
+  const [planReview, setPlanReview] = useState<import("@/components/PlanReviewPanel").PlanReviewPlan | null>(null);
+  const [planLoading, setPlanLoading] = useState(false);
+  // Full-Site Mode (Phase 1): multi-page plan + review. Triggered via
+  // ?siteMode=full URL flag. Phase 2 wires the parallel build orchestrator
+  // to consume the approved plan; for now the Approve button is disabled
+  // with a clear "coming next session" message so the UX shape is locked.
+  const [sitePlan, setSitePlan] = useState<{
+    plan: SitePlan;
+    source: "llm" | "fallback";
+    modelUsed?: string;
+  } | null>(null);
+  const [sitePlanLoading, setSitePlanLoading] = useState(false);
   const [streamWarning, setStreamWarning] = useState<string | null>(null);
+  // Post-build smoke check — server validates the file tree against
+  // the import allow-list + syntax balance + entry-point existence
+  // BEFORE the user's preview tries to render. Catches the 80% case
+  // of "blank preview, no error" that Sandpack times out on. Real
+  // headless Chrome can layer on top (Phase 2) for runtime errors.
+  const [validation, setValidation] = useState<{
+    ok: boolean;
+    issues: Array<{ severity: "error" | "warning"; file: string; line?: number; rule: string; message: string }>;
+    summary: string;
+  } | null>(null);
+  const [validating, setValidating] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState("");  // Empty = use pipeline's smart routing (Haiku/Opus/Sonnet)
-  const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Opus, pipeline=7-agent
+  const [buildMode, setBuildMode] = useState<"instant" | "deep" | "pipeline">("instant"); // instant=registry, deep=Sonnet, pipeline=7-agent
   const instantMode = buildMode === "instant"; // back-compat
   const [fullStack, setFullStack] = useState(false); // Full-stack mode: auto-provisions Supabase backend (auth, database, storage)
+  // Launch video combo removed 2026-05-26 — AI Video Creator (and its
+  // /api/generate/launch-video sub-feature) cut from launch scope.
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [reactSource, setReactSource] = useState<Record<string, string> | null>(null);
   const [reactFiles, setReactFiles] = useState<Record<string, string> | null>(null);
   const [reactDeps, setReactDeps] = useState<Record<string, string>>({});
   const [generationMode, setGenerationMode] = useState<GenerationMode>("react");
-  const [domainHookOpen, setDomainHookOpen] = useState(false);
-  const [domainHookShownForThisBuild, setDomainHookShownForThisBuild] = useState(false);
   const [mcpContext, setMcpContext] = useState("");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
-  // Phase 2: Visual editing
+  // Project persistence
+  const [projectId, setProjectId] = useState<string | null>(null);
+  const [projectName, setProjectName] = useState("");
+  const [chatMessages, setChatMessages] = useState<Array<{ id: string; role: "user" | "assistant" | "system"; content: string; timestamp: number; status?: string; changedFiles?: string[]; durationMs?: number }>>([]);
+  const [showSections, setShowSections] = useState(false);
   // Phase 3: Project mode
   const [projectFiles, setProjectFiles] = useState<{ path: string; content: string; language: string; isModified?: boolean }[]>([]);
   const [activeProjectFile, setActiveProjectFile] = useState<string | null>(null);
@@ -548,7 +464,21 @@ function BuilderPage() {
   const [showDiffPanel, setShowDiffPanel] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [showBuildSuccess, setShowBuildSuccess] = useState(false);
+  // T6 follow-up: BrandSpec from the server's done event. Used to
+  // deep-link /brand-kit with the actual build's palette/typography.
+  const [buildBrandSpec, setBuildBrandSpec] = useState<{
+    brandName: string;
+    primaryColor: string;
+    bgColor: string;
+    textPrimary: string;
+    textSecondary: string;
+    accentColor: string;
+    headlineFont: string;
+    bodyFont: string;
+  } | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [crontechAvailable, setCrontechAvailable] = useState(false);
+  const [crontechProjectId, setCrontechProjectId] = useState<string | null>(null);
 
   // Recording mode — ?record=1 hides all chrome for clean screen captures
   const [recordingMode, setRecordingMode] = useState(false);
@@ -558,8 +488,19 @@ function BuilderPage() {
   const [agencyId, setAgencyId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState("");
   const [userName, setUserName] = useState("");
+  // Advanced mode — hidden by default so novices see only Chat + Preview + Deploy.
+  // Power users click the toggle to reveal all 23 tools.
+  const [advancedMode, setAdvancedMode] = useState(false);
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [previewRect, setPreviewRect] = useState<DOMRect | null>(null);
+
+  // Check CronTech availability on mount
+  useEffect(() => {
+    fetch("/api/crontech/availability")
+      .then(r => r.json())
+      .then(d => setCrontechAvailable(Boolean(d.available)))
+      .catch(() => {});
+  }, []);
 
   // Show welcome modal on first visit
   useEffect(() => {
@@ -609,6 +550,12 @@ function BuilderPage() {
   const generationIdRef = useRef(0); // Tracks current generation to prevent stale image replacements
   const watchdogSlowRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const watchdogStuckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Throttle preview refreshes during streaming so the user sees components
+  // slot in progressively (~every 1.2s) rather than all batched at once.
+  // React 18 auto-batching + Vercel SSE buffering would otherwise collapse
+  // all partial setReactFiles calls into a single render.
+  const previewThrottleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingPreviewFilesRef = useRef<Record<string, string> | null>(null);
   const timelineScrollRef = useRef<HTMLDivElement | null>(null);
 
   const clearWatchdog = useCallback(() => {
@@ -664,6 +611,10 @@ function BuilderPage() {
         const parsed = JSON.parse(u);
         if (parsed.email) headers["x-user-email"] = parsed.email;
         if (parsed.role === "admin" || parsed.plan === "unlimited") headers["x-admin"] = "1";
+        // Pass the plan to the API so it can decide whether to inject the
+        // free-tier watermark into generated App.tsx. Falls back to "free"
+        // server-side if absent.
+        if (typeof parsed.plan === "string") headers["x-zoobicon-plan"] = parsed.plan;
       }
     } catch { /* ignore */ }
     return headers;
@@ -742,8 +693,8 @@ function BuilderPage() {
               if (agency?.brand_config?.agencyName) {
                 setAgencyBrand({
                   agencyName: agency.brand_config.agencyName,
-                  primaryColor: agency.brand_config.primaryColor || "#3b82f6",
-                  secondaryColor: agency.brand_config.secondaryColor || "#8b5cf6",
+                  primaryColor: agency.brand_config.primaryColor || "#78716c",
+                  secondaryColor: agency.brand_config.secondaryColor || "#78716c",
                   logoUrl: agency.brand_config.logoUrl,
                 });
                 // Store for TopBar to pick up
@@ -867,6 +818,61 @@ function BuilderPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generatedCode]);
 
+  // Auto-save project when generation completes or after edits
+  useEffect(() => {
+    if (status !== "complete" || !reactFiles || Object.keys(reactFiles).length === 0) return;
+    if (!userEmail) return;
+
+    const save = async () => {
+      setSaveStatus("saving");
+      try {
+        if (!projectId) {
+          const name = projectName || prompt.slice(0, 60) || "Untitled Project";
+          const res = await fetch("/api/projects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name,
+              email: userEmail,
+              prompt,
+              code: JSON.stringify(reactFiles),
+              // Admin-private visibility flag. Server double-checks the
+              // role claim before honouring it — non-admins always save
+              // as 'public' regardless of what they POST.
+              visibility: isAdmin && adminPrivate ? "admin_private" : "public",
+            }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.id) {
+              setProjectId(data.id);
+              setProjectName(name);
+              await fetch(`/api/projects/${data.id}/versions`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ files: reactFiles, deps: reactDeps, label: "Initial build" }),
+              });
+            }
+          }
+        } else {
+          await fetch(`/api/projects/${projectId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: JSON.stringify(reactFiles) }),
+          });
+        }
+        setSaveStatus("saved");
+        setTimeout(() => setSaveStatus("idle"), 2000);
+      } catch {
+        setSaveStatus("idle");
+      }
+    };
+
+    const t = setTimeout(save, 1000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, reactFiles, userEmail]);
+
   // Show build success modal on first successful generation
   useEffect(() => {
     if (status === "complete" && generatedCode && shouldShowBuildSuccess()) {
@@ -874,30 +880,10 @@ function BuilderPage() {
     }
   }, [status, generatedCode]);
 
-  // Open the Domain Hook modal once per build when a site finishes generating.
-  // This is the #1 monetization hook: free site → paid domain + deploy + email.
-  useEffect(() => {
-    if (status === "complete" && reactFiles && Object.keys(reactFiles).length > 0 && !domainHookShownForThisBuild) {
-      const t = setTimeout(() => {
-        setDomainHookOpen(true);
-        setDomainHookShownForThisBuild(true);
-      }, 2500);
-      return () => clearTimeout(t);
-    }
-  }, [status, reactFiles, domainHookShownForThisBuild]);
-
-  // Reset the "shown once" flag whenever the user starts a new prompt
-  useEffect(() => {
-    if (status === "idle") setDomainHookShownForThisBuild(false);
-  }, [status]);
-
-  // Derive a site name from the current prompt for the Domain Hook
-  const siteNameForHook = useMemo(() => {
-    const raw = (prompt || "").trim().toLowerCase();
-    if (!raw) return "mysite";
-    const slug = raw.replace(/[^a-z0-9\s-]/g, "").split(/\s+/).slice(0, 3).join("").slice(0, 32);
-    return slug || "mysite";
-  }, [prompt]);
+  // Rule 33 (2026-05-30): the domain-in-checkout hook is retired.
+  // Zoobicon now sits on top of Crontech's API — custom domains for
+  // generated sites are provisioned through Crontech's project API at
+  // deploy time, not through a Zoobicon-owned Stripe + OpenSRS flow.
 
   const handleUndo = useCallback(() => {
     if (!canUndo) return;
@@ -998,16 +984,65 @@ function BuilderPage() {
     });
   }, []);
 
+  /**
+   * Trigger the launch video pipeline once the site has been generated.
+   * Streams progress steps, then either yields a videoUrl or surfaces an
+   * error — never blocks or kills the site flow (Bible Law 8).
+   *
+   * Declared BEFORE handleGenerate so handleGenerate's dep array can
+   * reference it without hitting a temporal dead zone at component init.
+   */
+
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim()) return;
 
-    // CHECK AUTH FIRST — don't waste the user's time
+    // FULL-SITE MODE — fork BEFORE any single-page logic. Detected via
+    // ?siteMode=full or window.__siteMode === "full" (dev override).
+    // When active, we fetch a multi-page plan first and halt for review.
+    // The user can approve (Phase 2 build) or cancel back to single-page.
+    const wantsFullSite =
+      typeof window !== "undefined" &&
+      (new URLSearchParams(window.location.search).get("siteMode") === "full" ||
+        (window as { __siteMode?: string }).__siteMode === "full");
+    if (wantsFullSite && !sitePlan && !sitePlanLoading) {
+      try {
+        setSitePlanLoading(true);
+        const res = await fetch("/api/generate/site-plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...authHeaders() },
+          body: JSON.stringify({ prompt: prompt.trim() }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setSitePlan(data);
+          setSitePlanLoading(false);
+          return; // Halt — SitePlanPanel renders, awaits Approve/Cancel.
+        }
+        // Plan endpoint failed — surface warning and continue to single-page.
+        const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        setStreamWarning(`Full-site plan unavailable (${err.error || "unknown error"}). Falling back to single-page build.`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setStreamWarning(`Full-site plan threw: ${msg.slice(0, 120)}. Falling back to single-page build.`);
+      } finally {
+        setSitePlanLoading(false);
+      }
+    }
+
+    // Rule 31 — /auth/signup was deleted (auth delegated to Crontech)
+    // but the builder used to hard-redirect anonymous users there on
+    // every Generate click. That meant every first-time visitor hit a
+    // 404 instead of seeing a site — and "no site has ever shipped"
+    // (Craig, 2026-05-26) traced back to exactly this. Until Crontech
+    // SSO is wired live, anonymous users can build with the same per-
+    // IP quota the API enforces. We save the prompt to localStorage so
+    // if/when a real signup flow lands they can resume.
     const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
     if (!userStr) {
-      // Save their prompt so it's not lost after signup
       try { localStorage.setItem("zoobicon_pending_prompt", prompt.trim()); } catch {}
-      window.location.href = `/auth/signup?redirect=/builder&prompt=${encodeURIComponent(prompt.trim().slice(0, 200))}`;
-      return;
+      // Don't block — proceed anonymously. The server-side quota gate
+      // (lib/build-quota.ts) handles abuse via the userEmail = null
+      // path (anonymous baseline, no DB writes).
     }
 
     // Close welcome modal if open
@@ -1017,16 +1052,40 @@ function BuilderPage() {
     }
 
     const currentGenId = ++generationIdRef.current;
+    const buildId = `build-${Date.now()}-${currentGenId}`;
+    // Flywheel: log the submit event the moment the user kicked the
+    // build off (before plan-mode or any network spend). If this is a
+    // re-roll within the same session, the type changes to regenerate.
+    const isRegenerate = currentGenId > 1;
+    captureFlywheelEvent(buildId, isRegenerate ? "regenerate" : "prompt_submit", {
+      promptHead: prompt.trim().slice(0, 200),
+      tier,
+      buildMode,
+      instantMode,
+      fullStack,
+    });
     setStatus("generating");
     setError("");
     setGeneratedCode("");
+    // Clear stale react state so a re-roll doesn't leave the PREVIOUS
+    // build visible in Sandpack while the new one is in flight. Without
+    // this, when the new build fails (auth/quota/timeout), the user sees
+    // an error overlay on top of an unrelated previously-generated site —
+    // looks like the build "kind of worked" when it actually failed.
+    setReactFiles(null);
+    setReactDeps({});
+    setReactSource(null);
     setActiveTab("preview");
     setPipelineAgents([]);
     setBuildProgress(null);
     setSectionTimeline([]);
     setBuildError(null);
     setStreamWarning(null);
+    setValidation(null);  // clear previous build's smoke check
     resetWatchdog();
+    // Clear any pending preview throttle from a previous build.
+    if (previewThrottleRef.current) { clearTimeout(previewThrottleRef.current); previewThrottleRef.current = null; }
+    pendingPreviewFilesRef.current = null;
     pendingLabelRef.current = `Build: ${prompt.trim().slice(0, 50)}`;
 
     abortRef.current?.abort();
@@ -1039,13 +1098,56 @@ function BuilderPage() {
 
       // THREE PATHS:
       // 1. Quick Build (buildMode="instant", DEFAULT): Registry scaffold (<1s) + AI customization (~10s)
-      // 2. Deep Build (buildMode="deep"): Opus generates everything from scratch (~30s)
+      // 2. Deep Build (buildMode="deep"): Sonnet generates everything from scratch (~30s)
       // 3. Full Build (buildMode="pipeline"): 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)
+      //
+      // Slot-locked composition (B1) — opt in via ?slotLocked=1 in the URL
+      // or window.__slotLocked = true in dev. When enabled, hits the new
+      // /api/generate/slot-stream endpoint with header x-slot-locked: 1
+      // so the feature flag in the route accepts the request.
+      const slotLockedEnabled =
+        typeof window !== "undefined" &&
+        (new URLSearchParams(window.location.search).get("slotLocked") === "1" ||
+          (window as { __slotLocked?: boolean }).__slotLocked === true);
+
+      // Plan Mode (B12) — when slot-locked is enabled AND the user hasn't
+      // already confirmed a plan, fetch a structured plan first so they
+      // can audit before the expensive build fires. Cost: ~$0.0008. Saves
+      // ~$0.04 every time a misclick gets caught.
+      const skipPlanReview =
+        typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).get("skipPlan") === "1";
+      if (slotLockedEnabled && !planReview && !skipPlanReview) {
+        try {
+          setPlanLoading(true);
+          const planRes = await fetch("/api/generate/plan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", ...authHeaders() },
+            body: JSON.stringify({ prompt: prompt.trim() }),
+          });
+          if (planRes.ok) {
+            const planData = await planRes.json();
+            setPlanReview(planData);
+            setPlanLoading(false);
+            return; // Halt here — wait for user to confirm via PlanReviewPanel
+          }
+          // Plan endpoint failed — degrade silently to direct build
+          console.warn("[builder] plan endpoint failed; proceeding to direct build");
+        } catch (err) {
+          console.warn("[builder] plan fetch threw; proceeding to direct build:", err);
+        } finally {
+          setPlanLoading(false);
+        }
+      }
+
       const useFastPath = instantMode;
-      const endpoint = buildMode === "pipeline"
-        ? "/api/generate/pipeline-stream"
-        : useFastPath ? "/api/generate/react-stream" : "/api/generate/react";
+      const endpoint = slotLockedEnabled
+        ? "/api/generate/slot-stream"
+        : buildMode === "pipeline"
+          ? "/api/generate/pipeline-stream"
+          : useFastPath ? "/api/generate/react-stream" : "/api/generate/react";
       setPipelineAgents([
+        slotLockedEnabled ? "Slot-locked composition — assembling hand-written templates with AI slot fills..." :
         buildMode === "pipeline" ? "Running 7-agent pipeline: Strategist, Brand, Copy, Architect, Developer, SEO, Animation..." :
         useFastPath ? "Assembling components from registry..." : "AI generating full application...",
       ]);
@@ -1053,18 +1155,49 @@ function BuilderPage() {
       try {
         const res = await fetch(endpoint, {
           method: "POST",
-          headers: authHeaders(),
+          headers: {
+            ...authHeaders(),
+            ...(slotLockedEnabled ? { "x-slot-locked": "1" } : {}),
+          },
           body: JSON.stringify({
             prompt: prompt.trim(),
             tier: useFastPath ? "standard" : "premium",
             fullStack,
+            // Plan Mode payoff: pass the confirmed plan to slot-stream
+            // so it doesn't re-classify. Saves a Haiku round trip and
+            // guarantees the build matches what the user just approved.
+            ...(planReview
+              ? {
+                  industry: planReview.plan.industry,
+                  theme: planReview.plan.theme,
+                  brandName: planReview.plan.brandName,
+                  componentIds: planReview.plan.componentIds,
+                  includePricing: planReview.plan.includePricing,
+                }
+              : {}),
           }),
           signal: controller.signal,
         });
 
         if (!res.ok) {
           const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-          throw new Error(errData.error || `HTTP ${res.status}`);
+          // 2026-05-26 fix: wrap raw HTTP codes with actionable context.
+          // Users were seeing "HTTP 429" with no explanation. Now they
+          // see "Rate limited — try again in 60s" with a reset timestamp
+          // when the server provides one.
+          let friendly = errData.error || `HTTP ${res.status}`;
+          if (res.status === 429) {
+            const resetIso = errData.resetsAt;
+            const resetMsg = resetIso ? ` (resets ${new Date(resetIso).toLocaleTimeString()})` : "";
+            friendly = `You've hit today's build limit${resetMsg}. ${errData.error || "Wait a bit and try again, or upgrade for more capacity."}`;
+          } else if (res.status === 503) {
+            friendly = `AI service temporarily unavailable. ${errData.error || "Try again in 30 seconds — the failover chain should pick up."}`;
+          } else if (res.status === 401 || res.status === 403) {
+            friendly = `Auth issue (${res.status}). ${errData.error || "If this persists, an API key may be missing or invalid in Vercel env vars."}`;
+          } else if (res.status >= 500) {
+            friendly = `Server error ${res.status}. ${errData.error || "This is on us — please retry."}`;
+          }
+          throw new Error(friendly);
         }
 
         // Read SSE stream — update preview as files arrive
@@ -1117,7 +1250,7 @@ function BuilderPage() {
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
-                  receivedFiles = true;
+                  if (Object.keys(event.files).length > 0) receivedFiles = true;
                   setPipelineAgents(prev => [...prev, `Scaffold ready — ${event.componentCount} components assembled`]);
                 }
               } else if (event.type === "customization" && event.data) {
@@ -1130,38 +1263,77 @@ function BuilderPage() {
                 if (generationIdRef.current === currentGenId) {
                   setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
-                  receivedFiles = true;
+                  if (Object.keys(event.files).length > 0) receivedFiles = true;
                 }
               } else if (event.type === "partial" && event.files) {
-                // Progressive streaming: each partial carries the full file map so far
+                // Progressive streaming: each partial carries the full file map so far.
+                // Only mark receivedFiles when the map actually has content — an empty
+                // {} partial would trip the safety net into thinking build succeeded.
                 if (generationIdRef.current === currentGenId) {
-                  setReactFiles(event.files);
                   setGeneratedCode("<!-- react-app-mode -->");
-                  receivedFiles = true;
+                  if (Object.keys(event.files).length > 0) {
+                    receivedFiles = true;
+                    // Throttle preview refreshes to ~1.2s intervals so the user sees
+                    // components slot in progressively. React 18 auto-batching + Vercel
+                    // SSE buffering would otherwise collapse all partials into one render.
+                    pendingPreviewFilesRef.current = event.files as Record<string, string>;
+                    if (!previewThrottleRef.current) {
+                      // First content — apply immediately so something appears fast.
+                      setReactFiles(event.files as Record<string, string>);
+                      previewThrottleRef.current = setTimeout(() => {
+                        previewThrottleRef.current = null;
+                        if (pendingPreviewFilesRef.current) {
+                          setReactFiles(pendingPreviewFilesRef.current);
+                          pendingPreviewFilesRef.current = null;
+                        }
+                      }, 1200);
+                    }
+                  }
                   // Update progress indicator
                   if (event.fileCount != null && event.totalComponents != null) {
-                    setBuildProgress({ current: event.fileCount, total: event.totalComponents, section: event.section || "" });
+                    setBuildProgress({ current: event.fileCount as number, total: event.totalComponents as number, section: (event.section as string) || "" });
                   }
                   if (event.section && event.customized) {
-                    upsertSection(event.section, "done");
+                    upsertSection(event.section as string, "done");
                   } else if (event.section) {
-                    upsertSection(event.section, "scaffolding");
+                    upsertSection(event.section as string, "scaffolding");
                   }
                 }
               } else if ((event.type === "done" && event.files) || (event.type === "done")) {
                 // Generation complete
                 if (generationIdRef.current === currentGenId) {
+                  // Flush any pending throttled preview update and clear the timer.
+                  if (previewThrottleRef.current) {
+                    clearTimeout(previewThrottleRef.current);
+                    previewThrottleRef.current = null;
+                  }
+                  pendingPreviewFilesRef.current = null;
                   if (event.files) {
-                    setReactFiles(event.files);
+                    setReactFiles(event.files as Record<string, string>);
                     setReactDeps(event.dependencies || {});
                     setReactSource(event.files);
                     receivedFiles = true;
+                  }
+                  // T6 follow-up: capture the planner-emitted BrandSpec
+                  // so the "Brand kit" affordance can deep-link to
+                  // /brand-kit?spec=<encoded> with the build's actual
+                  // palette + typography.
+                  if (event.brandSpec && typeof event.brandSpec === "object") {
+                    setBuildBrandSpec(event.brandSpec as typeof buildBrandSpec);
                   }
                   setGeneratedCode("<!-- react-app-mode -->");
                   setStatus("complete");
                   setBuildProgress(null);
                   receivedDone = true;
                   clearWatchdog();
+                  // Flywheel: build completed successfully — record metrics
+                  // for the consolidation cron to mine.
+                  captureFlywheelEvent(buildId, "build_complete", {
+                    componentsOk: typeof event.componentsOk === "number" ? event.componentsOk : undefined,
+                    qualityScore: typeof event.qualityScore === "number" ? event.qualityScore : undefined,
+                    cacheHitRate: typeof event.cacheHitRate === "number" ? event.cacheHitRate : undefined,
+                    durationMs: typeof event.durationMs === "number" ? event.durationMs : undefined,
+                  });
                   setSectionTimeline(prev => prev.map(s => s.status === "done" ? s : { ...s, status: "done", finishedAt: Date.now() }));
                   // Surface partial-fallback summary in the final pipeline log so the
                   // user knows some sections shipped as base templates (Law 8).
@@ -1172,6 +1344,33 @@ function BuilderPage() {
                   }
                   setPipelineAgents(prev => [...prev, "Build complete"]);
                   trackEvent("build");
+                  // Post-build smoke check — non-blocking. Fires the
+                  // server-side validator with the final file tree.
+                  // Surfaces import/syntax/entry-point issues BEFORE
+                  // the user stares at a blank preview wondering what
+                  // broke.
+                  if (event.files) {
+                    setValidating(true);
+                    fetch("/api/builds/validate", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ files: event.files }),
+                    })
+                      .then((r) => r.json())
+                      .then((v) => {
+                        if (v && typeof v.ok === "boolean") {
+                          setValidation(v);
+                          if (!v.ok) {
+                            setPipelineAgents((prev) => [...prev, `⚠ Smoke check: ${v.summary}`]);
+                          }
+                        }
+                      })
+                      .catch((err) => {
+                        console.warn("[builder] validate failed:", err);
+                      })
+                      .finally(() => setValidating(false));
+                  }
+                  // Launch-video side-effect removed 2026-05-26 (Rule 19).
                 }
               } else if (event.type === "warning") {
                 // Non-fatal in-flight warning (section-fallback, etc.) — show it
@@ -1185,6 +1384,16 @@ function BuilderPage() {
                 if (kind === "section-fallback") {
                   setStreamWarning(`One or more sections fell back to base templates — the LLM provider couldn't customise them.`);
                 }
+              } else if (event.type === "fallback") {
+                // 2026-05-26 fix: surface provider failover so the user knows
+                // when Anthropic became Sonnet, OpenAI, or Gemini mid-build.
+                // Was silent (server console.log only) — looked like Anthropic
+                // handled the whole request when actually OpenAI saved it.
+                const provider = event.provider || "alternate provider";
+                const model = event.model || "";
+                const section = event.section || "";
+                const where = section ? ` (${section})` : "";
+                setPipelineAgents(prev => [...prev, `↪ Switched to ${provider}${model ? ` / ${model}` : ""}${where}`]);
               } else if (event.type === "error") {
                 const msg = event.message || "Generation failed";
                 // Soft warnings ship with fatal:false. They mean "this step was
@@ -1249,6 +1458,7 @@ function BuilderPage() {
                 setBuildProgress(null);
                 setPipelineAgents(prev => [...prev, "Build complete"]);
                 trackEvent("build");
+                // Launch-video side-effect removed 2026-05-26 (Rule 19).
               } else if (event.type === "warning") {
                 const kind = event.kind || "warning";
                 const section = event.section || "";
@@ -1286,6 +1496,10 @@ function BuilderPage() {
         if ((err as Error).name === "AbortError") { clearWatchdog(); return; }
         const errMsg = err instanceof Error ? err.message : String(err);
         console.error("[React Generate] Failed:", errMsg);
+        // Flywheel: failure event for the consolidation cron to mine.
+        captureFlywheelEvent(buildId, "build_failed", {
+          message: errMsg.slice(0, 200),
+        });
         setGeneratedCode("");
         setReactFiles(null);
         setBuildProgress(null);
@@ -1297,13 +1511,51 @@ function BuilderPage() {
       }
       return;
     }
-  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection]);
+  }, [prompt, tier, autoReplaceImages, selectedModel, buildMode, instantMode, generationMode, fullStack, resetWatchdog, clearWatchdog, errorSuggestion, upsertSection, planReview, sitePlan, sitePlanLoading, authHeaders]);
 
-  // Edit existing React files via the same streaming endpoint
-  const handleEdit = useCallback(async () => {
-    if (!editPrompt.trim() || !reactFiles) return;
+  // Plan Mode (B12) callback handlers — used by the PlanReviewPanel.
+  const handlePlanConfirm = useCallback(() => {
+    // planReview is already set; handleGenerate's branching condition
+    // (!planReview) will be false → skips plan-fetch → proceeds directly
+    // to the slot-stream call with the confirmed plan in the body.
+    void handleGenerate();
+  }, [handleGenerate]);
 
-    const instruction = editPrompt.trim();
+  const handlePlanEdit = useCallback(() => {
+    setPlanReview(null);
+    // Focus the prompt textarea so the user can refine.
+    if (typeof document !== "undefined") {
+      const ta = document.querySelector<HTMLTextAreaElement>('textarea[name="prompt"]');
+      ta?.focus();
+    }
+  }, []);
+
+  const handlePlanCancel = useCallback(() => {
+    setPlanReview(null);
+    setStatus("idle");
+    setBuildProgress(null);
+  }, []);
+
+  const handlePlanClarify = useCallback(
+    (amb: import("@/components/PlanReviewPanel").PlanReviewPlan["ambiguities"][number]) => {
+      // Append the clarifying question to the prompt as an additional
+      // detail and re-fetch the plan. The user gets a refined plan
+      // without typing — single click cost.
+      const clarified = `${prompt.trim()}\n\nClarification — ${amb.clarifyingQuestion}: ${amb.currentDefault}`;
+      setPrompt(clarified);
+      setPlanReview(null);
+      void handleGenerate();
+    },
+    [prompt, handleGenerate],
+  );
+
+  // Edit existing React files via the same streaming endpoint. Core
+  // body extracted to runEditWith(instruction) so the Prompt Queue
+  // panel (T2) can fire edits sequentially without going through
+  // editPrompt state.
+  const runEditWith = useCallback(async (instruction: string): Promise<void> => {
+    if (!instruction.trim() || !reactFiles) return;
+
     setStatus("generating");
     setError("");
     setPipelineAgents([`Editing: ${instruction.slice(0, 60)}...`]);
@@ -1313,7 +1565,6 @@ function BuilderPage() {
     abortRef.current = controller;
 
     try {
-      // Use diff-based editing — only regenerate changed files (2-5s vs 30s)
       const res = await fetch("/api/generate/edit", {
         method: "POST",
         headers: authHeaders(),
@@ -1329,12 +1580,12 @@ function BuilderPage() {
         throw new Error(errData.error || `HTTP ${res.status}`);
       }
 
-      // Read SSE stream
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No response stream");
 
       const decoder = new TextDecoder();
       let lineBuffer = "";
+      let sawDone = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -1350,31 +1601,30 @@ function BuilderPage() {
             if (event.type === "status") {
               setPipelineAgents(prev => [...prev, event.message]);
             } else if (event.type === "partial" && event.files) {
-              // Merge changed files into existing files (diff-based)
               setReactFiles(prev => ({ ...prev, ...event.files }));
             } else if (event.type === "done" && event.files) {
-              // Merge ONLY the changed files — keep everything else
               setReactFiles(prev => {
                 const merged = { ...prev, ...event.files };
                 setReactSource(merged);
                 return merged;
               });
               setStatus("complete");
-              setEditPrompt("");
               setPipelineAgents(prev => [...prev, `Edit complete — ${event.changedCount || Object.keys(event.files).length} file(s) changed`]);
+              sawDone = true;
             } else if (event.type === "error") {
               throw new Error(event.message);
             }
           } catch (e) {
-            // Malformed JSON = partial SSE chunk or heartbeat line, skip.
-            // Anything else (including our own "throw new Error(event.message)"
-            // above and legitimate application errors) must propagate — otherwise
-            // the user stares at an unchanging Sandpack preview and never learns
-            // the edit failed (Law 8: no silent catches).
             if (e instanceof SyntaxError) continue;
             throw e;
           }
         }
+      }
+
+      // If the stream ended without a 'done' event, surface that
+      // instead of silently leaving the queue runner thinking success.
+      if (!sawDone) {
+        throw new Error("Edit stream ended without a done event");
       }
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
@@ -1382,8 +1632,25 @@ function BuilderPage() {
       console.error("[Edit] Failed:", errMsg);
       setError(cleanErrorMessage(errMsg));
       setStatus("error");
+      // Re-throw so the queue runner can mark this item as errored.
+      throw err;
     }
-  }, [editPrompt, reactFiles, tier, selectedModel]);
+  }, [reactFiles, authHeaders]);
+
+  // Manual single-shot edit (the Send button path). Calls
+  // runEditWith with the current editPrompt then clears it.
+  const handleEdit = useCallback(async () => {
+    if (!editPrompt.trim() || !reactFiles) return;
+    const instruction = editPrompt.trim();
+    try {
+      await runEditWith(instruction);
+      setEditPrompt("");
+    } catch {
+      // runEditWith already surfaced the error via setError; nothing
+      // more to do here.
+    }
+  }, [editPrompt, reactFiles, runEditWith]);
+
 
   const handleCodeUpdate = useCallback((newCode: string) => {
     setGeneratedCode(newCode);
@@ -1411,88 +1678,80 @@ function BuilderPage() {
     []
   );
 
-  /** Build the deployable HTML code from current state (React files or raw HTML) */
-  const buildDeployCode = useCallback((siteName: string): string | null => {
-    const files = reactFiles ?? {};
-    const hasReactFiles = Object.keys(files).length > 0;
-    const hasHtml = generatedCode && generatedCode !== "<!-- react-app-mode -->";
-
-    if (!hasReactFiles && !hasHtml) return null;
-
-    if (hasReactFiles && !hasHtml) {
-      // React mode: combine all files into a single deployable HTML page
-      const appCode = files["App.tsx"] || "";
-      const cssCode = files["styles.css"] || "";
-      const componentCodes = Object.entries(files)
-        .filter(([path]) => path.startsWith("components/") && path.endsWith(".tsx"))
-        .map(([path, code]) => {
-          const name = path.replace("components/", "").replace(".tsx", "");
-          return `// --- ${name} ---\n${code}`;
-        })
-        .join("\n\n");
-
-      return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${siteName}</title>
-  <script src="https://cdn.tailwindcss.com"><\/script>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"><\/script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"><\/script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
-  <style>${cssCode}</style>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="text/babel">
-${componentCodes}
-
-${appCode}
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(React.createElement(App));
-  <\/script>
-</body>
-</html>`;
+  /** Called by DeployModal when user confirms deploy.
+   *  Rule 31 — all deploy paths go through Crontech now. The provider
+   *  arg is retained for DeployModal compatibility but both options
+   *  resolve to /api/crontech/deploy (first deploy) or /api/crontech/update
+   *  (re-deploy when a crontechProjectId already exists). After the initial
+   *  POST, if Crontech returns status "provisioning" we poll
+   *  /api/crontech/status every 3s until it flips to "live" or "failed". */
+  const handleDeployWithName = useCallback(async (siteName: string, _provider: "zoobicon" | "crontech" = "crontech"): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
+    if (!reactFiles || Object.keys(reactFiles).length === 0) {
+      throw new Error("No files to deploy");
     }
-
-    return generatedCode;
-  }, [generatedCode, reactFiles]);
-
-  /** Called by DeployModal when user confirms deploy */
-  const handleDeployWithName = useCallback(async (siteName: string): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
-    const deployCode = buildDeployCode(siteName);
-    if (!deployCode) throw new Error("No code to deploy");
 
     setIsDeploying(true);
     setDeployStatus("deploying");
+    const t0 = Date.now();
 
     try {
-      const userStr = typeof window !== "undefined" ? localStorage.getItem("zoobicon_user") : null;
-      const user = userStr ? JSON.parse(userStr) : null;
-      const email = user?.email || "anonymous@zoobicon.com";
+      let data: { ok: boolean; projectId?: string; url: string; status: string; error?: string };
 
-      const res = await fetch("/api/hosting/deploy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: siteName, email, code: deployCode }),
-      });
+      if (crontechProjectId) {
+        // Re-deploy: PATCH the existing project instead of creating a new one.
+        const res = await fetch("/api/crontech/update", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projectId: crontechProjectId, files: reactFiles, deps: reactDeps }),
+          signal: AbortSignal.timeout(60_000),
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Re-deploy failed");
+      } else {
+        // First deploy: POST to create a new Crontech project.
+        // Prefer the saved Zoobicon projectId so Crontech has authoritative
+        // metadata. Fall back to inline files for anonymous builds.
+        const body = projectId
+          ? { projectId }
+          : { name: siteName, files: reactFiles, deps: reactDeps, prompt };
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Deploy failed");
+        const res = await fetch("/api/crontech/deploy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(60_000),
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Deploy failed");
       }
 
-      const data = await res.json();
-      setDeployUrl(data.url);
+      // Save the Crontech project ID for future re-deploys.
+      if (data.projectId) setCrontechProjectId(data.projectId);
+
+      // Poll until Crontech flips from "provisioning" to "live".
+      let liveUrl = data.url;
+      if (data.status === "provisioning" && data.projectId) {
+        const maxWait = 60_000;
+        const interval = 3_000;
+        const start = Date.now();
+        while (Date.now() - start < maxWait) {
+          await new Promise(r => setTimeout(r, interval));
+          const poll = await fetch(`/api/crontech/status?projectId=${encodeURIComponent(data.projectId)}`)
+            .then(r => r.json())
+            .catch(() => null);
+          if (!poll) continue;
+          if (poll.status === "live") { liveUrl = poll.url || liveUrl; break; }
+          if (poll.status === "failed") throw new Error("Crontech deploy failed during provisioning");
+        }
+      }
+
+      setDeployUrl(liveUrl);
       setDeployStatus("deployed");
-
-      // Track deploy achievement + send notification
       trackEvent("deploy");
-      notifyDeploy(siteName, data.url);
+      notifyDeploy(siteName, liveUrl);
 
-      return { url: data.url, slug: data.siteSlug, deployTimeMs: data.deployTimeMs };
+      const slug = (liveUrl || "").replace(/^https?:\/\//, "").split(".")[0] || siteName;
+      return { url: liveUrl, slug, deployTimeMs: Date.now() - t0 };
     } catch (err) {
       setError(err instanceof Error ? err.message : "Deploy failed");
       setDeployStatus("error");
@@ -1500,7 +1759,7 @@ root.render(React.createElement(App));
     } finally {
       setIsDeploying(false);
     }
-  }, [buildDeployCode]);
+  }, [reactFiles, reactDeps, projectId, prompt, crontechProjectId]);
 
   /** Quick deploy handler for inline button and BuildSuccessModal */
   const handleDeploy = useCallback(() => {
@@ -1637,7 +1896,7 @@ root.render(React.createElement(App));
       case "crawl":
         return (
           <div className="flex flex-col gap-4 p-4">
-            <p className="text-xs text-white/50 leading-relaxed">
+            <p className="text-xs text-[var(--ink-secondary)] leading-relaxed">
               Crawl a competitor&apos;s website to detect their tech stack, features, and design patterns.
               Use insights to build something better.
             </p>
@@ -1664,7 +1923,7 @@ root.render(React.createElement(App));
   /* ─── Recording Mode: fullscreen preview only ─── */
   if (recordingMode) {
     return (
-      <div className="h-screen w-screen bg-[#0b1530] relative overflow-hidden">
+      <div className="h-screen w-screen bg-[var(--paper)] relative overflow-hidden">
         {/* Minimal recording chrome — press Escape to exit */}
         <div className="absolute top-3 right-3 z-50 flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-500/20 border border-stone-500/40 text-stone-400 text-xs font-semibold animate-pulse">
@@ -1682,28 +1941,36 @@ root.render(React.createElement(App));
         {/* Pipeline status overlay — shows during generation with progress bar */}
         {status === "generating" && pipelineAgents.length > 0 && (
           <div className="absolute bottom-6 left-6 right-6 z-40">
-            <div className="max-w-xl mx-auto px-5 py-3 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/[0.08] shadow-2xl">
+            <div className="max-w-2xl mx-auto px-5 py-3 rounded-2xl shadow-lg" style={{ background: "var(--paper-elevated)", border: "1px solid var(--rule)" }}>
+              {/* Six-agent orb row — derives the active agent by
+                  keyword-matching the latest log line. No new
+                  server-side state required. */}
+              <AgentOrbsRow
+                latestMessage={pipelineAgents[pipelineAgents.length - 1] || null}
+                componentsDone={buildProgress?.current}
+                componentsTotal={buildProgress?.total}
+              />
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-stone-500 animate-pulse flex-shrink-0" />
-                <span className="text-sm text-white/80 font-medium truncate">
+                <div className="w-2.5 h-2.5 rounded-full animate-pulse flex-shrink-0" style={{ background: "var(--gold)" }} />
+                <span className="text-sm font-medium truncate" style={{ color: "var(--ink)" }}>
                   {pipelineAgents[pipelineAgents.length - 1]}
                 </span>
                 {buildProgress && buildProgress.total > 0 && (
-                  <span className="text-xs text-white/40 ml-auto flex-shrink-0">
+                  <span className="text-xs ml-auto flex-shrink-0" style={{ color: "var(--ink-muted)" }}>
                     {buildProgress.current}/{buildProgress.total}
                   </span>
                 )}
               </div>
               {buildProgress && buildProgress.total > 0 && (
-                <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: "var(--rule)" }}>
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-stone-500 to-stone-500 transition-all duration-500 ease-out"
-                    style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%` }}
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{ width: `${Math.round((buildProgress.current / buildProgress.total) * 100)}%`, background: "var(--gold)" }}
                   />
                 </div>
               )}
               {streamWarning && (
-                <div className="flex items-center gap-2 text-[10px] text-stone-400 mt-2">
+                <div className="flex items-center gap-2 text-[10px] mt-2" style={{ color: "var(--ink-muted)" }}>
                   <AlertTriangle className="w-3 h-3" />
                   <span>{streamWarning}</span>
                 </div>
@@ -1715,12 +1982,12 @@ root.render(React.createElement(App));
                     return (
                       <div key={s.section} className="flex items-center gap-2 text-[10px]">
                         {s.status === "done" ? (
-                          <Check className="w-3 h-3 text-stone-400 flex-shrink-0" />
+                          <Check className="w-3 h-3 flex-shrink-0" style={{ color: "var(--gold)" }} />
                         ) : (
-                          <span className="w-2 h-2 rounded-full bg-stone-500 animate-pulse flex-shrink-0" />
+                          <span className="w-2 h-2 rounded-full animate-pulse flex-shrink-0" style={{ background: "var(--gold)" }} />
                         )}
-                        <span className={s.status === "done" ? "text-white/60" : "text-white/90"}>{s.label}</span>
-                        {elapsed && <span className="text-white/30 ml-auto tabular-nums">{elapsed}s</span>}
+                        <span style={{ color: s.status === "done" ? "var(--ink-muted)" : "var(--ink)" }}>{s.label}</span>
+                        {elapsed && <span className="ml-auto tabular-nums" style={{ color: "var(--ink-muted)" }}>{elapsed}s</span>}
                       </div>
                     );
                   })}
@@ -1732,22 +1999,87 @@ root.render(React.createElement(App));
 
         {buildError && (
           <div className="absolute top-16 left-6 right-6 z-50">
-            <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl bg-stone-950/90 backdrop-blur-xl border border-stone-500/40 shadow-2xl">
+            <div className="max-w-2xl mx-auto px-4 py-3 rounded-xl shadow-lg" style={{ background: "var(--paper-elevated)", border: "1px solid var(--rule)" }}>
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-stone-400 flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: "var(--gold-deep)" }} />
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-stone-200">{buildError.message}</div>
-                  <div className="text-xs text-stone-300/80 mt-0.5">{buildError.suggestion}</div>
+                  <div className="text-sm font-semibold" style={{ color: "var(--ink)" }}>{buildError.message}</div>
+                  <div className="text-xs mt-0.5" style={{ color: "var(--ink-muted)" }}>{buildError.suggestion}</div>
                 </div>
                 <button
                   onClick={() => { setBuildError(null); handleGenerate(); }}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-500/20 hover:bg-stone-500/30 text-xs text-stone-100 border border-stone-500/40 transition"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs transition"
+                  style={{ background: "var(--ink)", color: "var(--paper)", border: "none" }}
                 >
                   <RotateCcw className="w-3 h-3" /> Retry
                 </button>
                 <button
                   onClick={() => setBuildError(null)}
-                  className="p-1.5 rounded-lg hover:bg-stone-500/20 text-stone-300 transition"
+                  className="p-1.5 rounded-lg transition"
+                  aria-label="Dismiss"
+                  style={{ color: "var(--ink-muted)" }}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Post-build smoke check banner — shown only when the server
+            validator found real issues. The preview still mounts (so
+            the user can see what DID render), but they get a clear
+            list of what's broken before they wonder if the iframe is
+            just slow. Phase 1: static-analysis issues only. Phase 2
+            adds runtime errors via headless Chrome. */}
+        {validation && !validation.ok && validation.issues.length > 0 && (
+          <div className="absolute top-16 left-6 right-6 z-40">
+            <div
+              className="max-w-2xl mx-auto rounded-xl border p-4 shadow-lg"
+              style={{
+                background: "var(--paper-elevated)",
+                borderColor: "var(--rule)",
+                color: "var(--ink)",
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                  style={{ background: "var(--gold-soft)", color: "var(--gold-deep)" }}
+                >
+                  !
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+                    Smoke check found {validation.issues.filter(i => i.severity === "error").length} error{validation.issues.filter(i => i.severity === "error").length === 1 ? "" : "s"}
+                  </div>
+                  <div className="text-[12px]" style={{ color: "var(--ink-muted)" }}>
+                    {validation.summary}
+                  </div>
+                  <ul className="mt-2 space-y-1.5 max-h-40 overflow-auto">
+                    {validation.issues.slice(0, 6).map((issue, i) => (
+                      <li
+                        key={`${issue.file}-${i}`}
+                        className="text-[11px] font-mono leading-snug"
+                        style={{
+                          color: issue.severity === "error" ? "#9a1f1f" : "var(--ink-secondary)",
+                        }}
+                      >
+                        <span style={{ opacity: 0.6 }}>{issue.file}{issue.line ? `:${issue.line}` : ""}</span>{" "}
+                        <span style={{ color: "var(--ink)" }}>{issue.message}</span>
+                      </li>
+                    ))}
+                    {validation.issues.length > 6 && (
+                      <li className="text-[11px]" style={{ color: "var(--ink-muted)" }}>
+                        … and {validation.issues.length - 6} more
+                      </li>
+                    )}
+                  </ul>
+                </div>
+                <button
+                  onClick={() => setValidation(null)}
+                  className="p-1.5 rounded-lg transition"
+                  style={{ color: "var(--ink-muted)" }}
                   aria-label="Dismiss"
                 >
                   <X className="w-4 h-4" />
@@ -1760,18 +2092,114 @@ root.render(React.createElement(App));
         {/* Fullscreen preview */}
         <PreviewSwitcher
           useWebContainers={useWebContainers}
+          useEscapeHatch={useEscapeHatch}
           onWebContainersFail={handleWebContainersFail}
           files={reactFiles || {}}
           reactDeps={reactDeps}
+          onDownload={() => {
+            // Fallback when Sandpack's bundler service times out
+            // (codesandbox.io infra). The user's build is fine — just
+            // hand them the file tree as a ZIP so they're not stuck.
+            const files = reactFiles || {};
+            const entries = Object.entries(files).map(([path, content]) => ({
+              path: path.replace(/^\/+/, ""),
+              content,
+            }));
+            if (entries.length === 0) return;
+            const slug = (projectName || prompt.slice(0, 40) || "zoobicon-build")
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-+|-+$/g, "")
+              .slice(0, 50);
+            downloadZip(entries, slug);
+          }}
         />
+        {/* Launch-video polaroid removed 2026-05-26 (Rule 19 retired). */}
         {isAdmin && (
-          <button
-            type="button"
-            onClick={() => setUseWebContainers((v) => !v)}
-            className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
-          >
-            Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
-          </button>
+          <div className="absolute top-2 right-2 z-50 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setAdminPrivate((v) => !v)}
+              className={`px-2 py-1 text-[10px] rounded border ${
+                adminPrivate
+                  ? "bg-amber-500/90 text-black border-amber-400"
+                  : "bg-black/70 text-white border-white/20"
+              }`}
+              title={
+                adminPrivate
+                  ? "This build is private — only you (admin) can see it. Click to make it public."
+                  : "This build is public — anyone can see it in showcase/gallery. Click to make it admin-private."
+              }
+            >
+              {adminPrivate ? "🔒 Admin Private" : "🌐 Public"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window === "undefined") return;
+                const url = new URL(window.location.href);
+                const isFull = url.searchParams.get("siteMode") === "full";
+                if (isFull) url.searchParams.delete("siteMode");
+                else url.searchParams.set("siteMode", "full");
+                window.history.replaceState({}, "", url.toString());
+                // Soft re-render — toggle a state to force the prompt
+                // path to re-read the URL on next submit.
+                setSitePlan(null);
+              }}
+              className="px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
+              title={
+                typeof window !== "undefined" && new URLSearchParams(window.location.search).get("siteMode") === "full"
+                  ? "Full-Site Mode ON — next prompt fetches a multi-page plan for review"
+                  : "Click to enable Full-Site Mode (multi-page plan + review before build)"
+              }
+            >
+              {typeof window !== "undefined" && new URLSearchParams(window.location.search).get("siteMode") === "full"
+                ? "🌐 Full-Site ON"
+                : "📄 Single-page"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setUseWebContainers((v) => !v)}
+              className="px-2 py-1 text-[10px] rounded bg-black/70 text-white border border-white/20"
+            >
+              Preview: {useWebContainers ? "WebContainers" : "Sandpack"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setUseEscapeHatch((v) => {
+                  const next = !v;
+                  try {
+                    localStorage.setItem("zoobicon_use_escape_hatch", next ? "1" : "0");
+                  } catch { /* sessionStorage disabled */ }
+                  return next;
+                });
+              }}
+              className={`px-2 py-1 text-[10px] rounded border ${
+                useEscapeHatch
+                  ? "bg-amber-500/90 text-black border-amber-400"
+                  : "bg-black/70 text-white border-white/20"
+              }`}
+              title={
+                useEscapeHatch
+                  ? "Direct preview ON — bypassing Sandpack's bundler. Reliable but no hot-reload."
+                  : "Click to bypass Sandpack and use the direct in-browser preview. Use this when Sandpack times out."
+              }
+            >
+              {useEscapeHatch ? "🪂 Direct preview" : "📦 Sandpack"}
+            </button>
+            {buildBrandSpec && (
+              <a
+                href={`/brand-kit?spec=${typeof window !== "undefined" ? btoa(JSON.stringify(buildBrandSpec)) : ""}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-2 py-1 text-[10px] rounded border bg-gradient-to-r from-amber-500/90 to-yellow-600/90 text-black border-amber-400 font-semibold hover:from-amber-400 hover:to-yellow-500 transition-all"
+                title="Open the brand kit for this build — favicon, OG card, business card, email signature, all derived from the planner's BrandSpec."
+              >
+                ✨ Brand kit
+              </a>
+            )}
+          </div>
         )}
 
         {/* Prompt input overlay at bottom — for recording demo sequences */}
@@ -1787,23 +2215,62 @@ root.render(React.createElement(App));
                 placeholder="Describe the website you want to build..."
                 className="flex-1 bg-transparent text-white text-base placeholder-white/50 outline-none"
               />
-              <button
-                onClick={() => setBuildMode(buildMode === "instant" ? "deep" : buildMode === "deep" ? "pipeline" : "instant")}
-                className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
-                  buildMode === "pipeline"
-                    ? "bg-violet-500/20 border-violet-500/40 text-violet-300"
-                    : buildMode === "deep"
-                    ? "bg-stone-500/10 border-stone-500/30 text-stone-400"
-                    : "bg-stone-500/10 border-stone-500/30 text-stone-400"
-                }`}
-                title={
-                  buildMode === "instant" ? "Quick Build: <3s preview from component library (free tier)" :
-                  buildMode === "deep" ? "Deep Build: full AI generation with Opus (~30s)" :
-                  "Full Build: 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)"
-                }
+              {/* Quality mode — segmented toggle. CLAUDE.md NEXT ACTION
+                  said "expose Quality mode toggle in builder UI (Sonnet
+                  vs deep pipeline)." The previous single-cycle button
+                  hid two of the three modes from view; this version
+                  makes all three speed/quality tradeoffs visible at a
+                  glance with the active segment lit in gold + a latency
+                  subtitle. */}
+              <div
+                className="flex items-center gap-0 rounded-xl p-0.5"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+                title="Quality mode — pick speed vs depth"
               >
-                {buildMode === "instant" ? "Quick" : buildMode === "deep" ? "Deep" : "Full Build"}
-              </button>
+                {([
+                  { id: "instant", label: "Quick", sub: "<3s" },
+                  { id: "deep", label: "Deep", sub: "~30s" },
+                  { id: "pipeline", label: "Full", sub: "~90s" },
+                ] as const).map((m) => {
+                  const active = buildMode === m.id;
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => setBuildMode(m.id)}
+                      className="flex flex-col items-center px-2.5 py-1 rounded-[10px] transition-all"
+                      style={{
+                        background: active
+                          ? "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)"
+                          : "transparent",
+                        color: active ? "#ffffff" : "rgba(255,255,255,0.5)",
+                        boxShadow: active
+                          ? "0 2px 8px -2px rgba(140,107,37,0.45), inset 0 1px 0 0 rgba(255,255,255,0.25)"
+                          : "none",
+                      }}
+                      title={
+                        m.id === "instant"
+                          ? "Quick: registry assembly + Sonnet customization (<3s preview, ~10s total)"
+                          : m.id === "deep"
+                          ? "Deep: Sonnet generates everything from scratch (~30s)"
+                          : "Full: 7-agent pipeline — Strategist, Brand, Copy, Architect, Developer, SEO, Animation (~90s, Pro+)"
+                      }
+                    >
+                      <span className="text-[10px] font-semibold uppercase tracking-wider leading-none">
+                        {m.label}
+                      </span>
+                      <span
+                        className="text-[8px] font-mono leading-none mt-0.5"
+                        style={{ opacity: active ? 0.85 : 0.6 }}
+                      >
+                        {m.sub}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
               <button
                 onClick={() => setFullStack(!fullStack)}
                 className={`px-3 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-wider transition-all border ${
@@ -1816,6 +2283,7 @@ root.render(React.createElement(App));
                 <Database size={12} className="inline mr-1" />
                 {fullStack ? "Full-Stack" : "Frontend"}
               </button>
+              {/* Launch-video toggle removed 2026-05-26 (Rule 19 retired). */}
               <button
                 onClick={handleGenerate}
                 disabled={!prompt.trim() || status === "generating"}
@@ -1831,10 +2299,198 @@ root.render(React.createElement(App));
   }
 
   return (
-    <div className="flex flex-col h-screen bg-zinc-950 relative overflow-hidden">
+    <div
+      className="builder-editorial flex flex-col h-screen relative overflow-hidden"
+      style={{ background: "var(--paper)" }}
+    >
+      {/* Pre-warm the esm.sh HTTP cache the moment the builder page loads.
+          This cuts EscapeHatchPreview's first-render latency from ~3-5s
+          (cold Babel + React fetch) to ~100ms (cache hit). */}
+      <PrewarmFrame />
       {/* Welcome modal for first-time users */}
       {showWelcome && (
         <WelcomeModal onClose={() => { setShowWelcome(false); dismissWelcomeModal(); setTimeout(() => { if (shouldShowTour()) setShowTour(true); }, 500); }} />
+      )}
+
+      {/* Plan Mode review (B12) — sits between prompt submission and the
+          expensive build. Renders only when planReview is set. */}
+      {planReview && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center p-6"
+          style={{ background: "rgba(10, 10, 11, 0.45)", backdropFilter: "blur(8px)" }}
+        >
+          <PlanReviewPanel
+            plan={planReview}
+            onConfirm={handlePlanConfirm}
+            onEdit={handlePlanEdit}
+            onCancel={handlePlanCancel}
+            onClarify={handlePlanClarify}
+          />
+        </div>
+      )}
+
+      {/* Full-Site Mode review — multi-page plan. Renders when sitePlan
+          is set. Approve triggers the parallel build orchestrator via
+          /api/generate/site-build (SSE), which emits per-page progress
+          + a final merged file tree that drops into Sandpack. */}
+      {sitePlan && (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center p-6 overflow-y-auto"
+          style={{ background: "rgba(10, 10, 11, 0.45)", backdropFilter: "blur(8px)" }}
+        >
+          <SitePlanPanel
+            plan={sitePlan.plan}
+            source={sitePlan.source}
+            modelUsed={sitePlan.modelUsed}
+            onCancel={() => setSitePlan(null)}
+            onApprove={async (approvedPlan) => {
+              // Hand the approved (possibly edited) plan to the parallel
+              // orchestrator. The orchestrator streams per-page progress
+              // + a final merged file tree. Errors surface via the
+              // standard streamWarning / buildError channels.
+              const planToBuild = approvedPlan;
+              setSitePlan(null);
+              setStatus("generating");
+              setError("");
+              setGeneratedCode("");
+              setReactFiles(null);
+              setReactDeps({});
+              setReactSource(null);
+              setActiveTab("preview");
+              setPipelineAgents([`Full-Site Mode: building ${planToBuild.pages.length} pages in parallel…`]);
+              setBuildProgress({ current: 0, total: planToBuild.meta.componentCount, section: "" });
+              setSectionTimeline([]);
+              setBuildError(null);
+              setStreamWarning(null);
+
+              abortRef.current?.abort();
+              const controller = new AbortController();
+              abortRef.current = controller;
+
+              try {
+                const res = await fetch("/api/generate/site-build", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", ...authHeaders() },
+                  body: JSON.stringify({ plan: planToBuild }),
+                  signal: controller.signal,
+                });
+                if (!res.ok) {
+                  const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+                  throw new Error(errData.error || `HTTP ${res.status}`);
+                }
+                const reader = res.body?.getReader();
+                if (!reader) throw new Error("No response stream");
+                const decoder = new TextDecoder();
+                let lineBuffer = "";
+                let receivedDone = false;
+                let pagesDone = 0;
+                let sectionsDone = 0;
+                while (true) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
+                  lineBuffer += decoder.decode(value, { stream: true });
+                  const lines = lineBuffer.split("\n");
+                  lineBuffer = lines.pop() || "";
+                  for (const line of lines) {
+                    if (!line.startsWith("data: ")) continue;
+                    const jsonStr = line.slice(6).trim();
+                    if (!jsonStr) continue;
+                    try {
+                      const event = JSON.parse(jsonStr);
+                      if (event.type === "phase") {
+                        setPipelineAgents(prev => [...prev, event.message]);
+                      } else if (event.type === "page") {
+                        if (event.status === "building") {
+                          setPipelineAgents(prev => [...prev, `Building page: ${event.name} (${event.slug})…`]);
+                        } else if (event.status === "done") {
+                          pagesDone++;
+                          setPipelineAgents(prev => [...prev, `✓ Page complete: ${event.name}`]);
+                        } else if (event.status === "failed") {
+                          setStreamWarning(`Page ${event.slug} failed: ${event.error || "unknown"}`);
+                        }
+                      } else if (event.type === "section") {
+                        sectionsDone++;
+                        setBuildProgress({
+                          current: sectionsDone,
+                          total: planToBuild.meta.componentCount,
+                          section: `${event.pageSlug} · ${event.category}`,
+                        });
+                      } else if (event.type === "files" && event.files) {
+                        // Progressive: show the current state in Sandpack.
+                        setReactFiles(event.files);
+                        setGeneratedCode("<!-- react-app-mode -->");
+                      } else if (event.type === "done") {
+                        receivedDone = true;
+                        if (event.files) {
+                          setReactFiles(event.files);
+                          setReactDeps(event.dependencies || {});
+                          setReactSource(event.files);
+                          setGeneratedCode("<!-- react-app-mode -->");
+                        }
+                        setPipelineAgents(prev => [
+                          ...prev,
+                          `Site complete — ${event.pageCount}/${event.totalPages} pages in ${Math.round((event.durationMs || 0) / 1000)}s`,
+                        ]);
+                        if (Array.isArray(event.failedSections) && event.failedSections.length > 0) {
+                          setStreamWarning(
+                            `${event.failedSections.length} section(s) fell back to base component. Build is still usable.`,
+                          );
+                        }
+                        setStatus("complete");
+                        setBuildProgress(null);
+                        trackEvent("build");
+                      } else if (event.type === "error") {
+                        if (event.fatal === false) {
+                          setStreamWarning(cleanErrorMessage(event.message || ""));
+                        } else {
+                          throw new Error(event.message || "Multi-page build failed");
+                        }
+                      }
+                    } catch (e) {
+                      if (e instanceof SyntaxError) continue;
+                      throw e;
+                    }
+                  }
+                }
+                if (!receivedDone) {
+                  setStreamWarning("Stream ended without a done event — showing what arrived.");
+                  setStatus("complete");
+                }
+              } catch (err) {
+                if ((err as Error).name === "AbortError") return;
+                const msg = err instanceof Error ? err.message : String(err);
+                console.error("[site-build] failed:", msg);
+                const cleaned = cleanErrorMessage(msg);
+                setError(cleaned);
+                setBuildError({ message: cleaned, suggestion: errorSuggestion(msg) });
+                setStatus("error");
+                setBuildProgress(null);
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {/* Full-Site plan-loading toast */}
+      {sitePlanLoading && !sitePlan && (
+        <div
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-[81] px-4 py-2 rounded-full text-xs font-medium shadow-lg"
+          style={{ background: "var(--ink)", color: "var(--paper)" }}
+        >
+          Planning your site…
+        </div>
+      )}
+
+      {/* Plan-loading toast — quick feedback while the cheap pre-flight
+          runs. Stays visible <1s on healthy network. */}
+      {planLoading && !planReview && (
+        <div
+          className="fixed bottom-6 right-6 z-[70] rounded-xl px-4 py-3 text-sm shadow-lg"
+          style={{ background: "var(--paper-elevated)", border: "1px solid var(--gold)", color: "var(--ink)" }}
+        >
+          <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full" style={{ background: "var(--gold-deep)" }} />
+          Reviewing your plan before building…
+        </div>
       )}
       {showOnboarding && (
         <OnboardingFlow onComplete={(prompt) => {
@@ -1859,23 +2515,59 @@ root.render(React.createElement(App));
       {/* Interactive particle constellation background */}
       <BuilderBackground isGenerating={status === "generating"} />
 
-      {/* ── Top Bar ── minimal, dark, premium */}
-      <div className="relative z-10 flex items-center h-12 border-b border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl px-3 gap-3">
+      {/* ── Top Bar ── editorial-light, matches site header */}
+      <div
+        className="relative z-10 flex items-center h-12 px-3 gap-3"
+        style={{
+          background: "rgba(250, 249, 244, 0.94)",
+          borderBottom: "1px solid var(--rule)",
+          backdropFilter: "blur(12px) saturate(140%)",
+          WebkitBackdropFilter: "blur(12px) saturate(140%)",
+        }}
+      >
         {/* Logo + branding */}
         <Link href="/" className="flex items-center gap-2 mr-2 group">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-stone-600 to-stone-600 flex items-center justify-center shadow-lg shadow-stone-500/20 group-hover:shadow-stone-500/40 transition-shadow">
-            <Sparkles className="w-3.5 h-3.5 text-white" />
+          <div
+            className="relative w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-[1.04]"
+            style={{
+              background: "var(--paper)",
+              border: "1.5px solid var(--gold)",
+              boxShadow: "0 2px 6px -2px rgba(140,107,37,0.18), inset 0 0 0 2px var(--paper)",
+            }}
+          >
+            <span
+              className="text-[14px] leading-none"
+              style={{
+                fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+                fontStyle: "italic",
+                fontWeight: 600,
+                color: "var(--ink)",
+                marginTop: "1px",
+              }}
+            >
+              Z
+            </span>
           </div>
-          <span className="text-sm font-semibold text-white/80 hidden sm:inline">Zoobicon</span>
+          <span
+            className="text-sm hidden sm:inline"
+            style={{
+              fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
+              fontWeight: 500,
+              color: "var(--ink)",
+              letterSpacing: "0.005em",
+            }}
+          >
+            Zoobicon
+          </span>
         </Link>
 
         {/* Divider */}
-        <div className="w-px h-5 bg-white/[0.08]" />
+        <div className="w-px h-5 bg-[var(--rule)]" />
 
         {/* Project name / status */}
         <div className="flex items-center gap-2 min-w-0">
           {hasCode && (
-            <span className="text-xs text-white/40 truncate max-w-[200px]">
+            <span className="text-xs text-[var(--ink-muted)] truncate max-w-[200px]">
               {prompt.trim().slice(0, 40) || "Untitled Project"}
             </span>
           )}
@@ -1906,7 +2598,7 @@ root.render(React.createElement(App));
               onClick={handleUndo}
               disabled={!canUndo}
               title="Undo (Ctrl+Z)"
-              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <Undo2 size={14} />
             </button>
@@ -1914,7 +2606,7 @@ root.render(React.createElement(App));
               onClick={handleRedo}
               disabled={!canRedo}
               title="Redo (Ctrl+Shift+Z)"
-              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <Redo2 size={14} />
             </button>
@@ -1922,9 +2614,54 @@ root.render(React.createElement(App));
               onClick={() => setShowDiffPanel(true)}
               disabled={snapshots.length < 2}
               title="Version History"
-              className="p-1.5 rounded-md text-white/40 hover:text-white/70 hover:bg-white/[0.06] transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <History size={14} />
+            </button>
+            {/* Sprint 4 T9 — Share / Fork. Persists the full file
+                state to /api/share/create and copies the resulting
+                /share/<code> URL. Recipient sees the exact same
+                generated site (not a fresh re-generation). Falls back
+                to the prompt-only URL if persistence fails (e.g. DB
+                offline). */}
+            <button
+              onClick={async () => {
+                const fallback = () => {
+                  const u = new URL(window.location.href);
+                  if (prompt) u.searchParams.set("prompt", prompt);
+                  u.searchParams.set("from", "share");
+                  return u.toString();
+                };
+                let shareUrl = fallback();
+                try {
+                  if (reactFiles && Object.keys(reactFiles).length > 0) {
+                    const res = await fetch("/api/share/create", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        prompt: prompt || "(no prompt)",
+                        files: reactFiles,
+                      }),
+                    });
+                    if (res.ok) {
+                      const data = (await res.json()) as { ok: boolean; url?: string };
+                      if (data.ok && data.url) shareUrl = data.url;
+                    }
+                  }
+                } catch {
+                  // Network / DB error — fall through to prompt-only URL
+                }
+                try {
+                  await navigator.clipboard.writeText(shareUrl);
+                  alert("Share link copied to clipboard");
+                } catch {
+                  window.prompt("Copy share link:", shareUrl);
+                }
+              }}
+              title="Share / fork — copy a link to this build"
+              className="p-1.5 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all"
+            >
+              <Share2 size={14} />
             </button>
           </div>
         )}
@@ -1951,7 +2688,7 @@ root.render(React.createElement(App));
                   window.open("/builder/ide", "_blank");
                 }}
                 title="Open full code editor"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border border-white/[0.06]"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-[var(--paper-elevated)] text-[var(--ink-secondary)] hover:text-[var(--ink)] hover:bg-stone-100 border border-[var(--rule)]"
               >
                 <Code2 size={13} />
                 <span className="hidden sm:inline">IDE</span>
@@ -1961,8 +2698,8 @@ root.render(React.createElement(App));
                 title="Push to GitHub"
                 className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
                   activeTool === "github-sync"
-                    ? "bg-white/[0.08] text-white/80 border-white/[0.12]"
-                    : "bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border-white/[0.06]"
+                    ? "bg-stone-100 text-[var(--ink)] border-stone-300"
+                    : "bg-[var(--paper-elevated)] text-[var(--ink-secondary)] hover:text-[var(--ink)] hover:bg-stone-100 border-[var(--rule)]"
                 }`}
               >
                 <GitBranchPlus size={13} />
@@ -1972,18 +2709,31 @@ root.render(React.createElement(App));
                 onClick={handleSaveTemplate}
                 disabled={saveStatus === "saving"}
                 title="Save as reusable template"
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-white/[0.05] text-white/50 hover:text-white/70 hover:bg-white/[0.08] border border-white/[0.06]"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all bg-[var(--paper-elevated)] text-[var(--ink-secondary)] hover:text-[var(--ink)] hover:bg-stone-100 border border-[var(--rule)]"
               >
                 {saveStatus === "saved" ? <Check size={13} className="text-stone-400" /> : <Save size={13} />}
                 <span className="hidden sm:inline">{saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}</span>
               </button>
+              {/* Advanced mode toggle in top bar — visible before and after build */}
+              <button
+                onClick={() => setAdvancedMode(m => !m)}
+                title={advancedMode ? "Switch to simple mode" : "Show advanced tools"}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all border ${
+                  advancedMode
+                    ? "border-stone-300 text-stone-700 bg-stone-100"
+                    : "border-stone-200 text-stone-500 hover:text-stone-700 hover:bg-stone-50"
+                }`}
+              >
+                <Wand2 size={13} />
+                <span className="hidden sm:inline">{advancedMode ? "Simple" : "Advanced"}</span>
+              </button>
               <button
                 onClick={() => setShowDeployModal(true)}
                 disabled={isDeploying}
-                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[11px] font-semibold transition-all border ${
                   isDeploying
-                    ? "bg-stone-500/10 text-stone-300/50 cursor-wait border border-stone-500/20"
-                    : "bg-gradient-to-r from-stone-600 to-stone-600 text-white hover:from-stone-500 hover:to-stone-500 shadow-lg shadow-stone-500/25 hover:shadow-stone-500/40 border border-stone-400/20"
+                    ? "border-[var(--rule)] text-[var(--ink-muted)] cursor-wait bg-[var(--paper-elevated)]"
+                    : "bg-[var(--ink)] hover:bg-[var(--ink-secondary)] text-[var(--paper)] border-[var(--ink)]"
                 }`}
               >
                 <Rocket size={13} className={isDeploying ? "animate-pulse" : ""} />
@@ -2008,7 +2758,7 @@ root.render(React.createElement(App));
 
       <div className="flex flex-1 overflow-hidden relative z-10">
         {/* ── Left Panel — Chat / Prompt ── */}
-        <div className="w-[380px] min-w-[320px] flex flex-col border-r border-white/[0.06] bg-zinc-950/60 backdrop-blur-xl">
+        <div className="w-[380px] min-w-[320px] flex flex-col" style={{ background: "var(--paper-bright)", borderRight: "1px solid var(--rule)", borderLeft: "1px solid var(--rule)" }}>
           <AnimatePresence mode="wait">
             {!hasCode ? (
               <motion.div
@@ -2020,30 +2770,30 @@ root.render(React.createElement(App));
                 className="flex flex-col h-full"
               >
                 {/* Panel header */}
-                <div className="px-4 py-3 border-b border-white/[0.06]">
+                <div className="px-4 py-3 border-b border-[var(--rule)]">
                   {generatorBanner ? (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-stone-600 to-stone-700 flex items-center justify-center">
+                        <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "var(--gold)", }}>
                           <Sparkles className="w-3 h-3 text-white" />
                         </div>
-                        <span className="text-xs font-semibold text-white/80">
+                        <span className="text-xs font-semibold text-[var(--ink)]">
                           {generatorBanner.name}
                         </span>
                       </div>
                       <button
                         onClick={() => setGeneratorBanner(null)}
-                        className="text-white/30 hover:text-white/50 text-xs transition-colors"
+                        className="text-[var(--ink-muted)] hover:text-[var(--ink)] text-xs transition-colors"
                       >
                         <X size={14} />
                       </button>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-stone-500/15 to-stone-600/15 border border-stone-500/10 flex items-center justify-center">
-                        <MessageSquare className="w-3 h-3 text-stone-400" />
+                      <div className="w-6 h-6 rounded-lg border border-[var(--rule)] flex items-center justify-center" style={{ background: "var(--paper-elevated)" }}>
+                        <MessageSquare className="w-3 h-3 text-[var(--ink-muted)]" />
                       </div>
-                      <span className="text-xs font-medium text-white/50">
+                      <span className="text-xs font-medium text-[var(--ink-secondary)]">
                         AI Website Builder
                       </span>
                     </div>
@@ -2052,17 +2802,48 @@ root.render(React.createElement(App));
 
                 {/* Context import strip */}
                 {mcpContext && (
-                  <div className="px-4 py-1.5 border-b border-white/[0.04] flex items-center gap-2 bg-stone-500/[0.03]">
-                    <span className="text-[10px] text-stone-400/70">Context imported</span>
-                    <button onClick={() => setActiveTool("mcp")} className="text-[10px] text-stone-400/50 hover:text-stone-400 transition-colors">Manage</button>
+                  <div className="px-4 py-1.5 border-b border-[var(--rule)] flex items-center gap-2" style={{ background: "var(--paper-elevated)" }}>
+                    <span className="text-[10px] text-[var(--ink-muted)]">Context imported</span>
+                    <button onClick={() => setActiveTool("mcp")} className="text-[10px] text-[var(--gold-deep)] hover:text-[var(--ink)] transition-colors">Manage</button>
                   </div>
                 )}
                 {!mcpContext && !hasCode && (
-                  <div className="px-4 py-1.5 border-b border-white/[0.04]">
-                    <button onClick={() => setActiveTool("mcp")} className="flex items-center gap-1.5 text-[10px] text-white/25 hover:text-stone-400/70 transition-colors">
+                  <div className="px-4 py-1.5 border-b border-[var(--rule)]">
+                    <button onClick={() => setActiveTool("mcp")} className="flex items-center gap-1.5 text-[10px] text-[var(--ink-muted)] hover:text-[var(--gold-deep)] transition-colors">
                       <ExternalLink size={10} />
                       Import from GitHub, Figma, or URL
                     </button>
+                  </div>
+                )}
+
+                {/* Free-tier upgrade banner — collapses to nothing for paid
+                    users. Watermark gets injected by the API; this banner is
+                    purely the conversion lever that explains why and offers
+                    the fix. */}
+                {isFreePlan && (
+                  <div className="mx-4 mt-3 mb-1 rounded-xl border border-[var(--gold)] bg-[var(--gold-soft)] px-3.5 py-2.5 flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] text-[var(--ink-secondary)]">
+                        <span className="font-semibold text-[var(--gold-deep)]">Free plan</span>
+                        <span className="text-[var(--ink-muted)]"> · sites you build include a small &ldquo;Built with Zoobicon&rdquo; badge.</span>
+                      </p>
+                    </div>
+                    <Link
+                      href="/pricing"
+                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-white transition-all whitespace-nowrap"
+                      style={{ background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)", boxShadow: "0 2px 6px rgba(184,146,63,0.3)", textShadow: "0 1px 1px rgba(80,55,15,0.35)" }}
+                    >
+                      Remove badge
+                    </Link>
+                  </div>
+                )}
+                {!isFreePlan && (
+                  <div className="mx-4 mt-3 mb-1 rounded-xl border border-[var(--gold)] bg-[var(--gold-soft)] px-3.5 py-2 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold)]" />
+                    <p className="text-[11px] text-[var(--gold-deep)]">
+                      <span className="font-semibold">{planLabel(userPlan)} plan</span>
+                      <span className="text-[var(--ink-muted)]"> · no watermark, custom domains, full feature set.</span>
+                    </p>
                   </div>
                 )}
 
@@ -2096,7 +2877,18 @@ root.render(React.createElement(App));
                     onGenerationModeChange={setGenerationMode}
                     fullStack={fullStack}
                     onFullStackChange={setFullStack}
+                    showAdvanced={advancedMode}
                   />
+                  {/* T2 Prompt Queue — Lovable-parity batch edits.
+                      Only surfaces when there's a build to edit. */}
+                  {hasCode && (
+                    <div className="mt-3">
+                      <PromptQueuePanel
+                        onRunPrompt={runEditWith}
+                        isBusy={status === "generating"}
+                      />
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ) : (
@@ -2109,21 +2901,73 @@ root.render(React.createElement(App));
                 className="flex flex-col h-full"
               >
                 {/* Chat header */}
-                <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
+                <div className="px-4 py-2.5 border-b border-[var(--rule)] flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-stone-500/10 flex items-center justify-center">
-                      <MessageSquare className="w-3 h-3 text-stone-400" />
+                    <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: "rgba(184,146,63,0.15)" }}>
+                      <MessageSquare className="w-3 h-3" style={{ color: "var(--gold-deep)" }} />
                     </div>
-                    <span className="text-xs font-medium text-white/50">Chat</span>
+                    <span className="text-xs font-semibold text-[var(--ink)]">Edit with AI</span>
+                    {saveStatus === "saving" && (
+                      <span className="text-[9px] text-amber-400/60 flex items-center gap-1">
+                        <Loader2 className="w-2.5 h-2.5 animate-spin" />Saving
+                      </span>
+                    )}
+                    {saveStatus === "saved" && (
+                      <span className="text-[9px] text-amber-400/60">Saved</span>
+                    )}
                   </div>
-                  <button
-                    onClick={handleNewSite}
-                    className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all"
-                  >
-                    <Plus size={12} />
-                    New
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setShowSections(s => !s)}
+                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] transition-all ${
+                        showSections ? "text-stone-700 bg-stone-100 border-stone-200" : "text-stone-400 hover:text-stone-700 hover:bg-stone-50"
+                      }`}
+                      title="Manage sections"
+                    >
+                      <Layout size={12} />
+                      Sections
+                    </button>
+                    <button
+                      onClick={handleNewSite}
+                      className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all"
+                    >
+                      <Plus size={12} />
+                      New
+                    </button>
+                    {/* Advanced tools toggle — keeps novice view clean */}
+                    <button
+                      onClick={() => setAdvancedMode(m => !m)}
+                      title={advancedMode ? "Hide advanced tools" : "Show advanced tools"}
+                      className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] transition-all border ${
+                        advancedMode
+                          ? "text-stone-700 bg-stone-100 border-stone-300"
+                          : "text-stone-400 hover:text-stone-700 bg-stone-50 hover:bg-stone-100 border-stone-200"
+                      }`}
+                    >
+                      <Wand2 size={11} />
+                      {advancedMode ? "Simple" : "Advanced"}
+                    </button>
+                  </div>
                 </div>
+
+                {/* Section editor (collapsible) */}
+                {showSections && (
+                  <div className="border-b border-[var(--rule)] max-h-[45%] overflow-y-auto">
+                    <SectionEditor
+                      files={reactFiles}
+                      onFilesUpdate={(updatedFiles) => {
+                        setReactFiles(updatedFiles);
+                        setReactSource(updatedFiles);
+                        setStatus("complete");
+                        pendingLabelRef.current = "Section reorder/delete";
+                      }}
+                      onEditSection={(name) => {
+                        setShowSections(false);
+                      }}
+                      isVisible={true}
+                    />
+                  </div>
+                )}
 
                 {/* Chat messages + edit input */}
                 <div className="flex-1 overflow-hidden">
@@ -2133,6 +2977,17 @@ root.render(React.createElement(App));
                       setReactFiles(prev => {
                         const merged = { ...prev, ...changedFiles };
                         setReactSource(merged);
+                        if (projectId) {
+                          fetch(`/api/projects/${projectId}/versions`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              files: merged,
+                              deps: reactDeps,
+                              label: `Edit: ${Object.keys(changedFiles).join(", ")}`,
+                            }),
+                          }).catch(() => {});
+                        }
                         return merged;
                       });
                       setStatus("complete");
@@ -2140,6 +2995,7 @@ root.render(React.createElement(App));
                     }}
                     isVisible={true}
                     isGenerating={status === "generating"}
+                    projectId={projectId}
                   />
                 </div>
               </motion.div>
@@ -2148,17 +3004,17 @@ root.render(React.createElement(App));
         </div>
 
         {/* ── Center Panel — Preview / Code / SEO ── */}
-        <div className="flex-1 flex flex-col bg-zinc-950/40 backdrop-blur-sm min-w-0">
+        <div className="flex-1 flex flex-col min-w-0" style={{ background: "var(--paper)", borderLeft: "1px solid var(--rule)" }}>
           {/* Tab bar — clean, minimal */}
-          <div className="flex items-center h-10 border-b border-white/[0.06] px-2 bg-zinc-900/30">
+          <div className="flex items-center h-10 border-b border-[var(--rule)] px-2" style={{ background: "var(--paper-elevated)" }}>
             <div className="flex items-center gap-0.5">
               {(["preview", "code", ...(hasCode ? ["seo"] : [])] as const).map(tab => (
                 <button
                   key={tab}
                   className={`relative px-3.5 py-2 text-[11px] font-medium transition-all ${
                     activeTab === tab
-                      ? "text-white"
-                      : "text-white/35 hover:text-white/55"
+                      ? "text-[var(--ink)]"
+                      : "text-[var(--ink-muted)] hover:text-[var(--ink-secondary)]"
                   }`}
                   onClick={() => setActiveTab(tab as typeof activeTab)}
                 >
@@ -2169,7 +3025,8 @@ root.render(React.createElement(App));
                   {activeTab === tab && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute bottom-0 left-1 right-1 h-[2px] bg-gradient-to-r from-stone-500 to-stone-500 rounded-full"
+                      className="absolute bottom-0 left-1 right-1 h-[2px] rounded-full"
+                      style={{ background: "var(--gold)" }}
                       transition={{ type: "spring", stiffness: 500, damping: 35 }}
                     />
                   )}
@@ -2197,7 +3054,7 @@ root.render(React.createElement(App));
             */}
             <div
               ref={previewContainerRef}
-              className="absolute inset-0 bg-zinc-950"
+              className="absolute inset-0 bg-[#f4f3ed]"
               style={{
                 visibility: activeTab === "preview" ? "visible" : "hidden",
                 zIndex: activeTab === "preview" ? 1 : 0,
@@ -2206,15 +3063,30 @@ root.render(React.createElement(App));
             >
               <PreviewSwitcher
                 useWebContainers={useWebContainers}
+                useEscapeHatch={useEscapeHatch}
                 onWebContainersFail={handleWebContainersFail}
                 files={reactFiles || {}}
                 reactDeps={reactDeps}
+                onDownload={() => {
+                  const files = reactFiles || {};
+                  const entries = Object.entries(files).map(([path, content]) => ({
+                    path: path.replace(/^\/+/, ""),
+                    content,
+                  }));
+                  if (entries.length === 0) return;
+                  const slug = (projectName || prompt.slice(0, 40) || "zoobicon-build")
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/^-+|-+$/g, "")
+                    .slice(0, 50);
+                  downloadZip(entries, slug);
+                }}
               />
               {activeTab === "preview" && isAdmin && (
                 <button
                   type="button"
                   onClick={() => setUseWebContainers((v) => !v)}
-                  className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded-md bg-zinc-900/90 backdrop-blur-sm text-white/60 border border-white/[0.08] hover:bg-zinc-800/90 transition-colors"
+                  className="absolute top-2 right-2 z-50 px-2 py-1 text-[10px] rounded-md bg-stone-900/90 backdrop-blur-sm text-white/60 border border-white/[0.08] hover:bg-stone-800/90 transition-colors"
                 >
                   {useWebContainers ? "WebContainers" : "Sandpack"}
                 </button>
@@ -2226,7 +3098,7 @@ root.render(React.createElement(App));
               {/* Build progress overlay on preview */}
               {activeTab === "preview" && status === "generating" && hasCode && pipelineAgents.length > 0 && (
                 <div className="absolute bottom-4 left-4 right-4 z-30 pointer-events-none">
-                  <div className="max-w-lg mx-auto px-4 py-3 rounded-2xl bg-zinc-950/80 backdrop-blur-2xl border border-white/[0.06] shadow-2xl shadow-black/40 pointer-events-auto">
+                  <div className="max-w-lg mx-auto px-4 py-3 rounded-2xl bg-stone-950/80 backdrop-blur-2xl border border-white/[0.06] shadow-2xl shadow-black/40 pointer-events-auto">
                     <div className="flex items-center gap-3 mb-1.5">
                       <Loader2 className="w-3.5 h-3.5 text-stone-400 animate-spin flex-shrink-0" />
                       <span className="text-xs text-white/70 font-medium truncate">
@@ -2327,17 +3199,17 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0, scale: 0.98 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-20 flex items-center justify-center bg-zinc-950"
+                  className="absolute inset-0 z-20 flex items-center justify-center bg-[var(--paper)]"
                 >
                   <div className="max-w-md text-center px-8">
-                    <div className="w-14 h-14 rounded-2xl bg-stone-500/10 border border-stone-500/15 flex items-center justify-center mx-auto mb-5">
-                      <AlertTriangle className="w-7 h-7 text-stone-400" />
+                    <div className="w-14 h-14 rounded-2xl bg-[var(--gold-soft)] border border-[var(--gold)] flex items-center justify-center mx-auto mb-5">
+                      <AlertTriangle className="w-7 h-7 text-[var(--gold-deep)]" />
                     </div>
-                    <h3 className="text-lg font-semibold text-white/90 mb-2">Something went wrong</h3>
-                    <p className="text-white/35 text-sm mb-6 leading-relaxed">{error}</p>
+                    <h3 className="text-lg font-semibold text-[var(--ink)] mb-2">Something went wrong</h3>
+                    <p className="text-[var(--ink-muted)] text-sm mb-6 leading-relaxed">{error}</p>
                     <button
                       onClick={() => { setError(""); setStatus("idle"); }}
-                      className="px-6 py-2.5 bg-gradient-to-r from-stone-600 to-stone-600 hover:from-stone-500 hover:to-stone-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-stone-500/20"
+                      className="px-6 py-2.5 bg-[var(--ink)] hover:bg-[var(--ink-secondary)] text-[var(--paper)] text-sm font-semibold rounded-xl transition-all shadow-[var(--shadow-1)]"
                     >
                       Try Again
                     </button>
@@ -2351,24 +3223,25 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-950/95 backdrop-blur-sm overflow-hidden"
+                  className="absolute inset-0 z-20 flex flex-col items-center justify-center overflow-hidden"
+                  style={{ background: "rgba(247,245,238,0.97)", backdropFilter: "blur(4px)" }}
                 >
                   <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-stone-600/[0.04] blur-[120px] animate-pulse" />
-                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full bg-stone-600/[0.03] blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[120px] animate-pulse" style={{ background: "rgba(184,146,63,0.08)" }} />
+                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full blur-[100px] animate-pulse" style={{ background: "rgba(184,146,63,0.05)", animationDelay: "1s" }} />
                   </div>
 
                   <div className="relative z-10 text-center px-6">
                     <div className="relative w-20 h-20 mx-auto mb-8">
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-stone-600 to-stone-700 animate-pulse shadow-2xl shadow-stone-500/30" />
-                      <div className="absolute inset-[3px] rounded-[13px] bg-zinc-950 flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 text-stone-400 animate-spin" />
+                      <div className="absolute inset-0 rounded-2xl animate-pulse shadow-xl" style={{ background: "linear-gradient(135deg, #c9a961 0%, #b8923f 100%)", boxShadow: "0 8px 32px rgba(184,146,63,0.35)" }} />
+                      <div className="absolute inset-[3px] rounded-[13px] flex items-center justify-center" style={{ background: "var(--paper)" }}>
+                        <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--gold)" }} />
                       </div>
-                      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-stone-500/20 via-transparent to-stone-500/20 animate-spin" style={{ animationDuration: "3s" }} />
+                      <div className="absolute -inset-1 rounded-2xl animate-spin" style={{ background: "conic-gradient(from 0deg, rgba(184,146,63,0.3), transparent, rgba(184,146,63,0.1))", animationDuration: "3s" }} />
                     </div>
 
-                    <h3 className="text-xl font-semibold text-white/90 mb-2">Building your website</h3>
-                    <p className="text-white/30 text-sm mb-8 max-w-sm">Generating production-ready React components</p>
+                    <h3 className="text-xl font-semibold mb-2" style={{ color: "var(--ink)" }}>Building your website</h3>
+                    <p className="text-sm mb-8 max-w-sm" style={{ color: "var(--ink-muted)" }}>Generating production-ready React components</p>
 
                     <div className="flex flex-col items-center gap-2.5">
                       {pipelineAgents.slice(-4).map((msg, i) => {
@@ -2417,20 +3290,22 @@ root.render(React.createElement(App));
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-10 overflow-hidden bg-zinc-950/95 backdrop-blur-sm"
+                  className="absolute inset-0 z-10 overflow-hidden"
+                  style={{ background: "var(--paper)" }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-stone-600/[0.025] blur-[150px]" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full blur-[150px]" style={{ background: "rgba(184,146,63,0.07)" }} />
+                      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: "rgba(184,146,63,0.04)" }} />
                     </div>
 
                     <div className="relative z-10 text-center px-6 max-w-xl">
-                      <h1 className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight">
-                        <span className="bg-gradient-to-b from-white via-white/90 to-white/50 bg-clip-text text-transparent">
+                      <h1 className="text-4xl sm:text-5xl font-bold mb-4 tracking-tight" style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic" }}>
+                        <span style={{ background: "linear-gradient(135deg, var(--ink) 0%, var(--gold-deep) 50%, var(--gold) 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
                           What do you want to build?
                         </span>
                       </h1>
-                      <p className="text-white/30 text-sm mb-10 leading-relaxed max-w-md mx-auto">
+                      <p className="text-sm mb-10 leading-relaxed max-w-md mx-auto" style={{ color: "var(--ink-muted)" }}>
                         Describe your vision and our AI will generate a complete, production-ready React application.
                       </p>
 
@@ -2446,17 +3321,18 @@ root.render(React.createElement(App));
                           <button
                             key={chip.label}
                             onClick={() => setPrompt(chip.label.toLowerCase())}
-                            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06] text-[11px] text-white/35 hover:text-white/60 hover:bg-white/[0.06] hover:border-white/[0.10] transition-all"
+                            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11px] transition-all border"
+                            style={{ background: "var(--paper-elevated)", borderColor: "var(--rule)", color: "var(--ink-secondary)" }}
                           >
-                            <span className="text-white/20 group-hover:text-stone-400 transition-colors">{chip.icon}</span>
+                            <span style={{ color: "var(--gold)" }}>{chip.icon}</span>
                             {chip.label}
-                            <ChevronRight size={10} className="text-white/15 group-hover:text-white/30 transition-colors" />
+                            <ChevronRight size={10} style={{ color: "var(--ink-muted)" }} />
                           </button>
                         ))}
                       </div>
 
-                      <div className="inline-flex items-center gap-2 text-[10px] text-white/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-stone-400/60 animate-pulse" />
+                      <div className="inline-flex items-center gap-2 text-[10px]" style={{ color: "var(--ink-muted)" }}>
+                        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--gold)" }} />
                         {useWebContainers ? "Runtime pre-warmed" : "Sandbox ready"}
                       </div>
                     </div>
@@ -2487,15 +3363,16 @@ root.render(React.createElement(App));
               animate={{ width: 380, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="flex flex-col border-l border-white/[0.06] bg-zinc-950/80 backdrop-blur-xl overflow-hidden"
+              className="flex flex-col border-l border-[var(--rule)] overflow-hidden"
+              style={{ background: "var(--paper-bright)" }}
             >
-              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06] min-w-[380px]">
-                <span className="text-[11px] font-medium text-white/40">
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--rule)] min-w-[380px]">
+                <span className="text-[11px] font-medium text-[var(--ink-secondary)]">
                   {activeToolLabel}
                 </span>
                 <button
                   onClick={() => setActiveTool(null)}
-                  className="p-1 rounded-md text-white/30 hover:text-white/60 hover:bg-white/[0.05] transition-all"
+                  className="p-1 rounded-md text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100 transition-all"
                 >
                   <X size={14} />
                 </button>
@@ -2505,37 +3382,31 @@ root.render(React.createElement(App));
           )}
         </AnimatePresence>
 
-        {/* ── Right Toolbar — Tool Icons ── */}
-        <div className="w-11 flex flex-col items-center py-2 gap-0.5 border-l border-white/[0.06] bg-zinc-950/60 backdrop-blur-xl overflow-y-auto">
-          {TOOLS.map((tool) => (
-            <button
-              key={tool.id}
-              onClick={() => toggleTool(tool.id)}
-              title={tool.label}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150 ${
-                activeTool === tool.id
-                  ? "bg-stone-500/15 text-stone-400"
-                  : "text-white/25 hover:text-white/50 hover:bg-white/[0.04]"
-              }`}
-            >
-              {tool.icon}
-            </button>
-          ))}
-        </div>
+        {/* ── Right Toolbar — Tool Icons (advanced mode only) ── */}
+        {advancedMode && (
+          <div className="w-11 flex flex-col items-center py-2 gap-0.5 border-l border-[var(--rule)] overflow-y-auto" style={{ background: "var(--paper-elevated)" }}>
+            {TOOLS.map((tool) => (
+              <button
+                key={tool.id}
+                onClick={() => toggleTool(tool.id)}
+                title={tool.label}
+                className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-150 ${
+                  activeTool === tool.id
+                    ? "bg-[var(--gold-soft)] text-[var(--gold-deep)]"
+                    : "text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-stone-100"
+                }`}
+              >
+                {tool.icon}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Status bar at bottom — minimal */}
       <StatusBar status={status} pipelineStep={pipelineAgents.length > 0 ? pipelineAgents[pipelineAgents.length - 1] : undefined} />
 
       <OnboardingTooltips active={showTour} />
-      <DomainHookModal
-        isOpen={domainHookOpen}
-        onClose={() => setDomainHookOpen(false)}
-        businessName={siteNameForHook}
-        siteFiles={reactFiles || {}}
-        contactEmail={userEmail || ""}
-        onComplete={() => setDomainHookOpen(false)}
-      />
       <BuildSuccessModal
         isOpen={showBuildSuccess}
         onClose={() => { setShowBuildSuccess(false); dismissBuildSuccess(); }}
@@ -2556,13 +3427,13 @@ root.render(React.createElement(App));
         isOpen={showDeployModal}
         onClose={() => {
           setShowDeployModal(false);
-          // If deploy succeeded, show share modal
           if (deployStatus === "deployed" && deployUrl) {
             setShowShareModal(true);
           }
         }}
         onDeploy={handleDeployWithName}
         defaultName={prompt.trim().slice(0, 50) || "My Site"}
+        crontechAvailable={crontechAvailable}
       />
     </div>
   );

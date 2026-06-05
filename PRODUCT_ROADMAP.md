@@ -1,7 +1,9 @@
 # Zoobicon Product Roadmap & Master Checklist
 
-> **Last updated:** 2026-03-14
+> **Last reconciled with CLAUDE.md:** 2026-05-13
 > **Principle:** Mediocre is failure. Every feature on the site must work end-to-end.
+> **Authoritative source:** `CLAUDE.md` (LIVE REPO STATUS + URGENT BUILD LIST + RECENTLY FIXED).
+> If this file disagrees with `CLAUDE.md`, `CLAUDE.md` wins and this file gets corrected in the same session.
 
 ---
 
@@ -63,44 +65,54 @@ These products have landing pages but lack working backends. Priority order: top
 | 6 | Add developer submission flow for community add-ons | TODO |
 | 7 | Add reviews/ratings system | TODO |
 
-### 1.5 Domains — LOWER PRIORITY
-**Status:** NOT BUILT — Mock domain search, no registrar integration
+### 1.5 Domains — WORKING (top of the revenue funnel)
+**Status:** DONE — OpenSRS/Tucows wired, AI name generator live, Stripe checkout working, RDAP fallback hardened. Needs Craig's Stripe products + `OPENSRS_ENV=live` to take real registrations.
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Choose registrar API (Cloudflare Registrar, Namecheap reseller, or Porkbun) | TODO |
-| 2 | Build `/api/domains/search` — real TLD availability check | TODO |
-| 3 | Build `/api/domains/register` — real domain purchase flow | TODO |
-| 4 | Wire Stripe for domain purchases | TODO |
-| 5 | Build DNS management UI (A records, CNAME, MX) | TODO |
+| 1 | Choose registrar API (Cloudflare Registrar, Namecheap reseller, or Porkbun) | DONE — OpenSRS/Tucows wholesale (`src/lib/opensrs.ts`) |
+| 2 | Build `/api/domains/search` — real TLD availability check | DONE — OpenSRS LOOKUP + RDAP fallback, 4-concurrent limit, 10-min cache |
+| 3 | Build `/api/domains/register` — real domain purchase flow | DONE — end-to-end wiring with contact form → Stripe → OpenSRS → DB |
+| 4 | Wire Stripe for domain purchases | DONE — needs Craig to create Stripe products + price IDs |
+| 5 | Build DNS management UI (A records, CNAME, MX) | PARTIAL — `/api/hosting/dns` exists, UI workflow needs polish |
 | 6 | Auto-connect purchased domain to hosted site | TODO |
-| 7 | Replace mock search results with real API calls | TODO |
+| 7 | Replace mock search results with real API calls | DONE — pre-crawled available-domain list shipped 2026-05 |
+| 8 | AI Name Generator — describe business → names with availability | DONE — Haiku 4.5 → Sonnet 4.5 fallback, 503 hard-fail when key missing |
 
-### 1.6 Email Support — LOWER PRIORITY
-**Status:** NOT BUILT — Beautiful mock inbox UI, no email provider
+### 1.6 Email Support — PARTIAL
+**Status:** Mailgun wired for transactional. Inbox + AI auto-reply still need building.
+**Decision lock:** Mailgun-only — never add Google Workspace or SendGrid (Rule 7).
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Choose email provider (SendGrid, Resend, or Postmark) | TODO |
+| 1 | Choose email provider | DONE — Mailgun (transactional), Cloudflare Email Routing → Zoho for receiving |
 | 2 | Build `/api/email/inbox` — fetch real emails via provider API | TODO |
-| 3 | Build `/api/email/send` — send replies | TODO |
-| 4 | Integrate AI auto-reply (use Claude to draft responses based on context) | TODO |
+| 3 | Build `/api/email/send` — send replies | DONE — Mailgun API integrated |
+| 4 | Integrate AI auto-reply (Cloudflare Worker → Mailgun webhook → Claude) | TODO — designed in `CLAUDE.md` § Phase 1 Step 3, not yet shipped |
 | 5 | Build ticketing system (DB table: tickets with status, priority, assignee) | TODO |
 | 6 | Replace mock inbox data with real email feed | TODO |
 | 7 | Add notification system (new ticket alerts) | TODO |
+| 8 | Shared email template with 4-domain signature footer (Rule 11) | DONE — `src/lib/email-template.ts` |
 
-### 1.7 Video Creator — LOWEST PRIORITY
-**Status:** NOT BUILT — Requires most external API work
+### 1.7 Video Creator — PIPELINE BUILT, NEEDS END-TO-END TEST
+**Status:** Own pipeline (Rule 19) — Fish Audio S1 → FLUX / Hedra Character-3 → SadTalker/Video-Retalking/Wav2Lip → Whisper captions. Pipeline code rebuilt 2026-04-08; needs one successful end-to-end production run.
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Choose video API (Runway ML, Pika, or Sora when available) | TODO |
-| 2 | Build `/api/video/generate` — text-to-video generation | TODO |
-| 3 | Build video editor/preview UI | TODO |
+| 1 | Choose video API | DONE — Own pipeline via Replicate + fal.ai. No HeyGen as primary (Rule 19). Sora is dead (April 26, 2026). |
+| 2 | Build `/api/video-creator/*` — text-to-video generation | DONE — chat, script, voiceover, render endpoints all live |
+| 3 | Build video editor/preview UI | DONE — 3-step chat-based flow at `/video-creator` |
 | 4 | Add format presets (TikTok 9:16, YouTube 16:9, Instagram 1:1) | TODO |
-| 5 | Add AI music/sound integration (if API supports) | TODO |
+| 5 | Add AI music/sound integration (MusicGen on Replicate) | TODO — endpoint stub exists |
 | 6 | Wire Stripe for video generation credits | TODO |
-| 7 | Replace landing page vapor CTAs with real flow | TODO |
+| 7 | Replace landing page vapor CTAs with real flow | DONE — chat-based flow shipped |
+| 8 | Multi-language dub (Fish Audio S1, 50+ languages) | DONE — shipped 2026-05 |
+| 9 | Auto-captions burned in (Whisper) | DONE — shipped 2026-04 |
+| 10 | AI Twins viral page (selfie → talking head) | DONE — shipped 2026-05, $0.05/min |
+| 11 | Voice cloning (Fish Speech / ElevenLabs fallback) | DONE — needs ELEVENLABS_API_KEY for premium tier |
+| 12 | B-roll via fal.ai (Veo 3.1 / Seedance 2.0 / Kling 3.0) | DONE — needs FAL_KEY |
+| 13 | Deep health endpoint `/api/video-creator/health?admin=true&deep=1` | DONE — verifies all 16 model slugs |
+| 14 | Hedra Character-3 as primary avatar engine ($0.05/min real-time) | EVALUATING — currently FLUX chain on Replicate |
 
 ---
 
@@ -153,16 +165,17 @@ The core builder works but needs polish to compete with market leaders.
 | 4 | Add undo/redo buttons (not just version rollback) | TODO |
 | 5 | Add quick actions bar (change colors, fonts, add section, remove section) | TODO |
 
-### 2.5 Export & Deployment — MEDIUM
-**Current:** HTML download, React export, WordPress export
+### 2.5 Export & Deployment — MOSTLY DONE
+**Current:** GitHub sync working end-to-end. One-click deploy to `*.zoobicon.sh` working. React export via `/api/export/github`.
 
 | # | Task | Status |
 |---|------|--------|
-| 1 | Add one-click deploy to Vercel/Netlify (OAuth flow) | TODO |
-| 2 | Add GitHub push (create repo + push generated code) | TODO |
-| 3 | Add download as ZIP with proper file structure (index.html, styles.css, script.js) | TODO |
-| 4 | Verify React/Next.js export produces runnable project | TODO |
-| 5 | Add Vue/Svelte export options | TODO |
+| 1 | Add one-click deploy to Vercel/Netlify (OAuth flow) | DONE — `/api/hosting/deploy` → `https://[slug].zoobicon.sh` |
+| 2 | Add GitHub push (create repo + push generated code) | DONE — full OAuth + create repo + push files + sync updates via `GitHubSyncPanel` |
+| 3 | Add download as ZIP with proper file structure | DONE — `/api/export/github` generates full Next.js 14 project |
+| 4 | Verify React/Next.js export produces runnable project | DONE — exported projects include package.json, tsconfig, tailwind config |
+| 5 | Add Vue/Svelte export options | TODO — low priority, React-first is the strategy |
+| 6 | CronTech as deploy provider (Craig's own platform) | SCAFFOLDED — `src/lib/crontech-adapter.ts`, awaiting Craig's API docs |
 
 ### 2.6 Design Quality — ONGOING
 **Current:** Component library provides good baseline
@@ -195,14 +208,15 @@ The core builder works but needs polish to compete with market leaders.
 | 3 | Add generation stats (tokens used, cost estimate, time) | DONE (2026-03-14) — generation history tab |
 | 4 | Add dashboard-level analytics (total projects, total deploys, uptime) | DONE (2026-03-14) — overview cards |
 
-### 3.3 Authentication & User Management — NEEDS REVIEW
+### 3.3 Authentication & User Management — MOSTLY DONE
 | # | Task | Status |
 |---|------|--------|
-| 1 | Audit localStorage auth for security (currently `zoobicon_user` key) | TODO |
-| 2 | Add OAuth providers (Google, GitHub) for faster signup | TODO |
-| 3 | Add email verification flow | TODO |
+| 1 | Audit localStorage auth for security (currently `zoobicon_user` key) | DONE — auth-aware navbars read `localStorage("zoobicon_user")` per Rule 16, server-side auth via `src/lib/auth-guard.ts` |
+| 2 | Add OAuth providers (Google, GitHub) for faster signup | DONE — both wired in `/api/auth/oauth/google` and `/api/auth/oauth/github`, needs Craig to set OAuth client IDs/secrets |
+| 3 | Add email verification flow | DONE — `email_verified` column, verify endpoint, graceful fallback if column missing |
 | 4 | Add account deletion / data export (GDPR) | TODO |
-| 5 | Add usage quotas per plan tier | TODO |
+| 5 | Add usage quotas per plan tier | DONE — `src/lib/auth-guard.ts` enforces Free 1/mo, Creator 15, Pro 50, Agency 200 |
+| 6 | Admin diagnostics endpoint | DONE — `/api/auth/diagnose` reports which env vars are missing |
 
 ### 3.4 Developer Platform (zoobicon.io) — NEEDS VERIFICATION
 | # | Task | Status |
@@ -254,12 +268,8 @@ The core builder works but needs polish to compete with market leaders.
 | 2 | Verify code examples (curl, JavaScript, Python) work | TODO |
 | 3 | Add link to real API docs or OpenAPI spec | DONE (2026-03-14) — SDKs/GitHub Actions marked coming soon |
 
-### 4.5 dominat8.io/com (Aggressive Brand)
-| # | Task | Status |
-|---|------|--------|
-| 1 | Verify "45+ generators" claim matches reality | DONE (2026-03-14) — corrected to 30+ |
-| 2 | Replace synthetic testimonials with real ones or remove | DONE (2026-03-14) — marked as examples |
-| 3 | Verify all features listed in Strike/Command tiers are real | DONE (2026-03-14) — marked unbuilt as "Soon" |
+### 4.5 dominat8.io/com — MOVED OUT OF THIS REPO
+Dominat8 is now a separate codebase with its own GitHub repo, Vercel project, and Supabase. See `DOMINAT8_CLAUDE.md` in that repo. Do not add `/dominat8` routes to this codebase.
 
 ---
 
@@ -308,21 +318,25 @@ The core builder works but needs polish to compete with market leaders.
 | 7 | **Booking / scheduling** | Wix, Squarespace | Vertical-specific | NOT BUILT |
 | 8 | **In-app domain purchasing** | Squarespace, Hostinger, Durable, Bolt.new | Convenience feature | NOT BUILT |
 
-### 5.4 Pricing Comparison
+### 5.4 Pricing Comparison (April 2026 verified)
 
-| Builder | Free | Entry | Mid | High | Enterprise |
+| Builder | Free | Entry | Mid | High | White-label |
 |---------|------|-------|-----|------|-----------|
-| **Zoobicon** | Free (3 sites/mo) | $19/mo Creator | $49/mo Pro | $99/mo Agency | $299/mo |
+| **Zoobicon** | Free (1 gen/mo) | $49/mo Starter | $129/mo Pro | $299/mo Agency | $499/mo |
 | **Wix** | Free (branded) | $17/mo Light | $29/mo Core | $36/mo Business | $159/mo Elite |
 | **Squarespace** | 14-day trial | $16/mo Basic | $23/mo Core | $39/mo Plus | $99/mo Advanced |
 | **Framer** | Free (branded) | $10/mo Basic | $30/mo Pro | $100/mo Scale | Custom |
 | **Hostinger** | No free | $2.99/mo Starter | $4.99/mo Business | $7.99/mo Cloud | — |
-| **Durable** | Free (basic) | $22/mo Launch | — | — | — |
-| **v0 (Vercel)** | Free ($5 credits) | $20/mo Premium | $30/user Team | — | Custom |
-| **Bolt.new** | Free (limited) | $25/mo Pro | $50/mo Pro 50 | $100-200/mo | Custom |
-| **Lovable** | Free (5/day) | $25/mo Pro | $50/mo Business | — | Custom |
+| **Lovable** ($400M ARR, $6.6B) | Free (5/day) | $25/mo Pro | $50/mo Business | $100/mo Scale | Custom |
+| **Bolt.new** ($40M ARR, $700M) | Free (limited) | $20/mo Pro | $50/mo Pro 50 | $200/mo | Custom |
+| **v0 (Vercel)** (6M devs) | Free ($5 credits) | $20/mo Premium | $30/user Team | — | Custom |
+| **Emergent** ($100M ARR) | Free | $30/mo | $100/mo | $200/mo | Custom |
+| **HeyGen** (video) | Free | $29/mo Creator | $89/mo Team | $149/mo+ | Enterprise |
+| **Filmora** ($1.75B mkt cap) | Free (watermark) | $50/yr | — | — | — |
 
-**CREDIBILITY WARNING:** Zoobicon's Pro ($49) and Agency ($99) tiers list features that are NOT YET BUILT (Video Creator, Email Support, SEO Agent dashboard). Users who pay and discover these are missing will feel misled. Either build them or update the pricing page to say "Coming Soon."
+Zoobicon's pricing is positioned as an ecosystem play (everything bundled — domains + hosting + email + builder + video) rather than feature-by-feature competition. The $499/mo white-label tier has no direct competitor.
+
+**CREDIBILITY NOTE:** Features listed on the pricing page must match reality. Anything not yet built must say "Coming Soon" with a waitlist (Rule 14). Currently safe; previous "Acme" placeholder regression on builder failure was fixed 2026-04-08 (`callLLMWithFailover` chain now surfaces real failure reasons instead of falling back to template scaffolds).
 
 ---
 

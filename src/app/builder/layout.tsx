@@ -12,6 +12,14 @@ export const metadata: Metadata = {
     siteName: "Zoobicon",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    site: "@zoobicon",
+    title: "AI Website Builder — Zoobicon",
+    description:
+      "Describe your website and watch 7 AI agents build it live. Full-stack apps, e-commerce stores, multi-page sites — all from a single prompt.",
+    images: ["https://zoobicon.com/og-image.png"],
+  },
   alternates: { canonical: "https://zoobicon.com/builder" },
 };
 

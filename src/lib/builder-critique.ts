@@ -22,6 +22,8 @@
  * expected to throw a 503 — we let that propagate untouched.
  */
 
+import { createCachedMessage } from "@/lib/anthropic-cached";
+
 export type CritiqueSeverity = "blocker" | "high" | "medium" | "low";
 
 export type CritiqueCategory =
@@ -65,32 +67,8 @@ export interface QualityLoopResult {
   history: CritiqueResult[];
 }
 
-/** Cached-Anthropic helper interface — kept loose so it works pre-landing. */
-interface CachedAnthropicLike {
-  createCachedMessage: (args: {
-    system: Array<{ type: "text"; text: string; cache_control?: { type: "ephemeral" } }> | string;
-    messages: Array<{ role: "user" | "assistant"; content: string }>;
-    model: string;
-    maxTokens: number;
-  }) => Promise<{ text: string }>;
-}
-
-/** Sonnet 4.5 model id. */
-const MODEL_SONNET_45 = "claude-sonnet-4-5";
-
-/**
- * Dynamically load the cached anthropic helper. Done at call time so this
- * module type-checks before the sibling helper lands.
- */
-async function loadCached(): Promise<CachedAnthropicLike> {
-  // @ts-expect-error - sibling module may not exist at compile time
-  const mod: any = await import("@/lib/anthropic-cached");
-  const helper = (mod?.default ?? mod) as CachedAnthropicLike;
-  if (!helper || typeof helper.createCachedMessage !== "function") {
-    throw new Error("anthropic-cached: createCachedMessage export missing");
-  }
-  return helper;
-}
+/** Sonnet 4.6 — same model the customiser uses, per Rule 35. */
+const MODEL_SONNET_45 = "claude-sonnet-4-6";
 
 /** Compact a files map into a single bounded string for the prompt. */
 function serializeFiles(files: Record<string, string>, maxCharsPerFile = 8000): string {
@@ -184,11 +162,10 @@ export async function critiqueGeneratedSite(args: {
   originalPrompt: string;
 }): Promise<CritiqueResult> {
   const { files, originalPrompt } = args;
-  const cached = await loadCached();
 
   const userMsg = `ORIGINAL USER PROMPT:\n${originalPrompt}\n\nGENERATED FILES:\n\n${serializeFiles(files)}`;
 
-  const res = await cached.createCachedMessage({
+  const res = await createCachedMessage({
     system: [
       { type: "text", text: CRITIC_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
     ],
@@ -253,7 +230,6 @@ export async function refineWithCritique(args: {
   originalPrompt: string;
 }): Promise<Record<string, string>> {
   const { files, critique, originalPrompt } = args;
-  const cached = await loadCached();
 
   const fixable = critique.issues.filter(
     (i) => i.severity === "blocker" || i.severity === "high",
@@ -269,7 +245,7 @@ export async function refineWithCritique(args: {
       2,
     )}`;
 
-  const res = await cached.createCachedMessage({
+  const res = await createCachedMessage({
     system: [
       { type: "text", text: REFINER_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
     ],
@@ -306,23 +282,52 @@ export async function runQualityLoop(args: {
   files: Record<string, string>;
   originalPrompt: string;
   maxPasses?: number;
+  /** Q2+T3: brand spec from the planner. When provided, the critic
+   *  receives it as additional context so it can flag cross-component
+   *  palette violations (e.g. a hero using bg-amber-50 with a footer
+   *  using bg-slate-900 — incoherent brand). */
+  brandSpec?: {
+    brandName: string;
+    primaryColor: string;
+    bgColor: string;
+    textPrimary: string;
+    textSecondary: string;
+    accentColor: string;
+    headlineFont: string;
+    bodyFont: string;
+  };
 }): Promise<QualityLoopResult> {
-  const { originalPrompt } = args;
+  const { originalPrompt, brandSpec } = args;
   const maxPasses = args.maxPasses ?? 2;
   let files: Record<string, string> = { ...args.files };
   const history: CritiqueResult[] = [];
   let passes = 0;
   let lastScore = 0;
 
+  // Brand spec block — appended to the originalPrompt so it flows
+  // into both critique and refine calls as part of context.
+  const promptWithBrand = brandSpec
+    ? `${originalPrompt}\n\nBRAND SPEC (what the build is supposed to match):\n` +
+      `  brandName     ${brandSpec.brandName}\n` +
+      `  bgColor       ${brandSpec.bgColor}\n` +
+      `  primaryColor  ${brandSpec.primaryColor}\n` +
+      `  textPrimary   ${brandSpec.textPrimary}\n` +
+      `  textSecondary ${brandSpec.textSecondary}\n` +
+      `  accentColor   ${brandSpec.accentColor}\n` +
+      `  headlineFont  ${brandSpec.headlineFont}\n` +
+      `  bodyFont      ${brandSpec.bodyFont}\n\n` +
+      `Flag any component using colors outside this spec (e.g. text-cyan-500 when the spec is amber) as a brand-coherence violation. Body text must use textPrimary or textSecondary, never accentColor.`
+    : originalPrompt;
+
   while (passes < maxPasses) {
     passes += 1;
-    const critique = await critiqueGeneratedSite({ files, originalPrompt });
+    const critique = await critiqueGeneratedSite({ files, originalPrompt: promptWithBrand });
     history.push(critique);
     lastScore = critique.scoreOutOf100;
 
     if (lastScore >= 90) break;
 
-    const updates = await refineWithCritique({ files, critique, originalPrompt });
+    const updates = await refineWithCritique({ files, critique, originalPrompt: promptWithBrand });
     if (Object.keys(updates).length === 0) break;
 
     files = { ...files, ...updates };

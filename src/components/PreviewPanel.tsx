@@ -106,7 +106,9 @@ function IdleAtmosphere() {
       <div
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse at 50% 100%, #0c1a30 0%, #080c18 40%, #0a1628 70%)",
+          // Editorial-light idle backdrop — subtle warm radial on bone
+          // (was the deep navy aurora; rule 29 forbids dark surfaces).
+          background: "radial-gradient(ellipse at 50% 100%, #f4f3ed 0%, #fafaf7 60%, #ffffff 100%)",
         }}
       />
 
@@ -114,7 +116,7 @@ function IdleAtmosphere() {
       <div
         className="absolute w-[180%] h-[400px] -left-[40%] top-[5%]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.10) 15%, rgba(14,165,233,0.15) 35%, rgba(0,180,255,0.12) 55%, rgba(59,130,246,0.08) 75%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.10) 15%, rgba(140, 107, 37, 0.15) 35%, rgba(184, 146, 63, 0.12) 55%, rgba(184, 146, 63, 0.08) 75%, transparent 100%)",
           filter: "blur(50px)",
           animation: "aurora-drift-1 16s ease-in-out infinite",
           transform: "rotate(-3deg)",
@@ -125,7 +127,7 @@ function IdleAtmosphere() {
       <div
         className="absolute w-[160%] h-[350px] -left-[30%] top-[30%]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(0,180,255,0.08) 20%, rgba(37,99,235,0.14) 45%, rgba(96,165,250,0.10) 65%, rgba(0,220,255,0.06) 85%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.08) 20%, rgba(184, 146, 63, 0.14) 45%, rgba(184, 146, 63, 0.10) 65%, rgba(184, 146, 63, 0.06) 85%, transparent 100%)",
           filter: "blur(60px)",
           animation: "aurora-drift-2 20s ease-in-out infinite",
           transform: "rotate(2deg)",
@@ -136,7 +138,7 @@ function IdleAtmosphere() {
       <div
         className="absolute w-[150%] h-[300px] -left-[25%] bottom-[5%]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.08) 25%, rgba(14,165,233,0.12) 50%, rgba(37,99,235,0.07) 75%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.08) 25%, rgba(140, 107, 37, 0.12) 50%, rgba(184, 146, 63, 0.07) 75%, transparent 100%)",
           filter: "blur(55px)",
           animation: "aurora-drift-3 14s ease-in-out infinite",
           transform: "rotate(-1.5deg)",
@@ -147,7 +149,7 @@ function IdleAtmosphere() {
       <div
         className="absolute w-[300px] h-[300px] top-[20%] left-[10%]"
         style={{
-          background: "radial-gradient(circle, rgba(37,99,235,0.10) 0%, transparent 60%)",
+          background: "radial-gradient(circle, rgba(184, 146, 63, 0.10) 0%, transparent 60%)",
           filter: "blur(40px)",
           animation: "orb-float-1 12s ease-in-out infinite",
         }}
@@ -157,7 +159,7 @@ function IdleAtmosphere() {
       <div
         className="absolute w-[250px] h-[250px] top-[40%] right-[15%]"
         style={{
-          background: "radial-gradient(circle, rgba(0,200,255,0.08) 0%, transparent 60%)",
+          background: "radial-gradient(circle, rgba(184, 146, 63, 0.08) 0%, transparent 60%)",
           filter: "blur(40px)",
           animation: "orb-float-2 15s ease-in-out infinite",
         }}
@@ -173,14 +175,14 @@ function IdleAtmosphere() {
       <div
         className="absolute top-[25%] left-0 w-full h-[1px]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(96,165,250,0.15) 25%, rgba(0,200,255,0.25) 50%, rgba(96,165,250,0.15) 75%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.15) 25%, rgba(184, 146, 63, 0.25) 50%, rgba(184, 146, 63, 0.15) 75%, transparent 100%)",
           animation: "line-glow 8s ease-in-out infinite",
         }}
       />
       <div
         className="absolute top-[60%] left-0 w-full h-[1px]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.12) 20%, rgba(14,165,233,0.20) 50%, rgba(37,99,235,0.12) 80%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.12) 20%, rgba(140, 107, 37, 0.20) 50%, rgba(184, 146, 63, 0.12) 80%, transparent 100%)",
           animation: "line-glow 10s ease-in-out 4s infinite",
         }}
       />
@@ -189,7 +191,7 @@ function IdleAtmosphere() {
       <div
         className="absolute bottom-0 left-0 right-0 h-[45%]"
         style={{
-          background: "linear-gradient(to top, rgba(37,99,235,0.06) 0%, rgba(14,165,233,0.02) 50%, transparent 100%)",
+          background: "linear-gradient(to top, rgba(184, 146, 63, 0.06) 0%, rgba(140, 107, 37, 0.02) 50%, transparent 100%)",
           animation: "bottom-breathe 10s ease-in-out infinite",
         }}
       />
@@ -205,7 +207,10 @@ function GeneratingAtmosphere() {
       <div
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse at 50% 50%, #0d1f3c 0%, #080e1e 50%, #0a1628 80%)",
+          // Editorial-light "generating" backdrop — same warm radial,
+          // slightly brighter so the gold aurora sweeps below feel alive
+          // without the original dark navy floor.
+          background: "radial-gradient(ellipse at 50% 50%, #f4f3ed 0%, #fafaf7 50%, #ffffff 90%)",
         }}
       />
 
@@ -213,7 +218,7 @@ function GeneratingAtmosphere() {
       <div
         className="absolute w-[200%] h-[400px] -left-[50%] top-[0%]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.18) 10%, rgba(14,165,233,0.28) 25%, rgba(0,220,255,0.22) 40%, rgba(59,130,246,0.16) 60%, rgba(37,99,235,0.12) 80%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.18) 10%, rgba(140, 107, 37, 0.28) 25%, rgba(184, 146, 63, 0.22) 40%, rgba(184, 146, 63, 0.16) 60%, rgba(184, 146, 63, 0.12) 80%, transparent 100%)",
           filter: "blur(40px)",
           animation: "aurora-gen-1 6s ease-in-out infinite",
           transform: "rotate(-4deg)",
@@ -224,7 +229,7 @@ function GeneratingAtmosphere() {
       <div
         className="absolute w-[180%] h-[380px] -left-[40%] top-[25%]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(0,200,255,0.14) 15%, rgba(37,99,235,0.24) 35%, rgba(96,165,250,0.18) 55%, rgba(0,240,255,0.12) 75%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.14) 15%, rgba(184, 146, 63, 0.24) 35%, rgba(184, 146, 63, 0.18) 55%, rgba(0,240,255,0.12) 75%, transparent 100%)",
           filter: "blur(45px)",
           animation: "aurora-gen-2 8s ease-in-out infinite",
           transform: "rotate(3deg)",
@@ -235,7 +240,7 @@ function GeneratingAtmosphere() {
       <div
         className="absolute w-[170%] h-[350px] -left-[35%] bottom-[0%]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.14) 20%, rgba(14,165,233,0.22) 40%, rgba(0,180,255,0.18) 60%, rgba(37,99,235,0.10) 80%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.14) 20%, rgba(140, 107, 37, 0.22) 40%, rgba(184, 146, 63, 0.18) 60%, rgba(184, 146, 63, 0.10) 80%, transparent 100%)",
           filter: "blur(50px)",
           animation: "aurora-gen-3 5s ease-in-out infinite",
           transform: "rotate(-2deg)",
@@ -246,7 +251,7 @@ function GeneratingAtmosphere() {
       <div
         className="absolute inset-0"
         style={{
-          background: "radial-gradient(ellipse at 50% 50%, rgba(37,99,235,0.12) 0%, rgba(14,165,233,0.04) 30%, transparent 60%)",
+          background: "radial-gradient(ellipse at 50% 50%, rgba(184, 146, 63, 0.12) 0%, rgba(140, 107, 37, 0.04) 30%, transparent 60%)",
           animation: "core-pulse 2.5s ease-in-out infinite",
         }}
       />
@@ -255,7 +260,7 @@ function GeneratingAtmosphere() {
       <div
         className="absolute w-[350px] h-[350px] top-[10%] left-[5%]"
         style={{
-          background: "radial-gradient(circle, rgba(37,99,235,0.14) 0%, transparent 50%)",
+          background: "radial-gradient(circle, rgba(184, 146, 63, 0.14) 0%, transparent 50%)",
           filter: "blur(30px)",
           animation: "orb-gen-1 4s ease-in-out infinite",
         }}
@@ -263,7 +268,7 @@ function GeneratingAtmosphere() {
       <div
         className="absolute w-[300px] h-[300px] top-[30%] right-[5%]"
         style={{
-          background: "radial-gradient(circle, rgba(0,200,255,0.12) 0%, transparent 50%)",
+          background: "radial-gradient(circle, rgba(184, 146, 63, 0.12) 0%, transparent 50%)",
           filter: "blur(30px)",
           animation: "orb-gen-2 5s ease-in-out infinite",
         }}
@@ -271,7 +276,7 @@ function GeneratingAtmosphere() {
       <div
         className="absolute w-[280px] h-[280px] bottom-[10%] left-[30%]"
         style={{
-          background: "radial-gradient(circle, rgba(96,165,250,0.10) 0%, transparent 50%)",
+          background: "radial-gradient(circle, rgba(184, 146, 63, 0.10) 0%, transparent 50%)",
           filter: "blur(30px)",
           animation: "orb-gen-3 3.5s ease-in-out infinite",
         }}
@@ -287,28 +292,28 @@ function GeneratingAtmosphere() {
       <div
         className="absolute top-[15%] left-0 w-full h-[3px]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(96,165,250,0.3) 25%, rgba(0,240,255,0.5) 50%, rgba(96,165,250,0.3) 75%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.3) 25%, rgba(0,240,255,0.5) 50%, rgba(184, 146, 63, 0.3) 75%, transparent 100%)",
           animation: "energy-wave 2.5s ease-in-out infinite",
         }}
       />
       <div
         className="absolute top-[40%] left-0 w-full h-[3px]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(37,99,235,0.25) 20%, rgba(14,165,233,0.40) 50%, rgba(37,99,235,0.25) 80%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.25) 20%, rgba(140, 107, 37, 0.40) 50%, rgba(184, 146, 63, 0.25) 80%, transparent 100%)",
           animation: "energy-wave 3.5s ease-in-out 0.8s infinite",
         }}
       />
       <div
         className="absolute top-[65%] left-0 w-full h-[3px]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(0,200,255,0.20) 15%, rgba(59,130,246,0.35) 50%, rgba(0,200,255,0.20) 85%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.20) 15%, rgba(184, 146, 63, 0.35) 50%, rgba(184, 146, 63, 0.20) 85%, transparent 100%)",
           animation: "energy-wave 3s ease-in-out 1.6s infinite",
         }}
       />
       <div
         className="absolute top-[85%] left-0 w-full h-[2px]"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(96,165,250,0.20) 30%, rgba(0,220,255,0.30) 50%, rgba(96,165,250,0.20) 70%, transparent 100%)",
+          background: "linear-gradient(90deg, transparent 0%, rgba(184, 146, 63, 0.20) 30%, rgba(184, 146, 63, 0.30) 50%, rgba(184, 146, 63, 0.20) 70%, transparent 100%)",
           animation: "energy-wave 2.8s ease-in-out 2.2s infinite",
         }}
       />
@@ -317,7 +322,7 @@ function GeneratingAtmosphere() {
       <div
         className="absolute bottom-0 left-0 right-0 h-[50%]"
         style={{
-          background: "linear-gradient(to top, rgba(37,99,235,0.12) 0%, rgba(14,165,233,0.04) 40%, transparent 100%)",
+          background: "linear-gradient(to top, rgba(184, 146, 63, 0.12) 0%, rgba(140, 107, 37, 0.04) 40%, transparent 100%)",
           animation: "bottom-breathe-fast 4s ease-in-out infinite",
         }}
       />
@@ -514,13 +519,13 @@ export default function PreviewPanel({
           <p
             className="text-lg font-bold uppercase tracking-[8px]"
             style={{
-              background: "linear-gradient(90deg, #60a5fa, #00ddff, #3b82f6, #60a5fa)",
+              background: "linear-gradient(90deg, #a8a29e, #00ddff, #78716c, #a8a29e)",
               backgroundSize: "300% 100%",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
               animation: "text-shimmer 2s linear infinite",
-              filter: "drop-shadow(0 0 20px rgba(37,99,235,0.4))",
+              filter: "drop-shadow(0 0 20px rgba(184, 146, 63, 0.4))",
             }}
           >
             Creating
@@ -549,7 +554,7 @@ export default function PreviewPanel({
             <p
               className="text-sm uppercase tracking-[6px] mb-3"
               style={{
-                background: "linear-gradient(90deg, rgba(96,165,250,0.5), rgba(0,200,255,0.6), rgba(96,165,250,0.5))",
+                background: "linear-gradient(90deg, rgba(184, 146, 63, 0.5), rgba(184, 146, 63, 0.6), rgba(184, 146, 63, 0.5))",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -645,13 +650,13 @@ export default function PreviewPanel({
           <p
             className="text-lg font-bold uppercase tracking-[8px]"
             style={{
-              background: "linear-gradient(90deg, #60a5fa, #00ddff, #3b82f6, #60a5fa)",
+              background: "linear-gradient(90deg, #a8a29e, #00ddff, #78716c, #a8a29e)",
               backgroundSize: "300% 100%",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
               animation: "text-shimmer 2s linear infinite",
-              filter: "drop-shadow(0 0 20px rgba(37,99,235,0.4))",
+              filter: "drop-shadow(0 0 20px rgba(184, 146, 63, 0.4))",
             }}
           >
             Optimizing
@@ -725,7 +730,7 @@ export default function PreviewPanel({
           <div className="w-full h-full">
             <Suspense
               fallback={
-                <div className="h-full flex items-center justify-center bg-[#0f2148] text-white/40 text-sm">
+                <div className="h-full flex items-center justify-center bg-[var(--paper)] text-white/40 text-sm">
                   Loading Sandpack...
                 </div>
               }

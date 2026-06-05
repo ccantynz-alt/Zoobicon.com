@@ -50,7 +50,7 @@ function CopyButton({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }}
-      className="absolute top-3 right-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-slate-400 hover:text-white"
+      className="absolute top-3 right-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-stone-400 hover:text-white"
       aria-label="Copy to clipboard"
     >
       {copied ? <Check className="w-4 h-4 text-stone-400" /> : <Copy className="w-4 h-4" />}
@@ -77,13 +77,13 @@ function CodeBlock({
             <span className="w-3 h-3 rounded-full bg-stone-500/60" />
             <span className="w-3 h-3 rounded-full bg-stone-500/60" />
           </div>
-          <span className="text-xs text-slate-400 font-mono ml-2">{filename}</span>
-          <span className="text-xs text-slate-600 ml-auto">{language}</span>
+          <span className="text-xs text-stone-400 font-mono ml-2">{filename}</span>
+          <span className="text-xs text-stone-600 ml-auto">{language}</span>
         </div>
       )}
       <CopyButton text={code} />
       <pre className="p-4 overflow-x-auto text-sm leading-relaxed">
-        <code className="text-slate-300 font-mono whitespace-pre">{code}</code>
+        <code className="text-stone-300 font-mono whitespace-pre">{code}</code>
       </pre>
     </div>
   );
@@ -233,7 +233,7 @@ const HOSTED_FEATURES = [
    ═══════════════════════════════════════════════════════════════ */
 export default function AgentsPage() {
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white relative">
+    <div className="min-h-screen bg-[var(--paper)] text-white relative">
       <BackgroundEffects preset="technical" />
 
       {/* ──────────── HERO ──────────── */}
@@ -265,7 +265,7 @@ export default function AgentsPage() {
 
             <motion.p
               variants={fadeInUp}
-              className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed"
+              className="text-lg sm:text-xl text-stone-400 max-w-2xl mx-auto mb-10 leading-relaxed"
             >
               An open-source framework for creating agents that discover tasks,
               execute them, and self-heal. 10 lines of code. Zero dependencies.
@@ -275,7 +275,7 @@ export default function AgentsPage() {
             <motion.div variants={fadeInUp} className="flex justify-center mb-8">
               <div className="relative inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-[#1e293b] border border-white/10 font-mono text-sm sm:text-base">
                 <Terminal className="w-4 h-4 text-stone-400 shrink-0" />
-                <span className="text-slate-300">npm install</span>
+                <span className="text-stone-300">npm install</span>
                 <span className="text-stone-400">@zoobicon/agents</span>
                 <CopyButton text="npm install @zoobicon/agents" />
               </div>
@@ -324,7 +324,7 @@ export default function AgentsPage() {
             </motion.h2>
             <motion.p
               variants={fadeInUp}
-              className="text-slate-400 text-center mb-10 max-w-xl mx-auto"
+              className="text-stone-400 text-center mb-10 max-w-xl mx-auto"
             >
               Here is a complete uptime monitor agent. It discovers URLs to
               check, pings them on a schedule, and reports results &mdash; all in
@@ -377,7 +377,7 @@ await monitor.run();`}
             </motion.h2>
             <motion.p
               variants={fadeInUp}
-              className="text-slate-400 text-center mb-14 max-w-xl mx-auto"
+              className="text-stone-400 text-center mb-14 max-w-xl mx-auto"
             >
               Batteries included, but every piece is replaceable.
             </motion.p>
@@ -395,7 +395,7 @@ await monitor.run();`}
                     <f.icon className={`w-5 h-5 ${f.color}`} />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">{f.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">
+                  <p className="text-stone-400 text-sm leading-relaxed">
                     {f.desc}
                   </p>
                 </motion.div>
@@ -422,7 +422,7 @@ await monitor.run();`}
             </motion.h2>
             <motion.p
               variants={fadeInUp}
-              className="text-slate-400 text-center mb-10 max-w-xl mx-auto"
+              className="text-stone-400 text-center mb-10 max-w-xl mx-auto"
             >
               A simple loop: discover, execute, store, emit. Failures retry
               automatically.
@@ -430,7 +430,7 @@ await monitor.run();`}
 
             <motion.div variants={fadeInUp}>
               <div className="rounded-2xl border border-white/10 bg-[#1e293b]/60 p-6 sm:p-10 overflow-x-auto">
-                <pre className="text-sm sm:text-base font-mono text-slate-300 leading-loose whitespace-pre">
+                <pre className="text-sm sm:text-base font-mono text-stone-300 leading-loose whitespace-pre">
 {`discover()
     │
     ▼
@@ -475,7 +475,7 @@ await monitor.run();`}
             </motion.h2>
             <motion.p
               variants={fadeInUp}
-              className="text-slate-400 text-center mb-10 max-w-xl mx-auto"
+              className="text-stone-400 text-center mb-10 max-w-xl mx-auto"
             >
               Zoobicon Agents is built for the serverless era &mdash; minimal
               surface area, maximum flexibility.
@@ -488,12 +488,12 @@ await monitor.run();`}
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-white/10 bg-white/[0.03]">
-                    <th className="px-5 py-4 text-slate-400 font-medium">Feature</th>
+                    <th className="px-5 py-4 text-stone-400 font-medium">Feature</th>
                     <th className="px-5 py-4 text-stone-400 font-semibold">
                       Zoobicon Agents
                     </th>
-                    <th className="px-5 py-4 text-slate-400 font-medium">OpenClaw</th>
-                    <th className="px-5 py-4 text-slate-400 font-medium">AutoGPT</th>
+                    <th className="px-5 py-4 text-stone-400 font-medium">OpenClaw</th>
+                    <th className="px-5 py-4 text-stone-400 font-medium">AutoGPT</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -504,14 +504,14 @@ await monitor.run();`}
                         i % 2 === 0 ? "bg-transparent" : "bg-white/[0.015]"
                       }`}
                     >
-                      <td className="px-5 py-3.5 text-slate-300 font-medium">
+                      <td className="px-5 py-3.5 text-stone-300 font-medium">
                         {row.feature}
                       </td>
                       <td className="px-5 py-3.5 text-white font-medium">
                         {row.agents}
                       </td>
-                      <td className="px-5 py-3.5 text-slate-400">{row.openclaw}</td>
-                      <td className="px-5 py-3.5 text-slate-400">{row.autogpt}</td>
+                      <td className="px-5 py-3.5 text-stone-400">{row.openclaw}</td>
+                      <td className="px-5 py-3.5 text-stone-400">{row.autogpt}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -539,7 +539,7 @@ await monitor.run();`}
               <h2 className="text-3xl sm:text-4xl font-bold mb-4">
                 Don&apos;t want to run your own infrastructure?
               </h2>
-              <p className="text-slate-300 text-lg max-w-xl mx-auto mb-8 leading-relaxed">
+              <p className="text-stone-300 text-lg max-w-xl mx-auto mb-8 leading-relaxed">
                 Zoobicon Agents Cloud runs your agents 24/7 with managed cron,
                 dashboards, alerts, and team collaboration.
               </p>
@@ -548,7 +548,7 @@ await monitor.run();`}
                 {HOSTED_FEATURES.map((f) => (
                   <span
                     key={f.label}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-slate-300"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-stone-300"
                   >
                     <f.icon className="w-4 h-4 text-stone-400" />
                     {f.label}
@@ -564,7 +564,7 @@ await monitor.run();`}
                   Starting at $19/month
                   <ArrowRight className="w-4 h-4" />
                 </Link>
-                <span className="text-slate-500 text-sm">
+                <span className="text-stone-500 text-sm">
                   Free tier available &middot; No credit card required
                 </span>
               </div>
@@ -590,7 +590,7 @@ await monitor.run();`}
             </motion.h2>
             <motion.p
               variants={fadeInUp}
-              className="text-slate-400 text-center mb-14 max-w-xl mx-auto"
+              className="text-stone-400 text-center mb-14 max-w-xl mx-auto"
             >
               From zero to a running agent in under five minutes.
             </motion.p>
@@ -619,17 +619,17 @@ await monitor.run();`}
             <span className="text-xl font-bold bg-gradient-to-r from-stone-400 to-stone-400 bg-clip-text text-transparent">
               @zoobicon/agents
             </span>
-            <span className="text-slate-500 text-sm">MIT License</span>
+            <span className="text-stone-500 text-sm">MIT License</span>
           </div>
 
-          <nav className="flex flex-wrap justify-center gap-6 text-sm text-slate-400">
-            <Link href="/developers" className="hover:text-white transition-colors">
+          <nav className="flex flex-wrap justify-center gap-6 text-sm text-stone-400">
+            <Link href="/builder" className="hover:text-white transition-colors">
               Developers
             </Link>
             <Link href="/pricing" className="hover:text-white transition-colors">
               Pricing
             </Link>
-            <Link href="/api-docs" className="hover:text-white transition-colors">
+            <Link href="/builder" className="hover:text-white transition-colors">
               API Docs
             </Link>
             <a

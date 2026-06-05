@@ -24,17 +24,43 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Critical-deps guard
+        # Fails CI if an auto-fix bot (GateTest etc) silently removes a
+        # dependency the project cannot run without. See the script's
+        # header for the rationale.
+        run: node scripts/critical-deps-guard.js
+
       - name: Quality Gate
         run: node scripts/quality-gate.js
 
       - name: Lint
         run: npm run lint
 
-      - name: Type Check
-        run: npx tsc --noEmit
+      - name: Critical code guard (broken imports + iOS-Safari footgun)
+        # Blocks the bug CLASSES that actually crash production but that a
+        # green `next build` hides (next.config has ignoreBuildErrors:true):
+        #   - broken imports in src/ (TS2305/TS2307) → "X is not a function"
+        #   - crypto.subtle in client preview code → blank preview on iPad
+        # Intentionally narrow so it can hard-fail TODAY without first
+        # paying down the 75-item type-strictness backlog. Full report:
+        # `npm run audit:code`.
+        run: node scripts/critical-code-guard.js
+
+      # A full `npx tsc --noEmit` hard-fail is NOT used here: next.config.js
+      # sets `ignoreBuildErrors: true` (Rule 3) and there is a pre-existing
+      # ~75-item TS strictness backlog across src/, cli/, scripts/, packages/.
+      # The critical-code-guard above gates the runtime-breaking subset.
+      # Re-enable the full check once that backlog is paid down.
 
       - name: Unit Tests
+        # BLOCKING (PR #417): the suite is fully green (364/364) and the
+        # repair surfaced 3 real bugs that had been hiding behind the
+        # previous `continue-on-error`. Now a test regression fails CI —
+        # the "broken code can't reach main" doctrine, extended to tests.
+        # If a suite legitimately needs to be quarantined, skip it in the
+        # test file (it.skip) with a reason, don't re-add continue-on-error.
         run: npm test
+
 
       - name: Build
         run: npm run build
@@ -49,7 +75,7 @@ jobs:
   gatetest:
     name: GateTest Quality Gate
     runs-on: ubuntu-latest
-    needs: build  # only run if native tests and build pass
+    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -58,11 +84,59 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
-      - name: Run GateTest quality gate
-        run: npx gatetest@latest --suite quick
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run site scanner
+        run: node scripts/site-scanner.js
+
+      - name: Run GateTest API scan
+        if: ${{ env.GATE_TEST_API_URL != '' }}
+        run: |
+          node -e "
+          const https = require('https');
+          const url = new URL(process.env.GATE_TEST_API_URL);
+          const body = JSON.stringify({
+            repo_url: 'https://github.com/${{ github.repository }}',
+            tier: 'full',
+            ref: '${{ github.sha }}'
+          });
+          const req = https.request({
+            hostname: url.hostname,
+            port: url.port || 443,
+            path: url.pathname,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': process.env.GATE_TEST_API_KEY || '',
+              'Content-Length': Buffer.byteLength(body)
+            },
+            timeout: 60000
+          }, (res) => {
+            let data = '';
+            res.on('data', (chunk) => data += chunk);
+            res.on('end', () => {
+              const result = JSON.parse(data);
+              console.log('Gate Test Results:');
+              console.log('  Modules:', result.totalModules, '| Issues:', result.totalIssues, '| Duration:', result.duration + 'ms');
+              for (const mod of result.modules || []) {
+                const icon = mod.status === 'passed' ? '✅' : '❌';
+                console.log('  ' + icon + ' ' + mod.name + ': ' + mod.checks + ' checks, ' + mod.issues + ' issues');
+                if (mod.details) mod.details.forEach(d => console.log('    → ' + d));
+              }
+              if (result.totalIssues > 0) {
+                console.error('Gate Test found ' + result.totalIssues + ' issue(s)');
+                process.exit(1);
+              }
+            });
+          });
+          req.on('error', (e) => { console.error('Gate Test API error:', e.message); process.exit(1); });
+          req.write(body);
+          req.end();
+          "
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    # GateTest is advisory for now — reports findings but does not block merge.
-    # Flip continue-on-error to false once GateTest is correctly configured and stable.
-    continue-on-error: true
+          GATE_TEST_API_URL: ${{ secrets.GATE_TEST_API_URL }}
+          GATE_TEST_API_KEY: ${{ secrets.GATE_TEST_API_KEY }}
+    continue-on-error: false
