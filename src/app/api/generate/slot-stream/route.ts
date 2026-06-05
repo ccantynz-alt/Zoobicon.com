@@ -220,7 +220,9 @@ function buildSlotAppFile(orderedIds: string[]): string {
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join("");
     importLines.push(`import ${comp} from "./components/${id}";`);
-    renderLines.push(`      <${comp} />`);
+    // Wrap each section so a render error degrades invisibly instead of
+    // blanking the page (pairs with EscapeHatchPreview isolation).
+    renderLines.push(`      <SectionBoundary name="${comp}"><${comp} /></SectionBoundary>`);
   }
   return `import React from "react";
 ${importLines.join("\n")}
@@ -231,6 +233,20 @@ ${importLines.join("\n")}
  * AI-filled JSON slot fill. Structure is guaranteed correct; content
  * is brand-tuned for this build.
  */
+class SectionBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { failed: false }; }
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(error) {
+    if (typeof console !== "undefined") {
+      console.error("[zoobicon] section failed to render:", error);
+    }
+  }
+  render() {
+    if (this.state.failed) return null;
+    return this.props.children;
+  }
+}
+
 export default function App() {
   return (
     <main className="min-h-screen" style={{ background: "var(--paper)", color: "var(--ink)" }}>
