@@ -209,3 +209,39 @@ export function axesNeedingRepair(verdict: PanelVerdict): CritiqueAxis[] {
     .filter((v) => !v.skipped && (v.score < 60 || v.findings.some((f) => f.severity === "blocker")))
     .map((v) => v.axis);
 }
+
+/**
+ * Close the critique→repair loop (B9). Turn a panel verdict into a
+ * concise, actionable guidance block that gets injected into a slot-refill
+ * prompt so the NEXT draft fixes the flagged issues. The panel no longer
+ * just reports — it drives a targeted regeneration.
+ *
+ * Only blocker/high/medium findings are included; `low` nitpicks aren't
+ * worth a regeneration round-trip. Slot-locked templates own typography +
+ * layout structurally, so `copy` is the most repairable axis — but
+ * content-driven typography/layout findings (headline length, ALL-CAPS
+ * kicker, missing italic-accent word, weak CTA wording) ARE fixable via
+ * slot content, so all axes feed in.
+ *
+ * Returns "" when there is nothing worth repairing (caller skips the pass).
+ */
+export function buildRepairGuidance(verdict: PanelVerdict): string {
+  const lines: string[] = [];
+  for (const v of verdict.verdicts) {
+    if (v.skipped) continue;
+    for (const f of v.findings) {
+      if (f.severity === "low") continue;
+      lines.push(`- [${v.axis}/${f.severity}] ${f.issue} → ${f.fix}`);
+    }
+  }
+  if (lines.length === 0) return "";
+  return [
+    "REVISION NOTES — a senior design critic reviewed the previous draft and",
+    "flagged the issues below. Produce a NEW slot fill that fixes EVERY one of",
+    "them while keeping the exact same JSON shape. Do not introduce AI-slop",
+    "words (revolutionary, unleash, seamless, leverage, etc). Keep what already",
+    "worked; only change what the notes call out.",
+    "",
+    ...lines,
+  ].join("\n");
+}

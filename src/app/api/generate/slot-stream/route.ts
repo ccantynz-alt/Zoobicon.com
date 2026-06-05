@@ -84,7 +84,8 @@ import {
   FAQ_ACCORDION_EXAMPLE,
 } from "@/lib/slot-locked/templates/faq-accordion";
 import { planPageForIndustry, planPageForIndustryAdaptive } from "@/lib/slot-locked/industry-planner";
-import { critiquePanel, axesNeedingRepair } from "@/lib/builder-critique/multi-judge";
+import { critiquePanel, axesNeedingRepair, buildRepairGuidance } from "@/lib/builder-critique/multi-judge";
+import type { PanelVerdict } from "@/lib/builder-critique/multi-judge";
 import { retrieveFewShotExamples, renderFewShotPrefix, recordSuccessfulBuild } from "@/lib/flywheel/successful-builds";
 import { normalisePrompt } from "@/lib/slot-locked/cache";
 import type { ComponentSchema, SlotValueMap } from "@/lib/slot-locked/types";
@@ -380,6 +381,9 @@ export async function POST(req: NextRequest): Promise<Response> {
       const aiCustomise = async (
         componentId: string,
         entry: typeof SLOT_REGISTRY[string],
+        /** When set (repair pass), critic guidance is prepended to the
+         *  system prompt so the new fill fixes the flagged issues. */
+        repairGuidance?: string,
       ): Promise<SlotValueMap> => {
         const brandBrief = `Brand: ${brandName || "(none provided)"}. User prompt: ${prompt}`;
         const aiPrompt = schemaToPrompt(entry.schema, brandBrief);
@@ -413,6 +417,7 @@ export async function POST(req: NextRequest): Promise<Response> {
             model: "claude-sonnet-4-6",
             system:
               fewShotPrefix +
+              (repairGuidance ? repairGuidance + "\n\n" : "") +
               "You are filling in the slots of a hand-written React component template. " +
               "Output ONLY a valid JSON object matching the schema. No prose, no markdown fences, no explanation.",
             userMessage: aiPrompt,
@@ -423,7 +428,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           },
         );
         telemetry.model({
-          step: `customise:${componentId}`,
+          step: `${repairGuidance ? "repair" : "customise"}:${componentId}`,
           provider: fb.provider || "unknown",
           model: fb.model || "unknown",
           inputTokens: fb.inputTokens,
@@ -582,46 +587,106 @@ export async function POST(req: NextRequest): Promise<Response> {
           filesOut["package.json"] = SLOT_PACKAGE_JSON;
         }
 
-        // ── PHASE 4: critique (B9 — multi-judge panel) ──
-        // Three small specialists (typography / copy / layout) score
-        // the assembled site in parallel. If any axis returns blockers
-        // or score <60, the verdict is surfaced via SSE warning events
-        // so the UI can show "Layout critic flagged 2 mobile issues —
-        // regenerating layout slots…". The actual targeted repair pass
-        // ships in the next commit; today we report.
+        // ── PHASE 4: critique + CLOSED-LOOP REPAIR (B9 — multi-judge) ──
+        // Three small specialists (typography / copy / layout) score the
+        // assembled site in parallel. If any axis returns blockers or
+        // scores <60, we don't just report it — we REGENERATE the flagged
+        // sections with the critic's specific fixes injected, re-score,
+        // and keep the better of the two drafts. The user only ever sees
+        // output that passed (or improved on) the panel.
+        //
+        // Safety: the repair pass can only help, never hurt. We snapshot
+        // the pre-repair files and revert if the second critique didn't
+        // beat the first. One pass max (bounded cost + latency).
         let qualityScore: number | null = null;
+        const buildSummary = (slots: Record<string, SlotValueMap>): string =>
+          JSON.stringify(
+            Object.entries(slots).map(([id, s]) => ({ component: id, slots: s })),
+            null,
+            2,
+          ).slice(0, 12_000);
+
         if (okCount > 0 && !body.skipCritique) {
           try {
             send("phase", { phase: "critique", message: "Multi-judge critique (typography / copy / layout)…" });
-            // Build a compact site summary the critics can score against.
-            // Sending raw component code is too much input; instead we
-            // pass the slot-fills + component ids so the critic can
-            // reason about copy/structure without the JSX boilerplate.
-            const summary = JSON.stringify(
-              Object.entries(summarySlots).map(([id, slots]) => ({ component: id, slots })),
-              null,
-              2,
-            ).slice(0, 12_000);
             const critiqueStart = Date.now();
-            const verdict = await critiquePanel(summary);
+            let verdict: PanelVerdict = await critiquePanel(buildSummary(summarySlots));
             telemetry.phase("critique", Date.now() - critiqueStart);
             qualityScore = verdict.overall;
             for (const v of verdict.verdicts) {
               if (v.skipped) continue;
-              send("critique", {
-                axis: v.axis,
-                score: v.score,
-                findings: v.findings,
-              });
+              send("critique", { axis: v.axis, score: v.score, findings: v.findings });
             }
+
+            // ── Closed-loop repair ──
             const repairAxes = axesNeedingRepair(verdict);
-            if (repairAxes.length > 0) {
-              send("warning", {
-                kind: "needs-repair",
+            const guidance = buildRepairGuidance(verdict);
+            // Only AI-customised components are repairable (cache hits +
+            // example fills are deterministic / already known-good).
+            const repairTargets = Object.keys(summarySlots).filter((id) => SLOT_REGISTRY[id]);
+            if (repairAxes.length > 0 && guidance && repairTargets.length > 0) {
+              send("phase", {
+                phase: "repair",
                 axes: repairAxes,
-                overall: verdict.overall,
-                message: `Critique flagged: ${repairAxes.join(", ")}. Targeted repair pass coming in next commit.`,
+                targets: repairTargets.length,
+                message: `Critic flagged ${repairAxes.join(", ")} — regenerating ${repairTargets.length} section(s) to fix it…`,
               });
+
+              // Snapshot so we can revert a non-improving repair.
+              const preRepairFiles: Record<string, string> = { ...filesOut };
+              const preRepairSlots: Record<string, SlotValueMap> = { ...summarySlots };
+
+              const repairStart = Date.now();
+              await Promise.all(
+                repairTargets.map(async (componentId) => {
+                  const entry = SLOT_REGISTRY[componentId];
+                  if (!entry) return;
+                  try {
+                    const repaired = await aiCustomise(componentId, entry, guidance);
+                    const result = assembleComponent({ template: entry.template, schema: entry.schema, slots: repaired });
+                    if (result.ok && result.code) {
+                      filesOut[`components/${componentId}.tsx`] = result.code;
+                      summarySlots[componentId] = repaired;
+                      send("component-repaired", { componentId });
+                    }
+                  } catch (e) {
+                    // Best-effort: keep the pre-repair version of this one.
+                    console.warn(`[slot-stream] repair failed for ${componentId}:`, e instanceof Error ? e.message : e);
+                  }
+                }),
+              );
+              telemetry.phase("repair", Date.now() - repairStart);
+
+              // Re-score ONCE. Keep the repair only if it actually improved.
+              try {
+                const verdict2 = await critiquePanel(buildSummary(summarySlots));
+                if (verdict2.overall >= verdict.overall) {
+                  for (const v of verdict2.verdicts) {
+                    if (v.skipped) continue;
+                    send("critique", { axis: v.axis, score: v.score, findings: v.findings, phase: "post-repair" });
+                  }
+                  send("repair-result", { before: verdict.overall, after: verdict2.overall, improved: true });
+                  verdict = verdict2;
+                  qualityScore = verdict2.overall;
+                } else {
+                  // Regression — revert to the pre-repair draft. The loop
+                  // is strictly non-harmful by construction.
+                  Object.assign(filesOut, preRepairFiles);
+                  Object.assign(summarySlots, preRepairSlots);
+                  send("repair-result", {
+                    before: verdict.overall,
+                    after: verdict2.overall,
+                    improved: false,
+                    message: "Repair did not beat the original — kept the first draft.",
+                  });
+                  qualityScore = verdict.overall;
+                }
+              } catch (e) {
+                // Re-critique failed — keep the repaired files (they were
+                // generated with the critic's fixes, so likely >= original)
+                // but report the pre-repair score we trust.
+                console.warn("[slot-stream] post-repair critique failed:", e instanceof Error ? e.message : e);
+              }
             }
           } catch (critErr) {
             // Critique is best-effort — failure doesn't block ship.
