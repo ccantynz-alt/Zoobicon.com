@@ -12,6 +12,7 @@ import {
   pageShell,
   sectionWrap,
   usesSerifHeadings,
+  compileComponentToModule,
 } from "../src/lib/v2/render-page";
 // Populate the 118-component registry (ensureRegistryLoaded uses CommonJS
 // require which doesn't run under vitest's ESM transform).
@@ -88,6 +89,35 @@ describe("v2 progressive streaming primitives", () => {
 
   it("sectionWrap addresses sections by index for in-place hot-swap", () => {
     expect(sectionWrap(3, "<h1>x</h1>")).toBe('<section data-zb-i="3"><h1>x</h1></section>');
+  });
+
+  it("compiles a component to a browser ES module (live hydration layer)", () => {
+    const tsx = `import React from "react";
+import { ArrowRight } from "lucide-react";
+export default function Hero() {
+  const [open, setOpen] = React.useState(false);
+  return <button onClick={() => setOpen(!open)}>Toggle <ArrowRight /></button>;
+}`;
+    const js = compileComponentToModule(tsx);
+    // ESM output keeps bare imports (resolved by the iframe importmap) + the
+    // default export, and the JSX is compiled away (no Babel needed in browser).
+    expect(js).toContain('import React from "react"');
+    expect(js).toContain('from "lucide-react"');
+    expect(js).toContain("export default");
+    expect(js).toContain("React.createElement");
+    expect(js).not.toContain("<button");
+  });
+
+  it("streaming shell carries the hydration runtime + importmap; static shell doesn't", () => {
+    const streaming = pageShell("", "Acme", { industry: "saas", streaming: true });
+    expect(streaming).toContain('type="importmap"');
+    expect(streaming).toContain("esm.sh/react@18.3.1");
+    expect(streaming).toContain("createRoot"); // live mount
+    expect(streaming).toContain("getDerivedStateFromError"); // per-section boundary
+
+    const staticShell = pageShell("<section>hi</section>", "Acme", { industry: "saas" });
+    expect(staticShell).not.toContain('type="importmap"');
+    expect(staticShell).not.toContain("createRoot");
   });
 
   it("editorial industries get serif display headings, tech industries stay sans", () => {

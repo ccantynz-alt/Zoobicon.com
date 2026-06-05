@@ -44,7 +44,7 @@ export default function BuilderV2() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const readyRef = useRef(false);
-  const queueRef = useRef<Array<{ index: number; html: string }>>([]);
+  const queueRef = useRef<Array<{ index: number; html: string; js?: string }>>([]);
 
   // The iframe (srcDoc, opaque origin) tells us when its hot-swap listener is
   // ready; we flush any sections that arrived before then.
@@ -54,7 +54,8 @@ export default function BuilderV2() {
         readyRef.current = true;
         const win = iframeRef.current?.contentWindow;
         if (win) {
-          for (const s of queueRef.current) win.postMessage({ type: "zb-section", index: s.index, html: s.html }, "*");
+          for (const s of queueRef.current)
+            win.postMessage({ type: "zb-section", index: s.index, html: s.html, js: s.js }, "*");
         }
         queueRef.current = [];
       }
@@ -63,11 +64,11 @@ export default function BuilderV2() {
     return () => window.removeEventListener("message", onMsg);
   }, []);
 
-  const pushSection = useCallback((index: number, html: string) => {
+  const pushSection = useCallback((index: number, html: string, js?: string) => {
     if (readyRef.current && iframeRef.current?.contentWindow) {
-      iframeRef.current.contentWindow.postMessage({ type: "zb-section", index, html }, "*");
+      iframeRef.current.contentWindow.postMessage({ type: "zb-section", index, html, js }, "*");
     } else {
-      queueRef.current.push({ index, html });
+      queueRef.current.push({ index, html, js });
     }
   }, []);
 
@@ -141,7 +142,7 @@ export default function BuilderV2() {
               setShell(evt.shell as string);
               setTailoring(true);
             } else if (evt.type === "section") {
-              pushSection(evt.index as number, evt.html as string);
+              pushSection(evt.index as number, evt.html as string, evt.js as string | undefined);
               if (evt.ai === false) setSectionsIn((n) => n + 1);
             } else if (evt.type === "done") {
               setResult({
@@ -286,9 +287,11 @@ export default function BuilderV2() {
           )}
 
           <div className="mt-auto pt-8 text-[11px] leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-            Slot-locked composition: the AI fills hand-tested templates, so the
-            output can&rsquo;t be structurally broken. Rendered server-side for
-            reliability competitors can&rsquo;t match.
+            Rendered server-side first — so the preview is rock-solid on every
+            device — then brought to life as a real, interactive React app
+            (menus, toggles, accordions, animations). If anything can&rsquo;t
+            load, the polished static version stays. It can only get better,
+            never break.
           </div>
         </aside>
 
@@ -366,7 +369,7 @@ export default function BuilderV2() {
                 title="Your website preview"
                 srcDoc={shell}
                 className="w-full flex-1 border-0"
-                sandbox="allow-scripts allow-popups allow-forms"
+                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
               />
             </div>
           )}

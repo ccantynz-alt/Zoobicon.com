@@ -29,6 +29,7 @@
 import { NextRequest } from "next/server";
 import {
   renderComponentToHtml,
+  compileComponentToModule,
   aiRewriteCopy,
   detectIndustry,
   usesSerifHeadings,
@@ -98,6 +99,17 @@ export async function POST(req: NextRequest): Promise<Response> {
           shell: pageShell("", brandName, { industry, streaming: true }),
         });
 
+        // Compile a component to its live browser module — best-effort, since
+        // hydration only enhances the static render (a null here just means
+        // that section stays static, never broken).
+        const compileLive = (code: string): string | undefined => {
+          try {
+            return compileComponentToModule(code);
+          } catch {
+            return undefined;
+          }
+        };
+
         // ── Phase 1: instant base render, streamed as each completes ──
         await Promise.all(
           components.map(async (c, index) => {
@@ -105,7 +117,7 @@ export async function POST(req: NextRequest): Promise<Response> {
             try {
               const html = await renderComponentToHtml(base);
               finalSections[index] = html;
-              send({ type: "section", index, html: sectionWrap(index, html), ai: false });
+              send({ type: "section", index, html: sectionWrap(index, html), ai: false, js: compileLive(base) });
             } catch {
               /* a single failed base section never blanks the page */
             }
@@ -123,7 +135,7 @@ export async function POST(req: NextRequest): Promise<Response> {
                 const html = await renderComponentToHtml(rewritten);
                 finalSections[index] = html;
                 aiUsed = true;
-                send({ type: "section", index, html: sectionWrap(index, html), ai: true });
+                send({ type: "section", index, html: sectionWrap(index, html), ai: true, js: compileLive(rewritten) });
               } catch {
                 /* keep the polished base section — never regress */
               }
