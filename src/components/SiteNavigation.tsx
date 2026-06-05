@@ -36,7 +36,7 @@ const PRODUCT_SECTIONS = [
     items: [
       { name: "AI Website Builder", href: "/builder", icon: Zap, desc: "Build sites in 60 seconds", badge: "Core" },
       { name: "Generators", href: "/generators", icon: Sparkles, desc: "Specialized site generators" },
-      { name: "Templates", href: "/starter-kits", icon: Layout, desc: "100+ ready-made templates" },
+      { name: "Templates", href: "/showcase", icon: Layout, desc: "Live builds from the community" },
     ],
   },
   {

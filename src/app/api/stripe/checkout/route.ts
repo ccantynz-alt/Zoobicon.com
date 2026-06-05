@@ -30,16 +30,10 @@ export async function POST(request: NextRequest) {
 
     const priceId = getPriceId(planSlug, billingInterval);
 
-    // SAFETY: Don't take payment if webhook can't process it
-    if (!process.env.STRIPE_WEBHOOK_SECRET) {
-      return Response.json(
-        { error: "Payment processing is being configured. Please try again shortly." },
-        { status: 503 }
-      );
-    }
-
-    // SAFETY: Don't take payment if webhook can't process it
-    if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    // SAFETY: Don't take payment if Stripe isn't fully configured.
+    // Graceful 503 (not 500) so the client can show a "being configured"
+    // message rather than a generic server-error toast.
+    if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
       return Response.json(
         { error: "Payment processing is being configured. Please try again shortly." },
         { status: 503 }

@@ -50,10 +50,10 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: "connect_domain",
     name: "Connect a domain",
-    description: "Search and register your perfect domain.",
+    description: "Provision a custom domain through the Crontech marketplace.",
     order: 5,
-    ctaLabel: "Find domain",
-    ctaHref: "/domains",
+    ctaLabel: "Open marketplace",
+    ctaHref: "/marketplace",
     points: 20,
   },
   {
@@ -84,12 +84,12 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     points: 15,
   },
   {
-    id: "first_video",
-    name: "Create your first AI video",
-    description: "Generate a marketing video with our AI pipeline.",
+    id: "import_existing",
+    name: "Import an existing site",
+    description: "Bring in your current site from URL, WordPress, GitHub, Figma, or Notion.",
     order: 9,
-    ctaLabel: "Open video creator",
-    ctaHref: "/video-creator",
+    ctaLabel: "Open import hub",
+    ctaHref: "/import",
     points: 20,
   },
   {

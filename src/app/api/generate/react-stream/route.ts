@@ -1320,6 +1320,21 @@ export async function POST(req: NextRequest): Promise<Response> {
               updatedCode = registry.emphasizeHeadings(updatedCode);
             }
 
+            // Re-validate after post-processing. The regex passes above
+            // (reskin*, swapImagesForIndustry, emphasizeHeadings) can in
+            // edge cases mutate JSX expression slots they shouldn't touch,
+            // producing syntactically invalid output that crashes the
+            // preview. Audit 2026-05-31 — root cause of recurring "Preview
+            // failed" errors. If post-processing broke the code, revert to
+            // the pre-process version (which already passed validation).
+            const postCheck = validateGeneratedComponent(updatedCode);
+            if (!postCheck.ok) {
+              console.warn(
+                `[react-stream] post-processing broke ${comp.id}: ${postCheck.reason} — reverting to pre-process code`
+              );
+              updatedCode = result.code;
+            }
+
             // Write the component file
             const { fileName } = registry.buildComponentFile(comp, { theme });
             files[fileName] = updatedCode;

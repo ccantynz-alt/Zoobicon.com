@@ -221,15 +221,16 @@ const TOOLS: InternalTool[] = [
         required: ["description"],
       },
     },
-    handler: async (args) => {
-      const description = str(args, "description");
-      if (!description) return { ok: false, error: "description is required" };
-      if (description.length > 3000) return { ok: false, error: "description must be 1-3000 characters" };
-      // The video-creator/chat endpoint expects messages in chat format
-      const result = await internalPost("/api/video-creator/chat", {
-        messages: [{ role: "user", content: description }],
-      }, 180_000);
-      return result;
+    handler: async () => {
+      // Rule 19 (2026-05-26) — AI Video Creator retired. Tool stays
+      // registered in the catalog so the MCP surface is reversible,
+      // but the handler returns a clear "feature retired" payload
+      // instead of calling the deleted /api/video-creator/chat route.
+      return {
+        ok: false,
+        error: "feature retired",
+        message: "AI Video Creator is not part of the current Zoobicon launch scope (Rule 19). If it ships in future, it will be a separate focused product.",
+      };
     },
   },
 
@@ -538,10 +539,14 @@ const TOOLS: InternalTool[] = [
         required: ["text"],
       },
     },
-    handler: async (args) => {
-      const text = str(args, "text");
-      if (!text) return { ok: false, error: "text is required" };
-      return await internalPost("/api/video-creator/voiceover", { text, voice: str(args, "voice", "") });
+    handler: async () => {
+      // Rule 19 — same as generate_video. Voiceover pipeline retired
+      // alongside the rest of the Video Creator surface.
+      return {
+        ok: false,
+        error: "feature retired",
+        message: "AI voiceover pipeline retired with the Video Creator (Rule 19).",
+      };
     },
   },
 

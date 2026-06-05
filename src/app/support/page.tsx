@@ -64,11 +64,11 @@ const QUICK_TOPICS = [
 ];
 
 const HELP_CATEGORIES = [
-  { icon: Globe, title: "Website Builder", desc: "Build, edit, and publish AI-generated websites", href: "/products/website-builder" },
-  { icon: Search, title: "SEO Agent", desc: "Set up and manage autonomous SEO campaigns", href: "/products/seo-agent" },
-  { icon: Server, title: "Domains & DNS", desc: "Domain registration, DNS records, transfers", href: "/domains" },
-  { icon: Code2, title: "API & Developer Tools", desc: "REST API, SDKs, CLI, and integrations", href: "/developers" },
-  { icon: BookOpen, title: "Marketplace", desc: "Browse and install add-ons and templates", href: "/marketplace" },
+  { icon: Globe, title: "Website Builder", desc: "Build, edit, and publish AI-generated websites", href: "/builder" },
+  { icon: Search, title: "SEO Agent", desc: "Set up and manage autonomous SEO campaigns", href: "/seo" },
+  { icon: BookOpen, title: "Marketplace", desc: "Browse and install add-ons via Crontech", href: "/marketplace" },
+  { icon: Code2, title: "Import a site", desc: "URL, WordPress, GitHub, Figma, Notion, or Audit", href: "/import" },
+  { icon: Server, title: "Compare", desc: "Zoobicon vs every other AI builder", href: "/compare" },
 ];
 
 export default function SupportPage() {

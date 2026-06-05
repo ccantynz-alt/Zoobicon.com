@@ -336,19 +336,56 @@ function buildSrcDoc(
           for (const path of [...pending]) {
             const deps = depsOf(path, FILES[path]);
             if (deps.every(d => moduleUrls[d])) {
-              try {
-                moduleUrls[path] = await compileModule(path);
-              } catch (err) {
-                // Transpile failure. Isolate section components; abort
-                // only for the entry / shared lib files that everything
-                // depends on.
-                if (isSection(path)) {
-                  console.error("[preview] failed to transpile " + path + ", stubbing section:", err);
-                  moduleUrls[path] = getNullComponentUrl();
-                } else {
-                  showError("Failed to transpile " + path, String(err && err.message || err));
-                  return;
+              // Strip CSS/image imports BEFORE Babel — Babel preserves
+              // them as-is and they'd leak into the Blob URL module.
+              const sourceForBabel = stripAssetImports(FILES[path]);
+              let transpiled;
+              // Cache key includes filename because tsx/ts/jsx/js
+              // toggling changes the Babel presets and the path is
+              // part of the transform input.
+              const cacheKey = await sha256Hex(path + "\0" + sourceForBabel);
+              const cached = cacheGet(cacheKey);
+              if (cached !== null) {
+                transpiled = cached;
+                cacheHits++;
+              } else {
+                let transpileFailed = false;
+                try {
+                  transpiled = Babel.transform(sourceForBabel, {
+                    presets: [
+                      ["typescript", { onlyRemoveTypeImports: true, isTSX: /\.tsx$/.test(path), allExtensions: true }],
+                      ["react", { runtime: "classic" }],
+                    ],
+                    filename: path,
+                  }).code;
+                } catch (err) {
+                  // CRITICAL — per-module error isolation. Without this, one
+                  // bad component blanks all 8 of its siblings (root cause of
+                  // "the builder has never worked" — Craig 2026-05-31).
+                  // Replace the broken file with a stub that renders an
+                  // inline error card so the other components keep working.
+                  transpileFailed = true;
+                  const msg = String(err && err.message || err).replace(/[\`\$\\]/g, "?");
+                  const safePath = String(path).replace(/[\`\$\\]/g, "?");
+                  transpiled =
+                    'import React from "react";\\n' +
+                    'export default function BrokenModule(){\\n' +
+                    '  return React.createElement("div",{style:{padding:"24px",margin:"12px",' +
+                    'background:"#fef2f2",border:"2px solid #fca5a5",borderRadius:"12px",' +
+                    'fontFamily:"ui-monospace,monospace",fontSize:"12px",color:"#991b1b",' +
+                    'whiteSpace:"pre-wrap"}},' +
+                    '"' + safePath + ' failed to transpile",' +
+                    'React.createElement("br"),' +
+                    'React.createElement("br"),' +
+                    '"' + msg + '"' +
+                    ');\\n' +
+                    '}\\n';
+                  console.warn("[zoobicon-preview] " + path + " replaced with error stub: " + msg);
                 }
+                // Only cache the successful transpile — broken stubs should
+                // re-attempt next render in case the source was fixed.
+                if (!transpileFailed) cacheSet(cacheKey, transpiled);
+                cacheMisses++;
               }
               pending.delete(path);
               progress = true;
@@ -378,86 +415,61 @@ function buildSrcDoc(
           return;
         }
 
-        // ── ISOLATION PASS ──────────────────────────────────────────────
-        // Transpiling succeeds but a section's TOP-LEVEL code can still
-        // throw when the module is first evaluated (e.g. a bad expression
-        // run at import time, a destructure of a stubbed package, a call
-        // to an undefined helper). React error boundaries can't catch
-        // module-evaluation errors — only render errors — so we catch
-        // them here: import every section module up front, and swap any
-        // that throw for a null-render stub. The entry is then rebuilt so
-        // it references the stubbed URLs. Net effect: one broken section
-        // disappears; the other nine render perfectly.
-        const sectionPaths = codeFiles.filter((p) => p !== entry && isSection(p) && moduleUrls[p]);
-        let stubbedAny = false;
-        if (sectionPaths.length > 0) {
-          const settled = await Promise.allSettled(sectionPaths.map((p) => import(moduleUrls[p])));
-          settled.forEach((res, i) => {
-            if (res.status === "rejected") {
-              const p = sectionPaths[i];
-              console.error("[preview] section " + p + " threw at evaluation, stubbing:", res.reason);
-              moduleUrls[p] = getNullComponentUrl();
-              stubbedAny = true;
-            }
-          });
-        }
-        // Rebuild the entry against any newly-stubbed section URLs so its
-        // imports resolve to the stubs (Babel is cache-hot, so cheap).
-        if (stubbedAny) {
-          try {
-            moduleUrls[entry] = await compileModule(entry);
-          } catch (err) {
-            showError("Failed to transpile " + entry, String(err && err.message || err));
-            return;
-          }
-        }
-
-        // Cache telemetry — visible in DevTools console.
-        if (cacheHits + cacheMisses > 0) {
-          console.log(
-            "[zoobicon-preview] transpile cache: " + cacheHits + " hits / " +
-              (cacheHits + cacheMisses) + " files (" +
-              Math.round((cacheHits / (cacheHits + cacheMisses)) * 100) + "% hit rate)"
-          );
-        }
-
-        const [{ default: React }, { createRoot }, AppMod] = await Promise.all([
+        const [{ default: React }, { createRoot }] = await Promise.all([
           import("react"),
           import("react-dom/client"),
-          import(moduleUrls[entry]),
         ]);
-        const App = AppMod.default || AppMod;
-        if (!App) {
-          showError("App.tsx has no default export", "Make sure App.tsx exports a default function.");
-          return;
+
+        // Wrap the entry import in its own try/catch so a single broken leaf
+        // module surfaces as an error card INSIDE the preview rather than
+        // killing the entire iframe. (Part of the per-module isolation
+        // landed alongside the transpile-stub fallback.)
+        let App = null;
+        let entryError = null;
+        try {
+          const AppMod = await import(moduleUrls[entry]);
+          App = AppMod.default || AppMod;
+        } catch (err) {
+          entryError = String(err && err.stack || err.message || err);
         }
 
-        // ── TOP-LEVEL RENDER BOUNDARY ───────────────────────────────────
-        // Last line of defence. The per-section boundaries baked into the
-        // generated App.tsx catch render errors inside each section; this
-        // catches anything that escapes (an error in App's own body, or a
-        // section that isn't wrapped). React surfaces render errors here
-        // asynchronously, so without this they'd hit window.onerror as a
-        // blank screen rather than the friendly card below.
-        const RootBoundary = class extends React.Component {
+        // Class-based error boundary so a runtime throw inside ANY child
+        // component (bad hook usage, undefined props, etc.) renders an
+        // inline error card instead of blanking the iframe.
+        class ZoobiconBoundary extends React.Component {
           constructor(props) { super(props); this.state = { err: null }; }
-          static getDerivedStateFromError(err) { return { err }; }
-          componentDidCatch(err) { console.error("[preview] render error:", err); }
+          static getDerivedStateFromError(err) { return { err: err }; }
+          componentDidCatch(err) { console.error("[zoobicon-preview] runtime error:", err); }
           render() {
             if (this.state.err) {
-              return React.createElement(
-                "div",
-                { style: { padding: 24, fontFamily: "-apple-system,BlinkMacSystemFont,sans-serif", color: "#1a1a1c", background: "#fcfaf3", border: "1px solid #ebe7d6", borderRadius: 12, margin: 24, maxWidth: 640 } },
-                React.createElement("div", { style: { fontWeight: 600, color: "#8c6b25", marginBottom: 8 } }, "This section hit a snag"),
-                React.createElement("div", { style: { fontSize: 13, color: "#2a2a30", marginBottom: 12 } }, "The rest of your site is fine — try regenerating or describe an edit to fix this part."),
-                React.createElement("pre", { style: { font: "11px/1.5 ui-monospace,monospace", color: "#76767e", whiteSpace: "pre-wrap", wordBreak: "break-word", background: "#fff", border: "1px solid #ebe7d6", borderRadius: 8, padding: 10, margin: 0, maxHeight: 200, overflow: "auto" } }, String(this.state.err && this.state.err.message || this.state.err))
+              const m = String(this.state.err && this.state.err.message || this.state.err);
+              return React.createElement("div", {
+                style: {
+                  padding: "24px", margin: "24px",
+                  background: "#fef2f2", border: "2px solid #fca5a5",
+                  borderRadius: "12px", fontFamily: "ui-monospace,monospace",
+                  fontSize: "13px", color: "#991b1b", whiteSpace: "pre-wrap",
+                  maxWidth: "720px",
+                },
+              },
+                React.createElement("div", { style: { fontWeight: 600, marginBottom: "8px" } }, "Runtime error in preview"),
+                m
               );
             }
             return this.props.children;
           }
-        };
-        createRoot(document.getElementById("root")).render(
-          React.createElement(RootBoundary, null, React.createElement(App))
+        }
+
+        const rootEl = document.getElementById("root");
+        if (entryError || !App) {
+          showError(
+            entryError ? "Entry module failed to load" : "App.tsx has no default export",
+            entryError || "Make sure App.tsx exports a default function."
+          );
+          return;
+        }
+        createRoot(rootEl).render(
+          React.createElement(ZoobiconBoundary, null, React.createElement(App))
         );
       } catch (err) {
         showError("Preview failed", String(err && err.stack || err));
@@ -506,7 +518,10 @@ function useResolvedEsm() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/vendor/manifest.json", { cache: "force-cache" });
+        // `no-cache` (not `force-cache`) — a previously-403'd manifest must
+        // not stick forever; vendor self-hosting should kick in the moment
+        // a fresh build lands. Browser still revalidates via ETag/Last-Modified.
+        const res = await fetch("/vendor/manifest.json", { cache: "no-cache" });
         if (!res.ok) return; // manifest missing — keep esm.sh fallbacks
         const manifest = (await res.json()) as VendorManifest;
         const okFiles = new Set(

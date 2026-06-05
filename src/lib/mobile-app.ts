@@ -46,8 +46,8 @@ export function generateManifest(): Record<string, unknown> {
     shortcuts: [
       { name: "Dashboard", url: "/admin/mobile", description: "Open dashboard" },
       { name: "Builder", url: "/builder", description: "Build a website" },
-      { name: "Domains", url: "/domains", description: "Search domains" },
-      { name: "Video", url: "/video-creator", description: "Create a video" },
+      { name: "Import", url: "/import", description: "Bring in an existing site" },
+      { name: "Marketplace", url: "/marketplace", description: "Crontech add-ons" },
     ],
   };
 }

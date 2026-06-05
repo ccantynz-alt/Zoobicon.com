@@ -169,7 +169,6 @@ export default function SiteFooter() {
               links={[
                 { name: "AI Builder", href: "/builder" },
                 { name: "Generators", href: "/generators" },
-                { name: "Templates", href: "/starter-kits" },
                 { name: "Showcase", href: "/showcase" },
               ]}
             />
