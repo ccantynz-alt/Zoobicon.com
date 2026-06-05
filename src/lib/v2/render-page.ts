@@ -53,7 +53,7 @@ export interface RenderedPage {
 // Transpile a TSX component string and render it to static HTML. Runs
 // entirely on the server (Node runtime). Mirrors the proven approach in
 // the render smoke tests.
-async function renderComponentToHtml(tsx: string): Promise<string> {
+export async function renderComponentToHtml(tsx: string): Promise<string> {
   const renderToStaticMarkup = await getRenderToStaticMarkup();
   const js = ts.transpileModule(tsx, {
     compilerOptions: {
@@ -81,7 +81,7 @@ async function renderComponentToHtml(tsx: string): Promise<string> {
 
 // Lightweight industry/theme heuristics so we don't need an LLM round-trip
 // just to plan the page. (The AI still customises the copy below.)
-function detectIndustry(prompt: string): string {
+export function detectIndustry(prompt: string): string {
   const p = prompt.toLowerCase();
   if (/\b(restaurant|cafe|bakery|menu|dining|bistro|coffee)\b/.test(p)) return "restaurant";
   if (/\b(portfolio|photographer|designer|artist|creative)\b/.test(p)) return "portfolio";
@@ -182,7 +182,7 @@ export async function renderSlotPage(opts: {
   }
 
   return {
-    html: pageShell(sections.join("\n"), brandName),
+    html: pageShell(sections.join("\n"), brandName, { industry }),
     componentIds,
     industry,
     theme,
@@ -204,7 +204,7 @@ export async function renderSlotPage(opts: {
 // Ask the model to rewrite only the user-facing text of a component to fit
 // the business, keeping structure/classes/imports intact. Returns the full
 // component code, or null on any failure (caller falls back to the base).
-async function aiRewriteCopy(
+export async function aiRewriteCopy(
   baseCode: string,
   prompt: string,
   brandName: string,
@@ -283,7 +283,7 @@ export async function renderFromRegistry(opts: {
   );
 
   return {
-    html: pageShell(sections.filter(Boolean).join("\n"), brandName),
+    html: pageShell(sections.filter(Boolean).join("\n"), brandName, { industry }),
     componentIds: components.map((c) => c.id),
     industry,
     theme: "editorial",
@@ -291,12 +291,70 @@ export async function renderFromRegistry(opts: {
   };
 }
 
+// ───────────────────────────────────────────────────────────────────────
+// SHARED RENDER HELPERS (used by the streaming build route too).
+// ───────────────────────────────────────────────────────────────────────
+
+// Industries whose brand reads as editorial / prestige — these get Playfair
+// display headings (the audit's "$100K serif pairing" gap). Modern/tech
+// industries keep the clean Inter sans look, where serif would feel wrong.
+const SERIF_INDUSTRIES = new Set(["restaurant", "portfolio", "professional", "agency", "other"]);
+
+export function usesSerifHeadings(industry: string): boolean {
+  return SERIF_INDUSTRIES.has(industry);
+}
+
+// Wrap a rendered section so the in-iframe script can address it by index
+// for progressive hot-swap (instant base render → AI-tailored copy lands).
+export function sectionWrap(index: number, html: string): string {
+  return `<section data-zb-i="${index}">${html}</section>`;
+}
+
 // The iframe document. Editorial-light design tokens inline; Tailwind via
 // CDN (a single reliable stylesheet generator — the ONLY script in the
 // iframe, and not our generated code). Playfair + Inter for the editorial,
-// non-cyberpunk look.
-function pageShell(body: string, brandName: string): string {
+// non-cyberpunk look. The Tailwind Play CDN watches the DOM, so sections
+// inserted/replaced after load are styled automatically.
+export function pageShell(
+  body: string,
+  brandName: string,
+  opts: { industry?: string; streaming?: boolean } = {},
+): string {
   const title = brandName ? `${escapeHtml(brandName)} — built with Zoobicon` : "Zoobicon preview";
+  const serif = opts.industry ? usesSerifHeadings(opts.industry) : true;
+  const headingRule = serif
+    ? `h1,h2{font-family:"Playfair Display",Georgia,serif;letter-spacing:-0.02em;}`
+    : "";
+  // Listener that hot-swaps sections as the AI-tailored copy streams in. Only
+  // emitted for the streaming shell; the static page never needs it.
+  const streamScript = opts.streaming
+    ? `<script>
+(function(){
+  function place(root, idx, html){
+    var existing = root.querySelector('[data-zb-i="'+idx+'"]');
+    if (existing){ existing.outerHTML = html; return; }
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    var node = tmp.firstElementChild;
+    if (!node) return;
+    var after = null, kids = root.children;
+    for (var i=0;i<kids.length;i++){
+      var k = parseInt(kids[i].getAttribute('data-zb-i'),10);
+      if (k > idx){ after = kids[i]; break; }
+    }
+    root.insertBefore(node, after);
+  }
+  window.addEventListener('message', function(e){
+    var d = e.data || {};
+    if (d.type === 'zb-section'){ place(document.getElementById('zb-root'), d.index, d.html); }
+  });
+  function ready(){ try { parent.postMessage({type:'zb-ready'}, '*'); } catch(_){} }
+  if (document.readyState !== 'loading') ready();
+  else document.addEventListener('DOMContentLoaded', ready);
+})();
+</script>`
+    : "";
+  const bodyContent = opts.streaming ? `<div id="zb-root">${body}</div>` : body;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -318,10 +376,12 @@ function pageShell(body: string, brandName: string): string {
       font-family:"Inter",system-ui,-apple-system,sans-serif;
       -webkit-font-smoothing:antialiased;}
     *{box-sizing:border-box;}
+    ${headingRule}
   </style>
 </head>
 <body>
-${body}
+${bodyContent}
+${streamScript}
 </body>
 </html>`;
 }

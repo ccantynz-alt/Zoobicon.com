@@ -6,7 +6,13 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { renderSlotPage, renderFromRegistry } from "../src/lib/v2/render-page";
+import {
+  renderSlotPage,
+  renderFromRegistry,
+  pageShell,
+  sectionWrap,
+  usesSerifHeadings,
+} from "../src/lib/v2/render-page";
 // Populate the 118-component registry (ensureRegistryLoaded uses CommonJS
 // require which doesn't run under vitest's ESM transform).
 import "../src/lib/component-registry/navbars";
@@ -64,5 +70,35 @@ describe("v2 renderFromRegistry (rich engine)", () => {
     const page = await renderFromRegistry({ prompt: "An online boutique store for handmade jewelry", useExampleFill: true });
     expect(page.componentIds.length).toBeGreaterThanOrEqual(6);
     expect(page.html.length).toBeGreaterThan(5000);
+  });
+});
+
+describe("v2 progressive streaming primitives", () => {
+  it("streaming shell carries the hot-swap listener + root, static shell doesn't", () => {
+    const streaming = pageShell("", "Acme", { industry: "saas", streaming: true });
+    expect(streaming).toContain('id="zb-root"');
+    expect(streaming).toContain("zb-section");
+    expect(streaming).toContain("zb-ready");
+
+    const staticShell = pageShell("<section>hi</section>", "Acme", { industry: "saas" });
+    expect(staticShell).not.toContain('id="zb-root"');
+    expect(staticShell).not.toContain("zb-ready");
+    expect(staticShell).toContain("<section>hi</section>");
+  });
+
+  it("sectionWrap addresses sections by index for in-place hot-swap", () => {
+    expect(sectionWrap(3, "<h1>x</h1>")).toBe('<section data-zb-i="3"><h1>x</h1></section>');
+  });
+
+  it("editorial industries get serif display headings, tech industries stay sans", () => {
+    expect(usesSerifHeadings("restaurant")).toBe(true);
+    expect(usesSerifHeadings("portfolio")).toBe(true);
+    expect(usesSerifHeadings("saas")).toBe(false);
+    expect(usesSerifHeadings("ecommerce")).toBe(false);
+    // Editorial shell injects the Playfair *heading* rule; saas omits it
+    // (the font link itself is always present, so assert on the h1,h2 rule).
+    const headingRule = 'h1,h2{font-family:"Playfair Display"';
+    expect(pageShell("", "", { industry: "restaurant" })).toContain(headingRule);
+    expect(pageShell("", "", { industry: "saas" })).not.toContain(headingRule);
   });
 });
