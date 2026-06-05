@@ -67,7 +67,11 @@ describe("planPageForIndustry", () => {
       "navbar-minimal-slot",
       "hero-spotlight-slot",
       "features-bento-slot",
+      "stats-strip-slot",
+      "testimonials-quotes-slot",
       "pricing-tiers-slot",
+      "faq-accordion-slot",
+      "cta-banner-slot",
       "footer-editorial-slot",
     ]);
   });
