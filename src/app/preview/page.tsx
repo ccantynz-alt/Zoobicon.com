@@ -69,46 +69,6 @@ body:has(#zb-home) { background: #08080b !important; }
 .zbx-card { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)); }
 .zbx-card-hover { transition: border-color .3s, transform .3s, box-shadow .3s; }
 .zbx-card-hover:hover { border-color: rgba(255,255,255,0.16); transform: translateY(-4px); box-shadow: 0 24px 50px -24px rgba(0,0,0,0.8); }
-
-/* ── Neutralize the legacy globals.css editorial-light override layer ──────────
-   The bottom of globals.css (the old Rule 29 "sand & gold" system) repaints
-   EVERY text-white / bg-white / border-white utility to dark ink/sand with
-   !important — which is why the headlines and card titles were rendering
-   near-black on this dark page. We re-assert each utility under the #zb-home
-   ID: ID+class specificity outranks the global bare-class selectors, so these
-   win even though both carry !important. This keeps the page fully dark-mode
-   no matter what the global override does — including after it's promoted to /. */
-#zb-home { color: #fff !important; }
-#zb-home .text-white { color: #fff !important; }
-#zb-home .text-white\\/80 { color: rgba(255,255,255,.80) !important; }
-#zb-home .text-white\\/75 { color: rgba(255,255,255,.75) !important; }
-#zb-home .text-white\\/70 { color: rgba(255,255,255,.70) !important; }
-#zb-home .text-white\\/65 { color: rgba(255,255,255,.65) !important; }
-#zb-home .text-white\\/60 { color: rgba(255,255,255,.60) !important; }
-#zb-home .text-white\\/55 { color: rgba(255,255,255,.55) !important; }
-#zb-home .text-white\\/50 { color: rgba(255,255,255,.50) !important; }
-#zb-home .text-white\\/45 { color: rgba(255,255,255,.45) !important; }
-#zb-home .text-white\\/40 { color: rgba(255,255,255,.40) !important; }
-#zb-home .text-white\\/35 { color: rgba(255,255,255,.35) !important; }
-#zb-home .text-white\\/30 { color: rgba(255,255,255,.30) !important; }
-#zb-home .text-white\\/20 { color: rgba(255,255,255,.20) !important; }
-#zb-home .bg-white { background-color: #fff !important; }
-#zb-home .bg-white\\/80 { background-color: rgba(255,255,255,.80) !important; }
-#zb-home .bg-white\\/40 { background-color: rgba(255,255,255,.40) !important; }
-#zb-home .bg-white\\/30 { background-color: rgba(255,255,255,.30) !important; }
-#zb-home .bg-white\\/25 { background-color: rgba(255,255,255,.25) !important; }
-#zb-home .bg-white\\/20 { background-color: rgba(255,255,255,.20) !important; }
-#zb-home .bg-white\\/15 { background-color: rgba(255,255,255,.15) !important; }
-#zb-home .bg-white\\/10 { background-color: rgba(255,255,255,.10) !important; }
-#zb-home .bg-white\\/8  { background-color: rgba(255,255,255,.08) !important; }
-#zb-home .bg-white\\/5  { background-color: rgba(255,255,255,.05) !important; }
-#zb-home .border-white\\/15 { border-color: rgba(255,255,255,.15) !important; }
-#zb-home .border-white\\/12 { border-color: rgba(255,255,255,.12) !important; }
-#zb-home .border-white\\/10 { border-color: rgba(255,255,255,.10) !important; }
-#zb-home .border-white\\/8  { border-color: rgba(255,255,255,.08) !important; }
-#zb-home .from-white { --tw-gradient-from: #fff var(--tw-gradient-from-position) !important; --tw-gradient-to: rgba(255,255,255,0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
-#zb-home .via-white\\/12 { --tw-gradient-to: rgba(255,255,255,0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), rgba(255,255,255,.12) var(--tw-gradient-via-position), var(--tw-gradient-to) !important; }
-#zb-home .via-white\\/10 { --tw-gradient-to: rgba(255,255,255,0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), rgba(255,255,255,.10) var(--tw-gradient-via-position), var(--tw-gradient-to) !important; }
 `;
 
 /* ── reveal-on-scroll: one observer for the whole page ───────────────────── */
@@ -213,7 +173,7 @@ function Wordmark() {
       <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-[9px] bg-[#d4f24e]">
         <span className="zbx-d text-[15px] text-[#161d05]">z</span>
       </span>
-      <span className="zbx-d-tight text-[18px] text-white">zoobicon</span>
+      <span className="zbx-d-tight text-[18px] text-[#fff]">zoobicon</span>
     </a>
   );
 }
@@ -260,7 +220,7 @@ function FloatingNav() {
       <div
         className={`zbx-b w-full max-w-6xl rounded-2xl border transition-all duration-300 ${
           scrolled || open
-            ? "border-white/10 bg-[#0c0c10]/80 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl"
+            ? "border-[rgba(255,255,255,0.10)] bg-[#0c0c10]/80 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl"
             : "border-transparent bg-transparent"
         }`}
         onMouseLeave={() => setOpen(null)}
@@ -274,7 +234,7 @@ function FloatingNav() {
               onMouseEnter={() => setOpen("platform")}
               onClick={() => setOpen(open === "platform" ? null : "platform")}
               className={`flex items-center gap-1 rounded-lg px-3 py-2 text-[14px] font-medium transition-colors ${
-                open === "platform" ? "text-white" : "text-white/60 hover:text-white"
+                open === "platform" ? "text-[#fff]" : "text-[rgba(255,255,255,0.60)] hover:text-[#fff]"
               }`}
             >
               Platform <I.chevron className={`h-3.5 w-3.5 transition-transform ${open === "platform" ? "rotate-180" : ""}`} />
@@ -283,19 +243,19 @@ function FloatingNav() {
               onMouseEnter={() => setOpen("docs")}
               onClick={() => setOpen(open === "docs" ? null : "docs")}
               className={`flex items-center gap-1 rounded-lg px-3 py-2 text-[14px] font-medium transition-colors ${
-                open === "docs" ? "text-white" : "text-white/60 hover:text-white"
+                open === "docs" ? "text-[#fff]" : "text-[rgba(255,255,255,0.60)] hover:text-[#fff]"
               }`}
             >
               Docs <I.chevron className={`h-3.5 w-3.5 transition-transform ${open === "docs" ? "rotate-180" : ""}`} />
             </button>
-            <a href="/pricing" onMouseEnter={() => setOpen(null)} className="rounded-lg px-3 py-2 text-[14px] font-medium text-white/60 transition-colors hover:text-white">
+            <a href="/pricing" onMouseEnter={() => setOpen(null)} className="rounded-lg px-3 py-2 text-[14px] font-medium text-[rgba(255,255,255,0.60)] transition-colors hover:text-[#fff]">
               Pricing
             </a>
           </nav>
 
           {/* desktop ctas */}
           <div className="hidden items-center gap-2 md:flex">
-            <a href="/auth/login" className="rounded-lg px-3 py-2 text-[14px] font-medium text-white/60 transition-colors hover:text-white">
+            <a href="/auth/login" className="rounded-lg px-3 py-2 text-[14px] font-medium text-[rgba(255,255,255,0.60)] transition-colors hover:text-[#fff]">
               Sign in
             </a>
             <a
@@ -308,7 +268,7 @@ function FloatingNav() {
           </div>
 
           {/* mobile toggle */}
-          <button onClick={() => setMobile((v) => !v)} className="md:hidden rounded-lg p-2 text-white" aria-label="Menu">
+          <button onClick={() => setMobile((v) => !v)} className="md:hidden rounded-lg p-2 text-[#fff]" aria-label="Menu">
             <div className="flex flex-col gap-1.5">
               <span className={`h-0.5 w-5 bg-current transition-transform ${mobile ? "translate-y-2 rotate-45" : ""}`} />
               <span className={`h-0.5 w-5 bg-current transition-opacity ${mobile ? "opacity-0" : ""}`} />
@@ -319,17 +279,17 @@ function FloatingNav() {
 
         {/* desktop mega dropdown */}
         {open && (
-          <div className="zbx-drop hidden border-t border-white/10 p-3 md:block">
+          <div className="zbx-drop hidden border-t border-[rgba(255,255,255,0.10)] p-3 md:block">
             {open === "platform" ? (
               <div className="grid grid-cols-2 gap-1">
                 {PLATFORM_MENU.map((m) => (
-                  <a key={m.title} href="/builder" className="group flex gap-3 rounded-xl p-3 transition-colors hover:bg-white/5">
-                    <span className="mt-0.5 flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-white/[0.06] text-[#d4f24e] ring-1 ring-white/10">
+                  <a key={m.title} href="/builder" className="group flex gap-3 rounded-xl p-3 transition-colors hover:bg-[rgba(255,255,255,0.05)]">
+                    <span className="mt-0.5 flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-[rgba(255,255,255,0.06)] text-[#d4f24e] ring-1 ring-[#fff]/10">
                       <m.icon className="h-[18px] w-[18px]" />
                     </span>
                     <span>
-                      <span className="block text-[14px] font-semibold text-white">{m.title}</span>
-                      <span className="mt-0.5 block text-[13px] leading-snug text-white/50">{m.body}</span>
+                      <span className="block text-[14px] font-semibold text-[#fff]">{m.title}</span>
+                      <span className="mt-0.5 block text-[13px] leading-snug text-[rgba(255,255,255,0.50)]">{m.body}</span>
                     </span>
                   </a>
                 ))}
@@ -337,9 +297,9 @@ function FloatingNav() {
             ) : (
               <div className="grid grid-cols-2 gap-1">
                 {DOCS_MENU.map((m) => (
-                  <a key={m.title} href="/builder" className="group rounded-xl p-3 transition-colors hover:bg-white/5">
-                    <span className="block text-[14px] font-semibold text-white">{m.title}</span>
-                    <span className="mt-0.5 block text-[13px] leading-snug text-white/50">{m.body}</span>
+                  <a key={m.title} href="/builder" className="group rounded-xl p-3 transition-colors hover:bg-[rgba(255,255,255,0.05)]">
+                    <span className="block text-[14px] font-semibold text-[#fff]">{m.title}</span>
+                    <span className="mt-0.5 block text-[13px] leading-snug text-[rgba(255,255,255,0.50)]">{m.body}</span>
                   </a>
                 ))}
               </div>
@@ -349,14 +309,14 @@ function FloatingNav() {
 
         {/* mobile sheet */}
         {mobile && (
-          <div className="zbx-drop border-t border-white/10 p-3 md:hidden">
+          <div className="zbx-drop border-t border-[rgba(255,255,255,0.10)] p-3 md:hidden">
             {["Platform", "Docs", "Pricing"].map((l) => (
-              <a key={l} href={l === "Pricing" ? "/pricing" : "/builder"} className="block rounded-lg px-3 py-2.5 text-[15px] font-medium text-white">
+              <a key={l} href={l === "Pricing" ? "/pricing" : "/builder"} className="block rounded-lg px-3 py-2.5 text-[15px] font-medium text-[#fff]">
                 {l}
               </a>
             ))}
             <div className="mt-2 grid grid-cols-2 gap-2 px-1">
-              <a href="/auth/login" className="rounded-lg border border-white/15 px-4 py-2.5 text-center text-[14px] font-semibold text-white">
+              <a href="/auth/login" className="rounded-lg border border-[rgba(255,255,255,0.15)] px-4 py-2.5 text-center text-[14px] font-semibold text-[#fff]">
                 Sign in
               </a>
               <a href="/builder" className="rounded-lg bg-[#d4f24e] px-4 py-2.5 text-center text-[14px] font-bold text-[#161d05]">
@@ -401,35 +361,35 @@ function BuilderMockup() {
   return (
     <div className="zbx-float relative w-full max-w-[520px]">
       <div className="zbx-anim pointer-events-none absolute -inset-6 -z-10 rounded-[32px] bg-[#d4f24e]/15 blur-3xl" style={{ animation: "zbx-glow 5s ease-in-out infinite" }} />
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0e0e12] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
+      <div className="overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.10)] bg-[#0e0e12] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
         {/* window chrome */}
-        <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
+        <div className="flex items-center gap-2 border-b border-[rgba(255,255,255,0.10)] px-4 py-3">
           <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
           <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
           <span className="h-3 w-3 rounded-full bg-[#28c840]" />
-          <div className="ml-3 flex h-6 flex-1 items-center rounded-md bg-white/5 px-3">
-            <span className="zbx-m text-[11px] text-white/40">zoobicon.com/builder</span>
+          <div className="ml-3 flex h-6 flex-1 items-center rounded-md bg-[rgba(255,255,255,0.05)] px-3">
+            <span className="zbx-m text-[11px] text-[rgba(255,255,255,0.40)]">zoobicon.com/builder</span>
           </div>
-          <span className={`zbx-m rounded-md px-2 py-1 text-[10px] font-medium ${phase === "live" ? "bg-[#d4f24e] text-[#161d05]" : "bg-white/10 text-white/50"}`}>
+          <span className={`zbx-m rounded-md px-2 py-1 text-[10px] font-medium ${phase === "live" ? "bg-[#d4f24e] text-[#161d05]" : "bg-[rgba(255,255,255,0.10)] text-[rgba(255,255,255,0.50)]"}`}>
             {phase === "live" ? "● LIVE" : "building"}
           </span>
         </div>
 
         <div className="grid grid-cols-[120px_1fr]">
           {/* prompt rail */}
-          <div className="border-r border-white/10 p-3">
-            <div className="zbx-m text-[10px] uppercase tracking-wider text-white/30">Prompt</div>
-            <div className="mt-2 rounded-lg bg-white/5 p-2.5 text-[11px] leading-snug text-white/70">
+          <div className="border-r border-[rgba(255,255,255,0.10)] p-3">
+            <div className="zbx-m text-[10px] uppercase tracking-wider text-[rgba(255,255,255,0.30)]">Prompt</div>
+            <div className="mt-2 rounded-lg bg-[rgba(255,255,255,0.05)] p-2.5 text-[11px] leading-snug text-[rgba(255,255,255,0.70)]">
               A bold landing page for a fintech app called Nova
               {phase === "typing" && <span className="zbx-cursor ml-0.5 inline-block h-3 w-[2px] translate-y-0.5 bg-[#d4f24e]" />}
             </div>
             <div className="mt-3 space-y-1.5">
               {HERO_SECTIONS.map((s, i) => (
                 <div key={s} className="flex items-center gap-1.5">
-                  <span className={`flex h-3.5 w-3.5 items-center justify-center rounded-[4px] ${i < built ? "bg-[#d4f24e] text-[#161d05]" : "bg-white/10 text-transparent"}`}>
+                  <span className={`flex h-3.5 w-3.5 items-center justify-center rounded-[4px] ${i < built ? "bg-[#d4f24e] text-[#161d05]" : "bg-[rgba(255,255,255,0.10)] text-transparent"}`}>
                     <I.check className="h-2.5 w-2.5" />
                   </span>
-                  <span className={`text-[10px] ${i < built ? "text-white/70" : "text-white/30"}`}>{s}</span>
+                  <span className={`text-[10px] ${i < built ? "text-[rgba(255,255,255,0.70)]" : "text-[rgba(255,255,255,0.30)]"}`}>{s}</span>
                 </div>
               ))}
             </div>
@@ -439,32 +399,32 @@ function BuilderMockup() {
           <div className="relative min-h-[260px] bg-[#08080b] p-3">
             {phase === "building" && (
               <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                <div className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/10 to-transparent" style={{ animation: "zbx-shimmer 1.4s ease-in-out infinite" }} />
+                <div className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.10)] to-transparent" style={{ animation: "zbx-shimmer 1.4s ease-in-out infinite" }} />
               </div>
             )}
             <div className="space-y-2.5">
               {built >= 1 && (
-                <div className="zbx-drop flex items-center justify-between rounded-lg bg-white/5 px-2.5 py-1.5">
+                <div className="zbx-drop flex items-center justify-between rounded-lg bg-[rgba(255,255,255,0.05)] px-2.5 py-1.5">
                   <div className="h-2 w-10 rounded bg-[#d4f24e]" />
-                  <div className="flex gap-1.5">{[0, 1, 2].map((k) => <div key={k} className="h-2 w-6 rounded bg-white/15" />)}</div>
+                  <div className="flex gap-1.5">{[0, 1, 2].map((k) => <div key={k} className="h-2 w-6 rounded bg-[rgba(255,255,255,0.15)]" />)}</div>
                 </div>
               )}
               {built >= 2 && (
-                <div className="zbx-drop rounded-lg bg-gradient-to-br from-white/[0.07] to-transparent p-3">
-                  <div className="h-3 w-3/4 rounded bg-white/80" />
+                <div className="zbx-drop rounded-lg bg-gradient-to-br from-[rgba(255,255,255,0.07)] to-transparent p-3">
+                  <div className="h-3 w-3/4 rounded bg-[rgba(255,255,255,0.80)]" />
                   <div className="mt-1.5 h-3 w-1/2 rounded bg-[#d4f24e]" />
-                  <div className="mt-2.5 h-1.5 w-full rounded bg-white/15" />
-                  <div className="mt-1 h-1.5 w-4/5 rounded bg-white/15" />
+                  <div className="mt-2.5 h-1.5 w-full rounded bg-[rgba(255,255,255,0.15)]" />
+                  <div className="mt-1 h-1.5 w-4/5 rounded bg-[rgba(255,255,255,0.15)]" />
                   <div className="mt-2.5 inline-flex h-5 items-center rounded-md bg-[#d4f24e] px-2 text-[8px] font-bold text-[#161d05]">Get started</div>
                 </div>
               )}
               {built >= 3 && (
                 <div className="zbx-drop grid grid-cols-3 gap-1.5">
                   {[0, 1, 2].map((k) => (
-                    <div key={k} className="rounded-lg bg-white/5 p-2">
+                    <div key={k} className="rounded-lg bg-[rgba(255,255,255,0.05)] p-2">
                       <div className="h-4 w-4 rounded bg-[#d4f24e]/70" />
-                      <div className="mt-1.5 h-1.5 w-full rounded bg-white/20" />
-                      <div className="mt-1 h-1.5 w-2/3 rounded bg-white/15" />
+                      <div className="mt-1.5 h-1.5 w-full rounded bg-[rgba(255,255,255,0.20)]" />
+                      <div className="mt-1 h-1.5 w-2/3 rounded bg-[rgba(255,255,255,0.15)]" />
                     </div>
                   ))}
                 </div>
@@ -472,17 +432,17 @@ function BuilderMockup() {
               {built >= 4 && (
                 <div className="zbx-drop flex gap-1.5">
                   {[0, 1, 2].map((k) => (
-                    <div key={k} className={`flex-1 rounded-lg p-2 ${k === 1 ? "bg-[#d4f24e]/15 ring-1 ring-[#d4f24e]/40" : "bg-white/5"}`}>
-                      <div className="h-3 w-8 rounded bg-white/40" />
-                      <div className="mt-1 h-1.5 w-full rounded bg-white/15" />
+                    <div key={k} className={`flex-1 rounded-lg p-2 ${k === 1 ? "bg-[#d4f24e]/15 ring-1 ring-[#d4f24e]/40" : "bg-[rgba(255,255,255,0.05)]"}`}>
+                      <div className="h-3 w-8 rounded bg-[rgba(255,255,255,0.40)]" />
+                      <div className="mt-1 h-1.5 w-full rounded bg-[rgba(255,255,255,0.15)]" />
                     </div>
                   ))}
                 </div>
               )}
               {built >= 5 && (
-                <div className="zbx-drop flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-1.5">
-                  <div className="h-2 w-8 rounded bg-white/30" />
-                  <div className="flex gap-1">{[0, 1, 2, 3].map((k) => <div key={k} className="h-2 w-2 rounded-full bg-white/20" />)}</div>
+                <div className="zbx-drop flex items-center justify-between rounded-lg bg-[rgba(255,255,255,0.03)] px-2.5 py-1.5">
+                  <div className="h-2 w-8 rounded bg-[rgba(255,255,255,0.30)]" />
+                  <div className="flex gap-1">{[0, 1, 2, 3].map((k) => <div key={k} className="h-2 w-2 rounded-full bg-[rgba(255,255,255,0.20)]" />)}</div>
                 </div>
               )}
             </div>
@@ -491,13 +451,13 @@ function BuilderMockup() {
       </div>
 
       {/* floating deploy chip */}
-      <div className={`absolute -bottom-4 -right-3 flex items-center gap-2 rounded-xl border border-white/10 bg-[#13131a] px-3 py-2 shadow-[0_12px_30px_rgba(0,0,0,0.5)] transition-all duration-500 ${phase === "live" ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}>
+      <div className={`absolute -bottom-4 -right-3 flex items-center gap-2 rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#13131a] px-3 py-2 shadow-[0_12px_30px_rgba(0,0,0,0.5)] transition-all duration-500 ${phase === "live" ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}>
         <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#d4f24e] text-[#161d05]">
           <I.globe className="h-3.5 w-3.5" />
         </span>
         <span className="zbx-b">
-          <span className="block text-[11px] font-semibold leading-none text-white">Deployed</span>
-          <span className="zbx-m block text-[10px] text-white/45">nova.zoobicon.app</span>
+          <span className="block text-[11px] font-semibold leading-none text-[#fff]">Deployed</span>
+          <span className="zbx-m block text-[10px] text-[rgba(255,255,255,0.45)]">nova.zoobicon.app</span>
         </span>
       </div>
     </div>
@@ -521,13 +481,13 @@ function Hero() {
       <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-5 pb-20 sm:pb-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
         {/* copy */}
         <div className="zbx-reveal">
-          <a href="/builder" className="zbx-b inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 py-1.5 pl-1.5 pr-3.5 text-[13px] text-white/80 backdrop-blur">
+          <a href="/builder" className="zbx-b inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] py-1.5 pl-1.5 pr-3.5 text-[13px] text-[rgba(255,255,255,0.80)] backdrop-blur">
             <span className="rounded-full bg-[#d4f24e] px-2 py-0.5 text-[11px] font-bold text-[#161d05]">NEW</span>
             Streaming preview — first paint in under 2 seconds
             <I.arrow className="h-3.5 w-3.5 text-[#d4f24e]" />
           </a>
 
-          <h1 className="zbx-d mt-6 text-[44px] text-white sm:text-[60px] lg:text-[68px]">
+          <h1 className="zbx-d mt-6 text-[44px] text-[#fff] sm:text-[60px] lg:text-[68px]">
             Describe it.
             <br />
             Watch it build.
@@ -537,8 +497,8 @@ function Hero() {
             </span>
           </h1>
 
-          <p className="zbx-b mt-6 max-w-xl text-[17px] leading-relaxed text-white/60 sm:text-[19px]">
-            Zoobicon is the AI website builder that ships a <span className="text-white">production-ready React site</span> — not a throwaway export. Six agents collaborate live in your browser, assemble from 118 agency-grade components, and hand you a real codebase with hosting and a domain in the same flow.
+          <p className="zbx-b mt-6 max-w-xl text-[17px] leading-relaxed text-[rgba(255,255,255,0.60)] sm:text-[19px]">
+            Zoobicon is the AI website builder that ships a <span className="text-[#fff]">production-ready React site</span> — not a throwaway export. Six agents collaborate live in your browser, assemble from 118 agency-grade components, and hand you a real codebase with hosting and a domain in the same flow.
           </p>
 
           <div className="zbx-b mt-8 flex flex-col gap-3 sm:flex-row">
@@ -551,14 +511,14 @@ function Hero() {
             </a>
             <a
               href="/builder"
-              className="group inline-flex items-center justify-center gap-2 rounded-xl border border-white/12 bg-white/5 px-6 py-3.5 text-[16px] font-semibold text-white backdrop-blur transition-colors hover:bg-white/10"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-6 py-3.5 text-[16px] font-semibold text-[#fff] backdrop-blur transition-colors hover:bg-[rgba(255,255,255,0.10)]"
             >
               <I.play className="h-[18px] w-[18px] text-[#d4f24e]" />
               Watch a 60-second build
             </a>
           </div>
 
-          <div className="zbx-b mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] text-white/45">
+          <div className="zbx-b mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] text-[rgba(255,255,255,0.45)]">
             <span className="inline-flex items-center gap-1.5"><I.check className="h-4 w-4 text-[#d4f24e]" /> No credit card</span>
             <span className="inline-flex items-center gap-1.5"><I.check className="h-4 w-4 text-[#d4f24e]" /> Export the real code</span>
             <span className="inline-flex items-center gap-1.5"><I.check className="h-4 w-4 text-[#d4f24e]" /> Live URL in one click</span>
@@ -572,12 +532,12 @@ function Hero() {
       </div>
 
       {/* niche marquee — honest: categories, not fake customer logos */}
-      <div className="relative border-y border-white/8 py-5">
-        <p className="zbx-b mb-3 text-center text-[12px] uppercase tracking-[0.22em] text-white/35">One prompt builds any of these</p>
+      <div className="relative border-y border-[rgba(255,255,255,0.08)] py-5">
+        <p className="zbx-b mb-3 text-center text-[12px] uppercase tracking-[0.22em] text-[rgba(255,255,255,0.35)]">One prompt builds any of these</p>
         <div className="zbx-scroll-hide relative overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]">
           <div className="zbx-marquee-track flex w-max gap-3">
             {[...NICHES, ...NICHES].map((n, i) => (
-              <span key={i} className="zbx-m whitespace-nowrap rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-[13px] text-white/55">
+              <span key={i} className="zbx-m whitespace-nowrap rounded-full border border-[rgba(255,255,255,0.10)] bg-[rgba(255,255,255,0.03)] px-4 py-1.5 text-[13px] text-[rgba(255,255,255,0.55)]">
                 {n}
               </span>
             ))}
@@ -609,18 +569,18 @@ const AGENTS = [
 function Pipeline() {
   return (
     <section className="relative py-24 sm:py-28">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.12)] to-transparent" />
       <div className="mx-auto max-w-6xl px-5">
         <div className="zbx-reveal mx-auto max-w-2xl text-center">
-          <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-white/70">
+          <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-[rgba(255,255,255,0.70)]">
             <I.spark className="h-3.5 w-3.5 text-[#d4f24e]" /> The pipeline
           </span>
-          <h2 className="zbx-d mt-5 text-[34px] text-white sm:text-[46px]">
+          <h2 className="zbx-d mt-5 text-[34px] text-[#fff] sm:text-[46px]">
             Not one model guessing.
             <br />
             <span className="text-[#d4f24e]">Six agents collaborating.</span>
           </h2>
-          <p className="zbx-b mx-auto mt-5 max-w-xl text-[17px] leading-relaxed text-white/60">
+          <p className="zbx-b mx-auto mt-5 max-w-xl text-[17px] leading-relaxed text-[rgba(255,255,255,0.60)]">
             Single-shot builders dump one blob and hope. Zoobicon runs a coordinated team — each agent does one job well, and the work streams into your preview as it lands.
           </p>
         </div>
@@ -630,17 +590,17 @@ function Pipeline() {
             {AGENTS.map((a, i) => (
               <div
                 key={a.name}
-                className="zbx-card zbx-card-hover group relative overflow-hidden rounded-2xl border border-white/10 p-5"
+                className="zbx-card zbx-card-hover group relative overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.10)] p-5"
               >
                 <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#d4f24e]/0 blur-2xl transition-colors duration-500 group-hover:bg-[#d4f24e]/20" />
                 <div className="flex items-center justify-between">
-                  <span className="zbx-m text-[12px] font-medium text-white/35">AGENT {String(i + 1).padStart(2, "0")}</span>
+                  <span className="zbx-m text-[12px] font-medium text-[rgba(255,255,255,0.35)]">AGENT {String(i + 1).padStart(2, "0")}</span>
                   <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d4f24e] text-[#161d05]">
                     <span className="zbx-d text-[13px]">{i + 1}</span>
                   </span>
                 </div>
-                <h3 className="zbx-d-tight mt-4 text-[20px] text-white">{a.name}</h3>
-                <p className="zbx-b mt-1.5 text-[14px] leading-snug text-white/55">{a.role}</p>
+                <h3 className="zbx-d-tight mt-4 text-[20px] text-[#fff]">{a.name}</h3>
+                <p className="zbx-b mt-1.5 text-[14px] leading-snug text-[rgba(255,255,255,0.55)]">{a.role}</p>
               </div>
             ))}
           </div>
@@ -652,8 +612,8 @@ function Pipeline() {
                 <I.bolt className="h-5 w-5" />
               </span>
               <div>
-                <p className="zbx-d-tight text-[18px] text-white">A production-ready site — in ~60 seconds</p>
-                <p className="zbx-b text-[14px] text-white/55">Streamed section-by-section, hydrated to real interactive React.</p>
+                <p className="zbx-d-tight text-[18px] text-[#fff]">A production-ready site — in ~60 seconds</p>
+                <p className="zbx-b text-[14px] text-[rgba(255,255,255,0.55)]">Streamed section-by-section, hydrated to real interactive React.</p>
               </div>
             </div>
             <a href="/builder" className="zbx-b inline-flex flex-none items-center justify-center gap-1.5 rounded-xl bg-[#d4f24e] px-5 py-2.5 text-[15px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5">
@@ -674,55 +634,55 @@ function Bento() {
     <section className="pb-24 sm:pb-28">
       <div className="mx-auto max-w-6xl px-5">
         <div className="zbx-reveal mx-auto mb-12 max-w-2xl text-center">
-          <h2 className="zbx-d text-[34px] text-white sm:text-[46px]">Everything serious builders ask for</h2>
-          <p className="zbx-b mx-auto mt-4 max-w-lg text-[17px] text-white/60">
+          <h2 className="zbx-d text-[34px] text-[#fff] sm:text-[46px]">Everything serious builders ask for</h2>
+          <p className="zbx-b mx-auto mt-4 max-w-lg text-[17px] text-[rgba(255,255,255,0.60)]">
             Speed, real code, and a finish that looks like a $100K agency built it — without the agency.
           </p>
         </div>
 
         <div className="zbx-reveal grid grid-cols-1 gap-3 md:grid-cols-6 md:grid-rows-2">
           {/* big — registry */}
-          <div className="zbx-card group relative overflow-hidden rounded-3xl border border-white/10 p-7 md:col-span-3 md:row-span-2">
+          <div className="zbx-card group relative overflow-hidden rounded-3xl border border-[rgba(255,255,255,0.10)] p-7 md:col-span-3 md:row-span-2">
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#d4f24e] text-[#161d05]">
               <I.layers className="h-[22px] w-[22px]" />
             </span>
-            <h3 className="zbx-d-tight mt-5 text-[24px] text-white">118-component registry, slot-locked</h3>
-            <p className="zbx-b mt-2 max-w-md text-[15px] leading-relaxed text-white/55">
+            <h3 className="zbx-d-tight mt-5 text-[24px] text-[#fff]">118-component registry, slot-locked</h3>
+            <p className="zbx-b mt-2 max-w-md text-[15px] leading-relaxed text-[rgba(255,255,255,0.55)]">
               Every site is assembled from hand-built, agency-grade sections — bento grids, spotlight cards, animated stats. The AI fills the copy; it can&apos;t break the layout. Consistent quality, every single build.
             </p>
             <div className="mt-6 grid grid-cols-4 gap-2">
               {Array.from({ length: 8 }).map((_, k) => (
-                <div key={k} className={`h-12 rounded-lg border border-white/10 ${k % 3 === 0 ? "bg-[#d4f24e]/20" : k % 3 === 1 ? "bg-white/[0.06]" : "bg-white/[0.03]"}`}>
-                  <div className={`m-2 h-1.5 w-1/2 rounded ${k % 3 === 0 ? "bg-[#d4f24e]" : "bg-white/25"}`} />
+                <div key={k} className={`h-12 rounded-lg border border-[rgba(255,255,255,0.10)] ${k % 3 === 0 ? "bg-[#d4f24e]/20" : k % 3 === 1 ? "bg-[rgba(255,255,255,0.06)]" : "bg-[rgba(255,255,255,0.03)]"}`}>
+                  <div className={`m-2 h-1.5 w-1/2 rounded ${k % 3 === 0 ? "bg-[#d4f24e]" : "bg-[rgba(255,255,255,0.25)]"}`} />
                 </div>
               ))}
             </div>
           </div>
 
           {/* perf */}
-          <div className="zbx-card rounded-3xl border border-white/10 p-7 md:col-span-3">
+          <div className="zbx-card rounded-3xl border border-[rgba(255,255,255,0.10)] p-7 md:col-span-3">
             <div className="flex items-start justify-between">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/[0.06] text-[#d4f24e] ring-1 ring-white/10">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[#d4f24e] ring-1 ring-[#fff]/10">
                 <I.gauge className="h-[22px] w-[22px]" />
               </span>
               <div className="text-right">
                 <p className="zbx-d text-[40px] leading-none text-[#d4f24e]">&lt;2s</p>
-                <p className="zbx-b text-[13px] text-white/50">first paint</p>
+                <p className="zbx-b text-[13px] text-[rgba(255,255,255,0.50)]">first paint</p>
               </div>
             </div>
-            <h3 className="zbx-d-tight mt-5 text-[22px] text-white">Streaming, not spinning</h3>
-            <p className="zbx-b mt-2 text-[15px] leading-relaxed text-white/55">
+            <h3 className="zbx-d-tight mt-5 text-[22px] text-[#fff]">Streaming, not spinning</h3>
+            <p className="zbx-b mt-2 text-[15px] leading-relaxed text-[rgba(255,255,255,0.55)]">
               The page renders from base components instantly, then each section hot-swaps as the AI tailors it. You never stare at a loader.
             </p>
           </div>
 
           {/* chat edit */}
-          <div className="zbx-card rounded-3xl border border-white/10 p-7 md:col-span-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/[0.06] text-[#d4f24e] ring-1 ring-white/10">
+          <div className="zbx-card rounded-3xl border border-[rgba(255,255,255,0.10)] p-7 md:col-span-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[#d4f24e] ring-1 ring-[#fff]/10">
               <I.chat className="h-[22px] w-[22px]" />
             </span>
-            <h3 className="zbx-d-tight mt-5 text-[22px] text-white">Edit by chatting</h3>
-            <p className="zbx-b mt-2 text-[15px] leading-relaxed text-white/55">
+            <h3 className="zbx-d-tight mt-5 text-[22px] text-[#fff]">Edit by chatting</h3>
+            <p className="zbx-b mt-2 text-[15px] leading-relaxed text-[rgba(255,255,255,0.55)]">
               &ldquo;Make the hero darker.&rdquo; &ldquo;Punchier pricing copy.&rdquo; One section re-renders in ~2 seconds — no full rebuild, no lost work.
             </p>
           </div>
@@ -735,12 +695,12 @@ function Bento() {
             { icon: I.globe, t: "Domain in checkout", b: "Buy the matching domain in the same flow. Hosting + SSL provisioned at deploy." },
             { icon: I.shield, t: "Shipped to last", b: "Multi-judge critique regenerates weak sections before you ever see them." },
           ].map((c) => (
-            <div key={c.t} className="zbx-card zbx-card-hover group rounded-3xl border border-white/10 p-6">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/[0.06] text-white/80 ring-1 ring-white/10 transition-colors group-hover:bg-[#d4f24e] group-hover:text-[#161d05]">
+            <div key={c.t} className="zbx-card zbx-card-hover group rounded-3xl border border-[rgba(255,255,255,0.10)] p-6">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.80)] ring-1 ring-[#fff]/10 transition-colors group-hover:bg-[#d4f24e] group-hover:text-[#161d05]">
                 <c.icon className="h-[22px] w-[22px]" />
               </span>
-              <h3 className="zbx-d-tight mt-5 text-[19px] text-white">{c.t}</h3>
-              <p className="zbx-b mt-2 text-[14px] leading-relaxed text-white/55">{c.b}</p>
+              <h3 className="zbx-d-tight mt-5 text-[19px] text-[#fff]">{c.t}</h3>
+              <p className="zbx-b mt-2 text-[14px] leading-relaxed text-[rgba(255,255,255,0.55)]">{c.b}</p>
             </div>
           ))}
         </div>
@@ -858,29 +818,29 @@ function Playground() {
 
   return (
     <section className="relative py-24 sm:py-28">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.12)] to-transparent" />
       <div className="mx-auto max-w-6xl px-5">
         <div className="zbx-reveal mx-auto mb-12 max-w-2xl text-center">
-          <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-white/70">
+          <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-[rgba(255,255,255,0.70)]">
             <I.play className="h-3.5 w-3.5 text-[#d4f24e]" /> Live playground
           </span>
-          <h2 className="zbx-d mt-5 text-[34px] text-white sm:text-[46px]">Try a build right here</h2>
-          <p className="zbx-b mx-auto mt-4 max-w-lg text-[17px] text-white/60">
+          <h2 className="zbx-d mt-5 text-[34px] text-[#fff] sm:text-[46px]">Try a build right here</h2>
+          <p className="zbx-b mx-auto mt-4 max-w-lg text-[17px] text-[rgba(255,255,255,0.60)]">
             Pick a brief, hit generate, and watch the agents work. This is the real flow — just sped up for the demo.
           </p>
         </div>
 
-        <div className="zbx-reveal overflow-hidden rounded-3xl border border-white/10 bg-[#0e0e12] shadow-[0_40px_100px_-30px_rgba(0,0,0,0.8)]">
+        <div className="zbx-reveal overflow-hidden rounded-3xl border border-[rgba(255,255,255,0.10)] bg-[#0e0e12] shadow-[0_40px_100px_-30px_rgba(0,0,0,0.8)]">
           {/* brief picker */}
-          <div className="flex flex-col gap-3 border-b border-white/10 p-4 sm:flex-row sm:items-center">
-            <span className="zbx-m text-[11px] uppercase tracking-wider text-white/35">Brief</span>
+          <div className="flex flex-col gap-3 border-b border-[rgba(255,255,255,0.10)] p-4 sm:flex-row sm:items-center">
+            <span className="zbx-m text-[11px] uppercase tracking-wider text-[rgba(255,255,255,0.35)]">Brief</span>
             <div className="flex flex-wrap gap-2">
               {PRESETS.map((p, i) => (
                 <button
                   key={p.id}
                   onClick={() => run(i)}
                   className={`zbx-b rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors ${
-                    active === i ? "bg-[#d4f24e] text-[#161d05]" : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+                    active === i ? "bg-[#d4f24e] text-[#161d05]" : "bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.60)] hover:bg-[rgba(255,255,255,0.10)] hover:text-[#fff]"
                   }`}
                 >
                   {p.label}
@@ -890,7 +850,7 @@ function Playground() {
             <button
               onClick={() => run(active)}
               disabled={running}
-              className="zbx-b ml-auto inline-flex items-center justify-center gap-1.5 rounded-lg bg-white px-4 py-1.5 text-[13px] font-bold text-[#0b0b0d] transition-opacity disabled:opacity-50"
+              className="zbx-b ml-auto inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#fff] px-4 py-1.5 text-[13px] font-bold text-[#0b0b0d] transition-opacity disabled:opacity-50"
             >
               {running ? (
                 <>
@@ -906,20 +866,20 @@ function Playground() {
           </div>
 
           {/* prompt line */}
-          <div className="border-b border-white/10 px-4 py-3">
-            <p className="zbx-m text-[13px] leading-snug text-white/70">
+          <div className="border-b border-[rgba(255,255,255,0.10)] px-4 py-3">
+            <p className="zbx-m text-[13px] leading-snug text-[rgba(255,255,255,0.70)]">
               <span className="text-[#d4f24e]">prompt&gt;</span> {preset.prompt}
             </p>
           </div>
 
           {/* tabs */}
-          <div className="flex border-b border-white/10">
+          <div className="flex border-b border-[rgba(255,255,255,0.10)]">
             {(["preview", "build"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
                 className={`zbx-b relative px-5 py-2.5 text-[13px] font-medium capitalize transition-colors ${
-                  tab === t ? "text-white" : "text-white/40 hover:text-white/70"
+                  tab === t ? "text-[#fff]" : "text-[rgba(255,255,255,0.40)] hover:text-[rgba(255,255,255,0.70)]"
                 }`}
               >
                 {t === "build" ? "Build log" : "Live preview"}
@@ -932,14 +892,14 @@ function Playground() {
           <div className="min-h-[340px]">
             {tab === "build" ? (
               <div className="zbx-m p-5 text-[13px] leading-relaxed">
-                <p className="text-white/30">$ zoobicon build --stream</p>
+                <p className="text-[rgba(255,255,255,0.30)]">$ zoobicon build --stream</p>
                 {preset.log.slice(0, lines).map((l, i) => (
-                  <p key={i} className="zbx-drop mt-1.5 text-white/75">
+                  <p key={i} className="zbx-drop mt-1.5 text-[rgba(255,255,255,0.75)]">
                     <span className="text-[#d4f24e]">✓</span> {l}
                   </p>
                 ))}
                 {running && lines < preset.log.length && (
-                  <p className="mt-1.5 text-white/40">
+                  <p className="mt-1.5 text-[rgba(255,255,255,0.40)]">
                     <span className="zbx-cursor inline-block">▌</span>
                   </p>
                 )}
@@ -954,7 +914,7 @@ function Playground() {
             )}
           </div>
         </div>
-        <p className="zbx-b mt-4 text-center text-[13px] text-white/40">
+        <p className="zbx-b mt-4 text-center text-[13px] text-[rgba(255,255,255,0.40)]">
           Like what you see?{" "}
           <a href="/builder" className="zbx-link-underline font-semibold text-[#d4f24e]">
             Build the real thing →
@@ -968,22 +928,22 @@ function Playground() {
 function PreviewMock({ preset }: { preset: Preset }) {
   return (
     <div className="p-4">
-      <div className="overflow-hidden rounded-xl border border-white/10 bg-[#08080b]">
-        <div className="flex items-center gap-1.5 border-b border-white/10 bg-white/[0.03] px-3 py-2">
+      <div className="overflow-hidden rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#08080b]">
+        <div className="flex items-center gap-1.5 border-b border-[rgba(255,255,255,0.10)] bg-[rgba(255,255,255,0.03)] px-3 py-2">
           <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-          <div className="zbx-m ml-2 flex h-5 flex-1 items-center rounded bg-white/5 px-2 text-[10px] text-white/40">
+          <div className="zbx-m ml-2 flex h-5 flex-1 items-center rounded bg-[rgba(255,255,255,0.05)] px-2 text-[10px] text-[rgba(255,255,255,0.40)]">
             {preset.id}.zoobicon.app
           </div>
         </div>
         {/* rendered hero */}
         <div className="relative px-5 py-6 sm:px-8 sm:py-9">
           <div className="flex items-center justify-between">
-            <span className="zbx-d-tight text-[14px] text-white">{preset.label}.</span>
+            <span className="zbx-d-tight text-[14px] text-[#fff]">{preset.label}.</span>
             <div className="hidden gap-3 sm:flex">
               {["Product", "Pricing", "About"].map((x) => (
-                <span key={x} className="zbx-b text-[11px] text-white/45">{x}</span>
+                <span key={x} className="zbx-b text-[11px] text-[rgba(255,255,255,0.45)]">{x}</span>
               ))}
               <span className="zbx-b rounded-md px-2 py-0.5 text-[11px] font-bold" style={{ background: preset.accent, color: "#161d05" }}>
                 {preset.cta}
@@ -991,13 +951,13 @@ function PreviewMock({ preset }: { preset: Preset }) {
             </div>
           </div>
           <div className="mt-6 max-w-md">
-            <h3 className="zbx-d text-[26px] leading-[1.04] text-white sm:text-[32px]">{preset.title}</h3>
-            <p className="zbx-b mt-3 text-[13px] leading-snug text-white/55">{preset.tagline}</p>
+            <h3 className="zbx-d text-[26px] leading-[1.04] text-[#fff] sm:text-[32px]">{preset.title}</h3>
+            <p className="zbx-b mt-3 text-[13px] leading-snug text-[rgba(255,255,255,0.55)]">{preset.tagline}</p>
             <div className="mt-5 flex gap-2">
               <span className="zbx-b inline-flex items-center rounded-lg px-3.5 py-2 text-[12px] font-bold" style={{ background: preset.accent, color: "#161d05" }}>
                 {preset.cta}
               </span>
-              <span className="zbx-b inline-flex items-center rounded-lg border border-white/15 px-3.5 py-2 text-[12px] font-semibold text-white">
+              <span className="zbx-b inline-flex items-center rounded-lg border border-[rgba(255,255,255,0.15)] px-3.5 py-2 text-[12px] font-semibold text-[#fff]">
                 Learn more
               </span>
             </div>
@@ -1005,15 +965,15 @@ function PreviewMock({ preset }: { preset: Preset }) {
           <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-full blur-3xl" style={{ background: preset.accent, opacity: 0.16 }} />
         </div>
         {/* feature strip */}
-        <div className="grid grid-cols-3 gap-px bg-white/10">
+        <div className="grid grid-cols-3 gap-px bg-[rgba(255,255,255,0.10)]">
           {[0, 1, 2].map((k) => (
             <div key={k} className="bg-[#08080b] p-4">
               <div className="h-7 w-7 rounded-lg" style={{ background: `${preset.accent}33` }}>
                 <div className="m-1.5 h-1 w-1/2 rounded" style={{ background: preset.accent }} />
               </div>
-              <div className="mt-3 h-2 w-3/4 rounded bg-white/15" />
-              <div className="mt-1.5 h-1.5 w-full rounded bg-white/8" />
-              <div className="mt-1 h-1.5 w-2/3 rounded bg-white/8" />
+              <div className="mt-3 h-2 w-3/4 rounded bg-[rgba(255,255,255,0.15)]" />
+              <div className="mt-1.5 h-1.5 w-full rounded bg-[rgba(255,255,255,0.08)]" />
+              <div className="mt-1 h-1.5 w-2/3 rounded bg-[rgba(255,255,255,0.08)]" />
             </div>
           ))}
         </div>
@@ -1041,14 +1001,14 @@ const PLEDGES = [
 function Enterprise() {
   return (
     <section className="relative py-24 sm:py-28">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(255,255,255,0.12)] to-transparent" />
       <div className="mx-auto max-w-6xl px-5">
         {/* stats */}
-        <div className="zbx-reveal grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 sm:grid-cols-4">
+        <div className="zbx-reveal grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-[rgba(255,255,255,0.10)] bg-[rgba(255,255,255,0.10)] sm:grid-cols-4">
           {STATS.map((s) => (
             <div key={s.l} className="bg-[#08080b] px-6 py-8 text-center">
               <p className="zbx-d text-[40px] text-[#d4f24e] sm:text-[52px]">{s.v}</p>
-              <p className="zbx-b mt-1 text-[13px] text-white/55">{s.l}</p>
+              <p className="zbx-b mt-1 text-[13px] text-[rgba(255,255,255,0.55)]">{s.l}</p>
             </div>
           ))}
         </div>
@@ -1056,15 +1016,15 @@ function Enterprise() {
         {/* pledge block */}
         <div className="zbx-reveal mt-16 grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14" style={{ transitionDelay: "60ms" }}>
           <div>
-            <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-white/70">
+            <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-[rgba(255,255,255,0.70)]">
               <I.shield className="h-3.5 w-3.5 text-[#d4f24e]" /> Infrastructure pledge
             </span>
-            <h2 className="zbx-d mt-5 text-[32px] text-white sm:text-[42px]">
+            <h2 className="zbx-d mt-5 text-[32px] text-[#fff] sm:text-[42px]">
               Build fast.
               <br />
               Own what you ship.
             </h2>
-            <p className="zbx-b mt-5 max-w-md text-[16px] leading-relaxed text-white/60">
+            <p className="zbx-b mt-5 max-w-md text-[16px] leading-relaxed text-[rgba(255,255,255,0.60)]">
               Zoobicon runs on managed infrastructure so you never touch a server — but the output is a real codebase you can take with you. No proprietary runtime, no hostage situation.
             </p>
             <a href="/pricing" className="zbx-b mt-7 inline-flex items-center gap-2 rounded-xl bg-[#d4f24e] px-5 py-3 text-[15px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5">
@@ -1074,12 +1034,12 @@ function Enterprise() {
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {PLEDGES.map((p) => (
-              <div key={p.t} className="zbx-card rounded-2xl border border-white/10 p-5">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.06] text-[#d4f24e] ring-1 ring-white/10">
+              <div key={p.t} className="zbx-card rounded-2xl border border-[rgba(255,255,255,0.10)] p-5">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[#d4f24e] ring-1 ring-[#fff]/10">
                   <p.icon className="h-5 w-5" />
                 </span>
-                <h3 className="zbx-d-tight mt-4 text-[17px] text-white">{p.t}</h3>
-                <p className="zbx-b mt-1.5 text-[14px] leading-snug text-white/55">{p.b}</p>
+                <h3 className="zbx-d-tight mt-4 text-[17px] text-[#fff]">{p.t}</h3>
+                <p className="zbx-b mt-1.5 text-[14px] leading-snug text-[rgba(255,255,255,0.55)]">{p.b}</p>
               </div>
             ))}
           </div>
@@ -1095,7 +1055,7 @@ function Enterprise() {
 function FinalCTA() {
   return (
     <section className="px-5 pb-24 sm:pb-28">
-      <div className="zbx-reveal relative mx-auto max-w-6xl overflow-hidden rounded-[32px] border border-white/10 bg-[#0e0e12] px-6 py-16 text-center sm:px-10 sm:py-20">
+      <div className="zbx-reveal relative mx-auto max-w-6xl overflow-hidden rounded-[32px] border border-[rgba(255,255,255,0.10)] bg-[#0e0e12] px-6 py-16 text-center sm:px-10 sm:py-20">
         <div
           className="zbx-grid-fade pointer-events-none absolute inset-0 opacity-[0.14]"
           style={{
@@ -1106,12 +1066,12 @@ function FinalCTA() {
         />
         <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[520px] -translate-x-1/2 rounded-full bg-[#d4f24e]/14 blur-[100px]" />
         <div className="relative">
-          <h2 className="zbx-d mx-auto max-w-2xl text-[36px] text-white sm:text-[56px]">
+          <h2 className="zbx-d mx-auto max-w-2xl text-[36px] text-[#fff] sm:text-[56px]">
             Your next site is one
             <br />
             <span className="text-[#d4f24e]">sentence</span> away.
           </h2>
-          <p className="zbx-b mx-auto mt-5 max-w-lg text-[17px] text-white/60">
+          <p className="zbx-b mx-auto mt-5 max-w-lg text-[17px] text-[rgba(255,255,255,0.60)]">
             Describe what you want. Watch six agents build it. Ship it with a domain — all in the next few minutes.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -1122,11 +1082,11 @@ function FinalCTA() {
               Start building free
               <I.arrow className="h-[18px] w-[18px] transition-transform group-hover:translate-x-0.5" />
             </a>
-            <a href="/pricing" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/12 bg-white/5 px-7 py-3.5 text-[16px] font-semibold text-white transition-colors hover:bg-white/10">
+            <a href="/pricing" className="inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-7 py-3.5 text-[16px] font-semibold text-[#fff] transition-colors hover:bg-[rgba(255,255,255,0.10)]">
               Compare plans
             </a>
           </div>
-          <p className="zbx-b mt-5 text-[13px] text-white/40">No credit card · Free to start · Export your code anytime</p>
+          <p className="zbx-b mt-5 text-[13px] text-[rgba(255,255,255,0.40)]">No credit card · Free to start · Export your code anytime</p>
         </div>
       </div>
     </section>
@@ -1177,13 +1137,13 @@ const FOOTER_COLS: { h: string; links: { label: string; href: string }[] }[] = [
 
 function Footer() {
   return (
-    <footer className="border-t border-white/10">
+    <footer className="border-t border-[rgba(255,255,255,0.10)]">
       <div className="mx-auto max-w-6xl px-5 py-16">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:grid-cols-6">
           {/* brand col */}
           <div className="col-span-2">
             <Wordmark />
-            <p className="zbx-b mt-4 max-w-xs text-[14px] leading-relaxed text-white/45">
+            <p className="zbx-b mt-4 max-w-xs text-[14px] leading-relaxed text-[rgba(255,255,255,0.45)]">
               The AI website builder for people who want a real site, not a toy. Describe it, watch it build, ship it.
             </p>
             <a
@@ -1196,11 +1156,11 @@ function Footer() {
 
           {FOOTER_COLS.map((col) => (
             <div key={col.h}>
-              <h4 className="zbx-b text-[12px] font-semibold uppercase tracking-wider text-white/40">{col.h}</h4>
+              <h4 className="zbx-b text-[12px] font-semibold uppercase tracking-wider text-[rgba(255,255,255,0.40)]">{col.h}</h4>
               <ul className="mt-4 space-y-2.5">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    <a href={l.href} className="zbx-b text-[14px] text-white/65 transition-colors hover:text-[#d4f24e]">
+                    <a href={l.href} className="zbx-b text-[14px] text-[rgba(255,255,255,0.65)] transition-colors hover:text-[#d4f24e]">
                       {l.label}
                     </a>
                   </li>
@@ -1210,16 +1170,16 @@ function Footer() {
           ))}
         </div>
 
-        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-7 sm:flex-row sm:items-center">
-          <p className="zbx-b text-[13px] text-white/40">© {new Date().getFullYear()} Zoobicon. All rights reserved.</p>
-          <div className="zbx-m flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-white/40">
-            <a href="https://zoobicon.com" className="zbx-link-underline hover:text-white/70">zoobicon.com</a>
-            <span className="text-white/20">·</span>
-            <a href="https://zoobicon.ai" className="zbx-link-underline hover:text-white/70">zoobicon.ai</a>
-            <span className="text-white/20">·</span>
-            <a href="https://zoobicon.io" className="zbx-link-underline hover:text-white/70">zoobicon.io</a>
-            <span className="text-white/20">·</span>
-            <a href="https://zoobicon.sh" className="zbx-link-underline hover:text-white/70">zoobicon.sh</a>
+        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[rgba(255,255,255,0.10)] pt-7 sm:flex-row sm:items-center">
+          <p className="zbx-b text-[13px] text-[rgba(255,255,255,0.40)]">© {new Date().getFullYear()} Zoobicon. All rights reserved.</p>
+          <div className="zbx-m flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-[rgba(255,255,255,0.40)]">
+            <a href="https://zoobicon.com" className="zbx-link-underline hover:text-[rgba(255,255,255,0.70)]">zoobicon.com</a>
+            <span className="text-[rgba(255,255,255,0.20)]">·</span>
+            <a href="https://zoobicon.ai" className="zbx-link-underline hover:text-[rgba(255,255,255,0.70)]">zoobicon.ai</a>
+            <span className="text-[rgba(255,255,255,0.20)]">·</span>
+            <a href="https://zoobicon.io" className="zbx-link-underline hover:text-[rgba(255,255,255,0.70)]">zoobicon.io</a>
+            <span className="text-[rgba(255,255,255,0.20)]">·</span>
+            <a href="https://zoobicon.sh" className="zbx-link-underline hover:text-[rgba(255,255,255,0.70)]">zoobicon.sh</a>
           </div>
         </div>
       </div>
@@ -1235,7 +1195,7 @@ export default function PreviewHomePage() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: SCOPED_CSS }} />
-      <div id="zb-home" className="zbx-b min-h-screen bg-[#08080b] text-white antialiased">
+      <div id="zb-home" className="zbx-b min-h-screen bg-[#08080b] text-[#fff] antialiased">
         <FloatingNav />
         <main>
           <Hero />
