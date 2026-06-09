@@ -117,7 +117,15 @@ export async function POST(req: NextRequest): Promise<Response> {
             try {
               const html = await renderComponentToHtml(base);
               finalSections[index] = html;
-              send({ type: "section", index, html: sectionWrap(index, html), ai: false, js: compileLive(base) });
+              send({
+                type: "section",
+                index,
+                html: sectionWrap(index, html),
+                ai: false,
+                js: compileLive(base),
+                code: base,
+                category: c.category,
+              });
             } catch {
               /* a single failed base section never blanks the page */
             }
@@ -135,7 +143,15 @@ export async function POST(req: NextRequest): Promise<Response> {
                 const html = await renderComponentToHtml(rewritten);
                 finalSections[index] = html;
                 aiUsed = true;
-                send({ type: "section", index, html: sectionWrap(index, html), ai: true, js: compileLive(rewritten) });
+                send({
+                  type: "section",
+                  index,
+                  html: sectionWrap(index, html),
+                  ai: true,
+                  js: compileLive(rewritten),
+                  code: rewritten,
+                  category: c.category,
+                });
               } catch {
                 /* keep the polished base section — never regress */
               }

@@ -45,6 +45,14 @@ export default function BuilderV2() {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const readyRef = useRef(false);
   const queueRef = useRef<Array<{ index: number; html: string; js?: string }>>([]);
+  // Live source code + category per section index — the client holds the real
+  // current code so conversational edits stack on the actual version.
+  const sectionMetaRef = useRef<Map<number, { category: string; code: string }>>(new Map());
+
+  // Conversational edit loop state.
+  const [editInstruction, setEditInstruction] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [editLog, setEditLog] = useState<Array<{ text: string; ok: boolean; note?: string }>>([]);
 
   // The iframe (srcDoc, opaque origin) tells us when its hot-swap listener is
   // ready; we flush any sections that arrived before then.
@@ -103,6 +111,8 @@ export default function BuilderV2() {
       setTailoring(false);
       readyRef.current = false;
       queueRef.current = [];
+      sectionMetaRef.current = new Map();
+      setEditLog([]);
       setElapsed(0);
       const started = Date.now();
       timerRef.current = setInterval(() => setElapsed((Date.now() - started) / 1000), 100);
@@ -142,7 +152,14 @@ export default function BuilderV2() {
               setShell(evt.shell as string);
               setTailoring(true);
             } else if (evt.type === "section") {
-              pushSection(evt.index as number, evt.html as string, evt.js as string | undefined);
+              const idx = evt.index as number;
+              pushSection(idx, evt.html as string, evt.js as string | undefined);
+              if (typeof evt.code === "string") {
+                sectionMetaRef.current.set(idx, {
+                  category: (evt.category as string) || "",
+                  code: evt.code as string,
+                });
+              }
               if (evt.ai === false) setSectionsIn((n) => n + 1);
             } else if (evt.type === "done") {
               setResult({
@@ -177,6 +194,61 @@ export default function BuilderV2() {
       }
     },
     [buildFallback, pushSection],
+  );
+
+  // Conversational edit — change one section without rebuilding the page.
+  const applyEdit = useCallback(
+    async (raw: string) => {
+      const instruction = raw.trim();
+      if (!instruction || editing) return;
+      const sections = Array.from(sectionMetaRef.current.entries()).map(([index, m]) => ({
+        index,
+        category: m.category,
+        code: m.code,
+      }));
+      if (sections.length === 0) return;
+      setEditing(true);
+      try {
+        const res = await fetch("/api/v2/edit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ instruction, sections }),
+        });
+        const data = (await res.json()) as {
+          ok: boolean;
+          error?: string;
+          index?: number;
+          html?: string;
+          js?: string;
+          code?: string;
+          category?: string;
+        };
+        if (!data.ok) {
+          setEditLog((l) => [{ text: instruction, ok: false, note: data.error }, ...l]);
+          return;
+        }
+        // Hot-swap the changed section in place; update our held source.
+        if (typeof data.index === "number" && data.html) {
+          pushSection(data.index, data.html, data.js);
+          if (typeof data.code === "string") {
+            sectionMetaRef.current.set(data.index, {
+              category: data.category || sectionMetaRef.current.get(data.index)?.category || "",
+              code: data.code,
+            });
+          }
+        }
+        setEditLog((l) => [{ text: instruction, ok: true, note: data.category }, ...l]);
+        setEditInstruction("");
+      } catch (err) {
+        setEditLog((l) => [
+          { text: instruction, ok: false, note: err instanceof Error ? err.message : "Edit failed" },
+          ...l,
+        ]);
+      } finally {
+        setEditing(false);
+      }
+    },
+    [editing, pushSection],
   );
 
   return (
@@ -283,6 +355,57 @@ export default function BuilderV2() {
               <div className="mt-2 text-[13px]" style={{ color: "var(--ink-secondary)" }}>
                 {result.componentIds.length} sections · {result.industry} · {result.aiUsed ? "AI-tailored copy" : "template copy"}
               </div>
+            </div>
+          )}
+
+          {/* Conversational edit loop — change one section, no rebuild. */}
+          {status === "done" && (
+            <div className="mt-5">
+              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--gold-deep)" }}>
+                Refine it — just say what to change
+              </div>
+              <textarea
+                value={editInstruction}
+                onChange={(e) => setEditInstruction(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) applyEdit(editInstruction);
+                }}
+                rows={2}
+                placeholder="Make the hero darker · Change the headline to… · Add a button to the CTA"
+                disabled={editing}
+                className="w-full resize-none rounded-xl px-3.5 py-2.5 text-[13px] leading-relaxed focus:outline-none disabled:opacity-60"
+                style={{ background: "var(--paper-bright)", border: "1px solid var(--rule)", color: "var(--ink)" }}
+              />
+              <button
+                onClick={() => applyEdit(editInstruction)}
+                disabled={editing || !editInstruction.trim()}
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-[13px] font-semibold transition-all hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+                style={{ background: "var(--gold-deep)", color: "var(--paper)" }}
+              >
+                {editing ? "Applying…" : "Apply change"}
+              </button>
+
+              {editLog.length > 0 && (
+                <div className="mt-3 flex flex-col gap-1.5">
+                  {editLog.slice(0, 5).map((e, i) => (
+                    <div
+                      key={i}
+                      className="rounded-lg px-2.5 py-1.5 text-[11px]"
+                      style={{
+                        background: "var(--paper-elevated)",
+                        border: "1px solid var(--rule)",
+                        color: e.ok ? "var(--ink-secondary)" : "var(--gold-deep)",
+                      }}
+                    >
+                      <span style={{ marginRight: 6 }}>{e.ok ? "✓" : "·"}</span>
+                      {e.text}
+                      {e.note && (
+                        <span style={{ color: "var(--ink-muted)" }}> — {e.ok ? `updated ${e.note}` : e.note}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
