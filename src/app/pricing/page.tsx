@@ -422,29 +422,26 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* ━━━━━━━━━━ FAQ (dark statement band) ━━━━━━━━━━ */}
-        <section className="zb-dark relative overflow-hidden px-6 py-28">
-          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-            <div
-              className="absolute left-[-10%] top-[-20%] h-[400px] w-[600px] rounded-full blur-[140px]"
-              style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.08), transparent 72%)" }}
-            />
-          </div>
+        {/* ━━━━━━━━━━ FAQ (bright) ━━━━━━━━━━ */}
+        <section
+          className="zb-bright relative px-6 py-28"
+          style={{ borderTop: "1px solid var(--zb-line)" }}
+        >
           <div className="relative mx-auto max-w-3xl">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
               <div className="mb-14 text-center">
-                <div className="zb-eyebrow mb-5 justify-center" style={{ color: "var(--zb-accent)" }}>
-                  <Star className="h-3.5 w-3.5" />
+                <div className="zb-eyebrow mb-5 justify-center" style={{ color: "var(--zb-ink-2)" }}>
+                  <Star className="h-3.5 w-3.5" style={{ color: "var(--gold-deep)" }} />
                   Questions
                 </div>
-                <motion.h2 custom={0} variants={fadeUp} className="zb-display text-4xl sm:text-6xl" style={{ color: "#ffffff" }}>
-                  Frequently <span style={{ color: "var(--zb-accent)" }}>asked.</span>
+                <motion.h2 custom={0} variants={fadeUp} className="zb-display text-4xl sm:text-6xl" style={{ color: "var(--zb-ink)" }}>
+                  Frequently <span className="zb-mark">asked.</span>
                 </motion.h2>
                 <motion.p
                   custom={1}
                   variants={fadeUp}
                   className="mx-auto mt-5 max-w-lg text-[15px]"
-                  style={{ color: "rgba(255,255,255,0.55)" }}
+                  style={{ color: "var(--zb-ink-2)" }}
                 >
                   Everything you need to know about our plans.
                 </motion.p>
@@ -461,9 +458,10 @@ export default function PricingPage() {
                       className="rounded-[20px] transition-all duration-300"
                       style={{
                         border: isOpen
-                          ? "1px solid rgba(212,242,78,0.4)"
-                          : "1px solid var(--zb-line-dark)",
-                        background: "var(--zb-ink-soft)",
+                          ? "1px solid var(--rule-strong)"
+                          : "1px solid var(--zb-line)",
+                        background: "var(--zb-surface)",
+                        boxShadow: isOpen ? "0 16px 40px -24px rgba(11,11,13,0.18)" : "none",
                       }}
                     >
                       <button
@@ -472,8 +470,8 @@ export default function PricingPage() {
                         aria-expanded={isOpen}
                       >
                         <span
-                          className="text-[15px] font-bold transition-colors"
-                          style={{ color: isOpen ? "var(--zb-accent)" : "#ffffff" }}
+                          className="text-[15px] font-bold"
+                          style={{ color: "var(--zb-ink)" }}
                         >
                           {faq.q}
                         </span>
@@ -482,8 +480,8 @@ export default function PricingPage() {
                           transition={{ duration: 0.2 }}
                           className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full"
                           style={{
-                            border: "1px solid var(--zb-line-dark)",
-                            color: "rgba(255,255,255,0.5)",
+                            border: "1px solid var(--zb-line)",
+                            color: "var(--zb-muted)",
                           }}
                         >
                           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
@@ -502,7 +500,7 @@ export default function PricingPage() {
                           >
                             <p
                               className="px-7 pb-6 text-[14px] leading-relaxed"
-                              style={{ color: "rgba(255,255,255,0.62)" }}
+                              style={{ color: "var(--zb-ink-2)" }}
                             >
                               {faq.a}
                             </p>
