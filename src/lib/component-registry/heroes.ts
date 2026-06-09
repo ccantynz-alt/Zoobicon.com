@@ -444,79 +444,6 @@ registerComponent({
 }`,
 });
 
-// ── Hero: Dashboard Mockup ──
-registerComponent({
-  id: "hero-dashboard",
-  name: "Dashboard Preview Hero",
-  category: "hero",
-  variant: "dashboard",
-  description: "Shows a dashboard/app mockup below the headline. Great for SaaS products and tools",
-  tags: ["dashboard", "saas", "app", "product", "tool", "analytics", "platform", "software", "startup", "b2b"],
-  code: `export default function Hero() {
-  return (
-    <section className="relative min-h-screen px-6 pt-32 pb-16 overflow-hidden bg-gradient-to-b from-navy-950 via-gray-900 to-navy-950">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-indigo-500/15 to-transparent rounded-full blur-[80px]" />
-      <div className="relative max-w-6xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 bg-indigo-500/10 text-indigo-400 text-xs font-semibold px-4 py-1.5 rounded-full border border-indigo-500/20 mb-8">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          Backed by Y Combinator &middot; Series A
-        </div>
-        <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-[1.05] tracking-tight mb-6">
-          Analytics That
-          <br />
-          <span className="bg-gradient-to-r from-indigo-400 to-sky-400 bg-clip-text text-transparent">Drive Decisions</span>
-        </h1>
-        <p className="text-lg text-gray-400 leading-relaxed mb-10 max-w-2xl mx-auto">
-          Stop guessing. See every metric that matters in one beautiful dashboard. Real-time insights, predictive trends, and AI-powered recommendations your whole team will actually use.
-        </p>
-        <div className="flex flex-wrap justify-center gap-4 mb-16">
-          <button className="px-8 py-3.5 bg-indigo-500 text-white font-bold rounded-xl hover:bg-indigo-600 transition-colors text-sm shadow-lg shadow-indigo-500/25">
-            Start Free Trial
-          </button>
-          <button className="px-8 py-3.5 bg-white/5 text-gray-300 font-semibold rounded-xl border border-white/10 hover:bg-white/10 transition-all text-sm">
-            Book a Demo
-          </button>
-        </div>
-        {/* Dashboard Mockup */}
-        <div className="relative mx-auto max-w-5xl">
-          <div className="absolute -inset-4 bg-gradient-to-b from-indigo-500/20 to-transparent rounded-3xl blur-2xl" />
-          <div className="relative bg-gray-900 rounded-2xl border border-gray-800 shadow-2xl overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-800 bg-gray-900/50">
-              <div className="w-3 h-3 rounded-full bg-red-500/80" />
-              <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-              <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-              <span className="text-xs text-gray-500 ml-2 font-mono">app.metriq.io/dashboard</span>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-4 gap-4 mb-6">
-                {[
-                  { label: "Revenue", value: "$284K", change: "+23%" },
-                  { label: "Users", value: "18.2K", change: "+12%" },
-                  { label: "Conversion", value: "4.8%", change: "+0.6%" },
-                  { label: "Retention", value: "94%", change: "+3%" },
-                ].map(m => (
-                  <div key={m.label} className="bg-gray-800/50 rounded-xl p-4 text-left">
-                    <div className="text-xs text-gray-500 mb-1">{m.label}</div>
-                    <div className="text-xl font-bold text-white">{m.value}</div>
-                    <div className="text-xs font-semibold mt-1 text-stone-300">
-                      {m.change} vs last month
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="bg-gray-800/30 rounded-xl h-48 flex items-end justify-between px-4 pb-4 gap-2">
-                {[40, 65, 45, 80, 55, 90, 70, 95, 60, 85, 75, 100].map((h, i) => (
-                  <div key={i} className="flex-1 bg-gradient-to-t from-indigo-500 to-indigo-400 rounded-t-md opacity-80" style={{ height: \`\${h}%\` }} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}`,
-});
 
 // ── Hero: Stats ──
 registerComponent({
@@ -845,6 +772,119 @@ registerComponent({
             {["Acme Corp", "Vertex", "Nebula", "Quantum", "Synapse"].map((name, i) => (
               <span key={i} className="text-sm font-bold text-white tracking-wider uppercase">{name}</span>
             ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}`,
+});
+
+// ── Hero: Aurora Dashboard (FLAGSHIP — the new visual bar) ──
+// Linear/Stripe/Vercel-grade dark hero. Layered aurora gradients + masked grid,
+// a glassy animated product dashboard, premium type scale, and entrance/ambient
+// motion done with CSS @keyframes (NOT JS-toggled opacity) — so it animates in
+// the crash-proof static render too, never stuck invisible if hydration is slow.
+registerComponent({
+  id: "hero-aurora-dashboard",
+  name: "Aurora Dashboard Hero",
+  category: "hero",
+  variant: "dark-dashboard-aurora",
+  description:
+    "Flagship dark hero: layered aurora gradients, masked grid, animated glass product dashboard, gradient headline. SaaS / startup / AI / platform / analytics.",
+  tags: ["saas","software","platform","startup","tech","ai","app","dashboard","analytics","data","b2b","fintech","developer","api","product","tool","modern","dark","launch"],
+  code: `export default function Hero() {
+  const bars = [42, 68, 55, 80, 48, 72, 90, 60, 74, 58];
+  const stats = [
+    { label: "Active users", value: "48,217", delta: "+12.4%" },
+    { label: "Conversion", value: "6.8%", delta: "+3.1%" },
+    { label: "Revenue", value: "$284k", delta: "+18.9%" },
+  ];
+  const avatars = ["#a78bfa", "#2dd4bf", "#f0abfc", "#b8923f"];
+  return (
+    <section className="relative overflow-hidden bg-navy-950 text-white" style={{ minHeight: "100vh" }}>
+      <style>{"@keyframes zbFadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}@keyframes zbAurora{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.15)}}@keyframes zbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}@keyframes zbGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}"}</style>
+
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="absolute" style={{ top: "-10%", left: "8%", width: "40rem", height: "40rem", background: "radial-gradient(circle, rgba(124,92,255,0.38), transparent 60%)", filter: "blur(80px)", animation: "zbAurora 14s ease-in-out infinite" }} />
+        <div className="absolute" style={{ top: "18%", right: "-6%", width: "36rem", height: "36rem", background: "radial-gradient(circle, rgba(45,212,191,0.30), transparent 60%)", filter: "blur(90px)", animation: "zbAurora 18s ease-in-out infinite reverse" }} />
+        <div className="absolute" style={{ bottom: "-16%", left: "28%", width: "44rem", height: "44rem", background: "radial-gradient(circle, rgba(184,146,63,0.22), transparent 60%)", filter: "blur(100px)", animation: "zbAurora 22s ease-in-out infinite" }} />
+        <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px)", backgroundSize: "56px 56px", maskImage: "radial-gradient(ellipse 80% 60% at 50% 38%, #000 38%, transparent 100%)", WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 38%, #000 38%, transparent 100%)" }} />
+      </div>
+
+      <div className="relative mx-auto grid max-w-7xl items-center gap-16 px-6 py-28 lg:grid-cols-2 lg:py-32">
+        <div>
+          <div style={{ animation: "zbFadeUp .7s ease both" }} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-medium text-white/80 backdrop-blur">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            </span>
+            New — AI insights that ship themselves
+          </div>
+
+          <h1 style={{ animation: "zbFadeUp .7s ease both", animationDelay: ".08s" }} className="mt-6 text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+            Turn data into
+            <span style={{ backgroundImage: "linear-gradient(100deg,#a78bfa,#2dd4bf 55%,#f0abfc)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}> decisions</span>, in seconds.
+          </h1>
+
+          <p style={{ animation: "zbFadeUp .7s ease both", animationDelay: ".16s" }} className="mt-6 max-w-xl text-lg leading-relaxed text-white/60">
+            Unify every signal, surface what matters, and let your team act in seconds — not spreadsheets. Built for teams who move fast.
+          </p>
+
+          <div style={{ animation: "zbFadeUp .7s ease both", animationDelay: ".24s" }} className="mt-9 flex flex-wrap items-center gap-3">
+            <button className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-navy-950 transition-transform hover:-translate-y-0.5">
+              Start free
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-hover:translate-x-0.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+            <button className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/10">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Watch demo
+            </button>
+          </div>
+
+          <div style={{ animation: "zbFadeUp .7s ease both", animationDelay: ".32s" }} className="mt-10 flex items-center gap-4">
+            <div className="flex -space-x-2.5">
+              {avatars.map((c, i) => (
+                <div key={i} className="h-9 w-9 rounded-full border-2 border-navy-950" style={{ background: c }} />
+              ))}
+            </div>
+            <div className="text-sm">
+              <div className="flex items-center gap-0.5 text-amber-300">
+                {[0,1,2,3,4].map(i => (<svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9"/></svg>))}
+              </div>
+              <span className="text-white/50">Trusted by 2,000+ data teams</span>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ animation: "zbFadeUp .8s ease both", animationDelay: ".2s" }} className="relative">
+          <div style={{ animation: "zbFloat 7s ease-in-out infinite" }} className="relative rounded-2xl border border-white/10 bg-white/5 p-3 shadow-2xl backdrop-blur-xl">
+            <div className="flex items-center gap-2 px-2 pb-3 pt-1">
+              <span className="h-3 w-3 rounded-full bg-red-400/80" />
+              <span className="h-3 w-3 rounded-full bg-amber-400/80" />
+              <span className="h-3 w-3 rounded-full bg-emerald-400/80" />
+              <div className="ml-3 h-5 flex-1 rounded-md bg-white/5" />
+            </div>
+            <div className="grid grid-cols-3 gap-3 rounded-xl bg-navy-950/60 p-4">
+              {stats.map((s, i) => (
+                <div key={i} className="rounded-lg border border-white/5 bg-white/5 p-3">
+                  <div className="text-[10px] uppercase tracking-wide text-white/40">{s.label}</div>
+                  <div className="mt-1 text-lg font-semibold text-white">{s.value}</div>
+                  <div className="text-[11px] font-medium text-emerald-400">{s.delta}</div>
+                </div>
+              ))}
+              <div className="col-span-3 mt-1 rounded-lg border border-white/5 bg-white/5 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="text-xs font-medium text-white/70">Revenue overview</div>
+                  <div className="text-[10px] text-white/30">Last 30 days</div>
+                </div>
+                <div className="flex h-28 items-end gap-2">
+                  {bars.map((h, i) => (
+                    <div key={i} className="flex-1 rounded-t" style={{ height: h + "%", transformOrigin: "bottom", animation: "zbGrow .9s ease both", animationDelay: (0.3 + i * 0.06) + "s", background: "linear-gradient(180deg,#a78bfa,#7c5aff)" }} />
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

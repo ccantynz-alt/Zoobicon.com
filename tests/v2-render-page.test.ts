@@ -13,6 +13,7 @@ import {
   sectionWrap,
   usesSerifHeadings,
   compileComponentToModule,
+  applyBrandTokens,
 } from "../src/lib/v2/render-page";
 // Populate the 118-component registry (ensureRegistryLoaded uses CommonJS
 // require which doesn't run under vitest's ESM transform).
@@ -72,6 +73,19 @@ describe("v2 renderFromRegistry (rich engine)", () => {
     expect(page.componentIds.length).toBeGreaterThanOrEqual(6);
     expect(page.html.length).toBeGreaterThan(5000);
   });
+
+  it("flagship aurora hero wins SaaS prompts and renders (incl. static-safe CSS motion)", async () => {
+    const page = await renderFromRegistry({
+      prompt: "A SaaS analytics platform for product teams",
+      useExampleFill: true,
+    });
+    expect(page.componentIds).toContain("hero-aurora-dashboard");
+    // Distinctive markers prove it rendered, and that motion is CSS-keyframe
+    // based (plays in the static render — not gated on JS hydration).
+    expect(page.html).toContain("Revenue overview");
+    expect(page.html).toContain("zbAurora");
+    expect(page.html).toContain("bg-navy-950");
+  });
 });
 
 describe("v2 progressive streaming primitives", () => {
@@ -89,6 +103,26 @@ describe("v2 progressive streaming primitives", () => {
 
   it("sectionWrap addresses sections by index for in-place hot-swap", () => {
     expect(sectionWrap(3, "<h1>x</h1>")).toBe('<section data-zb-i="3"><h1>x</h1></section>');
+  });
+
+  it("feeds the iframe the app's custom Tailwind palette so navy/brand render", () => {
+    // Without this, bg-navy-950 (dark navbars/heroes) resolves to nothing in
+    // the vanilla Tailwind CDN and dark sections render washed-out.
+    const shell = pageShell("<section>x</section>", "Acme", { industry: "saas" });
+    expect(shell).toContain("tailwind.config");
+    expect(shell).toContain('navy:');
+    expect(shell).toContain('"#0c0a09"'); // navy-950
+    expect(shell).toContain('brand:');
+  });
+
+  it("swaps placeholder brand names so the header never ships someone else's name", () => {
+    expect(applyBrandTokens("<span>Acme</span> and <b>Nexus</b>", "Lumière Bakery")).toBe(
+      "<span>Lumière Bakery</span> and <b>Lumière Bakery</b>",
+    );
+    // No brand → leave untouched (AI handles it in the normal path).
+    expect(applyBrandTokens("<span>Acme</span>", "")).toBe("<span>Acme</span>");
+    // Word-boundaried: doesn't corrupt unrelated substrings.
+    expect(applyBrandTokens("Nexuses are great", "Zo")).toBe("Nexuses are great");
   });
 
   it("compiles a component to a browser ES module (live hydration layer)", () => {
