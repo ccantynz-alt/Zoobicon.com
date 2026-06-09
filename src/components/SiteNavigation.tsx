@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Zap,
-  Globe,
   Layout,
   Bot,
   ChevronDown,
@@ -16,20 +15,12 @@ import {
   Shield,
   BookOpen,
   Sparkles,
-  Wrench,
-  KeyRound,
-  QrCode,
-  FileCode,
 } from "lucide-react";
 
-// ── Product categories for mega menu — 4 columns (post-Crontech pivot) ──
-// Rule 31 — Zoobicon is now pure AI Builder + Domains + Free Tools.
-// Hosting/email/CRM/analytics all delegated to Crontech.
-// Rule 19 retired 2026-05-26 — AI Video Creator removed from launch
-// scope. Quality bar (HeyGen-grade) wasn't reachable as a side feature.
-
-// Rule 32 — one product: AI Website Builder. Domain registration is a
-// feature of the builder checkout, not a separate product in the nav.
+// ── Product categories for the mega menu ──
+// Rule 32 — one product: AI Website Builder. Domain + hosting are
+// features of the builder deploy step (Crontech-provisioned), not
+// separate products in the nav.
 const PRODUCT_SECTIONS = [
   {
     label: "Build",
@@ -51,7 +42,7 @@ const PRODUCT_SECTIONS = [
     items: [
       { name: "Agency Platform", href: "/agencies", icon: Shield, desc: "White-label for agencies" },
       { name: "AI Agents", href: "/agents", icon: Bot, desc: "Agent framework" },
-      { name: "Changelog", href: "/changelog", icon: BookOpen, desc: "What&apos;s new" },
+      { name: "Changelog", href: "/changelog", icon: BookOpen, desc: "What's new" },
     ],
   },
 ];
@@ -64,32 +55,36 @@ const TOP_NAV_LINKS = [
   { name: "Pricing", href: "/pricing" },
 ];
 
+/**
+ * SiteNavigation — ZOOBICON BOLD (Rule 37).
+ *
+ * A confident near-black bar (the Klaviyo stratum) that reads as one
+ * defined band over both the dark hero and the bright content sections.
+ * White links, ONE lime CTA. Lime square logo mark with an ink Z —
+ * no serif, no gold, no glass gradients.
+ */
 export default function SiteNavigation() {
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   // Admin role is intentionally NOT surfaced in the public nav per
-  // Craig's directive — admin access is URL-only (/admin). The
-  // localStorage payload still includes role for downstream guards.
+  // Craig's directive — admin access is URL-only (/admin).
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const megaRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Check auth state
   useEffect(() => {
     try {
       const raw = localStorage.getItem("zoobicon_user");
       if (raw) {
-        // Parse just to validate the payload shape; role intentionally
-        // not surfaced in nav per Craig's directive (admin via URL only).
         JSON.parse(raw);
         setIsLoggedIn(true);
       }
     } catch { /* ignore */ }
   }, []);
 
-  // Scroll-aware: strengthen backdrop once the user moves off the hero
+  // Scroll-aware: tighten the shadow once the user moves off the hero
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -97,7 +92,7 @@ export default function SiteNavigation() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close mega menu on route change
+  // Close menus on route change
   useEffect(() => {
     setMegaOpen(false);
     setMobileOpen(false);
@@ -106,7 +101,6 @@ export default function SiteNavigation() {
   // Close mega menu on click outside
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      // Don't close if clicking inside the mega menu panel itself
       const target = e.target as HTMLElement;
       if (target.closest("[data-mega-menu]")) return;
       if (megaRef.current && !megaRef.current.contains(target)) {
@@ -131,110 +125,77 @@ export default function SiteNavigation() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      className="fixed top-0 left-0 right-0 z-50 transition-shadow duration-300"
       style={{
-        // Craig (May 13): "The menu disappears when you start scrolling
-        // through the different pages." Root cause: previous rgba alphas
-        // (0.82/0.94) composited against the pure white page rendered as
-        // `~#fafaf6` — barely distinguishable from the body, so the header
-        // visually merged with content on scroll. Pulled the alpha up to
-        // 0.96/0.99 and shifted the tint slightly warmer so the bar reads
-        // as a defined stratum at all times. Stronger bottom shadow on
-        // scroll for an unmistakable edge.
-        background: scrolled
-          ? "rgba(252, 250, 243, 0.99)"
-          : "rgba(254, 252, 245, 0.96)",
-        backdropFilter: "blur(24px) saturate(140%)",
-        WebkitBackdropFilter: "blur(24px) saturate(140%)",
-        borderBottom: "1px solid var(--rule)",
-        boxShadow: scrolled
-          ? "0 8px 24px -8px rgba(10,10,11,0.10), 0 1px 0 0 rgba(212,242,78,0.32)"
-          : "0 2px 8px -4px rgba(10,10,11,0.04), 0 1px 0 0 rgba(212,242,78,0.22)",
+        background: "rgba(11, 11, 13, 0.92)",
+        backdropFilter: "blur(20px) saturate(140%)",
+        WebkitBackdropFilter: "blur(20px) saturate(140%)",
+        borderBottom: "1px solid var(--zb-line-dark)",
+        boxShadow: scrolled ? "0 12px 32px -16px rgba(0,0,0,0.55)" : "none",
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-[76px]">
-          {/* Logo — editorial monogram. Thin gold ring on bone holding a
-              Playfair italic Z. Reads like a Sotheby's mark, not a tech
-              square. Wordmark sits next to it in Playfair regular at
-              the right optical weight to balance the italic Z. */}
-          <Link href="/" className="group flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center justify-between h-[72px]">
+          {/* Logo — lime square mark, bold Jakarta wordmark */}
+          <Link href="/" className="group flex items-center gap-2.5 flex-shrink-0">
             <div
-              className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 group-hover:scale-[1.04]"
-              style={{
-                background: "var(--paper)",
-                border: "1.5px solid var(--gold)",
-                boxShadow: "0 2px 6px -2px rgba(150,175,40,0.18), inset 0 0 0 3px var(--paper)",
-              }}
+              className="flex h-9 w-9 items-center justify-center rounded-[10px] transition-transform duration-300 group-hover:scale-[1.06] group-hover:-rotate-3"
+              style={{ background: "var(--zb-accent)" }}
             >
               <span
-                className="text-[20px] leading-none"
-                style={{
-                  fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
-                  fontStyle: "italic",
-                  fontWeight: 600,
-                  color: "var(--ink)",
-                  marginTop: "1px",
-                }}
+                className="zb-display text-[19px] leading-none"
+                style={{ color: "var(--zb-accent-ink)", marginTop: "-1px" }}
               >
                 Z
               </span>
             </div>
             <span
-              className="hidden sm:block text-[19px] tracking-[-0.01em]"
-              style={{
-                fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
-                fontWeight: 500,
-                color: "var(--ink)",
-                letterSpacing: "0.005em",
-              }}
+              className="zb-display hidden sm:block text-[19px]"
+              style={{ color: "#ffffff", letterSpacing: "-0.02em" }}
             >
-              Zoobicon
+              zoobicon
             </span>
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5">
             {/* Products mega menu trigger */}
             <div ref={megaRef} className="relative">
               <button
                 onClick={() => setMegaOpen(!megaOpen)}
-                className={`flex items-center gap-1.5 px-4 py-2 text-[13px] font-medium rounded-full transition-all duration-300 ${
+                className={`flex items-center gap-1.5 px-4 py-2 text-[13.5px] font-semibold rounded-full transition-all duration-200 ${
                   megaOpen
-                    ? "text-white bg-white/[0.08] border border-white/[0.12]"
-                    : "text-white/70 hover:text-white border border-transparent hover:bg-white/[0.04] hover:border-white/[0.08]"
+                    ? "text-white bg-white/[0.1]"
+                    : "text-white/75 hover:text-white hover:bg-white/[0.06]"
                 }`}
               >
-                Products
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${megaOpen ? "rotate-180 text-[#d4f24e]" : ""}`} />
+                Product
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-300 ${megaOpen ? "rotate-180" : ""}`}
+                  style={megaOpen ? { color: "var(--zb-accent)" } : undefined}
+                />
               </button>
 
-              {/* Mega Menu Panel — FULL WIDTH 6 columns, editorial bright treatment.
-                  Background sits at near-paper-input white (very bright) with a
-                  strong rule + shadow so it reads as a defined drop-down panel
-                  on top of the cream header. Item text below uses explicit ink
-                  colours instead of relying on the override layer's mapping —
-                  the override pulls text-white/X down to muted grey which read
-                  as dull. */}
+              {/* Mega menu panel — same ink stratum as the bar, hairline-split */}
               {megaOpen && (
                 <div
                   data-mega-menu
-                  className="fixed top-[76px] left-0 right-0"
+                  className="fixed top-[72px] left-0 right-0"
                   style={{
-                    background: "rgba(255, 254, 250, 0.99)",
-                    backdropFilter: "blur(28px) saturate(140%)",
-                    WebkitBackdropFilter: "blur(28px) saturate(140%)",
-                    borderBottom: "1px solid var(--rule-strong)",
-                    boxShadow: "0 16px 48px -12px rgba(10,10,11,0.18), 0 4px 12px -4px rgba(10,10,11,0.08)",
+                    background: "rgba(11, 11, 13, 0.98)",
+                    backdropFilter: "blur(24px) saturate(140%)",
+                    WebkitBackdropFilter: "blur(24px) saturate(140%)",
+                    borderBottom: "1px solid var(--zb-line-dark)",
+                    boxShadow: "0 32px 64px -24px rgba(0,0,0,0.7)",
                   }}
                 >
                   <div className="relative max-w-7xl mx-auto px-6 py-10">
-                    <div className="grid grid-cols-4 gap-8">
+                    <div className="grid grid-cols-3 gap-10">
                       {PRODUCT_SECTIONS.map((section) => (
                         <div key={section.label}>
                           <h3
-                            className="mb-4 text-[10px] uppercase tracking-[0.22em] font-semibold"
-                            style={{ color: "var(--gold-deep)" }}
+                            className="zb-eyebrow mb-4"
+                            style={{ color: "var(--zb-accent)" }}
                           >
                             {section.label}
                           </h3>
@@ -243,43 +204,34 @@ export default function SiteNavigation() {
                               <Link
                                 key={item.href}
                                 href={item.href}
-                                className="group flex items-start gap-2.5 p-2.5 rounded-xl transition-all duration-200 hover:translate-x-0.5"
-                                style={{ background: "transparent" }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.background = "var(--paper-elevated)";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.background = "transparent";
-                                }}
+                                className="group flex items-start gap-3 p-3 rounded-2xl transition-all duration-200 hover:bg-white/[0.06]"
                                 onClick={() => setMegaOpen(false)}
                               >
-                                <item.icon
-                                  className="w-4 h-4 group-hover:text-[var(--gold-deep)] transition-colors mt-0.5 flex-shrink-0"
-                                  style={{ color: "var(--ink-muted)" }}
-                                />
+                                <div
+                                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[10px] transition-colors duration-200"
+                                  style={{ background: "rgba(255,255,255,0.07)" }}
+                                >
+                                  <item.icon
+                                    className="w-4 h-4 transition-colors group-hover:text-[var(--zb-accent)]"
+                                    style={{ color: "rgba(255,255,255,0.6)" }}
+                                  />
+                                </div>
                                 <div className="min-w-0">
-                                  <div
-                                    className="text-[13px] font-semibold flex items-center gap-1.5"
-                                    style={{ color: "var(--ink)" }}
-                                  >
+                                  <div className="text-[14px] font-bold flex items-center gap-1.5 text-white">
                                     <span className="truncate">{item.name}</span>
                                     {item.badge && (
                                       <span
-                                        className="text-[9px] px-1.5 py-0.5 rounded-full font-bold flex-shrink-0 uppercase tracking-wider"
+                                        className="text-[9px] px-1.5 py-0.5 rounded-full font-extrabold flex-shrink-0 uppercase tracking-wider"
                                         style={{
-                                          background: "var(--gold-soft)",
-                                          color: "var(--gold-deep)",
-                                          border: "1px solid var(--gold)",
+                                          background: "var(--zb-accent)",
+                                          color: "var(--zb-accent-ink)",
                                         }}
                                       >
                                         {item.badge}
                                       </span>
                                     )}
                                   </div>
-                                  <div
-                                    className="text-[11px] mt-0.5 leading-relaxed"
-                                    style={{ color: "var(--ink-secondary)" }}
-                                  >
+                                  <div className="text-[12px] mt-0.5 leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
                                     {item.desc}
                                   </div>
                                 </div>
@@ -291,33 +243,23 @@ export default function SiteNavigation() {
                     </div>
                     <div
                       className="mt-8 pt-6 flex items-center justify-between"
-                      style={{ borderTop: "1px solid var(--rule)" }}
+                      style={{ borderTop: "1px solid var(--zb-line-dark)" }}
                     >
-                      <span className="text-[12px]" style={{ color: "var(--ink-secondary)" }}>
+                      <span className="text-[12.5px]" style={{ color: "rgba(255,255,255,0.5)" }}>
                         AI Website Builder.{" "}
-                        <span style={{ color: "var(--ink)", fontWeight: 600 }}>
-                          Hosting + custom domain via Crontech at deploy.
+                        <span className="font-semibold text-white">
+                          Hosting + custom domain provisioned at deploy.
                         </span>
                       </span>
-                      <div className="flex items-center gap-5">
-                        <Link
-                          href="/builder"
-                          className="group text-[12px] flex items-center gap-1.5 transition-colors"
-                          style={{ color: "var(--ink-secondary)" }}
-                          onClick={() => setMegaOpen(false)}
-                        >
-                          Open builder
-                          <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
-                        </Link>
-                        <Link
-                          href="/generators"
-                          className="group text-[12px] text-white/60 hover:text-[#d4f24e] flex items-center gap-1.5 transition-colors"
-                          onClick={() => setMegaOpen(false)}
-                        >
-                          All generators
-                          <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
-                        </Link>
-                      </div>
+                      <Link
+                        href="/builder"
+                        className="group text-[12.5px] font-semibold flex items-center gap-1.5 transition-colors hover:text-[var(--zb-accent)]"
+                        style={{ color: "rgba(255,255,255,0.75)" }}
+                        onClick={() => setMegaOpen(false)}
+                      >
+                        Open the builder
+                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -331,10 +273,10 @@ export default function SiteNavigation() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-2 text-[13px] font-medium rounded-full transition-all duration-300 border ${
+                  className={`px-4 py-2 text-[13.5px] font-semibold rounded-full transition-all duration-200 ${
                     active
-                      ? "text-white bg-white/[0.08] border-white/[0.12]"
-                      : "text-white/70 hover:text-white hover:bg-white/[0.04] border-transparent hover:border-white/[0.08]"
+                      ? "text-white bg-white/[0.1]"
+                      : "text-white/75 hover:text-white hover:bg-white/[0.06]"
                   }`}
                 >
                   {link.name}
@@ -343,16 +285,13 @@ export default function SiteNavigation() {
             })}
           </div>
 
-          {/* Right side: CTA only. Rule 31 — auth delegated to Crontech SSO.
-              Builder runs anonymously; signed-in identity comes from the
-              Crontech token forwarded on SSO callback. Until SSO is wired,
-              no "Sign in" button surfaces in the public nav. Admin access
-              is URL-only (/admin) per Craig's directive. */}
+          {/* Right side: ONE lime CTA. Rule 31 — auth delegated to Crontech
+              SSO; no sign-in button until SSO is wired. Admin is URL-only. */}
           <div className="hidden lg:flex items-center gap-2">
             {isLoggedIn && (
               <button
                 onClick={handleLogout}
-                className="p-2 text-white/40 hover:text-white/70 rounded-full hover:bg-white/[0.04] transition-colors"
+                className="p-2 text-white/45 hover:text-white rounded-full hover:bg-white/[0.06] transition-colors"
                 aria-label="Sign out"
               >
                 <LogOut className="w-4 h-4" />
@@ -360,48 +299,25 @@ export default function SiteNavigation() {
             )}
             <Link
               href="/builder"
-              className="group inline-flex items-center gap-2 px-5 py-2.5 text-[13px] rounded-full transition-all duration-300 hover:-translate-y-0.5"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 text-[13.5px] font-bold rounded-full transition-all duration-200 hover:-translate-y-0.5"
               style={{
-                // Bright champagne gradient with crisp white text — Craig:
-                // "the gold is nice but doesn't seem to work — the writing
-                // should be white." A subtle gradient (soft champagne →
-                // deeper champagne) keeps the gold feel while giving the
-                // button enough body for white text to land cleanly. Inner
-                // highlight + soft warm shadow finish the polish.
-                background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)",
-                color: "#ffffff",
-                border: "1px solid #a47d2c",
-                boxShadow: "0 6px 18px -8px rgba(150,175,40,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
-                fontWeight: 600,
-                letterSpacing: "0.01em",
-                textShadow: "0 1px 1px rgba(80,55,15,0.35)",
+                background: "var(--zb-accent)",
+                color: "var(--zb-accent-ink)",
+                boxShadow: "0 10px 26px -12px rgba(212,242,78,0.55)",
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "linear-gradient(135deg, #d4f24e 0%, #a9c43a 100%)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)";
-              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--zb-accent-hi)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "var(--zb-accent)"; }}
             >
-              <span>Start Building</span>
-              <span
-                className="text-[15px] leading-none transition-transform group-hover:translate-x-0.5"
-                style={{
-                  fontFamily: "'Playfair Display', 'Fraunces', ui-serif, Georgia, serif",
-                  fontWeight: 500,
-                  marginTop: "-1px",
-                }}
-                aria-hidden
-              >
-                →
-              </span>
+              Start building
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
 
           {/* Mobile/tablet hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 text-white/80 hover:text-[#d4f24e] rounded-full transition-colors border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl"
+            className="lg:hidden p-2.5 text-white rounded-full transition-colors hover:bg-white/[0.08]"
+            style={{ border: "1px solid var(--zb-line-dark)" }}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -409,38 +325,47 @@ export default function SiteNavigation() {
         </div>
       </div>
 
-      {/* Mobile Menu — full-screen editorial overlay */}
+      {/* Mobile menu — same ink stratum, full-bleed */}
       {mobileOpen && (
         <div
           className="lg:hidden max-h-[85vh] overflow-y-auto"
           style={{
-            background: "rgba(250,250,247,0.98)",
-            backdropFilter: "blur(24px)",
-            WebkitBackdropFilter: "blur(24px)",
-            borderTop: "1px solid var(--rule)",
+            background: "rgba(11, 11, 13, 0.98)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderTop: "1px solid var(--zb-line-dark)",
           }}
         >
-          <div className="px-4 py-4 space-y-5">
+          <div className="px-4 py-5 space-y-6">
             {PRODUCT_SECTIONS.map((section) => (
               <div key={section.label}>
-                <h3 className="text-[10px] uppercase tracking-wider text-stone-500 font-semibold mb-2">{section.label}</h3>
+                <h3 className="zb-eyebrow mb-2.5" style={{ color: "var(--zb-accent)" }}>
+                  {section.label}
+                </h3>
                 <div className="space-y-0.5">
                   {section.items.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/[0.05] transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.06] transition-colors"
                     >
-                      <item.icon className="w-4 h-4 text-stone-500 flex-shrink-0" />
+                      <item.icon className="w-4 h-4 flex-shrink-0" style={{ color: "rgba(255,255,255,0.55)" }} />
                       <div className="min-w-0 flex-1">
-                        <span className="text-sm text-white/80 flex items-center gap-1.5">
+                        <span className="text-[14px] font-semibold text-white flex items-center gap-1.5">
                           {item.name}
                           {item.badge && (
-                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-stone-500/20 text-stone-300 font-semibold">{item.badge}</span>
+                            <span
+                              className="text-[9px] px-1.5 py-0.5 rounded-full font-extrabold uppercase tracking-wider"
+                              style={{ background: "var(--zb-accent)", color: "var(--zb-accent-ink)" }}
+                            >
+                              {item.badge}
+                            </span>
                           )}
                         </span>
-                        <span className="text-[11px] text-stone-500 block">{item.desc}</span>
+                        <span className="text-[11.5px] block" style={{ color: "rgba(255,255,255,0.45)" }}>
+                          {item.desc}
+                        </span>
                       </div>
                     </Link>
                   ))}
@@ -448,11 +373,19 @@ export default function SiteNavigation() {
               </div>
             ))}
 
-            <div className="pt-4 border-t border-white/[0.06] space-y-2">
-              <Link href="/pricing" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05] font-medium">
+            <div className="pt-4 space-y-2" style={{ borderTop: "1px solid var(--zb-line-dark)" }}>
+              <Link
+                href="/pricing"
+                onClick={() => setMobileOpen(false)}
+                className="block p-3 text-[14px] font-semibold text-white/85 rounded-xl hover:bg-white/[0.06]"
+              >
                 Pricing
               </Link>
-              <Link href="/compare" onClick={() => setMobileOpen(false)} className="block p-2.5 text-sm text-white/80 rounded-lg hover:bg-white/[0.05]">
+              <Link
+                href="/compare"
+                onClick={() => setMobileOpen(false)}
+                className="block p-3 text-[14px] font-semibold text-white/85 rounded-xl hover:bg-white/[0.06]"
+              >
                 Compare
               </Link>
               {/* Rule 31 — auth delegated to Crontech SSO; no in-product
@@ -460,18 +393,14 @@ export default function SiteNavigation() {
               <Link
                 href="/builder"
                 onClick={() => setMobileOpen(false)}
-                className="block p-3 text-center text-sm rounded-lg transition-colors"
+                className="block p-3.5 text-center text-[14px] font-bold rounded-full transition-colors"
                 style={{
-                  background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)",
-                  color: "#ffffff",
-                  border: "1px solid #a47d2c",
-                  fontWeight: 600,
-                  letterSpacing: "0.01em",
-                  boxShadow: "0 4px 12px -4px rgba(150,175,40,0.45), inset 0 1px 0 0 rgba(255,255,255,0.35)",
-                  textShadow: "0 1px 1px rgba(80,55,15,0.35)",
+                  background: "var(--zb-accent)",
+                  color: "var(--zb-accent-ink)",
+                  boxShadow: "0 10px 26px -12px rgba(212,242,78,0.55)",
                 }}
               >
-                Start Building →
+                Start building →
               </Link>
             </div>
           </div>
