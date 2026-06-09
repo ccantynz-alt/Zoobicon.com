@@ -371,7 +371,7 @@ export default function DubPanel({
             className="w-10 h-10 rounded-xl flex items-center justify-center"
             style={{ background: "var(--ink, #0a0a0b)" }}
           >
-            <Globe className="w-5 h-5" style={{ color: "var(--gold, #c9a961)" }} />
+            <Globe className="w-5 h-5" style={{ color: "var(--gold, #d4f24e)" }} />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -494,7 +494,7 @@ export default function DubPanel({
                             : "var(--paper, #fafaf7)",
                           border: `1px solid ${
                             isSelected
-                              ? "var(--gold, #c9a961)"
+                              ? "var(--gold, #d4f24e)"
                               : "var(--rule, #e8e6dc)"
                           }`,
                           color: isSelected
@@ -514,7 +514,7 @@ export default function DubPanel({
                             className="block text-[10px] truncate"
                             style={{
                               color: isSelected
-                                ? "var(--gold, #c9a961)"
+                                ? "var(--gold, #d4f24e)"
                                 : "var(--ink-muted, #6f6e69)",
                             }}
                           >
@@ -527,7 +527,7 @@ export default function DubPanel({
                         {isSelected && (
                           <Check
                             className="w-3.5 h-3.5"
-                            style={{ color: "var(--gold, #c9a961)" }}
+                            style={{ color: "var(--gold, #d4f24e)" }}
                           />
                         )}
                       </button>
@@ -715,7 +715,7 @@ function DubResultCard({
         background: "var(--paper, #fafaf7)",
         border: `1px solid ${
           state.step === "done"
-            ? "var(--gold, #c9a961)"
+            ? "var(--gold, #d4f24e)"
             : state.step === "failed"
               ? "rgba(180,60,40,0.30)"
               : "var(--rule, #e8e6dc)"
@@ -834,7 +834,7 @@ function StepBadge({ step, label }: { step: DubStep; label: string }) {
       <span
         className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.14em] px-2 py-1 rounded"
         style={{
-          background: "var(--gold, #c9a961)",
+          background: "var(--gold, #d4f24e)",
           color: "var(--ink, #0a0a0b)",
         }}
       >

@@ -168,7 +168,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[var(--paper)] text-white selection:bg-[#E8D4B0]/30 overflow-hidden fs-grain pt-[72px]">
+    <div className="relative min-h-screen bg-[var(--paper)] text-white selection:bg-[#d4f24e]/30 overflow-hidden fs-grain pt-[72px]">
       {/* ── structured data ── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
@@ -177,7 +177,7 @@ export default function PricingPage() {
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
         <div
           className="absolute top-[-30%] left-1/2 h-[900px] w-[1200px] -translate-x-1/2 rounded-full blur-[180px]"
-          style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }}
+          style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.09), transparent 70%)" }}
         />
         <div
           className="absolute bottom-[-20%] right-[-10%] h-[600px] w-[800px] rounded-full blur-[160px]"
@@ -196,7 +196,7 @@ export default function PricingPage() {
             <motion.div
               custom={0}
               variants={fadeUp}
-              className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8"
+              className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-8"
             >
               <Star className="h-3 w-3" />
               Simple, transparent pricing
@@ -235,14 +235,14 @@ export default function PricingPage() {
               </span>
               <button
                 onClick={() => setAnnual(!annual)}
-                className="relative h-7 w-14 rounded-full border border-white/[0.1] bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E8D4B0]"
+                className="relative h-7 w-14 rounded-full border border-white/[0.1] bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4f24e]"
                 aria-label="Toggle annual billing"
               >
                 <motion.div
                   className="absolute left-0.5 top-0.5 h-6 w-6 rounded-full shadow-lg"
                   style={{
                     background: "var(--ink)",
-                    boxShadow: "0 6px 14px -4px rgba(232,212,176,0.55)",
+                    boxShadow: "0 6px 14px -4px rgba(212,242,78,0.55)",
                   }}
                   animate={{ x: annual ? 28 : 0 }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -257,7 +257,7 @@ export default function PricingPage() {
                     initial={{ opacity: 0, scale: 0.8, x: -8 }}
                     animate={{ opacity: 1, scale: 1, x: 0 }}
                     exit={{ opacity: 0, scale: 0.8, x: -8 }}
-                    className="rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/10 px-2.5 py-1 text-[11px] font-bold text-[#E8D4B0]"
+                    className="rounded-full border border-[#d4f24e]/25 bg-[#d4f24e]/10 px-2.5 py-1 text-[11px] font-bold text-[#d4f24e]"
                   >
                     Save up to 23%
                   </motion.span>
@@ -290,19 +290,19 @@ export default function PricingPage() {
                     {plan.featured && (
                       <div
                         className="absolute -inset-2 rounded-[32px] opacity-70 blur-2xl -z-10"
-                        style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.25), transparent 70%)" }}
+                        style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.25), transparent 70%)" }}
                       />
                     )}
 
                     <div
                       className="relative h-full rounded-[28px] border p-8 flex flex-col backdrop-blur-xl transition-all duration-500 hover:-translate-y-1"
                       style={{
-                        borderColor: plan.featured ? "rgba(232,212,176,0.35)" : "rgba(255,255,255,0.08)",
+                        borderColor: plan.featured ? "rgba(212,242,78,0.35)" : "rgba(255,255,255,0.08)",
                         background: plan.featured
                           ? "var(--paper-elevated)"
                           : "var(--paper-elevated)",
                         boxShadow: plan.featured
-                          ? "0 1px 0 rgba(232,212,176,0.15) inset, 0 32px 80px -32px rgba(232,212,176,0.45)"
+                          ? "0 1px 0 rgba(212,242,78,0.15) inset, 0 32px 80px -32px rgba(212,242,78,0.45)"
                           : "0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 50px -30px rgba(0,0,0,0.6)",
                       }}
                     >
@@ -312,9 +312,9 @@ export default function PricingPage() {
                           <span
                             className="whitespace-nowrap rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em]"
                             style={{
-                              background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                              background: "linear-gradient(135deg, #d4f24e 0%, #F0DCB8 100%)",
                               color: "#0a1628",
-                              boxShadow: "0 10px 24px -10px rgba(232,212,176,0.55)",
+                              boxShadow: "0 10px 24px -10px rgba(212,242,78,0.55)",
                             }}
                           >
                             Most popular
@@ -328,10 +328,10 @@ export default function PricingPage() {
                           className="flex h-10 w-10 items-center justify-center rounded-xl"
                           style={{
                             background: plan.featured
-                              ? "linear-gradient(135deg, rgba(232,212,176,0.15), rgba(224,139,176,0.08))"
+                              ? "linear-gradient(135deg, rgba(212,242,78,0.15), rgba(224,139,176,0.08))"
                               : "rgba(255,255,255,0.04)",
-                            color: plan.featured ? "#E8D4B0" : "rgba(255,255,255,0.55)",
-                            border: plan.featured ? "1px solid rgba(232,212,176,0.25)" : "1px solid rgba(255,255,255,0.06)",
+                            color: plan.featured ? "#d4f24e" : "rgba(255,255,255,0.55)",
+                            border: plan.featured ? "1px solid rgba(212,242,78,0.25)" : "1px solid rgba(255,255,255,0.06)",
                           }}
                         >
                           <Icon className="h-4 w-4" />
@@ -356,7 +356,7 @@ export default function PricingPage() {
                         {annual && !isCustom && (
                           <p className="mt-1.5 text-[11px] text-white/45">
                             ${price * 12}/yr &middot;{" "}
-                            <span className="text-[#E8D4B0]">
+                            <span className="text-[#d4f24e]">
                               save ${(plan.monthly - plan.annual) * 12}/yr
                             </span>
                           </p>
@@ -375,8 +375,8 @@ export default function PricingPage() {
                             <div
                               className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full mt-0.5"
                               style={{
-                                background: plan.featured ? "rgba(232,212,176,0.15)" : "rgba(255,255,255,0.05)",
-                                color: plan.featured ? "#E8D4B0" : "rgba(255,255,255,0.4)",
+                                background: plan.featured ? "rgba(212,242,78,0.15)" : "rgba(255,255,255,0.05)",
+                                color: plan.featured ? "#d4f24e" : "rgba(255,255,255,0.4)",
                               }}
                             >
                               <Check className="h-2.5 w-2.5" strokeWidth={3} />
@@ -390,7 +390,7 @@ export default function PricingPage() {
                       {plan.id === "enterprise" ? (
                         <a
                           href="mailto:sales@zoobicon.com?subject=Enterprise%20Inquiry"
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] py-3.5 text-[13px] font-semibold text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] py-3.5 text-[13px] font-semibold text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#d4f24e]/35 hover:text-[#d4f24e]"
                         >
                           {plan.cta}
                           <ArrowRight className="h-3.5 w-3.5" />
@@ -400,9 +400,9 @@ export default function PricingPage() {
                           href="/builder"
                           className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
                           style={plan.featured ? {
-                            background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                            background: "linear-gradient(135deg, #d4f24e 0%, #F0DCB8 100%)",
                             color: "#0a1628",
-                            boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+                            boxShadow: "0 14px 40px -16px rgba(212,242,78,0.5)",
                           } : {
                             background: "rgba(255,255,255,0.03)",
                             border: "1px solid rgba(255,255,255,0.12)",
@@ -432,17 +432,17 @@ export default function PricingPage() {
               className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-[13px] text-white/45"
             >
               <span className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-[#E8D4B0]" />
+                <Check className="h-4 w-4 text-[#d4f24e]" />
                 No credit card required
               </span>
               <span className="h-1 w-1 rounded-full bg-white/15 hidden sm:inline-flex" />
               <span className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-[#E8D4B0]" />
+                <Check className="h-4 w-4 text-[#d4f24e]" />
                 14-day free trial on all paid plans
               </span>
               <span className="h-1 w-1 rounded-full bg-white/15 hidden sm:inline-flex" />
               <span className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-[#E8D4B0]" />
+                <Check className="h-4 w-4 text-[#d4f24e]" />
                 Cancel anytime
               </span>
             </motion.div>
@@ -458,7 +458,7 @@ export default function PricingPage() {
               viewport={{ once: true, margin: "-60px" }}
             >
               <div className="text-center mb-14">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-6">
                   <Star className="h-3 w-3" />
                   Questions
                 </div>
@@ -494,12 +494,12 @@ export default function PricingPage() {
                       variants={fadeUp}
                       className="rounded-[20px] border backdrop-blur-xl transition-all duration-500"
                       style={{
-                        borderColor: isOpen ? "rgba(232,212,176,0.25)" : "rgba(255,255,255,0.08)",
+                        borderColor: isOpen ? "rgba(212,242,78,0.25)" : "rgba(255,255,255,0.08)",
                         background: isOpen
                           ? "var(--paper-elevated)"
                           : "var(--paper-elevated)",
                         boxShadow: isOpen
-                          ? "0 1px 0 rgba(232,212,176,0.12) inset, 0 20px 50px -28px rgba(232,212,176,0.3)"
+                          ? "0 1px 0 rgba(212,242,78,0.12) inset, 0 20px 50px -28px rgba(212,242,78,0.3)"
                           : "0 1px 0 rgba(255,255,255,0.03) inset",
                       }}
                     >
@@ -508,7 +508,7 @@ export default function PricingPage() {
                         className="w-full flex items-center justify-between gap-4 px-7 py-5 text-left"
                         aria-expanded={isOpen}
                       >
-                        <span className={`text-[15px] font-semibold transition-colors ${isOpen ? "text-[#E8D4B0]" : "text-white"}`}>{faq.q}</span>
+                        <span className={`text-[15px] font-semibold transition-colors ${isOpen ? "text-[#d4f24e]" : "text-white"}`}>{faq.q}</span>
                         <motion.span
                           animate={{ rotate: isOpen ? 45 : 0 }}
                           transition={{ duration: 0.2 }}
@@ -560,7 +560,7 @@ export default function PricingPage() {
             >
               <div
                 className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
-                style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.18), transparent 70%)" }}
+                style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.18), transparent 70%)" }}
               />
               <div className="relative">
                 <h2 className="fs-display-md text-white">
@@ -581,9 +581,9 @@ export default function PricingPage() {
                     href="/builder"
                     className="group inline-flex items-center gap-2 rounded-full px-7 py-4 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
                     style={{
-                      background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+                      background: "linear-gradient(135deg, #d4f24e 0%, #F0DCB8 100%)",
                       color: "#0a1628",
-                      boxShadow: "0 18px 48px -18px rgba(232,212,176,0.55)",
+                      boxShadow: "0 18px 48px -18px rgba(212,242,78,0.55)",
                     }}
                   >
                     Try the builder free
@@ -591,7 +591,7 @@ export default function PricingPage() {
                   </Link>
                   <Link
                     href="/builder"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-4 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-4 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#d4f24e]/35 hover:text-[#d4f24e]"
                   >
                     Create free account
                   </Link>

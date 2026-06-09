@@ -45,8 +45,8 @@ const config: Config = {
         brand: {
           200: "#f4ead0",
           300: "#e7d6a3",
-          400: "#d4b86d",
-          500: "#b8923f",
+          400: "#e4ff6b",
+          500: "#d4f24e",
           600: "#9c7a2c",
           700: "#7a5e1f",
         },
@@ -56,7 +56,7 @@ const config: Config = {
         accent: {
           cyan: "#a8a29e",
           purple: "#78716c",
-          pink: "#b8923f",
+          pink: "#d4f24e",
           stone: "#78716c",
         },
         // Signature — was electric violet, now warm gold series.
@@ -65,8 +65,8 @@ const config: Config = {
           100: "#fbf2d4",
           200: "#f4ead0",
           300: "#e7d6a3",
-          400: "#d4b86d",
-          500: "#b8923f",
+          400: "#e4ff6b",
+          500: "#d4f24e",
           600: "#9c7a2c",
           700: "#7a5e1f",
           800: "#5a4716",
@@ -151,12 +151,12 @@ const config: Config = {
         // 255) values bled through every `shadow-glow*` usage in the
         // codebase and were the source of Craig's "purple sneaking in"
         // report. Same intensity ratios, gold channel.
-        glow: "0 4px 24px rgba(184, 146, 63, 0.18), 0 0 48px rgba(184, 146, 63, 0.08)",
-        "glow-lg": "0 8px 40px rgba(184, 146, 63, 0.24), 0 0 80px rgba(184, 146, 63, 0.10)",
-        "glow-cyan": "0 4px 24px rgba(184, 146, 63, 0.15), 0 0 48px rgba(184, 146, 63, 0.06)",
-        "glow-blue": "0 4px 24px rgba(184, 146, 63, 0.15), 0 0 48px rgba(184, 146, 63, 0.06)",
-        "glow-zoo": "0 4px 24px rgba(184, 146, 63, 0.22), 0 0 60px rgba(184, 146, 63, 0.10)",
-        "glow-zoo-lg": "0 8px 40px rgba(184, 146, 63, 0.30), 0 0 80px rgba(184, 146, 63, 0.14)",
+        glow: "0 4px 24px rgba(212, 242, 78, 0.18), 0 0 48px rgba(212, 242, 78, 0.08)",
+        "glow-lg": "0 8px 40px rgba(212, 242, 78, 0.24), 0 0 80px rgba(212, 242, 78, 0.10)",
+        "glow-cyan": "0 4px 24px rgba(212, 242, 78, 0.15), 0 0 48px rgba(212, 242, 78, 0.06)",
+        "glow-blue": "0 4px 24px rgba(212, 242, 78, 0.15), 0 0 48px rgba(212, 242, 78, 0.06)",
+        "glow-zoo": "0 4px 24px rgba(212, 242, 78, 0.22), 0 0 60px rgba(212, 242, 78, 0.10)",
+        "glow-zoo-lg": "0 8px 40px rgba(212, 242, 78, 0.30), 0 0 80px rgba(212, 242, 78, 0.14)",
         // Premium/card shadows softened for the bright editorial-light
         // canvas. Removed the inset white highlight (rendered as a grimy
         // ring on cream) and tuned darks down so cards stop reading "too
@@ -199,11 +199,11 @@ const config: Config = {
         // (purple → blue → cyan). That was the single biggest source of
         // blue/purple bleeding through. Now: warm champagne ladder so every
         // `bg-gradient-zoo` reference paints sand/gold instead.
-        "gradient-zoo": "linear-gradient(135deg, #d4b86d, #b8923f, #8c6b25)",
-        "gradient-zoo-subtle": "linear-gradient(135deg, rgba(184, 146, 63, 0.14), rgba(140, 107, 37, 0.08))",
+        "gradient-zoo": "linear-gradient(135deg, #e4ff6b, #d4f24e, #a9c43a)",
+        "gradient-zoo-subtle": "linear-gradient(135deg, rgba(212, 242, 78, 0.14), rgba(150, 175, 40, 0.08))",
         // Cleaner semantic names for new components.
-        "gradient-gold": "linear-gradient(135deg, #d4b86d 0%, #b8923f 50%, #8c6b25 100%)",
-        "gradient-gold-soft": "linear-gradient(135deg, rgba(212, 184, 109, 0.18), rgba(184, 146, 63, 0.10))",
+        "gradient-gold": "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 50%, #a9c43a 100%)",
+        "gradient-gold-soft": "linear-gradient(135deg, rgba(228, 255, 107, 0.18), rgba(212, 242, 78, 0.10))",
         // Subtle paper-to-cream lift for hero sections.
         "gradient-paper-lift": "linear-gradient(180deg, #ffffff 0%, #fbf9f1 100%)",
       },

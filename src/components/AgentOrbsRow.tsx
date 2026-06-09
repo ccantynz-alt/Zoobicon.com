@@ -71,17 +71,17 @@ export default function AgentOrbsRow({
               borderColor: isActive
                 ? "rgba(212,175,94,0.6)"
                 : isDone
-                ? "rgba(184,146,63,0.3)"
+                ? "rgba(212,242,78,0.3)"
                 : "rgba(255,255,255,0.08)",
               background: isActive
                 ? "rgba(212,175,94,0.10)"
                 : isDone
-                ? "rgba(184,146,63,0.04)"
+                ? "rgba(212,242,78,0.04)"
                 : "rgba(255,255,255,0.02)",
               color: isActive
                 ? "#ffffff"
                 : isDone
-                ? "rgba(232,212,176,0.8)"
+                ? "rgba(212,242,78,0.8)"
                 : "rgba(255,255,255,0.40)",
               transform: isActive ? "scale(1.04)" : "scale(1)",
             }}

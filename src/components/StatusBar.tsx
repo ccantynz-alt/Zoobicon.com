@@ -87,7 +87,7 @@ export default function StatusBar({ status, pipelineStep }: StatusBarProps) {
       : status === "generating" || status === "editing"
       ? "bg-stone-400 shadow-[0_0_6px_rgba(0,150,255,0.6)]"
       : status === "complete"
-      ? "bg-stone-500 shadow-[0_0_6px_rgba(184,146,63,0.5)]"
+      ? "bg-stone-500 shadow-[0_0_6px_rgba(212,242,78,0.5)]"
       : "bg-stone-500";
 
   return (

@@ -127,9 +127,9 @@ const HERO_STATS = [
 
 const CARD_BG = "var(--paper-elevated)";
 const PRIMARY_CTA = {
-  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  background: "linear-gradient(135deg, #d4f24e 0%, #F0DCB8 100%)",
   color: "#0a1628",
-  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+  boxShadow: "0 14px 40px -16px rgba(212,242,78,0.5)",
 } as const;
 // SERIF accent — Fraunces italic in the brand sand→champagne→bronze
 // gradient. Single source of truth for every hero accent on this page.
@@ -137,7 +137,7 @@ const SERIF: React.CSSProperties = {
   fontFamily: "Fraunces, ui-serif, Georgia, serif",
   fontStyle: "italic",
   fontWeight: 400,
-  background: "linear-gradient(180deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%)",
+  background: "linear-gradient(180deg, #e4ff6b 0%, #d4f24e 55%, #a9c43a 100%)",
   WebkitBackgroundClip: "text",
   WebkitTextFillColor: "transparent",
   backgroundClip: "text",
@@ -180,13 +180,13 @@ export default function AgenciesPage() {
       <section className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
           <div className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
-            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }} />
+            style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.09), transparent 70%)" }} />
           <div className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
             style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.07), transparent 70%)" }} />
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-8">
             <Building2 className="w-3 h-3" />
             Built for agencies · White-label platform · Unlimited seats
           </div>
@@ -207,7 +207,7 @@ export default function AgenciesPage() {
                 key={pill}
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[11px] text-white/60"
               >
-                <Check className="w-3 h-3" style={{ color: "#E8D4B0" }} />
+                <Check className="w-3 h-3" style={{ color: "#d4f24e" }} />
                 {pill}
               </span>
             ))}
@@ -224,7 +224,7 @@ export default function AgenciesPage() {
             </Link>
             <a
               href="mailto:sales@zoobicon.com?subject=Agency Demo Request"
-              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#d4f24e]/35 hover:text-[#d4f24e]"
             >
               <Briefcase className="w-4 h-4" />
               Book a Demo
@@ -239,7 +239,7 @@ export default function AgenciesPage() {
                 className="rounded-[20px] border border-white/[0.08] p-5 text-center"
                 style={{ background: CARD_BG }}
               >
-                <div className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] mb-1" style={{ color: "#E8D4B0" }}>
+                <div className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] mb-1" style={{ color: "#d4f24e" }}>
                   {stat.value}
                 </div>
                 <div className="text-[12px] text-white/55">{stat.label}</div>
@@ -253,7 +253,7 @@ export default function AgenciesPage() {
       <section id="white-label" className="relative py-20 md:py-24 border-t border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-6">
               <Palette className="w-3 h-3" />
               White label platform
             </div>
@@ -270,14 +270,14 @@ export default function AgenciesPage() {
             {WHITE_LABEL_FEATURES.map((f) => (
               <div
                 key={f.title}
-                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#d4f24e]/25"
                 style={{ background: CARD_BG }}
               >
                 <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                  style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.07), transparent 70%)" }} />
                 <div className="relative">
-                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
-                    <f.icon className="h-5 w-5 text-[#E8D4B0]" />
+                  <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#d4f24e]/20 bg-[#d4f24e]/[0.05]">
+                    <f.icon className="h-5 w-5 text-[#d4f24e]" />
                   </div>
                   <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{f.title}</h3>
                   <p className="text-[13px] text-white/55 leading-relaxed">{f.desc}</p>
@@ -292,7 +292,7 @@ export default function AgenciesPage() {
       <section id="tools" className="relative py-20 md:py-24 border-t border-white/[0.06]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-6">
               Agency tools
             </div>
             <h2 className="fs-display-lg mb-4">
@@ -308,19 +308,19 @@ export default function AgenciesPage() {
             {AGENCY_TOOLS.map((tool) => (
               <div
                 key={tool.title}
-                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#d4f24e]/25"
                 style={{ background: CARD_BG }}
               >
                 <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }} />
+                  style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.07), transparent 70%)" }} />
                 <div className="relative">
                   <div className="flex items-start justify-between mb-5">
-                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
-                      <tool.icon className="h-5 w-5 text-[#E8D4B0]" />
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-[#d4f24e]/20 bg-[#d4f24e]/[0.05]">
+                      <tool.icon className="h-5 w-5 text-[#d4f24e]" />
                     </div>
                     <span
-                      className="rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
-                      style={{ color: "#E8D4B0" }}
+                      className="rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.05] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                      style={{ color: "#d4f24e" }}
                     >
                       {tool.stat}
                     </span>
@@ -338,11 +338,11 @@ export default function AgenciesPage() {
       <section className="relative py-20 md:py-24 border-t border-white/[0.06] overflow-hidden">
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           <div className="absolute left-1/2 top-1/2 h-[480px] w-[860px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
-            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.06), transparent 70%)" }} />
+            style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.06), transparent 70%)" }} />
         </div>
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-6">
               <BadgeCheck className="w-3 h-3" />
               Loved by agencies
             </div>
@@ -356,12 +356,12 @@ export default function AgenciesPage() {
             {TESTIMONIALS.map((t) => (
               <div
                 key={t.name}
-                className="rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+                className="rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#d4f24e]/25"
                 style={{ background: CARD_BG }}
               >
                 <div className="flex gap-0.5 mb-5">
                   {Array.from({ length: t.stars }).map((_, j) => (
-                    <Star key={j} className="w-4 h-4" style={{ color: "#E8D4B0", fill: "#E8D4B0" }} />
+                    <Star key={j} className="w-4 h-4" style={{ color: "#d4f24e", fill: "#d4f24e" }} />
                   ))}
                 </div>
                 <p className="text-[14px] text-white/70 leading-relaxed mb-6">&ldquo;{t.text}&rdquo;</p>
@@ -379,7 +379,7 @@ export default function AgenciesPage() {
       <section id="pricing" className="relative py-20 md:py-24 border-t border-white/[0.06]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-6">
               Pricing
             </div>
             <h2 className="fs-display-lg mb-4">
@@ -396,7 +396,7 @@ export default function AgenciesPage() {
               <div
                 key={tier.name}
                 className={`relative rounded-[24px] p-7 transition-all duration-500 hover:-translate-y-1 ${
-                  tier.featured ? "border-2 border-[#E8D4B0]/35" : "border border-white/[0.08] hover:border-[#E8D4B0]/25"
+                  tier.featured ? "border-2 border-[#d4f24e]/35" : "border border-white/[0.08] hover:border-[#d4f24e]/25"
                 }`}
                 style={{
                   background: tier.featured
@@ -407,21 +407,21 @@ export default function AgenciesPage() {
                 {tier.featured && (
                   <div
                     className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
-                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a1628" }}
+                    style={{ background: "linear-gradient(135deg, #d4f24e 0%, #F0DCB8 100%)", color: "#0a1628" }}
                   >
                     Most popular
                   </div>
                 )}
                 <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2">{tier.name}</h3>
                 <div className="flex items-baseline gap-1 mb-3">
-                  <span className="text-4xl font-semibold tracking-[-0.02em]" style={{ color: "#E8D4B0" }}>{tier.price}</span>
+                  <span className="text-4xl font-semibold tracking-[-0.02em]" style={{ color: "#d4f24e" }}>{tier.price}</span>
                   {tier.period && <span className="text-[13px] text-white/50">{tier.period}</span>}
                 </div>
                 <p className="text-[13px] text-white/55 mb-6">{tier.desc}</p>
                 <ul className="space-y-2.5 mb-7">
                   {tier.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-[13px] text-white/65">
-                      <Check className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#E8D4B0" }} />
+                      <Check className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#d4f24e" }} />
                       <span>{f}</span>
                     </li>
                   ))}
@@ -429,7 +429,7 @@ export default function AgenciesPage() {
                 {tier.cta === "Contact Sales" ? (
                   <a
                     href="mailto:sales@zoobicon.com?subject=Agency Enterprise Inquiry"
-                    className="block text-center rounded-full py-3 text-[13px] font-semibold transition-all border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                    className="block text-center rounded-full py-3 text-[13px] font-semibold transition-all border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#d4f24e]/35 hover:text-[#d4f24e]"
                   >
                     {tier.cta}
                   </a>
@@ -437,7 +437,7 @@ export default function AgenciesPage() {
                   <Link
                     href="/builder"
                     className={`block text-center rounded-full py-3 text-[13px] font-semibold transition-all ${
-                      tier.featured ? "" : "border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+                      tier.featured ? "" : "border border-white/[0.12] bg-white/[0.03] text-white/80 hover:border-[#d4f24e]/35 hover:text-[#d4f24e]"
                     }`}
                     style={tier.featured ? PRIMARY_CTA : undefined}
                   >
@@ -454,7 +454,7 @@ export default function AgenciesPage() {
       <section className="relative py-24 md:py-32 border-t border-white/[0.06] overflow-hidden">
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           <div className="absolute left-1/2 top-1/2 h-[560px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
-            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.11), transparent 70%)" }} />
+            style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.11), transparent 70%)" }} />
         </div>
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="fs-display-lg mb-5">
@@ -473,9 +473,9 @@ export default function AgenciesPage() {
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
           <div className="flex flex-wrap items-center justify-center gap-6 mt-8 text-[12px] text-white/55">
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> No credit card</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> 14-day free trial</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#E8D4B0" }} /> Cancel anytime</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#d4f24e" }} /> No credit card</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#d4f24e" }} /> 14-day free trial</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5" style={{ color: "#d4f24e" }} /> Cancel anytime</span>
           </div>
         </div>
       </section>

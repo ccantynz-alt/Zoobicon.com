@@ -110,8 +110,8 @@ export default function VoiceToBuildButton({
         aria-label={listening ? "Stop recording" : "Start voice input"}
         className={`relative ${dim} rounded-full flex items-center justify-center text-white transition-all ${className}`}
         style={listening
-          ? { background: "linear-gradient(135deg, #d4af5e 0%, #9c7a2c 100%)", boxShadow: "0 4px 16px rgba(184,146,63,0.5)" }
-          : { background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)", boxShadow: "0 2px 8px rgba(184,146,63,0.3)" }}
+          ? { background: "linear-gradient(135deg, #e4ff6b 0%, #9c7a2c 100%)", boxShadow: "0 4px 16px rgba(212,242,78,0.5)" }
+          : { background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)", boxShadow: "0 2px 8px rgba(212,242,78,0.3)" }}
       >
         {listening && (
           <>

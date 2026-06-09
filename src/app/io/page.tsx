@@ -615,7 +615,7 @@ export default function ZoobiconIOPage() {
 
       {/* ─── How It Works ─── */}
       <section className="relative py-24 px-4">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(184,146,63,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(184,146,63,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(212,242,78,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(212,242,78,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
         <div className="relative max-w-4xl mx-auto">
           <motion.div
@@ -926,7 +926,7 @@ export default function ZoobiconIOPage() {
 
       {/* ─── Comparison Table ─── */}
       <section className="relative py-24 px-4">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(184,146,63,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(184,146,63,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(212,242,78,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(212,242,78,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
         <div className="relative max-w-4xl mx-auto">
           <motion.div
@@ -1009,7 +1009,7 @@ export default function ZoobiconIOPage() {
                 variants={scaleIn}
                 className={`relative p-8 rounded-xl border transition-all ${
                   tier.highlight
-                    ? "border-zoo-500/40 bg-zoo-500/[0.03] shadow-[0_0_60px_-15px_rgba(184,146,63,0.15)]"
+                    ? "border-zoo-500/40 bg-zoo-500/[0.03] shadow-[0_0_60px_-15px_rgba(212,242,78,0.15)]"
                     : "border-white/15 bg-white/[0.05] hover:border-white/15"
                 }`}
               >

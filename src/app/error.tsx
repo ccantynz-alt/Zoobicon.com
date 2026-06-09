@@ -52,7 +52,7 @@ export default function GlobalError({
             style={{
               width: "40px",
               height: "40px",
-              border: "3px solid rgba(184,146,63, 0.2)",
+              border: "3px solid rgba(212,242,78, 0.2)",
               borderTopColor: "#57534e",
               borderRadius: "50%",
               animation: "spin 0.8s linear infinite",

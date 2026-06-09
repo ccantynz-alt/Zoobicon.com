@@ -19,7 +19,7 @@ export default function NotFound() {
             // The display numeral IS the brand — sandy champagne gradient
             // (lighter sand at top → deeper bronze at bottom) so it reads
             // as Zoobicon on first glance, not as a generic 404.
-            background: "linear-gradient(180deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%)",
+            background: "linear-gradient(180deg, #e4ff6b 0%, #d4f24e 55%, #a9c43a 100%)",
             WebkitBackgroundClip: "text",
             backgroundClip: "text",
             color: "transparent",
