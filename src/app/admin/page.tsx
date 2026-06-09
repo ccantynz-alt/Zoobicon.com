@@ -343,11 +343,11 @@ export default function AdminPage() {
                         className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
                         style={{
                           background: "var(--paper)",
-                          border: "1px solid var(--gold-soft, rgba(184,146,63,0.35))",
-                          boxShadow: "0 1px 3px rgba(140,107,37,0.10)",
+                          border: "1px solid var(--gold-soft, rgba(212,242,78,0.35))",
+                          boxShadow: "0 1px 3px rgba(150,175,40,0.10)",
                         }}
                       >
-                        <a.icon className="w-5 h-5" style={{ color: "var(--gold-deep, #8c6b25)" }} />
+                        <a.icon className="w-5 h-5" style={{ color: "var(--gold-deep, #a9c43a)" }} />
                       </div>
                       <div className="min-w-0">
                         <div className="text-sm font-semibold truncate text-stone-700 group-hover:text-stone-900 transition-colors">{a.label}</div>
@@ -378,11 +378,11 @@ export default function AdminPage() {
                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
                     style={{
                       background: "var(--paper)",
-                      border: "1px solid var(--gold-soft, rgba(184,146,63,0.35))",
-                      boxShadow: "0 1px 3px rgba(140,107,37,0.10)",
+                      border: "1px solid var(--gold-soft, rgba(212,242,78,0.35))",
+                      boxShadow: "0 1px 3px rgba(150,175,40,0.10)",
                     }}
                   >
-                    <f.icon className="w-6 h-6" style={{ color: "var(--gold-deep, #8c6b25)" }} />
+                    <f.icon className="w-6 h-6" style={{ color: "var(--gold-deep, #a9c43a)" }} />
                   </div>
                   <h3 className="text-sm font-bold mb-1.5 text-stone-700">{f.title}</h3>
                   <p className="text-xs text-stone-600 leading-relaxed">{f.desc}</p>

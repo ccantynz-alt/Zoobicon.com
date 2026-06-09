@@ -2243,11 +2243,11 @@ function BuilderPage() {
                       className="flex flex-col items-center px-2.5 py-1 rounded-[10px] transition-all"
                       style={{
                         background: active
-                          ? "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)"
+                          ? "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)"
                           : "transparent",
-                        color: active ? "#ffffff" : "rgba(255,255,255,0.5)",
+                        color: active ? "#161d05" : "rgba(255,255,255,0.5)",
                         boxShadow: active
-                          ? "0 2px 8px -2px rgba(140,107,37,0.45), inset 0 1px 0 0 rgba(255,255,255,0.25)"
+                          ? "0 2px 8px -2px rgba(150,175,40,0.45)"
                           : "none",
                       }}
                       title={
@@ -2515,11 +2515,11 @@ function BuilderPage() {
       {/* Interactive particle constellation background */}
       <BuilderBackground isGenerating={status === "generating"} />
 
-      {/* ── Top Bar ── editorial-light, matches site header */}
+      {/* ── Top Bar ── dark chrome, matches site header */}
       <div
         className="relative z-10 flex items-center h-12 px-3 gap-3"
         style={{
-          background: "rgba(250, 249, 244, 0.94)",
+          background: "rgba(14, 14, 18, 0.85)",
           borderBottom: "1px solid var(--rule)",
           backdropFilter: "blur(12px) saturate(140%)",
           WebkitBackdropFilter: "blur(12px) saturate(140%)",
@@ -2532,7 +2532,7 @@ function BuilderPage() {
             style={{
               background: "var(--paper)",
               border: "1.5px solid var(--gold)",
-              boxShadow: "0 2px 6px -2px rgba(140,107,37,0.18), inset 0 0 0 2px var(--paper)",
+              boxShadow: "0 2px 6px -2px rgba(150,175,40,0.18), inset 0 0 0 2px var(--paper)",
             }}
           >
             <span
@@ -2831,7 +2831,7 @@ function BuilderPage() {
                     <Link
                       href="/pricing"
                       className="px-3 py-1.5 rounded-lg text-[11px] font-semibold text-white transition-all whitespace-nowrap"
-                      style={{ background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)", boxShadow: "0 2px 6px rgba(184,146,63,0.3)", textShadow: "0 1px 1px rgba(80,55,15,0.35)" }}
+                      style={{ background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)", boxShadow: "0 2px 6px rgba(212,242,78,0.3)", textShadow: "0 1px 1px rgba(80,55,15,0.35)" }}
                     >
                       Remove badge
                     </Link>
@@ -2903,7 +2903,7 @@ function BuilderPage() {
                 {/* Chat header */}
                 <div className="px-4 py-2.5 border-b border-[var(--rule)] flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: "rgba(184,146,63,0.15)" }}>
+                    <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: "rgba(212,242,78,0.15)" }}>
                       <MessageSquare className="w-3 h-3" style={{ color: "var(--gold-deep)" }} />
                     </div>
                     <span className="text-xs font-semibold text-[var(--ink)]">Edit with AI</span>
@@ -3054,7 +3054,7 @@ function BuilderPage() {
             */}
             <div
               ref={previewContainerRef}
-              className="absolute inset-0 bg-[#f4f3ed]"
+              className="absolute inset-0 bg-[#0e0e12]"
               style={{
                 visibility: activeTab === "preview" ? "visible" : "hidden",
                 zIndex: activeTab === "preview" ? 1 : 0,
@@ -3227,17 +3227,17 @@ function BuilderPage() {
                   style={{ background: "rgba(247,245,238,0.97)", backdropFilter: "blur(4px)" }}
                 >
                   <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[120px] animate-pulse" style={{ background: "rgba(184,146,63,0.08)" }} />
-                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full blur-[100px] animate-pulse" style={{ background: "rgba(184,146,63,0.05)", animationDelay: "1s" }} />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[120px] animate-pulse" style={{ background: "rgba(212,242,78,0.08)" }} />
+                    <div className="absolute top-1/3 left-1/3 w-[350px] h-[350px] rounded-full blur-[100px] animate-pulse" style={{ background: "rgba(212,242,78,0.05)", animationDelay: "1s" }} />
                   </div>
 
                   <div className="relative z-10 text-center px-6">
                     <div className="relative w-20 h-20 mx-auto mb-8">
-                      <div className="absolute inset-0 rounded-2xl animate-pulse shadow-xl" style={{ background: "linear-gradient(135deg, #c9a961 0%, #b8923f 100%)", boxShadow: "0 8px 32px rgba(184,146,63,0.35)" }} />
+                      <div className="absolute inset-0 rounded-2xl animate-pulse shadow-xl" style={{ background: "linear-gradient(135deg, #d4f24e 0%, #d4f24e 100%)", boxShadow: "0 8px 32px rgba(212,242,78,0.35)" }} />
                       <div className="absolute inset-[3px] rounded-[13px] flex items-center justify-center" style={{ background: "var(--paper)" }}>
                         <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--gold)" }} />
                       </div>
-                      <div className="absolute -inset-1 rounded-2xl animate-spin" style={{ background: "conic-gradient(from 0deg, rgba(184,146,63,0.3), transparent, rgba(184,146,63,0.1))", animationDuration: "3s" }} />
+                      <div className="absolute -inset-1 rounded-2xl animate-spin" style={{ background: "conic-gradient(from 0deg, rgba(212,242,78,0.3), transparent, rgba(212,242,78,0.1))", animationDuration: "3s" }} />
                     </div>
 
                     <h3 className="text-xl font-semibold mb-2" style={{ color: "var(--ink)" }}>Building your website</h3>
@@ -3295,8 +3295,8 @@ function BuilderPage() {
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full blur-[150px]" style={{ background: "rgba(184,146,63,0.07)" }} />
-                      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: "rgba(184,146,63,0.04)" }} />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full blur-[150px]" style={{ background: "rgba(212,242,78,0.07)" }} />
+                      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full blur-[120px]" style={{ background: "rgba(212,242,78,0.04)" }} />
                     </div>
 
                     <div className="relative z-10 text-center px-6 max-w-xl">

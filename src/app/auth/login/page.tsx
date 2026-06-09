@@ -24,8 +24,8 @@ export default function LoginStub() {
           <div
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-5 text-[11px] font-medium"
             style={{
-              background: "rgba(184, 146, 63, 0.14)",
-              color: "#8c6b25",
+              background: "rgba(212, 242, 78, 0.14)",
+              color: "#a9c43a",
             }}
           >
             <Info className="w-3 h-3" />

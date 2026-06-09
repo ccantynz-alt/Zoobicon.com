@@ -12,7 +12,7 @@ export default function Icon() {
         style={{
           width: 32,
           height: 32,
-          background: "linear-gradient(135deg, #d4b86d 0%, #b8923f 100%)",
+          background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)",
           borderRadius: 8,
           display: "flex",
           alignItems: "center",

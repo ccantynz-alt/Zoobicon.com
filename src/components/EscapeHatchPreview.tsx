@@ -112,7 +112,7 @@ function buildSrcDoc(
       const wrap = document.createElement('div');
       wrap.style.cssText = 'padding:24px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a1c;background:#fcfaf3;border:1px solid #ebe7d6;border-radius:12px;margin:24px;max-width:640px';
       const h = document.createElement('div');
-      h.style.cssText = 'font-weight:600;color:#8c6b25;margin-bottom:8px;';
+      h.style.cssText = 'font-weight:600;color:#a9c43a;margin-bottom:8px;';
       h.textContent = title;
       const p = document.createElement('pre');
       p.style.cssText = 'font:11px/1.5 ui-monospace,monospace;color:#2a2a30;white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid #ebe7d6;border-radius:8px;padding:10px;margin:0;max-height:240px;overflow:auto';
@@ -465,7 +465,7 @@ function buildSrcDoc(
               return React.createElement(
                 "div",
                 { style: { padding: 24, fontFamily: "-apple-system,BlinkMacSystemFont,sans-serif", color: "#1a1a1c", background: "#fcfaf3", border: "1px solid #ebe7d6", borderRadius: 12, margin: 24, maxWidth: 640 } },
-                React.createElement("div", { style: { fontWeight: 600, color: "#8c6b25", marginBottom: 8 } }, "This section hit a snag"),
+                React.createElement("div", { style: { fontWeight: 600, color: "#a9c43a", marginBottom: 8 } }, "This section hit a snag"),
                 React.createElement("div", { style: { fontSize: 13, color: "#2a2a30", marginBottom: 12 } }, "The rest of your site is fine — try regenerating or describe an edit to fix this part."),
                 React.createElement("pre", { style: { font: "11px/1.5 ui-monospace,monospace", color: "#76767e", whiteSpace: "pre-wrap", wordBreak: "break-word", background: "#fff", border: "1px solid #ebe7d6", borderRadius: 8, padding: 10, margin: 0, maxHeight: 200, overflow: "auto" } }, String(this.state.err && this.state.err.message || this.state.err))
               );

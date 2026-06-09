@@ -148,8 +148,8 @@ export default function SiteNavigation() {
         WebkitBackdropFilter: "blur(24px) saturate(140%)",
         borderBottom: "1px solid var(--rule)",
         boxShadow: scrolled
-          ? "0 8px 24px -8px rgba(10,10,11,0.10), 0 1px 0 0 rgba(184,146,63,0.32)"
-          : "0 2px 8px -4px rgba(10,10,11,0.04), 0 1px 0 0 rgba(184,146,63,0.22)",
+          ? "0 8px 24px -8px rgba(10,10,11,0.10), 0 1px 0 0 rgba(212,242,78,0.32)"
+          : "0 2px 8px -4px rgba(10,10,11,0.04), 0 1px 0 0 rgba(212,242,78,0.22)",
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -164,7 +164,7 @@ export default function SiteNavigation() {
               style={{
                 background: "var(--paper)",
                 border: "1.5px solid var(--gold)",
-                boxShadow: "0 2px 6px -2px rgba(140,107,37,0.18), inset 0 0 0 3px var(--paper)",
+                boxShadow: "0 2px 6px -2px rgba(150,175,40,0.18), inset 0 0 0 3px var(--paper)",
               }}
             >
               <span
@@ -206,7 +206,7 @@ export default function SiteNavigation() {
                 }`}
               >
                 Products
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${megaOpen ? "rotate-180 text-[#E8D4B0]" : ""}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${megaOpen ? "rotate-180 text-[#d4f24e]" : ""}`} />
               </button>
 
               {/* Mega Menu Panel — FULL WIDTH 6 columns, editorial bright treatment.
@@ -311,7 +311,7 @@ export default function SiteNavigation() {
                         </Link>
                         <Link
                           href="/generators"
-                          className="group text-[12px] text-white/60 hover:text-[#E8D4B0] flex items-center gap-1.5 transition-colors"
+                          className="group text-[12px] text-white/60 hover:text-[#d4f24e] flex items-center gap-1.5 transition-colors"
                           onClick={() => setMegaOpen(false)}
                         >
                           All generators
@@ -368,19 +368,19 @@ export default function SiteNavigation() {
                 // deeper champagne) keeps the gold feel while giving the
                 // button enough body for white text to land cleanly. Inner
                 // highlight + soft warm shadow finish the polish.
-                background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)",
+                background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)",
                 color: "#ffffff",
                 border: "1px solid #a47d2c",
-                boxShadow: "0 6px 18px -8px rgba(140,107,37,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                boxShadow: "0 6px 18px -8px rgba(150,175,40,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
                 fontWeight: 600,
                 letterSpacing: "0.01em",
                 textShadow: "0 1px 1px rgba(80,55,15,0.35)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "linear-gradient(135deg, #b8923f 0%, #8c6b25 100%)";
+                e.currentTarget.style.background = "linear-gradient(135deg, #d4f24e 0%, #a9c43a 100%)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)";
+                e.currentTarget.style.background = "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)";
               }}
             >
               <span>Start Building</span>
@@ -401,7 +401,7 @@ export default function SiteNavigation() {
           {/* Mobile/tablet hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 text-white/80 hover:text-[#E8D4B0] rounded-full transition-colors border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl"
+            className="lg:hidden p-2 text-white/80 hover:text-[#d4f24e] rounded-full transition-colors border border-white/[0.08] bg-white/[0.04] backdrop-blur-xl"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -462,12 +462,12 @@ export default function SiteNavigation() {
                 onClick={() => setMobileOpen(false)}
                 className="block p-3 text-center text-sm rounded-lg transition-colors"
                 style={{
-                  background: "linear-gradient(135deg, #d4af5e 0%, #b8923f 100%)",
+                  background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)",
                   color: "#ffffff",
                   border: "1px solid #a47d2c",
                   fontWeight: 600,
                   letterSpacing: "0.01em",
-                  boxShadow: "0 4px 12px -4px rgba(140,107,37,0.45), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+                  boxShadow: "0 4px 12px -4px rgba(150,175,40,0.45), inset 0 1px 0 0 rgba(255,255,255,0.35)",
                   textShadow: "0 1px 1px rgba(80,55,15,0.35)",
                 }}
               >

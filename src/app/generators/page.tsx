@@ -53,9 +53,9 @@ import { endpointToGeneratorId } from "@/lib/generator-prompts";
 
 const CARD_BG = "var(--paper-elevated)";
 const PRIMARY_CTA = {
-  background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)",
+  background: "linear-gradient(135deg, #d4f24e 0%, #F0DCB8 100%)",
   color: "#0a1628",
-  boxShadow: "0 14px 40px -16px rgba(232,212,176,0.5)",
+  boxShadow: "0 14px 40px -16px rgba(212,242,78,0.5)",
 } as const;
 // SERIF accent — Fraunces italic in the brand sand→champagne→bronze
 // gradient. Single source of truth for every hero accent on this page.
@@ -63,7 +63,7 @@ const SERIF: React.CSSProperties = {
   fontFamily: "Fraunces, ui-serif, Georgia, serif",
   fontStyle: "italic",
   fontWeight: 400,
-  background: "linear-gradient(180deg, #d4b86d 0%, #b8923f 55%, #8c6b25 100%)",
+  background: "linear-gradient(180deg, #e4ff6b 0%, #d4f24e 55%, #a9c43a 100%)",
   WebkitBackgroundClip: "text",
   WebkitTextFillColor: "transparent",
   backgroundClip: "text",
@@ -223,7 +223,7 @@ export default function GeneratorsPage() {
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
           <div
             className="absolute left-1/2 top-0 h-[720px] w-[1200px] -translate-x-1/2 rounded-full blur-[160px]"
-            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.09), transparent 70%)" }}
+            style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.09), transparent 70%)" }}
           />
           <div
             className="absolute right-[-10%] top-[30%] h-[420px] w-[520px] rounded-full blur-[140px]"
@@ -232,7 +232,7 @@ export default function GeneratorsPage() {
         </div>
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-8">
             <Bot className="w-3 h-3" />
             {totalGenerators} AI generators · 10-agent pipeline
           </div>
@@ -258,7 +258,7 @@ export default function GeneratorsPage() {
                 setSelectedCategory(null);
               }}
               placeholder="Search generators..."
-              className="w-full rounded-full border border-white/[0.12] bg-white/[0.03] pl-12 pr-5 py-3.5 text-[14px] text-white placeholder:text-white/40 backdrop-blur transition-all focus:outline-none focus:border-[#E8D4B0]/40 focus:bg-white/[0.05]"
+              className="w-full rounded-full border border-white/[0.12] bg-white/[0.03] pl-12 pr-5 py-3.5 text-[14px] text-white placeholder:text-white/40 backdrop-blur transition-all focus:outline-none focus:border-[#d4f24e]/40 focus:bg-white/[0.05]"
             />
           </div>
 
@@ -268,8 +268,8 @@ export default function GeneratorsPage() {
               onClick={() => { setSelectedCategory(null); setSearchQuery(""); }}
               className={`rounded-full px-4 py-1.5 text-[12px] font-medium transition-all duration-500 ${
                 !isFiltering
-                  ? "border border-[#E8D4B0]/35 bg-[#E8D4B0]/[0.08] text-[#E8D4B0]"
-                  : "border border-white/[0.10] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/25 hover:text-[#E8D4B0]"
+                  ? "border border-[#d4f24e]/35 bg-[#d4f24e]/[0.08] text-[#d4f24e]"
+                  : "border border-white/[0.10] bg-white/[0.03] text-white/60 hover:border-[#d4f24e]/25 hover:text-[#d4f24e]"
               }`}
             >
               All ({totalGenerators})
@@ -280,8 +280,8 @@ export default function GeneratorsPage() {
                 onClick={() => { setSelectedCategory(cat.name); setSearchQuery(""); }}
                 className={`rounded-full px-4 py-1.5 text-[12px] font-medium transition-all duration-500 ${
                   selectedCategory === cat.name
-                    ? "border border-[#E8D4B0]/35 bg-[#E8D4B0]/[0.08] text-[#E8D4B0]"
-                    : "border border-white/[0.10] bg-white/[0.03] text-white/60 hover:border-[#E8D4B0]/25 hover:text-[#E8D4B0]"
+                    ? "border border-[#d4f24e]/35 bg-[#d4f24e]/[0.08] text-[#d4f24e]"
+                    : "border border-white/[0.10] bg-white/[0.03] text-white/60 hover:border-[#d4f24e]/25 hover:text-[#d4f24e]"
                 }`}
               >
                 {cat.name} ({cat.generators.length})
@@ -300,7 +300,7 @@ export default function GeneratorsPage() {
             </Link>
             <Link
               href="/builder"
-              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-3.5 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#d4f24e]/35 hover:text-[#d4f24e]"
             >
               <Code2 className="w-4 h-4" />
               API docs
@@ -320,7 +320,7 @@ export default function GeneratorsPage() {
               { value: "~60s", label: "Average build time" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] mb-2" style={{ color: "#E8D4B0" }}>
+                <div className="text-4xl md:text-5xl font-semibold tracking-[-0.02em] mb-2" style={{ color: "#d4f24e" }}>
                   {stat.value}
                 </div>
                 <div className="text-[13px] text-white/55">{stat.label}</div>
@@ -334,7 +334,7 @@ export default function GeneratorsPage() {
       <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-6">
               <Workflow className="w-3 h-3" />
               Multi-agent pipeline
             </div>
@@ -352,7 +352,7 @@ export default function GeneratorsPage() {
               <div
                 key={tier.name}
                 className={`relative overflow-hidden rounded-[24px] p-7 transition-all duration-500 hover:-translate-y-1 ${
-                  tier.tag ? "border-2 border-[#E8D4B0]/35" : "border border-white/[0.08] hover:border-[#E8D4B0]/25"
+                  tier.tag ? "border-2 border-[#d4f24e]/35" : "border border-white/[0.08] hover:border-[#d4f24e]/25"
                 }`}
                 style={{
                   background: tier.tag
@@ -363,7 +363,7 @@ export default function GeneratorsPage() {
                 {tier.tag && (
                   <div
                     className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wide"
-                    style={{ background: "linear-gradient(135deg, #E8D4B0 0%, #F0DCB8 100%)", color: "#0a1628" }}
+                    style={{ background: "linear-gradient(135deg, #d4f24e 0%, #F0DCB8 100%)", color: "#0a1628" }}
                   >
                     {tier.tag}
                   </div>
@@ -375,7 +375,7 @@ export default function GeneratorsPage() {
                   </span>
                 </div>
                 <p className="text-[13px] text-white/55 leading-relaxed mb-6">{tier.description}</p>
-                <div className="flex items-center gap-2 text-[12px]" style={{ color: "#E8D4B0" }}>
+                <div className="flex items-center gap-2 text-[12px]" style={{ color: "#d4f24e" }}>
                   <Zap className="w-3.5 h-3.5" />
                   <span className="font-semibold">{tier.speed}</span>
                 </div>
@@ -390,7 +390,7 @@ export default function GeneratorsPage() {
         <section className="relative py-20 md:py-24 border-t border-white/[0.06]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-6">
                 {selectedCategory || "Search results"}
               </div>
               <h2 className="fs-display-lg mb-4">
@@ -404,7 +404,7 @@ export default function GeneratorsPage() {
                 className="mx-auto max-w-lg rounded-[24px] border border-white/[0.08] p-10 text-center"
                 style={{ background: CARD_BG }}
               >
-                <Search className="w-8 h-8 mx-auto mb-4 text-[#E8D4B0]/60" />
+                <Search className="w-8 h-8 mx-auto mb-4 text-[#d4f24e]/60" />
                 <p className="text-[14px] text-white/60">
                   No generators match your search. Try a different keyword or clear the filter.
                 </p>
@@ -423,7 +423,7 @@ export default function GeneratorsPage() {
           <section key={cat.name} className="relative py-20 md:py-24 border-t border-white/[0.06]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
               <div className="text-center mb-14">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-6">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-6">
                   {String(idx + 1).padStart(2, "0")} · {cat.generators.length} generators
                 </div>
                 <h2 className="fs-display-lg mb-4">
@@ -450,11 +450,11 @@ export default function GeneratorsPage() {
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           <div
             className="absolute left-1/2 top-1/2 h-[560px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
-            style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.11), transparent 70%)" }}
+            style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.11), transparent 70%)" }}
           />
         </div>
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90 mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-8">
             <BadgeCheck className="w-3 h-3" />
             All {totalGenerators} generators live in the builder
           </div>
@@ -476,7 +476,7 @@ export default function GeneratorsPage() {
             </Link>
             <Link
               href="/builder"
-              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-8 py-4 text-[15px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0]"
+              className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-8 py-4 text-[15px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#d4f24e]/35 hover:text-[#d4f24e]"
             >
               <Code2 className="w-4 h-4" />
               API docs
@@ -494,24 +494,24 @@ function GeneratorCard({ gen }: { gen: GeneratorItem }) {
   return (
     <Link
       href={`/generators/${generatorId}`}
-      className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#E8D4B0]/25"
+      className="group relative overflow-hidden rounded-[24px] border border-white/[0.08] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#d4f24e]/25"
       style={{ background: CARD_BG }}
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.07), transparent 70%)" }}
+        style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.07), transparent 70%)" }}
       />
       {gen.tag && (
         <span
-          className="absolute top-5 right-5 rounded-full border border-[#E8D4B0]/25 bg-[#E8D4B0]/[0.06] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-          style={{ color: "#E8D4B0" }}
+          className="absolute top-5 right-5 rounded-full border border-[#d4f24e]/25 bg-[#d4f24e]/[0.06] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+          style={{ color: "#d4f24e" }}
         >
           {gen.tag}
         </span>
       )}
       <div className="relative">
-        <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.05]">
-          <Icon className="h-5 w-5 text-[#E8D4B0]" />
+        <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#d4f24e]/20 bg-[#d4f24e]/[0.05]">
+          <Icon className="h-5 w-5 text-[#d4f24e]" />
         </div>
         <h3 className="text-[17px] font-semibold tracking-[-0.01em] mb-2 text-white">
           {gen.name}
@@ -519,7 +519,7 @@ function GeneratorCard({ gen }: { gen: GeneratorItem }) {
         <p className="text-[13px] text-white/55 leading-relaxed mb-5">
           {gen.description}
         </p>
-        <div className="flex items-center gap-1.5 text-[12px] font-semibold transition-all" style={{ color: "#E8D4B0" }}>
+        <div className="flex items-center gap-1.5 text-[12px] font-semibold transition-all" style={{ color: "#d4f24e" }}>
           <span>Generate</span>
           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
         </div>

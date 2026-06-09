@@ -272,9 +272,9 @@ export default function PromptInput({
               : "border hover:border-stone-300"
           }`}
           style={tier === "premium" ? {
-            background: "linear-gradient(135deg, rgba(184,146,63,0.18), rgba(212,184,109,0.10), rgba(247,234,208,0.06))",
+            background: "linear-gradient(135deg, rgba(212,242,78,0.18), rgba(228,255,107,0.10), rgba(247,234,208,0.06))",
             borderColor: "var(--gold)",
-            boxShadow: "0 4px 16px -4px rgba(184,146,63,0.25)",
+            boxShadow: "0 4px 16px -4px rgba(212,242,78,0.25)",
           } : { background: "var(--paper-elevated)", borderColor: "var(--rule)" }}
         >
           {/* Animated shimmer on premium when selected */}
@@ -282,7 +282,7 @@ export default function PromptInput({
             <div
               className="absolute inset-0 opacity-20"
               style={{
-                background: "linear-gradient(90deg, transparent, rgba(184,146,63,0.3), transparent)",
+                background: "linear-gradient(90deg, transparent, rgba(212,242,78,0.3), transparent)",
                 backgroundSize: "200% 100%",
                 animation: "premium-shimmer 3s linear infinite",
               }}
@@ -492,7 +492,7 @@ export default function PromptInput({
       <button
         className="w-full py-3 rounded-xl text-sm font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed transition-all"
         style={tier === "premium"
-          ? { background: "linear-gradient(135deg, #c9a961 0%, #b8923f 50%, #9c7a2c 100%)", color: "#ffffff", boxShadow: "0 4px 16px -2px rgba(184,146,63,0.45)", textShadow: "0 1px 1px rgba(80,55,15,0.4)" }
+          ? { background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)", color: "#161d05", boxShadow: "0 4px 16px -2px rgba(212,242,78,0.45)" }
           : { background: "var(--ink)", color: "var(--paper)", boxShadow: "0 4px 16px -4px rgba(10,10,11,0.25)" }}
         onClick={handleGenerateWithCustomization}
         disabled={isGenerating || !prompt.trim()}
