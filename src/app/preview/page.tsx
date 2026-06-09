@@ -1,19 +1,18 @@
 "use client";
 
 /**
- * ZOOBICON — Standalone world-class homepage (ZOOBICON BOLD, Rule 37).
+ * ZOOBICON — Standalone world-class homepage (deep-ink dark edition).
  *
- * Fully self-contained greenfield build. Does NOT depend on the legacy
- * `--paper` / `--zb-*` design tokens or the globals.css override layer —
- * every colour is hardcoded via Tailwind arbitrary values so this file can
- * be lifted, reviewed at /preview, and swapped into src/app/page.tsx wholesale.
+ * Fully self-contained greenfield build. No dependency on the project's
+ * legacy design tokens or the globals.css override layer — every colour is
+ * hardcoded via Tailwind arbitrary values so this file can be lifted,
+ * reviewed at /preview, and swapped into src/app/page.tsx wholesale.
  *
- * Palette (Klaviyo-beating, locked by Craig 2026-06-09):
- *   canvas   #faf9f5   warm-white
- *   surface  #ffffff   cards on light
- *   ink      #0b0b0d   near-black statement bands + bold type
- *   ink-soft #161618   lifted panels on dark
- *   accent   #d4f24e   electric lime  (text on lime: #161d05)
+ * Aesthetic: Stripe / Linear-grade deep ink. Near-black canvas, glassy
+ * elevated surfaces, hairline borders, restrained radial glows, fine grid
+ * textures, crisp near-white display type, and ONE electric-lime signature
+ * accent (#d4f24e, text on lime #161d05) so the brand stays distinctive
+ * rather than generic SaaS blue.
  *
  * Type: Plus Jakarta Sans 800 display, Inter body, JetBrains Mono code —
  * all loaded globally in layout.tsx.
@@ -22,18 +21,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Scoped style — fonts helpers, keyframes, reveal-on-scroll, hidden chrome.
-   Kept inline so the component carries its own behaviour with zero external
-   CSS. `body:has(#zb-home)` retires the global nav/footer/backdrop on this
-   route so this homepage's own chrome is the only chrome.
+   Scoped style — fonts, keyframes, reveal-on-scroll, hidden global chrome.
+   `body:has(#zb-home)` retires the global nav/footer/backdrop on this route
+   so this homepage's own chrome is the only chrome, and paints the page
+   near-black before the bundle loads.
    ────────────────────────────────────────────────────────────────────────── */
 const SCOPED_CSS = `
 body:has(#zb-home) > nav,
 body:has(#zb-home) > footer,
 body:has(#zb-home) .site-backdrop { display: none !important; }
-body:has(#zb-home) { background: #faf9f5 !important; }
+body:has(#zb-home) { background: #08080b !important; }
 
 #zb-home, #zb-home * { box-sizing: border-box; }
+#zb-home ::selection { background: #d4f24e; color: #161d05; }
 .zbx-d { font-family: 'Plus Jakarta Sans','Inter',system-ui,sans-serif; font-weight: 800; letter-spacing: -0.04em; line-height: 0.98; }
 .zbx-d-tight { font-family: 'Plus Jakarta Sans','Inter',system-ui,sans-serif; font-weight: 700; letter-spacing: -0.03em; }
 .zbx-b { font-family: 'Inter',system-ui,-apple-system,sans-serif; }
@@ -49,21 +49,24 @@ body:has(#zb-home) { background: #faf9f5 !important; }
 @keyframes zbx-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes zbx-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @keyframes zbx-blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
-@keyframes zbx-glow { 0%,100% { opacity: .35; } 50% { opacity: .8; } }
-@keyframes zbx-shimmer { 100% { transform: translateX(200%); } }
+@keyframes zbx-glow { 0%,100% { opacity: .35; } 50% { opacity: .75; } }
+@keyframes zbx-shimmer { 100% { transform: translateX(220%); } }
 @keyframes zbx-drop { 0% { opacity: 0; transform: translateY(10px) scale(.98); } 100% { opacity: 1; transform: none; } }
-@keyframes zbx-dash { to { stroke-dashoffset: 0; } }
 @keyframes zbx-spin { to { transform: rotate(360deg); } }
 
-.zbx-marquee-track { animation: zbx-marquee 32s linear infinite; }
+.zbx-marquee-track { animation: zbx-marquee 34s linear infinite; }
 .zbx-float { animation: zbx-float 6s ease-in-out infinite; }
 .zbx-cursor { animation: zbx-blink 1s step-end infinite; }
 .zbx-drop { animation: zbx-drop .45s cubic-bezier(.16,1,.3,1) both; }
-.zbx-grid-fade { -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%); mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%); }
+.zbx-grid-fade { -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 38%, #000 38%, transparent 100%); mask-image: radial-gradient(ellipse 80% 70% at 50% 38%, #000 38%, transparent 100%); }
 .zbx-scroll-hide::-webkit-scrollbar { display: none; }
 .zbx-scroll-hide { scrollbar-width: none; }
-.zbx-link-underline { background-image: linear-gradient(#d4f24e,#d4f24e); background-size: 0% 2px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size .3s cubic-bezier(.16,1,.3,1); }
-.zbx-link-underline:hover { background-size: 100% 2px; }
+.zbx-link-underline { background-image: linear-gradient(#d4f24e,#d4f24e); background-size: 0% 1.5px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size .3s cubic-bezier(.16,1,.3,1); }
+.zbx-link-underline:hover { background-size: 100% 1.5px; }
+/* subtle top sheen on glass cards */
+.zbx-card { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)); }
+.zbx-card-hover { transition: border-color .3s, transform .3s, box-shadow .3s; }
+.zbx-card-hover:hover { border-color: rgba(255,255,255,0.16); transform: translateY(-4px); box-shadow: 0 24px 50px -24px rgba(0,0,0,0.8); }
 `;
 
 /* ── reveal-on-scroll: one observer for the whole page ───────────────────── */
@@ -92,7 +95,7 @@ function useReveal() {
   }, []);
 }
 
-/* ── tiny icon set (inline SVG, no dependency) ───────────────────────────── */
+/* ── inline icon set (no dependency) ─────────────────────────────────────── */
 type IconProps = { className?: string };
 const I = {
   bolt: (p: IconProps) => (
@@ -162,14 +165,13 @@ const I = {
 };
 
 /* ── brand wordmark ──────────────────────────────────────────────────────── */
-function Wordmark({ dark = false }: { dark?: boolean }) {
+function Wordmark() {
   return (
     <a href="/" className="group inline-flex items-center gap-2.5 select-none">
-      <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-[9px] bg-[#0b0b0d]">
-        <span className="zbx-d text-[15px] text-[#d4f24e]">z</span>
-        <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[#d4f24e] ring-2 ring-[#faf9f5]" />
+      <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-[9px] bg-[#d4f24e]">
+        <span className="zbx-d text-[15px] text-[#161d05]">z</span>
       </span>
-      <span className={`zbx-d-tight text-[18px] ${dark ? "text-white" : "text-[#0b0b0d]"}`}>zoobicon</span>
+      <span className="zbx-d-tight text-[18px] text-white">zoobicon</span>
     </a>
   );
 }
@@ -216,7 +218,7 @@ function FloatingNav() {
       <div
         className={`zbx-b w-full max-w-6xl rounded-2xl border transition-all duration-300 ${
           scrolled || open
-            ? "border-[#e7e4d8] bg-[#faf9f5]/85 shadow-[0_8px_30px_rgba(11,11,13,0.08)] backdrop-blur-xl"
+            ? "border-white/10 bg-[#0c0c10]/80 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl"
             : "border-transparent bg-transparent"
         }`}
         onMouseLeave={() => setOpen(null)}
@@ -230,7 +232,7 @@ function FloatingNav() {
               onMouseEnter={() => setOpen("platform")}
               onClick={() => setOpen(open === "platform" ? null : "platform")}
               className={`flex items-center gap-1 rounded-lg px-3 py-2 text-[14px] font-medium transition-colors ${
-                open === "platform" ? "text-[#0b0b0d]" : "text-[#3b3b42] hover:text-[#0b0b0d]"
+                open === "platform" ? "text-white" : "text-white/60 hover:text-white"
               }`}
             >
               Platform <I.chevron className={`h-3.5 w-3.5 transition-transform ${open === "platform" ? "rotate-180" : ""}`} />
@@ -239,32 +241,32 @@ function FloatingNav() {
               onMouseEnter={() => setOpen("docs")}
               onClick={() => setOpen(open === "docs" ? null : "docs")}
               className={`flex items-center gap-1 rounded-lg px-3 py-2 text-[14px] font-medium transition-colors ${
-                open === "docs" ? "text-[#0b0b0d]" : "text-[#3b3b42] hover:text-[#0b0b0d]"
+                open === "docs" ? "text-white" : "text-white/60 hover:text-white"
               }`}
             >
               Docs <I.chevron className={`h-3.5 w-3.5 transition-transform ${open === "docs" ? "rotate-180" : ""}`} />
             </button>
-            <a href="/pricing" onMouseEnter={() => setOpen(null)} className="rounded-lg px-3 py-2 text-[14px] font-medium text-[#3b3b42] transition-colors hover:text-[#0b0b0d]">
+            <a href="/pricing" onMouseEnter={() => setOpen(null)} className="rounded-lg px-3 py-2 text-[14px] font-medium text-white/60 transition-colors hover:text-white">
               Pricing
             </a>
           </nav>
 
           {/* desktop ctas */}
           <div className="hidden items-center gap-2 md:flex">
-            <a href="/auth/login" className="rounded-lg px-3 py-2 text-[14px] font-medium text-[#3b3b42] transition-colors hover:text-[#0b0b0d]">
+            <a href="/auth/login" className="rounded-lg px-3 py-2 text-[14px] font-medium text-white/60 transition-colors hover:text-white">
               Sign in
             </a>
             <a
               href="/builder"
-              className="group inline-flex items-center gap-1.5 rounded-lg bg-[#0b0b0d] px-4 py-2 text-[14px] font-semibold text-white transition-transform hover:-translate-y-0.5"
+              className="group inline-flex items-center gap-1.5 rounded-lg bg-[#d4f24e] px-4 py-2 text-[14px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5"
             >
               Start building
-              <I.arrow className="h-4 w-4 text-[#d4f24e] transition-transform group-hover:translate-x-0.5" />
+              <I.arrow className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </a>
           </div>
 
           {/* mobile toggle */}
-          <button onClick={() => setMobile((v) => !v)} className="md:hidden rounded-lg p-2 text-[#0b0b0d]" aria-label="Menu">
+          <button onClick={() => setMobile((v) => !v)} className="md:hidden rounded-lg p-2 text-white" aria-label="Menu">
             <div className="flex flex-col gap-1.5">
               <span className={`h-0.5 w-5 bg-current transition-transform ${mobile ? "translate-y-2 rotate-45" : ""}`} />
               <span className={`h-0.5 w-5 bg-current transition-opacity ${mobile ? "opacity-0" : ""}`} />
@@ -275,17 +277,17 @@ function FloatingNav() {
 
         {/* desktop mega dropdown */}
         {open && (
-          <div className="zbx-drop hidden border-t border-[#e7e4d8] p-3 md:block">
+          <div className="zbx-drop hidden border-t border-white/10 p-3 md:block">
             {open === "platform" ? (
               <div className="grid grid-cols-2 gap-1">
                 {PLATFORM_MENU.map((m) => (
-                  <a key={m.title} href="/builder" className="group flex gap-3 rounded-xl p-3 transition-colors hover:bg-white">
-                    <span className="mt-0.5 flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-[#0b0b0d] text-[#d4f24e]">
+                  <a key={m.title} href="/builder" className="group flex gap-3 rounded-xl p-3 transition-colors hover:bg-white/5">
+                    <span className="mt-0.5 flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-white/[0.06] text-[#d4f24e] ring-1 ring-white/10">
                       <m.icon className="h-[18px] w-[18px]" />
                     </span>
                     <span>
-                      <span className="block text-[14px] font-semibold text-[#0b0b0d]">{m.title}</span>
-                      <span className="mt-0.5 block text-[13px] leading-snug text-[#6c6c75]">{m.body}</span>
+                      <span className="block text-[14px] font-semibold text-white">{m.title}</span>
+                      <span className="mt-0.5 block text-[13px] leading-snug text-white/50">{m.body}</span>
                     </span>
                   </a>
                 ))}
@@ -293,9 +295,9 @@ function FloatingNav() {
             ) : (
               <div className="grid grid-cols-2 gap-1">
                 {DOCS_MENU.map((m) => (
-                  <a key={m.title} href="/builder" className="group rounded-xl p-3 transition-colors hover:bg-white">
-                    <span className="block text-[14px] font-semibold text-[#0b0b0d]">{m.title}</span>
-                    <span className="mt-0.5 block text-[13px] leading-snug text-[#6c6c75]">{m.body}</span>
+                  <a key={m.title} href="/builder" className="group rounded-xl p-3 transition-colors hover:bg-white/5">
+                    <span className="block text-[14px] font-semibold text-white">{m.title}</span>
+                    <span className="mt-0.5 block text-[13px] leading-snug text-white/50">{m.body}</span>
                   </a>
                 ))}
               </div>
@@ -305,17 +307,17 @@ function FloatingNav() {
 
         {/* mobile sheet */}
         {mobile && (
-          <div className="zbx-drop border-t border-[#e7e4d8] p-3 md:hidden">
+          <div className="zbx-drop border-t border-white/10 p-3 md:hidden">
             {["Platform", "Docs", "Pricing"].map((l) => (
-              <a key={l} href={l === "Pricing" ? "/pricing" : "/builder"} className="block rounded-lg px-3 py-2.5 text-[15px] font-medium text-[#0b0b0d]">
+              <a key={l} href={l === "Pricing" ? "/pricing" : "/builder"} className="block rounded-lg px-3 py-2.5 text-[15px] font-medium text-white">
                 {l}
               </a>
             ))}
             <div className="mt-2 grid grid-cols-2 gap-2 px-1">
-              <a href="/auth/login" className="rounded-lg border border-[#e7e4d8] px-4 py-2.5 text-center text-[14px] font-semibold text-[#0b0b0d]">
+              <a href="/auth/login" className="rounded-lg border border-white/15 px-4 py-2.5 text-center text-[14px] font-semibold text-white">
                 Sign in
               </a>
-              <a href="/builder" className="rounded-lg bg-[#0b0b0d] px-4 py-2.5 text-center text-[14px] font-semibold text-white">
+              <a href="/builder" className="rounded-lg bg-[#d4f24e] px-4 py-2.5 text-center text-[14px] font-bold text-[#161d05]">
                 Start building
               </a>
             </div>
@@ -356,9 +358,8 @@ function BuilderMockup() {
 
   return (
     <div className="zbx-float relative w-full max-w-[520px]">
-      {/* lime glow */}
-      <div className="zbx-anim pointer-events-none absolute -inset-6 -z-10 rounded-[32px] bg-[#d4f24e]/20 blur-3xl" style={{ animation: "zbx-glow 5s ease-in-out infinite" }} />
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f12] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)]">
+      <div className="zbx-anim pointer-events-none absolute -inset-6 -z-10 rounded-[32px] bg-[#d4f24e]/15 blur-3xl" style={{ animation: "zbx-glow 5s ease-in-out infinite" }} />
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0e0e12] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
         {/* window chrome */}
         <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
           <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
@@ -393,8 +394,7 @@ function BuilderMockup() {
           </div>
 
           {/* live canvas */}
-          <div className="relative min-h-[260px] bg-[#0b0b0d] p-3">
-            {/* shimmer sweep while building */}
+          <div className="relative min-h-[260px] bg-[#08080b] p-3">
             {phase === "building" && (
               <div className="pointer-events-none absolute inset-0 overflow-hidden">
                 <div className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/10 to-transparent" style={{ animation: "zbx-shimmer 1.4s ease-in-out infinite" }} />
@@ -449,13 +449,13 @@ function BuilderMockup() {
       </div>
 
       {/* floating deploy chip */}
-      <div className={`absolute -bottom-4 -right-3 flex items-center gap-2 rounded-xl border border-[#e7e4d8] bg-white px-3 py-2 shadow-[0_12px_30px_rgba(11,11,13,0.12)] transition-all duration-500 ${phase === "live" ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}>
+      <div className={`absolute -bottom-4 -right-3 flex items-center gap-2 rounded-xl border border-white/10 bg-[#13131a] px-3 py-2 shadow-[0_12px_30px_rgba(0,0,0,0.5)] transition-all duration-500 ${phase === "live" ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}>
         <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#d4f24e] text-[#161d05]">
           <I.globe className="h-3.5 w-3.5" />
         </span>
         <span className="zbx-b">
-          <span className="block text-[11px] font-semibold leading-none text-[#0b0b0d]">Deployed</span>
-          <span className="zbx-m block text-[10px] text-[#6c6c75]">nova.zoobicon.app</span>
+          <span className="block text-[11px] font-semibold leading-none text-white">Deployed</span>
+          <span className="zbx-m block text-[10px] text-white/45">nova.zoobicon.app</span>
         </span>
       </div>
     </div>
@@ -464,22 +464,22 @@ function BuilderMockup() {
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden bg-[#0b0b0d] pt-28 sm:pt-32">
+    <section className="relative overflow-hidden pt-28 sm:pt-32">
       {/* grid texture */}
       <div
-        className="zbx-grid-fade pointer-events-none absolute inset-0 opacity-[0.18]"
+        className="zbx-grid-fade pointer-events-none absolute inset-0 opacity-[0.16]"
         style={{
           backgroundImage:
             "linear-gradient(rgba(255,255,255,0.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.6) 1px,transparent 1px)",
           backgroundSize: "56px 56px",
         }}
       />
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[680px] -translate-x-1/2 rounded-full bg-[#d4f24e]/12 blur-[120px]" />
+      <div className="pointer-events-none absolute left-1/2 top-[-60px] h-[460px] w-[760px] -translate-x-1/2 rounded-full bg-[#d4f24e]/10 blur-[130px]" />
 
       <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-5 pb-20 sm:pb-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
         {/* copy */}
         <div className="zbx-reveal">
-          <a href="/builder" className="zbx-b inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 py-1.5 pl-1.5 pr-3.5 text-[13px] text-white/80 backdrop-blur">
+          <a href="/builder" className="zbx-b inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 py-1.5 pl-1.5 pr-3.5 text-[13px] text-white/80 backdrop-blur">
             <span className="rounded-full bg-[#d4f24e] px-2 py-0.5 text-[11px] font-bold text-[#161d05]">NEW</span>
             Streaming preview — first paint in under 2 seconds
             <I.arrow className="h-3.5 w-3.5 text-[#d4f24e]" />
@@ -491,26 +491,25 @@ function Hero() {
             Watch it build.
             <br />
             <span className="relative inline-block">
-              <span className="relative z-10">Ship it.</span>
-              <span className="absolute inset-x-[-6px] bottom-1.5 -z-0 h-[0.42em] -rotate-1 rounded-[3px] bg-[#d4f24e]" />
+              <span className="relative z-10 text-[#d4f24e]">Ship it.</span>
             </span>
           </h1>
 
-          <p className="zbx-b mt-6 max-w-xl text-[17px] leading-relaxed text-white/65 sm:text-[19px]">
+          <p className="zbx-b mt-6 max-w-xl text-[17px] leading-relaxed text-white/60 sm:text-[19px]">
             Zoobicon is the AI website builder that ships a <span className="text-white">production-ready React site</span> — not a throwaway export. Six agents collaborate live in your browser, assemble from 118 agency-grade components, and hand you a real codebase with hosting and a domain in the same flow.
           </p>
 
           <div className="zbx-b mt-8 flex flex-col gap-3 sm:flex-row">
             <a
               href="/builder"
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#d4f24e] px-6 py-3.5 text-[16px] font-bold text-[#161d05] shadow-[0_8px_30px_rgba(212,242,78,0.35)] transition-transform hover:-translate-y-0.5"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#d4f24e] px-6 py-3.5 text-[16px] font-bold text-[#161d05] shadow-[0_8px_30px_rgba(212,242,78,0.28)] transition-transform hover:-translate-y-0.5"
             >
               Start building free
               <I.arrow className="h-[18px] w-[18px] transition-transform group-hover:translate-x-0.5" />
             </a>
             <a
               href="/builder"
-              className="group inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3.5 text-[16px] font-semibold text-white backdrop-blur transition-colors hover:bg-white/10"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl border border-white/12 bg-white/5 px-6 py-3.5 text-[16px] font-semibold text-white backdrop-blur transition-colors hover:bg-white/10"
             >
               <I.play className="h-[18px] w-[18px] text-[#d4f24e]" />
               Watch a 60-second build
@@ -531,7 +530,7 @@ function Hero() {
       </div>
 
       {/* niche marquee — honest: categories, not fake customer logos */}
-      <div className="relative border-t border-white/10 py-5">
+      <div className="relative border-y border-white/8 py-5">
         <p className="zbx-b mb-3 text-center text-[12px] uppercase tracking-[0.22em] text-white/35">One prompt builds any of these</p>
         <div className="zbx-scroll-hide relative overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]">
           <div className="zbx-marquee-track flex w-max gap-3">
@@ -554,61 +553,58 @@ const NICHES = [
 ];
 
 /* ══════════════════════════════════════════════════════════════════════════
-   CORE PIPELINE — the six-agent orchestration (our actual differentiator)
+   CORE PIPELINE — six-agent orchestration (the actual differentiator)
    ══════════════════════════════════════════════════════════════════════════ */
 const AGENTS = [
-  { n: "01", name: "Strategist", role: "Reads intent, picks the page architecture" },
-  { n: "02", name: "Brand Designer", role: "Palette, type pairing, visual tone" },
-  { n: "03", name: "Architect", role: "Selects slot-locked sections from the registry" },
-  { n: "04", name: "Copywriter", role: "Writes conversion copy for every block" },
-  { n: "05", name: "Developer", role: "Assembles real React + Tailwind, hydrates live" },
-  { n: "06", name: "SEO Agent", role: "Meta, schema, semantic structure, a11y" },
+  { name: "Strategist", role: "Reads intent, picks the page architecture" },
+  { name: "Brand Designer", role: "Palette, type pairing, visual tone" },
+  { name: "Architect", role: "Selects slot-locked sections from the registry" },
+  { name: "Copywriter", role: "Writes conversion copy for every block" },
+  { name: "Developer", role: "Assembles real React + Tailwind, hydrates live" },
+  { name: "SEO Agent", role: "Meta, schema, semantic structure, a11y" },
 ];
 
 function Pipeline() {
   return (
-    <section className="bg-[#faf9f5] py-24 sm:py-28">
+    <section className="relative py-24 sm:py-28">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
       <div className="mx-auto max-w-6xl px-5">
         <div className="zbx-reveal mx-auto max-w-2xl text-center">
-          <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-[#e7e4d8] bg-white px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#6c6c75]">
-            <I.spark className="h-3.5 w-3.5 text-[#0b0b0d]" /> The pipeline
+          <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-white/70">
+            <I.spark className="h-3.5 w-3.5 text-[#d4f24e]" /> The pipeline
           </span>
-          <h2 className="zbx-d mt-5 text-[34px] text-[#0b0b0d] sm:text-[46px]">
+          <h2 className="zbx-d mt-5 text-[34px] text-white sm:text-[46px]">
             Not one model guessing.
             <br />
-            <span className="relative inline-block">
-              <span className="relative z-10">Six agents collaborating.</span>
-              <span className="absolute inset-x-[-4px] bottom-1 -z-0 h-[0.36em] -rotate-1 rounded-[3px] bg-[#d4f24e]" />
-            </span>
+            <span className="text-[#d4f24e]">Six agents collaborating.</span>
           </h2>
-          <p className="zbx-b mx-auto mt-5 max-w-xl text-[17px] leading-relaxed text-[#3b3b42]">
+          <p className="zbx-b mx-auto mt-5 max-w-xl text-[17px] leading-relaxed text-white/60">
             Single-shot builders dump one blob and hope. Zoobicon runs a coordinated team — each agent does one job well, and the work streams into your preview as it lands.
           </p>
         </div>
 
-        {/* flow */}
         <div className="zbx-reveal mt-14" style={{ transitionDelay: "80ms" }}>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {AGENTS.map((a, i) => (
               <div
                 key={a.name}
-                className="group relative overflow-hidden rounded-2xl border border-[#e7e4d8] bg-white p-5 transition-all hover:-translate-y-1 hover:border-[#0b0b0d]/15 hover:shadow-[0_18px_40px_-18px_rgba(11,11,13,0.25)]"
+                className="zbx-card zbx-card-hover group relative overflow-hidden rounded-2xl border border-white/10 p-5"
               >
-                <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#d4f24e]/0 blur-2xl transition-colors duration-500 group-hover:bg-[#d4f24e]/30" />
+                <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#d4f24e]/0 blur-2xl transition-colors duration-500 group-hover:bg-[#d4f24e]/20" />
                 <div className="flex items-center justify-between">
-                  <span className="zbx-m text-[12px] font-medium text-[#a8a8b0]">AGENT {a.n}</span>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0b0b0d] text-[#d4f24e]">
+                  <span className="zbx-m text-[12px] font-medium text-white/35">AGENT {String(i + 1).padStart(2, "0")}</span>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d4f24e] text-[#161d05]">
                     <span className="zbx-d text-[13px]">{i + 1}</span>
                   </span>
                 </div>
-                <h3 className="zbx-d-tight mt-4 text-[20px] text-[#0b0b0d]">{a.name}</h3>
-                <p className="zbx-b mt-1.5 text-[14px] leading-snug text-[#6c6c75]">{a.role}</p>
+                <h3 className="zbx-d-tight mt-4 text-[20px] text-white">{a.name}</h3>
+                <p className="zbx-b mt-1.5 text-[14px] leading-snug text-white/55">{a.role}</p>
               </div>
             ))}
           </div>
 
           {/* result bar */}
-          <div className="mt-3 flex flex-col items-stretch gap-3 rounded-2xl border border-[#0b0b0d] bg-[#0b0b0d] p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-3 flex flex-col items-stretch gap-3 overflow-hidden rounded-2xl border border-[#d4f24e]/30 bg-[#d4f24e]/[0.06] p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#d4f24e] text-[#161d05]">
                 <I.bolt className="h-5 w-5" />
@@ -633,39 +629,38 @@ function Pipeline() {
    ══════════════════════════════════════════════════════════════════════════ */
 function Bento() {
   return (
-    <section className="bg-[#faf9f5] pb-24 sm:pb-28">
+    <section className="pb-24 sm:pb-28">
       <div className="mx-auto max-w-6xl px-5">
         <div className="zbx-reveal mx-auto mb-12 max-w-2xl text-center">
-          <h2 className="zbx-d text-[34px] text-[#0b0b0d] sm:text-[46px]">Everything serious builders ask for</h2>
-          <p className="zbx-b mx-auto mt-4 max-w-lg text-[17px] text-[#3b3b42]">
+          <h2 className="zbx-d text-[34px] text-white sm:text-[46px]">Everything serious builders ask for</h2>
+          <p className="zbx-b mx-auto mt-4 max-w-lg text-[17px] text-white/60">
             Speed, real code, and a finish that looks like a $100K agency built it — without the agency.
           </p>
         </div>
 
         <div className="zbx-reveal grid grid-cols-1 gap-3 md:grid-cols-6 md:grid-rows-2">
           {/* big — registry */}
-          <div className="group relative overflow-hidden rounded-3xl border border-[#e7e4d8] bg-white p-7 md:col-span-3 md:row-span-2">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0b0b0d] text-[#d4f24e]">
+          <div className="zbx-card group relative overflow-hidden rounded-3xl border border-white/10 p-7 md:col-span-3 md:row-span-2">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#d4f24e] text-[#161d05]">
               <I.layers className="h-[22px] w-[22px]" />
             </span>
-            <h3 className="zbx-d-tight mt-5 text-[24px] text-[#0b0b0d]">118-component registry, slot-locked</h3>
-            <p className="zbx-b mt-2 max-w-md text-[15px] leading-relaxed text-[#6c6c75]">
+            <h3 className="zbx-d-tight mt-5 text-[24px] text-white">118-component registry, slot-locked</h3>
+            <p className="zbx-b mt-2 max-w-md text-[15px] leading-relaxed text-white/55">
               Every site is assembled from hand-built, agency-grade sections — bento grids, spotlight cards, animated stats. The AI fills the copy; it can&apos;t break the layout. Consistent quality, every single build.
             </p>
-            {/* mini swatch wall */}
             <div className="mt-6 grid grid-cols-4 gap-2">
               {Array.from({ length: 8 }).map((_, k) => (
-                <div key={k} className={`h-12 rounded-lg border border-[#e7e4d8] ${k % 3 === 0 ? "bg-[#0b0b0d]" : k % 3 === 1 ? "bg-[#d4f24e]/25" : "bg-[#f3f1e8]"}`}>
-                  <div className={`m-2 h-1.5 w-1/2 rounded ${k % 3 === 0 ? "bg-[#d4f24e]" : "bg-[#0b0b0d]/30"}`} />
+                <div key={k} className={`h-12 rounded-lg border border-white/10 ${k % 3 === 0 ? "bg-[#d4f24e]/20" : k % 3 === 1 ? "bg-white/[0.06]" : "bg-white/[0.03]"}`}>
+                  <div className={`m-2 h-1.5 w-1/2 rounded ${k % 3 === 0 ? "bg-[#d4f24e]" : "bg-white/25"}`} />
                 </div>
               ))}
             </div>
           </div>
 
           {/* perf */}
-          <div className="rounded-3xl border border-[#e7e4d8] bg-[#0b0b0d] p-7 md:col-span-3">
+          <div className="zbx-card rounded-3xl border border-white/10 p-7 md:col-span-3">
             <div className="flex items-start justify-between">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#d4f24e] text-[#161d05]">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/[0.06] text-[#d4f24e] ring-1 ring-white/10">
                 <I.gauge className="h-[22px] w-[22px]" />
               </span>
               <div className="text-right">
@@ -680,12 +675,12 @@ function Bento() {
           </div>
 
           {/* chat edit */}
-          <div className="rounded-3xl border border-[#e7e4d8] bg-white p-7 md:col-span-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0b0b0d] text-[#d4f24e]">
+          <div className="zbx-card rounded-3xl border border-white/10 p-7 md:col-span-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/[0.06] text-[#d4f24e] ring-1 ring-white/10">
               <I.chat className="h-[22px] w-[22px]" />
             </span>
-            <h3 className="zbx-d-tight mt-5 text-[22px] text-[#0b0b0d]">Edit by chatting</h3>
-            <p className="zbx-b mt-2 text-[15px] leading-relaxed text-[#6c6c75]">
+            <h3 className="zbx-d-tight mt-5 text-[22px] text-white">Edit by chatting</h3>
+            <p className="zbx-b mt-2 text-[15px] leading-relaxed text-white/55">
               &ldquo;Make the hero darker.&rdquo; &ldquo;Punchier pricing copy.&rdquo; One section re-renders in ~2 seconds — no full rebuild, no lost work.
             </p>
           </div>
@@ -698,12 +693,12 @@ function Bento() {
             { icon: I.globe, t: "Domain in checkout", b: "Buy the matching domain in the same flow. Hosting + SSL provisioned at deploy." },
             { icon: I.shield, t: "Shipped to last", b: "Multi-judge critique regenerates weak sections before you ever see them." },
           ].map((c) => (
-            <div key={c.t} className="group rounded-3xl border border-[#e7e4d8] bg-white p-6 transition-all hover:-translate-y-1 hover:shadow-[0_18px_40px_-20px_rgba(11,11,13,0.25)]">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#f3f1e8] text-[#0b0b0d] transition-colors group-hover:bg-[#d4f24e]">
+            <div key={c.t} className="zbx-card zbx-card-hover group rounded-3xl border border-white/10 p-6">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/[0.06] text-white/80 ring-1 ring-white/10 transition-colors group-hover:bg-[#d4f24e] group-hover:text-[#161d05]">
                 <c.icon className="h-[22px] w-[22px]" />
               </span>
-              <h3 className="zbx-d-tight mt-5 text-[19px] text-[#0b0b0d]">{c.t}</h3>
-              <p className="zbx-b mt-2 text-[14px] leading-relaxed text-[#6c6c75]">{c.b}</p>
+              <h3 className="zbx-d-tight mt-5 text-[19px] text-white">{c.t}</h3>
+              <p className="zbx-b mt-2 text-[14px] leading-relaxed text-white/55">{c.b}</p>
             </div>
           ))}
         </div>
@@ -713,7 +708,7 @@ function Bento() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   INTERACTIVE PLAYGROUND — pick a prompt, run the build, see the preview
+   INTERACTIVE PLAYGROUND — pick a brief, run the build, see the preview
    ══════════════════════════════════════════════════════════════════════════ */
 type Preset = {
   id: string;
@@ -771,7 +766,7 @@ const PRESETS: Preset[] = [
     cta: "View work",
     log: [
       "strategist  ▸ intent: personal brand · goal: inbound leads",
-      "designer    ▸ palette: bone + indigo · editorial whitespace",
+      "designer    ▸ palette: ink + indigo · editorial whitespace",
       "architect   ▸ sections: nav · hero · work grid · about · contact",
       "copywriter  ▸ case-study summaries · contact CTA written",
       "developer   ▸ assembled 11 components · hydrated ✓",
@@ -793,50 +788,48 @@ function Playground() {
     timers.current = [];
   };
 
-  const run = useCallback(
-    (idx: number) => {
-      clearTimers();
-      setActive(idx);
-      setTab("build");
-      setRunning(true);
-      setLines(0);
-      const p = PRESETS[idx];
-      p.log.forEach((_, i) => {
-        timers.current.push(
-          setTimeout(() => {
-            setLines(i + 1);
-            if (i === p.log.length - 1) {
-              timers.current.push(
-                setTimeout(() => {
-                  setRunning(false);
-                  setTab("preview");
-                }, 650)
-              );
-            }
-          }, 480 * (i + 1))
-        );
-      });
-    },
-    []
-  );
+  const run = useCallback((idx: number) => {
+    clearTimers();
+    setActive(idx);
+    setTab("build");
+    setRunning(true);
+    setLines(0);
+    const p = PRESETS[idx];
+    p.log.forEach((_, i) => {
+      timers.current.push(
+        setTimeout(() => {
+          setLines(i + 1);
+          if (i === p.log.length - 1) {
+            timers.current.push(
+              setTimeout(() => {
+                setRunning(false);
+                setTab("preview");
+              }, 650)
+            );
+          }
+        }, 480 * (i + 1))
+      );
+    });
+  }, []);
 
   useEffect(() => () => clearTimers(), []);
 
   return (
-    <section className="bg-[#0b0b0d] py-24 sm:py-28">
+    <section className="relative py-24 sm:py-28">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
       <div className="mx-auto max-w-6xl px-5">
         <div className="zbx-reveal mx-auto mb-12 max-w-2xl text-center">
-          <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-white/70">
+          <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-white/70">
             <I.play className="h-3.5 w-3.5 text-[#d4f24e]" /> Live playground
           </span>
           <h2 className="zbx-d mt-5 text-[34px] text-white sm:text-[46px]">Try a build right here</h2>
-          <p className="zbx-b mx-auto mt-4 max-w-lg text-[17px] text-white/55">
+          <p className="zbx-b mx-auto mt-4 max-w-lg text-[17px] text-white/60">
             Pick a brief, hit generate, and watch the agents work. This is the real flow — just sped up for the demo.
           </p>
         </div>
 
-        <div className="zbx-reveal overflow-hidden rounded-3xl border border-white/10 bg-[#0f0f12] shadow-[0_40px_100px_-30px_rgba(0,0,0,0.7)]">
-          {/* prompt picker */}
+        <div className="zbx-reveal overflow-hidden rounded-3xl border border-white/10 bg-[#0e0e12] shadow-[0_40px_100px_-30px_rgba(0,0,0,0.8)]">
+          {/* brief picker */}
           <div className="flex flex-col gap-3 border-b border-white/10 p-4 sm:flex-row sm:items-center">
             <span className="zbx-m text-[11px] uppercase tracking-wider text-white/35">Brief</span>
             <div className="flex flex-wrap gap-2">
@@ -894,7 +887,7 @@ function Playground() {
           </div>
 
           {/* panel */}
-          <div className="grid min-h-[340px] grid-cols-1 lg:grid-cols-[1fr]">
+          <div className="min-h-[340px]">
             {tab === "build" ? (
               <div className="zbx-m p-5 text-[13px] leading-relaxed">
                 <p className="text-white/30">$ zoobicon build --stream</p>
@@ -933,18 +926,17 @@ function Playground() {
 function PreviewMock({ preset }: { preset: Preset }) {
   return (
     <div className="p-4">
-      {/* mini browser */}
-      <div className="overflow-hidden rounded-xl border border-white/10 bg-white">
-        <div className="flex items-center gap-1.5 border-b border-black/5 bg-[#faf9f5] px-3 py-2">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-[#08080b]">
+        <div className="flex items-center gap-1.5 border-b border-white/10 bg-white/[0.03] px-3 py-2">
           <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-          <div className="zbx-m ml-2 flex h-5 flex-1 items-center rounded bg-white px-2 text-[10px] text-black/40">
+          <div className="zbx-m ml-2 flex h-5 flex-1 items-center rounded bg-white/5 px-2 text-[10px] text-white/40">
             {preset.id}.zoobicon.app
           </div>
         </div>
         {/* rendered hero */}
-        <div className="relative bg-[#0b0b0d] px-5 py-6 sm:px-8 sm:py-9">
+        <div className="relative px-5 py-6 sm:px-8 sm:py-9">
           <div className="flex items-center justify-between">
             <span className="zbx-d-tight text-[14px] text-white">{preset.label}.</span>
             <div className="hidden gap-3 sm:flex">
@@ -968,18 +960,18 @@ function PreviewMock({ preset }: { preset: Preset }) {
               </span>
             </div>
           </div>
-          <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-full blur-3xl" style={{ background: preset.accent, opacity: 0.18 }} />
+          <div className="pointer-events-none absolute right-0 top-0 h-32 w-32 rounded-full blur-3xl" style={{ background: preset.accent, opacity: 0.16 }} />
         </div>
         {/* feature strip */}
-        <div className="grid grid-cols-3 gap-px bg-[#e7e4d8]">
+        <div className="grid grid-cols-3 gap-px bg-white/10">
           {[0, 1, 2].map((k) => (
-            <div key={k} className="bg-white p-4">
+            <div key={k} className="bg-[#08080b] p-4">
               <div className="h-7 w-7 rounded-lg" style={{ background: `${preset.accent}33` }}>
                 <div className="m-1.5 h-1 w-1/2 rounded" style={{ background: preset.accent }} />
               </div>
-              <div className="mt-3 h-2 w-3/4 rounded bg-black/10" />
-              <div className="mt-1.5 h-1.5 w-full rounded bg-black/5" />
-              <div className="mt-1 h-1.5 w-2/3 rounded bg-black/5" />
+              <div className="mt-3 h-2 w-3/4 rounded bg-white/15" />
+              <div className="mt-1.5 h-1.5 w-full rounded bg-white/8" />
+              <div className="mt-1 h-1.5 w-2/3 rounded bg-white/8" />
             </div>
           ))}
         </div>
@@ -1006,14 +998,15 @@ const PLEDGES = [
 
 function Enterprise() {
   return (
-    <section className="bg-[#faf9f5] py-24 sm:py-28">
+    <section className="relative py-24 sm:py-28">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
       <div className="mx-auto max-w-6xl px-5">
         {/* stats */}
-        <div className="zbx-reveal grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-[#e7e4d8] bg-[#e7e4d8] sm:grid-cols-4">
+        <div className="zbx-reveal grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 sm:grid-cols-4">
           {STATS.map((s) => (
-            <div key={s.l} className="bg-[#faf9f5] px-6 py-8 text-center">
-              <p className="zbx-d text-[40px] text-[#0b0b0d] sm:text-[52px]">{s.v}</p>
-              <p className="zbx-b mt-1 text-[13px] text-[#6c6c75]">{s.l}</p>
+            <div key={s.l} className="bg-[#08080b] px-6 py-8 text-center">
+              <p className="zbx-d text-[40px] text-[#d4f24e] sm:text-[52px]">{s.v}</p>
+              <p className="zbx-b mt-1 text-[13px] text-white/55">{s.l}</p>
             </div>
           ))}
         </div>
@@ -1021,30 +1014,30 @@ function Enterprise() {
         {/* pledge block */}
         <div className="zbx-reveal mt-16 grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14" style={{ transitionDelay: "60ms" }}>
           <div>
-            <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-[#e7e4d8] bg-white px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#6c6c75]">
-              <I.shield className="h-3.5 w-3.5 text-[#0b0b0d]" /> Infrastructure pledge
+            <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/5 px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-white/70">
+              <I.shield className="h-3.5 w-3.5 text-[#d4f24e]" /> Infrastructure pledge
             </span>
-            <h2 className="zbx-d mt-5 text-[32px] text-[#0b0b0d] sm:text-[42px]">
+            <h2 className="zbx-d mt-5 text-[32px] text-white sm:text-[42px]">
               Build fast.
               <br />
               Own what you ship.
             </h2>
-            <p className="zbx-b mt-5 max-w-md text-[16px] leading-relaxed text-[#3b3b42]">
+            <p className="zbx-b mt-5 max-w-md text-[16px] leading-relaxed text-white/60">
               Zoobicon runs on managed infrastructure so you never touch a server — but the output is a real codebase you can take with you. No proprietary runtime, no hostage situation.
             </p>
-            <a href="/pricing" className="zbx-b mt-7 inline-flex items-center gap-2 rounded-xl bg-[#0b0b0d] px-5 py-3 text-[15px] font-semibold text-white transition-transform hover:-translate-y-0.5">
-              See plans & pricing <I.arrow className="h-4 w-4 text-[#d4f24e]" />
+            <a href="/pricing" className="zbx-b mt-7 inline-flex items-center gap-2 rounded-xl bg-[#d4f24e] px-5 py-3 text-[15px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5">
+              See plans & pricing <I.arrow className="h-4 w-4" />
             </a>
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {PLEDGES.map((p) => (
-              <div key={p.t} className="rounded-2xl border border-[#e7e4d8] bg-white p-5">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0b0b0d] text-[#d4f24e]">
+              <div key={p.t} className="zbx-card rounded-2xl border border-white/10 p-5">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.06] text-[#d4f24e] ring-1 ring-white/10">
                   <p.icon className="h-5 w-5" />
                 </span>
-                <h3 className="zbx-d-tight mt-4 text-[17px] text-[#0b0b0d]">{p.t}</h3>
-                <p className="zbx-b mt-1.5 text-[14px] leading-snug text-[#6c6c75]">{p.b}</p>
+                <h3 className="zbx-d-tight mt-4 text-[17px] text-white">{p.t}</h3>
+                <p className="zbx-b mt-1.5 text-[14px] leading-snug text-white/55">{p.b}</p>
               </div>
             ))}
           </div>
@@ -1059,17 +1052,17 @@ function Enterprise() {
    ══════════════════════════════════════════════════════════════════════════ */
 function FinalCTA() {
   return (
-    <section className="bg-[#faf9f5] px-5 pb-24 sm:pb-28">
-      <div className="zbx-reveal relative mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-[#0b0b0d] px-6 py-16 text-center sm:px-10 sm:py-20">
+    <section className="px-5 pb-24 sm:pb-28">
+      <div className="zbx-reveal relative mx-auto max-w-6xl overflow-hidden rounded-[32px] border border-white/10 bg-[#0e0e12] px-6 py-16 text-center sm:px-10 sm:py-20">
         <div
-          className="zbx-grid-fade pointer-events-none absolute inset-0 opacity-[0.16]"
+          className="zbx-grid-fade pointer-events-none absolute inset-0 opacity-[0.14]"
           style={{
             backgroundImage:
               "linear-gradient(rgba(255,255,255,0.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.5) 1px,transparent 1px)",
             backgroundSize: "48px 48px",
           }}
         />
-        <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[520px] -translate-x-1/2 rounded-full bg-[#d4f24e]/15 blur-[100px]" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[520px] -translate-x-1/2 rounded-full bg-[#d4f24e]/14 blur-[100px]" />
         <div className="relative">
           <h2 className="zbx-d mx-auto max-w-2xl text-[36px] text-white sm:text-[56px]">
             Your next site is one
@@ -1082,12 +1075,12 @@ function FinalCTA() {
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
               href="/builder"
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#d4f24e] px-7 py-3.5 text-[16px] font-bold text-[#161d05] shadow-[0_8px_30px_rgba(212,242,78,0.35)] transition-transform hover:-translate-y-0.5"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#d4f24e] px-7 py-3.5 text-[16px] font-bold text-[#161d05] shadow-[0_8px_30px_rgba(212,242,78,0.28)] transition-transform hover:-translate-y-0.5"
             >
               Start building free
               <I.arrow className="h-[18px] w-[18px] transition-transform group-hover:translate-x-0.5" />
             </a>
-            <a href="/pricing" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-7 py-3.5 text-[16px] font-semibold text-white transition-colors hover:bg-white/10">
+            <a href="/pricing" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/12 bg-white/5 px-7 py-3.5 text-[16px] font-semibold text-white transition-colors hover:bg-white/10">
               Compare plans
             </a>
           </div>
@@ -1142,12 +1135,12 @@ const FOOTER_COLS: { h: string; links: { label: string; href: string }[] }[] = [
 
 function Footer() {
   return (
-    <footer className="border-t border-white/10 bg-[#0b0b0d]">
+    <footer className="border-t border-white/10">
       <div className="mx-auto max-w-6xl px-5 py-16">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:grid-cols-6">
           {/* brand col */}
           <div className="col-span-2">
-            <Wordmark dark />
+            <Wordmark />
             <p className="zbx-b mt-4 max-w-xs text-[14px] leading-relaxed text-white/45">
               The AI website builder for people who want a real site, not a toy. Describe it, watch it build, ship it.
             </p>
@@ -1200,7 +1193,7 @@ export default function PreviewHomePage() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: SCOPED_CSS }} />
-      <div id="zb-home" className="zbx-b min-h-screen bg-[#faf9f5] text-[#0b0b0d] antialiased">
+      <div id="zb-home" className="zbx-b min-h-screen bg-[#08080b] text-white antialiased">
         <FloatingNav />
         <main>
           <Hero />
