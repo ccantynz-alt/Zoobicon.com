@@ -33,9 +33,13 @@ jobs:
         if: github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Production'
         run: |
           echo "Checking if live site responds..."
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "https://zoobicon.com" || echo "000")
-          if [ "$HTTP_CODE" = "200" ]; then
-            echo "✅ zoobicon.com returns 200 — site is live"
+          # Follow redirects (-L): the apex can answer with a benign 307/308
+          # (canonical normalization or Vercel's protection challenge for
+          # cookieless bots). A redirect proves the server is alive, so treat
+          # any 2xx/3xx as healthy and only fail on no-response / 4xx / 5xx.
+          HTTP_CODE=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 15 "https://zoobicon.com" || echo "000")
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+            echo "✅ zoobicon.com responded with $HTTP_CODE — site is live"
           else
             echo "❌ zoobicon.com returned $HTTP_CODE — site may be down"
             exit 1
