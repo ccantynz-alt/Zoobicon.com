@@ -14,26 +14,27 @@
    * cream so they have maximum contrast against white. Same ink colour
    * stack — readability is unchanged.
    */
-  /* ─── GLOBAL DARK FLIP (2026-06-09 — Rule 37 ZOOBICON BOLD, Craig-authorized) ───
-   * The legacy editorial-light tokens are repointed at the dark ZB BOLD
-   * palette so all 87 token-driven files + the override layer below flip
-   * to dark in ONE move. The variable NAMES are kept (not renamed) so
-   * nothing that references them breaks — only the values change. The
-   * --gold* family now resolves to the electric-lime accent. Was: pure
-   * white #ffffff canvas / cream cards / champagne #d4f24e accent. */
-  --paper: #08080b;          /* near-black page canvas (matches /preview) */
-  --paper-elevated: #101015; /* elevated dark surface — cards/panels */
-  --paper-bright: #15151b;   /* slightly brighter dark panel */
-  --paper-input: #121218;    /* dark input recess */
-  --ink: #f4f4f5;            /* primary text — near-white */
-  --ink-secondary: #c9c9d0;  /* secondary text */
-  --ink-muted: #8b8b93;      /* muted text, captions */
-  --rule: rgba(255, 255, 255, 0.10);     /* hairline border on dark */
-  --rule-strong: rgba(255, 255, 255, 0.18); /* stronger border */
-  --gold: #d4f24e;           /* electric-lime accent (was champagne) */
-  --gold-soft: rgba(212, 242, 78, 0.14);
-  --gold-glow: rgba(212, 242, 78, 0.40);
-  --gold-deep: #c9ee52;      /* bright lime for text + hover on dark */
+  /* ─── GLOBAL LIGHT FLIP (2026-06-09 — Craig: the dark+lime read as
+   * "cyberpunk, doesn't instill trust." The reference (klaviyo.com) is
+   * overwhelmingly LIGHT — dark is only the slim nav and the occasional
+   * statement band. The legacy tokens are repointed at the bright ZB
+   * BOLD palette so all 87 token-driven files + the override layer below
+   * flip to light in ONE move. Variable NAMES kept so nothing breaks.
+   * The --gold* family resolves to a deep olive-lime that is legible on
+   * white and harmonizes with the --zb-accent lime. */
+  --paper: #faf9f5;          /* bright warm-white canvas (matches --zb-bg) */
+  --paper-elevated: #ffffff; /* elevated light surface — cards/panels */
+  --paper-bright: #f5f3ea;   /* warm panel tint */
+  --paper-input: #ffffff;    /* input surface */
+  --ink: #0b0b0d;            /* primary text — near-black */
+  --ink-secondary: #3b3b42;  /* secondary text */
+  --ink-muted: #6c6c75;      /* muted text, captions */
+  --rule: rgba(11, 11, 13, 0.10);        /* hairline border on light */
+  --rule-strong: rgba(11, 11, 13, 0.20); /* stronger border */
+  --gold: #94a832;           /* olive-lime — borders/icons on light */
+  --gold-soft: rgba(148, 168, 50, 0.14);
+  --gold-glow: rgba(148, 168, 50, 0.32);
+  --gold-deep: #55650f;      /* deep olive — accent TEXT, AA on white */
   --shadow-1: 0 1px 2px rgba(10, 10, 11, 0.06), 0 0 0 1px rgba(10, 10, 11, 0.06);
   --shadow-2: 0 8px 24px rgba(10, 10, 11, 0.10), 0 2px 6px rgba(10, 10, 11, 0.06);
 

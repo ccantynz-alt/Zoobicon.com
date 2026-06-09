@@ -4,22 +4,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ArrowRight,
+  ArrowUpRight,
   ShieldCheck,
   Globe2,
   Lock,
-  Sparkles,
   Zap,
 } from "lucide-react";
 
 /**
- * SiteFooter — the serious business footer.
+ * SiteFooter — ZOOBICON BOLD, light-first (2026-06-09).
  *
- * Rule 29 (Filmora standard). Shared across every public page.
- * Hidden on /builder, /admin, /edit, /auth.
- * Columns: Build · Launch · Grow · Scale · Company · Legal.
- * Trust row: four-domain signature, SOC2/GDPR/Stripe-secure badges,
- * live status link. Newsletter handled inline here so every page
- * has a conversion surface at the bottom.
+ * Craig's call: dark+lime read as "cyberpunk." The footer is now a
+ * bright, premium closing surface: huge ink display CTA with one lime
+ * marker highlight, hairline-ruled link columns, trust badges,
+ * three-domain signature. Hidden on /builder, /admin, /edit, /auth.
  */
 export default function SiteFooter() {
   const pathname = usePathname();
@@ -33,143 +31,129 @@ export default function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative border-t" style={{ borderColor: "var(--rule)", background: "var(--paper)" }}>
-      <div className="relative mx-auto max-w-7xl px-6 pt-20 pb-10">
-        {/* Top CTA strip — conversion surface */}
-        <div
-          className="relative mb-20 overflow-hidden rounded-[32px] p-10 sm:p-14"
-          style={{
-            background: "var(--paper-elevated)",
-            border: "1px solid var(--rule)",
-            boxShadow: "var(--shadow-2)",
-          }}
-        >
-          <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
-            <div className="max-w-xl">
-              <div
-                className="mb-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium"
-                style={{
-                  border: "1px solid var(--rule)",
-                  background: "var(--paper)",
-                  color: "var(--ink-secondary)",
-                }}
-              >
-                <Sparkles className="h-3 w-3" style={{ color: "var(--gold-deep)" }} />
-                Ready when you are
-              </div>
-              <h2
-                className="text-4xl sm:text-5xl font-semibold leading-[1.05] tracking-[-0.032em]"
-                style={{ color: "var(--ink)" }}
-              >
-                Build the thing.{" "}
-                <span
-                  className="display-italic font-normal"
-                  style={{ color: "var(--gold-deep)" }}
-                >
-                  Today.
-                </span>
-              </h2>
-              <p className="mt-4 text-[15px] leading-relaxed max-w-md" style={{ color: "var(--ink-secondary)" }}>
-                One sentence. Sixty seconds. A complete, responsive site
-                with the matching custom domain + hosting provisioned via Crontech.
-                No templates. No code.
-              </p>
+    <footer
+      className="zb-bright relative"
+      style={{ borderTop: "1px solid var(--zb-line)" }}
+    >
+      <div className="relative mx-auto max-w-7xl px-6 pt-24 pb-10">
+        {/* ── CTA band ── */}
+        <div className="mb-24 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
+          <div className="max-w-2xl">
+            <div className="zb-eyebrow mb-5" style={{ color: "var(--zb-ink-2)" }}>
+              <Zap className="h-3.5 w-3.5" style={{ color: "var(--gold-deep)" }} />
+              Ready when you are
             </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/builder"
-                className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition-all duration-300 hover:-translate-y-0.5"
-                style={{
-                  background: "var(--ink)",
-                  color: "var(--paper)",
-                  boxShadow: "0 8px 24px -8px rgba(10,10,11,0.25)",
-                }}
-              >
-                Start building
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/pricing"
-                className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-medium transition-all duration-300 hover:-translate-y-0.5"
-                style={{
-                  border: "1px solid var(--rule-strong)",
-                  background: "var(--paper)",
-                  color: "var(--ink)",
-                }}
-              >
-                See pricing
-              </Link>
-            </div>
+            <h2 className="zb-display text-5xl sm:text-6xl" style={{ color: "var(--zb-ink)" }}>
+              Build the thing. <span className="zb-mark">Today.</span>
+            </h2>
+            <p
+              className="mt-6 max-w-md text-[15.5px] leading-relaxed"
+              style={{ color: "var(--zb-ink-2)" }}
+            >
+              One sentence. Sixty seconds. A complete, responsive site with
+              hosting and a custom domain provisioned in the same deploy step.
+              No templates. No code.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/builder" className="zb-btn-ink">
+              Start building
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-[15px] font-semibold transition-all duration-200 hover:-translate-y-0.5"
+              style={{
+                border: "1px solid var(--rule-strong)",
+                background: "var(--zb-surface)",
+                color: "var(--zb-ink)",
+              }}
+            >
+              See pricing
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
 
-        {/* Link columns */}
-        <div className="grid gap-10 lg:grid-cols-12">
+        {/* ── Link columns ── */}
+        <div
+          className="grid gap-12 pt-14 lg:grid-cols-12"
+          style={{ borderTop: "1px solid var(--zb-line)" }}
+        >
           {/* Brand column */}
           <div className="lg:col-span-4">
             <Link href="/" className="inline-flex items-center gap-2.5 mb-5">
               <div
-                className="flex h-9 w-9 items-center justify-center rounded-xl"
-                style={{
-                  background: "var(--ink)",
-                  boxShadow: "var(--shadow-1)",
-                }}
+                className="flex h-9 w-9 items-center justify-center rounded-[10px]"
+                style={{ background: "var(--zb-ink)" }}
               >
-                <span style={{ color: "var(--gold)" }} className="font-black text-[15px] tracking-tight">Z</span>
+                <span className="zb-display text-[19px] leading-none" style={{ color: "var(--zb-accent)" }}>
+                  Z
+                </span>
               </div>
-              <span className="font-semibold text-[18px] tracking-[-0.02em]" style={{ color: "var(--ink)" }}>
-                Zoobicon
+              <span className="zb-display text-[19px]" style={{ color: "var(--zb-ink)" }}>
+                zoobicon
               </span>
             </Link>
-            <p className="text-[13px] leading-relaxed max-w-sm mb-6" style={{ color: "var(--ink-secondary)" }}>
-              The AI Website Builder that buys you the domain in the same
-              checkout. Describe your business, watch six agents build it,
-              ship it under your own name.
+            <p
+              className="mb-7 max-w-sm text-[13.5px] leading-relaxed"
+              style={{ color: "var(--zb-ink-2)" }}
+            >
+              The AI Website Builder that ships the whole thing — site, hosting
+              and custom domain — from one prompt. Describe your business,
+              watch six agents build it, deploy under your own name.
             </p>
             <div className="flex flex-wrap items-center gap-2.5">
-              <span
-                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px]"
-                style={{ border: "1px solid var(--rule)", background: "var(--paper)", color: "var(--ink-secondary)" }}
-              >
-                <ShieldCheck className="h-3 w-3 text-amber-600" /> SOC 2 aligned
-              </span>
-              <span
-                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px]"
-                style={{ border: "1px solid var(--rule)", background: "var(--paper)", color: "var(--ink-secondary)" }}
-              >
-                <Lock className="h-3 w-3" style={{ color: "var(--gold-deep)" }} /> GDPR ready
-              </span>
-              <span
-                className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px]"
-                style={{ border: "1px solid var(--rule)", background: "var(--paper)", color: "var(--ink-secondary)" }}
-              >
-                <Zap className="h-3 w-3" style={{ color: "var(--gold-deep)" }} /> Stripe Verified
-              </span>
+              {[
+                { icon: ShieldCheck, label: "SOC 2 aligned" },
+                { icon: Lock, label: "GDPR ready" },
+                { icon: Zap, label: "Stripe verified" },
+              ].map(({ icon: Icon, label }) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10.5px] font-semibold"
+                  style={{
+                    border: "1px solid var(--zb-line)",
+                    background: "var(--zb-surface)",
+                    color: "var(--zb-ink-2)",
+                  }}
+                >
+                  <Icon className="h-3 w-3" style={{ color: "var(--gold-deep)" }} />
+                  {label}
+                </span>
+              ))}
             </div>
             <div
-              className="mt-6 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-medium"
+              className="mt-7 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-semibold"
               style={{
-                border: "1px solid rgba(16, 185, 129, 0.3)",
-                background: "rgba(16, 185, 129, 0.06)",
-                color: "rgb(5, 122, 85)",
+                border: "1px solid rgba(85, 101, 15, 0.25)",
+                background: "rgba(148, 168, 50, 0.08)",
+                color: "var(--gold-deep)",
               }}
             >
               <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500/60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-500" />
+                <span
+                  className="absolute inline-flex h-full w-full animate-ping rounded-full"
+                  style={{ background: "rgba(148, 168, 50, 0.5)" }}
+                />
+                <span
+                  className="relative inline-flex h-1.5 w-1.5 rounded-full"
+                  style={{ background: "var(--gold)" }}
+                />
               </span>
               All systems operational
             </div>
           </div>
 
           {/* Link columns */}
-          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
+          <div className="lg:col-span-8 grid grid-cols-2 gap-10 sm:grid-cols-4">
             <FooterColumn
               label="Build"
               links={[
                 { name: "AI Builder", href: "/builder" },
                 { name: "Generators", href: "/generators" },
                 { name: "Showcase", href: "/showcase" },
+                { name: "Import a site", href: "/import" },
               ]}
             />
             <FooterColumn
@@ -177,7 +161,7 @@ export default function SiteFooter() {
               links={[
                 { name: "Pricing", href: "/pricing" },
                 { name: "Compare", href: "/compare" },
-                { name: "SEO Dashboard", href: "/seo" },
+                { name: "Free audit", href: "/audit" },
                 { name: "Changelog", href: "/changelog" },
               ]}
             />
@@ -186,7 +170,7 @@ export default function SiteFooter() {
               links={[
                 { name: "Agencies", href: "/agencies" },
                 { name: "AI Agents", href: "/agents" },
-                { name: "WordPress", href: "/wordpress" },
+                { name: "Marketplace", href: "/marketplace" },
               ]}
             />
             <FooterColumn
@@ -201,19 +185,22 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        {/* Three-domain signature + copyright. Rule 31 — zoobicon.sh retired. */}
+        {/* ── Three-domain signature + copyright. Rule 31 — zoobicon.sh retired. ── */}
         <div
-          className="mt-16 pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-          style={{ borderTop: "1px solid var(--rule)" }}
+          className="mt-20 flex flex-col items-start justify-between gap-4 pt-8 sm:flex-row sm:items-center"
+          style={{ borderTop: "1px solid var(--zb-line)" }}
         >
-          <div className="text-[11px] flex items-center gap-1.5" style={{ color: "var(--ink-muted)" }}>
+          <div
+            className="flex items-center gap-1.5 text-[11px]"
+            style={{ color: "var(--zb-muted)" }}
+          >
             <Globe2 className="h-3 w-3" />
             <span className="font-mono tracking-tight">
               zoobicon.com · zoobicon.ai · zoobicon.io
             </span>
           </div>
-          <div className="text-[11px]" style={{ color: "var(--ink-muted)" }}>
-            © {year} Zoobicon Limited. Built on Opus 4.7.
+          <div className="text-[11px]" style={{ color: "var(--zb-muted)" }}>
+            © {year} Zoobicon Limited. Built with Claude.
           </div>
         </div>
       </div>
@@ -230,22 +217,19 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <div
-        className="mb-4 text-[10px] uppercase tracking-[0.2em] font-semibold"
-        style={{ color: "var(--gold-deep)" }}
-      >
+      <div className="zb-eyebrow mb-5" style={{ color: "var(--zb-muted)" }}>
         {label}
       </div>
-      <ul className="space-y-2.5">
+      <ul className="space-y-3">
         {links.map((l) => (
           <li key={l.href}>
             <Link
               href={l.href}
-              className="group inline-flex items-center gap-1 text-[13px] transition-colors"
-              style={{ color: "var(--ink-secondary)" }}
+              className="group inline-flex items-center gap-1 text-[13.5px] font-medium transition-colors hover:text-[var(--zb-ink)]"
+              style={{ color: "var(--zb-ink-2)" }}
             >
               {l.name}
-              <ArrowRight className="h-3 w-3 opacity-0 -translate-x-1 group-hover:opacity-60 group-hover:translate-x-0 transition-all" />
+              <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-60" />
             </Link>
           </li>
         ))}

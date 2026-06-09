@@ -7,15 +7,15 @@ import { ArrowRight, ArrowUpRight, Globe2, Sparkles } from "lucide-react";
 import VoiceToBuildButton from "@/components/VoiceToBuildButton";
 
 /**
- * HeroBuilder — the homepage hero, rebuilt 2026-06-09.
+ * HeroBuilder — the homepage hero, rebuilt light 2026-06-09.
  *
- * Zoobicon Bold direction (Craig overrode Rule 29): a near-black
- * statement hero, one electric-lime accent, huge Plus Jakarta Sans
- * display type. The job of this hero is to SELL — so the primary CTA
- * routes reliably into the full builder (`/builder`) instead of
- * running an inline SSE stream on the landing page (that stream has
- * been the thing failing for months). The builder is where building
- * happens; the homepage's job is to convert.
+ * Craig's call: the dark+lime hero read as "cyberpunk — doesn't instill
+ * trust." The reference (klaviyo.com) is overwhelmingly LIGHT: huge
+ * confident type on a bright canvas, dark reserved for the nav. This
+ * hero is bright warm-white, giant ink display type with ONE lime
+ * marker highlight, and a clean white product input card. The primary
+ * CTA routes reliably into `/builder` — the homepage's job is to
+ * convert, not to run an inline build.
  */
 
 const AGENTS = [
@@ -84,53 +84,37 @@ export default function HeroBuilder() {
   };
 
   return (
-    <section className="zb-dark relative overflow-hidden">
-      {/* ambient lime glow */}
-      <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden" aria-hidden>
-        <div
-          className="absolute left-1/2 top-[-10%] h-[620px] w-[1100px] -translate-x-1/2 rounded-full blur-[150px]"
-          style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.14), transparent 72%)" }}
-        />
-        <div
-          className="absolute inset-0 opacity-[0.6]"
-          style={{
-            backgroundImage:
-              "radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px)",
-            backgroundSize: "26px 26px",
-          }}
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-6xl px-6 pt-20 pb-24 sm:pt-28 sm:pb-32 text-center">
+    <section className="zb-bright relative overflow-hidden">
+      <div className="relative mx-auto max-w-6xl px-6 pt-20 pb-24 sm:pt-28 sm:pb-28 text-center">
         {/* eyebrow */}
-        <div className="zb-eyebrow mb-7 justify-center" style={{ color: "var(--zb-accent)" }}>
-          <Sparkles className="h-3.5 w-3.5" />
+        <div className="zb-eyebrow mb-7 justify-center" style={{ color: "var(--zb-ink-2)" }}>
+          <Sparkles className="h-3.5 w-3.5" style={{ color: "var(--gold-deep)" }} />
           Six AI agents · one prompt · a live website
         </div>
 
         {/* headline */}
-        <h1 className="zb-display mx-auto max-w-4xl text-[2.9rem] sm:text-7xl lg:text-[5.6rem]">
+        <h1 className="zb-display mx-auto max-w-4xl text-[2.9rem] sm:text-7xl lg:text-[5.6rem]" style={{ color: "var(--zb-ink)" }}>
           Describe your business.{" "}
           <span className="zb-mark">Get a website</span> that sells.
         </h1>
 
         <p
           className="mx-auto mt-7 max-w-xl text-base sm:text-lg leading-relaxed"
-          style={{ color: "rgba(255,255,255,0.62)" }}
+          style={{ color: "var(--zb-ink-2)" }}
         >
           Type one sentence. Six agents design the brand, write the copy,
           build the code and ship a deployable site — in under a minute.
           No templates. No drag-and-drop. No dev team.
         </p>
 
-        {/* input */}
+        {/* input — clean white product card */}
         <form onSubmit={submit} className="relative mx-auto mt-10 w-full max-w-2xl">
           <div
-            className="relative rounded-2xl backdrop-blur-xl transition-all duration-300"
+            className="relative rounded-2xl transition-all duration-300"
             style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.14)",
-              boxShadow: "0 30px 80px -40px rgba(0,0,0,0.7)",
+              background: "var(--zb-surface)",
+              border: "1px solid var(--zb-line)",
+              boxShadow: "0 24px 60px -28px rgba(11, 11, 13, 0.18), 0 2px 8px -2px rgba(11, 11, 13, 0.06)",
             }}
           >
             <textarea
@@ -145,8 +129,8 @@ export default function HeroBuilder() {
               }}
               rows={2}
               placeholder={placeholder}
-              className="zb-input w-full resize-none bg-transparent px-6 py-5 pr-36 text-left text-lg leading-relaxed focus:outline-none sm:text-xl"
-              style={{ color: "#ffffff" }}
+              className="zb-input-light w-full resize-none bg-transparent px-6 py-5 pr-36 text-left text-lg leading-relaxed focus:outline-none sm:text-xl"
+              style={{ color: "var(--zb-ink)" }}
             />
             <div className="absolute right-[8rem] top-1/2 -translate-y-1/2">
               <VoiceToBuildButton
@@ -157,14 +141,14 @@ export default function HeroBuilder() {
                 }}
               />
             </div>
-            <button type="submit" className="zb-btn absolute right-3 top-1/2 -translate-y-1/2 !py-2.5 !px-5 text-sm">
+            <button type="submit" className="zb-btn-ink absolute right-3 top-1/2 -translate-y-1/2 !py-2.5 !px-5 text-sm">
               Build it <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 
           {/* suggestion chips */}
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            <span className="text-[12px]" style={{ color: "rgba(255,255,255,0.4)" }}>
+            <span className="text-[12px]" style={{ color: "var(--zb-muted)" }}>
               Try:
             </span>
             {["Coffee roaster", "Law firm", "Photographer", "SaaS landing", "Dental clinic"].map((t) => (
@@ -175,7 +159,8 @@ export default function HeroBuilder() {
                   setPrompt(`A ${t.toLowerCase()} website`);
                   inputRef.current?.focus();
                 }}
-                className="zb-chip-dark transition-colors hover:!border-[rgba(212,242,78,0.5)]"
+                className="zb-chip-light transition-all hover:-translate-y-0.5"
+                style={{ cursor: "pointer" }}
               >
                 {t}
               </button>
@@ -189,26 +174,31 @@ export default function HeroBuilder() {
             href="/upgrade"
             className="group inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px] transition-all duration-300 hover:-translate-y-0.5"
             style={{
-              border: "1px solid rgba(255,255,255,0.14)",
-              background: "rgba(255,255,255,0.03)",
-              color: "rgba(255,255,255,0.8)",
+              border: "1px solid var(--zb-line)",
+              background: "var(--zb-surface)",
+              color: "var(--zb-ink-2)",
             }}
           >
-            <Globe2 className="h-3.5 w-3.5" style={{ color: "var(--zb-accent)" }} />
+            <Globe2 className="h-3.5 w-3.5" style={{ color: "var(--gold-deep)" }} />
             Already have a website?
-            <span className="font-semibold" style={{ color: "var(--zb-accent)" }}>
+            <span className="font-semibold" style={{ color: "var(--zb-ink)" }}>
               Paste the URL — we&rsquo;ll rebuild it better
             </span>
-            <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" style={{ color: "var(--zb-accent)" }} />
+            <ArrowUpRight
+              className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              style={{ color: "var(--gold-deep)" }}
+            />
           </Link>
         </div>
 
         {/* agent rail */}
         <div className="mt-14 flex flex-wrap items-center justify-center gap-2.5">
           {AGENTS.map((a) => (
-            <div key={a.name} className="zb-chip-dark">
+            <div key={a.name} className="zb-chip-light">
               <span className="text-sm">{a.icon}</span>
-              <span className="font-medium tracking-tight">{a.name}</span>
+              <span className="font-medium tracking-tight" style={{ color: "var(--zb-ink-2)" }}>
+                {a.name}
+              </span>
             </div>
           ))}
         </div>

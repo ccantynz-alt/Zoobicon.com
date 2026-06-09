@@ -217,12 +217,6 @@ export default function HomePage() {
 
         {/* ── HOW IT WORKS (dark statement) ── */}
         <section className="zb-dark relative overflow-hidden px-6 py-28 sm:py-32">
-          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-            <div
-              className="absolute right-[-5%] top-[-10%] h-[500px] w-[700px] rounded-full blur-[150px]"
-              style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.1), transparent 72%)" }}
-            />
-          </div>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -324,10 +318,18 @@ export default function HomePage() {
                 </p>
               </motion.div>
               <motion.div variants={fadeUp} className="mt-10 flex flex-wrap items-center gap-3">
-                <Link href="/builder" className="zb-btn">
+                <Link href="/builder" className="zb-btn-ink">
                   Try the builder <ArrowRight className="h-4 w-4" />
                 </Link>
-                <a href="mailto:hello@zoobicon.com" className="zb-btn-ink">
+                <a
+                  href="mailto:hello@zoobicon.com"
+                  className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-[15px] font-semibold transition-all duration-200 hover:-translate-y-0.5"
+                  style={{
+                    border: "1px solid var(--rule-strong)",
+                    background: "var(--zb-surface)",
+                    color: "var(--zb-ink)",
+                  }}
+                >
                   Tell us what&rsquo;s broken
                 </a>
               </motion.div>
@@ -420,12 +422,6 @@ export default function HomePage() {
 
         {/* ── FINAL CTA (dark) ── */}
         <section className="zb-dark relative overflow-hidden px-6 py-32 sm:py-36">
-          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-            <div
-              className="absolute left-1/2 top-1/2 h-[600px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[160px]"
-              style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.12), transparent 70%)" }}
-            />
-          </div>
           <motion.div
             initial="hidden"
             whileInView="visible"

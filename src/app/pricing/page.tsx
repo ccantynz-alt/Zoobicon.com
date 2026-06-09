@@ -34,7 +34,7 @@ const PLANS = [
       "Basic SEO tools",
       "Community support",
     ],
-    cta: "Get Started",
+    cta: "Get started",
     featured: false,
   },
   {
@@ -46,7 +46,7 @@ const PLANS = [
     description: "For creators and businesses ready to scale with the full AI toolkit.",
     features: [
       "3 AI-generated websites",
-      "AI builder (Claude Opus 4.7)",
+      "Deep agentic builds",
       "3 custom domains included",
       "10 email mailboxes",
       "SEO monitor & optimizer",
@@ -55,7 +55,7 @@ const PLANS = [
       "GitHub & React export",
       "Email support (24h SLA)",
     ],
-    cta: "Start Pro Trial",
+    cta: "Start Pro trial",
     featured: true,
   },
   {
@@ -75,7 +75,7 @@ const PLANS = [
       "Team seats (up to 10)",
       "Bulk generation tools",
     ],
-    cta: "Start Agency Trial",
+    cta: "Start Agency trial",
     featured: false,
   },
   {
@@ -95,7 +95,7 @@ const PLANS = [
       "Custom integrations",
       "Invoiced billing (NET 30)",
     ],
-    cta: "Contact Sales",
+    cta: "Contact sales",
     featured: false,
   },
 ];
@@ -127,7 +127,7 @@ const FAQS = [
   },
   {
     q: "What AI models power the builder?",
-    a: "Every plan uses Claude Opus 4.7 for the core developer agent, the most powerful AI model available. We also use Claude Haiku for planning and Sonnet for enhancements. Same quality across all tiers.",
+    a: "Claude Sonnet 4.6 powers every component build and edit — the same model on every tier. Deep agentic builds run Claude Opus for the developer phase. Same quality whether you pay $49 or $299.",
   },
   {
     q: "Do you offer refunds?",
@@ -135,6 +135,11 @@ const FAQS = [
   },
 ];
 
+/**
+ * Pricing — ZOOBICON BOLD (Rule 37).
+ * Bright warm canvas, bold Jakarta display, lime marker accents,
+ * near-black featured card. The footer supplies the closing dark CTA.
+ */
 export default function PricingPage() {
   const [annual, setAnnual] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -168,87 +173,66 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[var(--paper)] text-white selection:bg-[#d4f24e]/30 overflow-hidden fs-grain pt-[72px]">
+    <div className="zb-bright relative min-h-screen pt-[72px]">
       {/* ── structured data ── */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
-      {/* ── ambient cinematic background ── */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
-        <div
-          className="absolute top-[-30%] left-1/2 h-[900px] w-[1200px] -translate-x-1/2 rounded-full blur-[180px]"
-          style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.09), transparent 70%)" }}
-        />
-        <div
-          className="absolute bottom-[-20%] right-[-10%] h-[600px] w-[800px] rounded-full blur-[160px]"
-          style={{ background: "radial-gradient(closest-side, rgba(224,139,176,0.05), transparent 70%)" }}
-        />
-      </div>
-
-      <main className="relative z-10">
+      <main className="relative">
         {/* ━━━━━━━━━━ HERO ━━━━━━━━━━ */}
-        <section className="pt-24 pb-20 text-center px-6">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            className="max-w-4xl mx-auto"
-          >
+        <section className="px-6 pt-24 pb-16 text-center">
+          <motion.div initial="hidden" animate="visible" className="mx-auto max-w-4xl">
             <motion.div
               custom={0}
               variants={fadeUp}
-              className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-8"
+              className="zb-eyebrow mb-7 justify-center"
+              style={{ color: "var(--zb-ink-2)" }}
             >
-              <Star className="h-3 w-3" />
+              <Star className="h-3.5 w-3.5" style={{ color: "var(--zb-accent-ink)" }} />
               Simple, transparent pricing
             </motion.div>
 
-            <motion.h1
-              custom={1}
-              variants={fadeUp}
-              className="fs-display-xl text-white"
-            >
-              Build smarter.{" "}
-              <span
-                className="font-normal text-display-sand"
-                style={{
-                  fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                  fontStyle: "italic",
-                }}
-              >
-                Pay&nbsp;less.
-              </span>
+            <motion.h1 custom={1} variants={fadeUp} className="zb-display text-5xl sm:text-7xl">
+              One subscription.{" "}
+              <span className="zb-mark">Everything</span> included.
             </motion.h1>
 
             <motion.p
               custom={2}
               variants={fadeUp}
-              className="mt-8 text-[17px] sm:text-lg text-white/55 max-w-2xl mx-auto leading-relaxed"
+              className="mx-auto mt-8 max-w-2xl text-[17px] leading-relaxed"
+              style={{ color: "var(--zb-ink-2)" }}
             >
-              One platform for AI websites and domains. Hosting via partner cloud.
-              Start with a 14-day free trial. No credit card required.
+              The AI Website Builder with hosting and a custom domain provisioned
+              in the same deploy step. Start with a 14-day free trial.
+              No credit card required.
             </motion.p>
 
             {/* ── billing toggle ── */}
             <motion.div custom={3} variants={fadeUp} className="mt-12 flex items-center justify-center gap-4">
-              <span className={`text-sm font-medium transition-colors ${!annual ? "text-white" : "text-white/35"}`}>
+              <span
+                className="text-sm font-bold transition-colors"
+                style={{ color: !annual ? "var(--zb-ink)" : "var(--zb-muted)" }}
+              >
                 Monthly
               </span>
               <button
                 onClick={() => setAnnual(!annual)}
-                className="relative h-7 w-14 rounded-full border border-white/[0.1] bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4f24e]"
+                className="relative h-8 w-[60px] rounded-full transition-colors focus:outline-none focus-visible:ring-2"
+                style={{ background: annual ? "var(--zb-ink)" : "#d9d4c6" }}
                 aria-label="Toggle annual billing"
               >
                 <motion.div
-                  className="absolute left-0.5 top-0.5 h-6 w-6 rounded-full shadow-lg"
-                  style={{
-                    background: "var(--ink)",
-                    boxShadow: "0 6px 14px -4px rgba(212,242,78,0.55)",
-                  }}
-                  animate={{ x: annual ? 28 : 0 }}
+                  className="absolute left-1 top-1 h-6 w-6 rounded-full"
+                  style={{ background: "var(--zb-accent)" }}
+                  animate={{ x: annual ? 26 : 0 }}
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               </button>
-              <span className={`text-sm font-medium transition-colors ${annual ? "text-white" : "text-white/35"}`}>
+              <span
+                className="text-sm font-bold transition-colors"
+                style={{ color: annual ? "var(--zb-ink)" : "var(--zb-muted)" }}
+              >
                 Annual
               </span>
               <AnimatePresence>
@@ -257,7 +241,8 @@ export default function PricingPage() {
                     initial={{ opacity: 0, scale: 0.8, x: -8 }}
                     animate={{ opacity: 1, scale: 1, x: 0 }}
                     exit={{ opacity: 0, scale: 0.8, x: -8 }}
-                    className="rounded-full border border-[#d4f24e]/25 bg-[#d4f24e]/10 px-2.5 py-1 text-[11px] font-bold text-[#d4f24e]"
+                    className="rounded-full px-3 py-1 text-[11px] font-extrabold"
+                    style={{ background: "var(--zb-accent)", color: "var(--zb-accent-ink)" }}
                   >
                     Save up to 23%
                   </motion.span>
@@ -268,13 +253,14 @@ export default function PricingPage() {
         </section>
 
         {/* ━━━━━━━━━━ PRICING CARDS ━━━━━━━━━━ */}
-        <section className="pb-24 px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
+        <section className="px-6 pb-20">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
               {PLANS.map((plan, index) => {
                 const price = annual ? plan.annual : plan.monthly;
                 const isCustom = price === 0;
                 const Icon = plan.icon;
+                const dark = plan.featured;
 
                 return (
                   <motion.div
@@ -284,79 +270,71 @@ export default function PricingPage() {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-40px" }}
                     variants={fadeUp}
-                    className="relative group"
+                    className="relative"
                   >
-                    {/* animated glow ring on featured card */}
-                    {plan.featured && (
-                      <div
-                        className="absolute -inset-2 rounded-[32px] opacity-70 blur-2xl -z-10"
-                        style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.25), transparent 70%)" }}
-                      />
-                    )}
-
-                    <div
-                      className="relative h-full rounded-[28px] border p-8 flex flex-col backdrop-blur-xl transition-all duration-500 hover:-translate-y-1"
-                      style={{
-                        borderColor: plan.featured ? "rgba(212,242,78,0.35)" : "rgba(255,255,255,0.08)",
-                        background: plan.featured
-                          ? "var(--paper-elevated)"
-                          : "var(--paper-elevated)",
-                        boxShadow: plan.featured
-                          ? "0 1px 0 rgba(212,242,78,0.15) inset, 0 32px 80px -32px rgba(212,242,78,0.45)"
-                          : "0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 50px -30px rgba(0,0,0,0.6)",
-                      }}
-                    >
+                    <div className={`${dark ? "zb-card-dark" : "zb-card"} relative flex h-full flex-col p-8`}>
                       {/* popular badge */}
-                      {plan.featured && (
-                        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                          <span
-                            className="whitespace-nowrap rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em]"
-                            style={{
-                              background: "linear-gradient(135deg, #d4f24e 0%, #F0DCB8 100%)",
-                              color: "#0a1628",
-                              boxShadow: "0 10px 24px -10px rgba(212,242,78,0.55)",
-                            }}
-                          >
-                            Most popular
-                          </span>
-                        </div>
+                      {dark && (
+                        <span
+                          className="absolute -top-3 left-8 rounded-full px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.12em]"
+                          style={{ background: "var(--zb-accent)", color: "var(--zb-accent-ink)" }}
+                        >
+                          Most popular
+                        </span>
                       )}
 
                       {/* icon + name */}
-                      <div className="flex items-center gap-3 mb-5 mt-1">
+                      <div className="mb-6 flex items-center gap-3">
                         <div
-                          className="flex h-10 w-10 items-center justify-center rounded-xl"
-                          style={{
-                            background: plan.featured
-                              ? "linear-gradient(135deg, rgba(212,242,78,0.15), rgba(224,139,176,0.08))"
-                              : "rgba(255,255,255,0.04)",
-                            color: plan.featured ? "#d4f24e" : "rgba(255,255,255,0.55)",
-                            border: plan.featured ? "1px solid rgba(212,242,78,0.25)" : "1px solid rgba(255,255,255,0.06)",
-                          }}
+                          className="flex h-10 w-10 items-center justify-center rounded-[12px]"
+                          style={
+                            dark
+                              ? { background: "var(--zb-accent)" }
+                              : { background: "var(--zb-ink)" }
+                          }
                         >
-                          <Icon className="h-4 w-4" />
+                          <Icon
+                            className="h-4 w-4"
+                            style={{ color: dark ? "var(--zb-accent-ink)" : "var(--zb-accent)" }}
+                            strokeWidth={2.2}
+                          />
                         </div>
-                        <h3 className="text-[18px] font-semibold text-white tracking-[-0.01em]">{plan.name}</h3>
+                        <h3
+                          className="text-[18px] font-bold tracking-[-0.01em]"
+                          style={{ color: dark ? "#ffffff" : "var(--zb-ink)" }}
+                        >
+                          {plan.name}
+                        </h3>
                       </div>
 
                       {/* price */}
                       <div className="mb-5">
-                        {isCustom ? (
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-5xl font-semibold tracking-[-0.03em] text-white">Custom</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-5xl font-semibold tracking-[-0.03em] text-white">
-                              ${price}
+                        <div className="flex items-baseline gap-1">
+                          <span
+                            className="text-5xl font-extrabold tracking-[-0.03em]"
+                            style={{ color: dark ? "#ffffff" : "var(--zb-ink)" }}
+                          >
+                            {isCustom ? "Custom" : `$${price}`}
+                          </span>
+                          {!isCustom && (
+                            <span
+                              className="text-sm font-medium"
+                              style={{ color: dark ? "rgba(255,255,255,0.45)" : "var(--zb-muted)" }}
+                            >
+                              /mo
                             </span>
-                            <span className="text-sm text-white/40 font-medium">/mo</span>
-                          </div>
-                        )}
+                          )}
+                        </div>
                         {annual && !isCustom && (
-                          <p className="mt-1.5 text-[11px] text-white/45">
-                            ${price * 12}/yr &middot;{" "}
-                            <span className="text-[#d4f24e]">
+                          <p
+                            className="mt-1.5 text-[11.5px]"
+                            style={{ color: dark ? "rgba(255,255,255,0.5)" : "var(--zb-muted)" }}
+                          >
+                            ${price * 12}/yr ·{" "}
+                            <span
+                              className="font-bold"
+                              style={{ color: dark ? "var(--zb-accent)" : "var(--zb-ink)" }}
+                            >
                               save ${(plan.monthly - plan.annual) * 12}/yr
                             </span>
                           </p>
@@ -364,24 +342,28 @@ export default function PricingPage() {
                       </div>
 
                       {/* description */}
-                      <p className="mb-7 text-[13px] text-white/55 leading-relaxed">
+                      <p
+                        className="mb-7 text-[13px] leading-relaxed"
+                        style={{ color: dark ? "rgba(255,255,255,0.6)" : "var(--zb-ink-2)" }}
+                      >
                         {plan.description}
                       </p>
 
                       {/* features */}
-                      <ul className="space-y-3 mb-8 flex-1">
+                      <ul className="mb-8 flex-1 space-y-2.5">
                         {plan.features.map((feature) => (
-                          <li key={feature} className="flex items-start gap-3">
-                            <div
-                              className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full mt-0.5"
-                              style={{
-                                background: plan.featured ? "rgba(212,242,78,0.15)" : "rgba(255,255,255,0.05)",
-                                color: plan.featured ? "#d4f24e" : "rgba(255,255,255,0.4)",
-                              }}
+                          <li key={feature} className="flex items-start gap-2.5">
+                            <Check
+                              className="mt-0.5 h-3.5 w-3.5 flex-shrink-0"
+                              style={{ color: dark ? "var(--zb-accent)" : "var(--zb-ink)" }}
+                              strokeWidth={2.5}
+                            />
+                            <span
+                              className="text-[13px] leading-relaxed"
+                              style={{ color: dark ? "rgba(255,255,255,0.78)" : "var(--zb-ink-2)" }}
                             >
-                              <Check className="h-2.5 w-2.5" strokeWidth={3} />
-                            </div>
-                            <span className="text-[13px] text-white/70 leading-relaxed">{feature}</span>
+                              {feature}
+                            </span>
                           </li>
                         ))}
                       </ul>
@@ -390,27 +372,20 @@ export default function PricingPage() {
                       {plan.id === "enterprise" ? (
                         <a
                           href="mailto:sales@zoobicon.com?subject=Enterprise%20Inquiry"
-                          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] py-3.5 text-[13px] font-semibold text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#d4f24e]/35 hover:text-[#d4f24e]"
+                          className="zb-btn-ink w-full"
                         >
                           {plan.cta}
                           <ArrowRight className="h-3.5 w-3.5" />
                         </a>
-                      ) : (
-                        <Link
-                          href="/builder"
-                          className="group/btn inline-flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-[13px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
-                          style={plan.featured ? {
-                            background: "linear-gradient(135deg, #d4f24e 0%, #F0DCB8 100%)",
-                            color: "#0a1628",
-                            boxShadow: "0 14px 40px -16px rgba(212,242,78,0.5)",
-                          } : {
-                            background: "rgba(255,255,255,0.03)",
-                            border: "1px solid rgba(255,255,255,0.12)",
-                            color: "rgba(255,255,255,0.85)",
-                          }}
-                        >
+                      ) : dark ? (
+                        <Link href="/builder" className="zb-btn w-full">
                           {plan.cta}
-                          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-0.5" />
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                      ) : (
+                        <Link href="/builder" className="zb-btn-ink w-full">
+                          {plan.cta}
+                          <ArrowRight className="h-3.5 w-3.5" />
                         </Link>
                       )}
                     </div>
@@ -421,64 +396,52 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* ━━━━━━━━━━ SOCIAL PROOF STRIP ━━━━━━━━━━ */}
-        <section className="pb-24 px-6">
-          <div className="max-w-3xl mx-auto text-center">
+        {/* ━━━━━━━━━━ TRUST STRIP ━━━━━━━━━━ */}
+        <section className="px-6 pb-24">
+          <div className="mx-auto max-w-3xl text-center">
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-[13px] text-white/45"
+              className="flex flex-col items-center justify-center gap-5 text-[13.5px] font-semibold sm:flex-row sm:gap-10"
+              style={{ color: "var(--zb-ink-2)" }}
             >
-              <span className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-[#d4f24e]" />
-                No credit card required
-              </span>
-              <span className="h-1 w-1 rounded-full bg-white/15 hidden sm:inline-flex" />
-              <span className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-[#d4f24e]" />
-                14-day free trial on all paid plans
-              </span>
-              <span className="h-1 w-1 rounded-full bg-white/15 hidden sm:inline-flex" />
-              <span className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-[#d4f24e]" />
-                Cancel anytime
-              </span>
+              {["No credit card required", "14-day free trial on paid plans", "Cancel anytime"].map((t) => (
+                <span key={t} className="flex items-center gap-2">
+                  <span
+                    className="flex h-5 w-5 items-center justify-center rounded-full"
+                    style={{ background: "var(--zb-accent)" }}
+                  >
+                    <Check className="h-3 w-3" style={{ color: "var(--zb-accent-ink)" }} strokeWidth={3} />
+                  </span>
+                  {t}
+                </span>
+              ))}
             </motion.div>
           </div>
         </section>
 
-        {/* ━━━━━━━━━━ FAQ ━━━━━━━━━━ */}
-        <section className="pb-32 px-6">
-          <div className="max-w-3xl mx-auto">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-60px" }}
-            >
-              <div className="text-center mb-14">
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#d4f24e]/20 bg-[#d4f24e]/[0.04] px-3 py-1 text-[11px] font-medium text-[#d4f24e]/90 mb-6">
-                  <Star className="h-3 w-3" />
+        {/* ━━━━━━━━━━ FAQ (bright) ━━━━━━━━━━ */}
+        <section
+          className="zb-bright relative px-6 py-28"
+          style={{ borderTop: "1px solid var(--zb-line)" }}
+        >
+          <div className="relative mx-auto max-w-3xl">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}>
+              <div className="mb-14 text-center">
+                <div className="zb-eyebrow mb-5 justify-center" style={{ color: "var(--zb-ink-2)" }}>
+                  <Star className="h-3.5 w-3.5" style={{ color: "var(--gold-deep)" }} />
                   Questions
                 </div>
-                <motion.h2
-                  custom={0}
-                  variants={fadeUp}
-                  className="fs-display-md text-white"
-                >
-                  Frequently{" "}
-                  <span
-                    className="font-normal text-display-sand"
-                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic" }}
-                  >
-                    asked.
-                  </span>
+                <motion.h2 custom={0} variants={fadeUp} className="zb-display text-4xl sm:text-6xl" style={{ color: "var(--zb-ink)" }}>
+                  Frequently <span className="zb-mark">asked.</span>
                 </motion.h2>
                 <motion.p
                   custom={1}
                   variants={fadeUp}
-                  className="mt-5 text-[15px] text-white/55 max-w-lg mx-auto"
+                  className="mx-auto mt-5 max-w-lg text-[15px]"
+                  style={{ color: "var(--zb-ink-2)" }}
                 >
                   Everything you need to know about our plans.
                 </motion.p>
@@ -492,27 +455,34 @@ export default function PricingPage() {
                       key={i}
                       custom={i + 2}
                       variants={fadeUp}
-                      className="rounded-[20px] border backdrop-blur-xl transition-all duration-500"
+                      className="rounded-[20px] transition-all duration-300"
                       style={{
-                        borderColor: isOpen ? "rgba(212,242,78,0.25)" : "rgba(255,255,255,0.08)",
-                        background: isOpen
-                          ? "var(--paper-elevated)"
-                          : "var(--paper-elevated)",
-                        boxShadow: isOpen
-                          ? "0 1px 0 rgba(212,242,78,0.12) inset, 0 20px 50px -28px rgba(212,242,78,0.3)"
-                          : "0 1px 0 rgba(255,255,255,0.03) inset",
+                        border: isOpen
+                          ? "1px solid var(--rule-strong)"
+                          : "1px solid var(--zb-line)",
+                        background: "var(--zb-surface)",
+                        boxShadow: isOpen ? "0 16px 40px -24px rgba(11,11,13,0.18)" : "none",
                       }}
                     >
                       <button
                         onClick={() => setOpenFaq(isOpen ? null : i)}
-                        className="w-full flex items-center justify-between gap-4 px-7 py-5 text-left"
+                        className="flex w-full items-center justify-between gap-4 px-7 py-5 text-left"
                         aria-expanded={isOpen}
                       >
-                        <span className={`text-[15px] font-semibold transition-colors ${isOpen ? "text-[#d4f24e]" : "text-white"}`}>{faq.q}</span>
+                        <span
+                          className="text-[15px] font-bold"
+                          style={{ color: "var(--zb-ink)" }}
+                        >
+                          {faq.q}
+                        </span>
                         <motion.span
                           animate={{ rotate: isOpen ? 45 : 0 }}
                           transition={{ duration: 0.2 }}
-                          className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/[0.1] text-white/40"
+                          className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full"
+                          style={{
+                            border: "1px solid var(--zb-line)",
+                            color: "var(--zb-muted)",
+                          }}
                         >
                           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
                             <path d="M5 1v8M1 5h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -528,7 +498,10 @@ export default function PricingPage() {
                             transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
                             className="overflow-hidden"
                           >
-                            <p className="px-7 pb-6 text-[14px] text-white/60 leading-relaxed">
+                            <p
+                              className="px-7 pb-6 text-[14px] leading-relaxed"
+                              style={{ color: "var(--zb-ink-2)" }}
+                            >
                               {faq.a}
                             </p>
                           </motion.div>
@@ -540,65 +513,6 @@ export default function PricingPage() {
               </div>
             </motion.div>
           </div>
-        </section>
-
-        {/* ━━━━━━━━━━ BOTTOM CTA ━━━━━━━━━━ */}
-        <section className="pb-32 px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="max-w-4xl mx-auto"
-          >
-            <div
-              className="relative overflow-hidden rounded-[40px] border border-white/[0.08] p-12 sm:p-16 text-center"
-              style={{
-                background: "var(--paper-elevated)",
-                boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset, 0 40px 100px -40px rgba(0,0,0,0.8)",
-              }}
-            >
-              <div
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[140px]"
-                style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.18), transparent 70%)" }}
-              />
-              <div className="relative">
-                <h2 className="fs-display-md text-white">
-                  Build something{" "}
-                  <span
-                    className="font-normal text-display-sand"
-                    style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic" }}
-                  >
-                    extraordinary.
-                  </span>
-                </h2>
-                <p className="mt-6 text-[16px] text-white/55 max-w-md mx-auto leading-relaxed">
-                  Join thousands of creators and agencies building with Zoobicon.
-                  Start your free trial today.
-                </p>
-                <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <Link
-                    href="/builder"
-                    className="group inline-flex items-center gap-2 rounded-full px-7 py-4 text-[14px] font-semibold transition-all duration-500 hover:-translate-y-0.5"
-                    style={{
-                      background: "linear-gradient(135deg, #d4f24e 0%, #F0DCB8 100%)",
-                      color: "#0a1628",
-                      boxShadow: "0 18px 48px -18px rgba(212,242,78,0.55)",
-                    }}
-                  >
-                    Try the builder free
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                  <Link
-                    href="/builder"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-7 py-4 text-[14px] font-medium text-white/80 backdrop-blur transition-all duration-500 hover:-translate-y-0.5 hover:border-[#d4f24e]/35 hover:text-[#d4f24e]"
-                  >
-                    Create free account
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </section>
       </main>
     </div>
