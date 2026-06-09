@@ -21,9 +21,21 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // CDN cache headers for static and marketing pages
-  async headers() {
+  // Route the builder to the reliable server-rendered engine (Builder V2).
+  // The legacy /builder previewed by compiling generated code IN the browser
+  // (Babel + esm.sh + blob modules), which failed constantly ("Preview
+  // failed"). /v2 renders the page to finished HTML on the SERVER and the
+  // browser just displays it — it can't hit that class of crash. This single
+  // redirect points every existing /builder link at the working engine.
+  // permanent:false (307) keeps it trivially reversible.
+  async redirects() {
     return [
+      { source: "/builder", destination: "/v2", permanent: false },
+    ];
+  },
+
+  // CDN cache headers for static and marketing pages
+  async headers() {    return [
       // Static assets — cache aggressively (1 year, immutable)
       {
         source: "/_next/static/:path*",
