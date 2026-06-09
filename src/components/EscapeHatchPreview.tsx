@@ -106,20 +106,48 @@ function buildSrcDoc(
       globalThis.require = (s) => { console.warn("[preview] require(" + s + ") not supported in browser sandbox"); return {}; };
     }
 
+    let errorShown = false;
+    // Turn any thrown value into a real, human-readable description.
+    // The old code showed only err.stack, which on a bare module-load
+    // failure is just "@about:srcdoc:NN:NN" with NO message — useless for
+    // diagnosis. This always leads with name + message.
+    function fmtErr(e) {
+      if (!e) return "Unknown error (no details)";
+      if (typeof e === "object" && ("message" in e || "name" in e)) {
+        var s = (e.name || "Error") + ": " + (e.message || "(no message)");
+        if (e.stack) s += "\n\n" + e.stack;
+        return s;
+      }
+      return String(e);
+    }
     function showError(title, detail) {
+      errorShown = true;
       const root = document.getElementById("root");
+      if (!root) return;
       root.innerHTML = '';
       const wrap = document.createElement('div');
-      wrap.style.cssText = 'padding:24px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#1a1a1c;background:#fcfaf3;border:1px solid #ebe7d6;border-radius:12px;margin:24px;max-width:640px';
+      wrap.style.cssText = 'padding:20px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#f4f4f5;background:#101015;border:1px solid rgba(255,255,255,0.10);border-radius:12px;margin:24px;max-width:680px';
       const h = document.createElement('div');
-      h.style.cssText = 'font-weight:600;color:#a9c43a;margin-bottom:8px;';
+      h.style.cssText = 'font-weight:700;color:#d4f24e;margin-bottom:8px;';
       h.textContent = title;
       const p = document.createElement('pre');
-      p.style.cssText = 'font:11px/1.5 ui-monospace,monospace;color:#2a2a30;white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid #ebe7d6;border-radius:8px;padding:10px;margin:0;max-height:240px;overflow:auto';
+      p.style.cssText = 'font:11px/1.5 ui-monospace,monospace;color:#c9c9d0;white-space:pre-wrap;word-break:break-word;background:#000;border:1px solid rgba(255,255,255,0.10);border-radius:8px;padding:10px;margin:0;max-height:300px;overflow:auto';
       p.textContent = detail;
       wrap.appendChild(h); wrap.appendChild(p);
       root.appendChild(wrap);
     }
+    // Async failures that never reach the try/catch below — the big one is
+    // a failed dynamic import of esm.sh (the message names the exact URL),
+    // plus any error thrown after first paint. Only surface if we haven't
+    // already shown a more specific error.
+    window.addEventListener("error", function (ev) {
+      if (errorShown) return;
+      showError("Preview error", fmtErr(ev.error) + (ev.filename ? "\n\nat " + ev.filename + ":" + ev.lineno + ":" + ev.colno : ""));
+    });
+    window.addEventListener("unhandledrejection", function (ev) {
+      if (errorShown) return;
+      showError("Preview error (async)", fmtErr(ev.reason));
+    });
 
     // Stub blob for a section that fails to evaluate — renders nothing
     // so the rest of the page is unaffected. Created lazily once.
@@ -464,10 +492,10 @@ function buildSrcDoc(
             if (this.state.err) {
               return React.createElement(
                 "div",
-                { style: { padding: 24, fontFamily: "-apple-system,BlinkMacSystemFont,sans-serif", color: "#1a1a1c", background: "#fcfaf3", border: "1px solid #ebe7d6", borderRadius: 12, margin: 24, maxWidth: 640 } },
-                React.createElement("div", { style: { fontWeight: 600, color: "#a9c43a", marginBottom: 8 } }, "This section hit a snag"),
-                React.createElement("div", { style: { fontSize: 13, color: "#2a2a30", marginBottom: 12 } }, "The rest of your site is fine — try regenerating or describe an edit to fix this part."),
-                React.createElement("pre", { style: { font: "11px/1.5 ui-monospace,monospace", color: "#76767e", whiteSpace: "pre-wrap", wordBreak: "break-word", background: "#fff", border: "1px solid #ebe7d6", borderRadius: 8, padding: 10, margin: 0, maxHeight: 200, overflow: "auto" } }, String(this.state.err && this.state.err.message || this.state.err))
+                { style: { padding: 24, fontFamily: "-apple-system,BlinkMacSystemFont,sans-serif", color: "#f4f4f5", background: "#101015", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 12, margin: 24, maxWidth: 640 } },
+                React.createElement("div", { style: { fontWeight: 700, color: "#d4f24e", marginBottom: 8 } }, "This section hit a snag"),
+                React.createElement("div", { style: { fontSize: 13, color: "#c9c9d0", marginBottom: 12 } }, "The rest of your site is fine — try regenerating or describe an edit to fix this part."),
+                React.createElement("pre", { style: { font: "11px/1.5 ui-monospace,monospace", color: "#8b8b93", whiteSpace: "pre-wrap", wordBreak: "break-word", background: "#000", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 8, padding: 10, margin: 0, maxHeight: 200, overflow: "auto" } }, String(this.state.err && this.state.err.message || this.state.err))
               );
             }
             return this.props.children;
@@ -477,7 +505,7 @@ function buildSrcDoc(
           React.createElement(RootBoundary, null, React.createElement(App))
         );
       } catch (err) {
-        showError("Preview failed", String(err && err.stack || err));
+        showError("Preview failed", fmtErr(err));
       }
     })();
   `;
@@ -499,9 +527,14 @@ ${JSON.stringify({ imports: esmMap }, null, 2)}
   <div id="root"></div>
   <script type="module">
 ${runtime
-  .replace("__FILES_JSON__", JSON.stringify(normalized))
-  .replace("__BABEL_URL__", JSON.stringify(babelUrl))
-  .replace("__ESM_SPECIFIERS__", JSON.stringify(Object.keys(esmMap)))}
+  // Function replacers (not string replacements): a string replacement
+  // value interprets $$, $&, $\`, $' specially, which CORRUPTS injected
+  // code that contains "$" — e.g. prices ("$99") or template literals
+  // (\`${x}\`). A replacer function returns its value verbatim, so the
+  // JSON/URL/specifier payloads are inserted exactly as-is.
+  .replace("__FILES_JSON__", () => JSON.stringify(normalized))
+  .replace("__BABEL_URL__", () => JSON.stringify(babelUrl))
+  .replace("__ESM_SPECIFIERS__", () => JSON.stringify(Object.keys(esmMap)))}
   </script>
 </body>
 </html>`;
