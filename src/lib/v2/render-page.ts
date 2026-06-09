@@ -290,10 +290,10 @@ export async function renderFromRegistry(opts: {
       // Render the tailored version; if it fails, fall back to the polished
       // base; if THAT fails, drop the section rather than blank the page.
       try {
-        return await renderComponentToHtml(code);
+        return applyBrandTokens(await renderComponentToHtml(code), brandName);
       } catch {
         try {
-          return await renderComponentToHtml(base);
+          return applyBrandTokens(await renderComponentToHtml(base), brandName);
         } catch {
           return "";
         }
@@ -327,6 +327,42 @@ export function usesSerifHeadings(industry: string): boolean {
 // for progressive hot-swap (instant base render → AI-tailored copy lands).
 export function sectionWrap(index: number, html: string): string {
   return `<section data-zb-i="${index}">${html}</section>`;
+}
+
+// CRITICAL FIX: the registry components were written against the main app's
+// Tailwind config, which defines custom color ramps (navy/brand/zoo/dark/
+// accent/warm). The preview iframe loads the *vanilla* Tailwind Play CDN,
+// which knows none of them — so `bg-navy-950` (dark navbars/heroes), brand
+// accents, etc. silently resolved to NOTHING, rendering dark sections with no
+// background ("washed-out / average header"). Feeding the CDN the same custom
+// palette makes those sections render exactly as designed. Mirrors
+// tailwind.config.ts.
+const TAILWIND_CONFIG = `<script>
+window.tailwind = window.tailwind || {};
+tailwind.config = { theme: { extend: { colors: {
+  navy: {50:"#fafaf9",100:"#f5f5f4",200:"#e7e5e4",300:"#d6d3d1",400:"#a8a29e",500:"#78716c",600:"#57534e",700:"#44403c",800:"#292524",900:"#1c1917",950:"#0c0a09"},
+  brand: {200:"#f4ead0",300:"#e7d6a3",400:"#d4b86d",500:"#b8923f",600:"#9c7a2c",700:"#7a5e1f"},
+  dark: {100:"#fbf9f1",200:"#f7f4e8",300:"#f0ecdc"},
+  zoo: {50:"#fdf9ec",100:"#fbf2d4",200:"#f4ead0",300:"#e7d6a3",400:"#d4b86d",500:"#b8923f",600:"#9c7a2c",700:"#7a5e1f",800:"#5a4716",900:"#3a2e0e"},
+  accent: {cyan:"#a8a29e",purple:"#78716c",pink:"#b8923f",stone:"#78716c"},
+  warm: {50:"#fafaf9",100:"#f5f5f4",200:"#e7e5e4",300:"#d6d3d1",400:"#a8a29e",500:"#78716c",600:"#57534e",700:"#44403c",800:"#292524",900:"#1c1917"}
+} } } };
+</script>`;
+
+// Placeholder brand names baked into the registry templates. If the AI copy
+// pass is off (no key) or misses them, they leak as "old website" branding.
+// A cheap deterministic swap replaces them with the real (or derived) brand so
+// the header never ships someone else's name.
+const PLACEHOLDER_BRANDS = ["Acme", "Nexus", "Launchpad", "Velocita", "Lumina", "Apex", "Nova", "Stellar"];
+
+export function applyBrandTokens(html: string, brand: string): string {
+  const name = (brand || "").trim();
+  if (!name) return html;
+  let out = html;
+  for (const p of PLACEHOLDER_BRANDS) {
+    out = out.replace(new RegExp(`\\b${p}\\b`, "g"), name);
+  }
+  return out;
 }
 
 // Browser runtime deps for the live-preview hydration layer. React does the
@@ -456,6 +492,7 @@ export function pageShell(
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title}</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  ${TAILWIND_CONFIG}
   ${importmap}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

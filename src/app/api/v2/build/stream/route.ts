@@ -35,6 +35,7 @@ import {
   usesSerifHeadings,
   pageShell,
   sectionWrap,
+  applyBrandTokens,
 } from "@/lib/v2/render-page";
 import { selectComponentsForPrompt } from "@/lib/component-registry";
 
@@ -115,7 +116,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           components.map(async (c, index) => {
             const base = baseCodeFor(c.code);
             try {
-              const html = await renderComponentToHtml(base);
+              const html = applyBrandTokens(await renderComponentToHtml(base), brandName);
               finalSections[index] = html;
               send({
                 type: "section",
@@ -140,7 +141,7 @@ export async function POST(req: NextRequest): Promise<Response> {
                 const base = baseCodeFor(c.code);
                 const rewritten = await aiRewriteCopy(base, prompt, brandName, c.category);
                 if (!rewritten) return;
-                const html = await renderComponentToHtml(rewritten);
+                const html = applyBrandTokens(await renderComponentToHtml(rewritten), brandName);
                 finalSections[index] = html;
                 aiUsed = true;
                 send({
