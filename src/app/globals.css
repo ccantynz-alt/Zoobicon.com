@@ -44,6 +44,109 @@
   --zoo-glow: var(--gold-glow);
   --editorial-ink: var(--ink);
   --editorial-paper: var(--paper);
+
+  /* ─── ZOOBICON BOLD identity (2026-06-09 — Rule 29 overridden by Craig) ───
+   * Klaviyo-beating system: a bright warm-white canvas, near-black
+   * statement sections, and ONE electric-lime accent. No gold lock,
+   * no Playfair. Bold display type in Plus Jakarta Sans 800 (already
+   * loaded in layout.tsx). These tokens use a NEW `--zb-*` namespace so
+   * the legacy editorial-light override layer at the bottom of this
+   * file never repaints anything drawn with them. */
+  --zb-bg: #faf9f5;          /* bright warm-white canvas */
+  --zb-surface: #ffffff;     /* cards on light */
+  --zb-ink: #0b0b0d;         /* near-black — bold type + dark statement bg */
+  --zb-ink-soft: #161618;    /* lifted panel on the ink sections */
+  --zb-ink-2: #3b3b42;       /* secondary text on light */
+  --zb-muted: #6c6c75;       /* captions on light */
+  --zb-line: #e9e6dd;        /* hairline on light */
+  --zb-line-dark: rgba(255, 255, 255, 0.12); /* hairline on dark */
+  --zb-accent: #d4f24e;      /* electric lime — THE accent */
+  --zb-accent-hi: #e4ff6b;   /* brighter lime for hover */
+  --zb-accent-ink: #161d05;  /* legible text on lime */
+  --zb-accent-soft: rgba(212, 242, 78, 0.16);
+}
+
+/* ─── ZOOBICON BOLD component classes (Rule 29 override 2026-06-09) ───
+ * Self-contained so the override layer below can't flip them. */
+.zb-dark { background: var(--zb-ink); color: #ffffff; }
+.zb-bright { background: var(--zb-bg); color: var(--zb-ink); }
+.zb-display {
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+.zb-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+/* Lime marker-highlight for accent words on LIGHT backgrounds */
+.zb-mark {
+  background: var(--zb-accent);
+  color: var(--zb-accent-ink);
+  padding: 0 0.18em;
+  border-radius: 0.14em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.zb-input::placeholder { color: rgba(255, 255, 255, 0.32); }
+.zb-input-light::placeholder { color: var(--zb-muted); }
+.zb-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: var(--zb-accent); color: var(--zb-accent-ink);
+  font-weight: 700; font-size: 15px; line-height: 1;
+  padding: 0.95rem 1.6rem; border-radius: 999px; border: none; cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.zb-btn:hover {
+  background: var(--zb-accent-hi); transform: translateY(-2px);
+  box-shadow: 0 14px 34px -10px rgba(212, 242, 78, 0.5);
+}
+.zb-btn-ink {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: var(--zb-ink); color: #ffffff;
+  font-weight: 600; font-size: 15px; line-height: 1;
+  padding: 0.95rem 1.6rem; border-radius: 999px; border: none; cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.zb-btn-ink:hover { transform: translateY(-2px); box-shadow: 0 14px 34px -12px rgba(0, 0, 0, 0.45); }
+.zb-btn-ghost-dark {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.06); color: #ffffff;
+  font-weight: 600; font-size: 15px; line-height: 1;
+  padding: 0.95rem 1.6rem; border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16); cursor: pointer;
+  transition: all 0.2s ease;
+}
+.zb-btn-ghost-dark:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--zb-accent); color: var(--zb-accent); }
+.zb-card {
+  background: var(--zb-surface);
+  border: 1px solid var(--zb-line);
+  border-radius: 22px;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.zb-card:hover { transform: translateY(-4px); box-shadow: 0 26px 64px -30px rgba(11, 11, 13, 0.22); border-color: #d9d4c6; }
+.zb-card-dark {
+  background: var(--zb-ink-soft);
+  border: 1px solid var(--zb-line-dark);
+  border-radius: 22px;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.zb-card-dark:hover { transform: translateY(-4px); border-color: rgba(212, 242, 78, 0.4); box-shadow: 0 26px 64px -30px rgba(0, 0, 0, 0.6); }
+.zb-chip-dark {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.12); background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px; padding: 0.4rem 0.85rem; font-size: 12.5px; color: rgba(255, 255, 255, 0.78);
+}
+.zb-chip-light {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  border: 1px solid var(--zb-line); background: var(--zb-surface);
+  border-radius: 999px; padding: 0.4rem 0.85rem; font-size: 12.5px; color: var(--zb-muted);
 }
 
 * {

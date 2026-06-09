@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
+  ArrowUpRight,
   ChevronRight,
   Wand2,
   Globe2,
@@ -18,171 +19,191 @@ import HeroBuilder from "@/components/HeroBuilder";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
-const stagger = { visible: { transition: { staggerChildren: 0.1 } } };
+const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
-// ── Trust strip data (verifiable, never inflated) ──
+// ── Trust strip (verifiable, never inflated) ──
 const TRUST_ITEMS = [
-  { label: "Opus 4.7", sub: "Latest Claude" },
+  { label: "Claude Opus 4.7", sub: "Latest model" },
   { label: "Next.js 14", sub: "App Router" },
   { label: "Vercel Edge", sub: "iad1 region" },
-  { label: "Stripe Verified", sub: "Live Connect" },
-  { label: "Neon Serverless", sub: "Postgres 16" },
+  { label: "Stripe", sub: "Live Connect" },
+  { label: "Neon", sub: "Postgres 16" },
   { label: "Cloudflare", sub: "5 domains" },
   { label: "Crontech", sub: "Hosting + domains" },
   { label: "121 Components", sub: "Registry" },
 ];
 
-// ── AI feature bento (Filmora 2×2 pattern, extended to 2×3) ──
-const AI_FEATURES = [
+const FEATURES = [
   {
     icon: Wand2,
-    title: "Six agents. One prompt.",
-    desc: "Strategist, brand designer, architect, copywriter, Opus developer and SEO specialist build your site in under 95 seconds. You watch it happen.",
     tag: "Builder",
-    href: "/builder",
-    size: "lg",
-  },
-  {
-    icon: Globe2,
-    title: "Hosting + domain via Crontech.",
-    desc: "Hosting + custom domain (.com, .ai, .io) provisioned through Crontech at deploy time. One platform, no glue scripts.",
-    tag: "Domains",
-    href: "/builder",
-  },
-  {
-    icon: Bot,
-    title: "Edit anything. By chat.",
-    desc: "Change one line without regenerating the site. Diff-based edits land in 2 seconds through the chat panel.",
-    tag: "Diff Editing",
-    href: "/builder",
+    title: "Six agents. One prompt.",
+    desc: "Strategist, brand designer, architect, copywriter, developer and SEO specialist build your site in under 95 seconds. You watch it happen.",
   },
   {
     icon: Layers,
-    title: "121 hand-polished sections.",
-    desc: "Bento grids, spotlight cards, text reveal, marquee logos — every component assembled from a registry of $100K+ quality primitives.",
     tag: "Components",
-    href: "/builder",
+    title: "121 hand-polished sections.",
+    desc: "Bento grids, spotlight cards, text-reveal heroes, marquee logos — every site assembled from a registry of $100K-agency primitives, never generated from scratch.",
+  },
+  {
+    icon: Bot,
+    tag: "Diff editing",
+    title: "Edit anything. By chat.",
+    desc: "“Make the header bolder.” Change one thing without regenerating the whole site. Diff-based edits land in seconds through the chat panel.",
+  },
+  {
+    icon: Globe2,
+    tag: "Domains + hosting",
+    title: "Ship it, domain and all.",
+    desc: "Hosting and a custom domain (.com, .ai, .io) are provisioned through Crontech at deploy time. One platform, no glue scripts, no second invoice.",
   },
   {
     icon: Zap,
-    title: "One-click deploy.",
-    desc: "Ship your generated site to the cloud in seconds. Free SSL, global CDN, custom domain. No config.",
     tag: "Deploy",
-    href: "/builder",
+    title: "One click to live.",
+    desc: "Push your generated site to the cloud in seconds. Free SSL, global CDN, custom domain. Nothing to configure.",
+  },
+  {
+    icon: ShieldCheck,
+    tag: "Backend",
+    title: "Real backend, day one.",
+    desc: "Auth, database, storage and email wired in from the start — not a frontend-only mockup. Your site works the moment it ships.",
   },
 ];
 
-// Testimonials block deliberately removed (2026-05-26). The previous
-// entries were fabricated personas ("Dental clinic owner / Auckland",
-// "Wedding photographer / Melbourne", etc.) — we don't have real
-// customers yet, so claiming we do was dishonest. The Founder's-Note
-// section below replaces it with a truthful "we're new" pitch and a
-// "tell us what's broken" CTA. Restore real, attributed quotes here
-// when actual customers ship sites and give consent.
+const STEPS = [
+  {
+    step: "01",
+    title: "Describe it.",
+    desc: "Tell the builder what your business does. One sentence is enough — six AI agents handle brand, copy, structure and code.",
+    icon: Wand2,
+  },
+  {
+    step: "02",
+    title: "Watch it build.",
+    desc: "Components stream in live: navbar, hero, features, pricing, footer — assembled from 121 hand-polished sections and tailored to your brand.",
+    icon: Layers,
+  },
+  {
+    step: "03",
+    title: "Ship it.",
+    desc: "Hosting plus a custom domain provisioned in one deploy step. Free SSL. No infrastructure to manage. One click and you’re live.",
+    icon: Globe2,
+  },
+];
+
+const PLANS = [
+  {
+    n: "Starter",
+    p: "$49",
+    d: "One site, builder, domain + email.",
+    f: false,
+    features: ["1 website", "1 domain + email", "60-second builds", "Hosting included"],
+  },
+  {
+    n: "Pro",
+    p: "$129",
+    d: "Three sites, deep builds, SEO, AI auto-reply.",
+    f: true,
+    features: ["3 websites", "Deep agentic builds", "SEO dashboard", "AI email auto-reply", "Priority support"],
+  },
+  {
+    n: "Agency",
+    p: "$299",
+    d: "Ten sites, white-label, API, priority.",
+    f: false,
+    features: ["10 websites", "White-label reseller", "Public API access", "Dedicated account"],
+  },
+];
 
 export default function HomePage() {
   return (
-    <div style={{ color: "var(--ink)" }}>
+    <div className="zb-bright">
       <div className="pt-[72px]">
+        {/* ── HERO (dark statement) ── */}
         <HeroBuilder />
 
-        {/* ── Trust strip — infinite marquee, editorial pattern ── */}
+        {/* ── Trust marquee (bright) ── */}
         <section
-          className="relative"
-          style={{
-            background: "var(--paper-elevated)",
-            borderTop: "1px solid var(--rule)",
-            borderBottom: "1px solid var(--rule)",
-          }}
+          className="zb-bright relative"
+          style={{ borderTop: "1px solid var(--zb-line)", borderBottom: "1px solid var(--zb-line)" }}
         >
-          <div className="relative py-8 overflow-hidden fs-marquee-paused">
+          <div className="relative overflow-hidden py-6 fs-marquee-paused">
             <div className="fs-marquee">
               {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
-                <div
-                  key={`${item.label}-${i}`}
-                  className="flex items-center gap-3 px-5 py-2 rounded-full border border-white/[0.06] bg-white/[0.02] backdrop-blur flex-shrink-0"
-                >
-                  <span className="text-[13px] font-semibold text-white/90">{item.label}</span>
-                  <span className="text-[11px] text-white/40">{item.sub}</span>
+                <div key={`${item.label}-${i}`} className="zb-chip-light flex-shrink-0">
+                  <span className="text-[13px] font-semibold" style={{ color: "var(--zb-ink)" }}>
+                    {item.label}
+                  </span>
+                  <span className="text-[11px]" style={{ color: "var(--zb-muted)" }}>
+                    {item.sub}
+                  </span>
                 </div>
               ))}
             </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#f4f3ed] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#f4f3ed] to-transparent" />
+            <div
+              className="pointer-events-none absolute inset-y-0 left-0 w-28"
+              style={{ background: "linear-gradient(to right, var(--zb-bg), transparent)" }}
+            />
+            <div
+              className="pointer-events-none absolute inset-y-0 right-0 w-28"
+              style={{ background: "linear-gradient(to left, var(--zb-bg), transparent)" }}
+            />
           </div>
         </section>
 
-        {/* ── AI FEATURE BENTO — Filmora 2×2 scaled to 2×3 ── */}
-        <section className="relative py-32 px-6">
+        {/* ── FEATURE BENTO (bright) ── */}
+        <section className="zb-bright relative px-6 py-28 sm:py-32">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
             variants={stagger}
-            className="mx-auto max-w-7xl"
+            className="mx-auto max-w-6xl"
           >
-            <motion.div variants={fadeUp} className="mb-16 max-w-3xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90">
-                <Sparkles className="h-3 w-3" />
+            <motion.div variants={fadeUp} className="mb-14 max-w-3xl">
+              <div className="zb-eyebrow mb-5" style={{ color: "var(--zb-ink-2)" }}>
+                <Sparkles className="h-3.5 w-3.5" style={{ color: "var(--zb-accent-ink)" }} />
                 What&rsquo;s inside
               </div>
-              <h2 className="fs-display-md text-white">
-                Everything a website needs.{" "}
-                <span
-                  className="text-display-sand"
-                  style={{
-                    fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                    fontStyle: "italic",
-                    fontWeight: 400,
-                  }}
-                >
-                  One
-                </span>{" "}
-                prompt.
+              <h2 className="zb-display text-4xl sm:text-6xl">
+                Everything a website needs. <span className="zb-mark">One</span> prompt.
               </h2>
-              <p className="mt-5 text-[16px] leading-relaxed text-white/55 max-w-2xl">
-                The AI Website Builder generates your site, registers your
-                domain, and deploys to the cloud — in a single flow. No
-                switching tabs. No separate accounts.
+              <p className="mt-6 max-w-2xl text-[16px] leading-relaxed" style={{ color: "var(--zb-ink-2)" }}>
+                The AI Website Builder generates your site, registers your domain
+                and deploys to the cloud in a single flow. No switching tabs.
+                No separate accounts. No half-finished mockups.
               </p>
             </motion.div>
 
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
-              {AI_FEATURES.map((f) => {
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {FEATURES.map((f) => {
                 const Icon = f.icon;
-                const spans = f.size === "lg" ? "lg:col-span-1" : "";
                 return (
-                  <motion.div key={f.title} variants={fadeUp} className={spans}>
-                    <Link
-                      href={f.href}
-                      className="fs-card group relative flex h-full flex-col p-8"
-                    >
-                      {/* Icon capsule */}
+                  <motion.div key={f.title} variants={fadeUp}>
+                    <Link href="/builder" className="zb-card group flex h-full flex-col p-8">
                       <div
-                        className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-500 group-hover:scale-[1.04]"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, rgba(232,212,176,0.18) 0%, rgba(232,212,176,0.04) 100%)",
-                          border: "1px solid rgba(232,212,176,0.22)",
-                          boxShadow: "0 10px 30px -12px rgba(232,212,176,0.3) inset",
-                        }}
+                        className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl transition-transform duration-500 group-hover:scale-[1.06]"
+                        style={{ background: "var(--zb-ink)" }}
                       >
-                        <Icon className="h-5 w-5 text-[#E8D4B0]" strokeWidth={2} />
+                        <Icon className="h-5 w-5" style={{ color: "var(--zb-accent)" }} strokeWidth={2} />
                       </div>
-
-                      <div className="mb-2 text-[10px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/80">
+                      <div className="zb-eyebrow mb-2" style={{ color: "var(--zb-muted)" }}>
                         {f.tag}
                       </div>
-                      <h3 className="mb-3 text-[22px] font-semibold leading-[1.2] tracking-[-0.02em] text-white">
+                      <h3 className="mb-3 text-[21px] font-bold leading-tight tracking-[-0.02em]" style={{ color: "var(--zb-ink)" }}>
                         {f.title}
                       </h3>
-                      <p className="text-[14px] leading-relaxed text-white/50 flex-1">
+                      <p className="flex-1 text-[14px] leading-relaxed" style={{ color: "var(--zb-ink-2)" }}>
                         {f.desc}
                       </p>
-
-                      <div className="mt-7 inline-flex items-center gap-1.5 text-[12px] font-medium text-white/60 transition-colors group-hover:text-[#E8D4B0]">
+                      <div
+                        className="mt-7 inline-flex items-center gap-1.5 text-[12px] font-semibold transition-colors"
+                        style={{ color: "var(--zb-ink)" }}
+                      >
                         Explore
                         <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                       </div>
@@ -194,85 +215,59 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* ── How it works — 3-step flow ── */}
-        <section className="relative py-32 px-6 border-t border-white/[0.05]">
+        {/* ── HOW IT WORKS (dark statement) ── */}
+        <section className="zb-dark relative overflow-hidden px-6 py-28 sm:py-32">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+            <div
+              className="absolute right-[-5%] top-[-10%] h-[500px] w-[700px] rounded-full blur-[150px]"
+              style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.1), transparent 72%)" }}
+            />
+          </div>
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
             variants={stagger}
-            className="mx-auto max-w-5xl"
+            className="relative mx-auto max-w-5xl"
           >
-            <motion.div variants={fadeUp} className="mb-16 text-center max-w-2xl mx-auto">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90">
-                <Zap className="h-3 w-3" />
+            <motion.div variants={fadeUp} className="mb-14 text-center">
+              <div className="zb-eyebrow mb-5 justify-center" style={{ color: "var(--zb-accent)" }}>
+                <Zap className="h-3.5 w-3.5" />
                 How it works
               </div>
-              <h2 className="fs-display-md text-white">
-                Type one sentence.{" "}
-                <span
-                  className="text-display-sand"
-                  style={{
-                    fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                    fontStyle: "italic",
-                    fontWeight: 400,
-                  }}
-                >
-                  Ship.
-                </span>
+              <h2 className="zb-display mx-auto max-w-3xl text-4xl sm:text-6xl" style={{ color: "#fff" }}>
+                Type one sentence. <span style={{ color: "var(--zb-accent)" }}>Ship.</span>
               </h2>
             </motion.div>
 
             <div className="grid gap-5 md:grid-cols-3">
-              {[
-                {
-                  step: "01",
-                  title: "Describe it.",
-                  desc: "Tell the builder what your business does. One sentence is enough. Six AI agents handle the rest — brand, copy, structure, code.",
-                  href: "/builder",
-                  cta: "Open the builder",
-                  icon: Wand2,
-                },
-                {
-                  step: "02",
-                  title: "Watch it build.",
-                  desc: "Components stream in live. Navbar, hero, features, pricing, footer — assembled from 121 hand-polished sections, customised to your brand.",
-                  href: "/builder",
-                  cta: "See it work",
-                  icon: Layers,
-                },
-                {
-                  step: "03",
-                  title: "Deploy.",
-                  desc: "Hosting + custom domain provisioned through Crontech in one deploy step. Free SSL. No infra to manage. One click.",
-                  href: "/builder",
-                  cta: "Try it free",
-                  icon: Globe2,
-                },
-              ].map((c) => {
+              {STEPS.map((c) => {
                 const Icon = c.icon;
                 return (
                   <motion.div key={c.step} variants={fadeUp}>
-                    <Link href={c.href} className="fs-card group relative block p-8 h-full">
+                    <Link href="/builder" className="zb-card-dark group flex h-full flex-col p-8">
                       <div className="mb-6 flex items-center gap-3">
                         <div
-                          className="inline-flex h-12 w-12 items-center justify-center rounded-[18px] transition-all duration-500 group-hover:scale-[1.04]"
-                          style={{
-                            background:
-                              "linear-gradient(135deg, rgba(232,212,176,0.18) 0%, rgba(232,212,176,0.04) 100%)",
-                            border: "1px solid rgba(232,212,176,0.22)",
-                          }}
+                          className="inline-flex h-12 w-12 items-center justify-center rounded-[16px] transition-transform duration-500 group-hover:scale-[1.06]"
+                          style={{ background: "var(--zb-accent)" }}
                         >
-                          <Icon className="h-5 w-5 text-[#E8D4B0]" strokeWidth={2} />
+                          <Icon className="h-5 w-5" style={{ color: "var(--zb-accent-ink)" }} strokeWidth={2.2} />
                         </div>
-                        <span className="text-[11px] font-mono text-[#E8D4B0]/40 tracking-widest">{c.step}</span>
+                        <span className="font-mono text-[12px] tracking-widest" style={{ color: "rgba(255,255,255,0.35)" }}>
+                          {c.step}
+                        </span>
                       </div>
-                      <h3 className="mb-4 text-[22px] font-semibold leading-tight tracking-[-0.02em] text-white">
+                      <h3 className="mb-4 text-[22px] font-bold leading-tight tracking-[-0.02em]" style={{ color: "#fff" }}>
                         {c.title}
                       </h3>
-                      <p className="text-[13px] leading-relaxed text-white/50">{c.desc}</p>
-                      <div className="mt-8 inline-flex items-center gap-1.5 text-[12px] font-medium text-white/60 transition-colors group-hover:text-[#E8D4B0]">
-                        {c.cta}
+                      <p className="flex-1 text-[14px] leading-relaxed" style={{ color: "rgba(255,255,255,0.62)" }}>
+                        {c.desc}
+                      </p>
+                      <div
+                        className="mt-8 inline-flex items-center gap-1.5 text-[12px] font-semibold transition-colors group-hover:text-[var(--zb-accent)]"
+                        style={{ color: "rgba(255,255,255,0.7)" }}
+                      >
+                        Open the builder
                         <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                       </div>
                     </Link>
@@ -283,63 +278,45 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* ── Founder's note (honest replacement for fabricated testimonials) ── */}
-        <section className="relative py-28 border-t border-white/[0.05]">
+        {/* ── FOUNDER'S NOTE (bright, honest) ── */}
+        <section className="zb-bright relative py-28" style={{ borderTop: "1px solid var(--zb-line)" }}>
           <div className="mx-auto max-w-3xl px-6">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-              variants={stagger}
-            >
-              <motion.div
-                variants={fadeUp}
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90"
-              >
-                <ShieldCheck className="h-3 w-3" />
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} variants={stagger}>
+              <motion.div variants={fadeUp} className="zb-eyebrow mb-6" style={{ color: "var(--zb-ink-2)" }}>
+                <ShieldCheck className="h-3.5 w-3.5" />
                 Founder&rsquo;s note
               </motion.div>
-              <motion.h2 variants={fadeUp} className="fs-display-md text-white mb-8">
-                We&rsquo;re{" "}
-                <span
-                  className="text-display-sand"
-                  style={{
-                    fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                    fontStyle: "italic",
-                    fontWeight: 400,
-                  }}
-                >
-                  new.
-                </span>{" "}
-                Here&rsquo;s the honest pitch.
+              <motion.h2 variants={fadeUp} className="zb-display mb-8 text-4xl sm:text-5xl">
+                We&rsquo;re <span className="zb-mark">new</span>. Here&rsquo;s the honest pitch.
               </motion.h2>
-              <motion.div variants={fadeUp} className="space-y-5 text-[16px] leading-relaxed text-white/65">
+              <motion.div variants={fadeUp} className="space-y-5 text-[16px] leading-relaxed" style={{ color: "var(--zb-ink-2)" }}>
                 <p>
-                  Most builder sites at this stage would put fake testimonials
-                  here from people who don&rsquo;t exist. We won&rsquo;t.
+                  Most builder sites at this stage put fake testimonials here from
+                  people who don&rsquo;t exist. We won&rsquo;t.
                 </p>
                 <p>
-                  Zoobicon is built and run by one person alongside a 24/7
-                  physical business. The platform is in active development. We
-                  ship one product: the AI Website Builder — generate, register
-                  your domain, and deploy in a single flow. Every commit is
+                  Zoobicon is built and run by one person alongside a 24/7 physical
+                  business. We ship one product: the AI Website Builder — generate,
+                  register your domain, and deploy in a single flow. Every commit is
                   visible on{" "}
                   <a
                     href="https://github.com/ccantynz-alt/Zoobicon.com"
                     target="_blank"
                     rel="noreferrer"
-                    className="underline decoration-[#E8D4B0]/40 hover:decoration-[#E8D4B0]"
+                    className="font-semibold underline decoration-2"
+                    style={{ color: "var(--zb-ink)", textDecorationColor: "var(--zb-accent)" }}
                   >
                     GitHub
                   </a>
                   .
                 </p>
                 <p>
-                  We&rsquo;d rather have ten real customers than a hundred fake
-                  quotes. If you try it and something&rsquo;s broken, email{" "}
+                  We&rsquo;d rather have ten real customers than a hundred fake quotes.
+                  If you try it and something&rsquo;s broken, email{" "}
                   <a
                     href="mailto:hello@zoobicon.com"
-                    className="underline decoration-[#E8D4B0]/40 hover:decoration-[#E8D4B0]"
+                    className="font-semibold underline decoration-2"
+                    style={{ color: "var(--zb-ink)", textDecorationColor: "var(--zb-accent)" }}
                   >
                     hello@zoobicon.com
                   </a>{" "}
@@ -347,16 +324,10 @@ export default function HomePage() {
                 </p>
               </motion.div>
               <motion.div variants={fadeUp} className="mt-10 flex flex-wrap items-center gap-3">
-                <Link
-                  href="/builder"
-                  className="inline-flex items-center gap-2 rounded-full bg-[#E8D4B0] px-6 py-3 text-[13px] font-semibold text-[#1a1a1c] hover:bg-[#d4b86d] transition-colors"
-                >
-                  Try the builder
+                <Link href="/builder" className="zb-btn">
+                  Try the builder <ArrowRight className="h-4 w-4" />
                 </Link>
-                <a
-                  href="mailto:hello@zoobicon.com"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.03] px-6 py-3 text-[13px] font-medium text-white/75 hover:border-[#E8D4B0]/35 hover:text-[#E8D4B0] transition-all"
-                >
+                <a href="mailto:hello@zoobicon.com" className="zb-btn-ink">
                   Tell us what&rsquo;s broken
                 </a>
               </motion.div>
@@ -364,8 +335,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── Pricing tease ── */}
-        <section className="relative py-32 px-6 border-t border-white/[0.05]">
+        {/* ── PRICING (bright) ── */}
+        <section className="zb-bright relative px-6 py-28 sm:py-32" style={{ borderTop: "1px solid var(--zb-line)" }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -373,107 +344,71 @@ export default function HomePage() {
             variants={stagger}
             className="mx-auto max-w-6xl"
           >
-            <motion.div variants={fadeUp} className="text-center mb-16 max-w-2xl mx-auto">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#E8D4B0]/20 bg-[#E8D4B0]/[0.04] px-3 py-1 text-[11px] font-medium text-[#E8D4B0]/90">
-                <Zap className="h-3 w-3" />
+            <motion.div variants={fadeUp} className="mb-14 max-w-2xl">
+              <div className="zb-eyebrow mb-5" style={{ color: "var(--zb-ink-2)" }}>
+                <Zap className="h-3.5 w-3.5" style={{ color: "var(--zb-accent-ink)" }} />
                 Simple pricing
               </div>
-              <h2 className="fs-display-md text-white">
-                One subscription.{" "}
-                <span
-                  className="text-display-sand"
-                  style={{
-                    fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                    fontStyle: "italic",
-                    fontWeight: 400,
-                  }}
-                >
-                  Everything
-                </span>{" "}
-                included.
+              <h2 className="zb-display text-4xl sm:text-6xl">
+                One subscription. <span className="zb-mark">Everything</span> included.
               </h2>
-              <p className="mt-5 text-[15px] text-white/55 leading-relaxed">
-                One product. One subscription. AI Website Builder with domain
+              <p className="mt-6 text-[16px] leading-relaxed" style={{ color: "var(--zb-ink-2)" }}>
+                One product, one subscription: the AI Website Builder with domain
                 registration and one-click deploy included. Cancel any time.
                 14-day free trial on paid plans.
               </p>
             </motion.div>
 
             <div className="grid gap-5 md:grid-cols-3">
-              {[
-                {
-                  n: "Starter",
-                  p: "$49",
-                  d: "One site, builder, domain, email",
-                  f: false,
-                  features: ["1 website", "1 domain + email", "60-sec builds", "Hosting included"],
-                },
-                {
-                  n: "Pro",
-                  p: "$129",
-                  d: "Three sites, Sonnet deep builds, SEO, AI auto-reply",
-                  f: true,
-                  features: [
-                    "3 websites",
-                    "Sonnet 4.6 deep builds",
-                    "SEO dashboard",
-                    "AI email auto-reply",
-                    "Priority support",
-                  ],
-                },
-                {
-                  n: "Agency",
-                  p: "$299",
-                  d: "Ten sites, white-label, API, priority",
-                  f: false,
-                  features: ["10 websites", "White-label", "Public API access", "Dedicated account"],
-                },
-              ].map((pl) => (
+              {PLANS.map((pl) => (
                 <motion.div key={pl.n} variants={fadeUp}>
                   <Link
                     href="/pricing"
-                    className={`group relative block rounded-[30px] border p-8 text-left transition-all duration-500 hover:-translate-y-1 h-full ${
-                      pl.f
-                        ? "border-[#E8D4B0]/35 bg-[#E8D4B0]/[0.03]"
-                        : "border-white/[0.08] bg-white/[0.015] hover:border-white/[0.18]"
-                    }`}
-                    style={
-                      pl.f
-                        ? { boxShadow: "0 30px 80px -30px rgba(232,212,176,0.25)" }
-                        : undefined
-                    }
+                    className={pl.f ? "zb-card-dark group relative block h-full p-8" : "zb-card group relative block h-full p-8"}
                   >
                     {pl.f && (
                       <span
-                        className="absolute -top-3 left-8 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-black"
-                        style={{ background: "#E8D4B0" }}
+                        className="absolute -top-3 left-8 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]"
+                        style={{ background: "var(--zb-accent)", color: "var(--zb-accent-ink)" }}
                       >
                         Most popular
                       </span>
                     )}
-                    <div className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[#E8D4B0]/80">
+                    <div className="zb-eyebrow" style={{ color: pl.f ? "var(--zb-accent)" : "var(--zb-muted)" }}>
                       {pl.n}
                     </div>
-                    <div className="mt-4 text-5xl font-semibold tracking-[-0.02em] text-white">
+                    <div
+                      className="mt-4 text-5xl font-extrabold tracking-[-0.03em]"
+                      style={{ color: pl.f ? "#fff" : "var(--zb-ink)" }}
+                    >
                       {pl.p}
-                      <span className="text-base font-normal text-white/40">/mo</span>
+                      <span className="text-base font-medium" style={{ color: pl.f ? "rgba(255,255,255,0.45)" : "var(--zb-muted)" }}>
+                        /mo
+                      </span>
                     </div>
-                    <div className="mt-3 text-[13px] leading-relaxed text-white/50">
+                    <div className="mt-3 text-[13px] leading-relaxed" style={{ color: pl.f ? "rgba(255,255,255,0.6)" : "var(--zb-ink-2)" }}>
                       {pl.d}
                     </div>
 
-                    <div className="my-6 h-px bg-white/[0.06]" />
+                    <div className="my-6 h-px" style={{ background: pl.f ? "rgba(255,255,255,0.1)" : "var(--zb-line)" }} />
 
                     <ul className="space-y-2.5">
                       {pl.features.map((feat) => (
-                        <li key={feat} className="flex items-start gap-2 text-[13px] text-white/65">
-                          <Check className="h-3.5 w-3.5 text-[#E8D4B0] mt-0.5 flex-shrink-0" strokeWidth={2.5} />
+                        <li key={feat} className="flex items-start gap-2 text-[13px]" style={{ color: pl.f ? "rgba(255,255,255,0.78)" : "var(--zb-ink-2)" }}>
+                          <Check
+                            className="mt-0.5 h-3.5 w-3.5 flex-shrink-0"
+                            style={{ color: pl.f ? "var(--zb-accent)" : "var(--zb-ink)" }}
+                            strokeWidth={2.5}
+                          />
                           {feat}
                         </li>
                       ))}
                     </ul>
 
-                    <div className="mt-7 inline-flex items-center gap-1 text-[12px] font-medium text-white/60 transition-colors group-hover:text-[#E8D4B0]">
+                    <div
+                      className="mt-7 inline-flex items-center gap-1 text-[12px] font-semibold"
+                      style={{ color: pl.f ? "var(--zb-accent)" : "var(--zb-ink)" }}
+                    >
                       See full plan <ChevronRight className="h-3.5 w-3.5" />
                     </div>
                   </Link>
@@ -483,15 +418,12 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* ── Final CTA — cinematic, restrained ── */}
-        <section className="relative py-36 px-6 border-t border-white/[0.05]">
-          <div
-            className="pointer-events-none absolute inset-0 overflow-hidden"
-            aria-hidden
-          >
+        {/* ── FINAL CTA (dark) ── */}
+        <section className="zb-dark relative overflow-hidden px-6 py-32 sm:py-36">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
             <div
-              className="absolute left-1/2 top-1/2 h-[800px] w-[1200px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[180px]"
-              style={{ background: "radial-gradient(closest-side, rgba(232,212,176,0.08), transparent 70%)" }}
+              className="absolute left-1/2 top-1/2 h-[600px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[160px]"
+              style={{ background: "radial-gradient(closest-side, rgba(212,242,78,0.12), transparent 70%)" }}
             />
           </div>
           <motion.div
@@ -501,37 +433,24 @@ export default function HomePage() {
             variants={stagger}
             className="relative mx-auto max-w-4xl text-center"
           >
-            <motion.h2
-              variants={fadeUp}
-              className="fs-display-lg text-white mb-8"
-            >
-              Stop reading.{" "}
-              <span
-                className="text-display-sand"
-                style={{
-                  fontFamily: "Fraunces, ui-serif, Georgia, serif",
-                  fontStyle: "italic",
-                  fontWeight: 400,
-                }}
-              >
-                Start building.
-              </span>
+            <motion.h2 variants={fadeUp} className="zb-display text-5xl sm:text-7xl" style={{ color: "#fff" }}>
+              Stop reading. <span style={{ color: "var(--zb-accent)" }}>Start building.</span>
             </motion.h2>
             <motion.p
               variants={fadeUp}
-              className="text-[16px] text-white/55 mb-12 max-w-xl mx-auto leading-relaxed"
+              className="mx-auto mt-8 mb-12 max-w-xl text-[16px] leading-relaxed"
+              style={{ color: "rgba(255,255,255,0.6)" }}
             >
               Scroll back up and type one sentence into the hero. Sixty seconds
               later you have a complete, responsive site with a working backend
               and a registered domain — all in one flow.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-wrap items-center justify-center gap-3">
-              <Link href="/builder" className="fs-btn-primary">
-                Open the builder
-                <ArrowRight className="h-4 w-4" />
+              <Link href="/builder" className="zb-btn">
+                Open the builder <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/pricing" className="fs-btn-ghost">
-                See pricing
+              <Link href="/pricing" className="zb-btn-ghost-dark">
+                See pricing <ArrowUpRight className="h-4 w-4" />
               </Link>
             </motion.div>
           </motion.div>
