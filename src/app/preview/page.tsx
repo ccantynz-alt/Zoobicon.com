@@ -27,9 +27,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
    near-black before the bundle loads.
    ────────────────────────────────────────────────────────────────────────── */
 const SCOPED_CSS = `
-body:has(#zb-home) > nav,
-body:has(#zb-home) > footer,
-body:has(#zb-home) .site-backdrop { display: none !important; }
+/* Hide ALL global chrome on this route — the Coming Soon / Maintenance /
+   Staging banners, nav, footer, backdrop, cookie consent — anything that
+   isn't this page's own #zb-home wrapper. The previous rule only caught
+   <nav>/<footer>, so the sand/gold Coming Soon banner (a <div>) bled through. */
+body:has(#zb-home) > *:not(#zb-home):not(:has(#zb-home)) { display: none !important; }
 body:has(#zb-home) { background: #08080b !important; }
 
 #zb-home, #zb-home * { box-sizing: border-box; }
@@ -67,6 +69,46 @@ body:has(#zb-home) { background: #08080b !important; }
 .zbx-card { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)); }
 .zbx-card-hover { transition: border-color .3s, transform .3s, box-shadow .3s; }
 .zbx-card-hover:hover { border-color: rgba(255,255,255,0.16); transform: translateY(-4px); box-shadow: 0 24px 50px -24px rgba(0,0,0,0.8); }
+
+/* ── Neutralize the legacy globals.css editorial-light override layer ──────────
+   The bottom of globals.css (the old Rule 29 "sand & gold" system) repaints
+   EVERY text-white / bg-white / border-white utility to dark ink/sand with
+   !important — which is why the headlines and card titles were rendering
+   near-black on this dark page. We re-assert each utility under the #zb-home
+   ID: ID+class specificity outranks the global bare-class selectors, so these
+   win even though both carry !important. This keeps the page fully dark-mode
+   no matter what the global override does — including after it's promoted to /. */
+#zb-home { color: #fff !important; }
+#zb-home .text-white { color: #fff !important; }
+#zb-home .text-white\\/80 { color: rgba(255,255,255,.80) !important; }
+#zb-home .text-white\\/75 { color: rgba(255,255,255,.75) !important; }
+#zb-home .text-white\\/70 { color: rgba(255,255,255,.70) !important; }
+#zb-home .text-white\\/65 { color: rgba(255,255,255,.65) !important; }
+#zb-home .text-white\\/60 { color: rgba(255,255,255,.60) !important; }
+#zb-home .text-white\\/55 { color: rgba(255,255,255,.55) !important; }
+#zb-home .text-white\\/50 { color: rgba(255,255,255,.50) !important; }
+#zb-home .text-white\\/45 { color: rgba(255,255,255,.45) !important; }
+#zb-home .text-white\\/40 { color: rgba(255,255,255,.40) !important; }
+#zb-home .text-white\\/35 { color: rgba(255,255,255,.35) !important; }
+#zb-home .text-white\\/30 { color: rgba(255,255,255,.30) !important; }
+#zb-home .text-white\\/20 { color: rgba(255,255,255,.20) !important; }
+#zb-home .bg-white { background-color: #fff !important; }
+#zb-home .bg-white\\/80 { background-color: rgba(255,255,255,.80) !important; }
+#zb-home .bg-white\\/40 { background-color: rgba(255,255,255,.40) !important; }
+#zb-home .bg-white\\/30 { background-color: rgba(255,255,255,.30) !important; }
+#zb-home .bg-white\\/25 { background-color: rgba(255,255,255,.25) !important; }
+#zb-home .bg-white\\/20 { background-color: rgba(255,255,255,.20) !important; }
+#zb-home .bg-white\\/15 { background-color: rgba(255,255,255,.15) !important; }
+#zb-home .bg-white\\/10 { background-color: rgba(255,255,255,.10) !important; }
+#zb-home .bg-white\\/8  { background-color: rgba(255,255,255,.08) !important; }
+#zb-home .bg-white\\/5  { background-color: rgba(255,255,255,.05) !important; }
+#zb-home .border-white\\/15 { border-color: rgba(255,255,255,.15) !important; }
+#zb-home .border-white\\/12 { border-color: rgba(255,255,255,.12) !important; }
+#zb-home .border-white\\/10 { border-color: rgba(255,255,255,.10) !important; }
+#zb-home .border-white\\/8  { border-color: rgba(255,255,255,.08) !important; }
+#zb-home .from-white { --tw-gradient-from: #fff var(--tw-gradient-from-position) !important; --tw-gradient-to: rgba(255,255,255,0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+#zb-home .via-white\\/12 { --tw-gradient-to: rgba(255,255,255,0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), rgba(255,255,255,.12) var(--tw-gradient-via-position), var(--tw-gradient-to) !important; }
+#zb-home .via-white\\/10 { --tw-gradient-to: rgba(255,255,255,0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), rgba(255,255,255,.10) var(--tw-gradient-via-position), var(--tw-gradient-to) !important; }
 `;
 
 /* ── reveal-on-scroll: one observer for the whole page ───────────────────── */
