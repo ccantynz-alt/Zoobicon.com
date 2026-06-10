@@ -1,14 +1,14 @@
 /**
  * POST /api/email-send/webhook
  *
- * Receives delivery lifecycle events from Crontech's email service
+ * Receives delivery lifecycle events from Vapron's email service
  * (services/email-send, BLK-030).
  *
  * Events: delivered | bounced | complained | opened | clicked
  * Signature: x-crontech-signature: sha256=<hex>
  *            hmac_sha256(EMAIL_SEND_WEBHOOK_SECRET, raw_body)
  *
- * Register this URL in the Crontech email service per-tenant config:
+ * Register this URL in the Vapron email service per-tenant config:
  *   POST https://api.crontech.ai/email-send/v1/webhooks
  *   { "url": "https://zoobicon.com/api/email-send/webhook",
  *     "events": ["delivered","bounced","complained","opened","clicked"],
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     case "bounced":
       console.warn(`[email-send/webhook] BOUNCED messageId=${messageId} to=${to} reason=${reason}`);
-      // Hard bounces are auto-suppressed by Crontech per-tenant.
+      // Hard bounces are auto-suppressed by Vapron per-tenant.
       // Log here for our own visibility — could write to DB if needed.
       break;
 

@@ -1,12 +1,12 @@
 /**
  * /api/intel/hn/email — send the latest digest as an email via the
- * Crontech email service. Useful for "resend without re-running the
+ * Vapron email service. Useful for "resend without re-running the
  * pipeline" from the admin dashboard, or for a separate morning cron
  * that just delivers (after a separate cron has built the digest).
  *
  * GET ?secret=$CRON_SECRET&to=<override>
  *
- * Returns { ok, sent, reason? }. Idempotent — Crontech dedupes on the
+ * Returns { ok, sent, reason? }. Idempotent — Vapron dedupes on the
  * `hn-digest-<date>-<to>` messageId within 24h.
  */
 

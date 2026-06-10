@@ -250,7 +250,7 @@ export function composeWordPressBuilderPrompt(imp: WordPressImport): string {
   // src/lib/seo/url-extractor.ts so the planner sees consistent
   // guidance regardless of the import source.
   parts.push(
-    "Modernize: replace the WordPress + theme stack with a clean React + Tailwind output. Ship 2026 design patterns (bento grids, spotlight cards, text reveal, marquee logos), mobile-first responsive layout, semantic HTML, JSON-LD structured data, sub-second LCP. Hosting + custom domain provisioned via Crontech at deploy. Pick a refined editorial-light palette that respects the existing brand voice."
+    "Modernize: replace the WordPress + theme stack with a clean React + Tailwind output. Ship 2026 design patterns (bento grids, spotlight cards, text reveal, marquee logos), mobile-first responsive layout, semantic HTML, JSON-LD structured data, sub-second LCP. Hosting + custom domain provisioned via Vapron at deploy. Pick a refined editorial-light palette that respects the existing brand voice."
   );
 
   return parts.join(" ");

@@ -185,7 +185,7 @@ class IntelMonitorAgent extends BaseAgent<IntelTarget, IntelOutput> {
     // Push alerts to notification system
     if (alerts.length > 0) {
       try {
-        // Rule 31 — competitor alerts will route through Crontech once
+        // Rule 31 — competitor alerts will route through Vapron once
         // its notification ingest is wired. For now we log them so they
         // surface in the agent run history.
         for (const alert of alerts) {

@@ -1,7 +1,7 @@
 /**
  * PATCH /api/crontech/update
  *
- * Re-deploys an edited project to Crontech without creating a new
+ * Re-deploys an edited project to Vapron without creating a new
  * projectId. The builder calls this when the user clicks "Deploy" and
  * a crontechProjectId is already known from the initial deploy.
  *
@@ -10,7 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { patchCrontech } from "@/lib/crontech-sync";
+import { patchVapron } from "@/lib/crontech-sync";
 import { authenticateRequest } from "@/lib/auth-guard";
 
 export const runtime = "nodejs";
@@ -37,14 +37,14 @@ export async function PATCH(req: NextRequest) {
 
   await authenticateRequest(req);
 
-  const result = await patchCrontech(body.projectId, {
+  const result = await patchVapron(body.projectId, {
     files: body.files,
     deps: body.deps,
   });
 
   if (!result.ok) {
     return NextResponse.json(
-      { error: result.error || "Crontech update failed" },
+      { error: result.error || "Vapron update failed" },
       { status: 502 },
     );
   }

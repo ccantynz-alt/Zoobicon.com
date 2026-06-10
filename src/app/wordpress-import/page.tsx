@@ -114,7 +114,7 @@ export default function WordPressImportPage() {
             Paste your WordPress site URL. We pull your posts, pages, categories,
             and brand voice via wp-json, then rebuild it as a React app — modern
             stack, mobile-first, sub-second LCP. Hosting + custom domain provisioned
-            via Crontech.
+            via Vapron.
           </p>
         </header>
 
@@ -288,7 +288,7 @@ export default function WordPressImportPage() {
               <p className="text-[14px] mb-5" style={{ color: "var(--ink-secondary)" }}>
                 Six agents rebuild your site in React + Tailwind. Posts and pages
                 preserved as a blog/content section. Modern stack, mobile-first,
-                sub-second LCP. Hosting + custom domain via Crontech at deploy.
+                sub-second LCP. Hosting + custom domain via Vapron at deploy.
               </p>
               {result?.builderHref && (
                 <Link

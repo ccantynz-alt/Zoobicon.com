@@ -1,15 +1,15 @@
 "use client";
 
 /**
- * /marketplace — the Crontech add-on catalog, surfaced inside Zoobicon.
+ * /marketplace — the Vapron add-on catalog, surfaced inside Zoobicon.
  *
  * Rule 34 phase 2: "once Zoobicon is connected via API the customer
- * can go shopping and add anything from the Crontech website." The
- * customer never leaves zoobicon.com — they browse Crontech add-ons
+ * can go shopping and add anything from the Vapron website." The
+ * customer never leaves zoobicon.com — they browse Vapron add-ons
  * here, click "Add to my plan", check out via Stripe, and the add-on
- * provisions through Crontech's API on success.
+ * provisions through Vapron's API on success.
  *
- * Pricing in the stub catalog is provisional pending Crontech's final
+ * Pricing in the stub catalog is provisional pending Vapron's final
  * pricing model. The provisional banner makes that honest.
  */
 
@@ -125,7 +125,7 @@ export default function MarketplacePage() {
           </h1>
           <p className="text-[16px] leading-relaxed" style={{ color: "var(--ink-secondary)" }}>
             Extra domains, premium hosting tiers, more mailboxes, wildcard SSL, dedicated CDN
-            regions, backups — every add-on provisions through Crontech&apos;s API on payment success.
+            regions, backups — every add-on provisions through Vapron&apos;s API on payment success.
             One bill, one dashboard, never leave Zoobicon.
           </p>
         </header>
@@ -142,10 +142,10 @@ export default function MarketplacePage() {
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "var(--gold-deep)" }} />
             <div>
-              <div className="text-[13px] font-semibold mb-0.5">Preview pricing — Crontech final pricing pending</div>
+              <div className="text-[13px] font-semibold mb-0.5">Preview pricing — Vapron final pricing pending</div>
               <p className="text-[12px]" style={{ color: "var(--ink-secondary)" }}>
                 The prices below are Zoobicon&apos;s best-guess placeholders. Final pricing comes from
-                Crontech&apos;s catalog API the moment it ships; the marketplace updates automatically with
+                Vapron&apos;s catalog API the moment it ships; the marketplace updates automatically with
                 no code change needed.
               </p>
             </div>
@@ -258,7 +258,7 @@ export default function MarketplacePage() {
               {
                 step: "01",
                 title: "Pick an add-on",
-                body: "Browse the Crontech catalog from inside Zoobicon. One bill, one dashboard.",
+                body: "Browse the Vapron catalog from inside Zoobicon. One bill, one dashboard.",
               },
               {
                 step: "02",
@@ -267,8 +267,8 @@ export default function MarketplacePage() {
               },
               {
                 step: "03",
-                title: "Crontech provisions",
-                body: "On payment success, Zoobicon calls Crontech&apos;s API. The add-on activates within seconds — no second login.",
+                title: "Vapron provisions",
+                body: "On payment success, Zoobicon calls Vapron&apos;s API. The add-on activates within seconds — no second login.",
               },
             ].map((c) => (
               <div
