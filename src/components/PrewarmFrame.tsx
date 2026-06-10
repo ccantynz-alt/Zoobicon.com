@@ -104,14 +104,17 @@ export default function PrewarmFrame() {
         );
         if (cancelled) return;
 
+        // Origin-prefix vendor paths — srcdoc iframes can't resolve
+        // root-relative URLs (same fix as EscapeHatchPreview).
+        const origin = window.location.origin;
         const hybrid: Record<string, string> = {};
         for (const [spec, fallback] of Object.entries(ESM_FALLBACK)) {
           const localPath = VENDOR_PATHS[spec];
           const localFile = localPath?.replace("/vendor/", "");
-          hybrid[spec] = localFile && okFiles.has(localFile) ? localPath : fallback;
+          hybrid[spec] = localFile && okFiles.has(localFile) ? origin + localPath : fallback;
         }
         const babelUrl = okFiles.has("babel-standalone.js")
-          ? BABEL_VENDOR_PATH
+          ? origin + BABEL_VENDOR_PATH
           : BABEL_FALLBACK_URL;
         setSrcDoc(buildSrcDoc(hybrid, babelUrl));
       } catch {
