@@ -128,7 +128,7 @@ function buildSrcDoc(
       const wrap = document.createElement('div');
       wrap.style.cssText = 'padding:20px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#f4f4f5;background:#101015;border:1px solid rgba(255,255,255,0.10);border-radius:12px;margin:24px;max-width:680px';
       const h = document.createElement('div');
-      h.style.cssText = 'font-weight:700;color:#d4f24e;margin-bottom:8px;';
+      h.style.cssText = 'font-weight:700;color:#e8402b;margin-bottom:8px;';
       h.textContent = title;
       const p = document.createElement('pre');
       p.style.cssText = 'font:11px/1.5 ui-monospace,monospace;color:#c9c9d0;white-space:pre-wrap;word-break:break-word;background:#000;border:1px solid rgba(255,255,255,0.10);border-radius:8px;padding:10px;margin:0;max-height:300px;overflow:auto';
@@ -493,7 +493,7 @@ function buildSrcDoc(
               return React.createElement(
                 "div",
                 { style: { padding: 24, fontFamily: "-apple-system,BlinkMacSystemFont,sans-serif", color: "#f4f4f5", background: "#101015", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 12, margin: 24, maxWidth: 640 } },
-                React.createElement("div", { style: { fontWeight: 700, color: "#d4f24e", marginBottom: 8 } }, "This section hit a snag"),
+                React.createElement("div", { style: { fontWeight: 700, color: "#e8402b", marginBottom: 8 } }, "This section hit a snag"),
                 React.createElement("div", { style: { fontSize: 13, color: "#c9c9d0", marginBottom: 12 } }, "The rest of your site is fine — try regenerating or describe an edit to fix this part."),
                 React.createElement("pre", { style: { font: "11px/1.5 ui-monospace,monospace", color: "#8b8b93", whiteSpace: "pre-wrap", wordBreak: "break-word", background: "#000", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 8, padding: 10, margin: 0, maxHeight: 200, overflow: "auto" } }, String(this.state.err && this.state.err.message || this.state.err))
               );

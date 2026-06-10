@@ -202,7 +202,7 @@ export default function PipelinePanel({ onApplyCode }: PipelinePanelProps) {
                       initial={false}
                       animate={{
                         scale: isRunning ? 1.01 : 1,
-                        borderColor: isRunning ? "rgba(212,242,78,0.35)" : isDone ? "rgba(212,242,78,0.2)" : "rgba(10,10,11,0.06)",
+                        borderColor: isRunning ? "rgba(232,64,43,0.35)" : isDone ? "rgba(232,64,43,0.2)" : "rgba(10,10,11,0.06)",
                       }}
                       className={`flex items-center gap-2.5 p-2 rounded-lg border transition-all duration-300 ${
                         isRunning

@@ -132,7 +132,7 @@ export default function SharePage({
           href={forkHref}
           className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[12px] font-semibold transition-all hover:-translate-y-0.5"
           style={{
-            background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)",
+            background: "linear-gradient(135deg, #ef5440 0%, #e8402b 100%)",
             color: "#ffffff",
             border: "1px solid #a47d2c",
           }}

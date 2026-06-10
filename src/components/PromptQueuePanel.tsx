@@ -176,7 +176,7 @@ export default function PromptQueuePanel({ onRunPrompt, isBusy }: PromptQueuePan
               disabled={running || isBusy}
               className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold transition-all disabled:opacity-50"
               style={{
-                background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)",
+                background: "linear-gradient(135deg, #ef5440 0%, #e8402b 100%)",
                 color: "#ffffff",
                 border: "1px solid #a47d2c",
               }}

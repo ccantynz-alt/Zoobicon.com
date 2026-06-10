@@ -371,10 +371,10 @@ function AddOnCard({ addOn, loading, onAdd }: AddOnCardProps) {
           disabled={loading}
           className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-semibold transition-all disabled:opacity-50"
           style={{
-            background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)",
+            background: "linear-gradient(135deg, #ef5440 0%, #e8402b 100%)",
             color: "#ffffff",
             border: "1px solid #a47d2c",
-            boxShadow: "0 4px 12px -4px rgba(150,175,40,0.4), inset 0 1px 0 0 rgba(255,255,255,0.25)",
+            boxShadow: "0 4px 12px -4px rgba(194,51,31,0.4), inset 0 1px 0 0 rgba(255,255,255,0.25)",
           }}
         >
           {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowRight className="w-3 h-3" />}

@@ -400,7 +400,7 @@ function ValuationChip({
           ? `Estimate: ${valuation.factors.join(" · ")}`
           : `Low ${valuation.low} · High ${valuation.high}`
       }
-      className="inline-flex items-center gap-1 text-[10.5px] px-2 py-0.5 rounded-full border border-[#d4f24e]/25 bg-[#d4f24e]/[0.06] text-[#d4f24e] font-semibold"
+      className="inline-flex items-center gap-1 text-[10.5px] px-2 py-0.5 rounded-full border border-[#e8402b]/25 bg-[#e8402b]/[0.06] text-[#e8402b] font-semibold"
     >
       <TrendingUp className="w-3 h-3" /> ≈ {formatted}
     </span>

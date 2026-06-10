@@ -125,7 +125,7 @@ export default function SiteNavigation() {
 
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 transition-shadow duration-300"
+      className="zb-nav fixed top-0 left-0 right-0 z-50 transition-shadow duration-300"
       style={{
         background: "rgba(11, 11, 13, 0.92)",
         backdropFilter: "blur(20px) saturate(140%)",
@@ -303,7 +303,7 @@ export default function SiteNavigation() {
               style={{
                 background: "var(--zb-accent)",
                 color: "var(--zb-accent-ink)",
-                boxShadow: "0 10px 26px -12px rgba(212,242,78,0.55)",
+                boxShadow: "0 10px 26px -12px rgba(232,64,43,0.55)",
               }}
               onMouseEnter={(e) => { e.currentTarget.style.background = "var(--zb-accent-hi)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "var(--zb-accent)"; }}
@@ -397,7 +397,7 @@ export default function SiteNavigation() {
                 style={{
                   background: "var(--zb-accent)",
                   color: "var(--zb-accent-ink)",
-                  boxShadow: "0 10px 26px -12px rgba(212,242,78,0.55)",
+                  boxShadow: "0 10px 26px -12px rgba(232,64,43,0.55)",
                 }}
               >
                 Start building →

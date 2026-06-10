@@ -173,10 +173,10 @@ const SLOT_STYLES_CSS = `/* Slot-locked editorial-light design tokens.
   --ink-muted: #76767e;
   --rule: #ebe7d6;
   --rule-strong: #a8a392;
-  --gold: #d4f24e;
-  --gold-soft: rgba(212, 242, 78, 0.14);
-  --gold-glow: rgba(212, 242, 78, 0.40);
-  --gold-deep: #a9c43a;
+  --gold: #e8402b;
+  --gold-soft: rgba(232, 64, 43, 0.14);
+  --gold-glow: rgba(232, 64, 43, 0.40);
+  --gold-deep: #c2331f;
 }
 
 body {

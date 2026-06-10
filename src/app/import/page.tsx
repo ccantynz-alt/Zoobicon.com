@@ -193,10 +193,10 @@ export default function ImportHubPage() {
             href="/builder"
             className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold transition-all hover:-translate-y-0.5"
             style={{
-              background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)",
+              background: "linear-gradient(135deg, #ef5440 0%, #e8402b 100%)",
               color: "#ffffff",
               border: "1px solid #a47d2c",
-              boxShadow: "0 6px 18px -8px rgba(150,175,40,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
+              boxShadow: "0 6px 18px -8px rgba(194,51,31,0.5), inset 0 1px 0 0 rgba(255,255,255,0.35)",
             }}
           >
             Open the builder

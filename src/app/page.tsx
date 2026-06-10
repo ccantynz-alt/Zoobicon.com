@@ -123,35 +123,24 @@ export default function HomePage() {
   return (
     <div className="zb-bright">
       <div className="pt-[72px]">
-        {/* ── HERO (dark statement) ── */}
+        {/* ── HERO (bright, product on stage) ── */}
         <HeroBuilder />
 
-        {/* ── Trust marquee (bright) ── */}
-        <section
-          className="zb-bright relative"
-          style={{ borderTop: "1px solid var(--zb-line)", borderBottom: "1px solid var(--zb-line)" }}
-        >
-          <div className="relative overflow-hidden py-6 fs-marquee-paused">
+        {/* ── Brand band (the Klaviyo red strip) ── */}
+        <section className="zb-band relative" style={{ background: "var(--zb-accent)" }}>
+          <div className="relative overflow-hidden py-5 fs-marquee-paused">
             <div className="fs-marquee">
               {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
-                <div key={`${item.label}-${i}`} className="zb-chip-light flex-shrink-0">
-                  <span className="text-[13px] font-semibold" style={{ color: "var(--zb-ink)" }}>
+                <div key={`${item.label}-${i}`} className="flex flex-shrink-0 items-baseline gap-2 px-7">
+                  <span className="text-[13.5px] font-bold tracking-tight text-white">
                     {item.label}
                   </span>
-                  <span className="text-[11px]" style={{ color: "var(--zb-muted)" }}>
+                  <span className="text-[11px] text-white/70">
                     {item.sub}
                   </span>
                 </div>
               ))}
             </div>
-            <div
-              className="pointer-events-none absolute inset-y-0 left-0 w-28"
-              style={{ background: "linear-gradient(to right, var(--zb-bg), transparent)" }}
-            />
-            <div
-              className="pointer-events-none absolute inset-y-0 right-0 w-28"
-              style={{ background: "linear-gradient(to left, var(--zb-bg), transparent)" }}
-            />
           </div>
         </section>
 
@@ -166,7 +155,7 @@ export default function HomePage() {
           >
             <motion.div variants={fadeUp} className="mb-14 max-w-3xl">
               <div className="zb-eyebrow mb-5" style={{ color: "var(--zb-ink-2)" }}>
-                <Sparkles className="h-3.5 w-3.5" style={{ color: "var(--zb-accent-ink)" }} />
+                <Sparkles className="h-3.5 w-3.5" style={{ color: "var(--zb-accent)" }} />
                 What&rsquo;s inside
               </div>
               <h2 className="zb-display text-4xl sm:text-6xl">
@@ -348,7 +337,7 @@ export default function HomePage() {
           >
             <motion.div variants={fadeUp} className="mb-14 max-w-2xl">
               <div className="zb-eyebrow mb-5" style={{ color: "var(--zb-ink-2)" }}>
-                <Zap className="h-3.5 w-3.5" style={{ color: "var(--zb-accent-ink)" }} />
+                <Zap className="h-3.5 w-3.5" style={{ color: "var(--zb-accent)" }} />
                 Simple pricing
               </div>
               <h2 className="zb-display text-4xl sm:text-6xl">

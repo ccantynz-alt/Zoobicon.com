@@ -126,19 +126,19 @@ export default function SiteFooter() {
             <div
               className="mt-7 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-semibold"
               style={{
-                border: "1px solid rgba(85, 101, 15, 0.25)",
-                background: "rgba(148, 168, 50, 0.08)",
-                color: "var(--gold-deep)",
+                border: "1px solid rgba(22, 101, 52, 0.25)",
+                background: "rgba(22, 101, 52, 0.07)",
+                color: "#166534",
               }}
             >
               <span className="relative flex h-1.5 w-1.5">
                 <span
                   className="absolute inline-flex h-full w-full animate-ping rounded-full"
-                  style={{ background: "rgba(148, 168, 50, 0.5)" }}
+                  style={{ background: "rgba(22, 163, 74, 0.5)" }}
                 />
                 <span
                   className="relative inline-flex h-1.5 w-1.5 rounded-full"
-                  style={{ background: "var(--gold)" }}
+                  style={{ background: "#16a34a" }}
                 />
               </span>
               All systems operational

@@ -285,7 +285,7 @@ export const INLINE_SLOT_EDITOR_IFRAME_SCRIPT = `
     if (target === hovered) return;
     if (hovered) { hovered.style.outline = ""; hovered.style.cursor = ""; }
     if (isEditable(target)) {
-      target.style.outline = "2px solid #d4f24e";
+      target.style.outline = "2px solid #e8402b";
       target.style.outlineOffset = "2px";
       target.style.cursor = "text";
       hovered = target;
