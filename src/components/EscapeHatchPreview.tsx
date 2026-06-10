@@ -566,17 +566,23 @@ function useResolvedEsm() {
         );
         if (cancelled) return;
 
-        // Build a hybrid map: local path if vendor file present, else esm.sh
+        // Build a hybrid map: local path if vendor file present, else esm.sh.
+        // CRITICAL: vendor paths must be ABSOLUTE (origin-prefixed). The
+        // preview runs in an about:srcdoc iframe, which has no base URL —
+        // a root-relative "/vendor/x.js" in the importmap throws
+        // "Module name does not resolve to a valid URL" and blanks the
+        // preview on every build (the months-long production crash).
+        const origin = window.location.origin;
         const hybrid: Record<string, string> = {};
         for (const [spec, fallback] of Object.entries(ESM_FALLBACK)) {
           const localPath = VENDOR_PATHS[spec];
           const localFile = localPath?.replace("/vendor/", "");
-          hybrid[spec] = localFile && okFiles.has(localFile) ? localPath : fallback;
+          hybrid[spec] = localFile && okFiles.has(localFile) ? origin + localPath : fallback;
         }
         setEsmMap(hybrid);
 
         if (okFiles.has("babel-standalone.js")) {
-          setBabelUrl(BABEL_VENDOR_PATH);
+          setBabelUrl(origin + BABEL_VENDOR_PATH);
         }
       } catch {
         // Network / parse failure — keep esm.sh fallbacks
