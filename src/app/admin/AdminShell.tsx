@@ -150,7 +150,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                 style={{
                   background: "var(--paper)",
                   border: "1.5px solid var(--gold)",
-                  boxShadow: "0 2px 6px -2px rgba(150,175,40,0.18), inset 0 0 0 2.5px var(--paper)",
+                  boxShadow: "0 2px 6px -2px rgba(194,51,31,0.18), inset 0 0 0 2.5px var(--paper)",
                 }}
               >
                 <span
@@ -306,7 +306,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             style={{
               background: "var(--paper)",
               border: "1.5px solid var(--gold)",
-              boxShadow: "0 2px 6px -2px rgba(150,175,40,0.18), inset 0 0 0 2.5px var(--paper)",
+              boxShadow: "0 2px 6px -2px rgba(194,51,31,0.18), inset 0 0 0 2.5px var(--paper)",
             }}
           >
             <span
@@ -384,7 +384,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               background: "var(--paper)",
               border: "1.5px solid var(--gold)",
               color: "var(--ink)",
-              boxShadow: "0 1px 3px rgba(150,175,40,0.12)",
+              boxShadow: "0 1px 3px rgba(194,51,31,0.12)",
             }}
           >
             {userName ? userName.charAt(0).toUpperCase() : "A"}

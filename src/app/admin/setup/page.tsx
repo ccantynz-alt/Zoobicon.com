@@ -115,15 +115,15 @@ export default function SetupPage() {
                 background:
                   blockers.length === 0
                     ? "linear-gradient(135deg, rgba(16,185,129,0.10) 0%, rgba(16,24,40,0.7) 100%)"
-                    : "linear-gradient(135deg, rgba(212,242,78,0.07) 0%, rgba(16,24,40,0.7) 100%)",
-                borderColor: blockers.length === 0 ? "rgba(16,185,129,0.30)" : "rgba(212,242,78,0.20)",
+                    : "linear-gradient(135deg, rgba(232,64,43,0.07) 0%, rgba(16,24,40,0.7) 100%)",
+                borderColor: blockers.length === 0 ? "rgba(16,185,129,0.30)" : "rgba(232,64,43,0.20)",
               }}
             >
               <div className="flex items-center gap-3 mb-2">
                 {blockers.length === 0 ? (
                   <CheckCircle2 className="w-6 h-6 text-amber-400" />
                 ) : (
-                  <AlertTriangle className="w-6 h-6 text-[#d4f24e]" />
+                  <AlertTriangle className="w-6 h-6 text-[#e8402b]" />
                 )}
                 <h2 className="text-xl font-semibold">
                   {blockers.length === 0
@@ -179,7 +179,7 @@ export default function SetupPage() {
             <div className="space-y-6">
               {grouped.map((group) => (
                 <div key={group.category}>
-                  <h3 className="text-[11px] uppercase tracking-[0.2em] font-semibold text-[#d4f24e]/85 mb-3">
+                  <h3 className="text-[11px] uppercase tracking-[0.2em] font-semibold text-[#e8402b]/85 mb-3">
                     {group.label}
                   </h3>
                   <div className="rounded-2xl border border-white/[0.07] bg-white/[0.015] divide-y divide-white/[0.05] overflow-hidden">
@@ -213,15 +213,15 @@ export default function SetupPage() {
               </h3>
               <ul className="text-sm text-white/65 space-y-2">
                 <li className="flex items-start gap-2">
-                  <span className="text-[#d4f24e]">·</span>
+                  <span className="text-[#e8402b]">·</span>
                   Create the 4 Stripe products at{" "}
-                  <a href="https://dashboard.stripe.com/products" target="_blank" rel="noopener noreferrer" className="text-[#d4f24e] underline">
+                  <a href="https://dashboard.stripe.com/products" target="_blank" rel="noopener noreferrer" className="text-[#e8402b] underline">
                     dashboard.stripe.com/products
                   </a>{" "}
                   and paste the price IDs as STRIPE_PRICE_STARTER / _PRO / _AGENCY / _WHITE_LABEL.
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-[#d4f24e]">·</span>
+                  <span className="text-[#e8402b]">·</span>
                   Point the Stripe webhook at{" "}
                   <code className="text-white/85 bg-white/[0.06] px-1.5 py-0.5 rounded text-[12px]">
                     https://zoobicon.com/api/stripe/webhook
@@ -229,7 +229,7 @@ export default function SetupPage() {
                   and copy the signing secret to STRIPE_WEBHOOK_SECRET.
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-[#d4f24e]">·</span>
+                  <span className="text-[#e8402b]">·</span>
                   Set OPENSRS_ENV=live once you&apos;re ready to take real domain registrations.
                 </li>
               </ul>

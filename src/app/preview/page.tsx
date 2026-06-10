@@ -11,7 +11,7 @@
  * Aesthetic: Stripe / Linear-grade deep ink. Near-black canvas, glassy
  * elevated surfaces, hairline borders, restrained radial glows, fine grid
  * textures, crisp near-white display type, and ONE electric-lime signature
- * accent (#d4f24e, text on lime #161d05) so the brand stays distinctive
+ * accent (#e8402b, text on lime #161d05) so the brand stays distinctive
  * rather than generic SaaS blue.
  *
  * Type: Plus Jakarta Sans 800 display, Inter body, JetBrains Mono code —
@@ -35,7 +35,7 @@ body:has(#zb-home) > *:not(#zb-home):not(:has(#zb-home)) { display: none !import
 body:has(#zb-home) { background: #08080b !important; }
 
 #zb-home, #zb-home * { box-sizing: border-box; }
-#zb-home ::selection { background: #d4f24e; color: #161d05; }
+#zb-home ::selection { background: #e8402b; color: #161d05; }
 .zbx-d { font-family: 'Plus Jakarta Sans','Inter',system-ui,sans-serif; font-weight: 800; letter-spacing: -0.04em; line-height: 0.98; }
 .zbx-d-tight { font-family: 'Plus Jakarta Sans','Inter',system-ui,sans-serif; font-weight: 700; letter-spacing: -0.03em; }
 .zbx-b { font-family: 'Inter',system-ui,-apple-system,sans-serif; }
@@ -63,7 +63,7 @@ body:has(#zb-home) { background: #08080b !important; }
 .zbx-grid-fade { -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 38%, #000 38%, transparent 100%); mask-image: radial-gradient(ellipse 80% 70% at 50% 38%, #000 38%, transparent 100%); }
 .zbx-scroll-hide::-webkit-scrollbar { display: none; }
 .zbx-scroll-hide { scrollbar-width: none; }
-.zbx-link-underline { background-image: linear-gradient(#d4f24e,#d4f24e); background-size: 0% 1.5px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size .3s cubic-bezier(.16,1,.3,1); }
+.zbx-link-underline { background-image: linear-gradient(#e8402b,#e8402b); background-size: 0% 1.5px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size .3s cubic-bezier(.16,1,.3,1); }
 .zbx-link-underline:hover { background-size: 100% 1.5px; }
 /* subtle top sheen on glass cards */
 .zbx-card { background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)); }
@@ -170,7 +170,7 @@ const I = {
 function Wordmark() {
   return (
     <a href="/" className="group inline-flex items-center gap-2.5 select-none">
-      <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-[9px] bg-[#d4f24e]">
+      <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-[9px] bg-[#e8402b]">
         <span className="zbx-d text-[15px] text-[#161d05]">z</span>
       </span>
       <span className="zbx-d-tight text-[18px] text-[#fff]">zoobicon</span>
@@ -260,7 +260,7 @@ function FloatingNav() {
             </a>
             <a
               href="/builder"
-              className="group inline-flex items-center gap-1.5 rounded-lg bg-[#d4f24e] px-4 py-2 text-[14px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5"
+              className="group inline-flex items-center gap-1.5 rounded-lg bg-[#e8402b] px-4 py-2 text-[14px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5"
             >
               Start building
               <I.arrow className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -284,7 +284,7 @@ function FloatingNav() {
               <div className="grid grid-cols-2 gap-1">
                 {PLATFORM_MENU.map((m) => (
                   <a key={m.title} href="/builder" className="group flex gap-3 rounded-xl p-3 transition-colors hover:bg-[rgba(255,255,255,0.05)]">
-                    <span className="mt-0.5 flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-[rgba(255,255,255,0.06)] text-[#d4f24e] ring-1 ring-[#fff]/10">
+                    <span className="mt-0.5 flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-[rgba(255,255,255,0.06)] text-[#e8402b] ring-1 ring-[#fff]/10">
                       <m.icon className="h-[18px] w-[18px]" />
                     </span>
                     <span>
@@ -319,7 +319,7 @@ function FloatingNav() {
               <a href="/auth/login" className="rounded-lg border border-[rgba(255,255,255,0.15)] px-4 py-2.5 text-center text-[14px] font-semibold text-[#fff]">
                 Sign in
               </a>
-              <a href="/builder" className="rounded-lg bg-[#d4f24e] px-4 py-2.5 text-center text-[14px] font-bold text-[#161d05]">
+              <a href="/builder" className="rounded-lg bg-[#e8402b] px-4 py-2.5 text-center text-[14px] font-bold text-[#161d05]">
                 Start building
               </a>
             </div>
@@ -360,7 +360,7 @@ function BuilderMockup() {
 
   return (
     <div className="zbx-float relative w-full max-w-[520px]">
-      <div className="zbx-anim pointer-events-none absolute -inset-6 -z-10 rounded-[32px] bg-[#d4f24e]/15 blur-3xl" style={{ animation: "zbx-glow 5s ease-in-out infinite" }} />
+      <div className="zbx-anim pointer-events-none absolute -inset-6 -z-10 rounded-[32px] bg-[#e8402b]/15 blur-3xl" style={{ animation: "zbx-glow 5s ease-in-out infinite" }} />
       <div className="overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.10)] bg-[#0e0e12] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
         {/* window chrome */}
         <div className="flex items-center gap-2 border-b border-[rgba(255,255,255,0.10)] px-4 py-3">
@@ -370,7 +370,7 @@ function BuilderMockup() {
           <div className="ml-3 flex h-6 flex-1 items-center rounded-md bg-[rgba(255,255,255,0.05)] px-3">
             <span className="zbx-m text-[11px] text-[rgba(255,255,255,0.40)]">zoobicon.com/builder</span>
           </div>
-          <span className={`zbx-m rounded-md px-2 py-1 text-[10px] font-medium ${phase === "live" ? "bg-[#d4f24e] text-[#161d05]" : "bg-[rgba(255,255,255,0.10)] text-[rgba(255,255,255,0.50)]"}`}>
+          <span className={`zbx-m rounded-md px-2 py-1 text-[10px] font-medium ${phase === "live" ? "bg-[#e8402b] text-[#161d05]" : "bg-[rgba(255,255,255,0.10)] text-[rgba(255,255,255,0.50)]"}`}>
             {phase === "live" ? "● LIVE" : "building"}
           </span>
         </div>
@@ -381,12 +381,12 @@ function BuilderMockup() {
             <div className="zbx-m text-[10px] uppercase tracking-wider text-[rgba(255,255,255,0.30)]">Prompt</div>
             <div className="mt-2 rounded-lg bg-[rgba(255,255,255,0.05)] p-2.5 text-[11px] leading-snug text-[rgba(255,255,255,0.70)]">
               A bold landing page for a fintech app called Nova
-              {phase === "typing" && <span className="zbx-cursor ml-0.5 inline-block h-3 w-[2px] translate-y-0.5 bg-[#d4f24e]" />}
+              {phase === "typing" && <span className="zbx-cursor ml-0.5 inline-block h-3 w-[2px] translate-y-0.5 bg-[#e8402b]" />}
             </div>
             <div className="mt-3 space-y-1.5">
               {HERO_SECTIONS.map((s, i) => (
                 <div key={s} className="flex items-center gap-1.5">
-                  <span className={`flex h-3.5 w-3.5 items-center justify-center rounded-[4px] ${i < built ? "bg-[#d4f24e] text-[#161d05]" : "bg-[rgba(255,255,255,0.10)] text-transparent"}`}>
+                  <span className={`flex h-3.5 w-3.5 items-center justify-center rounded-[4px] ${i < built ? "bg-[#e8402b] text-[#161d05]" : "bg-[rgba(255,255,255,0.10)] text-transparent"}`}>
                     <I.check className="h-2.5 w-2.5" />
                   </span>
                   <span className={`text-[10px] ${i < built ? "text-[rgba(255,255,255,0.70)]" : "text-[rgba(255,255,255,0.30)]"}`}>{s}</span>
@@ -405,24 +405,24 @@ function BuilderMockup() {
             <div className="space-y-2.5">
               {built >= 1 && (
                 <div className="zbx-drop flex items-center justify-between rounded-lg bg-[rgba(255,255,255,0.05)] px-2.5 py-1.5">
-                  <div className="h-2 w-10 rounded bg-[#d4f24e]" />
+                  <div className="h-2 w-10 rounded bg-[#e8402b]" />
                   <div className="flex gap-1.5">{[0, 1, 2].map((k) => <div key={k} className="h-2 w-6 rounded bg-[rgba(255,255,255,0.15)]" />)}</div>
                 </div>
               )}
               {built >= 2 && (
                 <div className="zbx-drop rounded-lg bg-gradient-to-br from-[rgba(255,255,255,0.07)] to-transparent p-3">
                   <div className="h-3 w-3/4 rounded bg-[rgba(255,255,255,0.80)]" />
-                  <div className="mt-1.5 h-3 w-1/2 rounded bg-[#d4f24e]" />
+                  <div className="mt-1.5 h-3 w-1/2 rounded bg-[#e8402b]" />
                   <div className="mt-2.5 h-1.5 w-full rounded bg-[rgba(255,255,255,0.15)]" />
                   <div className="mt-1 h-1.5 w-4/5 rounded bg-[rgba(255,255,255,0.15)]" />
-                  <div className="mt-2.5 inline-flex h-5 items-center rounded-md bg-[#d4f24e] px-2 text-[8px] font-bold text-[#161d05]">Get started</div>
+                  <div className="mt-2.5 inline-flex h-5 items-center rounded-md bg-[#e8402b] px-2 text-[8px] font-bold text-[#161d05]">Get started</div>
                 </div>
               )}
               {built >= 3 && (
                 <div className="zbx-drop grid grid-cols-3 gap-1.5">
                   {[0, 1, 2].map((k) => (
                     <div key={k} className="rounded-lg bg-[rgba(255,255,255,0.05)] p-2">
-                      <div className="h-4 w-4 rounded bg-[#d4f24e]/70" />
+                      <div className="h-4 w-4 rounded bg-[#e8402b]/70" />
                       <div className="mt-1.5 h-1.5 w-full rounded bg-[rgba(255,255,255,0.20)]" />
                       <div className="mt-1 h-1.5 w-2/3 rounded bg-[rgba(255,255,255,0.15)]" />
                     </div>
@@ -432,7 +432,7 @@ function BuilderMockup() {
               {built >= 4 && (
                 <div className="zbx-drop flex gap-1.5">
                   {[0, 1, 2].map((k) => (
-                    <div key={k} className={`flex-1 rounded-lg p-2 ${k === 1 ? "bg-[#d4f24e]/15 ring-1 ring-[#d4f24e]/40" : "bg-[rgba(255,255,255,0.05)]"}`}>
+                    <div key={k} className={`flex-1 rounded-lg p-2 ${k === 1 ? "bg-[#e8402b]/15 ring-1 ring-[#e8402b]/40" : "bg-[rgba(255,255,255,0.05)]"}`}>
                       <div className="h-3 w-8 rounded bg-[rgba(255,255,255,0.40)]" />
                       <div className="mt-1 h-1.5 w-full rounded bg-[rgba(255,255,255,0.15)]" />
                     </div>
@@ -452,7 +452,7 @@ function BuilderMockup() {
 
       {/* floating deploy chip */}
       <div className={`absolute -bottom-4 -right-3 flex items-center gap-2 rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#13131a] px-3 py-2 shadow-[0_12px_30px_rgba(0,0,0,0.5)] transition-all duration-500 ${phase === "live" ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}>
-        <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#d4f24e] text-[#161d05]">
+        <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#e8402b] text-[#161d05]">
           <I.globe className="h-3.5 w-3.5" />
         </span>
         <span className="zbx-b">
@@ -476,15 +476,15 @@ function Hero() {
           backgroundSize: "56px 56px",
         }}
       />
-      <div className="pointer-events-none absolute left-1/2 top-[-60px] h-[460px] w-[760px] -translate-x-1/2 rounded-full bg-[#d4f24e]/10 blur-[130px]" />
+      <div className="pointer-events-none absolute left-1/2 top-[-60px] h-[460px] w-[760px] -translate-x-1/2 rounded-full bg-[#e8402b]/10 blur-[130px]" />
 
       <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-5 pb-20 sm:pb-24 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
         {/* copy */}
         <div className="zbx-reveal">
           <a href="/builder" className="zbx-b inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] py-1.5 pl-1.5 pr-3.5 text-[13px] text-[rgba(255,255,255,0.80)] backdrop-blur">
-            <span className="rounded-full bg-[#d4f24e] px-2 py-0.5 text-[11px] font-bold text-[#161d05]">NEW</span>
+            <span className="rounded-full bg-[#e8402b] px-2 py-0.5 text-[11px] font-bold text-[#161d05]">NEW</span>
             Streaming preview — first paint in under 2 seconds
-            <I.arrow className="h-3.5 w-3.5 text-[#d4f24e]" />
+            <I.arrow className="h-3.5 w-3.5 text-[#e8402b]" />
           </a>
 
           <h1 className="zbx-d mt-6 text-[44px] text-[#fff] sm:text-[60px] lg:text-[68px]">
@@ -493,7 +493,7 @@ function Hero() {
             Watch it build.
             <br />
             <span className="relative inline-block">
-              <span className="relative z-10 text-[#d4f24e]">Ship it.</span>
+              <span className="relative z-10 text-[#e8402b]">Ship it.</span>
             </span>
           </h1>
 
@@ -504,7 +504,7 @@ function Hero() {
           <div className="zbx-b mt-8 flex flex-col gap-3 sm:flex-row">
             <a
               href="/builder"
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#d4f24e] px-6 py-3.5 text-[16px] font-bold text-[#161d05] shadow-[0_8px_30px_rgba(212,242,78,0.28)] transition-transform hover:-translate-y-0.5"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8402b] px-6 py-3.5 text-[16px] font-bold text-[#161d05] shadow-[0_8px_30px_rgba(232,64,43,0.28)] transition-transform hover:-translate-y-0.5"
             >
               Start building free
               <I.arrow className="h-[18px] w-[18px] transition-transform group-hover:translate-x-0.5" />
@@ -513,15 +513,15 @@ function Hero() {
               href="/builder"
               className="group inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-6 py-3.5 text-[16px] font-semibold text-[#fff] backdrop-blur transition-colors hover:bg-[rgba(255,255,255,0.10)]"
             >
-              <I.play className="h-[18px] w-[18px] text-[#d4f24e]" />
+              <I.play className="h-[18px] w-[18px] text-[#e8402b]" />
               Watch a 60-second build
             </a>
           </div>
 
           <div className="zbx-b mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] text-[rgba(255,255,255,0.45)]">
-            <span className="inline-flex items-center gap-1.5"><I.check className="h-4 w-4 text-[#d4f24e]" /> No credit card</span>
-            <span className="inline-flex items-center gap-1.5"><I.check className="h-4 w-4 text-[#d4f24e]" /> Export the real code</span>
-            <span className="inline-flex items-center gap-1.5"><I.check className="h-4 w-4 text-[#d4f24e]" /> Live URL in one click</span>
+            <span className="inline-flex items-center gap-1.5"><I.check className="h-4 w-4 text-[#e8402b]" /> No credit card</span>
+            <span className="inline-flex items-center gap-1.5"><I.check className="h-4 w-4 text-[#e8402b]" /> Export the real code</span>
+            <span className="inline-flex items-center gap-1.5"><I.check className="h-4 w-4 text-[#e8402b]" /> Live URL in one click</span>
           </div>
         </div>
 
@@ -573,12 +573,12 @@ function Pipeline() {
       <div className="mx-auto max-w-6xl px-5">
         <div className="zbx-reveal mx-auto max-w-2xl text-center">
           <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-[rgba(255,255,255,0.70)]">
-            <I.spark className="h-3.5 w-3.5 text-[#d4f24e]" /> The pipeline
+            <I.spark className="h-3.5 w-3.5 text-[#e8402b]" /> The pipeline
           </span>
           <h2 className="zbx-d mt-5 text-[34px] text-[#fff] sm:text-[46px]">
             Not one model guessing.
             <br />
-            <span className="text-[#d4f24e]">Six agents collaborating.</span>
+            <span className="text-[#e8402b]">Six agents collaborating.</span>
           </h2>
           <p className="zbx-b mx-auto mt-5 max-w-xl text-[17px] leading-relaxed text-[rgba(255,255,255,0.60)]">
             Single-shot builders dump one blob and hope. Zoobicon runs a coordinated team — each agent does one job well, and the work streams into your preview as it lands.
@@ -592,10 +592,10 @@ function Pipeline() {
                 key={a.name}
                 className="zbx-card zbx-card-hover group relative overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.10)] p-5"
               >
-                <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#d4f24e]/0 blur-2xl transition-colors duration-500 group-hover:bg-[#d4f24e]/20" />
+                <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#e8402b]/0 blur-2xl transition-colors duration-500 group-hover:bg-[#e8402b]/20" />
                 <div className="flex items-center justify-between">
                   <span className="zbx-m text-[12px] font-medium text-[rgba(255,255,255,0.35)]">AGENT {String(i + 1).padStart(2, "0")}</span>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d4f24e] text-[#161d05]">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#e8402b] text-[#161d05]">
                     <span className="zbx-d text-[13px]">{i + 1}</span>
                   </span>
                 </div>
@@ -606,9 +606,9 @@ function Pipeline() {
           </div>
 
           {/* result bar */}
-          <div className="mt-3 flex flex-col items-stretch gap-3 overflow-hidden rounded-2xl border border-[#d4f24e]/30 bg-[#d4f24e]/[0.06] p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-3 flex flex-col items-stretch gap-3 overflow-hidden rounded-2xl border border-[#e8402b]/30 bg-[#e8402b]/[0.06] p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#d4f24e] text-[#161d05]">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e8402b] text-[#161d05]">
                 <I.bolt className="h-5 w-5" />
               </span>
               <div>
@@ -616,7 +616,7 @@ function Pipeline() {
                 <p className="zbx-b text-[14px] text-[rgba(255,255,255,0.55)]">Streamed section-by-section, hydrated to real interactive React.</p>
               </div>
             </div>
-            <a href="/builder" className="zbx-b inline-flex flex-none items-center justify-center gap-1.5 rounded-xl bg-[#d4f24e] px-5 py-2.5 text-[15px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5">
+            <a href="/builder" className="zbx-b inline-flex flex-none items-center justify-center gap-1.5 rounded-xl bg-[#e8402b] px-5 py-2.5 text-[15px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5">
               See it run <I.arrow className="h-4 w-4" />
             </a>
           </div>
@@ -643,7 +643,7 @@ function Bento() {
         <div className="zbx-reveal grid grid-cols-1 gap-3 md:grid-cols-6 md:grid-rows-2">
           {/* big — registry */}
           <div className="zbx-card group relative overflow-hidden rounded-3xl border border-[rgba(255,255,255,0.10)] p-7 md:col-span-3 md:row-span-2">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#d4f24e] text-[#161d05]">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e8402b] text-[#161d05]">
               <I.layers className="h-[22px] w-[22px]" />
             </span>
             <h3 className="zbx-d-tight mt-5 text-[24px] text-[#fff]">118-component registry, slot-locked</h3>
@@ -652,8 +652,8 @@ function Bento() {
             </p>
             <div className="mt-6 grid grid-cols-4 gap-2">
               {Array.from({ length: 8 }).map((_, k) => (
-                <div key={k} className={`h-12 rounded-lg border border-[rgba(255,255,255,0.10)] ${k % 3 === 0 ? "bg-[#d4f24e]/20" : k % 3 === 1 ? "bg-[rgba(255,255,255,0.06)]" : "bg-[rgba(255,255,255,0.03)]"}`}>
-                  <div className={`m-2 h-1.5 w-1/2 rounded ${k % 3 === 0 ? "bg-[#d4f24e]" : "bg-[rgba(255,255,255,0.25)]"}`} />
+                <div key={k} className={`h-12 rounded-lg border border-[rgba(255,255,255,0.10)] ${k % 3 === 0 ? "bg-[#e8402b]/20" : k % 3 === 1 ? "bg-[rgba(255,255,255,0.06)]" : "bg-[rgba(255,255,255,0.03)]"}`}>
+                  <div className={`m-2 h-1.5 w-1/2 rounded ${k % 3 === 0 ? "bg-[#e8402b]" : "bg-[rgba(255,255,255,0.25)]"}`} />
                 </div>
               ))}
             </div>
@@ -662,11 +662,11 @@ function Bento() {
           {/* perf */}
           <div className="zbx-card rounded-3xl border border-[rgba(255,255,255,0.10)] p-7 md:col-span-3">
             <div className="flex items-start justify-between">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[#d4f24e] ring-1 ring-[#fff]/10">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[#e8402b] ring-1 ring-[#fff]/10">
                 <I.gauge className="h-[22px] w-[22px]" />
               </span>
               <div className="text-right">
-                <p className="zbx-d text-[40px] leading-none text-[#d4f24e]">&lt;2s</p>
+                <p className="zbx-d text-[40px] leading-none text-[#e8402b]">&lt;2s</p>
                 <p className="zbx-b text-[13px] text-[rgba(255,255,255,0.50)]">first paint</p>
               </div>
             </div>
@@ -678,7 +678,7 @@ function Bento() {
 
           {/* chat edit */}
           <div className="zbx-card rounded-3xl border border-[rgba(255,255,255,0.10)] p-7 md:col-span-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[#d4f24e] ring-1 ring-[#fff]/10">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[#e8402b] ring-1 ring-[#fff]/10">
               <I.chat className="h-[22px] w-[22px]" />
             </span>
             <h3 className="zbx-d-tight mt-5 text-[22px] text-[#fff]">Edit by chatting</h3>
@@ -696,7 +696,7 @@ function Bento() {
             { icon: I.shield, t: "Shipped to last", b: "Multi-judge critique regenerates weak sections before you ever see them." },
           ].map((c) => (
             <div key={c.t} className="zbx-card zbx-card-hover group rounded-3xl border border-[rgba(255,255,255,0.10)] p-6">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.80)] ring-1 ring-[#fff]/10 transition-colors group-hover:bg-[#d4f24e] group-hover:text-[#161d05]">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.80)] ring-1 ring-[#fff]/10 transition-colors group-hover:bg-[#e8402b] group-hover:text-[#161d05]">
                 <c.icon className="h-[22px] w-[22px]" />
               </span>
               <h3 className="zbx-d-tight mt-5 text-[19px] text-[#fff]">{c.t}</h3>
@@ -728,7 +728,7 @@ const PRESETS: Preset[] = [
     id: "saas",
     label: "SaaS",
     prompt: "A bold landing page for Nova, an AI analytics platform for product teams.",
-    accent: "#d4f24e",
+    accent: "#e8402b",
     title: "Ship features your users actually use.",
     tagline: "Nova turns product analytics into one clear next move.",
     cta: "Start free",
@@ -822,7 +822,7 @@ function Playground() {
       <div className="mx-auto max-w-6xl px-5">
         <div className="zbx-reveal mx-auto mb-12 max-w-2xl text-center">
           <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-[rgba(255,255,255,0.70)]">
-            <I.play className="h-3.5 w-3.5 text-[#d4f24e]" /> Live playground
+            <I.play className="h-3.5 w-3.5 text-[#e8402b]" /> Live playground
           </span>
           <h2 className="zbx-d mt-5 text-[34px] text-[#fff] sm:text-[46px]">Try a build right here</h2>
           <p className="zbx-b mx-auto mt-4 max-w-lg text-[17px] text-[rgba(255,255,255,0.60)]">
@@ -840,7 +840,7 @@ function Playground() {
                   key={p.id}
                   onClick={() => run(i)}
                   className={`zbx-b rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors ${
-                    active === i ? "bg-[#d4f24e] text-[#161d05]" : "bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.60)] hover:bg-[rgba(255,255,255,0.10)] hover:text-[#fff]"
+                    active === i ? "bg-[#e8402b] text-[#161d05]" : "bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.60)] hover:bg-[rgba(255,255,255,0.10)] hover:text-[#fff]"
                   }`}
                 >
                   {p.label}
@@ -868,7 +868,7 @@ function Playground() {
           {/* prompt line */}
           <div className="border-b border-[rgba(255,255,255,0.10)] px-4 py-3">
             <p className="zbx-m text-[13px] leading-snug text-[rgba(255,255,255,0.70)]">
-              <span className="text-[#d4f24e]">prompt&gt;</span> {preset.prompt}
+              <span className="text-[#e8402b]">prompt&gt;</span> {preset.prompt}
             </p>
           </div>
 
@@ -883,7 +883,7 @@ function Playground() {
                 }`}
               >
                 {t === "build" ? "Build log" : "Live preview"}
-                {tab === t && <span className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-[#d4f24e]" />}
+                {tab === t && <span className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-[#e8402b]" />}
               </button>
             ))}
           </div>
@@ -895,7 +895,7 @@ function Playground() {
                 <p className="text-[rgba(255,255,255,0.30)]">$ zoobicon build --stream</p>
                 {preset.log.slice(0, lines).map((l, i) => (
                   <p key={i} className="zbx-drop mt-1.5 text-[rgba(255,255,255,0.75)]">
-                    <span className="text-[#d4f24e]">✓</span> {l}
+                    <span className="text-[#e8402b]">✓</span> {l}
                   </p>
                 ))}
                 {running && lines < preset.log.length && (
@@ -904,7 +904,7 @@ function Playground() {
                   </p>
                 )}
                 {!running && lines === preset.log.length && (
-                  <p className="zbx-drop mt-3 inline-flex items-center gap-2 rounded-lg bg-[#d4f24e]/15 px-3 py-1.5 text-[#d4f24e]">
+                  <p className="zbx-drop mt-3 inline-flex items-center gap-2 rounded-lg bg-[#e8402b]/15 px-3 py-1.5 text-[#e8402b]">
                     <I.check className="h-4 w-4" /> Build complete — deployed to preview
                   </p>
                 )}
@@ -916,7 +916,7 @@ function Playground() {
         </div>
         <p className="zbx-b mt-4 text-center text-[13px] text-[rgba(255,255,255,0.40)]">
           Like what you see?{" "}
-          <a href="/builder" className="zbx-link-underline font-semibold text-[#d4f24e]">
+          <a href="/builder" className="zbx-link-underline font-semibold text-[#e8402b]">
             Build the real thing →
           </a>
         </p>
@@ -1007,7 +1007,7 @@ function Enterprise() {
         <div className="zbx-reveal grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-[rgba(255,255,255,0.10)] bg-[rgba(255,255,255,0.10)] sm:grid-cols-4">
           {STATS.map((s) => (
             <div key={s.l} className="bg-[#08080b] px-6 py-8 text-center">
-              <p className="zbx-d text-[40px] text-[#d4f24e] sm:text-[52px]">{s.v}</p>
+              <p className="zbx-d text-[40px] text-[#e8402b] sm:text-[52px]">{s.v}</p>
               <p className="zbx-b mt-1 text-[13px] text-[rgba(255,255,255,0.55)]">{s.l}</p>
             </div>
           ))}
@@ -1017,7 +1017,7 @@ function Enterprise() {
         <div className="zbx-reveal mt-16 grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-14" style={{ transitionDelay: "60ms" }}>
           <div>
             <span className="zbx-b inline-flex items-center gap-2 rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-wider text-[rgba(255,255,255,0.70)]">
-              <I.shield className="h-3.5 w-3.5 text-[#d4f24e]" /> Infrastructure pledge
+              <I.shield className="h-3.5 w-3.5 text-[#e8402b]" /> Infrastructure pledge
             </span>
             <h2 className="zbx-d mt-5 text-[32px] text-[#fff] sm:text-[42px]">
               Build fast.
@@ -1027,7 +1027,7 @@ function Enterprise() {
             <p className="zbx-b mt-5 max-w-md text-[16px] leading-relaxed text-[rgba(255,255,255,0.60)]">
               Zoobicon runs on managed infrastructure so you never touch a server — but the output is a real codebase you can take with you. No proprietary runtime, no hostage situation.
             </p>
-            <a href="/pricing" className="zbx-b mt-7 inline-flex items-center gap-2 rounded-xl bg-[#d4f24e] px-5 py-3 text-[15px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5">
+            <a href="/pricing" className="zbx-b mt-7 inline-flex items-center gap-2 rounded-xl bg-[#e8402b] px-5 py-3 text-[15px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5">
               See plans & pricing <I.arrow className="h-4 w-4" />
             </a>
           </div>
@@ -1035,7 +1035,7 @@ function Enterprise() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {PLEDGES.map((p) => (
               <div key={p.t} className="zbx-card rounded-2xl border border-[rgba(255,255,255,0.10)] p-5">
-                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[#d4f24e] ring-1 ring-[#fff]/10">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[rgba(255,255,255,0.06)] text-[#e8402b] ring-1 ring-[#fff]/10">
                   <p.icon className="h-5 w-5" />
                 </span>
                 <h3 className="zbx-d-tight mt-4 text-[17px] text-[#fff]">{p.t}</h3>
@@ -1064,12 +1064,12 @@ function FinalCTA() {
             backgroundSize: "48px 48px",
           }}
         />
-        <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[520px] -translate-x-1/2 rounded-full bg-[#d4f24e]/14 blur-[100px]" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[520px] -translate-x-1/2 rounded-full bg-[#e8402b]/14 blur-[100px]" />
         <div className="relative">
           <h2 className="zbx-d mx-auto max-w-2xl text-[36px] text-[#fff] sm:text-[56px]">
             Your next site is one
             <br />
-            <span className="text-[#d4f24e]">sentence</span> away.
+            <span className="text-[#e8402b]">sentence</span> away.
           </h2>
           <p className="zbx-b mx-auto mt-5 max-w-lg text-[17px] text-[rgba(255,255,255,0.60)]">
             Describe what you want. Watch six agents build it. Ship it with a domain — all in the next few minutes.
@@ -1077,7 +1077,7 @@ function FinalCTA() {
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
               href="/builder"
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#d4f24e] px-7 py-3.5 text-[16px] font-bold text-[#161d05] shadow-[0_8px_30px_rgba(212,242,78,0.28)] transition-transform hover:-translate-y-0.5"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8402b] px-7 py-3.5 text-[16px] font-bold text-[#161d05] shadow-[0_8px_30px_rgba(232,64,43,0.28)] transition-transform hover:-translate-y-0.5"
             >
               Start building free
               <I.arrow className="h-[18px] w-[18px] transition-transform group-hover:translate-x-0.5" />
@@ -1148,7 +1148,7 @@ function Footer() {
             </p>
             <a
               href="/builder"
-              className="zbx-b mt-5 inline-flex items-center gap-1.5 rounded-lg bg-[#d4f24e] px-4 py-2 text-[14px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5"
+              className="zbx-b mt-5 inline-flex items-center gap-1.5 rounded-lg bg-[#e8402b] px-4 py-2 text-[14px] font-bold text-[#161d05] transition-transform hover:-translate-y-0.5"
             >
               Start building <I.arrow className="h-4 w-4" />
             </a>
@@ -1160,7 +1160,7 @@ function Footer() {
               <ul className="mt-4 space-y-2.5">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    <a href={l.href} className="zbx-b text-[14px] text-[rgba(255,255,255,0.65)] transition-colors hover:text-[#d4f24e]">
+                    <a href={l.href} className="zbx-b text-[14px] text-[rgba(255,255,255,0.65)] transition-colors hover:text-[#e8402b]">
                       {l.label}
                     </a>
                   </li>

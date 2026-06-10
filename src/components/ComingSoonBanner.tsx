@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
  *    site is not really orgasmic either."
  *
  * Design rules:
- * - Editorial palette (stone / warm #d4f24e accent) to match the reskin
+ * - Editorial palette (stone / warm #e8402b accent) to match the reskin
  * - Dismissible per session, but re-shows on every fresh visit so honesty
  *   isn't a one-time suggestion
  * - Inline waitlist capture so a dismissed banner still converts interest
@@ -105,14 +105,14 @@ export default function ComingSoonBanner() {
       className="relative z-[9998] border-b border-stone-800/60 bg-stone-950 text-stone-100"
     >
       <div className="absolute inset-0 pointer-events-none opacity-[0.18]" style={{
-        background: "radial-gradient(1200px 200px at 20% 0%, rgba(212,242,78,0.35), transparent 70%), radial-gradient(800px 160px at 80% 100%, rgba(212,242,78,0.2), transparent 60%)",
+        background: "radial-gradient(1200px 200px at 20% 0%, rgba(232,64,43,0.35), transparent 70%), radial-gradient(800px 160px at 80% 100%, rgba(232,64,43,0.2), transparent 60%)",
       }} />
       <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-2.5">
         <div className="flex items-start gap-3 sm:items-center">
-          <span className="mt-1 inline-flex h-2 w-2 flex-none rounded-full bg-[#d4f24e] shadow-[0_0_10px_rgba(212,242,78,0.8)] sm:mt-0" aria-hidden />
+          <span className="mt-1 inline-flex h-2 w-2 flex-none rounded-full bg-[#e8402b] shadow-[0_0_10px_rgba(232,64,43,0.8)] sm:mt-0" aria-hidden />
           <p className="text-[13px] leading-snug text-stone-200 sm:text-sm">
             <span
-              className="font-semibold tracking-wide text-[#d4f24e]"
+              className="font-semibold tracking-wide text-[#e8402b]"
               style={{ fontFamily: "Fraunces, ui-serif, Georgia, serif", fontStyle: "italic" }}
             >
               Coming Soon.
@@ -127,7 +127,7 @@ export default function ComingSoonBanner() {
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           {submitted ? (
-            <p className="text-[13px] text-[#d4f24e] sm:text-sm">
+            <p className="text-[13px] text-[#e8402b] sm:text-sm">
               Thanks — you&apos;re on the list.
             </p>
           ) : (
@@ -146,12 +146,12 @@ export default function ComingSoonBanner() {
                 placeholder="you@work.com"
                 autoComplete="email"
                 disabled={submitting}
-                className="h-8 min-w-0 flex-1 rounded-md border border-stone-700 bg-stone-900/80 px-3 text-[13px] text-stone-100 placeholder-stone-500 outline-none transition focus:border-[#d4f24e] focus:ring-1 focus:ring-[#d4f24e]/40 sm:w-56"
+                className="h-8 min-w-0 flex-1 rounded-md border border-stone-700 bg-stone-900/80 px-3 text-[13px] text-stone-100 placeholder-stone-500 outline-none transition focus:border-[#e8402b] focus:ring-1 focus:ring-[#e8402b]/40 sm:w-56"
               />
               <button
                 type="submit"
                 disabled={submitting}
-                className="h-8 flex-none rounded-md bg-[#d4f24e] px-3 text-[12px] font-semibold text-stone-900 transition hover:bg-[#f0dfba] disabled:opacity-60"
+                className="h-8 flex-none rounded-md bg-[#e8402b] px-3 text-[12px] font-semibold text-stone-900 transition hover:bg-[#f0dfba] disabled:opacity-60"
               >
                 {submitting ? "…" : "Notify me"}
               </button>

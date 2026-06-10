@@ -170,7 +170,7 @@ export default function WelcomeModal({ onClose, onBrowseTemplates }: WelcomeModa
             <button
               onClick={handleStartBuilding}
               className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold text-white transition-all"
-              style={{ background: "linear-gradient(135deg, #e4ff6b 0%, #d4f24e 100%)", boxShadow: "0 2px 8px rgba(212,242,78,0.3)", textShadow: "0 1px 1px rgba(80,55,15,0.35)" }}
+              style={{ background: "linear-gradient(135deg, #ef5440 0%, #e8402b 100%)", boxShadow: "0 2px 8px rgba(232,64,43,0.3)", textShadow: "0 1px 1px rgba(80,55,15,0.35)" }}
             >
               Start Building
             </button>

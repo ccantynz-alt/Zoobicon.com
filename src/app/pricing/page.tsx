@@ -188,7 +188,7 @@ export default function PricingPage() {
               className="zb-eyebrow mb-7 justify-center"
               style={{ color: "var(--zb-ink-2)" }}
             >
-              <Star className="h-3.5 w-3.5" style={{ color: "var(--zb-accent-ink)" }} />
+              <Star className="h-3.5 w-3.5" style={{ color: "var(--zb-accent)" }} />
               Simple, transparent pricing
             </motion.div>
 

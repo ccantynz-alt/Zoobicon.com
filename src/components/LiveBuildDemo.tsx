@@ -41,8 +41,8 @@ const SITES: DemoSite[] = [
     tag: "AI analytics",
     headline: "Know your customers before they know themselves.",
     sub: "Real-time behavioural insights, no tracking debt.",
-    accent: "#d4f24e",
-    accentSoft: "rgba(212, 242, 78, 0.12)",
+    accent: "#e8402b",
+    accentSoft: "rgba(232, 64, 43, 0.12)",
     features: [
       { label: "Live cohorts", sub: "Update every 400ms" },
       { label: "Anomaly alerts", sub: "Before you notice" },

@@ -150,19 +150,19 @@ const zoobiconTheme = {
     base: "#0a0a0b",          // body text — near-black
     disabled: "#a8a392",      // disabled / placeholder
     hover: "#0a0a0b",         // hover text
-    accent: "#d4f24e",        // champagne accent
+    accent: "#e8402b",        // champagne accent
     error: "#b91c1c",
     errorSurface: "#fef2f2",
   },
   syntax: {
     plain: "#0a0a0b",
     comment: { color: "#76767e", fontStyle: "italic" as const },
-    keyword: "#a9c43a",
+    keyword: "#c2331f",
     tag: "#0a0a0b",
     punctuation: "#2a2a30",
     definition: "#0a0a0b",
-    property: "#a9c43a",
-    static: "#d4f24e",
+    property: "#c2331f",
+    static: "#e8402b",
     string: "#1a3d2e",
   },
   font: {
@@ -385,18 +385,18 @@ export default function App() {
           width: "40px",
           height: "40px",
           margin: "0 auto 16px",
-          border: "3px solid rgba(212, 242, 78, 0.20)",
-          borderTopColor: "#d4f24e",
+          border: "3px solid rgba(232, 64, 43, 0.20)",
+          borderTopColor: "#e8402b",
           borderRadius: "50%",
           animation: "sp-spin 0.8s linear infinite",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}>
-          <Sparkles size={14} color="#d4f24e" />
+          <Sparkles size={14} color="#e8402b" />
         </div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
-          <Zap size={12} color="#a9c43a" />
+          <Zap size={12} color="#c2331f" />
           <span>Preview ready — describe your site to begin</span>
         </div>
         <div className={dotClass} style={{ fontSize: "11px", marginTop: "8px", opacity: 0.6 }}>
@@ -414,7 +414,7 @@ export default function App() {
   <meta charset="utf-8" />
   <style>
     body { margin: 0; background: #ffffff; color: #2a2a30; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-size: 14px; text-align: center; }
-    .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid rgba(212, 242, 78, 0.20); border-top-color: #d4f24e; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .spinner { width: 40px; height: 40px; margin: 0 auto 16px; border: 3px solid rgba(232, 64, 43, 0.20); border-top-color: #e8402b; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
