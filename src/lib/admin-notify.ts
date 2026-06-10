@@ -1,7 +1,7 @@
 /**
  * Admin Notification Service — Rule 31 (2026-05-17).
  *
- * Routes through Crontech's own email service (services/email-send,
+ * Routes through Vapron's own email service (services/email-send,
  * BLK-030) via src/lib/email-send.ts. Set EMAIL_SEND_TOKEN in Vercel
  * to enable live delivery; falls back to console log when unset.
  *

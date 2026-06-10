@@ -1,28 +1,28 @@
 /**
- * Crontech project hand-off — the primary deploy path for the AI Builder.
+ * Vapron project hand-off — the primary deploy path for the AI Builder.
  *
  * Unlike GitHub sync (which is a developer workflow: branch + PR + review),
- * Crontech sync is a one-shot project drop: the entire generated file
- * tree is POSTed to Crontech's project API with our service PAT, and
- * Crontech provisions hosting + URL + SSL + CDN behind the scenes.
+ * Vapron sync is a one-shot project drop: the entire generated file
+ * tree is POSTed to Vapron's project API with our service PAT, and
+ * Vapron provisions hosting + URL + SSL + CDN behind the scenes.
  *
  *   user clicks "Deploy"
  *   → Zoobicon serializes { files, deps, meta } to JSON
  *   → POST https://api.crontech.ai/api/v1/projects   (Bearer <CRONTECH_PAT>)
- *   → Crontech returns { projectId, url, status }
+ *   → Vapron returns { projectId, url, status }
  *   → Zoobicon shows the live URL in the builder UI
  *
- * STATUS: mocked against the contract below. When Crontech ships the
+ * STATUS: mocked against the contract below. When Vapron ships the
  * real endpoint, swap the URL in CRONTECH_API_BASE and verify the
  * response shape matches.
  *
- * CONTRACT WE NEED FROM CRONTECH (hand to the Crontech team):
+ * CONTRACT WE NEED FROM CRONTECH (hand to the Vapron team):
  *
  *   POST {CRONTECH_API_BASE}/api/v1/projects
  *   Headers:
  *     Authorization: Bearer <PAT>
  *     Content-Type: application/json
- *     X-Crontech-Source: zoobicon-builder
+ *     X-Vapron-Source: zoobicon-builder
  *   Body:
  *     {
  *       "name": "string",                  // project slug, /^[a-z0-9-]{1,40}$/
@@ -30,7 +30,7 @@
  *       "deps":  { "<package>": "<version>" },
  *       "meta": {
  *         "source": "zoobicon-ai-builder",
- *         "createdBy": "<email>",           // Crontech SSO subject if known
+ *         "createdBy": "<email>",           // Vapron SSO subject if known
  *         "prompt": "<string>",
  *         "template": "<string|null>",
  *         "visibility": "public" | "admin_private"
@@ -45,7 +45,7 @@
  *   Errors:
  *     401  invalid PAT
  *     409  slug taken (Zoobicon retries with a suffix)
- *     413  payload too large (Crontech caps at TBD MB)
+ *     413  payload too large (Vapron caps at TBD MB)
  *     5xx  upstream — Zoobicon surfaces "deploy failed, try again"
  *
  *   GET {CRONTECH_API_BASE}/api/v1/projects/{projectId}
@@ -65,19 +65,19 @@ export interface CrontechSyncInput {
     prompt?: string;
     template?: string | null;
     visibility?: "public" | "admin_private";
-    /** Project structure hint for Crontech's build pipeline:
+    /** Project structure hint for Vapron's build pipeline:
      *   "vite-spa"        single-page Vite app (Full-Site Mode output)
      *   "sandpack-react"  Sandpack-style React project (single-page mode)
      *   "static"          plain index.html + assets (legacy HTML mode)
-     *  If omitted Crontech auto-detects from package.json scripts. */
+     *  If omitted Vapron auto-detects from package.json scripts. */
     framework?: "vite-spa" | "sandpack-react" | "static";
-    /** Hint that this is a multi-page React SPA — Crontech will rewrite
+    /** Hint that this is a multi-page React SPA — Vapron will rewrite
      *  unknown routes to / so HashRouter (or BrowserRouter) handles
      *  client-side navigation without 404s. */
     isMultiPage?: boolean;
-    /** Suggested build command. Crontech defaults to npm run build. */
+    /** Suggested build command. Vapron defaults to npm run build. */
     buildCommand?: string;
-    /** Directory to serve after build. Crontech defaults to dist/ or build/. */
+    /** Directory to serve after build. Vapron defaults to dist/ or build/. */
     outputDir?: string;
   };
 }
@@ -100,7 +100,7 @@ export function crontechAvailable(): boolean {
 }
 
 /**
- * Normalise a project name into the slug shape Crontech expects.
+ * Normalise a project name into the slug shape Vapron expects.
  * Conservative: lowercase, alphanumerics + hyphen, 40 chars max.
  */
 export function toCrontechSlug(name: string): string {
@@ -136,10 +136,10 @@ function detectFrameworkHints(input: CrontechSyncInput): Partial<NonNullable<Cro
 }
 
 /**
- * Push a built project to Crontech. Mocked until CRONTECH_PAT is set —
+ * Push a built project to Vapron. Mocked until CRONTECH_PAT is set —
  * returns a fake live URL so the UI/end-to-end test still works locally.
  */
-export async function pushToCrontech(input: CrontechSyncInput): Promise<CrontechSyncResult> {
+export async function pushToVapron(input: CrontechSyncInput): Promise<CrontechSyncResult> {
   const slug = toCrontechSlug(input.name);
   // Merge auto-detected framework hints with any caller-provided ones.
   // Caller takes precedence — Full-Site Mode can set isMultiPage=true
@@ -163,7 +163,7 @@ export async function pushToCrontech(input: CrontechSyncInput): Promise<Crontech
       headers: {
         Authorization: `Bearer ${CRONTECH_PAT}`,
         "Content-Type": "application/json",
-        "X-Crontech-Source": "zoobicon-builder",
+        "X-Vapron-Source": "zoobicon-builder",
       },
       body: JSON.stringify({
         name: slug,
@@ -174,7 +174,7 @@ export async function pushToCrontech(input: CrontechSyncInput): Promise<Crontech
           ...mergedMeta,
         },
       }),
-      // 30s budget — Crontech provisioning can take a moment on cold tenants
+      // 30s budget — Vapron provisioning can take a moment on cold tenants
       signal: AbortSignal.timeout(30_000),
     });
 
@@ -182,7 +182,7 @@ export async function pushToCrontech(input: CrontechSyncInput): Promise<Crontech
       const text = await res.text().catch(() => "");
       return {
         ok: false,
-        error: `Crontech ${res.status}: ${text.slice(0, 200) || res.statusText}`,
+        error: `Vapron ${res.status}: ${text.slice(0, 200) || res.statusText}`,
       };
     }
 
@@ -191,18 +191,18 @@ export async function pushToCrontech(input: CrontechSyncInput): Promise<Crontech
   } catch (err) {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : "Crontech sync failed",
+      error: err instanceof Error ? err.message : "Vapron sync failed",
     };
   }
 }
 
 /**
- * Push an updated file tree to an existing Crontech project.
+ * Push an updated file tree to an existing Vapron project.
  * Called by the builder when the user edits a site that was previously
  * deployed — avoids creating a new projectId on every save.
  * Mock-safe: returns ok:true immediately when CRONTECH_PAT is unset.
  */
-export async function patchCrontech(
+export async function patchVapron(
   projectId: string,
   input: Pick<CrontechSyncInput, "files" | "deps">,
 ): Promise<CrontechSyncResult> {
@@ -215,25 +215,25 @@ export async function patchCrontech(
       headers: {
         Authorization: `Bearer ${CRONTECH_PAT}`,
         "Content-Type": "application/json",
-        "X-Crontech-Source": "zoobicon-builder",
+        "X-Vapron-Source": "zoobicon-builder",
       },
       body: JSON.stringify({ files: input.files, deps: input.deps || {} }),
       signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) {
       const text = await res.text().catch(() => "");
-      return { ok: false, error: `Crontech ${res.status}: ${text.slice(0, 200) || res.statusText}` };
+      return { ok: false, error: `Vapron ${res.status}: ${text.slice(0, 200) || res.statusText}` };
     }
     const data = (await res.json()) as { projectId: string; url: string; status: "provisioning" | "live" };
     return { ok: true, projectId: data.projectId, url: data.url, status: data.status };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : "Crontech patch failed" };
+    return { ok: false, error: err instanceof Error ? err.message : "Vapron patch failed" };
   }
 }
 
 /**
- * Poll a Crontech project's status. Used after the initial POST when
- * Crontech returns `status: "provisioning"` — the UI shows a spinner
+ * Poll a Vapron project's status. Used after the initial POST when
+ * Vapron returns `status: "provisioning"` — the UI shows a spinner
  * and re-checks every few seconds until status flips to `"live"`.
  */
 export async function getCrontechStatus(projectId: string): Promise<CrontechSyncResult> {
@@ -245,7 +245,7 @@ export async function getCrontechStatus(projectId: string): Promise<CrontechSync
       headers: { Authorization: `Bearer ${CRONTECH_PAT}` },
       signal: AbortSignal.timeout(10_000),
     });
-    if (!res.ok) return { ok: false, error: `Crontech ${res.status}` };
+    if (!res.ok) return { ok: false, error: `Vapron ${res.status}` };
     const data = (await res.json()) as { projectId: string; url: string; status: "provisioning" | "live" };
     return { ok: true, ...data };
   } catch (err) {

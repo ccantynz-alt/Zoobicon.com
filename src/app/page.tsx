@@ -19,16 +19,17 @@ const fadeUp = {
 };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
-// ── Red brand strip (verifiable, never inflated) ──
+// ── Red brand strip — OUR product promises only. Craig (2026-06-10):
+// never name other platforms/vendors in the brand band. ──
 const TRUST_ITEMS = [
-  { label: "Claude Opus 4.7", sub: "Latest model" },
-  { label: "Next.js 14", sub: "App Router" },
-  { label: "Vercel Edge", sub: "iad1 region" },
-  { label: "Stripe", sub: "Live Connect" },
-  { label: "Neon", sub: "Postgres 16" },
-  { label: "Cloudflare", sub: "5 domains" },
-  { label: "Crontech", sub: "Hosting + domains" },
-  { label: "121 Components", sub: "Registry" },
+  { label: "60-second builds", sub: "describe → live" },
+  { label: "Domain included", sub: "in the same flow" },
+  { label: "Hosting included", sub: "nothing to configure" },
+  { label: "121 sections", sub: "hand-built registry" },
+  { label: "Edit by chat", sub: "one section in seconds" },
+  { label: "SEO built in", sub: "meta · schema · sitemap" },
+  { label: "Own your code", sub: "export any time" },
+  { label: "Cancel anytime", sub: "14-day free trial" },
 ];
 
 // ── Stat ticker (honest numbers) ──

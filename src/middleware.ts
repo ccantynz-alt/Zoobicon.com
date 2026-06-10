@@ -14,7 +14,7 @@ import { getRateLimitConfig } from "@/lib/rateLimitConfig";
  * @upstash/redis uses fetch (REST) — safe on Vercel edge runtime.
  */
 
-// Rule 31 — zoobicon.sh removed (hosting delegated to Crontech).
+// Rule 31 — zoobicon.sh removed (hosting delegated to Vapron).
 const ALLOWED_ORIGINS = new Set([
   "https://zoobicon.com",
   "https://zoobicon.ai",

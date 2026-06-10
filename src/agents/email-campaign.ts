@@ -91,8 +91,8 @@ class EmailCampaignAgent extends BaseAgent<CampaignTaskInput, CampaignTaskOutput
 
     if (input.type === "scheduled_campaign" && input.campaignId) {
       try {
-        // Rule 31 — campaign send delegated to Crontech BLK-030. Stub
-        // result keeps the agent flow alive until Crontech is wired.
+        // Rule 31 — campaign send delegated to Vapron BLK-030. Stub
+        // result keeps the agent flow alive until Vapron is wired.
         const result = {
           campaignId: input.campaignId,
           sent: 0,

@@ -3,7 +3,7 @@
  *
  * Supports multiple brands from a single codebase:
  * - zoobicon.com / zoobicon.ai / zoobicon.io — Primary brand
- *   (zoobicon.sh retired 2026-05-17 — hosting delegated to Crontech)
+ *   (zoobicon.sh retired 2026-05-17 — hosting delegated to Vapron)
  * - dominat8.io / dominat8.com — Secondary income stream brand
  *
  * Usage:

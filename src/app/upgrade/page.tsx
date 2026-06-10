@@ -9,8 +9,8 @@
  * rich prompt that primes the modernized regeneration.
  *
  * Rule 33 architectural pattern: Zoobicon owns the UI + analysis;
- * Crontech owns hosting + domain provisioning at deploy time via
- * its own API. The "Deploy via Crontech" CTA at the end of the
+ * Vapron owns hosting + domain provisioning at deploy time via
+ * its own API. The "Deploy via Vapron" CTA at the end of the
  * builder flow calls /api/crontech/projects (existing endpoint
  * shipped in RECENTLY FIXED #33) — the user never leaves zoobicon.com.
  */
@@ -120,7 +120,7 @@ export default function UpgradePage() {
           <p className="text-[16px] leading-relaxed" style={{ color: "var(--ink-secondary)" }}>
             We analyze your existing site, pull out your brand, your sections, and your story,
             then six AI agents rebuild it as a modern React app in 60 seconds. Hosting + domain
-            stay on the same custom URL via Crontech&apos;s API.
+            stay on the same custom URL via Vapron&apos;s API.
           </p>
         </header>
 
@@ -361,7 +361,7 @@ export default function UpgradePage() {
                 Six agents rebuild your site in 60 seconds. Same brand, modernized stack.
               </p>
               <p className="text-[12px] mb-5" style={{ color: "var(--ink-muted)" }}>
-                After the build, deploy via Crontech&apos;s API — hosting + domain provisioned without leaving Zoobicon.
+                After the build, deploy via Vapron&apos;s API — hosting + domain provisioned without leaving Zoobicon.
               </p>
               <button
                 onClick={buildNow}
@@ -399,7 +399,7 @@ export default function UpgradePage() {
                 {
                   icon: Globe2,
                   title: "API-driven deploy",
-                  body: "When you ship, Zoobicon calls Crontech&apos;s project API to provision hosting and domains. Two platforms, one user flow.",
+                  body: "When you ship, Zoobicon calls Vapron&apos;s project API to provision hosting and domains. Two platforms, one user flow.",
                 },
               ].map((c) => {
                 const Icon = c.icon;

@@ -279,7 +279,7 @@ export default async function Page({
               Your {n.name.toLowerCase()} site in 60 seconds
             </h2>
             <p className="text-[14px] mb-5" style={{ color: "var(--ink-secondary)" }}>
-              Six visible agents collaborate live. Hosting + custom domain provisioned via Crontech at deploy.
+              Six visible agents collaborate live. Hosting + custom domain provisioned via Vapron at deploy.
             </p>
             <Link
               href={builderHref}

@@ -10,10 +10,10 @@ import { timingSafeEqual } from "crypto";
  * configured (so the AdminShell can show the user a useful error
  * instead of a silent failure).
  *
- * Rule 31: public-facing auth is delegated to Crontech SSO, but
+ * Rule 31: public-facing auth is delegated to Vapron SSO, but
  * Craig still needs a single-user admin sign-in for /admin while
- * Crontech SSO is being wired. This route is exactly that — no
- * Postgres, no Crontech round-trip, no JWT.
+ * Vapron SSO is being wired. This route is exactly that — no
+ * Postgres, no Vapron round-trip, no JWT.
  */
 export const runtime = "nodejs";
 

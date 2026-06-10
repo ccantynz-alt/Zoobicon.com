@@ -79,9 +79,9 @@ function buildPackageJson(brandName: string): string {
       private: true,
       type: "module",
       scripts: {
-        // Crontech's build pipeline runs `npm install && npm run build`
+        // Vapron's build pipeline runs `npm install && npm run build`
         // by default. Vite outputs a static SPA into ./dist that
-        // Crontech can serve directly — no SSR config needed.
+        // Vapron can serve directly — no SSR config needed.
         dev: "vite",
         build: "vite build",
         preview: "vite preview",
@@ -165,9 +165,9 @@ function buildIndexHtml(brandName: string): string {
 
 /**
  * Client-side session module. Emitted into the generated site whenever
- * the plan flags backend.needsAuth=true. Wraps Crontech's session API
+ * the plan flags backend.needsAuth=true. Wraps Vapron's session API
  * (POST /api/auth/login, /api/auth/logout, /api/auth/me) which is the
- * standard contract Crontech's hosting layer provides. Pages import:
+ * standard contract Vapron's hosting layer provides. Pages import:
  *
  *   import { useSession, signIn, signOut } from "./lib/session";
  *
@@ -528,7 +528,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         // Auth provider — when the plan flagged needsAuth, wrap the
         // router with a real session provider so login/signup pages
         // actually authenticate. We emit a small client module that
-        // talks to Crontech's session endpoint via fetch (no SDK
+        // talks to Vapron's session endpoint via fetch (no SDK
         // dependency). Pages can import { useSession, signIn, signOut }
         // from "./lib/session".
         // wrapWithAuth is hoisted to the top of the route so the shared
@@ -545,7 +545,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         });
 
         const finalFiles: Record<string, string> = {
-          // Build pipeline scaffolding so Crontech can run
+          // Build pipeline scaffolding so Vapron can run
           // `npm install && npm run build` and serve ./dist.
           "package.json": buildPackageJson(plan.brand.name),
           "vite.config.ts": buildViteConfig(),

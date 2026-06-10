@@ -2,7 +2,7 @@
  * POST /api/crontech/deploy
  *
  * The Deploy button in the AI Builder calls this. Loads the project
- * from the projects table, then hands the file tree off to Crontech
+ * from the projects table, then hands the file tree off to Vapron
  * via src/lib/crontech-sync.ts.
  *
  * Body: { projectId: string }
@@ -15,7 +15,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { authenticateRequest } from "@/lib/auth-guard";
-import { pushToCrontech, crontechAvailable } from "@/lib/crontech-sync";
+import { pushToVapron, crontechAvailable } from "@/lib/crontech-sync";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
   const { user } = await authenticateRequest(req);
 
-  let pushPayload: Parameters<typeof pushToCrontech>[0];
+  let pushPayload: Parameters<typeof pushToVapron>[0];
 
   if (body.projectId) {
     // DB-backed path — load + visibility/ownership check.
@@ -92,11 +92,11 @@ export async function POST(req: NextRequest) {
     };
   }
 
-  const result = await pushToCrontech(pushPayload);
+  const result = await pushToVapron(pushPayload);
 
   if (!result.ok) {
     return NextResponse.json(
-      { error: result.error || "Crontech deploy failed", available: crontechAvailable() },
+      { error: result.error || "Vapron deploy failed", available: crontechAvailable() },
       { status: 502 },
     );
   }

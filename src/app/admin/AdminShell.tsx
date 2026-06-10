@@ -20,10 +20,10 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
-// Rule 31 — post-Crontech pivot admin only covers what Zoobicon still owns:
+// Rule 31 — post-Vapron pivot admin only covers what Zoobicon still owns:
 // builder/video/domains/intel. Hosting, email, mailboxes, support tickets,
-// usage analytics, eSIM, booking — all delegated to Crontech, sidebar items
-// removed. Crontech admin panel covers those domains.
+// usage analytics, eSIM, booking — all delegated to Vapron, sidebar items
+// removed. Vapron admin panel covers those domains.
 const SIDEBAR_SECTIONS = [
   {
     label: "OVERVIEW",

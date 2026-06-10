@@ -97,7 +97,7 @@ export default function FigmaImportPage() {
           <p className="text-[16px] leading-relaxed" style={{ color: "var(--ink-secondary)" }}>
             Paste your Figma file URL. We read the top-level frames via the
             Figma REST API, map each to a corresponding React section, and the
-            six-agent pipeline builds it. Hosting + custom domain via Crontech
+            six-agent pipeline builds it. Hosting + custom domain via Vapron
             at deploy.
           </p>
         </header>

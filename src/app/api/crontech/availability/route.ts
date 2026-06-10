@@ -2,7 +2,7 @@
  * GET /api/crontech/availability
  *
  * Lightweight check the builder client calls on mount to decide whether
- * to show Crontech as an enabled deploy target.
+ * to show Vapron as an enabled deploy target.
  *
  * Returns { available: boolean, base: string }.
  * Uses Edge runtime — no cold-start delay.

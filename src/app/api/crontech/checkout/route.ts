@@ -1,23 +1,23 @@
 /**
  * /api/crontech/checkout — start a Stripe checkout session for a
- * Crontech add-on.
+ * Vapron add-on.
  *
  * Architecture (Rule 34):
  *   Customer clicks "Add to my plan" in /marketplace
  *   → POST /api/crontech/checkout { addOnId, projectId?, email? }
  *   → Zoobicon looks up the add-on price from the catalog
  *   → Stripe checkout session created with metadata identifying
- *     the add-on + (if available) the connected Crontech project
+ *     the add-on + (if available) the connected Vapron project
  *   → On payment success, Stripe webhook fires
- *     → Zoobicon's webhook handler calls Crontech's provisioning API
+ *     → Zoobicon's webhook handler calls Vapron's provisioning API
  *       with the add-on id + the customer's project + the proof of
  *       payment.
  *
- * The customer never sees Crontech. They see Zoobicon → Stripe →
+ * The customer never sees Vapron. They see Zoobicon → Stripe →
  * back to Zoobicon. The add-on appears in their dashboard.
  *
  * IMPORTANT: prices in the stub catalog are PROVISIONAL placeholders.
- * Once Crontech ships final pricing, the catalog endpoint returns
+ * Once Vapron ships final pricing, the catalog endpoint returns
  * real numbers and this checkout uses them transparently — no code
  * change needed.
  */
@@ -30,7 +30,7 @@ export const dynamic = "force-dynamic";
 
 interface CheckoutBody {
   addOnId?: string;
-  /** The connected Crontech project this add-on attaches to */
+  /** The connected Vapron project this add-on attaches to */
   projectId?: string;
   /** Customer email for the Stripe session */
   email?: string;
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
 
   try {
     // We use price_data here (not a pre-created Stripe Price object)
-    // because the add-on catalog is dynamic — Crontech can ship a new
+    // because the add-on catalog is dynamic — Vapron can ship a new
     // add-on at any time and the marketplace needs to charge for it
     // without us pre-creating a Stripe Price for every possibility.
     const session = await stripe.checkout.sessions.create({
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `${addOn.name} (via Crontech)`,
+              name: `${addOn.name} (via Vapron)`,
               description: addOn.tagline,
               metadata: {
                 addOnId: addOn.id,
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
         },
       ],
       // Metadata on the session itself — the Stripe webhook reads
-      // these to know which Crontech add-on to provision on payment
+      // these to know which Vapron add-on to provision on payment
       // success.
       metadata: {
         kind: "crontech_addon",

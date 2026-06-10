@@ -50,7 +50,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: "connect_domain",
     name: "Connect a domain",
-    description: "Provision a custom domain through the Crontech marketplace.",
+    description: "Provision a custom domain through the Vapron marketplace.",
     order: 5,
     ctaLabel: "Open marketplace",
     ctaHref: "/marketplace",

@@ -169,7 +169,7 @@ class SupportResponderAgent extends BaseAgent<SupportTicketInput, SupportRespons
       // Auto-send if conditions met
       if (canAutoSend) {
         try {
-          // Rule 31 — support reply send delegated to Crontech BLK-030.
+          // Rule 31 — support reply send delegated to Vapron BLK-030.
           // Until wired, auto-send is a no-op so the draft just sits on the
           // ticket for a human to send.
           const result = { success: false as const, reason: "crontech-stub" };

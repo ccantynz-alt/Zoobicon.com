@@ -13,7 +13,7 @@ interface AgencyBrand {
   logoUrl?: string;
 }
 
-// Rule 31 — useEmailNotifications removed (email + inbox delegated to Crontech).
+// Rule 31 — useEmailNotifications removed (email + inbox delegated to Vapron).
 
 export default function TopBar() {
   const [isAdmin, setIsAdmin] = useState(false);

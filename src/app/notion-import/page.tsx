@@ -96,7 +96,7 @@ export default function NotionImportPage() {
           <p className="text-[16px] leading-relaxed" style={{ color: "var(--ink-secondary)" }}>
             Paste your Notion page URL. We read your headings and body copy via
             the Notion API; the six-agent pipeline turns them into a React site
-            with proper section structure. Hosting + custom domain via Crontech
+            with proper section structure. Hosting + custom domain via Vapron
             at deploy.
           </p>
         </header>

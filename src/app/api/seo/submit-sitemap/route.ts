@@ -10,7 +10,7 @@
  * Triggers:
  *   - Manual: GET this endpoint from the admin dashboard
  *   - Cron:   GET with ?secret=$CRON_SECRET on a daily schedule via
- *             Crontech (or any external scheduler)
+ *             Vapron (or any external scheduler)
  *   - Webhook: future — fire after every Vercel deploy
  *
  * Returns { ok, submitted, endpoints[] } so the admin can see exactly

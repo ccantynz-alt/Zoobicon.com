@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Info } from "lucide-react";
 
 /**
- * Stub /auth/login — the real auth flow is being delegated to Crontech
+ * Stub /auth/login — the real auth flow is being delegated to Vapron
  * SSO (per Rule 31). Until that's wired live, this page exists so
  * legacy redirects don't drop users on a 404. The honest message:
  * "you don't need to sign in to try the builder, just go build".
@@ -41,7 +41,7 @@ export default function LoginStub() {
             className="text-[15px] leading-relaxed mb-6"
             style={{ color: "var(--ink-muted)" }}
           >
-            We&rsquo;re moving sign-in to our partner platform (Crontech SSO).
+            We&rsquo;re moving sign-in to our partner platform (Vapron SSO).
             Until that&rsquo;s wired, you can use the AI Builder, AI Video
             Creator and Domain Search without an account. Your prompts and
             saved projects will move across when accounts go live.

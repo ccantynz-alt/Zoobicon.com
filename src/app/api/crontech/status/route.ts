@@ -1,7 +1,7 @@
 /**
  * GET /api/crontech/status?projectId=ctp_abc123
  *
- * Polls Crontech for the deploy status of a project. The builder calls
+ * Polls Vapron for the deploy status of a project. The builder calls
  * this every 3 seconds after a deploy that returns status "provisioning",
  * stopping once status flips to "live" or "failed".
  *

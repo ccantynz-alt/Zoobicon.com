@@ -690,7 +690,7 @@ export async function setPainkillerStatus(id: string, status: string): Promise<v
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 5. EMAIL — send the daily digest via Crontech email service
+// 5. EMAIL — send the daily digest via Vapron email service
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Tiny purpose-built markdown → HTML for the constrained digest format
@@ -821,7 +821,7 @@ export async function sendDigestEmail(opts?: {
     subject,
     html,
     text: digest.summary_md,
-    // Idempotency key — Crontech deduplicates within 24h, so even if
+    // Idempotency key — Vapron deduplicates within 24h, so even if
     // the cron runs twice the same morning, only one email lands.
     messageId: `hn-digest-${digest.digest_date}-${to}`,
   });
