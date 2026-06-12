@@ -409,9 +409,10 @@ function BuilderInner() {
       >
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2.5" style={{ textDecoration: "none", color: "var(--zb-ink)" }}>
+            {/* Craig 2026-06-12: red Z on an off-white tile (was white Z on red) */}
             <span
-              className="zb-display flex h-8 w-8 items-center justify-center rounded-lg text-[17px]"
-              style={{ background: "var(--zb-accent)", color: "#ffffff" }}
+              className="zb-display flex h-8 w-8 items-center justify-center rounded-lg text-[19px]"
+              style={{ background: "var(--zb-bg)", border: "1px solid var(--zb-line)", color: "var(--zb-accent)" }}
             >
               Z
             </span>

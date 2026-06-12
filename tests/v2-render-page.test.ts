@@ -15,6 +15,8 @@ import {
   compileComponentToModule,
   applyBrandTokens,
   normalizePageLinks,
+  swapImagesForIndustry,
+  activateCtas,
 } from "../src/lib/v2/render-page";
 // Populate the 118-component registry (ensureRegistryLoaded uses CommonJS
 // require which doesn't run under vitest's ESM transform).
@@ -199,5 +201,39 @@ describe("v2 normalizePageLinks (footer/nav link repair)", () => {
     });
     expect(page.html).toMatch(/<section id="(features|pricing|faq|cta|footer|testimonials|stats|navbar|hero)"/);
     expect(page.html).not.toMatch(/href="\/(?!\/)/); // no internal route links survive
+  });
+});
+
+describe("v2 source transforms (industry images + live CTAs)", () => {
+  it("swaps unsplash photo ids for industry-pool ids, keeps params + avatars", () => {
+    const code =
+      '<img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop" />' +
+      '<img src="https://randomuser.me/api/portraits/women/33.jpg" />';
+    const out = swapImagesForIndustry(code, "restaurant", 0);
+    expect(out).not.toContain("photo-1551288049"); // analytics dashboard gone
+    expect(out).toContain("?w=800&h=600&fit=crop"); // size params preserved
+    expect(out).toContain("randomuser.me/api/portraits/women/33.jpg"); // avatar untouched
+    expect(out).toMatch(/images\.unsplash\.com\/photo-[a-zA-Z0-9_-]+\?w=800/);
+    // deterministic
+    expect(swapImagesForIndustry(code, "restaurant", 0)).toBe(out);
+  });
+
+  it("turns dead CTA buttons into anchors, leaves live + submit buttons alone", () => {
+    const present = new Set(["features", "contact", "pricing"]);
+    const code =
+      '<button className="px-8">Order Online Now</button>' +
+      '<button className="x">See What\'s Baking</button>' +
+      '<button onClick={() => setOpen(!open)}>Order toggle</button>' +
+      '<button type="submit">Send Message</button>';
+    const out = activateCtas(code, present);
+    expect(out).toContain('<a href="#contact" className="px-8">Order Online Now</a>');
+    expect(out).toContain('<a href="#features" className="x">See What\'s Baking</a>');
+    expect(out).toContain("<button onClick={() => setOpen(!open)}>Order toggle</button>");
+    expect(out).toContain('<button type="submit">Send Message</button>');
+  });
+
+  it("leaves buttons alone when no matching section exists on the page", () => {
+    const out = activateCtas('<button className="x">View pricing</button>', new Set(["hero", "footer"]));
+    expect(out).toContain("<button");
   });
 });

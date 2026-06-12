@@ -597,6 +597,22 @@ const DEFAULT_PHOTOS = [
   "photo-1498050108023-c5249f4df085",
 ];
 
+// Bridge from the V2 builder's industry names (lib/v2/render-page detectIndustry)
+// to the curated pools above. Exported for the V2 image-swap pass.
+const V2_INDUSTRY_BRIDGE: Record<string, string> = {
+  restaurant: "restaurant",
+  saas: "saas",
+  ecommerce: "ecommerce",
+  fitness: "fitness",
+  professional: "legal",
+  agency: "saas",
+};
+
+export function industryPhotoPool(v2Industry: string): string[] {
+  const key = V2_INDUSTRY_BRIDGE[v2Industry] || v2Industry;
+  return INDUSTRY_PHOTOS[key] || DEFAULT_PHOTOS;
+}
+
 /**
  * Replace all picsum.photos URLs in generated HTML with curated Unsplash photos.
  * This is the safety net — no matter what the AI outputs, images will be relevant.

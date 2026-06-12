@@ -37,6 +37,8 @@ import {
   sectionWrap,
   applyBrandTokens,
   normalizePageLinks,
+  swapImagesForIndustry,
+  activateCtas,
 } from "@/lib/v2/render-page";
 import { selectComponentsForPrompt } from "@/lib/component-registry";
 
@@ -69,8 +71,14 @@ export async function POST(req: NextRequest): Promise<Response> {
   const doAi = !body.useExampleFill && hasKey;
 
   // Registry component code omits `import React`; the render pipeline prepends
-  // it so each component renders in isolation.
-  const baseCodeFor = (code: string) => `import React from "react";\n\n${code}\n`;
+  // it so each component renders in isolation. Source-level transforms run
+  // here so static render, live hydration, export, and edits all agree:
+  // industry-appropriate imagery + dead CTA buttons become working anchors.
+  const baseCodeFor = (code: string, index: number) =>
+    activateCtas(
+      swapImagesForIndustry(`import React from "react";\n\n${code}\n`, industry, index),
+      presentCategories,
+    );
 
   const encoder = new TextEncoder();
   // Best HTML per index — base render first, overwritten by AI render if it
@@ -131,7 +139,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         // ── Phase 1: instant base render, streamed as each completes ──
         await Promise.all(
           components.map(async (c, index) => {
-            const base = baseCodeFor(c.code);
+            const base = baseCodeFor(c.code, index);
             try {
               const html = normalizePageLinks(
                 applyBrandTokens(await renderComponentToHtml(base), brandName),
@@ -164,7 +172,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           await Promise.all(
             components.map(async (c, index) => {
               try {
-                const base = baseCodeFor(c.code);
+                const base = baseCodeFor(c.code, index);
                 const rewritten = await aiRewriteCopy(base, prompt, brandName, c.category);
                 if (!rewritten) return;
                 const html = normalizePageLinks(

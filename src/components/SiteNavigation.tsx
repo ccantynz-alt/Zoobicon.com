@@ -60,8 +60,8 @@ const TOP_NAV_LINKS = [
  *
  * A confident near-black bar (the Klaviyo stratum) that reads as one
  * defined band over both the dark hero and the bright content sections.
- * White links, ONE lime CTA. Lime square logo mark with an ink Z —
- * no serif, no gold, no glass gradients.
+ * White links, ONE accent CTA. Off-white square logo mark with a red Z
+ * (Craig 2026-06-12) — no serif, no gold, no glass gradients.
  */
 export default function SiteNavigation() {
   const [megaOpen, setMegaOpen] = useState(false);
@@ -138,13 +138,14 @@ export default function SiteNavigation() {
         <div className="flex items-center justify-between h-[72px]">
           {/* Logo — lime square mark, bold Jakarta wordmark */}
           <Link href="/" className="group flex items-center gap-2.5 flex-shrink-0">
+            {/* Craig 2026-06-12: red Z on an off-white tile (was white Z on red) */}
             <div
               className="flex h-9 w-9 items-center justify-center rounded-[10px] transition-transform duration-300 group-hover:scale-[1.06] group-hover:-rotate-3"
-              style={{ background: "var(--zb-accent)" }}
+              style={{ background: "var(--zb-bg)" }}
             >
               <span
-                className="zb-display text-[19px] leading-none"
-                style={{ color: "var(--zb-accent-ink)", marginTop: "-1px" }}
+                className="zb-display text-[21px] leading-none"
+                style={{ color: "var(--zb-accent)", marginTop: "-1px" }}
               >
                 Z
               </span>
