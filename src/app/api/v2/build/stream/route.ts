@@ -127,8 +127,13 @@ export async function POST(req: NextRequest): Promise<Response> {
                 code: base,
                 category: c.category,
               });
-            } catch {
-              /* a single failed base section never blanks the page */
+            } catch (err) {
+              // A single failed base section never blanks the page — but the
+              // reason must be observable, or quality gaps stay invisible.
+              console.warn(
+                `[v2/build/stream] base section failed: ${c.id}:`,
+                err instanceof Error ? err.message : err,
+              );
             }
           }),
         );
@@ -153,8 +158,12 @@ export async function POST(req: NextRequest): Promise<Response> {
                   code: rewritten,
                   category: c.category,
                 });
-              } catch {
-                /* keep the polished base section — never regress */
+              } catch (err) {
+                // Keep the polished base section — never regress.
+                console.warn(
+                  `[v2/build/stream] AI tailor failed: ${c.id}:`,
+                  err instanceof Error ? err.message : err,
+                );
               }
             }),
           );
