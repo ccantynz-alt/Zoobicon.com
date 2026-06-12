@@ -543,8 +543,24 @@ export function pageShell(
     if (d.type === 'zb-section'){
       place(document.getElementById('zb-root'), d.index, d.html);
       if (d.js) hydrate(d.index, d.js);
+    } else if (d.type === 'zb-edit-mode'){
+      // Point-and-edit: parent toggles pick mode; we highlight sections on
+      // hover and report the clicked one instead of activating it.
+      ZB.pick = !!d.on;
+      document.documentElement.classList.toggle('zb-pick', ZB.pick);
     }
   });
+  document.addEventListener('click', function(e){
+    if (!ZB.pick) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var t = e.target;
+    var sec = t && t.closest ? t.closest('[data-zb-i]') : null;
+    if (sec){
+      var idx = parseInt(sec.getAttribute('data-zb-i'), 10);
+      try { parent.postMessage({ type: 'zb-section-pick', index: idx }, '*'); } catch(_){}
+    }
+  }, true);
   function ready(){ try { parent.postMessage({type:'zb-ready'}, '*'); } catch(_){} }
   if (document.readyState !== 'loading') ready();
   else document.addEventListener('DOMContentLoaded', ready);
@@ -576,6 +592,9 @@ export function pageShell(
       -webkit-font-smoothing:antialiased;}
     *{box-sizing:border-box;}
     ${headingRule}
+    /* Point-and-edit pick mode (inert unless the parent toggles .zb-pick). */
+    .zb-pick [data-zb-i]{cursor:crosshair;}
+    .zb-pick [data-zb-i]:hover{outline:3px solid #e8402b;outline-offset:-3px;}
   </style>
 </head>
 <body>

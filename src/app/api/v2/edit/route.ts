@@ -1,12 +1,14 @@
 /**
  * POST /api/v2/edit — apply one conversational edit to a built V2 page.
  *
- * Body: { instruction, sections: [{ index, category, code }] }
+ * Body: { instruction, sections: [{ index, category, code }], targetIndex? }
  *   - instruction: e.g. "make the hero darker", "change the headline to X",
  *     "add a second button to the CTA"
  *   - sections: the page's current sections (the client holds the live code
  *     from the build stream and sends it back, so edits stack on the real
  *     current version, not a re-derivation).
+ *   - targetIndex: optional — set when the user clicked a section in the
+ *     preview (point-and-edit). Skips instruction routing entirely.
  *
  * Returns: { ok, index, category, html, js, code }
  *   The caller hot-swaps section `index` (the streaming iframe already knows
@@ -26,7 +28,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest): Promise<Response> {
-  let body: { instruction?: string; sections?: EditSection[] };
+  let body: { instruction?: string; sections?: EditSection[]; targetIndex?: number };
   try {
     body = await req.json();
   } catch {
@@ -53,7 +55,12 @@ export async function POST(req: NextRequest): Promise<Response> {
   }
 
   try {
-    const index = await routeEdit(instruction, sections);
+    // A clicked section (point-and-edit) beats instruction routing.
+    const picked =
+      typeof body.targetIndex === "number" && sections.some((s) => s.index === body.targetIndex)
+        ? body.targetIndex
+        : null;
+    const index = picked !== null ? picked : await routeEdit(instruction, sections);
     if (index < 0) {
       return Response.json({
         ok: false,

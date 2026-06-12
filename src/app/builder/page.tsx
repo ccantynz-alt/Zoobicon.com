@@ -31,6 +31,7 @@ import {
   ExternalLink,
   Loader2,
   Monitor,
+  MousePointerClick,
   RefreshCw,
   Smartphone,
   Sparkles,
@@ -86,6 +87,10 @@ function BuilderInner() {
   const [chat, setChat] = useState<ChatMsg[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [editing, setEditing] = useState(false);
+  // Point-and-edit: click a section in the preview to target the next edit.
+  const [pickMode, setPickMode] = useState(false);
+  const [editTarget, setEditTarget] = useState<{ index: number; category: string } | null>(null);
+  const chatInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const readyRef = useRef(false);
@@ -109,6 +114,13 @@ function BuilderInner() {
             win.postMessage({ type: "zb-section", index: s.index, html: s.html, js: s.js }, "*");
         }
         queueRef.current = [];
+      } else if (e.data && e.data.type === "zb-section-pick" && typeof e.data.index === "number") {
+        const idx = e.data.index as number;
+        const meta = sectionMetaRef.current.get(idx);
+        setEditTarget({ index: idx, category: meta?.category || `section ${idx + 1}` });
+        setPickMode(false);
+        iframeRef.current?.contentWindow?.postMessage({ type: "zb-edit-mode", on: false }, "*");
+        chatInputRef.current?.focus();
       }
     };
     window.addEventListener("message", onMsg);
@@ -160,6 +172,8 @@ function BuilderInner() {
       setSectionsIn(0);
       setTailoring(false);
       setChat([]);
+      setPickMode(false);
+      setEditTarget(null);
       readyRef.current = false;
       queueRef.current = [];
       sectionMetaRef.current = new Map();
@@ -292,7 +306,11 @@ function BuilderInner() {
         const res = await fetch("/api/v2/edit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ instruction, sections }),
+          body: JSON.stringify({
+            instruction,
+            sections,
+            ...(editTarget ? { targetIndex: editTarget.index } : {}),
+          }),
         });
         const data = (await res.json()) as {
           ok: boolean;
@@ -320,6 +338,7 @@ function BuilderInner() {
           ...c,
           { role: "system", text: `Updated the ${data.category || "section"}.`, ok: true },
         ]);
+        setEditTarget(null);
       } catch (err) {
         setChat((c) => [
           ...c,
@@ -329,7 +348,7 @@ function BuilderInner() {
         setEditing(false);
       }
     },
-    [editing, status, pushSection],
+    [editing, status, pushSection, editTarget],
   );
 
   // Export the CURRENT page (including refine edits) as a clean, deployable
@@ -596,8 +615,27 @@ function BuilderInner() {
                   )}
                   <div ref={chatEndRef} />
                 </div>
+                {editTarget && (
+                  <div className="mt-3 flex items-center gap-2">
+                    <span
+                      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold"
+                      style={{ background: "rgba(232,64,43,0.08)", color: "var(--zb-accent)", border: "1px solid rgba(232,64,43,0.22)" }}
+                    >
+                      <MousePointerClick size={11} />
+                      Editing: {editTarget.category}
+                      <button
+                        onClick={() => setEditTarget(null)}
+                        aria-label="Clear section target"
+                        className="ml-0.5 font-bold hover:opacity-60"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  </div>
+                )}
                 <div className="mt-3 flex items-end gap-2">
                   <textarea
+                    ref={chatInputRef}
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -607,7 +645,7 @@ function BuilderInner() {
                       }
                     }}
                     rows={1}
-                    placeholder="Make the hero darker…"
+                    placeholder={editTarget ? `What should change in the ${editTarget.category}?` : "Make the hero darker…"}
                     disabled={editing}
                     className="zb-input-light min-h-[44px] flex-1 resize-none rounded-xl px-3.5 py-2.5 text-[13.5px] outline-none transition-shadow focus:shadow-[0_0_0_3px_rgba(232,64,43,0.18)] disabled:opacity-60"
                     style={{ background: "var(--zb-bg)", border: "1px solid var(--zb-line)", color: "var(--zb-ink)" }}
@@ -730,6 +768,23 @@ function BuilderInner() {
                 {/* Actions */}
                 {status === "done" && (
                   <span className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => {
+                        const next = !pickMode;
+                        setPickMode(next);
+                        iframeRef.current?.contentWindow?.postMessage({ type: "zb-edit-mode", on: next }, "*");
+                      }}
+                      className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold transition-transform hover:-translate-y-0.5"
+                      style={
+                        pickMode
+                          ? { background: "var(--zb-accent)", color: "#ffffff" }
+                          : { background: "var(--zb-bg)", border: "1px solid var(--zb-line)", color: "var(--zb-ink)" }
+                      }
+                      title="Click a section in the preview, then say what to change"
+                    >
+                      <MousePointerClick size={13} />
+                      <span className="hidden md:inline">{pickMode ? "Click a section…" : "Point & edit"}</span>
+                    </button>
                     <ChromeButton onClick={() => build(prompt)} label="Rebuild">
                       <RefreshCw size={13} />
                     </ChromeButton>
