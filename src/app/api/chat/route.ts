@@ -156,7 +156,7 @@ function classifyEdit(instruction: string, html: string): { mode: EditMode; sect
 }
 
 export async function POST(request: NextRequest) {
-  // Rule 31 — API key validation delegated to Crontech. Token-bearing
+  // Rule 31 — API key validation delegated to Vapron. Token-bearing
   // requests get the higher rate; everything else falls back to anonymous.
   const bearerKey = request.headers.get("authorization")?.replace("Bearer ", "").trim() || "";
   const crontechToken = request.headers.get("x-crontech-token");

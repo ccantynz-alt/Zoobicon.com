@@ -262,7 +262,7 @@ const deploySiteTool: MCPTool = {
       }
 
       // Rule 31 — Vercel/hosting deploy modules were retired (delegated to
-      // Crontech). MCP deploy now routes through /api/crontech/deploy.
+      // Vapron). MCP deploy now routes through /api/crontech/deploy.
       const baseUrl = getBaseUrl();
       const res = await fetch(`${baseUrl}/api/crontech/deploy`, {
         method: "POST",

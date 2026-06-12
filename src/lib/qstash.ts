@@ -120,7 +120,7 @@ export const CRON_SCHEDULES: ScheduleConfig[] = [
     retries: 3,
     scheduleId: "health-check",
   },
-  // daily-comeback removed (Rule 31) — email + analytics delegated to Crontech.
+  // daily-comeback removed (Rule 31) — email + analytics delegated to Vapron.
   {
     destination: "/api/cron/warm-replicate",
     cron: "*/5 * * * *",

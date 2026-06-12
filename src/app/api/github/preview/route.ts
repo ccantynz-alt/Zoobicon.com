@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       "Include sections: hero with project name + tagline + GitHub-style stats, features (extract from README), installation snippet (syntax-highlighted, copyable), screenshot/demo placeholder, contributors / star count, FAQ. The landing should make a developer want to clone the repo within 10 seconds of landing on the page."
     );
     parts.push(
-      "Modernize: 2026 design patterns (bento grids, syntax-highlighted code blocks, dark/light toggle), mobile-first responsive, semantic HTML, JSON-LD SoftwareApplication schema, sub-second LCP. Hosting + custom domain via Crontech."
+      "Modernize: 2026 design patterns (bento grids, syntax-highlighted code blocks, dark/light toggle), mobile-first responsive, semantic HTML, JSON-LD SoftwareApplication schema, sub-second LCP. Hosting + custom domain via Vapron."
     );
 
     const prompt = parts.join(" ");

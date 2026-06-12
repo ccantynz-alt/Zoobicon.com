@@ -47,7 +47,7 @@ export function generateManifest(): Record<string, unknown> {
       { name: "Dashboard", url: "/admin/mobile", description: "Open dashboard" },
       { name: "Builder", url: "/builder", description: "Build a website" },
       { name: "Import", url: "/import", description: "Bring in an existing site" },
-      { name: "Marketplace", url: "/marketplace", description: "Crontech add-ons" },
+      { name: "Marketplace", url: "/marketplace", description: "Vapron add-ons" },
     ],
   };
 }

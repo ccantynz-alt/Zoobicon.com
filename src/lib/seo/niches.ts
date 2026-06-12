@@ -85,7 +85,7 @@ const niches: Niche[] = [
     faqs: [
       {
         q: "Can Zoobicon build a restaurant menu that updates without a developer?",
-        a: "Yes — the generated React site exposes the menu as a typed data structure. Edit one TSX file (or paste your printed menu and let the builder regenerate) and the site updates. Crontech hosting redeploys automatically.",
+        a: "Yes — the generated React site exposes the menu as a typed data structure. Edit one TSX file (or paste your printed menu and let the builder regenerate) and the site updates. Vapron hosting redeploys automatically.",
       },
       {
         q: "Do you integrate with OpenTable or Resy?",
@@ -125,11 +125,11 @@ const niches: Niche[] = [
     faqs: [
       {
         q: "Can I sell coffee subscriptions through the site?",
-        a: "Yes — the generated site ships with a Stripe-ready newsletter / subscription block. Wire your Stripe Connect account through Crontech's billing layer and recurring subscriptions are live.",
+        a: "Yes — the generated site ships with a Stripe-ready newsletter / subscription block. Wire your Stripe Connect account through Vapron's billing layer and recurring subscriptions are live.",
       },
       {
         q: "Will the menu update for seasonal specials without a developer?",
-        a: "Yes — the menu lives in a typed data file. Edit, redeploy, done. Crontech handles the hosting redeploy automatically.",
+        a: "Yes — the menu lives in a typed data file. Edit, redeploy, done. Vapron handles the hosting redeploy automatically.",
       },
     ],
     relatedCompetitors: ["wix", "squarespace", "carrd"],
@@ -193,7 +193,7 @@ const niches: Niche[] = [
     faqs: [
       {
         q: "How do my photos get into the generated site?",
-        a: "The builder generates placeholder image slots. After the build, drop your images in the assets folder; the Crontech deploy step picks them up automatically. Future release: paste a folder URL and the builder pulls images in.",
+        a: "The builder generates placeholder image slots. After the build, drop your images in the assets folder; the Vapron deploy step picks them up automatically. Future release: paste a folder URL and the builder pulls images in.",
       },
       {
         q: "Does the site work for both wedding and commercial work?",
@@ -259,7 +259,7 @@ const niches: Niche[] = [
     faqs: [
       {
         q: "Can I export the site to a static HTML I can host elsewhere?",
-        a: "Yes — Zoobicon outputs a real React + Tailwind codebase. Run `next build && next export` or just deploy to any host. Crontech is the default but not the lock-in.",
+        a: "Yes — Zoobicon outputs a real React + Tailwind codebase. Run `next build && next export` or just deploy to any host. Vapron is the default but not the lock-in.",
       },
     ],
     relatedCompetitors: ["framer", "webflow", "squarespace"],
@@ -287,17 +287,17 @@ const niches: Niche[] = [
       "Above-the-fold conversion — headline + CTA visible without scrolling",
       "Pricing block that's easy to scan in 3 seconds",
       "FAQ for SEO + objections",
-      "Stripe checkout wired (via Crontech billing) — not a marketing form",
+      "Stripe checkout wired (via Vapron billing) — not a marketing form",
     ],
     category: "tech",
     faqs: [
       {
         q: "Can I wire up Stripe checkout from the pricing block?",
-        a: "Yes — the generated pricing block emits standard data-driven CTAs. Connect Stripe through Crontech's billing layer and the buttons go from marketing CTAs to real checkout sessions.",
+        a: "Yes — the generated pricing block emits standard data-driven CTAs. Connect Stripe through Vapron's billing layer and the buttons go from marketing CTAs to real checkout sessions.",
       },
       {
         q: "Does the site support feature flags or A/B tests?",
-        a: "The output is a clean React codebase — drop in your favorite feature-flag library (PostHog, Statsig, GrowthBook). Crontech handles the build redeploy.",
+        a: "The output is a clean React codebase — drop in your favorite feature-flag library (PostHog, Statsig, GrowthBook). Vapron handles the build redeploy.",
       },
       {
         q: "Will it rank for my SaaS keywords?",
@@ -359,7 +359,7 @@ const niches: Niche[] = [
       "Contact",
     ],
     mustHaves: [
-      "Stripe checkout wired (via Crontech billing) — no Shopify tax",
+      "Stripe checkout wired (via Vapron billing) — no Shopify tax",
       "Product variants (size, color)",
       "Mobile-optimized cart drawer",
       "Product JSON-LD for Google Shopping eligibility",
@@ -368,11 +368,11 @@ const niches: Niche[] = [
     faqs: [
       {
         q: "Do I need Shopify if I use Zoobicon?",
-        a: "No. The generated ecommerce site has Stripe checkout wired through Crontech's billing layer. You skip Shopify's monthly fee and per-transaction cut.",
+        a: "No. The generated ecommerce site has Stripe checkout wired through Vapron's billing layer. You skip Shopify's monthly fee and per-transaction cut.",
       },
       {
         q: "Can I do product variants like size and color?",
-        a: "Yes — the generated product detail page supports variants via a typed data structure. Edit the product file, push, and Crontech redeploys.",
+        a: "Yes — the generated product detail page supports variants via a typed data structure. Edit the product file, push, and Vapron redeploys.",
       },
     ],
     relatedCompetitors: ["wix", "squarespace", "framer"],
@@ -500,7 +500,7 @@ const niches: Niche[] = [
     faqs: [
       {
         q: "Can I embed my Cal.com or Calendly booking widget?",
-        a: "Yes — paste the embed code into the generated site's contact section. Crontech redeploys automatically.",
+        a: "Yes — paste the embed code into the generated site's contact section. Vapron redeploys automatically.",
       },
     ],
     relatedCompetitors: ["framer", "carrd", "squarespace"],
@@ -532,7 +532,7 @@ const niches: Niche[] = [
     faqs: [
       {
         q: "Can I sell coaching packages with Stripe?",
-        a: "Yes — wire Stripe through Crontech's billing layer and the package CTAs become real checkout sessions.",
+        a: "Yes — wire Stripe through Vapron's billing layer and the package CTAs become real checkout sessions.",
       },
     ],
     relatedCompetitors: ["carrd", "squarespace", "framer"],
@@ -564,7 +564,7 @@ const niches: Niche[] = [
     faqs: [
       {
         q: "Can the class schedule auto-update weekly?",
-        a: "Yes — the generated schedule reads from a typed data file. Edit your timetable, redeploy, done. Crontech handles the redeploy.",
+        a: "Yes — the generated schedule reads from a typed data file. Edit your timetable, redeploy, done. Vapron handles the redeploy.",
       },
     ],
     relatedCompetitors: ["wix", "squarespace"],
@@ -726,7 +726,7 @@ const niches: Niche[] = [
     faqs: [
       {
         q: "Can I accept tax-deductible donations through the site?",
-        a: "Yes — wire Stripe (or your nonprofit-friendly processor like Donorbox or Givebutter) through Crontech's billing layer. The donate buttons become real checkout sessions.",
+        a: "Yes — wire Stripe (or your nonprofit-friendly processor like Donorbox or Givebutter) through Vapron's billing layer. The donate buttons become real checkout sessions.",
       },
     ],
     relatedCompetitors: ["wix", "squarespace"],
@@ -792,7 +792,7 @@ const niches: Niche[] = [
     faqs: [
       {
         q: "Can I sell merch from the site?",
-        a: "Yes — link to your Bandcamp store, Shopify store, or wire Stripe through Crontech for direct sales.",
+        a: "Yes — link to your Bandcamp store, Shopify store, or wire Stripe through Vapron for direct sales.",
       },
     ],
     relatedCompetitors: ["squarespace", "carrd", "framer"],
@@ -888,7 +888,7 @@ const niches: Niche[] = [
     faqs: [
       {
         q: "Can I embed Booking.com or my Cloudbeds booking widget?",
-        a: "Yes — paste the widget code into the generated booking section. Crontech redeploys automatically.",
+        a: "Yes — paste the widget code into the generated booking section. Vapron redeploys automatically.",
       },
     ],
     relatedCompetitors: ["squarespace", "wix"],

@@ -1,7 +1,7 @@
 /**
- * Crontech email send client — wraps `services/email-send` (BLK-030).
+ * Vapron email send client — wraps `services/email-send` (BLK-030).
  *
- * Crontech runs its own outbound mail service at
+ * Vapron runs its own outbound mail service at
  * https://api.crontech.ai/email-send/v1/messages — no Mailgun, no SES,
  * no third-party dependency. This module is the single Zoobicon callsite
  * for all outbound transactional mail.
@@ -16,10 +16,10 @@
  * Delivery lifecycle events arrive at /api/email-send/webhook.
  */
 
-const CRONTECH_API_BASE = process.env.CRONTECH_API_BASE || "https://api.crontech.ai";
+const CRONTECH_API_BASE = process.env.VAPRON_API_BASE || process.env.CRONTECH_API_BASE || "https://api.crontech.ai";
 const EMAIL_SEND_TOKEN = process.env.EMAIL_SEND_TOKEN || "";
 const EMAIL_FROM = process.env.EMAIL_FROM || "Zoobicon <noreply@mail.zoobicon.com>";
-const TENANT_ID = process.env.CRONTECH_EMAIL_TENANT_ID || "zoobicon";
+const TENANT_ID = process.env.VAPRON_EMAIL_TENANT_ID || process.env.CRONTECH_EMAIL_TENANT_ID || "zoobicon";
 
 export interface SendEmailInput {
   to: string | string[];
@@ -28,7 +28,7 @@ export interface SendEmailInput {
   text?: string;
   /** Override the default from address for this message. */
   from?: string;
-  /** Idempotency key — Crontech deduplicates on this within 24h. */
+  /** Idempotency key — Vapron deduplicates on this within 24h. */
   messageId?: string;
 }
 
@@ -48,7 +48,7 @@ export function emailSendAvailable(): boolean {
 }
 
 /**
- * Send a transactional email via Crontech's own email service.
+ * Send a transactional email via Vapron's own email service.
  * Returns { ok: true, id } on 202 Accepted, { ok: false, error } otherwise.
  */
 export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult> {
@@ -93,8 +93,8 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
       if (parsed.issues) detail = JSON.stringify(parsed.issues).slice(0, 300);
     } catch { /* raw text is fine */ }
 
-    console.error(`[email-send] ${res.status} from Crontech email: ${detail}`);
-    return { ok: false, error: `Crontech email ${res.status}: ${detail}` };
+    console.error(`[email-send] ${res.status} from Vapron email: ${detail}`);
+    return { ok: false, error: `Vapron email ${res.status}: ${detail}` };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     console.error(`[email-send] network error: ${msg}`);
@@ -103,7 +103,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
 }
 
 /**
- * Verify a Crontech email webhook signature.
+ * Verify a Vapron email webhook signature.
  * Header: x-crontech-signature: sha256=<hex>
  * Computed as: hmac_sha256(webhookSecret, rawBody)
  */

@@ -366,6 +366,7 @@ All gates green (build 245/245, critical-code-guard clear, tsc clean on changed 
 **NEXT ACTION:** Big reliability + quality session (2026-06-05, 7 PRs merged). **THE real preview-crash root cause is fixed** — `crypto.subtle` was used in the EscapeHatchPreview transpile cache, and `window.crypto.subtle` is unavailable in srcdoc iframes on iOS Safari, so it threw synchronously and blanked the preview on Craig's iPad *every build* (PR #412 — replaced with a synchronous FNV hash). Also shipped: 3-layer preview fault isolation (#406), URL-clone funnel on the homepage hero (#406), +4 slot-locked templates — stats/testimonials/cta/faq (#406), a **deep-audit tool** `npm run audit:code` + fixed 3 crashing API routes + removed dead code/tests (#413), a **CI hard-gate** (`scripts/critical-code-guard.js`) that blocks broken imports + the crypto footgun from ever merging again (#414), and the **closed critique→repair loop** — the slot-locked builder now regenerates sections the multi-judge panel flags, reverting if it doesn't improve (#415). **Verify on iPad:** close+reopen zoobicon.com, run a build — preview should render. **Known backlog (non-crashing):** ~75 low-severity TS warnings + 10 real test failures (llm-provider, slot-locked-assembler #each, qstash, api-bank) — run `npm run audit:code` to see them. Next: burn down that test backlog; wire the critique-repair loop onto the default react-stream path; MCP integration; Tier 0F Stripe products (Craig task).
 
 ### CRONTECH PIVOT (RULE 31) — STATUS
+> **⚠️ NAME CHANGE (Craig, 2026-06-12): Crontech is now VAPRON.** All user-facing copy and code comments were swept Crontech→Vapron on 2026-06-12 (368 occurrences, 69 files). Internal identifiers (`crontech-sync.ts`, `/api/crontech/*` routes, `x-crontech-token` header, `CRONTECH_*` env names) deliberately stay until the live Vapron API + its real domain are confirmed — env reads accept `VAPRON_*` first with `CRONTECH_*` fallback, so Vercel needs no changes today. Historical references below (commit hashes, rule quotes) keep the old name; "Crontech" in rules 31/33/36 should be read as "Vapron".
 - §1 AUTH — DONE (1fbcb40). auth-guard.ts is a Crontech-SSO shim.
 - §2 PAYMENTS — STRIPE STAYS (5060535 amendment) — direct AI Builder purchase.
 - §3 EMAIL — DONE (7962fee). admin-notify, audit-middleware are stubs.
@@ -435,11 +436,11 @@ User Prompt → Haiku classifies intent (<1s) → Select from 100-component regi
 | STRIPE_WEBHOOK_SECRET | Stripe webhooks | NOT SET |
 | OPENSRS_API_KEY | Domain registration (revenue stream) | CHECK |
 | REPLICATE_API_TOKEN | Video pipeline | ✅ SET |
-| **CRONTECH_PAT** | **Project hand-off to Crontech for hosting** | **NOT SET (mocked)** |
-| CRONTECH_API_BASE | Crontech API base URL (default https://api.crontech.ai) | OPTIONAL |
+| **VAPRON_PAT** (alias: CRONTECH_PAT) | **Project hand-off to Vapron for hosting** — ⚠️ Crontech RENAMED to **Vapron** (Craig, 2026-06-12). Code reads `VAPRON_*` first, falls back to `CRONTECH_*`; internal route paths `/api/crontech/*`, lib filenames, and the default API base stay until the live Vapron API confirms its domain. | **NOT SET (mocked)** |
+| VAPRON_API_BASE (alias: CRONTECH_API_BASE) | Vapron API base URL (default still https://api.crontech.ai until Vapron's domain is confirmed) | OPTIONAL |
 | **EMAIL_SEND_TOKEN** | **Crontech email service bearer token** | **NOT SET (stubbed)** |
 | EMAIL_FROM | Sender address (default: Zoobicon <noreply@mail.zoobicon.com>) | NOT SET |
-| CRONTECH_EMAIL_TENANT_ID | Tenant slug for Crontech email service (default: zoobicon) | OPTIONAL |
+| VAPRON_EMAIL_TENANT_ID (alias: CRONTECH_EMAIL_TENANT_ID) | Tenant slug for Vapron email service (default: zoobicon) | OPTIONAL |
 | EMAIL_SEND_WEBHOOK_SECRET | HMAC secret for /api/email-send/webhook delivery events | NOT SET |
 | ADMIN_NOTIFY_EMAIL | Recipient for admin alert emails (default: admin@zoobicon.com) | NOT SET |
 | FAL_KEY | Video fallback chain | NOT SET |

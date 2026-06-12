@@ -125,10 +125,10 @@ export default function DeployModal({
     ? siteName.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40)
     : "my-site";
 
-  // Rule 31 — both deploy targets are Crontech now; legacy zoobicon.sh
+  // Rule 31 — both deploy targets are Vapron now; legacy zoobicon.sh
   // was retired. We keep two provider entries for the time being so the
   // UI still hints that fast-tier vs preview-tier exists, but both URLs
-  // resolve to Crontech-owned subdomains until the tiers diverge.
+  // resolve to Vapron-owned subdomains until the tiers diverge.
   const previewUrl = provider === "crontech"
     ? `https://${previewSlug}.crontech.app`
     : `https://${previewSlug}.crontech.app`;

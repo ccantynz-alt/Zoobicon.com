@@ -1,22 +1,22 @@
 /**
- * Crontech catalog client — surfaces Crontech's add-on inventory
+ * Vapron catalog client — surfaces Vapron's add-on inventory
  * inside Zoobicon's UI.
  *
  * Rule 34: "once Zoobicon is connected via API the Customer can go
- * shopping and add anything that they want from the Crontech website."
- * The customer never leaves zoobicon.com — they browse Crontech
+ * shopping and add anything that they want from the Vapron website."
+ * The customer never leaves zoobicon.com — they browse Vapron
  * add-ons inside the Zoobicon dashboard, check out via Zoobicon's
- * Stripe billing, and Crontech provisions the add-on via its API on
+ * Stripe billing, and Vapron provisions the add-on via its API on
  * payment success.
  *
  * Two-mode design:
  *   Live mode  — CRONTECH_PAT is set. Fetches the real catalog from
  *                {CRONTECH_API_BASE}/api/v1/catalog. Used in production
- *                once Crontech ships the endpoint.
+ *                once Vapron ships the endpoint.
  *   Stub mode  — CRONTECH_PAT is unset (or fetch fails). Returns a
  *                hard-coded catalog with realistic add-ons reflecting
- *                what we expect Crontech to expose. Lets the marketplace
- *                UI ship + render + be reviewable before Crontech is
+ *                what we expect Vapron to expose. Lets the marketplace
+ *                UI ship + render + be reviewable before Vapron is
  *                live.
  *
  * Honesty: when in stub mode, the API response includes
@@ -25,8 +25,8 @@
 
 import { crontechAvailable } from "@/lib/crontech-sync";
 
-const CRONTECH_API_BASE = process.env.CRONTECH_API_BASE || "https://api.crontech.ai";
-const CRONTECH_PAT = process.env.CRONTECH_PAT || "";
+const CRONTECH_API_BASE = process.env.VAPRON_API_BASE || process.env.CRONTECH_API_BASE || "https://api.crontech.ai";
+const CRONTECH_PAT = process.env.VAPRON_PAT || process.env.CRONTECH_PAT || "";
 
 export type AddOnCategory =
   | "domains"
@@ -67,13 +67,13 @@ export interface Catalog {
   fetchedAt: string;
   addOns: AddOn[];
   /** When true, prices shown are Zoobicon's best-guess placeholders
-   *  pending Crontech's final pricing model. The UI surfaces a banner
+   *  pending Vapron's final pricing model. The UI surfaces a banner
    *  so customers + admins know not to treat these as commitments. */
   pricingProvisional: boolean;
 }
 
 // ────────────────────────────────────────────────────────────────────
-// Stub catalog — what we expect Crontech to expose. Update as their
+// Stub catalog — what we expect Vapron to expose. Update as their
 // real catalog lands; the rendering UI is shape-stable across both.
 // ────────────────────────────────────────────────────────────────────
 
@@ -85,12 +85,12 @@ const STUB_CATALOG: AddOn[] = [
     name: "Extra .com domain",
     tagline: "Register an additional .com for your project",
     description:
-      "Add another custom domain to a connected Zoobicon project. Registered via Crontech's registrar at deploy time; DNS auto-configures.",
+      "Add another custom domain to a connected Zoobicon project. Registered via Vapron's registrar at deploy time; DNS auto-configures.",
     priceCents: 1499,
     billing: "annual",
     bestFor: "Brand variants, redirect domains, alt-spellings",
-    features: ["Free WHOIS privacy", "Auto-DNS to your Crontech project", "1-year registration"],
-    prerequisites: ["A connected Crontech project"],
+    features: ["Free WHOIS privacy", "Auto-DNS to your Vapron project", "1-year registration"],
+    prerequisites: ["A connected Vapron project"],
     featured: true,
   },
   {
@@ -103,7 +103,7 @@ const STUB_CATALOG: AddOn[] = [
     priceCents: 14900,
     billing: "annual",
     features: [".ai .io .app — three TLDs", "1-year registration each", "Free 301 redirects"],
-    prerequisites: ["A connected Crontech project"],
+    prerequisites: ["A connected Vapron project"],
   },
 
   // ── Hosting ──────────────────────────────────────────────────
@@ -113,7 +113,7 @@ const STUB_CATALOG: AddOn[] = [
     name: "Hosting · Pro tier",
     tagline: "100 GB bandwidth, sub-100ms global edge, dedicated IP",
     description:
-      "Upgrade your Crontech hosting from the default tier to Pro. Includes a dedicated IP, global edge cache, and 100 GB monthly bandwidth.",
+      "Upgrade your Vapron hosting from the default tier to Pro. Includes a dedicated IP, global edge cache, and 100 GB monthly bandwidth.",
     priceCents: 2900,
     billing: "monthly",
     bestFor: "Sites doing >10k visits/mo",
@@ -127,7 +127,7 @@ const STUB_CATALOG: AddOn[] = [
     name: "Hosting · Business tier",
     tagline: "1 TB bandwidth, SLA, priority support",
     description:
-      "Crontech Business hosting tier. 1 TB monthly bandwidth, 99.99% uptime SLA, priority human support, dedicated build queue.",
+      "Vapron Business hosting tier. 1 TB monthly bandwidth, 99.99% uptime SLA, priority human support, dedicated build queue.",
     priceCents: 9900,
     billing: "monthly",
     bestFor: "Sites doing >100k visits/mo or production-critical",
@@ -142,12 +142,12 @@ const STUB_CATALOG: AddOn[] = [
     name: "5 extra mailboxes",
     tagline: "Add 5 more custom-domain mailboxes",
     description:
-      "Extra mailboxes on your Crontech-managed domain. Full IMAP/SMTP, spam filtering, web client, 25 GB per mailbox.",
+      "Extra mailboxes on your Vapron-managed domain. Full IMAP/SMTP, spam filtering, web client, 25 GB per mailbox.",
     priceCents: 1900,
     billing: "monthly",
     features: ["5 mailboxes", "25 GB per mailbox", "Spam + virus filtering"],
     capacity: "5 mailboxes",
-    prerequisites: ["A Crontech-registered domain"],
+    prerequisites: ["A Vapron-registered domain"],
   },
   {
     id: "email-marketing",
@@ -155,7 +155,7 @@ const STUB_CATALOG: AddOn[] = [
     name: "Marketing email · 10k sends",
     tagline: "Send up to 10,000 marketing emails per month",
     description:
-      "Crontech's transactional + marketing email service. 10k monthly sends, deliverability monitoring, bounce + complaint handling, DMARC reports.",
+      "Vapron's transactional + marketing email service. 10k monthly sends, deliverability monitoring, bounce + complaint handling, DMARC reports.",
     priceCents: 2900,
     billing: "monthly",
     features: ["10,000 sends per month", "Deliverability dashboard", "Auto-DKIM + SPF + DMARC"],
@@ -169,11 +169,11 @@ const STUB_CATALOG: AddOn[] = [
     name: "Wildcard SSL",
     tagline: "Covers all subdomains under your custom domain",
     description:
-      "Wildcard SSL certificate covering *.yourdomain.com. Auto-renewed, served from Crontech's edge.",
+      "Wildcard SSL certificate covering *.yourdomain.com. Auto-renewed, served from Vapron's edge.",
     priceCents: 4900,
     billing: "annual",
     features: ["Covers unlimited subdomains", "Auto-renewal", "Edge-served"],
-    prerequisites: ["A Crontech-managed custom domain"],
+    prerequisites: ["A Vapron-managed custom domain"],
   },
   {
     id: "ssl-ev",
@@ -193,7 +193,7 @@ const STUB_CATALOG: AddOn[] = [
     name: "DDoS protection · Pro",
     tagline: "Layer 3-7 mitigation, no bandwidth cap",
     description:
-      "Crontech's premium DDoS shield. Layer 3 + 4 + 7 mitigation, no surge bandwidth cap, 24/7 monitoring with auto-response.",
+      "Vapron's premium DDoS shield. Layer 3 + 4 + 7 mitigation, no surge bandwidth cap, 24/7 monitoring with auto-response.",
     priceCents: 4900,
     billing: "monthly",
     features: ["L3-L7 mitigation", "No bandwidth surge cap", "24/7 auto-response"],
@@ -206,10 +206,10 @@ const STUB_CATALOG: AddOn[] = [
     name: "Extra CDN regions (5)",
     tagline: "Add 5 dedicated edge regions to your hosting",
     description:
-      "Pin your site at 5 additional Crontech edge regions (e.g. Tokyo, Mumbai, São Paulo, Cape Town, Sydney). Reduces latency for global audiences.",
+      "Pin your site at 5 additional Vapron edge regions (e.g. Tokyo, Mumbai, São Paulo, Cape Town, Sydney). Reduces latency for global audiences.",
     priceCents: 1900,
     billing: "monthly",
-    features: ["5 additional edge regions", "Choose any from Crontech's 40+ POPs", "Sub-50ms regional latency"],
+    features: ["5 additional edge regions", "Choose any from Vapron's 40+ POPs", "Sub-50ms regional latency"],
     capacity: "5 regions",
   },
 
@@ -220,10 +220,10 @@ const STUB_CATALOG: AddOn[] = [
     name: "100 GB object storage",
     tagline: "S3-compatible storage for site assets",
     description:
-      "Crontech-managed object storage for images, video, downloads. S3-compatible API, free egress to your own Crontech-hosted sites.",
+      "Vapron-managed object storage for images, video, downloads. S3-compatible API, free egress to your own Vapron-hosted sites.",
     priceCents: 990,
     billing: "monthly",
-    features: ["100 GB capacity", "S3-compatible API", "Free egress to Crontech hosting"],
+    features: ["100 GB capacity", "S3-compatible API", "Free egress to Vapron hosting"],
     capacity: "100 GB",
   },
   {
@@ -235,7 +235,7 @@ const STUB_CATALOG: AddOn[] = [
       "Same as the 100 GB tier, scaled to 1 TB. Ideal for video portfolios, photography sites, and downloadable products.",
     priceCents: 4900,
     billing: "monthly",
-    features: ["1 TB capacity", "S3-compatible API", "Free egress to Crontech hosting"],
+    features: ["1 TB capacity", "S3-compatible API", "Free egress to Vapron hosting"],
     capacity: "1 TB",
   },
 
@@ -246,7 +246,7 @@ const STUB_CATALOG: AddOn[] = [
     name: "30-day point-in-time backups",
     tagline: "Daily backups with 30-day retention",
     description:
-      "Crontech-managed automated backups of your site + database. Daily snapshots, 30-day retention, one-click restore to any point.",
+      "Vapron-managed automated backups of your site + database. Daily snapshots, 30-day retention, one-click restore to any point.",
     priceCents: 990,
     billing: "monthly",
     features: ["Daily automated snapshots", "30-day retention", "One-click restore"],
@@ -259,7 +259,7 @@ const STUB_CATALOG: AddOn[] = [
     name: "Privacy-first analytics",
     tagline: "Cookie-free analytics with country + device breakdowns",
     description:
-      "Crontech's bundled analytics (Plausible-style). No cookies, GDPR-friendly, no consent banner needed. Country + device + referrer breakdowns.",
+      "Vapron's bundled analytics (Plausible-style). No cookies, GDPR-friendly, no consent banner needed. Country + device + referrer breakdowns.",
     priceCents: 990,
     billing: "monthly",
     features: ["No cookies, no consent banner", "Per-site dashboards", "Goal + funnel tracking"],
@@ -267,13 +267,13 @@ const STUB_CATALOG: AddOn[] = [
 ];
 
 // ────────────────────────────────────────────────────────────────────
-// Catalog fetcher — live mode hits Crontech, stub mode returns above.
+// Catalog fetcher — live mode hits Vapron, stub mode returns above.
 // ────────────────────────────────────────────────────────────────────
 
-export async function getCrontechCatalog(): Promise<Catalog> {
+export async function getVapronCatalog(): Promise<Catalog> {
   // Stub-mode helper — used in three places below so it stays consistent.
   // pricingProvisional: true is the honest signal that these prices are
-  // Zoobicon's best guess, NOT Crontech's final pricing (which Craig is
+  // Zoobicon's best guess, NOT Vapron's final pricing (which Craig is
   // still working through).
   const stubCatalog = (): Catalog => ({
     source: "stub",
@@ -291,11 +291,11 @@ export async function getCrontechCatalog(): Promise<Catalog> {
       headers: {
         Authorization: `Bearer ${CRONTECH_PAT}`,
         Accept: "application/json",
-        "X-Crontech-Source": "zoobicon-marketplace",
+        "X-Vapron-Source": "zoobicon-marketplace",
       },
       signal: AbortSignal.timeout(8000),
       // Catalog can be cached at the edge for a minute — add-ons don't
-      // change every second and this saves Crontech API quota.
+      // change every second and this saves Vapron API quota.
       next: { revalidate: 60 },
     });
     if (!res.ok) {
@@ -310,7 +310,7 @@ export async function getCrontechCatalog(): Promise<Catalog> {
       source: "live",
       fetchedAt: new Date().toISOString(),
       addOns: data.addOns || [],
-      // Crontech may flag its own catalog as still provisional (e.g.
+      // Vapron may flag its own catalog as still provisional (e.g.
       // during a beta period) — honour that flag if set.
       pricingProvisional: Boolean(data.pricingProvisional),
     };

@@ -351,7 +351,7 @@ function BuilderPage() {
   // Admin-private builds (Rule 31, 2026-05-17). Toggle only visible when
   // isAdmin is true. When checked, the save call stamps visibility =
   // 'admin_private' so the project never surfaces in gallery, showcase,
-  // intel exports, or the future Crontech project map.
+  // intel exports, or the future Vapron project map.
   const [adminPrivate, setAdminPrivate] = useState<boolean>(true);
   const [useWebContainers, setUseWebContainers] = useState<boolean>(true);
   // Escape-hatch preview: when Sandpack's hosted bundler is flaky
@@ -477,8 +477,8 @@ function BuilderPage() {
     bodyFont: string;
   } | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [crontechAvailable, setCrontechAvailable] = useState(false);
-  const [crontechProjectId, setCrontechProjectId] = useState<string | null>(null);
+  const [crontechAvailable, setVapronAvailable] = useState(false);
+  const [crontechProjectId, setVapronProjectId] = useState<string | null>(null);
 
   // Recording mode — ?record=1 hides all chrome for clean screen captures
   const [recordingMode, setRecordingMode] = useState(false);
@@ -498,7 +498,7 @@ function BuilderPage() {
   useEffect(() => {
     fetch("/api/crontech/availability")
       .then(r => r.json())
-      .then(d => setCrontechAvailable(Boolean(d.available)))
+      .then(d => setVapronAvailable(Boolean(d.available)))
       .catch(() => {});
   }, []);
 
@@ -881,8 +881,8 @@ function BuilderPage() {
   }, [status, generatedCode]);
 
   // Rule 33 (2026-05-30): the domain-in-checkout hook is retired.
-  // Zoobicon now sits on top of Crontech's API — custom domains for
-  // generated sites are provisioned through Crontech's project API at
+  // Zoobicon now sits on top of Vapron's API — custom domains for
+  // generated sites are provisioned through Vapron's project API at
   // deploy time, not through a Zoobicon-owned Stripe + OpenSRS flow.
 
   const handleUndo = useCallback(() => {
@@ -1029,11 +1029,11 @@ function BuilderPage() {
       }
     }
 
-    // Rule 31 — /auth/signup was deleted (auth delegated to Crontech)
+    // Rule 31 — /auth/signup was deleted (auth delegated to Vapron)
     // but the builder used to hard-redirect anonymous users there on
     // every Generate click. That meant every first-time visitor hit a
     // 404 instead of seeing a site — and "no site has ever shipped"
-    // (Craig, 2026-05-26) traced back to exactly this. Until Crontech
+    // (Craig, 2026-05-26) traced back to exactly this. Until Vapron
     // SSO is wired live, anonymous users can build with the same per-
     // IP quota the API enforces. We save the prompt to localStorage so
     // if/when a real signup flow lands they can resume.
@@ -1679,11 +1679,11 @@ function BuilderPage() {
   );
 
   /** Called by DeployModal when user confirms deploy.
-   *  Rule 31 — all deploy paths go through Crontech now. The provider
+   *  Rule 31 — all deploy paths go through Vapron now. The provider
    *  arg is retained for DeployModal compatibility but both options
    *  resolve to /api/crontech/deploy (first deploy) or /api/crontech/update
    *  (re-deploy when a crontechProjectId already exists). After the initial
-   *  POST, if Crontech returns status "provisioning" we poll
+   *  POST, if Vapron returns status "provisioning" we poll
    *  /api/crontech/status every 3s until it flips to "live" or "failed". */
   const handleDeployWithName = useCallback(async (siteName: string, _provider: "zoobicon" | "crontech" = "crontech"): Promise<{ url: string; slug: string; deployTimeMs?: number } | null> => {
     if (!reactFiles || Object.keys(reactFiles).length === 0) {
@@ -1708,8 +1708,8 @@ function BuilderPage() {
         data = await res.json();
         if (!res.ok) throw new Error(data.error || "Re-deploy failed");
       } else {
-        // First deploy: POST to create a new Crontech project.
-        // Prefer the saved Zoobicon projectId so Crontech has authoritative
+        // First deploy: POST to create a new Vapron project.
+        // Prefer the saved Zoobicon projectId so Vapron has authoritative
         // metadata. Fall back to inline files for anonymous builds.
         const body = projectId
           ? { projectId }
@@ -1725,10 +1725,10 @@ function BuilderPage() {
         if (!res.ok) throw new Error(data.error || "Deploy failed");
       }
 
-      // Save the Crontech project ID for future re-deploys.
-      if (data.projectId) setCrontechProjectId(data.projectId);
+      // Save the Vapron project ID for future re-deploys.
+      if (data.projectId) setVapronProjectId(data.projectId);
 
-      // Poll until Crontech flips from "provisioning" to "live".
+      // Poll until Vapron flips from "provisioning" to "live".
       let liveUrl = data.url;
       if (data.status === "provisioning" && data.projectId) {
         const maxWait = 60_000;
@@ -1741,7 +1741,7 @@ function BuilderPage() {
             .catch(() => null);
           if (!poll) continue;
           if (poll.status === "live") { liveUrl = poll.url || liveUrl; break; }
-          if (poll.status === "failed") throw new Error("Crontech deploy failed during provisioning");
+          if (poll.status === "failed") throw new Error("Vapron deploy failed during provisioning");
         }
       }
 

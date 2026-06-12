@@ -269,9 +269,9 @@ async function checkFishAudio(): Promise<ProviderCheck> {
   };
 }
 
-// Rule 31 — Supabase/Cloudflare/Mailgun delegated to Crontech. The deep
+// Rule 31 — Supabase/Cloudflare/Mailgun delegated to Vapron. The deep
 // health orchestrator no longer probes those providers directly; their
-// status is owned by the Crontech platform health endpoint.
+// status is owned by the Vapron platform health endpoint.
 
 async function checkNeon(): Promise<ProviderCheck> {
   const url = process.env.DATABASE_URL;
@@ -345,7 +345,7 @@ export async function GET(req: NextRequest) {
   const overallStart = Date.now();
 
   // Run EVERY check in parallel. Worst case we wait CHECK_TIMEOUT + a little.
-  // Supabase/Mailgun/Cloudflare removed per Rule 31 — those are Crontech's
+  // Supabase/Mailgun/Cloudflare removed per Rule 31 — those are Vapron's
   // responsibility now; this endpoint only covers what Zoobicon owns directly.
   const checks = await Promise.all([
     checkAnthropic(),

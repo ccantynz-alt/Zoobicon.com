@@ -255,7 +255,7 @@ function detectImprovements(opts: {
     ops.push("Currently on Wix — template-based, can't be exported. We ship a real React codebase you own.");
   }
   if (opts.stack.includes("Squarespace")) {
-    ops.push("Currently on Squarespace — locked-in to their hosting + CMS. We ship a portable React codebase, hosting via Crontech.");
+    ops.push("Currently on Squarespace — locked-in to their hosting + CMS. We ship a portable React codebase, hosting via Vapron.");
   }
   if (!opts.hasMobileMeta) {
     ops.push("No mobile viewport meta tag — site likely doesn't scale on phones. Our output is mobile-first by default.");

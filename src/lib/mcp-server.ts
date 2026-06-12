@@ -409,13 +409,13 @@ const TOOLS: InternalTool[] = [
     def: {
       name: "deploy_site",
       description:
-        "Deploy generated website files via the Crontech partner cloud. Returns a live URL.",
+        "Deploy generated website files via the Vapron partner cloud. Returns a live URL.",
       inputSchema: {
         type: "object",
         properties: {
           projectName: {
             type: "string",
-            description: "Project name (used as Crontech subdomain: projectname.crontech.app)",
+            description: "Project name (used as Vapron subdomain: projectname.crontech.app)",
           },
           files: {
             type: "object",

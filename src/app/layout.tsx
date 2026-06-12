@@ -169,7 +169,7 @@ export default function RootLayout({
           </>
         )}
         {/* Organization JSON-LD — site-wide authority signal. Refreshed
-            for Rule 33 (six agents, $49-299 builder tiers, Crontech-
+            for Rule 33 (six agents, $49-299 builder tiers, Vapron-
             provisioned hosting + domain). */}
         <script
           type="application/ld+json"
@@ -179,7 +179,7 @@ export default function RootLayout({
             "name": "Zoobicon",
             "url": "https://zoobicon.com",
             "logo": "https://zoobicon.com/og-image.png",
-            "description": "AI Website Builder. Six agents build a production-ready React site from a single prompt; hosting + custom domain provisioned via Crontech at deploy.",
+            "description": "AI Website Builder. Six agents build a production-ready React site from a single prompt; hosting + custom domain provisioned via Vapron at deploy.",
             "foundingDate": "2024",
             "sameAs": [
               "https://zoobicon.ai",
@@ -277,7 +277,7 @@ export default function RootLayout({
               "priceCurrency": "USD",
               "offerCount": "3"
             },
-            "description": "Six AI agents collaborate to generate a production-ready React website from a single prompt. Hosting + custom domain provisioned via Crontech at deploy."
+            "description": "Six AI agents collaborate to generate a production-ready React website from a single prompt. Hosting + custom domain provisioned via Vapron at deploy."
           }) }}
         />
         {/* WebSite JSON-LD with SearchAction — enables Google Sitelinks
@@ -319,7 +319,7 @@ export default function RootLayout({
                 "name": "How much does Zoobicon cost?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Three tiers: Starter $49/mo (1 site, 1 custom domain included), Pro $129/mo (3 sites, 3 domains, Opus 4.7), Agency $299/mo (10 sites, white-label, API access). All domains and hosting are provisioned via the Crontech API at deploy time."
+                  "text": "Three tiers: Starter $49/mo (1 site, 1 custom domain included), Pro $129/mo (3 sites, 3 domains, Opus 4.7), Agency $299/mo (10 sites, white-label, API access). All domains and hosting are provisioned via the Vapron API at deploy time."
                 }
               },
               {
@@ -343,7 +343,7 @@ export default function RootLayout({
                 "name": "Where are Zoobicon sites hosted?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Hosting + custom domains are provisioned via the Crontech API at deploy time — one platform, free SSL, global CDN. The generated codebase is portable, so you can also export and host anywhere else."
+                  "text": "Hosting + custom domains are provisioned via the Vapron API at deploy time — one platform, free SSL, global CDN. The generated codebase is portable, so you can also export and host anywhere else."
                 }
               }
             ]

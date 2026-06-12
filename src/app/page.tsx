@@ -27,7 +27,7 @@ const TRUST_ITEMS = [
   { label: "Stripe", sub: "Live Connect" },
   { label: "Neon", sub: "Postgres 16" },
   { label: "Cloudflare", sub: "5 domains" },
-  { label: "Crontech", sub: "Hosting + domains" },
+  { label: "Vapron", sub: "Hosting + domains" },
   { label: "121 Components", sub: "Registry" },
 ];
 
