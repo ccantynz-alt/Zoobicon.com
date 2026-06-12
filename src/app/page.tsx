@@ -19,16 +19,17 @@ const fadeUp = {
 };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
-// ── Red brand strip (verifiable, never inflated) ──
+// ── Red brand strip — OUR family of products + the Vapron platform.
+// Never list suppliers or competitors here (Craig, 2026-06-12).
 const TRUST_ITEMS = [
-  { label: "Claude Opus 4.7", sub: "Latest model" },
-  { label: "Next.js 14", sub: "App Router" },
-  { label: "Vercel Edge", sub: "iad1 region" },
-  { label: "Stripe", sub: "Live Connect" },
-  { label: "Neon", sub: "Postgres 16" },
-  { label: "Cloudflare", sub: "5 domains" },
-  { label: "Vapron", sub: "Hosting + domains" },
-  { label: "121 Components", sub: "Registry" },
+  { label: "Vapron", sub: "vapron.ai — the platform underneath" },
+  { label: "Vapron Hosting", sub: "one-click deploy" },
+  { label: "Vapron Domains", sub: "custom domains + SSL" },
+  { label: "Vapron Auth", sub: "single sign-on" },
+  { label: "Vapron Email", sub: "send + receive, built in" },
+  { label: "GateTest", sub: "gatetest.ai — AI browser testing" },
+  { label: "Gluecron", sub: "gluecron.com" },
+  { label: "AlecRae", sub: "alecrae.com" },
 ];
 
 // ── Stat ticker (honest numbers) ──

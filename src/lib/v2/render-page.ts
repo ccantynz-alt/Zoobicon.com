@@ -40,6 +40,7 @@ import { schemaToPrompt } from "@/lib/slot-locked/assembler";
 import { selectComponentsForPrompt } from "@/lib/component-registry";
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { validateEditJson } from "@/lib/llm-output-validator";
+import { industryPhotoPool } from "@/lib/stock-images";
 import type { SlotValueMap } from "@/lib/slot-locked/types";
 
 export interface RenderedPage {
@@ -344,11 +345,16 @@ export async function renderFromRegistry(opts: {
   const doAi = !opts.useExampleFill && hasKey;
   let aiUsed = false;
 
+  const allCategories = new Set(components.map((c) => c.category));
   const sections = await Promise.all(
-    components.map(async (c) => {
+    components.map(async (c, idx) => {
       // Registry component code omits `import React`; the pipeline prepends
-      // it. Match that so the component renders in isolation.
-      const base = `import React from "react";\n\n${c.code}\n`;
+      // it. Match that so the component renders in isolation. Same source
+      // transforms as the streaming route: industry imagery + live CTAs.
+      const base = activateCtas(
+        swapImagesForIndustry(`import React from "react";\n\n${c.code}\n`, industry, idx),
+        allCategories,
+      );
       let code = base;
       if (doAi) {
         const rewritten = await aiRewriteCopy(base, prompt, brandName, c.category);
@@ -434,6 +440,57 @@ const ANCHOR_SYNONYMS: Record<string, string[]> = {
   blog: ["blog", "news", "articles", "resources"],
   cta: ["signup", "sign-up", "start", "get-started", "demo", "trial"],
 };
+
+// ── Source-level transforms ─────────────────────────────────────────────
+// These run on the component CODE (not the rendered HTML) so the static
+// render, the live hydrated React, the export, and follow-up edits all stay
+// consistent — an HTML-only patch would be undone the moment a section
+// hydrates and re-renders from source.
+
+// (1) Industry image swap. Registry components ship with fixed Unsplash IDs
+// (SaaS dashboards, nature shots) regardless of the business — a bakery was
+// getting analytics laptops and beaches. Swap every Unsplash photo ID for one
+// from the curated industry pool (src/lib/stock-images.ts), deterministically
+// seeded by section index so builds are stable. Size/crop params are kept.
+// Avatar photos (randomuser.me) are intentionally untouched.
+export function swapImagesForIndustry(code: string, industry: string, seed: number): string {
+  const pool = industryPhotoPool(industry);
+  if (!pool.length) return code;
+  let n = 0;
+  return code.replace(/images\.unsplash\.com\/photo-[a-zA-Z0-9_-]+/g, () => {
+    const id = pool[(seed * 2 + n) % pool.length];
+    n += 1;
+    return `images.unsplash.com/${id}`;
+  });
+}
+
+// (2) Dead-CTA activation. Many registry components render their calls to
+// action as bare <button> elements with no onClick and no href — "Order
+// Online Now" did literally nothing. Buttons WITHOUT behaviour whose label
+// matches a known intent become real anchors to the matching section on the
+// page. Buttons with onClick (menus, accordions, carousels) and submit
+// buttons are never touched.
+const CTA_INTENTS: Array<{ pattern: RegExp; targets: string[] }> = [
+  { pattern: /order|buy now|shop|add to cart|cart/i, targets: ["ecommerce", "contact", "cta", "pricing"] },
+  { pattern: /pricing|plans?\b/i, targets: ["pricing", "cta", "contact"] },
+  { pattern: /menu|baking|browse|gallery|portfolio|our work|view|see |explore|discover|learn more|what we do/i, targets: ["features", "gallery", "about", "pricing"] },
+  { pattern: /book|reserve|contact|get in touch|quote|call us|talk to/i, targets: ["contact", "cta", "forms"] },
+  { pattern: /start|trial|join|sign up|demo|get started/i, targets: ["cta", "contact", "forms", "pricing"] },
+];
+
+export function activateCtas(code: string, presentCategories: Set<string>): string {
+  return code.replace(/<button\b([^>]*)>([\s\S]*?)<\/button>/g, (full, attrs: string, inner: string) => {
+    if (/onClick|type=["']submit["']/.test(attrs)) return full;
+    const label = inner.replace(/\{[^}]*\}/g, " ").replace(/<[^>]+>/g, " ");
+    for (const intent of CTA_INTENTS) {
+      if (!intent.pattern.test(label)) continue;
+      const target = intent.targets.find((t) => presentCategories.has(t));
+      if (!target) return full;
+      return `<a href="#${target}"${attrs}>${inner}</a>`;
+    }
+    return full;
+  });
+}
 
 function anchorForSlug(slug: string, present: Set<string>): string | null {
   for (const [category, slugs] of Object.entries(ANCHOR_SYNONYMS)) {

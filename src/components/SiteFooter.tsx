@@ -83,11 +83,12 @@ export default function SiteFooter() {
           {/* Brand column */}
           <div className="lg:col-span-4">
             <Link href="/" className="inline-flex items-center gap-2.5 mb-5">
+              {/* Craig 2026-06-12: red Z on an off-white tile, matching nav + builder */}
               <div
                 className="flex h-9 w-9 items-center justify-center rounded-[10px]"
-                style={{ background: "var(--zb-ink)" }}
+                style={{ background: "var(--zb-bg)", border: "1px solid var(--zb-line)" }}
               >
-                <span className="zb-display text-[19px] leading-none" style={{ color: "var(--zb-accent)" }}>
+                <span className="zb-display text-[21px] leading-none" style={{ color: "var(--zb-accent)" }}>
                   Z
                 </span>
               </div>
