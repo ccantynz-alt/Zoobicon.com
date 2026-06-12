@@ -33,7 +33,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 
-// Rule 31 — Users + Analytics tabs delegated to Crontech.
+// Rule 31 — Users + Analytics tabs delegated to Vapron.
 type AdminTab = "overview" | "templates";
 
 interface TemplateRecord {
@@ -56,7 +56,7 @@ export default function AdminPage() {
   const [apiTest, setApiTest] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [apiError, setApiError] = useState("");
 
-  // Rule 31 — users/analytics state removed (delegated to Crontech).
+  // Rule 31 — users/analytics state removed (delegated to Vapron).
   const [templates, setTemplates] = useState<TemplateRecord[]>([]);
   const [templatesLoading, setTemplatesLoading] = useState(false);
 
@@ -139,11 +139,11 @@ export default function AdminPage() {
     return () => { cancelled = true; };
   }, []);
 
-  // Rule 31 — user CRUD lives in Crontech; updateUser/deleteUser removed.
+  // Rule 31 — user CRUD lives in Vapron; updateUser/deleteUser removed.
 
   if (!isAdmin) return null;
 
-  // Rule 31 — Users + Analytics tabs removed (delegated to Crontech).
+  // Rule 31 — Users + Analytics tabs removed (delegated to Vapron).
   // Overview + Templates only — both Zoobicon-owned.
   const tabs: { id: AdminTab; label: string; icon: React.ReactNode }[] = [
     { id: "overview", label: "Overview", icon: <Zap className="w-4 h-4" /> },
@@ -313,7 +313,7 @@ export default function AdminPage() {
                   // Product surfaces that actually exist on disk.
                   // Rule 33 (2026-05-30): Zoobicon owns no domain UI —
                   // custom domains for built sites are provisioned via
-                  // Crontech's API at deploy time.
+                  // Vapron's API at deploy time.
                   { icon: FolderOpen, label: "Builds", href: "/admin/builds", desc: "Build history" },
                   { icon: Workflow, label: "Integrations", href: "/admin/integrations", desc: "Third-party hooks" },
                   { icon: TrendingUp, label: "SEO control room", href: "/admin/seo", desc: "Sitemap + IndexNow" },

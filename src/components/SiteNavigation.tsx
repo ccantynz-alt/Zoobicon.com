@@ -19,7 +19,7 @@ import {
 
 // ── Product categories for the mega menu ──
 // Rule 32 — one product: AI Website Builder. Domain + hosting are
-// features of the builder deploy step (Crontech-provisioned), not
+// features of the builder deploy step (Vapron-provisioned), not
 // separate products in the nav.
 const PRODUCT_SECTIONS = [
   {
@@ -285,7 +285,7 @@ export default function SiteNavigation() {
             })}
           </div>
 
-          {/* Right side: ONE lime CTA. Rule 31 — auth delegated to Crontech
+          {/* Right side: ONE lime CTA. Rule 31 — auth delegated to Vapron
               SSO; no sign-in button until SSO is wired. Admin is URL-only. */}
           <div className="hidden lg:flex items-center gap-2">
             {isLoggedIn && (
@@ -388,7 +388,7 @@ export default function SiteNavigation() {
               >
                 Compare
               </Link>
-              {/* Rule 31 — auth delegated to Crontech SSO; no in-product
+              {/* Rule 31 — auth delegated to Vapron SSO; no in-product
                   sign-in link until SSO is wired. */}
               <Link
                 href="/builder"

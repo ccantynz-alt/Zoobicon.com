@@ -65,10 +65,10 @@ const ZOOBICON_PRICING: PricingTier[] = [
 ];
 
 const COMMON_OUR_EDGE = [
-  "Hosting + custom domains provisioned via the Crontech API at deploy time — one platform, no glue scripts between builder, hosting, and registrar",
+  "Hosting + custom domains provisioned via the Vapron API at deploy time — one platform, no glue scripts between builder, hosting, and registrar",
   "Slot-locked composition + 121-component registry — every section is hand-polished, agency-grade, never generated from scratch",
   "Six visible agents stream live during generation (Strategist, Brand, Architect, Copy, Developer, SEO) — Emergent shows four, most show none",
-  "Crontech-delegated infrastructure (auth, hosting, DB, email, domains) — we pour 100% of engineering into builder quality, not reinventing infrastructure",
+  "Vapron-delegated infrastructure (auth, hosting, DB, email, domains) — we pour 100% of engineering into builder quality, not reinventing infrastructure",
 ];
 
 // ─── Lovable ──────────────────────────────────────────────────────────
@@ -77,7 +77,7 @@ const lovable: Competitor = {
   name: "Lovable",
   tagline: "Build apps and websites by chatting with AI",
   metaPitch:
-    "Lovable alternative comparison. Zoobicon ships a 121-component registry, Crontech-managed hosting and domains, and six visible agents — see how they stack up on speed, quality, and price.",
+    "Lovable alternative comparison. Zoobicon ships a 121-component registry, Vapron-managed hosting and domains, and six visible agents — see how they stack up on speed, quality, and price.",
   positioning:
     "$400M ARR full-stack AI app builder that runs Plan Mode, Prompt Queue, and Browser Testing on top of Supabase auto-provisioning.",
   founded: 2024,
@@ -96,7 +96,7 @@ const lovable: Competitor = {
   ],
   features: [
     { label: "Generates full-stack apps (DB + API + UI)", ours: true, theirs: true },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: false },
     { label: "Hand-polished 121-component registry", ours: true, theirs: false },
     { label: "Visible 6-agent streaming UI", ours: true, theirs: false },
     { label: "Supabase auto-provisioning", ours: "Partial", theirs: true },
@@ -110,7 +110,7 @@ const lovable: Competitor = {
   faqs: [
     {
       q: "Is Zoobicon a Lovable alternative?",
-      a: "Yes — Zoobicon is built for the same job (describe an app, get a working site) but provisions a custom domain alongside hosting via the Crontech API at deploy time. Lovable doesn't bundle the hosting + domain layer at all — you have to buy a domain separately and wire it up yourself.",
+      a: "Yes — Zoobicon is built for the same job (describe an app, get a working site) but provisions a custom domain alongside hosting via the Vapron API at deploy time. Lovable doesn't bundle the hosting + domain layer at all — you have to buy a domain separately and wire it up yourself.",
     },
     {
       q: "Why is Zoobicon more expensive than Lovable's Starter tier?",
@@ -129,7 +129,7 @@ const bolt: Competitor = {
   name: "Bolt.new",
   tagline: "Prompt-driven dev environment in your browser",
   metaPitch:
-    "Bolt.new alternative comparison. See how Zoobicon's Crontech-managed hosting + domain provisioning, slot-locked composition, and visible 6-agent UI compare to Bolt's WebContainers and Plan Mode.",
+    "Bolt.new alternative comparison. See how Zoobicon's Vapron-managed hosting + domain provisioning, slot-locked composition, and visible 6-agent UI compare to Bolt's WebContainers and Plan Mode.",
   positioning:
     "$40M ARR StackBlitz spinoff running WebContainers (full Node.js in browser), Plan Mode, and auto-error-fix. 5M+ users.",
   founded: 2024,
@@ -148,7 +148,7 @@ const bolt: Competitor = {
   features: [
     { label: "First preview <5 seconds", ours: "Pre-warm pending", theirs: true },
     { label: "Full Node.js in browser (WebContainers)", ours: false, theirs: true },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: false },
     { label: "Hand-polished 121-component registry", ours: true, theirs: false },
     { label: "Visible 6-agent streaming UI", ours: true, theirs: false },
     { label: "Plan Mode / auto-error-fix", ours: false, theirs: true },
@@ -169,7 +169,7 @@ const bolt: Competitor = {
     },
     {
       q: "Why use Zoobicon if Bolt is faster?",
-      a: "Crontech-managed hosting + custom domain at deploy: Bolt doesn't sell domains or run a hosting + registrar bundle, you buy each separately. Zoobicon provisions both via Crontech in one deploy step.",
+      a: "Vapron-managed hosting + custom domain at deploy: Bolt doesn't sell domains or run a hosting + registrar bundle, you buy each separately. Zoobicon provisions both via Vapron in one deploy step.",
     },
   ],
 };
@@ -192,7 +192,7 @@ const v0: Competitor = {
   ],
   ourEdge: [
     ...COMMON_OUR_EDGE,
-    "Deploy is platform-agnostic via Crontech — not locked into Vercel hosting",
+    "Deploy is platform-agnostic via Vapron — not locked into Vercel hosting",
   ],
   pricing: [
     { name: "Free", price: "$0", limits: "Daily credits" },
@@ -201,13 +201,13 @@ const v0: Competitor = {
   ],
   features: [
     { label: "Generates React + Tailwind", ours: true, theirs: true },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: false },
     { label: "Visible 6-agent streaming UI", ours: true, theirs: false },
     { label: "Hand-polished 121-component registry", ours: true, theirs: "shadcn/ui only" },
     { label: "Web search mid-build", ours: false, theirs: true },
     { label: "Deploys to any host (not Vercel-locked)", ours: true, theirs: false },
     { label: "GitHub OAuth + push", ours: true, theirs: true },
-    { label: "Database auto-connect", ours: "Crontech", theirs: true },
+    { label: "Database auto-connect", ours: "Vapron", theirs: true },
     { label: "Multi-LLM failover", ours: true, theirs: false },
     { label: "Agency white-label tier", ours: true, theirs: false },
     { label: "Starting paid price", ours: "$49/mo", theirs: "$20/mo" },
@@ -219,7 +219,7 @@ const v0: Competitor = {
     },
     {
       q: "Does Zoobicon lock me to Vercel hosting like v0 does?",
-      a: "No. Zoobicon deploys through Crontech, a hosting-agnostic platform. v0's deploy path is tightly integrated with Vercel; if you need different hosting you have to download and deploy manually.",
+      a: "No. Zoobicon deploys through Vapron, a hosting-agnostic platform. v0's deploy path is tightly integrated with Vercel; if you need different hosting you have to download and deploy manually.",
     },
     {
       q: "Can Zoobicon do everything v0 does?",
@@ -234,7 +234,7 @@ const emergent: Competitor = {
   name: "Emergent",
   tagline: "Multi-agent AI app builder",
   metaPitch:
-    "Emergent alternative. Zoobicon ships 6 visible agents vs Emergent's 4, plus Crontech-managed hosting + custom domain and a 121-component registry. Full comparison inside.",
+    "Emergent alternative. Zoobicon ships 6 visible agents vs Emergent's 4, plus Vapron-managed hosting + custom domain and a 121-component registry. Full comparison inside.",
   positioning:
     "$100M ARR. 6M signups, 150K paying. MCP integration LIVE (Notion, GitHub, Figma). Fork Feature for session continuity. Google Play app.",
   founded: 2024,
@@ -256,7 +256,7 @@ const emergent: Competitor = {
   ],
   features: [
     { label: "Multi-agent visualization", ours: "6 agents", theirs: "4 agents" },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: false },
     { label: "Hand-polished 121-component registry", ours: true, theirs: false },
     { label: "MCP integration (Notion, GitHub, Figma)", ours: "Stub", theirs: true },
     { label: "Fork / session continuity", ours: false, theirs: true },
@@ -289,7 +289,7 @@ const wix: Competitor = {
   name: "Wix",
   tagline: "All-in-one website builder",
   metaPitch:
-    "Wix alternative for the AI-first era. Describe a site in one sentence, watch six agents build it, deploy with a custom domain via Crontech.",
+    "Wix alternative for the AI-first era. Describe a site in one sentence, watch six agents build it, deploy with a custom domain via Vapron.",
   positioning:
     "Public Israeli company. Established drag-and-drop builder with 200M+ users and an AI editor (Wix ADI) bolted on.",
   founded: 2006,
@@ -313,7 +313,7 @@ const wix: Competitor = {
   features: [
     { label: "AI-generated from one prompt", ours: true, theirs: "Wix ADI (legacy)" },
     { label: "Hand-polished React components", ours: true, theirs: false },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: true },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: true },
     { label: "Code export (own your site)", ours: true, theirs: false },
     { label: "Six visible agents during build", ours: true, theirs: false },
     { label: "App marketplace", ours: false, theirs: true },
@@ -356,7 +356,7 @@ const squarespace: Competitor = {
   ],
   ourEdge: [
     "Generated bespoke, not selected from a template grid",
-    "Crontech-managed hosting + custom domain at deploy — Squarespace owns its registrar layer but charges full retail and locks you to its CMS",
+    "Vapron-managed hosting + custom domain at deploy — Squarespace owns its registrar layer but charges full retail and locks you to its CMS",
     ...COMMON_OUR_EDGE,
   ],
   pricing: [
@@ -368,7 +368,7 @@ const squarespace: Competitor = {
   features: [
     { label: "AI-generated from one prompt", ours: true, theirs: "AI design assistant" },
     { label: "Hand-polished React components", ours: true, theirs: false },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: true },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: true },
     { label: "Built-in eCommerce", ours: false, theirs: true },
     { label: "Built-in member sites", ours: false, theirs: true },
     { label: "Code export (own your site)", ours: true, theirs: false },
@@ -384,7 +384,7 @@ const squarespace: Competitor = {
     },
     {
       q: "Does Zoobicon do eCommerce like Squarespace?",
-      a: "Not as a built-in product surface — Squarespace Commerce is a deep vertical. Zoobicon generates a marketing/checkout site and the eCommerce layer routes through Stripe or integrates via the Crontech infrastructure layer.",
+      a: "Not as a built-in product surface — Squarespace Commerce is a deep vertical. Zoobicon generates a marketing/checkout site and the eCommerce layer routes through Stripe or integrates via the Vapron infrastructure layer.",
     },
     {
       q: "Why pay $49 for Zoobicon over Squarespace Personal at $16?",
@@ -423,9 +423,9 @@ const webflow: Competitor = {
   features: [
     { label: "AI-generated from one prompt", ours: true, theirs: "AI bolt-on" },
     { label: "Hand-polished components", ours: true, theirs: false },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: false },
     { label: "Visual editor (post-build)", ours: "Click-to-edit", theirs: true },
-    { label: "CMS for dynamic content", ours: "Crontech", theirs: true },
+    { label: "CMS for dynamic content", ours: "Vapron", theirs: true },
     { label: "Code export", ours: true, theirs: "Paid add-on" },
     { label: "Visible 6-agent UI", ours: true, theirs: false },
     { label: "Modern React/Tailwind stack", ours: true, theirs: false },
@@ -439,7 +439,7 @@ const webflow: Competitor = {
     },
     {
       q: "Can Zoobicon do a CMS-driven site like Webflow?",
-      a: "Dynamic content lives in the Crontech database layer we delegate to, not bolted into the builder. For marketing sites and landing pages Zoobicon ships faster; for complex content models Webflow's CMS is still ahead.",
+      a: "Dynamic content lives in the Vapron database layer we delegate to, not bolted into the builder. For marketing sites and landing pages Zoobicon ships faster; for complex content models Webflow's CMS is still ahead.",
     },
     {
       q: "Is Zoobicon a Webflow alternative for agencies?",
@@ -478,7 +478,7 @@ const framer: Competitor = {
   features: [
     { label: "AI-generated from one prompt", ours: true, theirs: true },
     { label: "Output is real React code", ours: true, theirs: false },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: true },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: true },
     { label: "Hand-polished components", ours: true, theirs: true },
     { label: "Visible 6-agent UI", ours: true, theirs: false },
     { label: "Design-tool canvas editor", ours: false, theirs: true },
@@ -535,7 +535,7 @@ const carrd: Competitor = {
     { label: "AI-generated from one prompt", ours: true, theirs: false },
     { label: "Multi-section / multi-page sites", ours: true, theirs: false },
     { label: "Hand-polished components", ours: true, theirs: "Templates" },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: false },
     { label: "Visible 6-agent UI", ours: true, theirs: false },
     { label: "Modern React/Tailwind stack", ours: true, theirs: false },
     { label: "Code export", ours: true, theirs: false },
@@ -591,11 +591,11 @@ const bubble: Competitor = {
     { label: "AI-generated from one prompt", ours: true, theirs: "AI assistant bolt-on" },
     { label: "Visual workflow editor", ours: false, theirs: true },
     { label: "Real React code output", ours: true, theirs: false },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: false },
     { label: "Hand-polished components", ours: true, theirs: false },
     { label: "Visible 6-agent UI", ours: true, theirs: false },
     { label: "Marketplace of plugins", ours: false, theirs: true },
-    { label: "Database editor", ours: "Crontech", theirs: true },
+    { label: "Database editor", ours: "Vapron", theirs: true },
     { label: "Code export", ours: true, theirs: false },
     { label: "Agency white-label tier", ours: true, theirs: "Bubble Agencies" },
     { label: "Starting paid price", ours: "$49/mo", theirs: "$29/mo" },
@@ -643,8 +643,8 @@ const stitch: Competitor = {
   features: [
     { label: "AI-generated from one prompt", ours: true, theirs: true },
     { label: "Deployable production site", ours: true, theirs: false },
-    { label: "Backend / API generation", ours: "Crontech", theirs: false },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
+    { label: "Backend / API generation", ours: "Vapron", theirs: false },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: false },
     { label: "Voice-driven design critiques", ours: false, theirs: true },
     { label: "Multi-screen generation", ours: true, theirs: true },
     { label: "Hand-polished component registry", ours: true, theirs: false },
@@ -655,7 +655,7 @@ const stitch: Competitor = {
   faqs: [
     {
       q: "Why pay Zoobicon when Google Stitch is free?",
-      a: "Stitch exports UI — it doesn't deploy a working site or handle the backend. Zoobicon outputs a deployable React app with hosting, domain registration, and Stripe checkout all wired through Crontech. Different product category.",
+      a: "Stitch exports UI — it doesn't deploy a working site or handle the backend. Zoobicon outputs a deployable React app with hosting, domain registration, and Stripe checkout all wired through Vapron. Different product category.",
     },
     {
       q: "Is Stitch a real threat to AI website builders?",
@@ -698,11 +698,11 @@ const replit: Competitor = {
   features: [
     { label: "AI-generated from one prompt", ours: true, theirs: true },
     { label: "No-IDE UX (write sentence, get site)", ours: true, theirs: false },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: false },
     { label: "Hand-polished components", ours: true, theirs: false },
     { label: "Visible 6-agent UI", ours: true, theirs: false },
     { label: "Full Linux dev environment", ours: false, theirs: true },
-    { label: "Backend / data-app generation", ours: "Crontech", theirs: true },
+    { label: "Backend / data-app generation", ours: "Vapron", theirs: true },
     { label: "GitHub OAuth + push", ours: true, theirs: true },
     { label: "Multi-LLM failover", ours: true, theirs: true },
     { label: "Agency white-label tier", ours: true, theirs: false },
@@ -715,11 +715,11 @@ const replit: Competitor = {
     },
     {
       q: "Can Zoobicon do everything Replit Agent does?",
-      a: "Not the deep backend / data-app work — Replit's Linux environment is built for it. Zoobicon's strength is the marketing + commerce frontend, with the backend delegated to Crontech.",
+      a: "Not the deep backend / data-app work — Replit's Linux environment is built for it. Zoobicon's strength is the marketing + commerce frontend, with the backend delegated to Vapron.",
     },
     {
       q: "Why is Zoobicon priced higher than Replit Core?",
-      a: "Zoobicon Starter ($49) includes a domain registration; Replit Core ($20) doesn't include any domain at all (you bring your own). Domain inclusive + production deploy via Crontech tighten the bundle.",
+      a: "Zoobicon Starter ($49) includes a domain registration; Replit Core ($20) doesn't include any domain at all (you bring your own). Domain inclusive + production deploy via Vapron tighten the bundle.",
     },
   ],
 };
@@ -756,7 +756,7 @@ const flutterflow: Competitor = {
     { label: "Output target", ours: "Web (React)", theirs: "Mobile (Flutter)" },
     { label: "AI-generated from one prompt", ours: true, theirs: "AI Gen" },
     { label: "App Store / Play Store deploy", ours: false, theirs: true },
-    { label: "Custom domain via Crontech at deploy", ours: true, theirs: false },
+    { label: "Custom domain via Vapron at deploy", ours: true, theirs: false },
     { label: "Hand-polished components", ours: true, theirs: true },
     { label: "Visible 6-agent UI", ours: true, theirs: false },
     { label: "Code export", ours: true, theirs: true },

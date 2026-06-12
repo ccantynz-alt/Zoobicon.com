@@ -147,11 +147,11 @@ async function sendEmail(notif: NotificationInput): Promise<DispatchResult> {
 }
 
 async function sendSmsChannel(_notif: NotificationInput): Promise<DispatchResult> {
-  // Rule 31 — SMS delegated to Crontech BLK-031. Caller should route
-  // SMS notifications through the Crontech SMS endpoint at
+  // Rule 31 — SMS delegated to Vapron BLK-031. Caller should route
+  // SMS notifications through the Vapron SMS endpoint at
   // https://api.crontech.ai/api/v1/sms (Twilio-shape compatible).
-  // This channel is a no-op until Crontech SMS is wired in.
-  return { channel: "sms", ok: false, error: "SMS delegated to Crontech BLK-031" };
+  // This channel is a no-op until Vapron SMS is wired in.
+  return { channel: "sms", ok: false, error: "SMS delegated to Vapron BLK-031" };
 }
 
 async function sendPush(): Promise<DispatchResult> {

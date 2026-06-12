@@ -3,7 +3,7 @@
  *
  * Sequence: ensureTables → poll → harvest → extract → digest.
  *
- * Crontech (or any external scheduler) hits this with
+ * Vapron (or any external scheduler) hits this with
  * `?secret=$CRON_SECRET` to fire the daily digest. Safe to call
  * multiple times — every stage is idempotent.
  *

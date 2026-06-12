@@ -154,7 +154,7 @@ const HOW_IT_WORKS = [
     step: "03",
     icon: Rocket,
     title: "Deploy",
-    subtitle: "One-click publish to a Crontech subdomain or your custom domain",
+    subtitle: "One-click publish to a Vapron subdomain or your custom domain",
     description: "Hit deploy and your site goes live instantly. Free hosting on or connect your own domain in one click.",
     color: "from-accent-stone to-stone-600",
     glowColor: "shadow-stone-500/30",

@@ -20,7 +20,7 @@
  * recurring caller other than this page.
  *
  * Rule 19 (video retired) and Rule 31 (email/hosting/auth delegated
- * to Crontech) are reflected — email checks ask about Crontech tokens,
+ * to Vapron) are reflected — email checks ask about Vapron tokens,
  * video category is omitted.
  */
 
@@ -225,11 +225,11 @@ export async function GET() {
     detail: "Out of scope. Revive as a separate focused product if it ships again.",
   });
 
-  // ── Email (Crontech BLK-030) ─────────────────────────────────
+  // ── Email (Vapron BLK-030) ─────────────────────────────────
   const emailToken = envStatus("EMAIL_SEND_TOKEN");
   checks.push({
     id: "email-crontech-token",
-    label: "Crontech email service bearer token",
+    label: "Vapron email service bearer token",
     category: "email",
     required: false,
     status: emailToken.status === "missing" ? "warn" : emailToken.status,
@@ -252,17 +252,17 @@ export async function GET() {
         : emailFrom.detail,
   });
 
-  // ── Auth (Crontech SSO shim per Rule 31) ─────────────────────
+  // ── Auth (Vapron SSO shim per Rule 31) ─────────────────────
   const crontechPat = envStatus("CRONTECH_PAT");
   checks.push({
     id: "auth-crontech",
-    label: "Crontech SSO project access token",
+    label: "Vapron SSO project access token",
     category: "auth",
     required: false,
     status: crontechPat.status === "missing" ? "warn" : crontechPat.status,
     detail:
       crontechPat.status === "missing"
-        ? "Builder runs anonymously until Crontech SSO is wired"
+        ? "Builder runs anonymously until Vapron SSO is wired"
         : crontechPat.detail,
   });
 

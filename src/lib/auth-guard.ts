@@ -1,22 +1,22 @@
 /**
- * Auth Guard — STUBBED for Crontech SSO 2026-05-17 (Rule 31).
+ * Auth Guard — STUBBED for Vapron SSO 2026-05-17 (Rule 31).
  *
- * Authentication is delegated to Crontech SSO. This module preserves
+ * Authentication is delegated to Vapron SSO. This module preserves
  * the legacy `authenticateRequest()` shape so the 14 existing API
  * route callers continue to compile and run. The underlying behaviour
  * is:
  *
  *   1. If a `x-crontech-token` header (or `Authorization: Bearer …`)
  *      is present, treat the request as authenticated and pull
- *      identity from the token claims. (Once Crontech SSO is wired,
- *      this layer will verify the signature against Crontech's public
+ *      identity from the token claims. (Once Vapron SSO is wired,
+ *      this layer will verify the signature against Vapron's public
  *      key. For now it just trusts the claim.)
  *   2. Without a token, the request is treated as anonymous. Routes
  *      that previously required auth still proceed in anonymous mode
- *      with conservative rate limits — Crontech tenancy enforces the
+ *      with conservative rate limits — Vapron tenancy enforces the
  *      actual access control once wired.
  *
- * The legacy `users` table is no longer queried — Crontech owns user
+ * The legacy `users` table is no longer queried — Vapron owns user
  * identity. Zoobicon-specific profile data lives in a thin
  * `zoobicon_user_profile` table keyed by `crontech_user_id` (to be
  * added when the migration runs).
@@ -57,16 +57,16 @@ const ANONYMOUS_USER: AuthUser = {
   email_verified: true,
 };
 
-function extractCrontechClaim(req: Request | NextRequest): Partial<AuthUser> | null {
+function extractVapronClaim(req: Request | NextRequest): Partial<AuthUser> | null {
   const token =
     req.headers.get("x-crontech-token") ||
     req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ||
     null;
   if (!token) return null;
-  // TODO when Crontech SSO is wired: verify signature against the
-  // Crontech public key + parse claims. For now the token presence
+  // TODO when Vapron SSO is wired: verify signature against the
+  // Vapron public key + parse claims. For now the token presence
   // is enough — we read user identity from supplementary headers
-  // Crontech is expected to forward on SSO callback.
+  // Vapron is expected to forward on SSO callback.
   const email = req.headers.get("x-user-email") || "user@crontech.local";
   const plan = req.headers.get("x-user-plan") || "free";
   const role = req.headers.get("x-user-role") || "user";
@@ -77,7 +77,7 @@ export async function authenticateRequest(
   request: Request | NextRequest,
   opts?: AuthOptions,
 ): Promise<AuthResult> {
-  const claim = extractCrontechClaim(request);
+  const claim = extractVapronClaim(request);
 
   if (claim) {
     return {
@@ -91,7 +91,7 @@ export async function authenticateRequest(
       user: null,
       error: Response.json(
         {
-          error: "Authentication required. Sign in via Crontech SSO at /auth/sso?to=zoobicon.",
+          error: "Authentication required. Sign in via Vapron SSO at /auth/sso?to=zoobicon.",
         },
         { status: 401 },
       ),
@@ -110,7 +110,7 @@ export const requireAuth = authenticateRequest;
 // Backwards-compatible quota shims.
 //
 // The canonical quota system moved to `src/lib/build-quota.ts`
-// (checkBuildQuota / recordBuildQuotaUsage) during the Crontech pivot.
+// (checkBuildQuota / recordBuildQuotaUsage) during the Vapron pivot.
 // Three legacy routes — /api/scaffold, /api/generate/react, and
 // /api/generate/pipeline — still import the OLD `checkUsageQuota` /
 // `trackUsage` signature from here. Because those named exports had been

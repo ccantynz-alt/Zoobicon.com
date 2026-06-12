@@ -3,7 +3,7 @@
  *
  * Craig wants to be able to build his own projects in the AI Builder
  * without them leaking into public lists (gallery, showcase, intel
- * exports, agency client views, the future Crontech project map).
+ * exports, agency client views, the future Vapron project map).
  *
  * Mechanism — one column on `projects` and `sites`:
  *   visibility TEXT NOT NULL DEFAULT 'public'
@@ -12,7 +12,7 @@
  *
  * On save:
  *   visibilityForRequest(request)  → looks at the request's auth claim
- *                                    (Crontech token role, or the
+ *                                    (Vapron token role, or the
  *                                    legacy x-admin header on the dev
  *                                    path) and returns the value to
  *                                    write into the column.

@@ -351,7 +351,7 @@ export default function SeoAdminPage() {
             <strong>3.</strong> Set <code className="font-mono text-[11px] px-1 py-0.5 rounded" style={{ background: "var(--paper)", border: "1px solid var(--rule)" }}>CRON_SECRET</code> in Vercel.
           </li>
           <li>
-            <strong>4.</strong> Point Crontech scheduler at <code className="font-mono text-[11px] px-1 py-0.5 rounded" style={{ background: "var(--paper)", border: "1px solid var(--rule)" }}>/api/seo/submit-sitemap?secret=$CRON_SECRET</code> — daily cadence.
+            <strong>4.</strong> Point Vapron scheduler at <code className="font-mono text-[11px] px-1 py-0.5 rounded" style={{ background: "var(--paper)", border: "1px solid var(--rule)" }}>/api/seo/submit-sitemap?secret=$CRON_SECRET</code> — daily cadence.
           </li>
         </ol>
       </div>

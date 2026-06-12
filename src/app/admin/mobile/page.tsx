@@ -51,7 +51,7 @@ export default function MobileAdminDashboard() {
 
   const fetchData = useCallback(async () => {
     try {
-      // Rule 31 — platform analytics live in Crontech; mobile dashboard
+      // Rule 31 — platform analytics live in Vapron; mobile dashboard
       // only pulls /api/health which Zoobicon still owns.
       const healthRes = await fetch("/api/health").then(r => r.json()).catch(() => null);
       if (healthRes) setHealth(healthRes);

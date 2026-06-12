@@ -73,12 +73,12 @@ export {
 // Rule 31 — Infrastructure-monitoring agents (site-monitor, uptime-monitor,
 // performance-guardian, deployment-guardian, auto-healer, security-sentinel,
 // abuse-detector, billing-guardian, revenue-monitor, onboarding-watchdog,
-// error-prevention) are owned by Crontech RUM + AI Gateway. They no longer
+// error-prevention) are owned by Vapron RUM + AI Gateway. They no longer
 // register here. The agent files remain on disk for the migration window
-// in case Crontech needs the implementation as reference.
+// in case Vapron needs the implementation as reference.
 import "./support-responder";          // builder-side support reply
 import "./intel-monitor";              // competitive intelligence
-import "./email-campaign";             // queued via Crontech BLK-030
+import "./email-campaign";             // queued via Vapron BLK-030
 import "./daily-todo-sender";          // Craig's todo digest
 import "./quality-auditor";            // builder output quality
 import "./seo-auto-fix";               // generated-site SEO

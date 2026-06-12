@@ -6,7 +6,7 @@
  *
  * Per-project ops live under /api/projects/[id]/.
  *
- * Rule 31 — auth delegated to Crontech SSO. `visibility` is admin-only;
+ * Rule 31 — auth delegated to Vapron SSO. `visibility` is admin-only;
  * defaults to 'public' for everyone else.
  */
 
