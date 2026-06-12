@@ -14,6 +14,7 @@ import {
   usesSerifHeadings,
   compileComponentToModule,
   applyBrandTokens,
+  normalizePageLinks,
 } from "../src/lib/v2/render-page";
 // Populate the 118-component registry (ensureRegistryLoaded uses CommonJS
 // require which doesn't run under vitest's ESM transform).
@@ -164,5 +165,39 @@ export default function Hero() {
     const headingRule = 'h1,h2{font-family:"Playfair Display"';
     expect(pageShell("", "", { industry: "restaurant" })).toContain(headingRule);
     expect(pageShell("", "", { industry: "saas" })).not.toContain(headingRule);
+  });
+});
+
+describe("v2 normalizePageLinks (footer/nav link repair)", () => {
+  const present = new Set(["features", "pricing", "faq", "contact", "footer", "navbar", "hero"]);
+
+  it("rewrites route-style internal links to matching anchors", () => {
+    const html = '<a href="/pricing">Plans</a> <a href="/about-us">About</a> <a href="/services">What we do</a>';
+    const out = normalizePageLinks(html, present);
+    expect(out).toContain('href="#pricing"');
+    expect(out).toContain('href="#features"'); // services → features synonym
+    expect(out).toContain('href="#"'); // about has no section on this page → defused
+    expect(out).not.toContain('href="/');
+  });
+
+  it("keeps anchors that resolve, defuses ones that don't", () => {
+    const out = normalizePageLinks('<a href="#faq">FAQ</a> <a href="#careers">Careers</a>', present);
+    expect(out).toContain('href="#faq"');
+    expect(out).not.toContain('href="#careers"');
+  });
+
+  it("never touches external, mailto, tel, or bare # links", () => {
+    const html =
+      '<a href="https://x.com/zoobicon">X</a> <a href="mailto:hi@a.com">Mail</a> <a href="tel:+6421">Call</a> <a href="#">·</a>';
+    expect(normalizePageLinks(html, present)).toBe(html);
+  });
+
+  it("renderFromRegistry output has section anchor ids and no route hrefs", async () => {
+    const page = await renderFromRegistry({
+      prompt: "A SaaS analytics platform for product teams",
+      useExampleFill: true,
+    });
+    expect(page.html).toMatch(/<section id="(features|pricing|faq|cta|footer|testimonials|stats|navbar|hero)"/);
+    expect(page.html).not.toMatch(/href="\/(?!\/)/); // no internal route links survive
   });
 });

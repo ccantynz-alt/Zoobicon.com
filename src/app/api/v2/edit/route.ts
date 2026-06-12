@@ -21,7 +21,12 @@
  */
 
 import { NextRequest } from "next/server";
-import { renderComponentToHtml, compileComponentToModule, sectionWrap } from "@/lib/v2/render-page";
+import {
+  renderComponentToHtml,
+  compileComponentToModule,
+  sectionWrap,
+  normalizePageLinks,
+} from "@/lib/v2/render-page";
 import { routeEdit, editSection, type EditSection } from "@/lib/v2/edit-section";
 
 export const runtime = "nodejs";
@@ -100,11 +105,14 @@ export async function POST(req: NextRequest): Promise<Response> {
       js = undefined; // section will still hot-swap as static
     }
 
+    // Same link repair + anchor id as the build stream, so an edited section
+    // keeps working in-page links and stays a valid anchor target.
+    const presentCategories = new Set(sections.map((s) => s.category));
     return Response.json({
       ok: true,
       index,
       category: target.category,
-      html: sectionWrap(index, html),
+      html: sectionWrap(index, normalizePageLinks(html, presentCategories), target.category),
       js,
       code: edited,
     });
