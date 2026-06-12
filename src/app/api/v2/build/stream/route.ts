@@ -36,6 +36,7 @@ import {
   pageShell,
   sectionWrap,
   applyBrandTokens,
+  normalizePageLinks,
 } from "@/lib/v2/render-page";
 import { selectComponentsForPrompt } from "@/lib/component-registry";
 
@@ -77,6 +78,22 @@ export async function POST(req: NextRequest): Promise<Response> {
   const finalSections: (string | undefined)[] = new Array(components.length);
   let aiUsed = false;
 
+  // Anchor ids + link repair: the first section of each category exposes its
+  // category as an id, and every internal href is normalised to a real anchor
+  // (or defused) — so footer/nav links work instead of erroring (see
+  // normalizePageLinks). Applied to streamed sections AND the done artifact.
+  const presentCategories = new Set(components.map((c) => c.category));
+  const firstOfCategory = new Map<string, number>();
+  components.forEach((c, i) => {
+    if (!firstOfCategory.has(c.category)) firstOfCategory.set(c.category, i);
+  });
+  const anchorIdFor = (i: number, html: string): string | undefined => {
+    if (firstOfCategory.get(components[i].category) !== i) return undefined;
+    const cat = components[i].category;
+    // Some components already carry their own id="<category>" — don't duplicate.
+    return html.includes(`id="${cat}"`) ? undefined : cat;
+  };
+
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const send = (obj: unknown) => {
@@ -116,12 +133,16 @@ export async function POST(req: NextRequest): Promise<Response> {
           components.map(async (c, index) => {
             const base = baseCodeFor(c.code);
             try {
-              const html = applyBrandTokens(await renderComponentToHtml(base), brandName);
-              finalSections[index] = html;
+              const html = normalizePageLinks(
+                applyBrandTokens(await renderComponentToHtml(base), brandName),
+                presentCategories,
+              );
+              const anchor = anchorIdFor(index, html);
+              finalSections[index] = anchor ? `<section id="${anchor}">${html}</section>` : html;
               send({
                 type: "section",
                 index,
-                html: sectionWrap(index, html),
+                html: sectionWrap(index, html, anchor),
                 ai: false,
                 js: compileLive(base),
                 code: base,
@@ -146,13 +167,17 @@ export async function POST(req: NextRequest): Promise<Response> {
                 const base = baseCodeFor(c.code);
                 const rewritten = await aiRewriteCopy(base, prompt, brandName, c.category);
                 if (!rewritten) return;
-                const html = applyBrandTokens(await renderComponentToHtml(rewritten), brandName);
-                finalSections[index] = html;
+                const html = normalizePageLinks(
+                  applyBrandTokens(await renderComponentToHtml(rewritten), brandName),
+                  presentCategories,
+                );
+                const anchor = anchorIdFor(index, html);
+                finalSections[index] = anchor ? `<section id="${anchor}">${html}</section>` : html;
                 aiUsed = true;
                 send({
                   type: "section",
                   index,
-                  html: sectionWrap(index, html),
+                  html: sectionWrap(index, html, anchor),
                   ai: true,
                   js: compileLive(rewritten),
                   code: rewritten,

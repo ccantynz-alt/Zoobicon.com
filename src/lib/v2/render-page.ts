@@ -368,8 +368,23 @@ export async function renderFromRegistry(opts: {
     }),
   );
 
+  // Anchor ids + link repair: first section of each category carries its
+  // category as an id, and every internal href resolves to a real anchor.
+  const present = new Set(components.map((c) => c.category));
+  const seen = new Set<string>();
+  const wrapped = sections.map((html, i) => {
+    if (!html) return "";
+    const cat = components[i].category;
+    if (!seen.has(cat)) {
+      seen.add(cat);
+      // Some components already carry their own id="<category>" — don't duplicate.
+      if (!html.includes(`id="${cat}"`)) return `<section id="${cat}">${html}</section>`;
+    }
+    return html;
+  });
+
   return {
-    html: pageShell(sections.filter(Boolean).join("\n"), brandName, { industry }),
+    html: pageShell(normalizePageLinks(wrapped.filter(Boolean).join("\n"), present), brandName, { industry }),
     componentIds: components.map((c) => c.id),
     industry,
     theme: "editorial",
@@ -392,8 +407,65 @@ export function usesSerifHeadings(industry: string): boolean {
 
 // Wrap a rendered section so the in-iframe script can address it by index
 // for progressive hot-swap (instant base render → AI-tailored copy lands).
-export function sectionWrap(index: number, html: string): string {
-  return `<section data-zb-i="${index}">${html}</section>`;
+// When the section's category is an anchor target (features/pricing/faq/…),
+// the wrapper carries that id so in-page nav/footer links actually work.
+export function sectionWrap(index: number, html: string, anchorId?: string): string {
+  const id = anchorId ? ` id="${anchorId}"` : "";
+  return `<section data-zb-i="${index}"${id}>${html}</section>`;
+}
+
+// ── In-page link repair ─────────────────────────────────────────────────
+// Registry components link to conventional anchors (#features, #pricing) or
+// route-style paths (/about, /pricing). On a single-page build those ids
+// never existed and the routes 404 — in the srcdoc preview a route click
+// navigated the iframe to an invalid URL ("all the footer links error").
+// Fix: sections expose their category as an id (sectionWrap above), and
+// every internal href is normalised to the matching anchor — or defused to
+// "#" if nothing on the page matches. External/mailto/tel links untouched.
+const ANCHOR_SYNONYMS: Record<string, string[]> = {
+  features: ["features", "feature", "services", "service", "products", "product", "solutions", "work", "menu", "how-it-works"],
+  pricing: ["pricing", "prices", "plans", "plan"],
+  faq: ["faq", "faqs", "questions", "help"],
+  contact: ["contact", "contact-us", "get-in-touch", "book", "booking", "quote", "support"],
+  testimonials: ["testimonials", "reviews", "customers", "stories", "case-studies"],
+  about: ["about", "about-us", "team", "story", "mission", "company"],
+  stats: ["stats", "results", "numbers", "impact"],
+  gallery: ["gallery", "photos", "showcase", "portfolio"],
+  blog: ["blog", "news", "articles", "resources"],
+  cta: ["signup", "sign-up", "start", "get-started", "demo", "trial"],
+};
+
+function anchorForSlug(slug: string, present: Set<string>): string | null {
+  for (const [category, slugs] of Object.entries(ANCHOR_SYNONYMS)) {
+    if (present.has(category) && (category === slug || slugs.includes(slug))) return category;
+  }
+  return null;
+}
+
+export function normalizePageLinks(html: string, presentCategories: Set<string>): string {
+  return html.replace(/href="([^"]*)"/g, (full, href: string) => {
+    if (
+      /^(https?:)?\/\//.test(href) ||
+      href.startsWith("mailto:") ||
+      href.startsWith("tel:") ||
+      href === "#"
+    ) {
+      return full;
+    }
+    const slug = href
+      .replace(/^#/, "")
+      .replace(/^\//, "")
+      .replace(/\.html?$/, "")
+      .replace(/\/$/, "")
+      .toLowerCase();
+    if (!slug || slug === "home" || slug === "top") return 'href="#"';
+    const anchor = anchorForSlug(slug, presentCategories);
+    if (anchor) return `href="#${anchor}"`;
+    // Anchor to an id we know exists? Keep it. Anything else is a dead
+    // route/section — defuse it so it can never error the page.
+    if (href.startsWith("#") && presentCategories.has(slug)) return full;
+    return 'href="#"';
+  });
 }
 
 // CRITICAL FIX: the registry components were written against the main app's
@@ -551,15 +623,36 @@ export function pageShell(
     }
   });
   document.addEventListener('click', function(e){
-    if (!ZB.pick) return;
-    e.preventDefault();
-    e.stopPropagation();
     var t = e.target;
-    var sec = t && t.closest ? t.closest('[data-zb-i]') : null;
-    if (sec){
-      var idx = parseInt(sec.getAttribute('data-zb-i'), 10);
-      try { parent.postMessage({ type: 'zb-section-pick', index: idx }, '*'); } catch(_){}
+    if (ZB.pick){
+      e.preventDefault();
+      e.stopPropagation();
+      var sec = t && t.closest ? t.closest('[data-zb-i]') : null;
+      if (sec){
+        var idx = parseInt(sec.getAttribute('data-zb-i'), 10);
+        try { parent.postMessage({ type: 'zb-section-pick', index: idx }, '*'); } catch(_){}
+      }
+      return;
     }
+    // Link safety net: the preview lives in a srcdoc iframe, so navigating it
+    // anywhere breaks the preview. External links open in a new tab, known
+    // anchors smooth-scroll, everything else is inert (never an error page).
+    var a = t && t.closest ? t.closest('a[href]') : null;
+    if (!a) return;
+    var href = a.getAttribute('href') || '';
+    if (/^(https?:)?\\/\\//.test(href) || /^https?:/.test(href)){
+      e.preventDefault();
+      try { window.open(href, '_blank', 'noopener'); } catch(_){}
+      return;
+    }
+    if (href.charAt(0) === '#' && href.length > 1){
+      var target = document.getElementById(href.slice(1));
+      e.preventDefault();
+      if (target){ try { target.scrollIntoView({ behavior: 'smooth' }); } catch(_){ target.scrollIntoView(); } }
+      return;
+    }
+    if (href.startsWith('mailto:') || href.startsWith('tel:')) return;
+    e.preventDefault(); // '#', '', or a route that doesn't exist here
   }, true);
   function ready(){ try { parent.postMessage({type:'zb-ready'}, '*'); } catch(_){} }
   if (document.readyState !== 'loading') ready();
