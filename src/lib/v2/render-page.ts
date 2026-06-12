@@ -50,6 +50,73 @@ export interface RenderedPage {
   aiUsed: boolean;
 }
 
+// Next.js App Router aliases `react` to its Server-Components subset inside
+// route handlers — hooks (useState, useRef, …) simply DON'T EXIST there. Any
+// registry component that called React.useState was silently dropped from the
+// page in production ("react_1.default.useState is not a function"), while
+// vitest — which loads full React — passed. Navbars, carousels and accordions
+// vanished from built sites for months because of this. For a STATIC first
+// render the correct hook semantics are exactly "initial state, no effects",
+// so when hooks are missing we supply those. The browser hydration layer uses
+// the real full React from esm.sh, so live interactivity is untouched.
+let _reactForComponents: typeof React | null = null;
+function getReactForComponents(): typeof React {
+  if (_reactForComponents) return _reactForComponents;
+  const anyR = React as Record<string, unknown>;
+  if (typeof anyR.useState === "function") {
+    _reactForComponents = React;
+    return React;
+  }
+  let idCounter = 0;
+  // Copy key-by-key: some RSC subset exports are guarded getters that throw
+  // on access — a plain spread would explode at module init.
+  const base: Record<string, unknown> = {};
+  for (const k of Object.keys(anyR)) {
+    try {
+      base[k] = anyR[k];
+    } catch {
+      /* guarded server-subset export — skip it */
+    }
+  }
+  _reactForComponents = {
+    ...base,
+    useState: (init: unknown) => [typeof init === "function" ? (init as () => unknown)() : init, () => {}],
+    useReducer: (_r: unknown, init: unknown, initFn?: (i: unknown) => unknown) => [
+      initFn ? initFn(init) : init,
+      () => {},
+    ],
+    useEffect: () => {},
+    useLayoutEffect: () => {},
+    useInsertionEffect: () => {},
+    useRef: (v: unknown = null) => ({ current: v }),
+    useMemo: (fn: () => unknown) => fn(),
+    useCallback: (fn: unknown) => fn,
+    useContext: (ctx: { _currentValue?: unknown } | null | undefined) => ctx && ctx._currentValue,
+    useId: () => `zb-${++idCounter}`,
+    useTransition: () => [false, (fn: () => void) => fn()],
+    useDeferredValue: (v: unknown) => v,
+    useSyncExternalStore: (
+      _sub: unknown,
+      getSnapshot: () => unknown,
+      getServerSnapshot?: () => unknown,
+    ) => (getServerSnapshot || getSnapshot)(),
+    useImperativeHandle: () => {},
+    useDebugValue: () => {},
+    createContext:
+      base.createContext ||
+      ((def: unknown) => {
+        const ctx = {
+          _currentValue: def,
+          Provider: ({ children }: { children?: unknown }) => children,
+          Consumer: ({ children }: { children?: (v: unknown) => unknown }) =>
+            typeof children === "function" ? children(def) : null,
+        };
+        return ctx;
+      }),
+  } as unknown as typeof React;
+  return _reactForComponents;
+}
+
 // Transpile a TSX component string and render it to static HTML. Runs
 // entirely on the server (Node runtime). Mirrors the proven approach in
 // the render smoke tests.
@@ -67,7 +134,7 @@ export async function renderComponentToHtml(tsx: string): Promise<string> {
 
   const moduleObj: { exports: Record<string, unknown> } = { exports: {} };
   const requireShim = (id: string): unknown => {
-    if (id === "react") return React;
+    if (id === "react") return getReactForComponents();
     if (id === "react/jsx-runtime" || id === "react/jsx-dev-runtime") return require("react/jsx-runtime");
     if (id === "lucide-react") return lucide;
     if (id === "framer-motion") return framer;
