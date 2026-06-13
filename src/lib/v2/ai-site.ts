@@ -32,6 +32,7 @@
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { streamClaude } from "@/lib/anthropic-cached";
 import { finalizeAiHtml, normalizeAiLinks } from "@/lib/v2/post-process";
+import { applyRealImages } from "@/lib/v2/images";
 
 // Opus 4.8 — Craig's chosen generation model for the whole-page engine. We try
 // Opus first, then automatically fall back to Sonnet 4.6 (still a real, bespoke
@@ -160,9 +161,8 @@ export async function generateAiSite(opts: {
     `\n\nDesign and build the complete website now. Output only the HTML document.`;
 
   const r = await callForHtml(BUILD_SYSTEM, userMessage);
-  return r
-    ? { ok: true, html: finalizeAiHtml(r.html, prompt), model: r.model }
-    : { ok: false, reason: "no model returned a complete HTML document" };
+  if (!r) return { ok: false, reason: "no model returned a complete HTML document" };
+  return { ok: true, html: await applyRealImages(finalizeAiHtml(r.html, prompt)), model: r.model };
 }
 
 /**
@@ -297,7 +297,7 @@ const CRITICS: Array<{ role: string; system: string }> = [
   {
     role: "design",
     system:
-      "You are a senior design director. Review this finished marketing website's HTML and list up to 5 SPECIFIC, concrete problems holding it back from $100K-agency quality — weak typographic hierarchy, timid spacing, a generic hero, bland or low-effort colour use, repetitive sections, poor imagery choices. Bullet points only, each one actionable. No prose, no praise.",
+      "You are a senior design director. List up to 6 SPECIFIC, concrete problems holding this finished marketing website back from $100K-agency quality. Be RUTHLESS about FLATNESS above all — explicitly call out: a hero with no full-bleed background photo, sections that are flat colour blocks with no imagery, missing depth/layering (no glassmorphism, no floating or overlapping cards, no shadows), weak typographic hierarchy, timid spacing, generic copy, repetitive identical sections. For each, state exactly what to ADD (e.g. 'hero needs a full-bleed photo + dark overlay + a floating glass card with proof points'). Bullet points only, each actionable. No prose, no praise.",
   },
   {
     role: "accessibility",
@@ -371,7 +371,6 @@ export async function reviewAndImproveAiSite(opts: {
     userMessage,
     (improved) => improved.length >= html.length * 0.7,
   );
-  return r
-    ? { ok: true, html: finalizeAiHtml(r.html, opts.prompt), model: r.model }
-    : { ok: false, reason: "no usable improvement — kept original" };
+  if (!r) return { ok: false, reason: "no usable improvement — kept original" };
+  return { ok: true, html: await applyRealImages(finalizeAiHtml(r.html, opts.prompt)), model: r.model };
 }

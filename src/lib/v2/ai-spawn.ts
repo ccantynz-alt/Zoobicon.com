@@ -27,6 +27,7 @@
 
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { finalizeAiHtml } from "@/lib/v2/post-process";
+import { applyRealImages } from "@/lib/v2/images";
 
 // Opus first, Sonnet as automatic fallback (a real design either way). Because
 // sections are spawned concurrently, Opus-per-section is still fast.
@@ -115,9 +116,21 @@ Requirements:
 - Tailwind utility classes only (the page loads the Tailwind CDN). Use arbitrary values for the exact hex colours above. Plain HTML — no React/JSX/imports.
 - Specific, confident, on-brand copy — never "Acme"/lorem. Real value props for this business.
 - Fully responsive (mobile-first), accessible (semantic tags, alt text, good contrast).
-- Internal links must point to "#<section-id>" anchors. If this is the navbar, link to the other sections by their ids: ${brief.sections.map((s) => "#" + s.id).join(", ")}. For a navbar include a working mobile menu using only Tailwind's "peer"/checkbox pattern or a data-attribute toggled by the page's tiny JS (a button with class "zb-menu-btn" toggles the element with class "zb-menu").
-- Use real imagery from https://images.unsplash.com and avatars from https://randomuser.me/api/portraits/ where it helps. Always include alt text.
-- Tasteful only — elegant, premium, never gaudy.`;
+- Internal links must point to "#<section-id>" anchors. If this is the navbar, link to the other sections by their ids: ${brief.sections.map((s) => "#" + s.id).join(", ")}. For a navbar include a working mobile menu (a button with class "zb-menu-btn" toggles the element with class "zb-menu").
+- Always include alt text on images.
+
+VISUAL RICHNESS — this is what separates $100K-agency work from a flat template. MATCH IT:
+- Use real PHOTOGRAPHY, not flat colour blocks. Most sections should feature imagery — full-bleed background photos with a dark gradient overlay for legibility, framed/rounded photos, or photo grids. Pull specific, on-topic images from https://images.unsplash.com (e.g. https://images.unsplash.com/photo-XXXXXXXX?auto=format&fit=crop&w=1600&q=80). Avatars from https://randomuser.me/api/portraits/.
+- IMAGES MUST carry a data-img attribute describing the subject in 2–5 words, e.g. <img data-img="airport departure terminal at dusk" src="https://images.unsplash.com/photo-...?auto=format&fit=crop&w=1600&q=80" alt="..."/>. Keep a real Unsplash src as a fallback; the platform swaps in a genuine matching photo when available. For CSS background images, add data-img to the element too.
+- Build DEPTH and LAYERING: elevated and glassmorphic cards (backdrop-blur, translucent backgrounds, subtle 1px borders, soft shadows) that FLOAT over imagery or gradients; overlapping elements; never everything flat on one plane.
+- Premium detail: rich shadows (shadow-xl / shadow-2xl), gradient accents, badges/pills, generous scale and whitespace, refined hover transitions, rounded corners.
+- "Tasteful" means CONSIDERED, not flat or minimal — rich, layered and confident like a top design agency. Avoid bland single-colour blocks with centred text.
+
+PREMIUM PATTERNS — draw on whichever fits this section:
+- Hero: a full-bleed background PHOTO + dark gradient overlay + a large display headline + a floating glassmorphic card with proof points or a quick-action widget (this is the highest-impact section — make it cinematic).
+- Features: a bento grid or alternating image+text rows with icons — not three identical columns.
+- Testimonials: cards with avatars and soft shadows over a tinted or textured background.
+- Stats: large gradient numbers. Gallery/menu: a real photo grid or masonry.`;
 }
 
 async function callText(system: string, userMessage: string, maxTokens: number): Promise<{ text: string; model: string } | null> {
@@ -158,10 +171,31 @@ export async function generateDesignBrief(prompt: string, variationHint?: string
   } as DesignBrief;
 }
 
+// Per-section richness guidance — pushes the most-visible sections (the hero
+// above all) toward cinematic, photographic, layered treatments, not flat blocks.
+function sectionRichHint(kind: string): string {
+  const k = (kind || "").toLowerCase();
+  if (/hero|header/.test(k))
+    return "MAKE IT CINEMATIC: a full-bleed background PHOTO (with a data-img attribute) under a dark gradient overlay for legibility, a large bold display headline, a short confident subhead, primary + secondary CTAs, and a floating glassmorphic card overlapping the image with proof points or a quick-action widget. This is the highest-impact section — it must read like a premium agency hero, never a flat colour block.";
+  if (/feature|service|benefit/.test(k))
+    return "Use a bento grid or alternating image+text rows with icons and at least one real photo — not three identical flat columns.";
+  if (/gallery|menu|portfolio|work|product|fleet/.test(k))
+    return "A rich photo grid or masonry of real images (each with data-img); make it visual and tactile.";
+  if (/testimonial|review/.test(k))
+    return "Glassmorphic cards with real avatars and soft shadows, over a tinted or photographic background.";
+  if (/stat|number|result/.test(k))
+    return "Large gradient numbers with labels, on a subtle photographic or gradient backdrop.";
+  if (/about|story/.test(k))
+    return "Pair editorial copy with a real photo; add depth via an overlapping accent or framed image.";
+  if (/cta|contact|book|quote/.test(k))
+    return "A bold, confident band — gradient or photographic background with an overlay, a large headline, and a prominent action.";
+  return "";
+}
+
 async function generateSection(prompt: string, brief: DesignBrief, section: DesignBrief["sections"][number]): Promise<string> {
   const r = await callText(
     sectionSystem(brief),
-    `Business: ${prompt}\nSection to build: ${section.kind} (id="${section.id}")\nThis section must: ${section.intent}\n\nReturn only the section's HTML.`,
+    `Business: ${prompt}\nSection to build: ${section.kind} (id="${section.id}")\nThis section must: ${section.intent}\n${sectionRichHint(section.kind)}\n\nReturn only the section's HTML.`,
     4000,
   );
   if (!r) return "";
@@ -256,9 +290,10 @@ export async function spawnSite(opts: { prompt: string; variationHint?: string }
   const good = htmls.filter((h) => h.length > 0);
   if (good.length < 3) return { ok: false, reason: "too few sections rendered" };
 
+  const finalized = finalizeAiHtml(assemblePage(brief, good), prompt);
   return {
     ok: true,
-    html: finalizeAiHtml(assemblePage(brief, good), prompt),
+    html: await applyRealImages(finalized),
     brief,
     model: SPAWN_MODELS[0],
     sectionCount: good.length,
