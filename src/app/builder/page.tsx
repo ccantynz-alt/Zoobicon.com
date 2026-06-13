@@ -78,6 +78,10 @@ function BuilderInner() {
   const [elapsed, setElapsed] = useState(0);
   const [shell, setShell] = useState<string | null>(null);
   const [result, setResult] = useState<BuildResult | null>(null);
+  // When the page was built by the AI engine it's a single finished HTML
+  // document (not streamed sections); aiHtml holds that document so the
+  // refine chat can edit the whole page. null ⇒ the streamed/registry engine.
+  const [aiHtml, setAiHtml] = useState<string | null>(null);
   const [totalSections, setTotalSections] = useState(0);
   const [sectionsIn, setSectionsIn] = useState(0); // base sections landed
   const [tailoring, setTailoring] = useState(false); // AI copy pass running
@@ -168,6 +172,7 @@ function BuilderInner() {
       setError("");
       setResult(null);
       setShell(null);
+      setAiHtml(null);
       setTotalSections(0);
       setSectionsIn(0);
       setTailoring(false);
@@ -181,6 +186,42 @@ function BuilderInner() {
       const started = Date.now();
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => setElapsed((Date.now() - started) / 1000), 100);
+
+      // PRIMARY ENGINE: the model designs + writes the whole page and returns
+      // a finished HTML document. Bespoke ($100K) output, and the browser
+      // executes none of it — it just displays it — so it can't blank.
+      try {
+        const aiRes = await fetch("/api/v2/build/ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text }),
+        });
+        if (genId !== genIdRef.current) return;
+        if (aiRes.ok) {
+          const data = (await aiRes.json().catch(() => null)) as
+            | { ok: boolean; html?: string; engine?: string; industry?: string; componentIds?: string[] }
+            | null;
+          if (genId !== genIdRef.current) return;
+          if (data?.ok && data.html) {
+            setShell(data.html);
+            // Only the true AI engine yields an editable single-document page;
+            // the registry safety-net falls through to section-based editing.
+            setAiHtml(data.engine === "ai" ? data.html : null);
+            setResult({
+              html: data.html,
+              componentIds: data.componentIds || [],
+              industry: data.industry || "",
+              aiUsed: data.engine === "ai",
+            });
+            setTailoring(false);
+            setStatus("done");
+            return;
+          }
+        }
+      } catch {
+        // AI route unreachable — fall through to the streaming engine below,
+        // which is itself reliable and has its own one-shot fallback.
+      }
 
       try {
         const res = await fetch("/api/v2/build/stream", {
@@ -290,6 +331,39 @@ function BuilderInner() {
     async (raw: string) => {
       const instruction = raw.trim();
       if (!instruction || editing || status === "building") return;
+
+      // AI-built page: it's one finished document, so edit the whole page and
+      // hot-swap the result back into the preview.
+      if (aiHtml) {
+        setChat((c) => [...c, { role: "user", text: instruction }]);
+        setChatInput("");
+        setEditing(true);
+        try {
+          const res = await fetch("/api/v2/edit/ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ html: aiHtml, instruction }),
+          });
+          const data = (await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }))) as {
+            ok: boolean;
+            html?: string;
+            error?: string;
+          };
+          if (!data.ok || !data.html) {
+            setChat((c) => [...c, { role: "system", text: data.error || "That change didn't land — try rewording it.", ok: false }]);
+            return;
+          }
+          setAiHtml(data.html);
+          setShell(data.html);
+          setChat((c) => [...c, { role: "system", text: "Updated your site.", ok: true }]);
+        } catch (err) {
+          setChat((c) => [...c, { role: "system", text: err instanceof Error ? err.message : "Edit failed — please try again.", ok: false }]);
+        } finally {
+          setEditing(false);
+        }
+        return;
+      }
+
       const sections = Array.from(sectionMetaRef.current.entries()).map(([index, m]) => ({
         index,
         category: m.category,
@@ -348,7 +422,7 @@ function BuilderInner() {
         setEditing(false);
       }
     },
-    [editing, status, pushSection, editTarget],
+    [editing, status, pushSection, editTarget, aiHtml],
   );
 
   // Export the CURRENT page (including refine edits) as a clean, deployable
@@ -666,10 +740,10 @@ function BuilderInner() {
           )}
 
           <div className="mt-auto pt-6 text-[11px] leading-relaxed" style={{ color: "var(--zb-muted)" }}>
-            Pages render on our servers first, then come alive as real
-            interactive React — menus, accordions, animations. If anything
-            can&rsquo;t load, the polished static version stays. Your preview
-            can only get better, never break.
+            Your site is designed and built on our servers, then shown to you
+            as a finished page — menus, accordions and animations included. If
+            anything can&rsquo;t load, you still get a complete page. Your
+            preview never breaks.
           </div>
         </aside>
 
@@ -687,8 +761,8 @@ function BuilderInner() {
                 </div>
                 <h2 className="zb-display text-[22px]">Your website appears here</h2>
                 <p className="mt-2 text-[14px]" style={{ color: "var(--zb-muted)" }}>
-                  Describe your business on the left and press build. A complete
-                  page streams in within seconds.
+                  Describe your business on the left and press build. A complete,
+                  custom page is designed and built just for you.
                 </p>
               </div>
             </div>
@@ -702,7 +776,17 @@ function BuilderInner() {
                   className="mx-auto mb-4 h-9 w-9 animate-spin rounded-full"
                   style={{ border: "3px solid var(--zb-line)", borderTopColor: "var(--zb-accent)" }}
                 />
-                <p className="text-[14px] font-semibold">Selecting your sections…</p>
+                <p className="text-[14px] font-semibold">
+                  {elapsed < 4
+                    ? "Understanding your business…"
+                    : elapsed < 12
+                    ? "Designing a layout that fits…"
+                    : elapsed < 24
+                    ? "Choosing colours, type & imagery…"
+                    : elapsed < 45
+                    ? "Writing your page…"
+                    : "Polishing the details…"}
+                </p>
                 <p className="mt-1 text-[12px]" style={{ color: "var(--zb-muted)" }}>
                   {elapsed.toFixed(1)}s
                 </p>
@@ -769,23 +853,25 @@ function BuilderInner() {
                 {/* Actions */}
                 {status === "done" && (
                   <span className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => {
-                        const next = !pickMode;
-                        setPickMode(next);
-                        iframeRef.current?.contentWindow?.postMessage({ type: "zb-edit-mode", on: next }, "*");
-                      }}
-                      className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold transition-transform hover:-translate-y-0.5"
-                      style={
-                        pickMode
-                          ? { background: "var(--zb-accent)", color: "#ffffff" }
-                          : { background: "var(--zb-bg)", border: "1px solid var(--zb-line)", color: "var(--zb-ink)" }
-                      }
-                      title="Click a section in the preview, then say what to change"
-                    >
-                      <MousePointerClick size={13} />
-                      <span className="hidden md:inline">{pickMode ? "Click a section…" : "Point & edit"}</span>
-                    </button>
+                    {!aiHtml && (
+                      <button
+                        onClick={() => {
+                          const next = !pickMode;
+                          setPickMode(next);
+                          iframeRef.current?.contentWindow?.postMessage({ type: "zb-edit-mode", on: next }, "*");
+                        }}
+                        className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold transition-transform hover:-translate-y-0.5"
+                        style={
+                          pickMode
+                            ? { background: "var(--zb-accent)", color: "#ffffff" }
+                            : { background: "var(--zb-bg)", border: "1px solid var(--zb-line)", color: "var(--zb-ink)" }
+                        }
+                        title="Click a section in the preview, then say what to change"
+                      >
+                        <MousePointerClick size={13} />
+                        <span className="hidden md:inline">{pickMode ? "Click a section…" : "Point & edit"}</span>
+                      </button>
+                    )}
                     <ChromeButton onClick={() => build(prompt)} label="Rebuild">
                       <RefreshCw size={13} />
                     </ChromeButton>
