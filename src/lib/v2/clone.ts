@@ -16,7 +16,17 @@
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { normalizeAiLinks } from "@/lib/v2/post-process";
 
-const CLONE_MODELS = ["claude-opus-4-8", "claude-sonnet-4-6"];
+// Cloning is reproduction, not creative design — Sonnet is plenty and ~2× faster
+// than Opus at emitting a full page, so it leads. Opus is only a fallback.
+const CLONE_MODELS = ["claude-sonnet-4-6", "claude-opus-4-8"];
+
+// Hard ceiling per model call so a clone can never hang the builder.
+function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`${label} timed out`)), ms)),
+  ]);
+}
 
 /** Pull the first real URL/domain out of a prompt, or null. */
 export function findUrlInPrompt(prompt: string): string | null {
@@ -49,6 +59,37 @@ async function fetchSiteHtml(url: string): Promise<string | null> {
   }
 }
 
+// HEADLESS-BROWSER READ via Cloudflare Browser Rendering: runs the page's
+// JavaScript in a real browser and returns the FULLY rendered HTML — so we can
+// read React/SPA sites (like bookaride) that a raw fetch only sees as an empty
+// shell. Graceful: no Cloudflare creds (or any failure) ⇒ null, and the caller
+// falls back to the raw fetch. This is the capability that makes JS sites
+// cloneable (and the same browser unlocks screenshot/vision next).
+async function renderViaBrowser(url: string): Promise<string | null> {
+  const account = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const token = process.env.CLOUDFLARE_API_TOKEN;
+  if (!account || !token) return null;
+  try {
+    const res = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${account}/browser-rendering/content`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+        signal: AbortSignal.timeout(30000),
+      },
+    );
+    if (!res.ok) return null;
+    const data = (await res.json()) as { success?: boolean; result?: string };
+    if (data.success && typeof data.result === "string" && data.result.length > 500) {
+      return data.result;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 // Resolve root-relative URLs to absolute so the clone's images/assets load.
 function absolutize(html: string, base: string): string {
   let origin = "";
@@ -73,7 +114,9 @@ function cleanHtmlForClone(html: string, base: string): string {
     .replace(/<svg[\s\S]*?<\/svg>/gi, "");
   s = absolutize(s, base);
   s = s.replace(/[\t ]{2,}/g, " ").replace(/>\s+</g, ">\n<").trim();
-  if (s.length > 48000) s = s.slice(0, 48000);
+  // Cap for speed — the top of the page (hero + main sections) is what makes a
+  // clone recognisable; less input also means faster output.
+  if (s.length > 30000) s = s.slice(0, 30000);
   return s;
 }
 
@@ -114,7 +157,8 @@ function extractDoc(raw: string): string {
 
 /** Fetch a real site and faithfully recreate it. Never throws. */
 export async function cloneSite(url: string): Promise<CloneResult | CloneFail> {
-  const raw = await fetchSiteHtml(url);
+  // Headless render first (reads JS/SPA sites); fall back to a raw fetch.
+  const raw = (await renderViaBrowser(url)) || (await fetchSiteHtml(url));
   if (!raw) return { ok: false, reason: "Couldn't fetch that URL — it may block bots, be down, or need https." };
   const cleaned = cleanHtmlForClone(raw, url);
   if (cleaned.length < 600) {
@@ -124,13 +168,17 @@ export async function cloneSite(url: string): Promise<CloneResult | CloneFail> {
   const userMessage = `Source URL: ${url}\n\nThe user's REAL website (cleaned HTML). Recreate it faithfully — same brand, copy, sections, order, colours, and reuse the image URLs:\n\n${cleaned}`;
   for (const model of CLONE_MODELS) {
     try {
-      const res = await callLLMWithFailover({ model, system: CLONE_SYSTEM, userMessage, maxTokens: 32000 });
+      const res = await withTimeout(
+        callLLMWithFailover({ model, system: CLONE_SYSTEM, userMessage, maxTokens: 32000 }),
+        85000,
+        `clone:${model}`,
+      );
       const out = extractDoc(res.text || "");
       if (out.length > 1500 && /<\/html>/i.test(out) && /<body/i.test(out)) {
         return { ok: true, html: normalizeAiLinks(out), sourceUrl: url, model: res.model || model };
       }
     } catch {
-      // try next model
+      // timed out or errored — try the next model, else fall back to a fresh build
     }
   }
   return { ok: false, reason: "Couldn't rebuild the page from the source." };
