@@ -235,3 +235,68 @@ export async function* streamAiSite(opts: {
   }
   yield { type: "result", html, model: GENERATION_MODEL };
 }
+
+// ───────────────────────────────────────────────────────────────────────
+// SELF-REVIEW & AUTO-FIX (move #2) — the "intelligence" pass.
+//
+// After a page is built, a senior-design-director pass critiques the model's
+// OWN output against a $100K bar and returns an improved version. This is a
+// reflexion loop on the code (no headless browser needed): asking a strong
+// model to find and fix its own weak spots reliably lifts quality. The client
+// runs this in the BACKGROUND after first paint and hot-swaps the result, so
+// it costs the user no wait. A regression guard means it can only ever improve
+// the page, never gut it — if anything looks off, the original is kept.
+// ───────────────────────────────────────────────────────────────────────
+
+const REVIEW_SYSTEM = `You are a brutally honest senior design director doing the final review of a finished marketing website before it ships to a paying client. You will receive the complete HTML document.
+
+Silently judge it against this bar (do NOT output your critique):
+- Distinctive, on-brand hero that fits THIS specific business — never generic
+- Specific, confident copy — no placeholder / lorem / "Acme"; real value props
+- Strong typographic hierarchy; generous, intentional spacing and rhythm
+- Section variety (not repetitive identical blocks)
+- Tasteful, intentional colour; good contrast (WCAG AA)
+- Imagery that genuinely suits the business
+- Truly responsive (mobile-first); a working mobile menu
+- Clear CTAs; accessible, semantic markup
+- The overall "$100K design agency" feeling
+
+Then return an IMPROVED, complete HTML document that fixes the weakest points and elevates it to that bar.
+
+Rules:
+- KEEP everything already strong. Do NOT remove sections or strip content — only improve. The result must be the same page, better.
+- Keep it a single self-contained document: Tailwind via the CDN, Google Fonts, vanilla JS only. No React, no imports, no build step.
+- Start with <!DOCTYPE html>, end with </html>. Output ONLY the HTML — no commentary, no markdown fences.`;
+
+export async function reviewAndImproveAiSite(opts: {
+  html: string;
+  prompt: string;
+  brandName?: string;
+}): Promise<AiSiteResult | AiSiteFail> {
+  const html = (opts.html || "").trim();
+  if (!html) return { ok: false, reason: "no page to review" };
+
+  try {
+    const res = await callLLMWithFailover({
+      model: GENERATION_MODEL,
+      system: REVIEW_SYSTEM,
+      userMessage:
+        `Business: ${opts.prompt}` +
+        (opts.brandName ? `\nBrand: ${opts.brandName}` : "") +
+        `\n\nReview and improve this website. Output only the full, improved HTML document.\n\n${html}`,
+      maxTokens: MAX_TOKENS,
+    });
+    const improved = extractHtmlDoc(res.text || "");
+    if (!looksLikeCompletePage(improved)) {
+      return { ok: false, reason: "review did not return a complete document" };
+    }
+    // Regression guard: a genuine polish keeps (or grows) the content. A much
+    // shorter result means the model dropped sections — reject, keep original.
+    if (improved.length < html.length * 0.7) {
+      return { ok: false, reason: "review output too short — kept original" };
+    }
+    return { ok: true, html: improved, model: res.model || GENERATION_MODEL };
+  } catch (err) {
+    return { ok: false, reason: err instanceof Error ? err.message : "review failed" };
+  }
+}

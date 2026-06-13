@@ -84,6 +84,8 @@ function BuilderInner() {
   const [aiHtml, setAiHtml] = useState<string | null>(null);
   // Live HTML as the AI streams it in — shown as a "watch it build" console.
   const [buildLog, setBuildLog] = useState("");
+  // Background self-review pass running (move #2) — polish after first paint.
+  const [polishing, setPolishing] = useState(false);
   const [totalSections, setTotalSections] = useState(0);
   const [sectionsIn, setSectionsIn] = useState(0); // base sections landed
   const [tailoring, setTailoring] = useState(false); // AI copy pass running
@@ -171,6 +173,35 @@ function BuilderInner() {
     setStatus("done");
   }, []);
 
+  // Move #2: background self-review. After first paint, ask the engine to
+  // critique + improve its own page, then hot-swap the better version in.
+  // Best-effort and gen-guarded — if it doesn't improve, the page stays as-is.
+  const refineSite = useCallback(async (html: string, promptText: string, genId: number) => {
+    setPolishing(true);
+    try {
+      const res = await fetch("/api/v2/build/ai/refine", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html, prompt: promptText }),
+      });
+      if (genId !== genIdRef.current) return;
+      const data = (await res.json().catch(() => null)) as { ok?: boolean; html?: string } | null;
+      if (genId !== genIdRef.current) return;
+      if (data?.ok && data.html) {
+        setShell(data.html);
+        setAiHtml(data.html);
+        setChat((c) => [
+          ...c,
+          { role: "system", text: "Polished the design — tightened the layout, hierarchy and copy.", ok: true },
+        ]);
+      }
+    } catch {
+      /* best-effort — keep the page as-is */
+    } finally {
+      if (genId === genIdRef.current) setPolishing(false);
+    }
+  }, []);
+
   const build = useCallback(
     async (p: string) => {
       const text = p.trim();
@@ -182,6 +213,7 @@ function BuilderInner() {
       setShell(null);
       setAiHtml(null);
       setBuildLog("");
+      setPolishing(false);
       setTotalSections(0);
       setSectionsIn(0);
       setTailoring(false);
@@ -242,6 +274,9 @@ function BuilderInner() {
                   aiUsed: evt.engine === "ai",
                 });
                 setStatus("done");
+                // Move #2: self-review & auto-fix runs in the background now
+                // that the page is on screen — swaps in the improved version.
+                if (evt.engine === "ai") void refineSite(html, text, genId);
                 finished = true;
               }
               // evt.type === "error" → let the fallback engines below run
@@ -282,6 +317,7 @@ function BuilderInner() {
             });
             setTailoring(false);
             setStatus("done");
+            if (data.engine === "ai") void refineSite(data.html, text, genId);
             return;
           }
         }
@@ -379,7 +415,7 @@ function BuilderInner() {
         if (genId === genIdRef.current && timerRef.current) clearInterval(timerRef.current);
       }
     },
-    [buildFallback, pushSection],
+    [buildFallback, pushSection, refineSite],
   );
 
   // Prefill + auto-build from ?prompt= (homepage hero, SEO pages, share forks).
@@ -909,6 +945,16 @@ function BuilderInner() {
                   >
                     <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full" style={{ background: "var(--zb-accent)" }} />
                     AI tailoring copy…
+                  </span>
+                )}
+                {polishing && (
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10.5px] font-semibold"
+                    style={{ background: "rgba(232,64,43,0.08)", color: "var(--zb-accent)" }}
+                    title="A senior-design-director pass is reviewing and improving your page"
+                  >
+                    <Sparkles size={11} />
+                    Polishing the design…
                   </span>
                 )}
 
