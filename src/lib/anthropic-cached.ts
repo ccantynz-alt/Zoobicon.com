@@ -24,6 +24,8 @@ export interface CallClaudeOptions {
   maxTokens?: number;
   temperature?: number;
   stream?: boolean;
+  /** Hard ceiling for streamClaude before it aborts. Default 120_000ms. */
+  timeoutMs?: number;
 }
 
 export interface ClaudeUsage {
@@ -191,7 +193,7 @@ export async function* streamClaude(
   // failover loop in callLLMWithFailover gets a thrown error instead of
   // a forever-pending promise. Without this the whole builder hangs.
   const ac = new AbortController();
-  const ceiling = setTimeout(() => ac.abort(new Error("anthropic stream timeout")), 120_000);
+  const ceiling = setTimeout(() => ac.abort(new Error("anthropic stream timeout")), opts.timeoutMs ?? 120_000);
 
   const res = await fetch(ANTHROPIC_URL, {
     method: "POST",
