@@ -37,6 +37,9 @@ export interface DesignBrief {
   industry: string;
   direction: string; // the creative angle for THIS build (varied)
   voice: string;
+  layout: string; // overall layout language, e.g. "asymmetric editorial grid"
+  motion: string; // motion language, e.g. "subtle scroll-reveal + parallax hero"
+  reference: string; // the quality bar to emulate, e.g. "Linear-grade SaaS"
   palette: { bg: string; ink: string; muted: string; surface: string; accent: string; accentInk: string };
   fonts: { display: string; body: string; googleHref: string };
   sections: Array<{ id: string; kind: string; intent: string }>;
@@ -81,6 +84,9 @@ const BRIEF_SYSTEM = `You are an award-winning brand and web designer planning a
   "industry": short string,
   "direction": one sentence describing the distinct creative direction for THIS build (be specific and confident),
   "voice": short phrase for the copy tone,
+  "layout": one phrase for the overall layout language (e.g. "asymmetric editorial grid", "bold centered minimal", "split-screen with sticky media"),
+  "motion": one phrase for the motion language (e.g. "subtle scroll-reveal with a parallax hero", "calm fades only"),
+  "reference": one phrase naming the quality bar to emulate (e.g. "Linear-grade SaaS", "Aesop editorial", "Stripe clarity"),
   "palette": { "bg": hex, "ink": hex, "muted": hex, "surface": hex, "accent": hex, "accentInk": hex },
   "fonts": { "display": Google font family name, "body": Google font family name, "googleHref": a valid https://fonts.googleapis.com/css2?... URL loading BOTH families },
   "sections": [ { "id": kebab-case unique id, "kind": one of navbar|hero|features|gallery|stats|testimonials|pricing|menu|about|process|faq|cta|contact|footer, "intent": one sentence on what this section must achieve for the business } ]
@@ -89,7 +95,8 @@ const BRIEF_SYSTEM = `You are an award-winning brand and web designer planning a
 Rules:
 - Choose a palette and font pairing that genuinely fit THIS business — never default blue, never generic. Ensure strong contrast (WCAG AA): ink on bg must be readable, accentInk on accent must be readable.
 - Pick 7–10 sections that suit the business (a restaurant needs a menu + gallery; a SaaS needs features + pricing; etc.). ALWAYS include a navbar first and a footer last.
-- The "direction" should make this build feel distinct, so two builds of the same business can differ.`;
+- The "direction" should make this build feel distinct, so two builds of the same business can differ.
+- Make "layout", "motion" and "reference" specific and ambitious — they set the quality bar every section is built to. Aim at genuinely premium, $100K-agency work.`;
 
 function sectionSystem(brief: DesignBrief): string {
   return `You are building ONE section of a bespoke marketing website that is part of a coherent whole. Write a single, complete, self-contained HTML <section> (or <nav>/<header>/<footer> where appropriate) and NOTHING else — no <html>, <head>, <body>, no markdown fences, no commentary.
@@ -97,6 +104,9 @@ function sectionSystem(brief: DesignBrief): string {
 Use these EXACT brand decisions so every section matches:
 - Brand: ${brief.brandName} — ${brief.industry}
 - Creative direction: ${brief.direction}
+- Layout language (honour it): ${brief.layout}
+- Motion language: ${brief.motion}
+- Quality bar to emulate: ${brief.reference}
 - Copy voice: ${brief.voice}
 - Colours (use these exact hex values via Tailwind arbitrary classes like bg-[${brief.palette.bg}] text-[${brief.palette.ink}] etc.): bg ${brief.palette.bg}, ink/text ${brief.palette.ink}, muted ${brief.palette.muted}, surface ${brief.palette.surface}, accent ${brief.palette.accent}, text-on-accent ${brief.palette.accentInk}.
 - Fonts (already loaded globally): display = "${brief.fonts.display}" (use class font-['${brief.fonts.display}'] or inline style for headings), body = "${brief.fonts.body}" (default).
@@ -139,6 +149,9 @@ export async function generateDesignBrief(prompt: string, variationHint?: string
     industry: obj.industry || "",
     direction: obj.direction || "",
     voice: obj.voice || "",
+    layout: obj.layout || "",
+    motion: obj.motion || "",
+    reference: obj.reference || "",
     palette: obj.palette,
     fonts: obj.fonts,
     sections,

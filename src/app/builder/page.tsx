@@ -265,9 +265,10 @@ function BuilderInner() {
             });
             setTailoring(false);
             setStatus("done");
-            // spawn pages are already Opus-per-section; only the slower
-            // whole-page engine ("ai") gets the background polish pass.
-            if (data.engine === "ai") void refineSite(data.html, text, genId);
+            // Quality pass: parallel critics → fixer, in the background after
+            // first paint (move #2, now critic-powered). Runs for spawn and the
+            // whole-page engine; regression-guarded so it can only improve.
+            if (data.engine === "ai" || data.engine === "spawn") void refineSite(data.html, text, genId);
             return;
           }
         }

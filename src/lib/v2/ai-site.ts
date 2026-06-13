@@ -286,6 +286,63 @@ Rules:
 - Keep it a single self-contained document: Tailwind via the CDN, Google Fonts, vanilla JS only. No React, no imports, no build step.
 - Start with <!DOCTYPE html>, end with </html>. Output ONLY the HTML — no commentary, no markdown fences.`;
 
+// Specialist critics run in PARALLEL over the finished page, each an expert at
+// one thing, producing concrete notes. A single fixer then applies them all.
+// This is the "spawn more, specialized" quality lever — far sharper than one
+// generalist "make it better" pass. Critics use a fast model (small analysis
+// output); the fixer uses the premium chain (callForHtml: Opus → Sonnet).
+const CRITIC_MODEL = "claude-sonnet-4-6";
+
+const CRITICS: Array<{ role: string; system: string }> = [
+  {
+    role: "design",
+    system:
+      "You are a senior design director. Review this finished marketing website's HTML and list up to 5 SPECIFIC, concrete problems holding it back from $100K-agency quality — weak typographic hierarchy, timid spacing, a generic hero, bland or low-effort colour use, repetitive sections, poor imagery choices. Bullet points only, each one actionable. No prose, no praise.",
+  },
+  {
+    role: "accessibility",
+    system:
+      "You are an accessibility & UX auditor. Review this website's HTML and list up to 5 SPECIFIC issues: low contrast (name the offending colours), missing alt text, tiny tap targets, unlabelled controls, poor mobile layout, missing focus states. Bullet points only, each one actionable. No prose.",
+  },
+  {
+    role: "copy",
+    system:
+      "You are a sharp brand copywriter. Review this website's copy and list up to 5 SPECIFIC weaknesses: vague headlines, generic/placeholder phrases, weak CTAs, missing value propositions, jargon. Quote the offending text and give a punchier rewrite for each. Bullet points only. No prose.",
+  },
+];
+
+async function runCritics(html: string): Promise<string> {
+  const results = await Promise.all(
+    CRITICS.map(async (c) => {
+      try {
+        const res = await callLLMWithFailover({
+          model: CRITIC_MODEL,
+          system: c.system,
+          userMessage: `HTML to review:\n\n${html}`,
+          maxTokens: 700,
+        });
+        const t = (res.text || "").trim();
+        return t ? `### ${c.role} critique\n${t}` : "";
+      } catch {
+        return "";
+      }
+    }),
+  );
+  return results.filter(Boolean).join("\n\n");
+}
+
+const FIXER_SYSTEM = `You are a senior design director and front-end engineer. You will receive a finished marketing website (complete HTML) and a list of SPECIFIC critiques from your design, accessibility and copy reviewers. Apply every fix you reasonably can, elevating the page to $100K-agency quality.
+
+Rules:
+- KEEP everything already strong. Do NOT remove sections or strip content — only improve. Same page, materially better.
+- Address the critiques concretely: fix contrast, sharpen copy, strengthen hierarchy and spacing, vary repetitive sections, improve imagery use.
+- Single self-contained document: Tailwind via the CDN, Google Fonts, vanilla JS only. No React, no imports, no build step.
+- Start with <!DOCTYPE html>, end with </html>. Output ONLY the HTML — no commentary, no markdown fences.`;
+
+/**
+ * Self-review & auto-fix via PARALLEL specialist critics → one fixer. Never
+ * throws; the regression guard keeps the original if the result drops content.
+ */
 export async function reviewAndImproveAiSite(opts: {
   html: string;
   prompt: string;
@@ -294,14 +351,24 @@ export async function reviewAndImproveAiSite(opts: {
   const html = (opts.html || "").trim();
   if (!html) return { ok: false, reason: "no page to review" };
 
-  // Regression guard as the accept gate: a genuine polish keeps (or grows) the
-  // content; a much shorter result means the model dropped sections — reject it
-  // and keep the original. Tries Opus → Sonnet like the other passes.
+  // 1) Specialist critics, in parallel → concrete notes (best-effort).
+  let notes = "";
+  try {
+    notes = await runCritics(html);
+  } catch {
+    notes = "";
+  }
+
+  // 2) Fixer applies the notes (or falls back to a generic senior review if the
+  // critics produced nothing). Opus → Sonnet via callForHtml; regression-guarded.
+  const brand = opts.brandName ? `\nBrand: ${opts.brandName}` : "";
+  const userMessage = notes
+    ? `Business: ${opts.prompt}${brand}\n\nReviewer critiques to fix:\n\n${notes}\n\nApply the fixes and output the full, improved HTML document.\n\n${html}`
+    : `Business: ${opts.prompt}${brand}\n\nReview and improve this website. Output only the full, improved HTML document.\n\n${html}`;
+
   const r = await callForHtml(
-    REVIEW_SYSTEM,
-    `Business: ${opts.prompt}` +
-      (opts.brandName ? `\nBrand: ${opts.brandName}` : "") +
-      `\n\nReview and improve this website. Output only the full, improved HTML document.\n\n${html}`,
+    notes ? FIXER_SYSTEM : REVIEW_SYSTEM,
+    userMessage,
     (improved) => improved.length >= html.length * 0.7,
   );
   return r
