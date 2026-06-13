@@ -21,17 +21,20 @@
  * reliably. If generation fails for ANY reason, the caller falls back to the
  * deterministic registry render, so the preview is never blank.
  *
- * Model: Sonnet 4.6 (the sanctioned generation model per Rule 35 — fast,
- * excellent at self-contained UI, cross-provider failover built in). The
- * design quality comes from the approach, not from a specific model.
+ * Model: Opus 4.7 (Craig's call, 2026-06-13 — after the whole-page approach
+ * proved Opus produces the bespoke "$100K" output his old slot-filling
+ * pipeline never could). callLLMWithFailover automatically fails over to
+ * Sonnet 4.6 and then other providers if Opus is unavailable, so a build can
+ * never hard-fail on model availability. The quality comes from the approach
+ * as much as the model.
  */
 
 import { callLLMWithFailover } from "@/lib/llm-provider";
 
-// Sonnet 4.6 — fast, strong at self-contained UI, and Rule-35-sanctioned for
-// generation. callLLMWithFailover transparently fails over to other providers
-// if Anthropic is unavailable.
-const GENERATION_MODEL = "claude-sonnet-4-6";
+// Opus 4.7 — Craig's chosen generation model for the whole-page engine
+// (2026-06-13). callLLMWithFailover transparently fails over to Sonnet 4.6 and
+// then other providers if Opus is ever unavailable, so a build never hard-fails.
+const GENERATION_MODEL = "claude-opus-4-7";
 
 // Big enough for a full premium landing page (the demo pages were ~18–20K
 // output tokens) with headroom so the document is never truncated mid-tag.
