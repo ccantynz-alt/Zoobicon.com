@@ -82,6 +82,8 @@ function BuilderInner() {
   // document (not streamed sections); aiHtml holds that document so the
   // refine chat can edit the whole page. null ⇒ the streamed/registry engine.
   const [aiHtml, setAiHtml] = useState<string | null>(null);
+  // Live HTML as the AI streams it in — shown as a "watch it build" console.
+  const [buildLog, setBuildLog] = useState("");
   const [totalSections, setTotalSections] = useState(0);
   const [sectionsIn, setSectionsIn] = useState(0); // base sections landed
   const [tailoring, setTailoring] = useState(false); // AI copy pass running
@@ -103,6 +105,7 @@ function BuilderInner() {
   const genIdRef = useRef(0); // guards against a stale stream writing state
   const autoStartedRef = useRef(false);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const buildLogRef = useRef<HTMLPreElement | null>(null);
   // Live source per section index — refine edits stack on the real current code.
   const sectionMetaRef = useRef<Map<number, { category: string; code: string }>>(new Map());
 
@@ -134,6 +137,11 @@ function BuilderInner() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [chat]);
+
+  // Keep the live build console pinned to the latest streamed line.
+  useEffect(() => {
+    if (buildLogRef.current) buildLogRef.current.scrollTop = buildLogRef.current.scrollHeight;
+  }, [buildLog]);
 
   const pushSection = useCallback((index: number, html: string, js?: string) => {
     if (readyRef.current && iframeRef.current?.contentWindow) {
@@ -173,6 +181,7 @@ function BuilderInner() {
       setResult(null);
       setShell(null);
       setAiHtml(null);
+      setBuildLog("");
       setTotalSections(0);
       setSectionsIn(0);
       setTailoring(false);
@@ -187,9 +196,67 @@ function BuilderInner() {
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => setElapsed((Date.now() - started) / 1000), 100);
 
-      // PRIMARY ENGINE: the model designs + writes the whole page and returns
-      // a finished HTML document. Bespoke ($100K) output, and the browser
-      // executes none of it — it just displays it — so it can't blank.
+      // PRIMARY ENGINE: stream the whole-page design live ("watch it build")
+      // with a cached prompt. The browser executes none of the generated code
+      // — it only displays the finished HTML — so it can't blank.
+      try {
+        const sres = await fetch("/api/v2/build/ai/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text }),
+        });
+        if (genId !== genIdRef.current) return;
+        if (sres.ok && sres.body) {
+          const reader = sres.body.getReader();
+          const decoder = new TextDecoder();
+          let sbuf = "";
+          let acc = "";
+          let finished = false;
+          // eslint-disable-next-line no-constant-condition
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            if (genId !== genIdRef.current) {
+              try { await reader.cancel(); } catch { /* closed */ }
+              return;
+            }
+            sbuf += decoder.decode(value, { stream: true });
+            const parts = sbuf.split("\n\n");
+            sbuf = parts.pop() || "";
+            for (const part of parts) {
+              const line = part.replace(/^data:\s?/, "").trim();
+              if (!line) continue;
+              let evt: Record<string, unknown>;
+              try { evt = JSON.parse(line); } catch { continue; }
+              if (evt.type === "delta") {
+                acc += (evt.text as string) || "";
+                setBuildLog(acc.length > 8000 ? acc.slice(-8000) : acc);
+              } else if (evt.type === "done" && typeof evt.html === "string") {
+                const html = evt.html as string;
+                setShell(html);
+                setAiHtml(evt.engine === "ai" ? html : null);
+                setResult({
+                  html,
+                  componentIds: (evt.componentIds as string[]) || [],
+                  industry: (evt.industry as string) || "",
+                  aiUsed: evt.engine === "ai",
+                });
+                setStatus("done");
+                finished = true;
+              }
+              // evt.type === "error" → let the fallback engines below run
+            }
+            if (finished) break;
+          }
+          try { await reader.cancel(); } catch { /* closed */ }
+          if (finished) return;
+        }
+      } catch {
+        // Live stream unavailable — fall through to the one-shot engines below.
+      }
+
+      // FALLBACK 2: one-shot whole-page AI (no streaming, but cross-provider
+      // failover). The browser still only displays finished HTML.
       try {
         const aiRes = await fetch("/api/v2/build/ai", {
           method: "POST",
@@ -768,9 +835,9 @@ function BuilderInner() {
             </div>
           )}
 
-          {/* Building, shell not yet arrived (~1s) */}
+          {/* Building — spinner + live "watch it build" console */}
           {building && !shell && (
-            <div className="flex flex-1 items-center justify-center">
+            <div className="flex flex-1 flex-col items-center justify-center gap-5 px-6 py-8">
               <div className="text-center">
                 <div
                   className="mx-auto mb-4 h-9 w-9 animate-spin rounded-full"
@@ -788,9 +855,34 @@ function BuilderInner() {
                     : "Polishing the details…"}
                 </p>
                 <p className="mt-1 text-[12px]" style={{ color: "var(--zb-muted)" }}>
-                  {elapsed.toFixed(1)}s
+                  {buildLog ? "Designing live" : "Warming up"} · {elapsed.toFixed(1)}s
                 </p>
               </div>
+              {buildLog && (
+                <div className="w-full max-w-2xl">
+                  <div
+                    className="mb-1.5 flex items-center gap-1.5 text-[10.5px] font-semibold uppercase tracking-wider"
+                    style={{ color: "var(--zb-muted)" }}
+                  >
+                    <Sparkles size={11} style={{ color: "var(--zb-accent)" }} />
+                    Watch it build
+                  </div>
+                  <pre
+                    ref={buildLogRef}
+                    className="h-44 w-full overflow-auto rounded-xl p-3 text-[10.5px] leading-relaxed"
+                    style={{
+                      background: "#0b0b0d",
+                      color: "#c7c7d1",
+                      border: "1px solid var(--zb-line)",
+                      fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
+                      whiteSpace: "pre-wrap",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {buildLog}
+                  </pre>
+                </div>
+              )}
             </div>
           )}
 
