@@ -145,6 +145,16 @@ function BuilderInner() {
     if (buildLogRef.current) buildLogRef.current.scrollTop = buildLogRef.current.scrollHeight;
   }, [buildLog]);
 
+  // Stop the elapsed timer the instant a build settles (the page is on screen),
+  // not at the very end of background work — fixes the timer running on after
+  // the site is clearly finished.
+  useEffect(() => {
+    if (status !== "building" && timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+  }, [status]);
+
   const pushSection = useCallback((index: number, html: string, js?: string) => {
     if (readyRef.current && iframeRef.current?.contentWindow) {
       iframeRef.current.contentWindow.postMessage({ type: "zb-section", index, html, js }, "*");
@@ -241,13 +251,18 @@ function BuilderInner() {
         if (genId !== genIdRef.current) return;
         if (spawnRes.ok) {
           const data = (await spawnRes.json().catch(() => null)) as
-            | { ok: boolean; html?: string; engine?: string; industry?: string }
+            | { ok: boolean; html?: string; engine?: string; industry?: string; sectionCount?: number }
             | null;
           if (genId !== genIdRef.current) return;
           if (data?.ok && data.html) {
             setShell(data.html);
             setAiHtml(data.html); // single-document page → refine edits the whole doc
-            setResult({ html: data.html, componentIds: [], industry: data.industry || "", aiUsed: true });
+            setResult({
+              html: data.html,
+              componentIds: Array.from({ length: data.sectionCount || 0 }, (_, i) => `s${i}`),
+              industry: data.industry || "",
+              aiUsed: true,
+            });
             setTailoring(false);
             setStatus("done");
             // spawn pages are already Opus-per-section; only the slower

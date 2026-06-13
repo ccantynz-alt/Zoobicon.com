@@ -31,6 +31,7 @@
 
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { streamClaude } from "@/lib/anthropic-cached";
+import { finalizeAiHtml, normalizeAiLinks } from "@/lib/v2/post-process";
 
 // Opus 4.8 — Craig's chosen generation model for the whole-page engine. We try
 // Opus first, then automatically fall back to Sonnet 4.6 (still a real, bespoke
@@ -160,7 +161,7 @@ export async function generateAiSite(opts: {
 
   const r = await callForHtml(BUILD_SYSTEM, userMessage);
   return r
-    ? { ok: true, html: r.html, model: r.model }
+    ? { ok: true, html: finalizeAiHtml(r.html, prompt), model: r.model }
     : { ok: false, reason: "no model returned a complete HTML document" };
 }
 
@@ -182,7 +183,7 @@ export async function editAiSite(opts: {
     `Instruction: ${instruction}\n\nCurrent HTML document:\n\n${html}`,
   );
   return r
-    ? { ok: true, html: r.html, model: r.model }
+    ? { ok: true, html: normalizeAiLinks(r.html), model: r.model }
     : { ok: false, reason: "edit did not return a complete document" };
 }
 
@@ -304,6 +305,6 @@ export async function reviewAndImproveAiSite(opts: {
     (improved) => improved.length >= html.length * 0.7,
   );
   return r
-    ? { ok: true, html: r.html, model: r.model }
+    ? { ok: true, html: finalizeAiHtml(r.html, opts.prompt), model: r.model }
     : { ok: false, reason: "no usable improvement — kept original" };
 }

@@ -26,6 +26,7 @@
  */
 
 import { callLLMWithFailover } from "@/lib/llm-provider";
+import { finalizeAiHtml } from "@/lib/v2/post-process";
 
 // Opus first, Sonnet as automatic fallback (a real design either way). Because
 // sections are spawned concurrently, Opus-per-section is still fast.
@@ -244,7 +245,7 @@ export async function spawnSite(opts: { prompt: string; variationHint?: string }
 
   return {
     ok: true,
-    html: assemblePage(brief, good),
+    html: finalizeAiHtml(assemblePage(brief, good), prompt),
     brief,
     model: SPAWN_MODELS[0],
     sectionCount: good.length,
