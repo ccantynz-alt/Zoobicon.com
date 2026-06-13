@@ -32,10 +32,15 @@
 import { callLLMWithFailover } from "@/lib/llm-provider";
 import { streamClaude } from "@/lib/anthropic-cached";
 
-// Opus 4.7 — Craig's chosen generation model for the whole-page engine
-// (2026-06-13). callLLMWithFailover transparently fails over to Sonnet 4.6 and
-// then other providers if Opus is ever unavailable, so a build never hard-fails.
-const GENERATION_MODEL = "claude-opus-4-7";
+// Opus 4.8 — Craig's chosen generation model for the whole-page engine. We try
+// Opus first, then automatically fall back to Sonnet 4.6 (still a real, bespoke
+// AI design) — so a wrong or unavailable Opus ID can NEVER again silently drop
+// a build to the old template engine. (Earlier the ID was the stale
+// "claude-opus-4-7", which the live API rejected, so EVERY build fell through
+// to the template path — exactly the "it still looks templated + slow" bug.)
+const GENERATION_MODEL = "claude-opus-4-8";
+const FALLBACK_MODEL = "claude-sonnet-4-6";
+const GENERATION_MODELS = [GENERATION_MODEL, FALLBACK_MODEL];
 
 // Big enough for a full premium landing page (the demo pages were ~18–20K
 // output tokens) with headroom so the document is never truncated mid-tag.
@@ -112,6 +117,31 @@ function looksLikeCompletePage(html: string): boolean {
   return l.includes("<html") && l.includes("</html>") && l.includes("<body") && l.includes("</body>");
 }
 
+// Try each generation model (Opus → Sonnet) until one returns a complete HTML
+// document. callLLMWithFailover handles cross-provider failover, but it RETHROWS
+// non-transient errors (e.g. a rejected/stale model ID) without trying anything
+// else — so this loop is what guarantees a bad Opus ID falls to Sonnet (a real
+// AI design) instead of bubbling up and dropping the build to the template
+// engine. `accept` is an optional extra gate (used by the review pass).
+async function callForHtml(
+  system: string,
+  userMessage: string,
+  accept?: (html: string) => boolean,
+): Promise<{ html: string; model: string } | null> {
+  for (const model of GENERATION_MODELS) {
+    try {
+      const res = await callLLMWithFailover({ model, system, userMessage, maxTokens: MAX_TOKENS });
+      const html = extractHtmlDoc(res.text || "");
+      if (looksLikeCompletePage(html) && (!accept || accept(html))) {
+        return { html, model: res.model || model };
+      }
+    } catch {
+      // try the next model
+    }
+  }
+  return null;
+}
+
 /**
  * Design + build a complete bespoke website for the prompt. Never throws —
  * returns { ok:false } on any failure so the caller can fall back.
@@ -128,21 +158,10 @@ export async function generateAiSite(opts: {
     (opts.brandName ? `\n\nBrand name: ${opts.brandName}` : "") +
     `\n\nDesign and build the complete website now. Output only the HTML document.`;
 
-  try {
-    const res = await callLLMWithFailover({
-      model: GENERATION_MODEL,
-      system: BUILD_SYSTEM,
-      userMessage,
-      maxTokens: MAX_TOKENS,
-    });
-    const html = extractHtmlDoc(res.text || "");
-    if (!looksLikeCompletePage(html)) {
-      return { ok: false, reason: "model did not return a complete HTML document" };
-    }
-    return { ok: true, html, model: res.model || GENERATION_MODEL };
-  } catch (err) {
-    return { ok: false, reason: err instanceof Error ? err.message : "generation failed" };
-  }
+  const r = await callForHtml(BUILD_SYSTEM, userMessage);
+  return r
+    ? { ok: true, html: r.html, model: r.model }
+    : { ok: false, reason: "no model returned a complete HTML document" };
 }
 
 /**
@@ -158,21 +177,13 @@ export async function editAiSite(opts: {
   if (!html) return { ok: false, reason: "no page to edit" };
   if (!instruction) return { ok: false, reason: "no instruction" };
 
-  try {
-    const res = await callLLMWithFailover({
-      model: GENERATION_MODEL,
-      system: EDIT_SYSTEM,
-      userMessage: `Instruction: ${instruction}\n\nCurrent HTML document:\n\n${html}`,
-      maxTokens: MAX_TOKENS,
-    });
-    const out = extractHtmlDoc(res.text || "");
-    if (!looksLikeCompletePage(out)) {
-      return { ok: false, reason: "edit did not return a complete document" };
-    }
-    return { ok: true, html: out, model: res.model || GENERATION_MODEL };
-  } catch (err) {
-    return { ok: false, reason: err instanceof Error ? err.message : "edit failed" };
-  }
+  const r = await callForHtml(
+    EDIT_SYSTEM,
+    `Instruction: ${instruction}\n\nCurrent HTML document:\n\n${html}`,
+  );
+  return r
+    ? { ok: true, html: r.html, model: r.model }
+    : { ok: false, reason: "edit did not return a complete document" };
 }
 
 // ───────────────────────────────────────────────────────────────────────
@@ -208,32 +219,38 @@ export async function* streamAiSite(opts: {
     (opts.brandName ? `\n\nBrand name: ${opts.brandName}` : "") +
     `\n\nDesign and build the complete website now. Output only the HTML document.`;
 
-  let full = "";
-  try {
-    for await (const d of streamClaude({
-      model: GENERATION_MODEL,
-      system: BUILD_SYSTEM, // > 1024 tokens ⇒ auto-cached by anthropic-cached
-      messages: [{ role: "user", content: userMessage }],
-      maxTokens: MAX_TOKENS,
-      temperature: 0.7,
-    })) {
-      if (d.type === "text" && d.text) {
-        full += d.text;
-        yield { type: "delta", text: d.text };
+  // Try Opus first, then Sonnet. If a stream errors after a COMPLETE document
+  // already arrived (e.g. the timeout fires at the tail), we still use it; only
+  // an incomplete result falls through to the next model. This guarantees a
+  // real AI design even if Opus is rejected/slow — never a template drop.
+  for (const model of GENERATION_MODELS) {
+    let full = "";
+    try {
+      for await (const d of streamClaude({
+        model,
+        system: BUILD_SYSTEM, // > 1024 tokens ⇒ auto-cached by anthropic-cached
+        messages: [{ role: "user", content: userMessage }],
+        maxTokens: MAX_TOKENS,
+        temperature: 0.7,
+        timeoutMs: 280_000, // real runway for Opus (the SSE route's maxDuration is 300s)
+      })) {
+        if (d.type === "text" && d.text) {
+          full += d.text;
+          yield { type: "delta", text: d.text };
+        }
+        // A stray per-chunk parse error is non-fatal — keep accumulating.
       }
-      // A stray per-chunk parse error is non-fatal — keep accumulating.
+    } catch {
+      // Stream errored — a complete doc may still have arrived first (checked
+      // next). Otherwise fall through to the next model.
     }
-  } catch (err) {
-    yield { type: "error", reason: err instanceof Error ? err.message : "stream failed" };
-    return;
+    const html = extractHtmlDoc(full);
+    if (looksLikeCompletePage(html)) {
+      yield { type: "result", html, model };
+      return;
+    }
   }
-
-  const html = extractHtmlDoc(full);
-  if (!looksLikeCompletePage(html)) {
-    yield { type: "error", reason: "model did not return a complete HTML document" };
-    return;
-  }
-  yield { type: "result", html, model: GENERATION_MODEL };
+  yield { type: "error", reason: "no model returned a complete HTML document" };
 }
 
 // ───────────────────────────────────────────────────────────────────────
@@ -276,27 +293,17 @@ export async function reviewAndImproveAiSite(opts: {
   const html = (opts.html || "").trim();
   if (!html) return { ok: false, reason: "no page to review" };
 
-  try {
-    const res = await callLLMWithFailover({
-      model: GENERATION_MODEL,
-      system: REVIEW_SYSTEM,
-      userMessage:
-        `Business: ${opts.prompt}` +
-        (opts.brandName ? `\nBrand: ${opts.brandName}` : "") +
-        `\n\nReview and improve this website. Output only the full, improved HTML document.\n\n${html}`,
-      maxTokens: MAX_TOKENS,
-    });
-    const improved = extractHtmlDoc(res.text || "");
-    if (!looksLikeCompletePage(improved)) {
-      return { ok: false, reason: "review did not return a complete document" };
-    }
-    // Regression guard: a genuine polish keeps (or grows) the content. A much
-    // shorter result means the model dropped sections — reject, keep original.
-    if (improved.length < html.length * 0.7) {
-      return { ok: false, reason: "review output too short — kept original" };
-    }
-    return { ok: true, html: improved, model: res.model || GENERATION_MODEL };
-  } catch (err) {
-    return { ok: false, reason: err instanceof Error ? err.message : "review failed" };
-  }
+  // Regression guard as the accept gate: a genuine polish keeps (or grows) the
+  // content; a much shorter result means the model dropped sections — reject it
+  // and keep the original. Tries Opus → Sonnet like the other passes.
+  const r = await callForHtml(
+    REVIEW_SYSTEM,
+    `Business: ${opts.prompt}` +
+      (opts.brandName ? `\nBrand: ${opts.brandName}` : "") +
+      `\n\nReview and improve this website. Output only the full, improved HTML document.\n\n${html}`,
+    (improved) => improved.length >= html.length * 0.7,
+  );
+  return r
+    ? { ok: true, html: r.html, model: r.model }
+    : { ok: false, reason: "no usable improvement — kept original" };
 }
