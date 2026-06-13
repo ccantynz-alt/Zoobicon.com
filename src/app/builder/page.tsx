@@ -238,6 +238,42 @@ function BuilderInner() {
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => setElapsed((Date.now() - started) / 1000), 100);
 
+      // CLONE PATH: if the prompt references a real website, faithfully COPY it
+      // (fetch the real page → recreate its content, brand, sections, images).
+      // noUrl ⇒ a normal creative build; a clone failure ⇒ fall back to a fresh
+      // build but TELL the user why (never silently hand back a different site).
+      let cloneFailReason: string | null = null;
+      try {
+        const cloneRes = await fetch("/api/v2/build/clone", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text }),
+        });
+        if (genId !== genIdRef.current) return;
+        if (cloneRes.ok) {
+          const data = (await cloneRes.json().catch(() => null)) as
+            | { ok?: boolean; html?: string; reason?: string; noUrl?: boolean; sourceUrl?: string }
+            | null;
+          if (genId !== genIdRef.current) return;
+          if (data?.ok && data.html) {
+            setShell(data.html);
+            setAiHtml(data.html);
+            setResult({ html: data.html, componentIds: [], industry: data.sourceUrl || "copied site", aiUsed: true });
+            setTailoring(false);
+            setStatus("done");
+            return;
+          }
+          if (data && data.reason) cloneFailReason = data.reason;
+        }
+      } catch {
+        // clone route unreachable — proceed to a normal build below.
+      }
+      if (cloneFailReason) {
+        setChat([
+          { role: "system", text: `I couldn't copy that site — ${cloneFailReason} So I designed a fresh version instead; refine it below.`, ok: false },
+        ]);
+      }
+
       // FASTEST ENGINE: parallel-spawn — a design brief, then every section
       // built concurrently (Opus per section). ~30–40s for a bespoke page, and
       // a fresh creative direction each build. The browser only displays the
