@@ -21,17 +21,21 @@
  * reliably. If generation fails for ANY reason, the caller falls back to the
  * deterministic registry render, so the preview is never blank.
  *
- * Model: Sonnet 4.6 (the sanctioned generation model per Rule 35 — fast,
- * excellent at self-contained UI, cross-provider failover built in). The
- * design quality comes from the approach, not from a specific model.
+ * Model: Opus 4.7 (Craig's call, 2026-06-13 — after the whole-page approach
+ * proved Opus produces the bespoke "$100K" output his old slot-filling
+ * pipeline never could). callLLMWithFailover automatically fails over to
+ * Sonnet 4.6 and then other providers if Opus is unavailable, so a build can
+ * never hard-fail on model availability. The quality comes from the approach
+ * as much as the model.
  */
 
 import { callLLMWithFailover } from "@/lib/llm-provider";
+import { streamClaude } from "@/lib/anthropic-cached";
 
-// Sonnet 4.6 — fast, strong at self-contained UI, and Rule-35-sanctioned for
-// generation. callLLMWithFailover transparently fails over to other providers
-// if Anthropic is unavailable.
-const GENERATION_MODEL = "claude-sonnet-4-6";
+// Opus 4.7 — Craig's chosen generation model for the whole-page engine
+// (2026-06-13). callLLMWithFailover transparently fails over to Sonnet 4.6 and
+// then other providers if Opus is ever unavailable, so a build never hard-fails.
+const GENERATION_MODEL = "claude-opus-4-7";
 
 // Big enough for a full premium landing page (the demo pages were ~18–20K
 // output tokens) with headroom so the document is never truncated mid-tag.
@@ -169,4 +173,65 @@ export async function editAiSite(opts: {
   } catch (err) {
     return { ok: false, reason: err instanceof Error ? err.message : "edit failed" };
   }
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// STREAMING GENERATION — the same whole-page engine, but yields the page as
+// the model writes it. Two speed wins at once:
+//   • Perceived speed: the builder shows the site being written live instead
+//     of a 60–120s spinner.
+//   • Real speed + cost: streamClaude auto-applies prompt caching to any
+//     system prompt over ~1024 tokens (BUILD_SYSTEM is well over), so repeat
+//     builds/edits within the cache window pay a fraction of the input cost
+//     and start faster.
+// streamClaude talks to Anthropic directly (no cross-provider failover), so
+// the SSE route falls back to the non-streaming generateAiSite() — which DOES
+// fail over — and then to the registry render, keeping "never blank" intact.
+// ───────────────────────────────────────────────────────────────────────
+
+export type AiStreamEvent =
+  | { type: "delta"; text: string }
+  | { type: "result"; html: string; model: string }
+  | { type: "error"; reason: string };
+
+export async function* streamAiSite(opts: {
+  prompt: string;
+  brandName?: string;
+}): AsyncGenerator<AiStreamEvent, void, unknown> {
+  const prompt = (opts.prompt || "").trim();
+  if (!prompt) {
+    yield { type: "error", reason: "empty prompt" };
+    return;
+  }
+  const userMessage =
+    `Business to build a website for:\n\n${prompt}` +
+    (opts.brandName ? `\n\nBrand name: ${opts.brandName}` : "") +
+    `\n\nDesign and build the complete website now. Output only the HTML document.`;
+
+  let full = "";
+  try {
+    for await (const d of streamClaude({
+      model: GENERATION_MODEL,
+      system: BUILD_SYSTEM, // > 1024 tokens ⇒ auto-cached by anthropic-cached
+      messages: [{ role: "user", content: userMessage }],
+      maxTokens: MAX_TOKENS,
+      temperature: 0.7,
+    })) {
+      if (d.type === "text" && d.text) {
+        full += d.text;
+        yield { type: "delta", text: d.text };
+      }
+      // A stray per-chunk parse error is non-fatal — keep accumulating.
+    }
+  } catch (err) {
+    yield { type: "error", reason: err instanceof Error ? err.message : "stream failed" };
+    return;
+  }
+
+  const html = extractHtmlDoc(full);
+  if (!looksLikeCompletePage(html)) {
+    yield { type: "error", reason: "model did not return a complete HTML document" };
+    return;
+  }
+  yield { type: "result", html, model: GENERATION_MODEL };
 }
