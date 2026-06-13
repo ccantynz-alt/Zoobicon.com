@@ -33,6 +33,7 @@ import { callLLMWithFailover } from "@/lib/llm-provider";
 import { streamClaude } from "@/lib/anthropic-cached";
 import { finalizeAiHtml, normalizeAiLinks } from "@/lib/v2/post-process";
 import { applyRealImages } from "@/lib/v2/images";
+import { visionCritique } from "@/lib/v2/vision";
 
 // Opus 4.8 — Craig's chosen generation model for the whole-page engine. We try
 // Opus first, then automatically fall back to Sonnet 4.6 (still a real, bespoke
@@ -312,23 +313,29 @@ const CRITICS: Array<{ role: string; system: string }> = [
 ];
 
 async function runCritics(html: string): Promise<string> {
-  const results = await Promise.all(
-    CRITICS.map(async (c) => {
-      try {
-        const res = await callLLMWithFailover({
-          model: CRITIC_MODEL,
-          system: c.system,
-          userMessage: `HTML to review:\n\n${html}`,
-          maxTokens: 700,
-        });
-        const t = (res.text || "").trim();
-        return t ? `### ${c.role} critique\n${t}` : "";
-      } catch {
-        return "";
-      }
-    }),
-  );
-  return results.filter(Boolean).join("\n\n");
+  // Code critics AND the vision critic, all in parallel. The vision critic
+  // screenshots the rendered page and judges how it actually LOOKS ("" when
+  // Cloudflare Browser Rendering isn't enabled — the code critics carry on).
+  const [results, vision] = await Promise.all([
+    Promise.all(
+      CRITICS.map(async (c) => {
+        try {
+          const res = await callLLMWithFailover({
+            model: CRITIC_MODEL,
+            system: c.system,
+            userMessage: `HTML to review:\n\n${html}`,
+            maxTokens: 700,
+          });
+          const t = (res.text || "").trim();
+          return t ? `### ${c.role} critique\n${t}` : "";
+        } catch {
+          return "";
+        }
+      }),
+    ),
+    visionCritique(html),
+  ]);
+  return [...results, vision].filter(Boolean).join("\n\n");
 }
 
 const FIXER_SYSTEM = `You are a senior design director and front-end engineer. You will receive a finished marketing website (complete HTML) and a list of SPECIFIC critiques from your design, accessibility and copy reviewers. Apply every fix you reasonably can, elevating the page to $100K-agency quality.
