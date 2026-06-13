@@ -228,9 +228,41 @@ function BuilderInner() {
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => setElapsed((Date.now() - started) / 1000), 100);
 
-      // PRIMARY ENGINE: stream the whole-page design live ("watch it build")
-      // with a cached prompt. The browser executes none of the generated code
-      // — it only displays the finished HTML — so it can't blank.
+      // FASTEST ENGINE: parallel-spawn — a design brief, then every section
+      // built concurrently (Opus per section). ~30–40s for a bespoke page, and
+      // a fresh creative direction each build. The browser only displays the
+      // finished HTML, so it can't blank.
+      try {
+        const spawnRes = await fetch("/api/v2/build/spawn", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text }),
+        });
+        if (genId !== genIdRef.current) return;
+        if (spawnRes.ok) {
+          const data = (await spawnRes.json().catch(() => null)) as
+            | { ok: boolean; html?: string; engine?: string; industry?: string }
+            | null;
+          if (genId !== genIdRef.current) return;
+          if (data?.ok && data.html) {
+            setShell(data.html);
+            setAiHtml(data.html); // single-document page → refine edits the whole doc
+            setResult({ html: data.html, componentIds: [], industry: data.industry || "", aiUsed: true });
+            setTailoring(false);
+            setStatus("done");
+            // spawn pages are already Opus-per-section; only the slower
+            // whole-page engine ("ai") gets the background polish pass.
+            if (data.engine === "ai") void refineSite(data.html, text, genId);
+            return;
+          }
+        }
+      } catch {
+        // spawn route unreachable — fall through to the streaming engine below.
+      }
+
+      // FALLBACK 1: stream the whole-page design live ("watch it build") with a
+      // cached prompt. The browser executes none of the generated code — it
+      // only displays the finished HTML — so it can't blank.
       try {
         const sres = await fetch("/api/v2/build/ai/stream", {
           method: "POST",
